@@ -34,31 +34,33 @@ const Directory = ({
   if (item.type === 'folder') {
     return (
       <>
-        <tr>
-          <td></td>
-          <td className="align-middle">
-            <p
-              onClick={() => {
-                if (currentFolder === item.name) {
-                  setCurrentFolder(item.parentName);
-                } else {
-                  setCurrentFolder(item.name);
-                  console.log('setting current folder to', item.name);
-                }
-              }}
-            >
-              {item.name === currentFolder ? <StyledOpenFolderIcon /> : <StyledFolderIcon />}
-              {item.name}
-            </p>
-          </td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-        </tr>
+        {item.name !== 'root' && (
+          <tr>
+            <td></td>
+            <td className="align-middle">
+              <p
+                onClick={() => {
+                  if (currentFolder === item.name) {
+                    setCurrentFolder(item.parentName);
+                  } else {
+                    setCurrentFolder(item.name);
+                    console.log('setting current folder to', item.name);
+                  }
+                }}
+              >
+                {item.name === currentFolder ? <StyledOpenFolderIcon /> : <StyledFolderIcon />}
+                {item.name}
+              </p>
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+        )}
         {item.children.map((item) => (
           <Directory
             key={Math.random()}
