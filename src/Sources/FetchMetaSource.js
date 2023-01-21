@@ -17,10 +17,10 @@ export const FetchMeta = (connection) => async (dispatch) => {
     if (containerName === '') {
       console.error('container name was not filled out for some reason');
     }
-    // Get the blob client
+    // Get the blob client.  TODO: REPLACE THIS WITH THE HANDLE WE ALREADY FOUND
     const blobServiceClient = new BlobServiceClient(`https://${accountName}.blob.core.windows.net?${sasToken}`);
     const containerClient = blobServiceClient.getContainerClient(containerName);
-    const blobMetaClient = containerClient.getBlobClient(blobName);
+    const blobMetaClient = containerClient.getBlobClient(blobName.replaceAll('(slash)', '/'));
     const downloadBlockBlobResponse = await blobMetaClient.download();
     const blob = await downloadBlockBlobResponse.blobBody;
     meta_string = await blob.text();
