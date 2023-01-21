@@ -16,7 +16,7 @@ import { About } from './About';
 const App = () => {
   return (
     <div>
-      <Row>
+      <Row style={{ marginTop: '10px' }}>
         <Col></Col>
         <Col md="7" style={{ textAlign: 'center' }}>
           <a href="/">
