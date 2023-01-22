@@ -14,6 +14,7 @@ import Nav from 'react-bootstrap/Nav';
 import { About } from './About';
 import ReactGA from 'react-ga';
 
+// TODO: figure out how to make the google analytics stuff not included when people run a local instance of the site
 const TRACKING_ID = 'G-NEM78RS5ZF';
 ReactGA.initialize(TRACKING_ID);
 
