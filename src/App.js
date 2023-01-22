@@ -41,6 +41,14 @@ const App = () => {
               <Nav.Link href="/about" style={{ fontSize: '24px' }}>
                 About
               </Nav.Link>
+              <a
+                class="nav-link"
+                style={{ fontSize: '24px' }}
+                target="_blank"
+                href="https://github.com/iqengine/iqengine"
+              >
+                GitHub
+              </a>
             </Container>
           </Navbar>
         </Col>
