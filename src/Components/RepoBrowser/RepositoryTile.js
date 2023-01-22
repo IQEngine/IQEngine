@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import React, { useRef, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Card, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
@@ -15,30 +15,32 @@ const RepositoryTile = (props) => {
     updateConnectionSasToken,
     setRecordingList,
   } = props;
+
   const { name, accountName, containerName, imageURL, description, sasToken } = item;
-  const expires = sasToken.slice(sasToken.search('se')).split('&')[0].slice(3, 13); // YEAR-MONTH-DAY
-  const writeable = sasToken.slice(sasToken.search('sp')).split('&')[0].includes('w'); // boolean
-
-  let writeableBool = null;
-
-  if (writeable) {
-    writeableBool = 'R-W';
-  } else {
-    writeableBool = 'R';
-  }
-
   const [isDisabled, setIsDisabled] = useState(false);
+  const [isWarning, setIsWarning] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [dayDifference, setDayDifference] = useState();
+  const [expires, setExpires] = useState();
+  const [writeableBool, setWriteableBool] = useState();
 
-  const errorDiv = useRef('');
-  const todayDate = new Date();
-  const todayFormattedDate = todayDate.toISOString().substring(0, 10);
-  const dayDifference = Math.abs((Date.parse(todayFormattedDate) - Date.parse(expires)) / 86400000);
-
-  const isWarning = todayFormattedDate <= expires && dayDifference <= 7;
-
-  const styleErrorDiv = {
-    display: 'none',
-  };
+  useEffect(() => {
+    const tempExpires = sasToken.slice(sasToken.search('se')).split('&')[0].slice(3, 13); // YEAR-MONTH-DAY
+    const writeable = sasToken.slice(sasToken.search('sp')).split('&')[0].includes('w'); // boolean
+    if (writeable) {
+      setWriteableBool('R-W');
+    } else {
+      setWriteableBool('R');
+    }
+    const todayDate = new Date();
+    const todayFormattedDate = todayDate.toISOString().substring(0, 10);
+    const tempDayDifference = Math.abs((Date.parse(todayFormattedDate) - Date.parse(tempExpires)) / 86400000);
+    setIsWarning(todayFormattedDate <= tempExpires && tempDayDifference <= 7);
+    setIsError(todayFormattedDate > tempExpires);
+    if (todayFormattedDate > tempExpires) setIsDisabled(true);
+    setExpires(tempExpires);
+    setDayDifference(tempDayDifference);
+  }, [sasToken]);
 
   const styleRW = {
     border: '2px solid lightblue',
@@ -53,17 +55,11 @@ const RepositoryTile = (props) => {
   };
 
   const handleOnClick = () => {
-    if (todayFormattedDate > expires) {
-      setIsDisabled(true);
-      errorDiv.current.style = 'auto';
-      errorDiv.current.style.color = 'red';
-    } else {
-      updateConnectionAccountName(accountName);
-      updateConnectionContainerName(containerName);
-      updateConnectionSasToken(sasToken);
-      setRecordingList({ accountName: accountName, containerName: containerName, sasToken: sasToken }); // updates the parent (App.js) state with the RecordingList
-      navigate('/recordings'); // data file
-    }
+    updateConnectionAccountName(accountName);
+    updateConnectionContainerName(containerName);
+    updateConnectionSasToken(sasToken);
+    setRecordingList({ accountName: accountName, containerName: containerName, sasToken: sasToken }); // updates the parent (App.js) state with the RecordingList
+    navigate('/recordings'); // data file
   };
 
   return (
@@ -81,12 +77,10 @@ const RepositoryTile = (props) => {
           <div className="mb-2">Container Name: {containerName}</div>
           <div className="mb-2">{description}</div>
           <div className="mb-3">SAS Token Expiration: {expires}</div>
-          <div ref={errorDiv} style={styleErrorDiv}>
-            ERROR - This SAS token is expired
-          </div>
+          {isError && <div style={{ color: 'red' }}>This SAS token is expired</div>}
           {isWarning && (
             <div style={{ color: 'yellow' }}>
-              WARNING - this token will expire {dayDifference === 0 ? 'today' : 'in ' + dayDifference + ' days'}
+              This token will expire {dayDifference === 0 ? 'today' : 'in ' + dayDifference + ' days'}
             </div>
           )}
         </center>
