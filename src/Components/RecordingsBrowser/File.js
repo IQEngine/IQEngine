@@ -46,38 +46,58 @@ export default function FileRow({
 
   return (
     <tr style={{ textAlign: 'center' }}>
-      <td>
-        {/* If we are looking at a local dir then dont display the spectrogram thumbnail */}
-        {!item.dataFileHandle && (
-          <div className="zoom">
-            <img src={item.thumbnailUrl} alt="Spectrogram Thumbnail" style={{ width: '200px', height: '100px' }} />
-          </div>
-        )}
-      </td>
-      <td className="align-middle" style={{ textAlign: 'left' }}>
-        <Link
-          to={'spectrogram/' + item.name.replace('.sigmf-meta', '')}
-          onClick={() => {
-            updateConnectionMetaFileHandle(item.metaFileHandle);
-            updateConnectionDataFileHandle(item.dataFileHandle);
-            updateConnectionRecording(item.name.replace('.sigmf-meta', ''));
-            updateConnectionBlobClient(item.dataClient);
-            updateBlobTotalBytes(item.lengthInBytes);
-          }}
-        >
-          <h5>{item.name.replaceAll('(slash)', '/').replace('.sigmf-meta', '')}</h5>
-        </Link>
-        {/* File download links */}
-        {!item.dataFileHandle && (
-          <>
-            {'('}download:&nbsp;
-            <a href={item.dataUrl}>data</a>
-            ,&nbsp;
-            <a href={item.metaUrl}>meta</a>
-            {')'}
-          </>
-        )}
-      </td>
+      {/* If we are looking at a recording from blob storage */}
+      {!item.dataFileHandle ? (
+        <>
+          <td>
+            <div className="zoom">
+              <img src={item.thumbnailUrl} alt="Spectrogram Thumbnail" style={{ width: '200px', height: '100px' }} />
+            </div>
+          </td>
+          <td className="align-middle" style={{ textAlign: 'left' }}>
+            <Link
+              to={'spectrogram/' + item.name.replace('.sigmf-meta', '')}
+              onClick={() => {
+                updateConnectionMetaFileHandle(item.metaFileHandle);
+                updateConnectionDataFileHandle(item.dataFileHandle);
+                updateConnectionRecording(item.name.replace('.sigmf-meta', ''));
+                updateConnectionBlobClient(item.dataClient);
+                updateBlobTotalBytes(item.lengthInBytes);
+              }}
+            >
+              <h5>{item.name.replaceAll('(slash)', '/').replace('.sigmf-meta', '')}</h5>
+            </Link>
+            {/* File download links */}
+            <>
+              {'('}download:&nbsp;
+              <a href={item.dataUrl}>data</a>
+              ,&nbsp;
+              <a href={item.metaUrl}>meta</a>
+              {')'}
+            </>
+          </td>
+        </>
+      ) : (
+        // If we are looking at a local recording then hide thumbnail/download links and dont include filename in url so its not included in google analytics
+        <>
+          <td></td>
+          <td className="align-middle" style={{ textAlign: 'left' }}>
+            <Link
+              to={'spectrogram/localfile'}
+              onClick={() => {
+                updateConnectionMetaFileHandle(item.metaFileHandle);
+                updateConnectionDataFileHandle(item.dataFileHandle);
+                updateConnectionRecording(item.name.replace('.sigmf-meta', ''));
+                updateConnectionBlobClient(item.dataClient);
+                updateBlobTotalBytes(item.lengthInBytes);
+              }}
+            >
+              <h5>{item.name.replaceAll('(slash)', '/').replace('.sigmf-meta', '')}</h5>
+            </Link>
+          </td>
+        </>
+      )}
+
       <td className="align-middle">{item.lengthInIQSamples / 1e6} M</td>
       <td className="align-middle">
         <NewlineText text={item.dataType} />

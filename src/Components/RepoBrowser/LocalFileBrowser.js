@@ -50,12 +50,11 @@ const LocalFileBrowser = (props) => {
     if (file1.name.includes('.sigmf-meta')) {
       props.updateConnectionMetaFileHandle(handle1); // store it in redux
       props.updateConnectionDataFileHandle(handle2); // assume other file is data
-      navigate('/recordings/spectrogram/' + file2.name.replace('.sigmf-data', '')); // data file
     } else {
       props.updateConnectionMetaFileHandle(handle2);
       props.updateConnectionDataFileHandle(handle1);
-      navigate('/recordings/' + file1.name.replace('.sigmf-data', '')); // data file
     }
+    navigate('/recordings/spectrogram/localfile'); // dont include filename so that it wont get included in google analytics
   };
 
   const openDir = async () => {
