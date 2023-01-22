@@ -46,9 +46,7 @@ const ScrollBar = (props) => {
 
       // Loop through the samples we downloaded, calc FFT and produce spectrogram image
       const fft_size = window.iq_data['minimap0'].length / 2; // just use the first one to find length
-      const clearBuf = new ArrayBuffer(fft_size * minimapNumFetches * 4); // fills with 0s ie. rgba 0,0,0,0 = transparent
-      let minimap = new Uint8ClampedArray(clearBuf);
-      let startOfs = 0;
+      let magnitudesBuffer = new Float64Array(fft_size * minimapNumFetches); // only typed arrays have set()
       for (let i = 0; i < minimapNumFetches; i++) {
         const samples = window.iq_data['minimap' + i.toString()];
         // Calc PSD
@@ -61,17 +59,26 @@ const ScrollBar = (props) => {
         }
         fftshift(magnitudes); // in-place
         magnitudes = magnitudes.map((x) => 10.0 * Math.log10(x)); // convert to dB
+        magnitudesBuffer.set(magnitudes, i * fft_size);
+      }
 
+      // Find max/min magnitudes across entire minimap
+      const maximum_val = Math.max(...magnitudesBuffer);
+      const minimum_val = Math.min(...magnitudesBuffer);
+
+      const clearBuf = new ArrayBuffer(fft_size * minimapNumFetches * 4); // fills with 0s ie. rgba 0,0,0,0 = transparent
+      let minimap = new Uint8ClampedArray(clearBuf);
+      let startOfs = 0;
+      for (let i = 0; i < minimapNumFetches; i++) {
+        let magnitudes = magnitudesBuffer.slice(i * fft_size, (i + 1) * fft_size);
         // convert to 0 - 255
-        let minimum_val = Math.min(...magnitudes); // the ... tell it that its an array I guess
         magnitudes = magnitudes.map((x) => x - minimum_val); // lowest value is now 0
-        let maximum_val = Math.max(...magnitudes);
         magnitudes = magnitudes.map((x) => x / maximum_val); // highest value is now 1
         magnitudes = magnitudes.map((x) => x * 255); // now from 0 to 255
 
         // apply magnitude min and max
-        const magnitude_max = 255;
-        const magnitude_min = 30;
+        const magnitude_max = 240;
+        const magnitude_min = 100;
         magnitudes = magnitudes.map((x) => x / ((magnitude_max - magnitude_min) / 255));
         magnitudes = magnitudes.map((x) => x - magnitude_min);
 
