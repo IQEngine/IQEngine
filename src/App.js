@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import '@fortawesome/react-fontawesome';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Routes, Route } from 'react-router-dom';
@@ -12,8 +12,16 @@ import { Navbar, Row, Col } from 'react-bootstrap';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import { About } from './About';
+import ReactGA from 'react-ga';
+
+const TRACKING_ID = 'G-NEM78RS5ZF';
+ReactGA.initialize(TRACKING_ID);
 
 const App = () => {
+  useEffect(() => {
+    ReactGA.pageview(window.location.pathname + window.location.search);
+  }, []);
+
   return (
     <div>
       <Row style={{ marginTop: '10px' }}>
