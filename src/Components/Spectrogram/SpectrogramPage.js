@@ -106,9 +106,9 @@ class SpectrogramPage extends Component {
       newState.blob.taps = props.blob.taps;
       this.renderImage(this.state.lowerTile, this.state.upperTile); // need to trigger a rerender here, because the handler is in settingspane
     }
-    // Grab the minimap data
+
+    // This kicks things off when you first load into the page
     if (newState.connection.blobClient != null && metaIsSet) {
-      // Grab the first N tiles so that its full when it first loads
       const { bytesPerSample, blob, fftSize } = newState;
       const { lowerTile, upperTile } = calculateTileNumbers(0, bytesPerSample, blob, fftSize);
       const tiles = range(Math.floor(lowerTile), Math.ceil(upperTile));
@@ -129,6 +129,7 @@ class SpectrogramPage extends Component {
       }
       this.renderImage(lowerTile, upperTile);
     }
+
     // Fetch the data we need for the minimap image, but only once we have metadata, and only do it once
     if (!newState.minimapFetch && newState.data_type) {
       const fft_size = 1024; // for minimap only. there's so much overhead with blob downloading that this might as well be a high value...
