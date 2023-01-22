@@ -43,6 +43,17 @@ const App = () => {
         <Route path="/recordings" element={<RecordingsListContainer />} />
         <Route path="/recordings/spectrogram/:recording" element={<SpectrogramContainer />} />
       </Routes>
+
+      {/* TODO Figure out how to use mailerlites embedded form*/}
+      <div class="container">
+        <Row style={{ marginTop: '30px', marginBottom: '30px' }}>
+          <a target="_blank" href="https://dashboard.mailerlite.com/forms/299501/77960409531811734/share">
+            <center>
+              <h5>Sign up for a once-a-month email update on IQEngine, such as new features, demos, and more!</h5>
+            </center>
+          </a>
+        </Row>
+      </div>
     </div>
   );
 };
