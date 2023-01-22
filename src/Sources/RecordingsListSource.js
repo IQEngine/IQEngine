@@ -67,6 +67,8 @@ export const FetchRecordingsList = (connection) => async (dispatch) => {
         const fName = blob.name.split('.')[0];
 
         const recording = parseMeta(json_string, baseUrl, fName, null, null);
+        if (!recording) continue;
+
         const { length, client } = await getLength(containerClient, fName);
         recording['lengthInIQSamples'] = length / 2 / recording.bytesPerSample; // in IQ samples
         recording['lengthInBytes'] = length;

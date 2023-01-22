@@ -4,6 +4,7 @@
 import React, { useEffect, useState } from 'react';
 import Directory from './Directory';
 import Spinner from 'react-bootstrap/Spinner';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
 function isFolder(file) {
   return file.name.endsWith('/');
@@ -150,7 +151,17 @@ export default function RecordingsBrowser(props) {
               <th>Spectrogram Thumbnail</th>
               <th style={{ minWidth: '10%' }}>Recording Name</th>
               <th>Length in Samples</th>
-              <th>Data Type</th>
+              <th>
+                Data Type{' '}
+                <a
+                  style={{ textDecoration: 'none', color: 'white', margin: '5px 0 0 5px' }}
+                  target="_blank"
+                  rel="noreferrer"
+                  href="https://pysdr.org/content/iq_files.html#binary-files"
+                >
+                  <InfoOutlinedIcon></InfoOutlinedIcon>
+                </a>
+              </th>
               <th>Frequency</th>
               <th>Sample Rate</th>
               <th>Number of Annotations</th>
