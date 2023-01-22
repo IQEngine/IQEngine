@@ -2,7 +2,7 @@
   <img width=250 src="https://raw.githubusercontent.com/IQEngine/IQEngine/main/public/IQEngine_Black.svg" />
 </p>
 
-<p align="center" style="font-style: italic;"><a href="https://www.iqengine.org">www.iqengine.org</a></p>
+_<p align="center"><a href="https://www.iqengine.org">www.iqengine.org</a></p>_
 
 <h4 style="text-align: center;"><i>A web-based SDR toolkit for analyzing, processing, and sharing RF recordings</i></h4>
 
