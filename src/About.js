@@ -13,6 +13,54 @@ const styleMargins = {
 export const About = () => {
   return (
     <div>
+      <Row style={{ padding: '10px' }}></Row>
+      <div style={{ backgroundColor: '#303030', width: 'auto' }}>
+        <Row style={{ styleMargins }}>
+          <center>
+            <h1
+              style={{
+                color: '#04b889',
+                fontWeight: 'bold',
+                marginTop: '30px',
+                marginBottom: '10px',
+              }}
+            >
+              Great For...
+            </h1>
+          </center>
+          <Col xs={3}></Col>
+          <Col xs={3}>
+            <div className="container">
+              <ul style={{ padding: '10px', fontSize: '30px' }}>
+                <li class="list-group-item">
+                  <i class="bi bi-soundwave">- RFML</i>
+                </li>
+                <li class="list-group-item">
+                  <i class="bi bi-soundwave">- Wireless CTFs</i>
+                </li>
+                <li class="list-group-item">
+                  <i class="bi bi-soundwave">- SIGINT</i>
+                </li>
+              </ul>
+            </div>
+          </Col>
+          <Col xs={4}>
+            <ul style={{ padding: '10px', fontSize: '30px' }}>
+              <li class="list-group-item">
+                <i class="bi bi-soundwave"> - Spectrum Awareness </i>
+              </li>
+              <li class="list-group-item">
+                <i class="bi bi-soundwave">- Debugging </i>
+              </li>
+              <li class="list-group-item">
+                <i class="bi bi-soundwave">- SDR/DSP/Wireless Students </i>
+              </li>
+            </ul>
+          </Col>
+          <Col></Col>
+        </Row>
+      </div>
+
       <div style={{ width: 'auto' }}>
         <Row style={{ styleMargins }}>
           <center>
@@ -20,8 +68,8 @@ export const About = () => {
               style={{
                 color: '#04b889',
                 fontWeight: 'bold',
-                marginTop: '50px',
-                marginBottom: '50px',
+                marginTop: '20px',
+                marginBottom: '10px',
               }}
             >
               Example Use-Cases
@@ -121,7 +169,7 @@ export const About = () => {
         </Row>
       </div>
 
-      <div style={{ backgroundColor: '#303030' }}>
+      <div style={{}}>
         <Row>
           <Col>
             <center>
@@ -150,13 +198,16 @@ export const About = () => {
           </Col>
         </Row>
 
-        <Row>
+        <Row style={{ marginBottom: '15px' }}>
           <center>
             <img style={{ width: '30%' }} alt="" src="./sprinterns.jpeg"></img>
             <p></p>
             Winter '23 Sprinterns from UMD and GMU
           </center>
         </Row>
+      </div>
+      <div style={{ backgroundColor: '#303030', width: 'auto' }}>
+        <Row style={{ paddingTop: '30px' }}></Row>
       </div>
     </div>
   );
