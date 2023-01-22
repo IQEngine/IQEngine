@@ -100,7 +100,6 @@ const ScrollBar = (props) => {
 
       // Add a tick wherever there are annotations
       let t = [];
-      console.log('skipNFfts:', skipNFfts);
       meta.annotations.forEach((annotation) => {
         t.push({
           y: (annotation['core:sample_start'] / fft_size / (skipNFfts + 1) / minimapNumFetches) * spectrogram_height,
@@ -108,7 +107,6 @@ const ScrollBar = (props) => {
             (annotation['core:sample_count'] / fft_size / (skipNFfts + 1) / minimapNumFetches) * spectrogram_height,
         });
       });
-      console.log(t);
       setTicks(t);
 
       // Render Image
@@ -117,7 +115,7 @@ const ScrollBar = (props) => {
         setMinimapImg(ret);
       });
     }
-  }, [size, minimapNumFetches, skipNFfts, spectrogram_height, meta.annotations]); // so that this triggers after each fetch happens
+  }, [size, minimapNumFetches]); // dont add anymore here, so that this triggers ONLY after each fetch happens
 
   const handleClick = (e) => {
     let currentY = e.evt.offsetY;
