@@ -22,6 +22,13 @@ For those who have *lots* of RF recordings, IQEngine can automatically insert me
 
 IQEngine is a work in progress, check back again soon!
 
+[Sign up for a once-a-month email update on IQEngine, such as new features, demos, and more!](https://dashboard.mailerlite.com/forms/299501/77960409531811734/share)
+
+```mermaid
+flowchart LR
+    Start --> Stop
+```
+
 # Notes
 
 Made with create-react-app https://create-react-app.dev/ under the hood it uses webpack (not Parcel!!!), Babel, ESLint, among other things 
