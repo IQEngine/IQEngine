@@ -1,8 +1,8 @@
 <p align="center">
-  <img width=250 src="https://raw.githubusercontent.com/IQEngine/IQEngine/main/public/IQEngine_bitmap.png" />
+  <img width=250 src="https://raw.githubusercontent.com/IQEngine/IQEngine/main/public/IQEngine_Black.svg" />
 </p>
 
-<p style="text-align: center; font-style: italic;"><a href="https://www.iqengine.org">www.iqengine.org</a></p>
+<p align="center" style="font-style: italic;"><a href="https://www.iqengine.org">www.iqengine.org</a></p>
 
 <h4 style="text-align: center;"><i>A web-based SDR toolkit for analyzing, processing, and sharing RF recordings</i></h4>
 
