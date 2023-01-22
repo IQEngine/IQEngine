@@ -42,7 +42,7 @@ const App = () => {
                 About
               </Nav.Link>
               <a
-                class="nav-link"
+                className="nav-link"
                 style={{ fontSize: '24px' }}
                 target="_blank"
                 href="https://github.com/iqengine/iqengine"
@@ -62,7 +62,7 @@ const App = () => {
       </Routes>
 
       {/* TODO Figure out how to use mailerlites embedded form*/}
-      <div class="container">
+      <div className="container">
         <Row style={{ marginTop: '30px', marginBottom: '30px' }}>
           <a target="_blank" href="https://dashboard.mailerlite.com/forms/299501/77960409531811734/share">
             <center>
