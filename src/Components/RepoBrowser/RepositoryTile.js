@@ -26,7 +26,6 @@ const RepositoryTile = (props) => {
   } else {
     writeableBool = 'R';
   }
-  console.log(writeableBool);
 
   const [isDisabled, setIsDisabled] = useState(false);
 

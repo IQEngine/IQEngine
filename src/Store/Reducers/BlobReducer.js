@@ -11,11 +11,10 @@ import {
   UPDATE_BLOB_TAPS,
 } from '../../Constants/BlobTypes';
 
-window.iq_data = {}; // This is GROSS!!! but it works?! We need a cleaner way to store large binary data.
-
 const initialState = {
   size: 0,
   totalBytes: 0,
+  currentMax: 0, // holds current max value of I/Q for that recording so we can scale the spectrogram appropriately
   status: 'idle',
   taps: new Float32Array(1).fill(1),
 };
