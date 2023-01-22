@@ -26,8 +26,8 @@ class SpectrogramPage extends Component {
       blob: props.blob,
       meta: props.meta,
       fftSize: 1024,
-      magnitudeMax: 255,
-      magnitudeMin: 30,
+      magnitudeMax: 240,
+      magnitudeMin: 100,
       window: 'hamming',
       autoscale: false,
       tileNumber: 0,
@@ -50,6 +50,8 @@ class SpectrogramPage extends Component {
       timeSelectionEnd: -1,
       openModal: false,
       cursorsEnabled: false,
+      currentFftMax: -999999,
+      currentFftMin: 999999,
     };
   }
 
@@ -330,7 +332,17 @@ class SpectrogramPage extends Component {
   };
 
   renderImage = (lowerTile, upperTile) => {
-    const { bytesPerSample, fftSize, magnitudeMax, magnitudeMin, meta, window, autoscale } = this.state;
+    const {
+      bytesPerSample,
+      fftSize,
+      magnitudeMax,
+      magnitudeMin,
+      meta,
+      window,
+      autoscale,
+      currentFftMax,
+      currentFftMin,
+    } = this.state;
     // Update the image (eventually this should get moved somewhere else)
     let ret = select_fft(
       lowerTile,
@@ -341,6 +353,8 @@ class SpectrogramPage extends Component {
       magnitudeMin,
       meta,
       window,
+      currentFftMax,
+      currentFftMin,
       autoscale
     );
     if (ret) {
@@ -357,6 +371,8 @@ class SpectrogramPage extends Component {
 
       this.setState({ annotations: ret.annotations });
       this.setState({ sampleRate: ret.sample_rate });
+      this.setState({ currentFftMax: ret.currentFftMax });
+      this.setState({ currentFftMin: ret.currentFftMin });
     }
   };
 

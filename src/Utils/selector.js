@@ -27,13 +27,25 @@ function getStandardDeviation(array) {
 
 const average = (array) => array.reduce((a, b) => a + b) / array.length;
 
-function calcFftOfTile(samples, fft_size, num_ffts, windowFunction, magnitude_min, magnitude_max, autoscale) {
+function calcFftOfTile(
+  samples,
+  fft_size,
+  num_ffts,
+  windowFunction,
+  magnitude_min,
+  magnitude_max,
+  autoscale,
+  currentFftMax,
+  currentFftMin
+) {
   let startTime = performance.now();
   const clearBuf = new ArrayBuffer(fft_size * num_ffts * 4); // fills with 0s ie. rgba 0,0,0,0 = transparent
   let new_fft_data = new Uint8ClampedArray(clearBuf);
   let startOfs = 0;
   let autoMin = 0;
   let autoMax = 0;
+  let tempCurrentFftMax = currentFftMax;
+  let tempCurrentFftMin = currentFftMin;
 
   // loop through each row
   for (let i = 0; i < num_ffts; i++) {
@@ -77,11 +89,14 @@ function calcFftOfTile(samples, fft_size, num_ffts, windowFunction, magnitude_mi
 
     magnitudes = magnitudes.map((x) => 10.0 * Math.log10(x)); // convert to dB
 
+    const tempFftMax = Math.max(...magnitudes);
+    if (tempFftMax > tempCurrentFftMax) tempCurrentFftMax = tempFftMax;
+    const tempFftMin = Math.min(...magnitudes);
+    if (tempFftMin < tempCurrentFftMin) tempCurrentFftMin = tempFftMin;
+
     // convert to 0 - 255
-    let minimum_val = Math.min(...magnitudes); // the ... tell it that its an array I guess
-    magnitudes = magnitudes.map((x) => x - minimum_val); // lowest value is now 0
-    let maximum_val = Math.max(...magnitudes);
-    magnitudes = magnitudes.map((x) => x / maximum_val); // highest value is now 1
+    magnitudes = magnitudes.map((x) => x - tempCurrentFftMin); // lowest value is now 0
+    magnitudes = magnitudes.map((x) => x / tempCurrentFftMax); // highest value is now 1
     magnitudes = magnitudes.map((x) => x * 255); // now from 0 to 255
 
     // When you click the button this code will run once, then it will turn itself off until you click it again
@@ -110,7 +125,9 @@ function calcFftOfTile(samples, fft_size, num_ffts, windowFunction, magnitude_mi
     // Clip from 0 to 255 and convert to ints
     magnitudes = magnitudes.map((x) => (x > 255 ? 255 : x)); // clip above 255
     magnitudes = magnitudes.map((x) => (x < 0 ? 0 : x)); // clip below 0
-    let ipBuf8 = Uint8ClampedArray.from(magnitudes); // anything over 255 or below 0 at this point will become a random number
+    let ipBuf8 = Uint8ClampedArray.from(magnitudes); // anything over 255 or below 0 at this point will become a random number, hence clipping above
+
+    // Apply colormap
     let line_offset = i * fft_size * 4;
     for (let sigVal, rgba, opIdx = 0, ipIdx = startOfs; ipIdx < fft_size + startOfs; opIdx += 4, ipIdx++) {
       sigVal = ipBuf8[ipIdx] || 0; // if input line too short add zeros
@@ -124,7 +141,13 @@ function calcFftOfTile(samples, fft_size, num_ffts, windowFunction, magnitude_mi
   }
   let endTime = performance.now();
   console.log('Rendering spectrogram took', endTime - startTime, 'milliseconds'); // first cut of our code processed+rendered 0.5M samples in 760ms on marcs computer
-  return { new_fft_data: new_fft_data, autoMax: autoMax, autoMin: autoMin };
+  return {
+    new_fft_data: new_fft_data,
+    autoMax: autoMax,
+    autoMin: autoMin,
+    newCurrentFftMax: tempCurrentFftMax,
+    newCurrentFftMin: tempCurrentFftMin,
+  };
 }
 
 // lowerTile and upperTile are in fractions of a tile
@@ -137,12 +160,16 @@ export const select_fft = (
   magnitudeMin,
   meta,
   windowFunction,
+  currentFftMax,
+  currentFftMin,
   autoscale = false
 ) => {
   let fft_size = fftSize;
   const num_ffts = TILE_SIZE_IN_BYTES / bytes_per_sample / 2 / fftSize; // per tile
   let magnitude_max = magnitudeMax;
   let magnitude_min = magnitudeMin;
+  let tempCurrentFftMax = currentFftMax;
+  let tempCurrentFftMin = currentFftMin;
 
   // Go through each of the tiles and compute the FFT and save in window.fft_data
   const tiles = range(Math.floor(lowerTile), Math.ceil(upperTile));
@@ -152,15 +179,19 @@ export const select_fft = (
     if (!(tile.toString() in window.fft_data)) {
       if (tile.toString() in window.iq_data) {
         let samples = window.iq_data[tile.toString()];
-        const { new_fft_data, autoMax, autoMin } = calcFftOfTile(
+        const { new_fft_data, autoMax, autoMin, newCurrentFftMax, newCurrentFftMin } = calcFftOfTile(
           samples,
           fft_size,
           num_ffts,
           windowFunction,
           magnitude_min,
           magnitude_max,
-          autoscale
+          autoscale,
+          tempCurrentFftMax,
+          tempCurrentFftMin
         );
+        tempCurrentFftMax = newCurrentFftMax;
+        tempCurrentFftMin = newCurrentFftMin;
         window.fft_data[tile.toString()] = new_fft_data;
         autoMaxs.push(autoMax);
         autoMins.push(autoMin);
@@ -236,6 +267,8 @@ export const select_fft = (
     sample_rate: window.sample_rate,
     autoMax: autoMaxs.length ? average(autoMaxs) : 255,
     autoMin: autoMins.length ? average(autoMins) : 0,
+    currentFftMax: tempCurrentFftMax,
+    currentFftMin: tempCurrentFftMin,
   };
   return select_fft_return;
 };
