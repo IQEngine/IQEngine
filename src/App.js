@@ -17,7 +17,7 @@ import ReactGA from 'react-ga4';
 // TODO: make the google analytics stuff not included when people run a local instance of the site, e.g. move key into an app env var
 ReactGA.initialize('G-NEM78RS5ZF');
 
-// We need to make sure local files don't have their filename show up in the url, so that it doesn't get included in google analytics
+// Note- we make sure to not include local file names in the urls, so they wont get sent to google analytics
 const App = () => {
   const location = useLocation();
   useEffect(() => {
