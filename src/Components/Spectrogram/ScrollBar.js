@@ -40,6 +40,10 @@ const ScrollBar = (props) => {
         .map((x) => x.includes('minimap'))
         .filter(Boolean).length === minimapNumFetches
     ) {
+      // First refresh the spectrogram (not minimap) data since the maxFft and minFft will be better estimates by the time the minimap data is fetched
+      window.fft_data = {};
+      props.fetchAndRender(0);
+
       // Loop through the samples we downloaded, calc FFT and produce spectrogram image
       const fft_size = window.iq_data['minimap0'].length / 2; // just use the first one to find length
       const clearBuf = new ArrayBuffer(fft_size * minimapNumFetches * 4); // fills with 0s ie. rgba 0,0,0,0 = transparent
