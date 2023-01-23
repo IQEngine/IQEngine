@@ -30,7 +30,6 @@ class SpectrogramPage extends Component {
       magnitudeMin: 100,
       window: 'hamming',
       autoscale: false,
-      tileNumber: 0,
       image: null,
       annotations: [],
       sampleRate: 1,
@@ -384,9 +383,6 @@ class SpectrogramPage extends Component {
     this.setState({ lowerTile: lowerTile, upperTile: upperTile });
 
     const tiles = range(Math.floor(lowerTile), Math.ceil(upperTile));
-    this.setState({
-      tileNumber: tiles[0],
-    });
 
     // Fetch the tiles
     for (let tile of tiles) {
