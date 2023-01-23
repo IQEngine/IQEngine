@@ -33,7 +33,7 @@ const App = () => {
         <Col></Col>
         <Col md="7" style={{ textAlign: 'center' }}>
           <a href="/">
-            <img src="./IQEngine.svg" alt="IQEngine" />
+            <img src="/IQEngine.svg" alt="IQEngine" />
           </a>
         </Col>
         <Col>
@@ -61,8 +61,8 @@ const App = () => {
       <Routes>
         <Route path="/about" element={<About />} />
         <Route exact path="/" element={<RepoBrowserContainer />} />
-        <Route path="/recordings" element={<RecordingsListContainer />} />
         <Route path="/recordings/spectrogram/:recording" element={<SpectrogramContainer />} />
+        <Route path="/recordings/:accountName?/:containerName?/:sasToken?" element={<RecordingsListContainer />} />
       </Routes>
 
       {/* TODO Figure out how to use mailerlites embedded form*/}

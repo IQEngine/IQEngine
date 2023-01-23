@@ -13,7 +13,7 @@ const RepositoryTile = (props) => {
     updateConnectionAccountName,
     updateConnectionContainerName,
     updateConnectionSasToken,
-    setRecordingList,
+    fetchRecordingsList,
   } = props;
 
   const { name, accountName, containerName, imageURL, description, sasToken } = item;
@@ -58,8 +58,16 @@ const RepositoryTile = (props) => {
     updateConnectionAccountName(accountName);
     updateConnectionContainerName(containerName);
     updateConnectionSasToken(sasToken);
-    setRecordingList({ accountName: accountName, containerName: containerName, sasToken: sasToken }); // updates the parent (App.js) state with the RecordingList
-    navigate('/recordings'); // data file
+    fetchRecordingsList({ accountName: accountName, containerName: containerName, sasToken: sasToken });
+    // so we can fetch when someone is linked to a repo directly
+    navigate(
+      '/recordings/?accountName=' +
+        accountName +
+        '&containerName=' +
+        containerName +
+        '&sasToken=' +
+        encodeURIComponent(sasToken)
+    );
   };
 
   return (

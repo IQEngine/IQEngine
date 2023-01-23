@@ -7,12 +7,7 @@ import AzureBlobBrowser from './AzureBlobBrowser';
 import RepositoryTile from './RepositoryTile';
 
 const RepoBrowser = (props) => {
-  let tileObj = null;
-  let tileObjInfo = [];
-  if (process.env && process.env.REACT_APP_CONNECTION_INFO) {
-    tileObj = JSON.parse(process.env.REACT_APP_CONNECTION_INFO);
-    tileObjInfo = tileObj.settings;
-  }
+  const tileObjInfo = JSON.parse(process.env.REACT_APP_CONNECTION_INFO).settings;
 
   return (
     <div className="homePage">
@@ -20,21 +15,21 @@ const RepoBrowser = (props) => {
         <RepositoryTile
           key={i}
           item={item}
-          setRecordingList={props.fetchRecordingsList}
+          fetchRecordingsList={props.fetchRecordingsList}
           updateConnectionAccountName={props.updateConnectionAccountName}
           updateConnectionContainerName={props.updateConnectionContainerName}
           updateConnectionSasToken={props.updateConnectionSasToken}
         />
       ))}
       <LocalFileBrowser
-        setRecordingList={props.fetchRecordingsList}
+        fetchRecordingsList={props.fetchRecordingsList}
         updateConnectionMetaFileHandle={props.updateConnectionMetaFileHandle}
         updateConnectionDataFileHandle={props.updateConnectionDataFileHandle}
         metafilehandle={props.metafilehandle}
         datafilehandle={props.datafilehandle}
       />
       <AzureBlobBrowser
-        setRecordingList={props.fetchRecordingsList}
+        fetchRecordingsList={props.fetchRecordingsList}
         updateConnectionAccountName={props.updateConnectionAccountName}
         updateConnectionContainerName={props.updateConnectionContainerName}
         updateConnectionSasToken={props.updateConnectionSasToken}
