@@ -102,7 +102,7 @@ class SpectrogramPage extends Component {
     }
     if (props.blob.taps !== prevProps.blob.taps) {
       newState.blob.taps = props.blob.taps;
-      this.renderImage(this.state.lowerTile, this.state.upperTile); // need to trigger a rerender here, because the handler is in settingspane
+      metaIsSet = true; // force a reload of the screen
     }
 
     // This kicks things off when you first load into the page
