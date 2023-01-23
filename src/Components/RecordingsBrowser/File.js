@@ -65,7 +65,7 @@ export default function FileRow({
                 updateBlobTotalBytes(item.lengthInBytes);
               }}
             >
-              <h5>{item.name.replaceAll('(slash)', '/').replace('.sigmf-meta', '')}</h5>
+              <h5>{item.name.split('(slash)').slice(-1)[0].replace('.sigmf-meta', '')}</h5>
             </Link>
             {/* File download links */}
             <>
@@ -92,7 +92,7 @@ export default function FileRow({
                 updateBlobTotalBytes(item.lengthInBytes);
               }}
             >
-              <h5>{item.name.replaceAll('(slash)', '/').replace('.sigmf-meta', '')}</h5>
+              <h5>{item.name.split('(slash)').slice(-1)[0].replace('.sigmf-meta', '')}</h5>
             </Link>
           </td>
         </>
