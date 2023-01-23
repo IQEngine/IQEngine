@@ -5,11 +5,13 @@ import React, { useState, useEffect } from 'react';
 import { Layer, Rect, Image } from 'react-konva';
 import { fftshift } from 'fftshift';
 import { colMap } from '../../Utils/colormap';
+import { MINIMUM_SCROLL_HANDLE_HEIGHT } from '../../Utils/constants';
+
 const FFT = require('fft.js');
 
 const ScrollBar = (props) => {
   let {
-    blob,
+    totalBytes,
     spectrogram_height,
     fetchAndRender,
     bytesPerSample,
@@ -25,10 +27,14 @@ const ScrollBar = (props) => {
   const [scrollbarWidth, setStageWidth] = useState(50);
   const [y, setY] = useState(0);
   const [ticks, setTicks] = useState([]);
+  const [handleHeightPixels, setHandleHeightPixels] = useState();
 
-  let x = (spectrogram_height / (blob.totalBytes / bytesPerSample / 2 / fftSize)) * spectrogram_height;
-  if (x < 20) x = 20;
-  const handleHeightPixels = x;
+  // Calc scroll handle height
+  useEffect(() => {
+    let x = (spectrogram_height / (totalBytes / bytesPerSample / 2 / fftSize)) * spectrogram_height;
+    if (x < MINIMUM_SCROLL_HANDLE_HEIGHT) x = MINIMUM_SCROLL_HANDLE_HEIGHT;
+    setHandleHeightPixels(x);
+  }, [spectrogram_height, totalBytes, bytesPerSample, fftSize]);
 
   useEffect(() => {
     if (!minimapNumFetches) {
@@ -119,7 +125,7 @@ const ScrollBar = (props) => {
 
   const handleClick = (e) => {
     let currentY = e.evt.offsetY;
-    let newY = currentY - handleHeightPixels / 2;
+    let newY = currentY - handleHeightPixels / 2; // assume we want the handle centered where we click but we have to send fetchAndRender the top of the handle
     if (newY < 0) {
       newY = 0;
     }

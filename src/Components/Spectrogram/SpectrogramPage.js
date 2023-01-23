@@ -30,11 +30,9 @@ class SpectrogramPage extends Component {
       magnitudeMin: 100,
       window: 'hamming',
       autoscale: false,
-      tileNumber: 0,
       image: null,
       annotations: [],
       sampleRate: 1,
-      stageRef: null,
       bytesPerSample: null,
       data_type: '',
       upperTile: -1,
@@ -384,9 +382,6 @@ class SpectrogramPage extends Component {
     this.setState({ lowerTile: lowerTile, upperTile: upperTile });
 
     const tiles = range(Math.floor(lowerTile), Math.ceil(upperTile));
-    this.setState({
-      tileNumber: tiles[0],
-    });
 
     // Fetch the tiles
     for (let tile of tiles) {
@@ -414,7 +409,6 @@ class SpectrogramPage extends Component {
       image,
       annotations,
       sampleRate,
-      stageRef,
       lowerTile,
       bytesPerSample,
       currentSamples,
@@ -434,8 +428,6 @@ class SpectrogramPage extends Component {
       magnitudeMin: magnitudeMin,
     };
 
-    var scrollBarHeight = (spectrogramHeight / (blob.totalBytes / bytesPerSample / 2 / fftSize)) * spectrogramHeight;
-    if (scrollBarHeight < 20) scrollBarHeight = 20;
     return (
       <div style={{ marginTop: '30px' }}>
         <Container>
@@ -492,7 +484,7 @@ class SpectrogramPage extends Component {
                       spectrogramWidthScale={spectrogramWidth / fftSize}
                     />
                   </Stage>
-                  <Stage width={600} height={600} stageRef={stageRef}>
+                  <Stage width={600} height={600}>
                     <Layer>
                       <Image image={image} x={0} y={0} width={600} height={600} />
                     </Layer>
@@ -527,7 +519,7 @@ class SpectrogramPage extends Component {
                     />
                     <ScrollBar
                       fetchAndRender={this.fetchAndRender}
-                      blob={blob}
+                      totalBytes={blob.totalBytes}
                       spectrogram_height={spectrogramHeight}
                       bytesPerSample={bytesPerSample}
                       fftSize={fftSize}
