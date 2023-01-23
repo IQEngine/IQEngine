@@ -50,6 +50,14 @@ const TimeSelector = (props) => {
             x={0}
             y={((startTileNum - lowerTile) / tileDiff) * 600}
             width={width}
+            height={((endTileNum - startTileNum) / tileDiff) * 600}
+            fill="black"
+            opacity={0.4}
+          />
+          <Rect
+            x={0}
+            y={((startTileNum - lowerTile) / tileDiff) * 600}
+            width={width}
             height={0}
             draggable={true}
             onDragMove={handleDragMoveStart}
@@ -58,8 +66,6 @@ const TimeSelector = (props) => {
             strokeWidth={5}
             stroke="white"
           ></Rect>
-        </>
-        <>
           <Rect
             x={0}
             y={((endTileNum - lowerTile) / tileDiff) * 600}
