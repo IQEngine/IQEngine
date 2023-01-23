@@ -287,7 +287,7 @@ export function calculateTileNumbers(handleTop, bytesPerSample, blob, fftSize) {
 
   // Make sure we dont try to fetch more than exists in the file
   if (Math.ceil(upperTile) * tileSizeInRows > totalNumFFTs) {
-    upperTile -= 1;
+    upperTile = Math.floor(upperTile) - 1 + 0.9999; // show the whole tile but dont go to the next one, which would go past the end of the file
   }
 
   return { lowerTile: lowerTile, upperTile: upperTile };
