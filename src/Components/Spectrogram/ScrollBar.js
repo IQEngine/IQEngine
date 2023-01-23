@@ -125,7 +125,7 @@ const ScrollBar = (props) => {
 
   const handleClick = (e) => {
     let currentY = e.evt.offsetY;
-    let newY = currentY - handleHeightPixels / 2;
+    let newY = currentY - handleHeightPixels / 2; // assume we want the handle centered where we click but we have to send fetchAndRender the top of the handle
     if (newY < 0) {
       newY = 0;
     }

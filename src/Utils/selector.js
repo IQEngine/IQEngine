@@ -275,16 +275,21 @@ export const select_fft = (
 
 export function calculateTileNumbers(handleTop, bytesPerSample, blob, fftSize) {
   const { totalBytes } = blob;
+  const tileSizeInRows = TILE_SIZE_IN_BYTES / bytesPerSample / 2 / fftSize;
   const totalNumFFTs = totalBytes / bytesPerSample / 2 / fftSize; // divide by 2 because IQ
   const scrollBarHeight = 600; // TODO REPLACE ME WITH ACTUAL WINDOW HEIGHT
   const handleFraction = scrollBarHeight / totalNumFFTs;
   const handleHeightPixels = handleFraction * scrollBarHeight;
 
   // Find which tiles are within view
-  const tileSizeInRows = TILE_SIZE_IN_BYTES / bytesPerSample / 2 / fftSize;
-  //const numTilesInFile = Math.ceil(totalNumFFTs / tileSizeInRows);
   const lowerTile = (totalNumFFTs / tileSizeInRows) * (handleTop / scrollBarHeight);
-  const upperTile = (totalNumFFTs / tileSizeInRows) * ((handleTop + handleHeightPixels) / scrollBarHeight);
+  let upperTile = (totalNumFFTs / tileSizeInRows) * ((handleTop + handleHeightPixels) / scrollBarHeight);
+
+  // Make sure we dont try to fetch more than exists in the file
+  if (Math.ceil(upperTile) * tileSizeInRows > totalNumFFTs) {
+    upperTile -= 1;
+  }
+
   return { lowerTile: lowerTile, upperTile: upperTile };
 }
 
