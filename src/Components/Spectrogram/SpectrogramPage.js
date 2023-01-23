@@ -521,7 +521,7 @@ class SpectrogramPage extends Component {
                     />
                     <ScrollBar
                       fetchAndRender={this.fetchAndRender}
-                      blob={blob}
+                      totalBytes={blob.totalBytes}
                       spectrogram_height={spectrogramHeight}
                       bytesPerSample={bytesPerSample}
                       fftSize={fftSize}
