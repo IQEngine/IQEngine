@@ -121,7 +121,7 @@ const ScrollBar = (props) => {
         setMinimapImg(ret);
       });
     }
-  }, [size, minimapNumFetches]); // dont add anymore here, so that this triggers ONLY after each fetch happens
+  }, [size, minimapNumFetches]); // dont add anymore here, so that this triggers ONLY at the start
 
   const handleClick = (e) => {
     let currentY = e.evt.offsetY;

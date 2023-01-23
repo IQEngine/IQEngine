@@ -124,7 +124,7 @@ export const About = () => {
           </center>
         </Row>
         <Row style={{ marginBottom: '15px', paddingBottom: '15px', fontSize: '20px' }}>
-          <center>IQEngine is a community effort, lead by the following individuals:</center>
+          <center>IQEngine is a community effort, lead by the following individuals (and seeking more!):</center>
         </Row>
         <Row style={{ marginBottom: '15px', paddingBottom: '15px', fontSize: '20px' }}>
           <Col></Col>
