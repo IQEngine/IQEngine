@@ -29,9 +29,8 @@ const AzureBlobBrowser = (props) => {
     props.updateConnectionAccountName(accountName);
     props.updateConnectionContainerName(containerName);
     props.updateConnectionSasToken(sasToken);
-    props.setRecordingList({ accountName: accountName, containerName: containerName, sasToken: sasToken }); // updates the parent (App.js) state with the RecordingList
-    navigate('/recordings'); // data file
-    // Parse SAS Token to find if its read/write and other info
+    props.fetchRecordingsList({ accountName: accountName, containerName: containerName, sasToken: sasToken });
+    navigate('/recordings', { accountName: accountName, containerName: containerName, sasToken: sasToken }); // include args in URL for linking-sake
   };
 
   return (

@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react';
 import Directory from './Directory';
 import Spinner from 'react-bootstrap/Spinner';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import { useLocation, useSearchParams } from 'react-router-dom';
 
 function isFolder(file) {
   return file.name.endsWith('/');
@@ -79,16 +80,40 @@ function GroupByFolder(files, root) {
 export default function RecordingsBrowser(props) {
   const {
     recording,
+    connection,
     updateConnectionMetaFileHandle,
     updateConnectionDataFileHandle,
     updateConnectionRecording,
     updateBlobTotalBytes,
     updateConnectionBlobClient,
+    updateConnectionAccountName,
+    updateConnectionContainerName,
+    updateConnectionSasToken,
+    fetchRecordingsList,
   } = props;
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+
   const data = recording.recordingsList;
 
   const [currentFolder, setCurrentFolder] = useState('root');
   const [load, toggleLoader] = useState(true);
+
+  // Load in the connection info based on repoId
+  useEffect(() => {
+    // This will happen when someone is linked directly to an azure repo
+    if (location.search && !connection.accountName) {
+      console.log('Updating connection info and fetching recordings list!');
+      const accountName = searchParams.get('accountName');
+      const containerName = searchParams.get('containerName');
+      const sasToken = searchParams.get('sasToken');
+      updateConnectionAccountName(accountName);
+      updateConnectionContainerName(containerName);
+      updateConnectionSasToken(sasToken);
+      fetchRecordingsList({ accountName: accountName, containerName: containerName, sasToken: sasToken });
+    }
+  }, []);
+
   useEffect(() => {
     toggleLoader(recording.loading);
   }, [recording.loading]);
