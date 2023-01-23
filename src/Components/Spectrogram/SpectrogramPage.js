@@ -33,7 +33,6 @@ class SpectrogramPage extends Component {
       image: null,
       annotations: [],
       sampleRate: 1,
-      stageRef: null,
       bytesPerSample: null,
       data_type: '',
       upperTile: -1,
@@ -410,7 +409,6 @@ class SpectrogramPage extends Component {
       image,
       annotations,
       sampleRate,
-      stageRef,
       lowerTile,
       bytesPerSample,
       currentSamples,
@@ -488,7 +486,7 @@ class SpectrogramPage extends Component {
                       spectrogramWidthScale={spectrogramWidth / fftSize}
                     />
                   </Stage>
-                  <Stage width={600} height={600} stageRef={stageRef}>
+                  <Stage width={600} height={600}>
                     <Layer>
                       <Image image={image} x={0} y={0} width={600} height={600} />
                     </Layer>
