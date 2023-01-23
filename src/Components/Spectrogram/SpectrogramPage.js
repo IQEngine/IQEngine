@@ -428,8 +428,6 @@ class SpectrogramPage extends Component {
       magnitudeMin: magnitudeMin,
     };
 
-    var scrollBarHeight = (spectrogramHeight / (blob.totalBytes / bytesPerSample / 2 / fftSize)) * spectrogramHeight;
-    if (scrollBarHeight < 20) scrollBarHeight = 20;
     return (
       <div style={{ marginTop: '30px' }}>
         <Container>

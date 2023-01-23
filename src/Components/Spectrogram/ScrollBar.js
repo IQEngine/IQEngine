@@ -29,6 +29,7 @@ const ScrollBar = (props) => {
   const [ticks, setTicks] = useState([]);
   const [handleHeightPixels, setHandleHeightPixels] = useState();
 
+  // Calc scroll handle height
   useEffect(() => {
     let x = (spectrogram_height / (totalBytes / bytesPerSample / 2 / fftSize)) * spectrogram_height;
     if (x < MINIMUM_SCROLL_HANDLE_HEIGHT) x = MINIMUM_SCROLL_HANDLE_HEIGHT;
