@@ -33,7 +33,7 @@ const App = () => {
         <Col></Col>
         <Col md="7" style={{ textAlign: 'center' }}>
           <a href="/">
-            <img src="./IQEngine.svg" alt="IQEngine" />
+            <img src="/IQEngine.svg" alt="IQEngine" />
           </a>
         </Col>
         <Col>
