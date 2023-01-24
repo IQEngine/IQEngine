@@ -21,15 +21,15 @@ const SettingsPane = (props) => {
     error: { magMax: '', magMin: '', size: '' },
   });
 
-  let [magnitudeMax, onChangeMagnitudeMax] = useState({ magnitudeMax: props.magnitudeMax });
-  let [magnitudeMin, onChangeMagnitudeMin] = useState({ magnitudeMin: props.magnitudeMin });
+  let [magnitudeMax, setMagnitudeMax] = useState(props.magnitudeMax);
+  let [magnitudeMin, setMagnitudeMin] = useState(props.magnitudeMin);
 
   useEffect(() => {
-    onChangeMagnitudeMax({ magnitudeMax: props.magnitudeMax });
+    setMagnitudeMax(props.magnitudeMax);
   }, [props.magnitudeMax]);
 
   useEffect(() => {
-    onChangeMagnitudeMin({ magnitudeMin: props.magnitudeMin });
+    setMagnitudeMin(props.magnitudeMin);
   }, [props.magnitudeMin]);
 
   const onChangeWindowFunction = (event) => {
@@ -38,12 +38,12 @@ const SettingsPane = (props) => {
   };
 
   const onChangeTargetMagnitudeMax = (event) => {
-    onChangeMagnitudeMax({ magnitudeMax: parseInt(event.target.value) });
+    setMagnitudeMax(parseInt(event.target.value));
   };
 
   const onSubmitMagnitudeMax = () => {
-    const min = parseInt(magnitudeMin.magnitudeMin);
-    const max = parseInt(magnitudeMax.magnitudeMax);
+    const min = parseInt(magnitudeMin);
+    const max = parseInt(magnitudeMax);
     if (parseInt(max) && max > min && max < 256) {
       props.updateMagnitudeMax(max);
       setState({
@@ -65,14 +65,14 @@ const SettingsPane = (props) => {
   };
 
   const onChangeTargetMagnitudeMin = (event) => {
-    onChangeMagnitudeMin({ magnitudeMin: parseInt(event.target.value) });
+    setMagnitudeMin(parseInt(event.target.value));
   };
 
   const onSubmitMagnitudeMin = () => {
-    const min = parseInt(magnitudeMin.magnitudeMin);
-    const max = parseInt(magnitudeMax.magnitudeMax);
+    const min = parseInt(magnitudeMin);
+    const max = parseInt(magnitudeMax);
     if (min && min >= 0 && min < max) {
-      props.updateMagnitudeMin(magnitudeMin.magnitudeMin);
+      props.updateMagnitudeMin(magnitudeMin);
       setState({
         ...state,
         error: {
@@ -169,12 +169,7 @@ const SettingsPane = (props) => {
         <Form.Label>Magnitude Max</Form.Label>
         <div style={{ color: 'red', marginBottom: '2px' }}>{state.error.magMax}</div>
         <InputGroup className="mb-3">
-          <Form.Control
-            type="text"
-            defaultValue={magnitudeMax.magnitudeMax}
-            onChange={onChangeTargetMagnitudeMax}
-            size="sm"
-          />
+          <Form.Control type="text" defaultValue={magnitudeMax} onChange={onChangeTargetMagnitudeMax} size="sm" />
           <Button variant="secondary" onClick={onSubmitMagnitudeMax}>
             <FontAwesomeIcon icon={faArrowRight} />
           </Button>
@@ -185,12 +180,7 @@ const SettingsPane = (props) => {
         <Form.Label>Magnitude Min</Form.Label>
         <div style={{ color: 'red', marginBottom: '2px' }}>{state.error.magMin}</div>
         <InputGroup className="mb-3">
-          <Form.Control
-            type="text"
-            defaultValue={magnitudeMin.magnitudeMin}
-            onChange={onChangeTargetMagnitudeMin}
-            size="sm"
-          />
+          <Form.Control type="text" defaultValue={magnitudeMin} onChange={onChangeTargetMagnitudeMin} size="sm" />
           <Button variant="secondary" onClick={onSubmitMagnitudeMin}>
             <FontAwesomeIcon icon={faArrowRight} />
           </Button>

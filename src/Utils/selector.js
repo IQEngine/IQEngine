@@ -107,8 +107,8 @@ function calcFftOfTile(
       // for now we're just going to use whatever the last FFT row's value is for min/max
       autoMin = mean - 1.5 * std;
       autoMax = mean + 1.5 * std;
-      if (autoMin < 0) {
-        autoMin = 0;
+      if (autoMin < 1) {
+        autoMin = 1; // recall there was a bug with setting min to 0
       }
       if (autoMax > 255) {
         autoMax = 255;

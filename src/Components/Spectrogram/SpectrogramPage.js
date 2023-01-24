@@ -268,9 +268,8 @@ class SpectrogramPage extends Component {
   };
 
   handleAutoScale = () => {
-    const { autoscale } = this.state;
     this.setState({
-      autoscale: !autoscale,
+      autoscale: true,
     });
   };
 
@@ -362,9 +361,14 @@ class SpectrogramPage extends Component {
         //console.log('Image Updated');
       });
       if (autoscale && ret.autoMax) {
-        this.handleAutoScale(); // toggles it off so this only will happen once
-        this.handleMagnitudeMax(ret.autoMax);
-        this.handleMagnitudeMin(ret.autoMin);
+        console.log(ret.autoMax, ret.autoMin);
+        this.setState({
+          autoscale: false, // toggles it off so this only will happen once
+          magnitudeMax: ret.autoMax,
+          magnitudeMin: ret.autoMin,
+        });
+        //this.handleMagnitudeMax(ret.autoMax);
+        //this.handleMagnitudeMin(ret.autoMin);
       }
 
       this.setState({ annotations: ret.annotations });
