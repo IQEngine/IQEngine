@@ -159,16 +159,6 @@ const SettingsPane = (props) => {
 
   return (
     <Form>
-      {/* When you press this button it will make autoscale run during the next call to select_fft, then it will turn itself off */}
-      <Button
-        className="mb-3"
-        variant="secondary"
-        onClick={props.handleAutoScale}
-        style={{ width: '100%', marginTop: '5px' }}
-      >
-        Autoscale
-      </Button>
-
       <Form.Group className="mb-3" controlId="formMagMax">
         <Form.Label>Magnitude Max</Form.Label>
         <div style={{ color: 'red', marginBottom: '2px' }}>{state.error.magMax}</div>
@@ -200,6 +190,16 @@ const SettingsPane = (props) => {
           </Button>
         </InputGroup>
       </Form.Group>
+
+      {/* When you press this button it will make autoscale run during the next call to select_fft, then it will turn itself off */}
+      <Button
+        className="mb-3"
+        variant="secondary"
+        onClick={props.handleAutoScale}
+        style={{ width: '100%', marginTop: '5px' }}
+      >
+        Autoscale
+      </Button>
 
       <Form.Group className="mb-3" controlId="formFFT">
         <Form.Label>
