@@ -462,18 +462,13 @@ class SpectrogramPage extends Component {
               >
                 <DownloadIcon></DownloadIcon>
               </Button>
+              <Toggle id="toggle" defaultChecked={false} onChange={this.toggleCursors} />
+              <Form.Label htmlFor="toggle">Toggle Cursors</Form.Label>
+              <TimePlot currentSamples={currentSamples} toggleModal={this.toggleModal} openModal={openModal} />
             </Col>
             <Col>
               <Row style={{ marginLeft: 0, marginRight: 0 }}>
                 <Col>
-                  <div style={{ display: 'flex', justifyContent: 'right' }}>
-                    {cursorsEnabled && (
-                      <TimePlot currentSamples={currentSamples} toggleModal={this.toggleModal} openModal={openModal} />
-                    )}
-                    <Toggle id="toggle" defaultChecked={false} onChange={this.toggleCursors} />
-                    <Form.Label htmlFor="toggle">Toggle Cursors</Form.Label>
-                  </div>
-
                   <Stage width={600} height={20}>
                     <RulerTop
                       fftSize={fftSize}
@@ -512,7 +507,7 @@ class SpectrogramPage extends Component {
                     )}
                   </Stage>
                 </Col>
-                <Col className="col-1" style={{ paddingTop: 60, paddingLeft: 0, paddingRight: 0 }}>
+                <Col className="col-1" style={{ paddingTop: 20, paddingLeft: 0, paddingRight: 0 }}>
                   <Stage width={rulerSideWidth} height={600}>
                     <RulerSide
                       spectrogram_width={spectrogramWidth}
@@ -522,7 +517,7 @@ class SpectrogramPage extends Component {
                     />
                   </Stage>
                 </Col>
-                <Col style={{ justifyContent: 'left', paddingTop: 60, paddingLeft: 0, paddingRight: 0 }}>
+                <Col style={{ justifyContent: 'left', paddingTop: 20, paddingLeft: 0, paddingRight: 0 }}>
                   <Stage width={50} height={600}>
                     <ScrollBar
                       fetchAndRender={this.fetchAndRender}
