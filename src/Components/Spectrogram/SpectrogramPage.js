@@ -9,6 +9,8 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import ScrollBar from './ScrollBar';
 import { TimePlot } from './TimePlot';
+import { FrequencyPlot } from './FrequencyPlot';
+import { IQPlot } from './IQPlot';
 import { Layer, Image, Stage } from 'react-konva';
 import { select_fft, clear_all_data, calculateTileNumbers, range } from '../../Utils/selector';
 import { AnnotationViewer } from './AnnotationViewer';
@@ -17,6 +19,8 @@ import { RulerSide } from './RulerSide';
 import { TILE_SIZE_IN_BYTES } from '../../Utils/constants';
 import DownloadIcon from '@mui/icons-material/Download';
 import TimeSelector from './TimeSelector';
+import Tab from 'react-bootstrap/Tab';
+import Tabs from 'react-bootstrap/Tabs';
 
 class SpectrogramPage extends Component {
   constructor(props) {
@@ -46,14 +50,14 @@ class SpectrogramPage extends Component {
       spectrogramWidth: 600,
       timeSelectionStart: -1,
       timeSelectionEnd: -1,
-      openModal: false,
       cursorsEnabled: false,
       currentFftMax: -999999,
       currentFftMin: 999999,
+      currentTab: 'spectrogram',
     };
   }
 
-  // This all just happens once when the spectrogram page opens for the first time
+  // This all just happens once when the spectrogram page opens for the first time (or when you make a change in the code)
   componentDidMount() {
     let { fetchMetaDataBlob, connection } = this.props;
     window.iq_data = {};
@@ -169,13 +173,6 @@ class SpectrogramPage extends Component {
   toggleCursors = (e) => {
     this.setState({
       cursorsEnabled: e.target.checked,
-    });
-  };
-
-  toggleModal = () => {
-    this.handleProcessTime();
-    this.setState({
-      openModal: !this.state.openModal,
     });
   };
 
@@ -307,10 +304,14 @@ class SpectrogramPage extends Component {
     const blob = new Blob([fileData], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
-
     link.download = 'spectrogram-meta-data-modified.sigmf-meta';
     link.href = url;
+    document.body.appendChild(link);
     link.click();
+    setTimeout(function () {
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    }, 0);
   }
 
   handleMetaChange = (e) => {
@@ -419,8 +420,7 @@ class SpectrogramPage extends Component {
       spectrogramWidth,
       upperTile,
       cursorsEnabled,
-      openModal,
-      timeSelectionStart,
+      currentTab,
     } = this.state;
     const fft = {
       size: fftSize,
@@ -448,90 +448,109 @@ class SpectrogramPage extends Component {
                 cursorsEnabled={cursorsEnabled}
                 handleProcessTime={this.handleProcessTime}
               />
+              <Button
+                className="text-right"
+                variant="secondary"
+                onClick={() => {
+                  this.handleMeta();
+                  this.downloadInfo();
+                }}
+              >
+                <DownloadIcon></DownloadIcon>
+              </Button>
+              <Toggle id="toggle" defaultChecked={false} onChange={this.toggleCursors} />
+              <Form.Label htmlFor="toggle">Toggle Cursors</Form.Label>
             </Col>
             <Col>
-              <Row>
-                <Col>
-                  <div style={{ display: 'flex', justifyContent: 'right' }}>
-                    {cursorsEnabled && (
-                      <TimePlot currentSamples={currentSamples} toggleModal={this.toggleModal} openModal={openModal} />
-                    )}
-                    <Toggle id="toggle" defaultChecked={false} onChange={this.toggleCursors} />
-                    <Form.Label htmlFor="toggle">Toggle Cursors</Form.Label>
-                    &nbsp; &nbsp;
-                    <Button
-                      className="text-right"
-                      variant="secondary"
-                      onClick={() => {
-                        this.handleMeta();
-                        this.downloadInfo();
-                      }}
-                    >
-                      <DownloadIcon></DownloadIcon>
-                    </Button>
-                  </div>
-
-                  <Stage width={600} height={20}>
-                    <RulerTop
-                      fftSize={fftSize}
-                      sampleRate={sampleRate}
-                      timescale_width={20}
-                      text_width={10}
-                      spectrogram_width={spectrogramWidth}
-                      fft={fft}
-                      meta={meta}
-                      blob={blob}
-                      spectrogramWidthScale={spectrogramWidth / fftSize}
-                    />
-                  </Stage>
-                  <Stage width={600} height={600}>
-                    <Layer>
-                      <Image image={image} x={0} y={0} width={600} height={600} />
-                    </Layer>
-                    <AnnotationViewer
-                      handleMeta={this.handleMeta}
-                      annotations={annotations}
-                      spectrogramWidthScale={spectrogramWidth / fftSize}
-                      meta={meta}
-                      fftSize={fftSize}
-                      lowerTile={lowerTile}
-                      bytesPerSample={bytesPerSample}
-                    />
-                    {cursorsEnabled && (
-                      <TimeSelector
-                        spectrogramWidth={spectrogramWidth}
-                        spectrogramHeight={spectrogramHeight}
-                        upperTile={parseInt(upperTile)}
-                        lowerTile={parseInt(lowerTile)}
-                        handleTimeSelectionStart={this.handleTimeSelectionStart}
-                        handleTimeSelectionEnd={this.handleTimeSelectionEnd}
-                      />
-                    )}
-                  </Stage>
-                </Col>
-                <Col style={{ paddingTop: 60, paddingLeft: 0, paddingRight: 0 }}>
-                  <Stage width={rulerSideWidth + 50} height={600}>
-                    <RulerSide
-                      spectrogram_width={spectrogramWidth}
-                      fftSize={fftSize}
-                      sampleRate={sampleRate}
-                      currentRowAtTop={(lowerTile * TILE_SIZE_IN_BYTES) / 2 / bytesPerSample / fftSize}
-                    />
-                    <ScrollBar
-                      fetchAndRender={this.fetchAndRender}
-                      totalBytes={blob.totalBytes}
-                      spectrogram_height={spectrogramHeight}
-                      bytesPerSample={bytesPerSample}
-                      fftSize={fftSize}
-                      minimapNumFetches={minimapNumFetches}
-                      rulerSideWidth={rulerSideWidth}
-                      meta={meta}
-                      skipNFfts={skipNFfts}
-                      size={this.props.minimap.size}
-                    />
-                  </Stage>
-                </Col>
-              </Row>
+              <Tabs
+                id="tabs"
+                activeKey={currentTab}
+                onSelect={(k) => {
+                  this.handleProcessTime();
+                  this.setState({ currentTab: k });
+                }}
+                className="mb-3"
+                //fill
+              >
+                <Tab eventKey="spectrogram" title="Spectrogram">
+                  <Row style={{ marginLeft: 0, marginRight: 0 }}>
+                    <Col>
+                      <Stage width={600} height={20}>
+                        <RulerTop
+                          fftSize={fftSize}
+                          sampleRate={sampleRate}
+                          timescale_width={20}
+                          text_width={10}
+                          spectrogram_width={spectrogramWidth}
+                          fft={fft}
+                          meta={meta}
+                          blob={blob}
+                          spectrogramWidthScale={spectrogramWidth / fftSize}
+                        />
+                      </Stage>
+                      <Stage width={600} height={600}>
+                        <Layer>
+                          <Image image={image} x={0} y={0} width={600} height={600} />
+                        </Layer>
+                        <AnnotationViewer
+                          handleMeta={this.handleMeta}
+                          annotations={annotations}
+                          spectrogramWidthScale={spectrogramWidth / fftSize}
+                          meta={meta}
+                          fftSize={fftSize}
+                          lowerTile={lowerTile}
+                          bytesPerSample={bytesPerSample}
+                        />
+                        {cursorsEnabled && (
+                          <TimeSelector
+                            spectrogramWidth={spectrogramWidth}
+                            spectrogramHeight={spectrogramHeight}
+                            upperTile={parseInt(upperTile)}
+                            lowerTile={parseInt(lowerTile)}
+                            handleTimeSelectionStart={this.handleTimeSelectionStart}
+                            handleTimeSelectionEnd={this.handleTimeSelectionEnd}
+                          />
+                        )}
+                      </Stage>
+                    </Col>
+                    <Col className="col-1" style={{ paddingTop: 20, paddingLeft: 0, paddingRight: 0 }}>
+                      <Stage width={rulerSideWidth} height={600}>
+                        <RulerSide
+                          spectrogram_width={spectrogramWidth}
+                          fftSize={fftSize}
+                          sampleRate={sampleRate}
+                          currentRowAtTop={(lowerTile * TILE_SIZE_IN_BYTES) / 2 / bytesPerSample / fftSize}
+                        />
+                      </Stage>
+                    </Col>
+                    <Col style={{ justifyContent: 'left', paddingTop: 20, paddingLeft: 0, paddingRight: 0 }}>
+                      <Stage width={50} height={600}>
+                        <ScrollBar
+                          fetchAndRender={this.fetchAndRender}
+                          totalBytes={blob.totalBytes}
+                          spectrogram_height={spectrogramHeight}
+                          bytesPerSample={bytesPerSample}
+                          fftSize={fftSize}
+                          minimapNumFetches={minimapNumFetches}
+                          meta={meta}
+                          skipNFfts={skipNFfts}
+                          size={this.props.minimap.size}
+                        />
+                      </Stage>
+                    </Col>
+                  </Row>
+                </Tab>
+                <Tab eventKey="time" title="Time Plot" disabled={!cursorsEnabled}>
+                  {/* Reduces lag by only rendering the time/freq/iq components when they are selected */}
+                  {currentTab == 'time' && <TimePlot currentSamples={currentSamples} />}
+                </Tab>
+                <Tab eventKey="frequency" title="Frequency Plot" disabled={!cursorsEnabled}>
+                  {currentTab == 'frequency' && <FrequencyPlot currentSamples={currentSamples} />}
+                </Tab>
+                <Tab eventKey="iq" title="IQ Plot" disabled={!cursorsEnabled}>
+                  {currentTab == 'iq' && <IQPlot currentSamples={currentSamples} />}
+                </Tab>
+              </Tabs>
             </Col>
           </Row>
           <textarea
