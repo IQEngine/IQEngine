@@ -11,6 +11,7 @@ import DropdownButton from 'react-bootstrap/DropdownButton';
 import Dropdown from 'react-bootstrap/Dropdown';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
+import Toggle from 'react-toggle';
 
 const SettingsPane = (props) => {
   const [state, setState] = useState({
@@ -20,15 +21,15 @@ const SettingsPane = (props) => {
     error: { magMax: '', magMin: '', size: '' },
   });
 
-  let [magnitudeMax, onChangeMagnitudeMax] = useState({ magnitudeMax: props.magnitudeMax });
-  let [magnitudeMin, onChangeMagnitudeMin] = useState({ magnitudeMin: props.magnitudeMin });
+  let [magnitudeMax, setMagnitudeMax] = useState(props.magnitudeMax);
+  let [magnitudeMin, setMagnitudeMin] = useState(props.magnitudeMin);
 
   useEffect(() => {
-    onChangeMagnitudeMax({ magnitudeMax: props.magnitudeMax });
+    setMagnitudeMax(props.magnitudeMax);
   }, [props.magnitudeMax]);
 
   useEffect(() => {
-    onChangeMagnitudeMin({ magnitudeMin: props.magnitudeMin });
+    setMagnitudeMin(props.magnitudeMin);
   }, [props.magnitudeMin]);
 
   const onChangeWindowFunction = (event) => {
@@ -37,12 +38,12 @@ const SettingsPane = (props) => {
   };
 
   const onChangeTargetMagnitudeMax = (event) => {
-    onChangeMagnitudeMax({ magnitudeMax: parseInt(event.target.value) });
+    setMagnitudeMax(parseInt(event.target.value));
   };
 
   const onSubmitMagnitudeMax = () => {
-    const min = parseInt(magnitudeMin.magnitudeMin);
-    const max = parseInt(magnitudeMax.magnitudeMax);
+    const min = parseInt(magnitudeMin);
+    const max = parseInt(magnitudeMax);
     if (parseInt(max) && max > min && max < 256) {
       props.updateMagnitudeMax(max);
       setState({
@@ -64,14 +65,14 @@ const SettingsPane = (props) => {
   };
 
   const onChangeTargetMagnitudeMin = (event) => {
-    onChangeMagnitudeMin({ magnitudeMin: parseInt(event.target.value) });
+    setMagnitudeMin(parseInt(event.target.value));
   };
 
   const onSubmitMagnitudeMin = () => {
-    const min = parseInt(magnitudeMin.magnitudeMin);
-    const max = parseInt(magnitudeMax.magnitudeMax);
+    const min = parseInt(magnitudeMin);
+    const max = parseInt(magnitudeMax);
     if (min && min >= 0 && min < max) {
-      props.updateMagnitudeMin(magnitudeMin.magnitudeMin);
+      props.updateMagnitudeMin(magnitudeMin);
       setState({
         ...state,
         error: {
@@ -159,26 +160,16 @@ const SettingsPane = (props) => {
 
   return (
     <Form>
-      {/* When you press this button it will make autoscale run during the next call to select_fft, then it will turn itself off */}
-      <Button
-        className="mb-3"
-        variant="secondary"
-        onClick={props.handleAutoScale}
-        style={{ width: '100%', marginTop: '5px' }}
-      >
-        Autoscale
-      </Button>
+      <Form.Group className="mb-3" controlId="toggle">
+        <Toggle id="toggle" defaultChecked={false} onChange={props.toggleCursors} />
+        <Form.Label style={{ marginLeft: '10px', marginBottom: '0px' }}> Toggle Cursors</Form.Label>
+      </Form.Group>
 
       <Form.Group className="mb-3" controlId="formMagMax">
         <Form.Label>Magnitude Max</Form.Label>
         <div style={{ color: 'red', marginBottom: '2px' }}>{state.error.magMax}</div>
         <InputGroup className="mb-3">
-          <Form.Control
-            type="text"
-            defaultValue={magnitudeMax.magnitudeMax}
-            onChange={onChangeTargetMagnitudeMax}
-            size="sm"
-          />
+          <Form.Control type="text" defaultValue={magnitudeMax} onChange={onChangeTargetMagnitudeMax} size="sm" />
           <Button variant="secondary" onClick={onSubmitMagnitudeMax}>
             <FontAwesomeIcon icon={faArrowRight} />
           </Button>
@@ -189,17 +180,22 @@ const SettingsPane = (props) => {
         <Form.Label>Magnitude Min</Form.Label>
         <div style={{ color: 'red', marginBottom: '2px' }}>{state.error.magMin}</div>
         <InputGroup className="mb-3">
-          <Form.Control
-            type="text"
-            defaultValue={magnitudeMin.magnitudeMin}
-            onChange={onChangeTargetMagnitudeMin}
-            size="sm"
-          />
+          <Form.Control type="text" defaultValue={magnitudeMin} onChange={onChangeTargetMagnitudeMin} size="sm" />
           <Button variant="secondary" onClick={onSubmitMagnitudeMin}>
             <FontAwesomeIcon icon={faArrowRight} />
           </Button>
         </InputGroup>
       </Form.Group>
+
+      {/* When you press this button it will make autoscale run during the next call to select_fft, then it will turn itself off */}
+      <Button
+        className="mb-3"
+        variant="secondary"
+        onClick={props.handleAutoScale}
+        style={{ width: '100%', marginTop: '5px' }}
+      >
+        Autoscale Max/Min
+      </Button>
 
       <Form.Group className="mb-3" controlId="formFFT">
         <Form.Label>

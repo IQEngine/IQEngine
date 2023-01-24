@@ -4,9 +4,7 @@
 import { Container, Row, Col } from 'react-bootstrap';
 import { Sidebar } from './Sidebar';
 import { Component } from 'react';
-import Toggle from 'react-toggle';
 import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
 import ScrollBar from './ScrollBar';
 import { TimePlot } from './TimePlot';
 import { FrequencyPlot } from './FrequencyPlot';
@@ -48,8 +46,8 @@ class SpectrogramPage extends Component {
       skipNFfts: null,
       spectrogramHeight: 600,
       spectrogramWidth: 600,
-      timeSelectionStart: -1,
-      timeSelectionEnd: -1,
+      timeSelectionStart: 0,
+      timeSelectionEnd: 10,
       cursorsEnabled: false,
       currentFftMax: -999999,
       currentFftMin: 999999,
@@ -270,9 +268,8 @@ class SpectrogramPage extends Component {
   };
 
   handleAutoScale = () => {
-    const { autoscale } = this.state;
     this.setState({
-      autoscale: !autoscale,
+      autoscale: true,
     });
   };
 
@@ -332,17 +329,8 @@ class SpectrogramPage extends Component {
   };
 
   renderImage = (lowerTile, upperTile) => {
-    const {
-      bytesPerSample,
-      fftSize,
-      magnitudeMax,
-      magnitudeMin,
-      meta,
-      window,
-      autoscale,
-      currentFftMax,
-      currentFftMin,
-    } = this.state;
+    const { bytesPerSample, fftSize, magnitudeMax, magnitudeMin, meta, autoscale, currentFftMax, currentFftMin } =
+      this.state;
     // Update the image (eventually this should get moved somewhere else)
     let ret = select_fft(
       lowerTile,
@@ -352,7 +340,7 @@ class SpectrogramPage extends Component {
       magnitudeMax,
       magnitudeMin,
       meta,
-      window,
+      this.state.window, // dont want to conflict with the main window var
       currentFftMax,
       currentFftMin,
       autoscale
@@ -364,9 +352,18 @@ class SpectrogramPage extends Component {
         //console.log('Image Updated');
       });
       if (autoscale && ret.autoMax) {
-        this.handleAutoScale(); // toggles it off so this only will happen once
-        this.handleMagnitudeMax(ret.autoMax);
-        this.handleMagnitudeMin(ret.autoMin);
+        console.log('New max/min:', ret.autoMax, ret.autoMin);
+        window.fft_data = {};
+        this.setState(
+          {
+            autoscale: false, // toggles it off so this only will happen once
+            magnitudeMax: ret.autoMax,
+            magnitudeMin: ret.autoMin,
+          },
+          () => {
+            this.renderImage(lowerTile, upperTile);
+          }
+        );
       }
 
       this.setState({ annotations: ret.annotations });
@@ -447,19 +444,8 @@ class SpectrogramPage extends Component {
                 handleMeta={this.handleMeta}
                 cursorsEnabled={cursorsEnabled}
                 handleProcessTime={this.handleProcessTime}
+                toggleCursors={this.toggleCursors}
               />
-              <Button
-                className="text-right"
-                variant="secondary"
-                onClick={() => {
-                  this.handleMeta();
-                  this.downloadInfo();
-                }}
-              >
-                <DownloadIcon></DownloadIcon>
-              </Button>
-              <Toggle id="toggle" defaultChecked={false} onChange={this.toggleCursors} />
-              <Form.Label htmlFor="toggle">Toggle Cursors</Form.Label>
             </Col>
             <Col>
               <Tabs
@@ -540,25 +526,45 @@ class SpectrogramPage extends Component {
                     </Col>
                   </Row>
                 </Tab>
-                <Tab eventKey="time" title="Time Plot" disabled={!cursorsEnabled}>
+                <Tab eventKey="time" title="Time Plot">
                   {/* Reduces lag by only rendering the time/freq/iq components when they are selected */}
-                  {currentTab == 'time' && <TimePlot currentSamples={currentSamples} />}
+                  {currentTab == 'time' && <TimePlot currentSamples={currentSamples} cursorsEnabled={cursorsEnabled} />}
                 </Tab>
-                <Tab eventKey="frequency" title="Frequency Plot" disabled={!cursorsEnabled}>
-                  {currentTab == 'frequency' && <FrequencyPlot currentSamples={currentSamples} />}
+                <Tab eventKey="frequency" title="Frequency Plot">
+                  {currentTab == 'frequency' && (
+                    <FrequencyPlot currentSamples={currentSamples} cursorsEnabled={cursorsEnabled} />
+                  )}
                 </Tab>
-                <Tab eventKey="iq" title="IQ Plot" disabled={!cursorsEnabled}>
-                  {currentTab == 'iq' && <IQPlot currentSamples={currentSamples} />}
+                <Tab eventKey="iq" title="IQ Plot">
+                  {currentTab == 'iq' && <IQPlot currentSamples={currentSamples} cursorsEnabled={cursorsEnabled} />}
                 </Tab>
               </Tabs>
             </Col>
           </Row>
-          <textarea
-            rows="20"
-            cols="130"
-            onChange={this.handleMetaChange}
-            value={JSON.stringify(this.state.meta, null, 4)}
-          />
+          <Row style={{ paddingBottom: '5px', paddingTop: '30px' }}>
+            <Col className="col-3">
+              <Button
+                className="text-right"
+                variant="secondary"
+                onClick={() => {
+                  this.handleMeta();
+                  this.downloadInfo();
+                }}
+              >
+                <DownloadIcon></DownloadIcon>
+                Download meta JSON
+              </Button>
+            </Col>
+            <Col></Col>
+          </Row>
+          <Row>
+            <textarea
+              rows="20"
+              cols="100"
+              onChange={this.handleMetaChange}
+              value={JSON.stringify(this.state.meta, null, 4)}
+            />
+          </Row>
         </Container>
       </div>
     );

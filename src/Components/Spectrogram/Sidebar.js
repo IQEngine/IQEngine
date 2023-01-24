@@ -28,6 +28,7 @@ const Sidebar = (props) => {
                 autoscale={props.autoscale}
                 magnitudeMax={props.fft.magnitudeMax}
                 magnitudeMin={props.fft.magnitudeMin}
+                toggleCursors={props.toggleCursors}
               />
             </Accordion.Body>
           </Accordion.Item>

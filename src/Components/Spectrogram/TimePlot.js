@@ -26,6 +26,14 @@ export const TimePlot = (props) => {
     }
   }, [currentSamples]); // TODO make sure this isnt going to be sluggish when currentSamples is huge
 
+  if (!props.cursorsEnabled) {
+    return (
+      <div>
+        <p>Please enable cursors first</p>
+      </div>
+    );
+  }
+
   return (
     <div>
       <Plot
