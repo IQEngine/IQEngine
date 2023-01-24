@@ -46,8 +46,8 @@ class SpectrogramPage extends Component {
       skipNFfts: null,
       spectrogramHeight: 600,
       spectrogramWidth: 600,
-      timeSelectionStart: -1,
-      timeSelectionEnd: -1,
+      timeSelectionStart: 0,
+      timeSelectionEnd: 10,
       cursorsEnabled: false,
       currentFftMax: -999999,
       currentFftMin: 999999,
@@ -526,15 +526,17 @@ class SpectrogramPage extends Component {
                     </Col>
                   </Row>
                 </Tab>
-                <Tab eventKey="time" title="Time Plot" disabled={!cursorsEnabled}>
+                <Tab eventKey="time" title="Time Plot">
                   {/* Reduces lag by only rendering the time/freq/iq components when they are selected */}
-                  {currentTab == 'time' && <TimePlot currentSamples={currentSamples} />}
+                  {currentTab == 'time' && <TimePlot currentSamples={currentSamples} cursorsEnabled={cursorsEnabled} />}
                 </Tab>
-                <Tab eventKey="frequency" title="Frequency Plot" disabled={!cursorsEnabled}>
-                  {currentTab == 'frequency' && <FrequencyPlot currentSamples={currentSamples} />}
+                <Tab eventKey="frequency" title="Frequency Plot">
+                  {currentTab == 'frequency' && (
+                    <FrequencyPlot currentSamples={currentSamples} cursorsEnabled={cursorsEnabled} />
+                  )}
                 </Tab>
-                <Tab eventKey="iq" title="IQ Plot" disabled={!cursorsEnabled}>
-                  {currentTab == 'iq' && <IQPlot currentSamples={currentSamples} />}
+                <Tab eventKey="iq" title="IQ Plot">
+                  {currentTab == 'iq' && <IQPlot currentSamples={currentSamples} cursorsEnabled={cursorsEnabled} />}
                 </Tab>
               </Tabs>
             </Col>
