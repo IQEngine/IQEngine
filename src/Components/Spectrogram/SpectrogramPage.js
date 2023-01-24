@@ -4,9 +4,7 @@
 import { Container, Row, Col } from 'react-bootstrap';
 import { Sidebar } from './Sidebar';
 import { Component } from 'react';
-import Toggle from 'react-toggle';
 import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
 import ScrollBar from './ScrollBar';
 import { TimePlot } from './TimePlot';
 import { FrequencyPlot } from './FrequencyPlot';
@@ -447,19 +445,8 @@ class SpectrogramPage extends Component {
                 handleMeta={this.handleMeta}
                 cursorsEnabled={cursorsEnabled}
                 handleProcessTime={this.handleProcessTime}
+                toggleCursors={this.toggleCursors}
               />
-              <Button
-                className="text-right"
-                variant="secondary"
-                onClick={() => {
-                  this.handleMeta();
-                  this.downloadInfo();
-                }}
-              >
-                <DownloadIcon></DownloadIcon>
-              </Button>
-              <Toggle id="toggle" defaultChecked={false} onChange={this.toggleCursors} />
-              <Form.Label htmlFor="toggle">Toggle Cursors</Form.Label>
             </Col>
             <Col>
               <Tabs
@@ -553,12 +540,30 @@ class SpectrogramPage extends Component {
               </Tabs>
             </Col>
           </Row>
-          <textarea
-            rows="20"
-            cols="130"
-            onChange={this.handleMetaChange}
-            value={JSON.stringify(this.state.meta, null, 4)}
-          />
+          <Row style={{ paddingBottom: '5px', paddingTop: '30px' }}>
+            <Col className="col-3">
+              <Button
+                className="text-right"
+                variant="secondary"
+                onClick={() => {
+                  this.handleMeta();
+                  this.downloadInfo();
+                }}
+              >
+                <DownloadIcon></DownloadIcon>
+                Download meta JSON
+              </Button>
+            </Col>
+            <Col></Col>
+          </Row>
+          <Row>
+            <textarea
+              rows="20"
+              cols="100"
+              onChange={this.handleMetaChange}
+              value={JSON.stringify(this.state.meta, null, 4)}
+            />
+          </Row>
         </Container>
       </div>
     );

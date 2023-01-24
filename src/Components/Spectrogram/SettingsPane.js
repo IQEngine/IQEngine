@@ -11,6 +11,7 @@ import DropdownButton from 'react-bootstrap/DropdownButton';
 import Dropdown from 'react-bootstrap/Dropdown';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
+import Toggle from 'react-toggle';
 
 const SettingsPane = (props) => {
   const [state, setState] = useState({
@@ -159,6 +160,11 @@ const SettingsPane = (props) => {
 
   return (
     <Form>
+      <Form.Group className="mb-3" controlId="toggle">
+        <Toggle id="toggle" defaultChecked={false} onChange={props.toggleCursors} />
+        <Form.Label style={{ marginLeft: '10px', marginBottom: '0px' }}> Toggle Cursors</Form.Label>
+      </Form.Group>
+
       <Form.Group className="mb-3" controlId="formMagMax">
         <Form.Label>Magnitude Max</Form.Label>
         <div style={{ color: 'red', marginBottom: '2px' }}>{state.error.magMax}</div>
@@ -198,7 +204,7 @@ const SettingsPane = (props) => {
         onClick={props.handleAutoScale}
         style={{ width: '100%', marginTop: '5px' }}
       >
-        Autoscale
+        Autoscale Max/Min
       </Button>
 
       <Form.Group className="mb-3" controlId="formFFT">
