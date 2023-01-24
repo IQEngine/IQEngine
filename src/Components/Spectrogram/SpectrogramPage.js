@@ -307,10 +307,14 @@ class SpectrogramPage extends Component {
     const blob = new Blob([fileData], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
-
     link.download = 'spectrogram-meta-data-modified.sigmf-meta';
     link.href = url;
+    document.body.appendChild(link);
     link.click();
+    setTimeout(function () {
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    }, 0);
   }
 
   handleMetaChange = (e) => {
@@ -448,6 +452,16 @@ class SpectrogramPage extends Component {
                 cursorsEnabled={cursorsEnabled}
                 handleProcessTime={this.handleProcessTime}
               />
+              <Button
+                className="text-right"
+                variant="secondary"
+                onClick={() => {
+                  this.handleMeta();
+                  this.downloadInfo();
+                }}
+              >
+                <DownloadIcon></DownloadIcon>
+              </Button>
             </Col>
             <Col>
               <Row>
@@ -458,17 +472,6 @@ class SpectrogramPage extends Component {
                     )}
                     <Toggle id="toggle" defaultChecked={false} onChange={this.toggleCursors} />
                     <Form.Label htmlFor="toggle">Toggle Cursors</Form.Label>
-                    &nbsp; &nbsp;
-                    <Button
-                      className="text-right"
-                      variant="secondary"
-                      onClick={() => {
-                        this.handleMeta();
-                        this.downloadInfo();
-                      }}
-                    >
-                      <DownloadIcon></DownloadIcon>
-                    </Button>
                   </div>
 
                   <Stage width={600} height={20}>
