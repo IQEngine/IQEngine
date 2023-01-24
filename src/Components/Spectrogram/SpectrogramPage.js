@@ -329,17 +329,8 @@ class SpectrogramPage extends Component {
   };
 
   renderImage = (lowerTile, upperTile) => {
-    const {
-      bytesPerSample,
-      fftSize,
-      magnitudeMax,
-      magnitudeMin,
-      meta,
-      window,
-      autoscale,
-      currentFftMax,
-      currentFftMin,
-    } = this.state;
+    const { bytesPerSample, fftSize, magnitudeMax, magnitudeMin, meta, autoscale, currentFftMax, currentFftMin } =
+      this.state;
     // Update the image (eventually this should get moved somewhere else)
     let ret = select_fft(
       lowerTile,
@@ -349,7 +340,7 @@ class SpectrogramPage extends Component {
       magnitudeMax,
       magnitudeMin,
       meta,
-      window,
+      this.state.window, // dont want to conflict with the main window var
       currentFftMax,
       currentFftMin,
       autoscale
@@ -361,14 +352,18 @@ class SpectrogramPage extends Component {
         //console.log('Image Updated');
       });
       if (autoscale && ret.autoMax) {
-        console.log(ret.autoMax, ret.autoMin);
-        this.setState({
-          autoscale: false, // toggles it off so this only will happen once
-          magnitudeMax: ret.autoMax,
-          magnitudeMin: ret.autoMin,
-        });
-        //this.handleMagnitudeMax(ret.autoMax);
-        //this.handleMagnitudeMin(ret.autoMin);
+        console.log('New max/min:', ret.autoMax, ret.autoMin);
+        window.fft_data = {};
+        this.setState(
+          {
+            autoscale: false, // toggles it off so this only will happen once
+            magnitudeMax: ret.autoMax,
+            magnitudeMin: ret.autoMin,
+          },
+          () => {
+            this.renderImage(lowerTile, upperTile);
+          }
+        );
       }
 
       this.setState({ annotations: ret.annotations });

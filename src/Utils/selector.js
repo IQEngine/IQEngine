@@ -42,8 +42,8 @@ function calcFftOfTile(
   const clearBuf = new ArrayBuffer(fft_size * num_ffts * 4); // fills with 0s ie. rgba 0,0,0,0 = transparent
   let new_fft_data = new Uint8ClampedArray(clearBuf);
   let startOfs = 0;
-  let autoMin = 0;
-  let autoMax = 0;
+  let autoMin;
+  let autoMax;
   let tempCurrentFftMax = currentFftMax;
   let tempCurrentFftMin = currentFftMin;
 
@@ -104,7 +104,7 @@ function calcFftOfTile(
       // get the last calculated standard deviation and mean calculated from this loop and define the auto magnitude of min and max
       const std = getStandardDeviation(magnitudes);
       const mean = magnitudes.reduce((a, b) => a + b) / magnitudes.length;
-      // for now we're just going to use whatever the last FFT row's value is for min/max
+      // TODO: for now we're just going to use whatever the last FFT row's value is for min/max
       autoMin = mean - 1.5 * std;
       autoMax = mean + 1.5 * std;
       if (autoMin < 1) {
