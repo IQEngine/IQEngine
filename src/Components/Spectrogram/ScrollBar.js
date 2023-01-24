@@ -17,7 +17,6 @@ const ScrollBar = (props) => {
     bytesPerSample,
     fftSize,
     minimapNumFetches,
-    rulerSideWidth,
     meta,
     skipNFfts,
     size,
@@ -146,7 +145,7 @@ const ScrollBar = (props) => {
       e.target.y(spectrogram_height - handleHeightPixels);
       newY = spectrogram_height - handleHeightPixels;
     }
-    e.target.x(rulerSideWidth);
+    e.target.x(0);
     setY(newY);
     fetchAndRender(y);
   };
@@ -156,7 +155,7 @@ const ScrollBar = (props) => {
       <>
         <Layer>
           <Rect
-            x={rulerSideWidth}
+            x={0}
             y={0}
             fill="grey"
             width={scrollbarWidth}
@@ -165,7 +164,7 @@ const ScrollBar = (props) => {
             onClick={handleClick}
           ></Rect>
           <Rect
-            x={rulerSideWidth}
+            x={0}
             y={y}
             fill="black"
             width={scrollbarWidth}
@@ -181,10 +180,10 @@ const ScrollBar = (props) => {
   return (
     <>
       <Layer>
-        <Image image={minimapImg} x={rulerSideWidth} y={0} width={scrollbarWidth} height={spectrogram_height} />
+        <Image image={minimapImg} x={0} y={0} width={scrollbarWidth} height={spectrogram_height} />
         {/* This rect is invisible */}
         <Rect
-          x={rulerSideWidth}
+          x={0}
           y={0}
           fill="grey"
           opacity={0}
@@ -196,7 +195,7 @@ const ScrollBar = (props) => {
       </Layer>
       <Layer>
         <Rect
-          x={rulerSideWidth}
+          x={0}
           y={y}
           fill="black"
           opacity={0.6}
@@ -207,7 +206,7 @@ const ScrollBar = (props) => {
         ></Rect>
         {ticks.map((tick, index) => (
           <Rect
-            x={rulerSideWidth}
+            x={0}
             y={tick.y}
             width={7}
             height={tick.height}

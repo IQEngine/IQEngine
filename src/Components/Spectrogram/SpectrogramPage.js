@@ -464,7 +464,7 @@ class SpectrogramPage extends Component {
               </Button>
             </Col>
             <Col>
-              <Row>
+              <Row style={{ marginLeft: 0, marginRight: 0 }}>
                 <Col>
                   <div style={{ display: 'flex', justifyContent: 'right' }}>
                     {cursorsEnabled && (
@@ -512,14 +512,18 @@ class SpectrogramPage extends Component {
                     )}
                   </Stage>
                 </Col>
-                <Col style={{ paddingTop: 60, paddingLeft: 0, paddingRight: 0 }}>
-                  <Stage width={rulerSideWidth + 50} height={600}>
+                <Col className="col-1" style={{ paddingTop: 60, paddingLeft: 0, paddingRight: 0 }}>
+                  <Stage width={rulerSideWidth} height={600}>
                     <RulerSide
                       spectrogram_width={spectrogramWidth}
                       fftSize={fftSize}
                       sampleRate={sampleRate}
                       currentRowAtTop={(lowerTile * TILE_SIZE_IN_BYTES) / 2 / bytesPerSample / fftSize}
                     />
+                  </Stage>
+                </Col>
+                <Col style={{ justifyContent: 'left', paddingTop: 60, paddingLeft: 0, paddingRight: 0 }}>
+                  <Stage width={50} height={600}>
                     <ScrollBar
                       fetchAndRender={this.fetchAndRender}
                       totalBytes={blob.totalBytes}
@@ -527,7 +531,6 @@ class SpectrogramPage extends Component {
                       bytesPerSample={bytesPerSample}
                       fftSize={fftSize}
                       minimapNumFetches={minimapNumFetches}
-                      rulerSideWidth={rulerSideWidth}
                       meta={meta}
                       skipNFfts={skipNFfts}
                       size={this.props.minimap.size}
