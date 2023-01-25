@@ -98,7 +98,7 @@ export default function FileRow({
         </>
       )}
 
-      <td className="align-middle">{item.lengthInIQSamples / 1e6} M</td>
+      <td className="align-middle">{item.lengthInMillionIQSamples} M</td>
       <td className="align-middle">
         <NewlineText text={item.dataType} />
       </td>
