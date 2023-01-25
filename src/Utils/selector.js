@@ -96,8 +96,11 @@ function calcFftOfTile(
 
     // convert to 0 - 255
     magnitudes = magnitudes.map((x) => x - tempCurrentFftMin); // lowest value is now 0
-    magnitudes = magnitudes.map((x) => x / tempCurrentFftMax); // highest value is now 1
+    magnitudes = magnitudes.map((x) => x / (tempCurrentFftMax - tempCurrentFftMin)); // highest value is now 1
     magnitudes = magnitudes.map((x) => x * 255); // now from 0 to 255
+
+    // To leave some margin to go above max and below min, scale it to 50 to 200 for now
+    magnitudes = magnitudes.map((x) => x * 0.588 + 50); // 0.588 is (200-50)/255
 
     // When you click the button this code will run once, then it will turn itself off until you click it again
     if (autoscale) {

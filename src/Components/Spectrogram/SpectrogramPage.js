@@ -29,7 +29,7 @@ class SpectrogramPage extends Component {
       meta: props.meta,
       fftSize: 1024,
       magnitudeMax: 240,
-      magnitudeMin: 100,
+      magnitudeMin: 80,
       window: 'hamming',
       autoscale: false,
       image: null,
@@ -365,7 +365,6 @@ class SpectrogramPage extends Component {
           }
         );
       }
-
       this.setState({ annotations: ret.annotations });
       this.setState({ sampleRate: ret.sample_rate });
       this.setState({ currentFftMax: ret.currentFftMax });
