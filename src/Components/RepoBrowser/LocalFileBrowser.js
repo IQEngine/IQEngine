@@ -46,7 +46,6 @@ const LocalFileBrowser = (props) => {
   const openFile = async () => {
     const [handle1, handle2] = await window.showOpenFilePicker({ multiple: true });
     const file1 = await handle1.getFile();
-    const file2 = await handle2.getFile();
     if (file1.name.includes('.sigmf-meta')) {
       props.updateConnectionMetaFileHandle(handle1); // store it in redux
       props.updateConnectionDataFileHandle(handle2); // assume other file is data

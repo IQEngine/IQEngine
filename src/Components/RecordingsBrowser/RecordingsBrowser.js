@@ -112,7 +112,7 @@ export default function RecordingsBrowser(props) {
       updateConnectionSasToken(sasToken);
       fetchRecordingsList({ accountName: accountName, containerName: containerName, sasToken: sasToken });
     }
-  }, []);
+  });
 
   useEffect(() => {
     toggleLoader(recording.loading);

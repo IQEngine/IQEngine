@@ -23,7 +23,8 @@ const ScrollBar = (props) => {
   } = props;
 
   const [minimapImg, setMinimapImg] = useState(null);
-  const [scrollbarWidth, setStageWidth] = useState(50);
+  //const [scrollbarWidth, setStageWidth] = useState(50);
+  const scrollbarWidth = 50;
   const [y, setY] = useState(0);
   const [ticks, setTicks] = useState([]);
   const [handleHeightPixels, setHandleHeightPixels] = useState();
@@ -119,6 +120,7 @@ const ScrollBar = (props) => {
         setMinimapImg(ret);
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [size, minimapNumFetches]); // dont add anymore here, so that this triggers ONLY at the start
 
   const handleClick = (e) => {
