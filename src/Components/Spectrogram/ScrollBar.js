@@ -71,8 +71,7 @@ const ScrollBar = (props) => {
       const maximum_val = Math.max(...magnitudesBuffer);
       const minimum_val = Math.min(...magnitudesBuffer);
 
-      const clearBuf = new ArrayBuffer(fft_size * minimapNumFetches * 4); // fills with 0s ie. rgba 0,0,0,0 = transparent
-      let minimap = new Uint8ClampedArray(clearBuf);
+      let minimap = new Uint8ClampedArray(fft_size * minimapNumFetches * 4);
       let startOfs = 0;
       for (let i = 0; i < minimapNumFetches; i++) {
         let magnitudes = magnitudesBuffer.slice(i * fft_size, (i + 1) * fft_size);

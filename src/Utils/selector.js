@@ -39,8 +39,7 @@ function calcFftOfTile(
   currentFftMin
 ) {
   let startTime = performance.now();
-  const clearBuf = new ArrayBuffer(fft_size * num_ffts * 4); // fills with 0s ie. rgba 0,0,0,0 = transparent
-  let new_fft_data = new Uint8ClampedArray(clearBuf);
+  let new_fft_data = new Uint8ClampedArray(fft_size * num_ffts * 4);
   let startOfs = 0;
   let autoMin;
   let autoMax;
