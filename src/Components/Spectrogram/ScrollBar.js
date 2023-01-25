@@ -78,12 +78,12 @@ const ScrollBar = (props) => {
         let magnitudes = magnitudesBuffer.slice(i * fft_size, (i + 1) * fft_size);
         // convert to 0 - 255
         magnitudes = magnitudes.map((x) => x - minimum_val); // lowest value is now 0
-        magnitudes = magnitudes.map((x) => x / maximum_val); // highest value is now 1
+        magnitudes = magnitudes.map((x) => x / (maximum_val - minimum_val)); // highest value is now 1
         magnitudes = magnitudes.map((x) => x * 255); // now from 0 to 255
 
         // apply magnitude min and max
         const magnitude_max = 240;
-        const magnitude_min = 100;
+        const magnitude_min = 80;
         magnitudes = magnitudes.map((x) => x / ((magnitude_max - magnitude_min) / 255));
         magnitudes = magnitudes.map((x) => x - magnitude_min);
 
