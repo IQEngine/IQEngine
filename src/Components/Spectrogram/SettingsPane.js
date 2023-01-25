@@ -251,7 +251,7 @@ const SettingsPane = (props) => {
           style={{ textDecoration: 'none', color: 'white', margin: '5px 0 0 5px' }}
           target="_blank"
           rel="noreferrer"
-          href="http://t-filter.engineerjs.com/"
+          href="http://t-filter.engineerjs.com/" //DevSkim: ignore DS137138
         >
           <InfoOutlinedIcon></InfoOutlinedIcon>
         </a>
