@@ -130,21 +130,21 @@ export const About = () => {
           <Col></Col>
           <Col>
             <center>
-              <img style={{ width: '50%' }} src="./Marc.png"></img>
+              <img style={{ width: '50%' }} src="./Marc.png" alt="marc"></img>
               <p></p>
               Marc
             </center>
           </Col>
           <Col>
             <center>
-              <img style={{ width: '50%' }} src="./Maheen.png"></img>
+              <img style={{ width: '50%' }} src="./Maheen.png" alt="maheen"></img>
               <p></p>
               Maheen
             </center>
           </Col>
           <Col>
             <center>
-              <img style={{ width: '50%' }} src="./Luke.png"></img>
+              <img style={{ width: '50%' }} src="./Luke.png" alt="luke avatar"></img>
               <p></p>
               Luke
             </center>
@@ -200,7 +200,7 @@ export const About = () => {
 
         <Row style={{ marginBottom: '15px' }}>
           <center>
-            <img style={{ width: '30%' }} alt="" src="./sprinterns.jpeg"></img>
+            <img style={{ width: '30%' }} alt="sprintern" src="./sprinterns.jpeg"></img>
             <p></p>
             Winter '23 Sprinterns from UMD and GMU
           </center>

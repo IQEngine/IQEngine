@@ -29,7 +29,7 @@ class SpectrogramPage extends Component {
       meta: props.meta,
       fftSize: 1024,
       magnitudeMax: 240,
-      magnitudeMin: 100,
+      magnitudeMin: 80,
       window: 'hamming',
       autoscale: false,
       image: null,
@@ -365,7 +365,6 @@ class SpectrogramPage extends Component {
           }
         );
       }
-
       this.setState({ annotations: ret.annotations });
       this.setState({ sampleRate: ret.sample_rate });
       this.setState({ currentFftMax: ret.currentFftMax });
@@ -528,15 +527,17 @@ class SpectrogramPage extends Component {
                 </Tab>
                 <Tab eventKey="time" title="Time Plot">
                   {/* Reduces lag by only rendering the time/freq/iq components when they are selected */}
-                  {currentTab == 'time' && <TimePlot currentSamples={currentSamples} cursorsEnabled={cursorsEnabled} />}
+                  {currentTab === 'time' && (
+                    <TimePlot currentSamples={currentSamples} cursorsEnabled={cursorsEnabled} />
+                  )}
                 </Tab>
                 <Tab eventKey="frequency" title="Frequency Plot">
-                  {currentTab == 'frequency' && (
+                  {currentTab === 'frequency' && (
                     <FrequencyPlot currentSamples={currentSamples} cursorsEnabled={cursorsEnabled} />
                   )}
                 </Tab>
                 <Tab eventKey="iq" title="IQ Plot">
-                  {currentTab == 'iq' && <IQPlot currentSamples={currentSamples} cursorsEnabled={cursorsEnabled} />}
+                  {currentTab === 'iq' && <IQPlot currentSamples={currentSamples} cursorsEnabled={cursorsEnabled} />}
                 </Tab>
               </Tabs>
             </Col>

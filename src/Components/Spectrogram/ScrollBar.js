@@ -23,7 +23,8 @@ const ScrollBar = (props) => {
   } = props;
 
   const [minimapImg, setMinimapImg] = useState(null);
-  const [scrollbarWidth, setStageWidth] = useState(50);
+  //const [scrollbarWidth, setStageWidth] = useState(50);
+  const scrollbarWidth = 50;
   const [y, setY] = useState(0);
   const [ticks, setTicks] = useState([]);
   const [handleHeightPixels, setHandleHeightPixels] = useState();
@@ -71,19 +72,18 @@ const ScrollBar = (props) => {
       const maximum_val = Math.max(...magnitudesBuffer);
       const minimum_val = Math.min(...magnitudesBuffer);
 
-      const clearBuf = new ArrayBuffer(fft_size * minimapNumFetches * 4); // fills with 0s ie. rgba 0,0,0,0 = transparent
-      let minimap = new Uint8ClampedArray(clearBuf);
+      let minimap = new Uint8ClampedArray(fft_size * minimapNumFetches * 4);
       let startOfs = 0;
       for (let i = 0; i < minimapNumFetches; i++) {
         let magnitudes = magnitudesBuffer.slice(i * fft_size, (i + 1) * fft_size);
         // convert to 0 - 255
         magnitudes = magnitudes.map((x) => x - minimum_val); // lowest value is now 0
-        magnitudes = magnitudes.map((x) => x / maximum_val); // highest value is now 1
+        magnitudes = magnitudes.map((x) => x / (maximum_val - minimum_val)); // highest value is now 1
         magnitudes = magnitudes.map((x) => x * 255); // now from 0 to 255
 
         // apply magnitude min and max
         const magnitude_max = 240;
-        const magnitude_min = 100;
+        const magnitude_min = 80;
         magnitudes = magnitudes.map((x) => x / ((magnitude_max - magnitude_min) / 255));
         magnitudes = magnitudes.map((x) => x - magnitude_min);
 
@@ -120,6 +120,7 @@ const ScrollBar = (props) => {
         setMinimapImg(ret);
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [size, minimapNumFetches]); // dont add anymore here, so that this triggers ONLY at the start
 
   const handleClick = (e) => {
