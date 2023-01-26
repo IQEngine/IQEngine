@@ -30,6 +30,7 @@ const Sidebar = (props) => {
                 magnitudeMax={props.fft.magnitudeMax}
                 magnitudeMin={props.fft.magnitudeMin}
                 toggleCursors={props.toggleCursors}
+                updatePythonSnippet={props.updatePythonSnippet}
               />
             </Accordion.Body>
           </Accordion.Item>

@@ -18,6 +18,7 @@ const SettingsPane = (props) => {
   const [state, setState] = useState({
     size: 1024,
     taps: '[1]',
+    pythonSnippet: '',
     windowFunction: 'hamming',
     error: { magMax: '', magMin: '', size: '' },
   });
@@ -116,6 +117,14 @@ const SettingsPane = (props) => {
         },
       });
     }
+  };
+
+  const onChangePythonSnippet = (event) => {
+    setState({ ...state, pythonSnippet: event.target.value });
+  };
+
+  const onSubmitPythonSnippet = () => {
+    props.updatePythonSnippet(state.pythonSnippet);
   };
 
   const onChangeTaps = (event) => {
@@ -296,6 +305,19 @@ const SettingsPane = (props) => {
           <HelpOutlineOutlinedIcon />
         </a>
       </Form.Label>
+
+      <Form.Group className="mb-3" controlId="formPythonSnippet">
+        <Form.Label style={{ display: 'flex' }}>
+          Python Snippet<br></br>
+        </Form.Label>
+        <InputGroup className="mb-3">
+          <textarea rows="3" cols="16" onChange={onChangePythonSnippet} value={state.pythonSnippet} />
+          &nbsp; &nbsp;
+          <Button variant="secondary" onClick={onSubmitPythonSnippet}>
+            <FontAwesomeIcon icon={faArrowRight} />
+          </Button>
+        </InputGroup>
+      </Form.Group>
     </Form>
   );
 };

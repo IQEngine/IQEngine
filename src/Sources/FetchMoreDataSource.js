@@ -30,15 +30,19 @@ export function convolve(array, taps) {
   return output;
 }
 
-export function convertSamples(buffer, blob, data_type) {
+export function applyConvolve(buffer, taps, data_type) {
   let samples;
   if (data_type === 'ci16_le') {
     samples = new Int16Array(buffer);
-    samples = convolve(samples, blob.taps); // we apply the taps here and not in the FFT calcs so transients dont hurt us as much
+    if (taps.length !== 1) {
+      samples = convolve(samples, taps); // we apply the taps here and not in the FFT calcs so transients dont hurt us as much
+    }
     samples = Int16Array.from(samples); // convert back to int TODO: clean this up
   } else if (data_type === 'cf32_le') {
     samples = new Float32Array(buffer);
-    samples = convolve(samples, blob.taps);
+    if (taps.length !== 1) {
+      samples = convolve(samples, taps);
+    }
   } else {
     console.error('unsupported data_type');
     samples = new Int16Array(buffer);
@@ -57,9 +61,27 @@ export function readFileAsync(file) {
   });
 }
 
+async function fetchUsingPythonSnippet(offset, count, blobName, dataType, pythonSnippet) {
+  const resp = await fetch('https://iqengine-azure-functions2.azurewebsites.net/pythonsnippet', {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      pythonSnippet: pythonSnippet,
+      dataType: dataType,
+      offset: offset,
+      count: count,
+      blobName: blobName,
+    }),
+  });
+  return resp.arrayBuffer(); // not typed- we convert it to the right type later
+}
+
 const FetchMoreData = createAsyncThunk('FetchMoreData', async (args, thunkAPI) => {
   console.log('running FetchMoreData');
-  const { tile, connection, blob, data_type, offset, count } = args;
+  const { tile, connection, blob, data_type, offset, count, pythonSnippet } = args;
 
   let samples;
   let startTime = performance.now();
@@ -68,19 +90,26 @@ const FetchMoreData = createAsyncThunk('FetchMoreData', async (args, thunkAPI) =
     while (recording === '') {
       console.log('waiting'); // hopefully this doesn't happen, and if it does it should be pretty quick because its the time it takes for the state to set
     }
-    //console.log('offset:', offset, 'count:', count);
-    const downloadBlockBlobResponse = await blobClient.download(offset, count);
-    const blobResp = await downloadBlockBlobResponse.blobBody; // this is how you have to do it in browser, in backend you can use readableStreamBody
-    const buffer = await blobResp.arrayBuffer();
 
-    samples = convertSamples(buffer, blob, data_type);
+    let buffer;
+    if (pythonSnippet !== '') {
+      // About 900 ms
+      const blobName = recording.replaceAll('(slash)', '/') + '.sigmf-data';
+      buffer = await fetchUsingPythonSnippet(offset, count, blobName, data_type, pythonSnippet);
+    } else {
+      // 600 ms for straight from blob
+      const downloadBlockBlobResponse = await blobClient.download(offset, count);
+      const blobResp = await downloadBlockBlobResponse.blobBody; // this is how you have to do it in browser, in backend you can use readableStreamBody
+      buffer = await blobResp.arrayBuffer();
+    }
+    samples = applyConvolve(buffer, blob.taps, data_type);
   } else {
     // Use a local file
     let handle = connection.datafilehandle;
     const fileData = await handle.getFile();
     console.log('offset:', offset, 'count:', count);
     const buffer = await readFileAsync(fileData.slice(offset, offset + count));
-    samples = convertSamples(buffer, blob, data_type);
+    samples = applyConvolve(buffer, blob.taps, data_type);
   }
 
   console.log('Fetching more data took', performance.now() - startTime, 'milliseconds');
