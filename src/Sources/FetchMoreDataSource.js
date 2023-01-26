@@ -62,7 +62,7 @@ export function readFileAsync(file) {
 }
 
 async function fetchUsingPythonSnippet(offset, count, blobName, dataType) {
-  return fetch('https://iqengine-azure-functions2.azurewebsites.net/pythonsnippet', {
+  const samples = await fetch('https://iqengine-azure-functions2.azurewebsites.net/pythonsnippet', {
     method: 'POST',
     headers: {
       Accept: 'application/json',
@@ -77,17 +77,30 @@ async function fetchUsingPythonSnippet(offset, count, blobName, dataType) {
     }),
   })
     .then(function (response) {
-      return response.body;
+      return response.body.getReader();
     })
     .then(function (body) {
-      return body.getReader();
+      return body;
     })
     .then(function (reader) {
+      console.log(reader);
       return reader.read();
     })
-    .then(function (read) {
-      return new Int16Array(read.value.buffer);
+    .then(function (reader) {
+      return reader.value.buffer;
+    })
+    .then(function (buffer) {
+      //while (buffer.byteLength !== count) {
+      // console.log('waiting');
+      //}
+      //console.log(buffer.byteLength); // FIXME why doesn't this match the count??
+      return new Int16Array(buffer);
+    })
+    .catch(function (e) {
+      console.log(e);
     });
+
+  return samples;
 }
 
 const FetchMoreData = createAsyncThunk('FetchMoreData', async (args, thunkAPI) => {
