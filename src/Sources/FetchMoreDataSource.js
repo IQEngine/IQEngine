@@ -103,7 +103,6 @@ const FetchMoreData = createAsyncThunk('FetchMoreData', async (args, thunkAPI) =
       const blobResp = await downloadBlockBlobResponse.blobBody; // this is how you have to do it in browser, in backend you can use readableStreamBody
       buffer = await blobResp.arrayBuffer();
     }
-
     samples = applyConvolve(buffer, blob.taps, data_type);
   } else {
     // Use a local file
