@@ -1,3 +1,7 @@
+/* Copyright (c) 2022 Microsoft Corporation */
+/* Copyright (c) 2023 Marc Lichtman */
+/* Licensed under the MIT License */
+
 .zoom {
   transition: transform 0.2s; /* Animation */
   width: 200px;

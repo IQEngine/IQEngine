@@ -1,5 +1,6 @@
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
+// Copyright (c) 2022 Microsoft Corporation
+// Copyright (c) 2023 Marc Lichtman
+// Licensed under the MIT License
 
 import {
   fetchRecordingsListFailure,
@@ -70,7 +71,8 @@ export const FetchRecordingsList = (connection) => async (dispatch) => {
         if (!recording) continue;
 
         const { length, client } = await getLength(containerClient, fName);
-        recording['lengthInIQSamples'] = length / 2 / recording.bytesPerSample; // in IQ samples
+        let lengthInMillionIQSamples = length / 2 / recording.bytesPerSample / 1e6;
+        recording['lengthInMillionIQSamples'] = Math.round(lengthInMillionIQSamples * 1000) / 1000;
         recording['lengthInBytes'] = length;
         recording['dataClient'] = client;
 

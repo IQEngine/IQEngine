@@ -1,5 +1,6 @@
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
+// Copyright (c) 2022 Microsoft Corporation
+// Copyright (c) 2023 Marc Lichtman
+// Licensed under the MIT License
 
 import React, { useState } from 'react';
 import { Modal, ModalHeader, ModalBody } from 'reactstrap';
@@ -98,7 +99,7 @@ export default function FileRow({
         </>
       )}
 
-      <td className="align-middle">{item.lengthInIQSamples / 1e6} M</td>
+      <td className="align-middle">{item.lengthInMillionIQSamples} M</td>
       <td className="align-middle">
         <NewlineText text={item.dataType} />
       </td>
