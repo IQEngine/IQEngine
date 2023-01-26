@@ -61,6 +61,35 @@ export function readFileAsync(file) {
   });
 }
 
+async function fetchUsingPythonSnippet(offset, count, blobName, dataType) {
+  return fetch('https://iqengine-azure-functions2.azurewebsites.net/pythonsnippet', {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      pythonSnippet: '',
+      dataType: dataType,
+      offset: offset,
+      count: count,
+      blobName: blobName,
+    }),
+  })
+    .then(function (response) {
+      return response.body;
+    })
+    .then(function (body) {
+      return body.getReader();
+    })
+    .then(function (reader) {
+      return reader.read();
+    })
+    .then(function (read) {
+      return new Int16Array(read.value.buffer);
+    });
+}
+
 const FetchMoreData = createAsyncThunk('FetchMoreData', async (args, thunkAPI) => {
   console.log('running FetchMoreData');
   const { tile, connection, blob, data_type, offset, count } = args;
@@ -73,9 +102,14 @@ const FetchMoreData = createAsyncThunk('FetchMoreData', async (args, thunkAPI) =
       console.log('waiting'); // hopefully this doesn't happen, and if it does it should be pretty quick because its the time it takes for the state to set
     }
     //console.log('offset:', offset, 'count:', count);
-    const downloadBlockBlobResponse = await blobClient.download(offset, count);
-    const blobResp = await downloadBlockBlobResponse.blobBody; // this is how you have to do it in browser, in backend you can use readableStreamBody
-    const buffer = await blobResp.arrayBuffer();
+
+    const blobName = 'cellular_downlink_880MHz.sigmf-data';
+    const buffer = await fetchUsingPythonSnippet(offset, count, blobName, data_type);
+
+    // 600 ms for straight from blob
+    //const downloadBlockBlobResponse = await blobClient.download(offset, count);
+    //const blobResp = await downloadBlockBlobResponse.blobBody; // this is how you have to do it in browser, in backend you can use readableStreamBody
+    //const buffer = await blobResp.arrayBuffer();
 
     samples = applyConvolve(buffer, blob.taps, data_type);
   } else {
