@@ -30,15 +30,15 @@ export function convolve(array, taps) {
   return output;
 }
 
-export function convertSamples(buffer, blob, data_type) {
+export function applyConvolve(buffer, taps, data_type) {
   let samples;
   if (data_type === 'ci16_le') {
     samples = new Int16Array(buffer);
-    samples = convolve(samples, blob.taps); // we apply the taps here and not in the FFT calcs so transients dont hurt us as much
+    samples = convolve(samples, taps); // we apply the taps here and not in the FFT calcs so transients dont hurt us as much
     samples = Int16Array.from(samples); // convert back to int TODO: clean this up
   } else if (data_type === 'cf32_le') {
     samples = new Float32Array(buffer);
-    samples = convolve(samples, blob.taps);
+    samples = convolve(samples, taps);
   } else {
     console.error('unsupported data_type');
     samples = new Int16Array(buffer);
@@ -73,14 +73,14 @@ const FetchMoreData = createAsyncThunk('FetchMoreData', async (args, thunkAPI) =
     const blobResp = await downloadBlockBlobResponse.blobBody; // this is how you have to do it in browser, in backend you can use readableStreamBody
     const buffer = await blobResp.arrayBuffer();
 
-    samples = convertSamples(buffer, blob, data_type);
+    samples = applyConvolve(buffer, blob.taps, data_type);
   } else {
     // Use a local file
     let handle = connection.datafilehandle;
     const fileData = await handle.getFile();
     console.log('offset:', offset, 'count:', count);
     const buffer = await readFileAsync(fileData.slice(offset, offset + count));
-    samples = convertSamples(buffer, blob, data_type);
+    samples = applyConvolve(buffer, blob.taps, data_type);
   }
 
   console.log('Fetching more data took', performance.now() - startTime, 'milliseconds');
