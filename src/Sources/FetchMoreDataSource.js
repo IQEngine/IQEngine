@@ -61,7 +61,7 @@ export function readFileAsync(file) {
   });
 }
 
-async function fetchUsingPythonSnippet(offset, count, blobName, dataType) {
+async function fetchUsingPythonSnippet(offset, count, blobName, dataType, pythonSnippet) {
   const resp = await fetch('https://iqengine-azure-functions2.azurewebsites.net/pythonsnippet', {
     method: 'POST',
     headers: {
@@ -69,7 +69,7 @@ async function fetchUsingPythonSnippet(offset, count, blobName, dataType) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      pythonSnippet: '',
+      pythonSnippet: pythonSnippet,
       dataType: dataType,
       offset: offset,
       count: count,
@@ -90,16 +90,19 @@ const FetchMoreData = createAsyncThunk('FetchMoreData', async (args, thunkAPI) =
     while (recording === '') {
       console.log('waiting'); // hopefully this doesn't happen, and if it does it should be pretty quick because its the time it takes for the state to set
     }
-    //console.log('offset:', offset, 'count:', count);
 
-    // About 900 ms
-    const blobName = recording.replaceAll('(slash)', '/') + '.sigmf-data';
-    const buffer = await fetchUsingPythonSnippet(offset, count, blobName, data_type);
-
-    // 600 ms for straight from blob
-    //const downloadBlockBlobResponse = await blobClient.download(offset, count);
-    //const blobResp = await downloadBlockBlobResponse.blobBody; // this is how you have to do it in browser, in backend you can use readableStreamBody
-    //const buffer = await blobResp.arrayBuffer();
+    const pythonSnippet = 'x = x**x';
+    let buffer;
+    if (pythonSnippet !== '') {
+      // About 900 ms
+      const blobName = recording.replaceAll('(slash)', '/') + '.sigmf-data';
+      buffer = await fetchUsingPythonSnippet(offset, count, blobName, data_type, pythonSnippet);
+    } else {
+      // 600 ms for straight from blob
+      const downloadBlockBlobResponse = await blobClient.download(offset, count);
+      const blobResp = await downloadBlockBlobResponse.blobBody; // this is how you have to do it in browser, in backend you can use readableStreamBody
+      buffer = await blobResp.arrayBuffer();
+    }
 
     samples = applyConvolve(buffer, blob.taps, data_type);
   } else {
