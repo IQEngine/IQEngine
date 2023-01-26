@@ -92,7 +92,8 @@ const FetchMoreData = createAsyncThunk('FetchMoreData', async (args, thunkAPI) =
     }
     //console.log('offset:', offset, 'count:', count);
 
-    const blobName = 'cellular_downlink_880MHz.sigmf-data';
+    // About 900 ms
+    const blobName = recording.replaceAll('(slash)', '/') + '.sigmf-data';
     const buffer = await fetchUsingPythonSnippet(offset, count, blobName, data_type);
 
     // 600 ms for straight from blob
