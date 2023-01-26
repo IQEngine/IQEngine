@@ -1,5 +1,6 @@
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
+// Copyright (c) 2022 Microsoft Corporation
+// Copyright (c) 2023 Marc Lichtman
+// Licensed under the MIT License
 
 // Similar to MATLAB's Jet colormap
 export const colMap = [

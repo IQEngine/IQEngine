@@ -1,3 +1,6 @@
+// Copyright (c) 2023 Marc Lichtman
+// Licensed under the MIT License
+
 export const template = {
   data: {
     barpolar: [
