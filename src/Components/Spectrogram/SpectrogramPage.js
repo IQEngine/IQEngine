@@ -53,6 +53,7 @@ class SpectrogramPage extends Component {
       currentFftMax: -999999,
       currentFftMin: 999999,
       currentTab: 'spectrogram',
+      pythonSnippet: '',
     };
   }
 
@@ -110,7 +111,7 @@ class SpectrogramPage extends Component {
 
     // This kicks things off when you first load into the page
     if (newState.connection.blobClient != null && metaIsSet) {
-      const { bytesPerSample, blob, fftSize } = newState;
+      const { bytesPerSample, blob, fftSize, pythonSnippet } = newState;
       const { lowerTile, upperTile } = calculateTileNumbers(0, bytesPerSample, blob, fftSize);
       const tiles = range(Math.floor(lowerTile), Math.ceil(upperTile));
       newState.lowerTile = lowerTile;
@@ -126,6 +127,7 @@ class SpectrogramPage extends Component {
           tile: tile,
           offset: tile * TILE_SIZE_IN_BYTES,
           count: TILE_SIZE_IN_BYTES,
+          pythonSnippet: pythonSnippet,
         });
       }
       this.renderImage(lowerTile, upperTile);
@@ -312,6 +314,14 @@ class SpectrogramPage extends Component {
     }, 0);
   }
 
+  updatePythonSnippet = (e) => {
+    window.iq_data = {};
+    window.fft_data = {};
+    this.setState({ pythonSnippet: e }, () => {
+      this.renderImage(this.state.lowerTile, this.state.upperTile);
+    });
+  };
+
   handleMetaChange = (e) => {
     const new_meta = JSON.parse(e.target.value);
     // update meta
@@ -375,7 +385,7 @@ class SpectrogramPage extends Component {
 
   // num is the y pixel coords of the top of the scrollbar handle, so range of 0 to the height of the scrollbar minus height of handle
   fetchAndRender = (handleTop) => {
-    const { blob, connection, data_type, bytesPerSample, fftSize } = this.state;
+    const { blob, connection, data_type, bytesPerSample, fftSize, pythonSnippet } = this.state;
     const { upperTile, lowerTile } = calculateTileNumbers(handleTop, bytesPerSample, blob, fftSize);
     this.setState({ lowerTile: lowerTile, upperTile: upperTile });
 
@@ -391,6 +401,7 @@ class SpectrogramPage extends Component {
           data_type: data_type,
           offset: tile * TILE_SIZE_IN_BYTES,
           count: TILE_SIZE_IN_BYTES,
+          pythonSnippet: pythonSnippet,
         });
       }
     }
@@ -445,6 +456,7 @@ class SpectrogramPage extends Component {
                 cursorsEnabled={cursorsEnabled}
                 handleProcessTime={this.handleProcessTime}
                 toggleCursors={this.toggleCursors}
+                updatePythonSnippet={this.updatePythonSnippet}
               />
             </Col>
             <Col>

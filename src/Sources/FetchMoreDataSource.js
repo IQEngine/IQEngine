@@ -81,7 +81,7 @@ async function fetchUsingPythonSnippet(offset, count, blobName, dataType, python
 
 const FetchMoreData = createAsyncThunk('FetchMoreData', async (args, thunkAPI) => {
   console.log('running FetchMoreData');
-  const { tile, connection, blob, data_type, offset, count } = args;
+  const { tile, connection, blob, data_type, offset, count, pythonSnippet } = args;
 
   let samples;
   let startTime = performance.now();
@@ -91,7 +91,6 @@ const FetchMoreData = createAsyncThunk('FetchMoreData', async (args, thunkAPI) =
       console.log('waiting'); // hopefully this doesn't happen, and if it does it should be pretty quick because its the time it takes for the state to set
     }
 
-    const pythonSnippet = 'x = x**x';
     let buffer;
     if (pythonSnippet !== '') {
       // About 900 ms
