@@ -22,7 +22,7 @@ IQEngine is rapidly evolving, so [sign up](https://dashboard.mailerlite.com/form
 Through the backend API, IQEngine supports three different classes of plugins (signal generation is not yet released).  The signal detector (with optional classifier) can be triggered in the main spectrogram page, which will display the output annotations as soon as it finishes.  The DSP module currently only supports Python snippets, and the samples out must be the same length as samples in, for now.
 
 <p align="center">
-  <img width=350 src="public/IQEngine_Plugins.svg" />
+  <img width=450 src="public/IQEngine_Plugins.svg" />
 </p>
 
 ## Local Install
