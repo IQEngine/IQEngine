@@ -51,9 +51,20 @@ export default function FileRow({
       {!item.dataFileHandle ? (
         <>
           <td>
-            <div className="zoom">
-              <img src={item.thumbnailUrl} alt="Spectrogram Thumbnail" style={{ width: '200px', height: '100px' }} />
-            </div>
+            <Link
+              to={'spectrogram/' + item.name.replace('.sigmf-meta', '')}
+              onClick={() => {
+                updateConnectionMetaFileHandle(item.metaFileHandle);
+                updateConnectionDataFileHandle(item.dataFileHandle);
+                updateConnectionRecording(item.name.replace('.sigmf-meta', ''));
+                updateConnectionBlobClient(item.dataClient);
+                updateBlobTotalBytes(item.lengthInBytes);
+              }}
+            >
+              <div className="zoom">
+                <img src={item.thumbnailUrl} alt="Spectrogram Thumbnail" style={{ width: '200px', height: '100px' }} />
+              </div>
+            </Link>
           </td>
           <td className="align-middle" style={{ textAlign: 'left' }}>
             <Link
@@ -68,6 +79,7 @@ export default function FileRow({
             >
               <h5>{item.name.split('(slash)').slice(-1)[0].replace('.sigmf-meta', '')}</h5>
             </Link>
+            <div title={item.description}>{item.shortDescription}</div>
             {/* File download links */}
             <>
               {'('}download:&nbsp;
