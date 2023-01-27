@@ -27,6 +27,12 @@ export default function parseMeta(json_string, baseUrl, fName, metaFileHandle, d
     bytesPerSample = 4;
   }
 
+  let shortDescription = obj['global']['core:description'] ?? '';
+  shortDescription = shortDescription.substring(0, 60);
+  if (shortDescription.length == 60) {
+    shortDescription += '...';
+  }
+
   return {
     name: fName,
     sampleRate: (obj['global']['core:sample_rate'] ?? 1e6) / 1e6, // in MHz
@@ -53,5 +59,7 @@ export default function parseMeta(json_string, baseUrl, fName, metaFileHandle, d
     metaFileHandle: metaFileHandle,
     dataFileHandle: dataFileHandle,
     bytesPerSample: bytesPerSample,
+    description: obj['global']['core:description'] ?? '',
+    shortDescription: shortDescription,
   };
 }
