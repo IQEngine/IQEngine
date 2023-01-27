@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="824.52216"
+   height="448.14844"
+   overflow="hidden"
+   version="1.1"
+   id="svg69"
+   sodipodi:docname="IQEngine Plugins.svg"
+   inkscape:version="1.2.1 (9c6d41e410, 2022-07-14)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview71"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="0.9453125"
+     inkscape:cx="346.97521"
+     inkscape:cy="278.21488"
+     inkscape:window-width="2560"
+     inkscape:window-height="1369"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg69" />
+  <defs
+     id="defs5">
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath388">
+      <g
+         id="g392">
+        <rect
+           x="0"
+           y="0"
+           width="1280"
+           height="720"
+           id="rect390" />
+      </g>
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath394">
+      <g
+         id="g398">
+        <rect
+           x="0"
+           y="0"
+           width="1280"
+           height="720"
+           id="rect396" />
+      </g>
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath400">
+      <g
+         id="g404">
+        <rect
+           x="0"
+           y="0"
+           width="1280"
+           height="720"
+           id="rect402" />
+      </g>
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath406">
+      <g
+         id="g410">
+        <rect
+           x="0"
+           y="0"
+           width="1280"
+           height="720"
+           id="rect408" />
+      </g>
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath412">
+      <g
+         id="g416">
+        <rect
+           x="0"
+           y="0"
+           width="1280"
+           height="720"
+           id="rect414" />
+      </g>
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath418">
+      <g
+         id="g422">
+        <rect
+           x="0"
+           y="0"
+           width="1280"
+           height="720"
+           id="rect420" />
+      </g>
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath424">
+      <g
+         id="g428">
+        <rect
+           x="0"
+           y="0"
+           width="1280"
+           height="720"
+           id="rect426" />
+      </g>
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath430">
+      <g
+         id="g434">
+        <rect
+           x="0"
+           y="0"
+           width="1280"
+           height="720"
+           id="rect432" />
+      </g>
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath436">
+      <g
+         id="g440">
+        <rect
+           x="0"
+           y="0"
+           width="1280"
+           height="720"
+           id="rect438" />
+      </g>
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath442">
+      <g
+         id="g446">
+        <rect
+           x="0"
+           y="0"
+           width="1280"
+           height="720"
+           id="rect444" />
+      </g>
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath448">
+      <g
+         id="g452">
+        <rect
+           x="0"
+           y="0"
+           width="1280"
+           height="720"
+           id="rect450" />
+      </g>
+    </clipPath>
+  </defs>
+  <rect
+     x="469"
+     y="160"
+     width="238"
+     height="103"
+     stroke="#000000"
+     stroke-width="4"
+     stroke-miterlimit="8"
+     fill="#c5e0b4"
+     id="rect9"
+     clip-path="url(#clipPath442)"
+     transform="translate(-222.7765,-81.851562)" />
+  <text
+     font-family="Calibri, Calibri_MSFontService, sans-serif"
+     font-weight="400"
+     font-size="32px"
+     id="text11"
+     x="266.10748"
+     y="121.14844">Signal Detector</text>
+  <text
+     font-family="Calibri, Calibri_MSFontService, sans-serif"
+     font-weight="400"
+     font-size="32px"
+     id="text13"
+     x="285.19452"
+     y="159.14844">[+ Classifier]</text>
+  <rect
+     x="469"
+     y="292"
+     width="238"
+     height="103"
+     stroke="#000000"
+     stroke-width="4"
+     stroke-miterlimit="8"
+     fill="#bdd7ee"
+     id="rect15"
+     clip-path="url(#clipPath436)"
+     transform="translate(-222.7765,-81.851562)" />
+  <text
+     font-family="Calibri, Calibri_MSFontService, sans-serif"
+     font-weight="400"
+     font-size="32px"
+     id="text17"
+     x="339.35748"
+     y="273.14844">DSP</text>
+  <rect
+     x="469"
+     y="425"
+     width="238"
+     height="103"
+     stroke="#000000"
+     stroke-width="4"
+     stroke-miterlimit="8"
+     fill="#ffe699"
+     id="rect19"
+     clip-path="url(#clipPath430)"
+     transform="translate(-222.7765,-81.851562)" />
+  <text
+     font-family="Calibri, Calibri_MSFontService, sans-serif"
+     font-weight="400"
+     font-size="32px"
+     id="text21"
+     x="256.49048"
+     y="405.14844">Signal Generator</text>
+  <path
+     d="m 381,207 h 67.612 v 8 H 381 Z m 63.612,-8 24,12 -24,12 z"
+     id="path23"
+     clip-path="url(#clipPath424)"
+     transform="translate(-222.7765,-81.851562)" />
+  <path
+     d="m 381,340 h 67.612 v 8 H 381 Z m 63.612,-8 24,12 -24,12 z"
+     id="path25"
+     clip-path="url(#clipPath418)"
+     transform="translate(-222.7765,-81.851562)" />
+  <path
+     d="m 381,472 h 67.612 v 8 H 381 Z m 63.612,-8 24,12 -24,12 z"
+     id="path27"
+     clip-path="url(#clipPath412)"
+     transform="translate(-222.7765,-81.851562)" />
+  <path
+     d="m 707,472 h 67.612 v 8 H 707 Z m 63.612,-8 24,12 -24,12 z"
+     id="path29"
+     clip-path="url(#clipPath406)"
+     transform="translate(-222.7765,-81.851562)" />
+  <path
+     d="m 707,340 h 67.612 v 8 H 707 Z m 63.612,-8 24,12 -24,12 z"
+     id="path31"
+     clip-path="url(#clipPath400)"
+     transform="translate(-222.7765,-81.851562)" />
+  <path
+     d="m 707,207 h 67.612 v 8 H 707 Z m 63.612,-8 24,12 -24,12 z"
+     id="path33"
+     clip-path="url(#clipPath394)"
+     transform="translate(-222.7765,-81.851562)" />
+  <text
+     fill="#2f5597"
+     font-family="Calibri, Calibri_MSFontService, sans-serif"
+     font-weight="400"
+     font-size="32px"
+     id="text35"
+     x="-2.6875"
+     y="272.14844">IQ</text>
+  <text
+     fill="#2f5597"
+     font-family="Calibri, Calibri_MSFontService, sans-serif"
+     font-weight="400"
+     font-size="32px"
+     id="text37"
+     x="33.979507"
+     y="272.14844">Sample</text>
+  <text
+     fill="#2f5597"
+     font-family="Calibri, Calibri_MSFontService, sans-serif"
+     font-weight="400"
+     font-size="32px"
+     id="text39"
+     x="129.6465"
+     y="272.14844">s</text>
+  <text
+     fill="#2f5597"
+     font-family="Calibri, Calibri_MSFontService, sans-serif"
+     font-weight="400"
+     font-size="32px"
+     id="text41"
+     x="585.80054"
+     y="273.14844">IQ</text>
+  <text
+     fill="#2f5597"
+     font-family="Calibri, Calibri_MSFontService, sans-serif"
+     font-weight="400"
+     font-size="32px"
+     id="text43"
+     x="622.46649"
+     y="273.14844">Sample</text>
+  <text
+     fill="#2f5597"
+     font-family="Calibri, Calibri_MSFontService, sans-serif"
+     font-weight="400"
+     font-size="32px"
+     id="text45"
+     x="718.13348"
+     y="273.14844">s</text>
+  <text
+     fill="#2f5597"
+     font-family="Calibri, Calibri_MSFontService, sans-serif"
+     font-weight="400"
+     font-size="32px"
+     id="text47"
+     x="-0.82350159"
+     y="140.14844">IQ</text>
+  <text
+     fill="#2f5597"
+     font-family="Calibri, Calibri_MSFontService, sans-serif"
+     font-weight="400"
+     font-size="32px"
+     id="text49"
+     x="35.843491"
+     y="140.14844">Sample</text>
+  <text
+     fill="#2f5597"
+     font-family="Calibri, Calibri_MSFontService, sans-serif"
+     font-weight="400"
+     font-size="32px"
+     id="text51"
+     x="131.51048"
+     y="140.14844">s</text>
+  <text
+     fill="#2f5597"
+     font-family="Calibri, Calibri_MSFontService, sans-serif"
+     font-weight="400"
+     font-size="32px"
+     id="text53"
+     x="584.86853"
+     y="405.14844">IQ</text>
+  <text
+     fill="#2f5597"
+     font-family="Calibri, Calibri_MSFontService, sans-serif"
+     font-weight="400"
+     font-size="32px"
+     id="text55"
+     x="621.53448"
+     y="405.14844">Sample</text>
+  <text
+     fill="#2f5597"
+     font-family="Calibri, Calibri_MSFontService, sans-serif"
+     font-weight="400"
+     font-size="32px"
+     id="text57"
+     x="717.20154"
+     y="405.14844">s</text>
+  <text
+     fill="#7e6000"
+     font-family="Calibri, Calibri_MSFontService, sans-serif"
+     font-weight="400"
+     font-size="32px"
+     id="text59"
+     x="-0.82350159"
+     y="404.14844">Parameters</text>
+  <text
+     fill="#385723"
+     font-family="Calibri, Calibri_MSFontService, sans-serif"
+     font-weight="400"
+     font-size="32px"
+     id="text61"
+     x="581.00653"
+     y="141.14844">SigMF Annotations</text>
+  <text
+     font-family="Calibri, Calibri_MSFontService, sans-serif"
+     font-weight="700"
+     font-size="37px"
+     id="text63"
+     x="192.51549"
+     y="25.148438">IQEngine Plugin Types</text>
+  <path
+     d="m 415.292,110.688 h 85.25 85.25 85.25 85.25 v 2 h -85.25 -85.25 -85.25 -85.25 z"
+     fill-rule="evenodd"
+     id="path65"
+     clip-path="url(#clipPath388)"
+     transform="translate(-222.7765,-81.851562)" />
+</svg>

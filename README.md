@@ -17,6 +17,14 @@ Try IQEngine now using the canonical instance at [www.iqengine.org](http://iqeng
 
 IQEngine is rapidly evolving, so [sign up](https://dashboard.mailerlite.com/forms/299501/77960409531811734/share) for a once-a-month email update, including new features, demos, and more!  There is also an IQEngine [Discord](https://discord.gg/CUER5P3J) chat channel if you want to get involved in the development.  You may also contact Marc at iqengine@vt.edu for questions/comments/suggestions.
 
+## Plugins
+
+Through the backend API, IQEngine supports three different classes of plugins (signal generation is not yet released).  The signal detector (with optional classifier) can be triggered in the main spectrogram page, which will display the output annotations as soon as it finishes.  The DSP module currently only supports Python snippets, and the samples out must be the same length as samples in, for now.
+
+<p align="center">
+  <img width=350 src="public/IQEngine_Plugins.svg" />
+</p>
+
 ## Local Install
 
 1. Install Node for your OS from https://nodejs.org/en/download/
