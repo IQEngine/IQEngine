@@ -340,8 +340,17 @@ class SpectrogramPage extends Component {
   };
 
   renderImage = (lowerTile, upperTile) => {
-    const { bytesPerSample, fftSize, magnitudeMax, magnitudeMin, meta, autoscale, currentFftMax, currentFftMin } =
-      this.state;
+    const {
+      bytesPerSample,
+      fftSize,
+      magnitudeMax,
+      magnitudeMin,
+      meta,
+      autoscale,
+      currentFftMax,
+      currentFftMin,
+      spectrogramHeight,
+    } = this.state;
     // Update the image (eventually this should get moved somewhere else)
     let ret = select_fft(
       lowerTile,
@@ -354,6 +363,7 @@ class SpectrogramPage extends Component {
       this.state.window, // dont want to conflict with the main window var
       currentFftMax,
       currentFftMin,
+      spectrogramHeight,
       autoscale
     );
     if (ret) {
@@ -498,6 +508,7 @@ class SpectrogramPage extends Component {
                           fftSize={fftSize}
                           lowerTile={lowerTile}
                           bytesPerSample={bytesPerSample}
+                          spectrogramHeight={spectrogramHeight}
                         />
                         {cursorsEnabled && (
                           <TimeSelector

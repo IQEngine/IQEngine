@@ -7,7 +7,7 @@ import { Layer, Rect, Text } from 'react-konva';
 import { TILE_SIZE_IN_BYTES } from '../../Utils/constants';
 
 const AnnotationViewer = (props) => {
-  let { spectrogramWidthScale, annotations, fftSize, meta, lowerTile, bytesPerSample } = props;
+  let { spectrogramWidthScale, annotations, fftSize, meta, lowerTile, bytesPerSample, spectrogramHeight } = props;
 
   // These two lines are a hack used to force a re-render when an annotation is updated, which for some reason wasnt updating
   const [, updateState] = React.useState();
@@ -27,9 +27,11 @@ const AnnotationViewer = (props) => {
     const f = annotations[annot_indx]['index']; // remember there are 2 different indexes- the ones on the screen and the meta.annotations
     let updatedAnnotations = [...props.meta.annotations];
     let start_sample_index = (lowerTile * TILE_SIZE_IN_BYTES) / 2 / bytesPerSample;
-    updatedAnnotations[f]['core:sample_start'] = (annotations[annot_indx].y1 / 0.92) * fftSize + start_sample_index; // FIXME FIGURE OUT WHY I NEED 0.92
+    updatedAnnotations[f]['core:sample_start'] =
+      (annotations[annot_indx].y1 / Math.sqrt(fftSize / spectrogramHeight / 2)) * fftSize + start_sample_index; // FIXME NOTE SURE WHY I NEED THIS LAST TERM
     updatedAnnotations[f]['core:sample_count'] =
-      ((annotations[annot_indx].y2 - annotations[annot_indx].y1) / 0.92) * fftSize; // FIXME FIGURE OUT WHY I NEED 0.92
+      ((annotations[annot_indx].y2 - annotations[annot_indx].y1) / Math.sqrt(fftSize / spectrogramHeight / 2)) *
+      fftSize; // FIXME NOTE SURE WHY I NEED THIS LAST TERM
     let lower_freq = meta.captures[0]['core:frequency'] - meta.global['core:sample_rate'] / 2;
     updatedAnnotations[f]['core:freq_lower_edge'] =
       (annotations[annot_indx].x1 / fftSize) * meta.global['core:sample_rate'] + lower_freq;

@@ -165,6 +165,7 @@ export const select_fft = (
   windowFunction,
   currentFftMax,
   currentFftMin,
+  spectrogramHeight,
   autoscale = false
 ) => {
   let fft_size = fftSize;
@@ -249,16 +250,16 @@ export const select_fft = (
     let sample_rate = meta.global['core:sample_rate'];
     window.sample_rate = sample_rate;
     let lower_freq = center_frequency - sample_rate / 2;
-
+    const mystery_factor = Math.sqrt(fft_size / spectrogramHeight / 2); // no idea where this comes from, was found empirically
     if (
-      (sample_start >= start_sample_index && sample_start < stop_sample_index) ||
-      (sample_start + sample_count >= start_sample_index && sample_start + sample_count < stop_sample_index)
+      (sample_start >= start_sample_index && sample_start * mystery_factor < stop_sample_index) ||
+      (sample_start + sample_count >= start_sample_index && sample_start * mystery_factor < stop_sample_index)
     ) {
       annotations_list.push({
         x1: ((freq_lower_edge - lower_freq) / sample_rate) * fft_size, // left side. units are in fractions of an FFT size, e.g. 0-1024
         x2: ((freq_upper_edge - lower_freq) / sample_rate) * fft_size, // right side
-        y1: ((sample_start - start_sample_index) / fft_size) * 0.92, // top FIXME WHY DO WE NEED THIS SCALAR FOR IT TO WORK
-        y2: ((sample_start - start_sample_index + sample_count) / fft_size) * 0.92, // bottom FIXME WHY DO WE NEED THIS SCALAR FOR IT TO WORK
+        y1: ((sample_start - start_sample_index) / fft_size) * mystery_factor, // top. NOTE SURE WHY I NEED THIS LAST TERM
+        y2: ((sample_start - start_sample_index + sample_count) / fft_size) * mystery_factor, // bottom. NOTE SURE WHY I NEED THIS LAST TERM
         description: description,
         index: i, // so we can keep track of which annotation it was in the full list
       });
