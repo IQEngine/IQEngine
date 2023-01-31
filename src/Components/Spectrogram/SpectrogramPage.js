@@ -20,6 +20,7 @@ import DownloadIcon from '@mui/icons-material/Download';
 import TimeSelector from './TimeSelector';
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
+import { Navigate } from 'react-router-dom';
 
 class SpectrogramPage extends Component {
   constructor(props) {
@@ -54,12 +55,17 @@ class SpectrogramPage extends Component {
       currentFftMin: 999999,
       currentTab: 'spectrogram',
       pythonSnippet: '',
+      redirect: false,
     };
   }
 
   // This all just happens once when the spectrogram page opens for the first time (or when you make a change in the code)
   componentDidMount() {
     let { fetchMetaDataBlob, connection } = this.props;
+
+    // If someone goes to a spectrogram page directly none of the state will be set so redirect to home
+    if (!connection.accountName && !connection.datafilehandle) this.setState({ redirect: true });
+
     window.iq_data = {};
     clear_all_data();
     fetchMetaDataBlob(connection); // fetch the metadata
@@ -439,12 +445,18 @@ class SpectrogramPage extends Component {
       upperTile,
       cursorsEnabled,
       currentTab,
+      redirect,
     } = this.state;
+
     const fft = {
       size: fftSize,
       magnitudeMax: magnitudeMax,
       magnitudeMin: magnitudeMin,
     };
+
+    if (redirect) {
+      return <Navigate to="/" />;
+    }
 
     return (
       <div style={{ marginTop: '30px' }}>
