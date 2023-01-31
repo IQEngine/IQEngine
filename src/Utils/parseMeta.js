@@ -29,7 +29,7 @@ export default function parseMeta(json_string, baseUrl, fName, metaFileHandle, d
 
   let shortDescription = obj['global']['core:description'] ?? '';
   shortDescription = shortDescription.substring(0, 60);
-  if (shortDescription.length == 60) {
+  if (shortDescription.length === 60) {
     shortDescription += '...';
   }
 

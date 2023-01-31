@@ -20,6 +20,7 @@ import DownloadIcon from '@mui/icons-material/Download';
 import TimeSelector from './TimeSelector';
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
+import { Navigate } from 'react-router-dom';
 
 class SpectrogramPage extends Component {
   constructor(props) {
@@ -34,7 +35,7 @@ class SpectrogramPage extends Component {
       window: 'hamming',
       autoscale: false,
       image: null,
-      annotations: [],
+      annotations: [], // annotations that are on the screen at that moment (likely a subset of the total annotations)
       sampleRate: 1,
       bytesPerSample: null,
       data_type: '',
@@ -54,12 +55,17 @@ class SpectrogramPage extends Component {
       currentFftMin: 999999,
       currentTab: 'spectrogram',
       pythonSnippet: '',
+      redirect: false,
     };
   }
 
   // This all just happens once when the spectrogram page opens for the first time (or when you make a change in the code)
   componentDidMount() {
     let { fetchMetaDataBlob, connection } = this.props;
+
+    // If someone goes to a spectrogram page directly none of the state will be set so redirect to home
+    if (!connection.accountName && !connection.datafilehandle) this.setState({ redirect: true });
+
     window.iq_data = {};
     clear_all_data();
     fetchMetaDataBlob(connection); // fetch the metadata
@@ -340,8 +346,17 @@ class SpectrogramPage extends Component {
   };
 
   renderImage = (lowerTile, upperTile) => {
-    const { bytesPerSample, fftSize, magnitudeMax, magnitudeMin, meta, autoscale, currentFftMax, currentFftMin } =
-      this.state;
+    const {
+      bytesPerSample,
+      fftSize,
+      magnitudeMax,
+      magnitudeMin,
+      meta,
+      autoscale,
+      currentFftMax,
+      currentFftMin,
+      spectrogramHeight,
+    } = this.state;
     // Update the image (eventually this should get moved somewhere else)
     let ret = select_fft(
       lowerTile,
@@ -354,6 +369,7 @@ class SpectrogramPage extends Component {
       this.state.window, // dont want to conflict with the main window var
       currentFftMax,
       currentFftMin,
+      spectrogramHeight,
       autoscale
     );
     if (ret) {
@@ -429,12 +445,18 @@ class SpectrogramPage extends Component {
       upperTile,
       cursorsEnabled,
       currentTab,
+      redirect,
     } = this.state;
+
     const fft = {
       size: fftSize,
       magnitudeMax: magnitudeMax,
       magnitudeMin: magnitudeMin,
     };
+
+    if (redirect) {
+      return <Navigate to="/" />;
+    }
 
     return (
       <div style={{ marginTop: '30px' }}>
@@ -498,6 +520,7 @@ class SpectrogramPage extends Component {
                           fftSize={fftSize}
                           lowerTile={lowerTile}
                           bytesPerSample={bytesPerSample}
+                          spectrogramHeight={spectrogramHeight}
                         />
                         {cursorsEnabled && (
                           <TimeSelector
