@@ -34,7 +34,7 @@ class SpectrogramPage extends Component {
       window: 'hamming',
       autoscale: false,
       image: null,
-      annotations: [],
+      annotations: [], // annotations that are on the screen at that moment (likely a subset of the total annotations)
       sampleRate: 1,
       bytesPerSample: null,
       data_type: '',

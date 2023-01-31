@@ -14,7 +14,7 @@ const AnnotationViewer = (props) => {
   const forceUpdate = React.useCallback(() => updateState({}), []);
 
   function onDragEnd(e) {
-    const x = e.target.x(); // look at box coords instead of cursor coords because above code didnt work
+    const x = e.target.x(); // coords of the corner box
     const y = e.target.y();
     const annot_indx = e.target.id().split('-')[0];
     const annot_pos_x = e.target.id().split('-')[1];
@@ -22,20 +22,19 @@ const AnnotationViewer = (props) => {
     annotations[annot_indx][annot_pos_x] = x / spectrogramWidthScale; // reverse the calcs done to generate the coords
     annotations[annot_indx][annot_pos_y] = y;
     forceUpdate(); // TODO remove the forceupdate and do it the proper way (possibly using spread?)
-    updateAnnotationFields(annot_indx);
-  }
 
-  // function converting coordinates back into the annotations fields
-  function updateAnnotationFields(f) {
+    // Now update the actual meta.annotations
+    const f = annotations[annot_indx]['index']; // remember there are 2 different indexes- the ones on the screen and the meta.annotations
     let updatedAnnotations = [...props.meta.annotations];
     let start_sample_index = (lowerTile * TILE_SIZE_IN_BYTES) / 2 / bytesPerSample;
-    updatedAnnotations[f]['core:sample_start'] = (annotations[f].y1 / 0.92) * fftSize + start_sample_index; // FIXME FIGURE OUT WHY I NEED 0.92
-    updatedAnnotations[f]['core:sample_count'] = ((annotations[f].y2 - annotations[f].y1) / 0.92) * fftSize; // FIXME FIGURE OUT WHY I NEED 0.92
+    updatedAnnotations[f]['core:sample_start'] = (annotations[annot_indx].y1 / 0.92) * fftSize + start_sample_index; // FIXME FIGURE OUT WHY I NEED 0.92
+    updatedAnnotations[f]['core:sample_count'] =
+      ((annotations[annot_indx].y2 - annotations[annot_indx].y1) / 0.92) * fftSize; // FIXME FIGURE OUT WHY I NEED 0.92
     let lower_freq = meta.captures[0]['core:frequency'] - meta.global['core:sample_rate'] / 2;
     updatedAnnotations[f]['core:freq_lower_edge'] =
-      (annotations[f].x1 / fftSize) * meta.global['core:sample_rate'] + lower_freq;
+      (annotations[annot_indx].x1 / fftSize) * meta.global['core:sample_rate'] + lower_freq;
     updatedAnnotations[f]['core:freq_upper_edge'] =
-      (annotations[f].x2 / fftSize) * meta.global['core:sample_rate'] + lower_freq;
+      (annotations[annot_indx].x2 / fftSize) * meta.global['core:sample_rate'] + lower_freq;
     props.handleMeta(updatedAnnotations);
   }
 
@@ -100,6 +99,7 @@ const AnnotationViewer = (props) => {
       {annotations.map((annotation, index) => (
         // for params of Rect see https://konvajs.org/api/Konva.Rect.html
         // for Text params see https://konvajs.org/api/Konva.Text.html
+        // Note that index is for the list of annotations currently on the screen, not for meta.annotations which contains all
         <>
           {/* Main rectangle */}
           <Rect

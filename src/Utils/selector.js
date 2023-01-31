@@ -260,6 +260,7 @@ export const select_fft = (
         y1: ((sample_start - start_sample_index) / fft_size) * 0.92, // top FIXME WHY DO WE NEED THIS SCALAR FOR IT TO WORK
         y2: ((sample_start - start_sample_index + sample_count) / fft_size) * 0.92, // bottom FIXME WHY DO WE NEED THIS SCALAR FOR IT TO WORK
         description: description,
+        index: i, // so we can keep track of which annotation it was in the full list
       });
     }
   }
