@@ -90,14 +90,28 @@ const AnnotationViewer = (props) => {
     textarea.value = e.target.text();
     textarea.style.position = 'absolute';
     textarea.style.top = '300px'; // middle of screen
-    textarea.style.left = '600px'; // middle of screen
-    textarea.style.width = '200px';
+    textarea.style.left = '500px'; // middle of screen
+    textarea.style.width = '400px';
+    textarea.style.fontSize = '25px';
+    textarea.rows = 1;
     textarea.id = e.target.id();
-
     textarea.focus();
 
+    // Add a note about hitting enter to finish the edit
+    var textarea2 = document.createElement('textarea');
+    document.body.appendChild(textarea2);
+    textarea2.value = 'Hit Enter to Finish';
+    textarea2.style.position = 'absolute';
+    textarea2.style.top = '270px';
+    textarea2.style.left = '600px';
+    textarea2.style.width = '140px';
+    textarea2.style.height = '30px';
+    textarea2.rows = 1;
+    textarea2.disabled = true;
+    textarea2.style.resize = 'none';
+    textarea2.style.backgroundColor = 'black';
+
     textarea.addEventListener('keydown', function (e) {
-      // hide on enter
       if (e.key === 'Enter') {
         console.log(textarea.value, textarea.id);
         annotations[textarea.id]['description'] = textarea.value; // update the local version first
@@ -106,6 +120,7 @@ const AnnotationViewer = (props) => {
         updatedAnnotations[annotations[textarea.id]['index']]['core:description'] = textarea.value;
         props.handleMeta(updatedAnnotations);
         document.body.removeChild(textarea);
+        document.body.removeChild(textarea2);
         forceUpdate(); // TODO remove the forceupdate and do it the proper way (possibly using spread?)
       }
     });
