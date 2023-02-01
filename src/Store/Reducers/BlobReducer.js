@@ -18,6 +18,7 @@ const initialState = {
   currentMax: 0, // holds current max value of I/Q for that recording so we can scale the spectrogram appropriately
   status: 'idle',
   taps: new Float32Array(1).fill(1),
+  numActiveFetches: 0,
 };
 
 export default function blobReducer(state = initialState, action) {
@@ -41,6 +42,7 @@ export default function blobReducer(state = initialState, action) {
       return {
         ...state,
         status: 'loading',
+        numActiveFetches: state.numActiveFetches + 1,
       };
     case FETCH_MORE_DATA_SUCCESS: // FetchMoreData/fulfilled, where FetchMoreData is the async thunk function
       window.iq_data[action.payload.tile.toString()] = action.payload.samples; // use tile as key to store samples
@@ -49,11 +51,13 @@ export default function blobReducer(state = initialState, action) {
         ...state,
         status: 'idle',
         size: state.size + 1,
+        numActiveFetches: state.numActiveFetches - 1,
       };
     case FETCH_MORE_DATA_FAILURE: // FetchMoreData/rejected, where FetchMoreData is the async thunk function
       return {
         ...state,
         status: 'error',
+        numActiveFetches: state.numActiveFetches - 1,
       };
     case RESET_BLOB_OBJ:
       return initialState;

@@ -15,7 +15,7 @@ import { select_fft, clear_all_data, calculateTileNumbers, range } from '../../U
 import { AnnotationViewer } from './AnnotationViewer';
 import { RulerTop } from './RulerTop';
 import { RulerSide } from './RulerSide';
-import { TILE_SIZE_IN_BYTES } from '../../Utils/constants';
+import { TILE_SIZE_IN_BYTES, MAX_SIMULTANEOUS_FETCHES } from '../../Utils/constants';
 import DownloadIcon from '@mui/icons-material/Download';
 import TimeSelector from './TimeSelector';
 import Tab from 'react-bootstrap/Tab';
@@ -99,6 +99,7 @@ class SpectrogramPage extends Component {
     if (JSON.stringify(props.connection) !== JSON.stringify(prevProps.connection)) {
       newState.connection = props.connection;
     }
+    // Each time a fetch finishes we increment blob.size, which causes this block to run and trigger a render
     if (props.blob.size !== prevProps.blob.size) {
       newState.blob.size = props.blob.size;
       let { lowerTile, upperTile } = newState;
@@ -106,6 +107,9 @@ class SpectrogramPage extends Component {
     }
     if (props.blob.totalBytes !== prevProps.blob.totalBytes) {
       newState.blob.totalBytes = props.blob.totalBytes;
+    }
+    if (props.blob.numActiveFetches !== prevProps.blob.numActiveFetches) {
+      newState.blob.numActiveFetches = props.blob.numActiveFetches;
     }
     if (props.blob.status !== prevProps.blob.status) {
       newState.blob.status = props.blob.status;
@@ -405,9 +409,14 @@ class SpectrogramPage extends Component {
     const { upperTile, lowerTile } = calculateTileNumbers(handleTop, bytesPerSample, blob, fftSize);
     this.setState({ lowerTile: lowerTile, upperTile: upperTile });
 
-    const tiles = range(Math.floor(lowerTile), Math.ceil(upperTile));
+    // If we already have too many pending fetches then bail
+    if (blob.numActiveFetches > MAX_SIMULTANEOUS_FETCHES) {
+      console.log('Hit limit of simultaenous fetches!');
+      return false;
+    }
 
     // Fetch the tiles
+    const tiles = range(Math.floor(lowerTile), Math.ceil(upperTile));
     for (let tile of tiles) {
       if (!(tile.toString() in window.iq_data)) {
         this.props.fetchMoreData({
@@ -422,6 +431,7 @@ class SpectrogramPage extends Component {
       }
     }
     this.renderImage(lowerTile, upperTile);
+    return true;
   };
 
   render() {
