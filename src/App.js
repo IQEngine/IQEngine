@@ -31,29 +31,29 @@ const App = () => {
   return (
     <div>
       <Row style={{ marginTop: '10px' }}>
-        <Col></Col>
-        <Col md="7" style={{ textAlign: 'center' }}>
+        <Col md="4"></Col>
+        <Col md="4" style={{ textAlign: 'center' }}>
           <a href="/">
             <img src="/IQEngine.svg" alt="IQEngine" />
           </a>
         </Col>
-        <Col>
+        <Col md="4">
           <Navbar variant="dark">
-            <Container className="nav justify-content-end">
-              <Nav.Link href="/" style={{ fontSize: '24px' }}>
+            <Container className="nav justify-content-end" style={{ whiteSpace: 'nowrap' }}>
+              <Nav.Link href="/" style={{ fontSize: '24px', paddingLeft: '0px', paddingRight: '30px' }}>
                 Home
               </Nav.Link>
-              <Nav.Link href="/about" style={{ fontSize: '24px' }}>
+              <Nav.Link href="/about" style={{ fontSize: '24px', paddingLeft: '0px', paddingRight: '20px' }}>
                 About
               </Nav.Link>
               <a
                 className="nav-link"
-                style={{ fontSize: '24px' }}
+                style={{ fontSize: '24px', paddingLeft: '0px', paddingRight: '0px' }}
                 target="_blank"
                 rel="noreferrer"
                 href="https://github.com/iqengine/iqengine"
               >
-                <img src="/github.svg" style={{ width: '12%' }} alt="GitHub" />
+                <img src="/github.svg" style={{ width: '22px' }} alt="GitHub" />
                 GitHub
               </a>
             </Container>
