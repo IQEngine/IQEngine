@@ -40,9 +40,9 @@ const AzureBlobBrowser = (props) => {
       <Card.Body className="cardBodyCenter">
         <Form.Group className="mb-3">
           <Form.Label>Storage Account Name:</Form.Label>
-          <Form.Control type="text" defaultValue={accountName} onChange={onAccountNameChange} />
+          <Form.Control className="mb-3" type="text" defaultValue={accountName} onChange={onAccountNameChange} />
           <Form.Label>Container Name:</Form.Label>
-          <Form.Control type="text" defaultValue={containerName} onChange={onContainerNameChange} />
+          <Form.Control className="mb-3" type="text" defaultValue={containerName} onChange={onContainerNameChange} />
           <Form.Label>SAS Token for Container:</Form.Label>
           <Form.Control type="password" defaultValue={sasToken} onChange={onSasTokenChange} />
         </Form.Group>
