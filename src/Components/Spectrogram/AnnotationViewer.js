@@ -2,6 +2,7 @@
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
 
+import { faCropSimple } from '@fortawesome/free-solid-svg-icons';
 import React from 'react';
 import { Layer, Rect, Text } from 'react-konva';
 import { TILE_SIZE_IN_BYTES } from '../../Utils/constants';
@@ -49,8 +50,35 @@ const AnnotationViewer = (props) => {
   }
 
   const newAnnotationClick = (e) => {
-    annotations.push({ description: 'Fill Me In', x1: 200, x2: 400, y1: 200, y2: 400 });
+    annotations.push({
+      x1: 200,
+      x2: 400,
+      y1: 200,
+      y2: 400,
+      description: 'Fill Me In',
+      index: -1,
+    });
     forceUpdate(); // TODO remove the forceupdate and do it the proper way (possibly using spread?)
+
+    // Add it to the meta.annotations as well. TODO: this is duplicate code
+    let updatedAnnotations = [...props.meta.annotations];
+    annotations[annotations.length - 1]['index'] = updatedAnnotations.length;
+    updatedAnnotations.push({});
+    const f = updatedAnnotations.length - 1;
+    const annot_indx = annotations.length - 1;
+    let start_sample_index = (lowerTile * TILE_SIZE_IN_BYTES) / 2 / bytesPerSample;
+    updatedAnnotations[f]['core:sample_start'] =
+      (annotations[annot_indx].y1 / Math.sqrt(fftSize / spectrogramHeight / 2)) * fftSize + start_sample_index; // FIXME NOTE SURE WHY I NEED THIS LAST TERM
+    updatedAnnotations[f]['core:sample_count'] =
+      ((annotations[annot_indx].y2 - annotations[annot_indx].y1) / Math.sqrt(fftSize / spectrogramHeight / 2)) *
+      fftSize; // FIXME NOTE SURE WHY I NEED THIS LAST TERM
+    let lower_freq = meta.captures[0]['core:frequency'] - meta.global['core:sample_rate'] / 2;
+    updatedAnnotations[f]['core:freq_lower_edge'] =
+      (annotations[annot_indx].x1 / fftSize) * meta.global['core:sample_rate'] + lower_freq;
+    updatedAnnotations[f]['core:freq_upper_edge'] =
+      (annotations[annot_indx].x2 / fftSize) * meta.global['core:sample_rate'] + lower_freq;
+    updatedAnnotations[f]['core:description'] = annotations[annot_indx]['description'];
+    props.handleMeta(updatedAnnotations);
   };
 
   // Ability to update annotation labels
@@ -75,7 +103,7 @@ const AnnotationViewer = (props) => {
         annotations[textarea.id]['description'] = textarea.value; // update the local version first
         // Now update the actual meta info
         let updatedAnnotations = [...props.meta.annotations];
-        updatedAnnotations[textarea.id]['core:description'] = textarea.value;
+        updatedAnnotations[annotations[textarea.id]['index']]['core:description'] = textarea.value;
         props.handleMeta(updatedAnnotations);
         document.body.removeChild(textarea);
         forceUpdate(); // TODO remove the forceupdate and do it the proper way (possibly using spread?)
