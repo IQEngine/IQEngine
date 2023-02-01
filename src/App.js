@@ -43,7 +43,7 @@ const App = () => {
               <Nav.Link href="/" style={{ fontSize: '24px', paddingLeft: '0px', paddingRight: '30px' }}>
                 Home
               </Nav.Link>
-              <Nav.Link href="/about" style={{ fontSize: '24px', paddingLeft: '0px', paddingRight: '20px' }}>
+              <Nav.Link href="/about" style={{ fontSize: '24px', paddingLeft: '0px', paddingRight: '25px' }}>
                 About
               </Nav.Link>
               <a
