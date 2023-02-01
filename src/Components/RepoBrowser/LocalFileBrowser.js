@@ -88,6 +88,9 @@ const LocalFileBrowser = (props) => {
             <br />
             and 1 .sigmf-data
           </Button>
+          <div style={{ color: 'grey' }}>
+            Note: FFTs and visualizations are done client-side (the data won't be uploaded anywhere)
+          </div>
         </center>
       </Card.Body>
     </Card>

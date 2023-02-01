@@ -80,12 +80,17 @@ const RepositoryTile = (props) => {
         <center>
           {imageURL && <Card.Img variant="top" src={imageURL} style={styleHeight}></Card.Img>}
           <br />
+          {/*
           <div className="mb-2" style={{ marginTop: '10px' }}>
             Account Name: {accountName}
           </div>
           <div className="mb-2">Container Name: {containerName}</div>
+          */}
+          <br></br>
           <div className="mb-2">{description}</div>
-          <div className="mb-3">SAS Token Expiration: {expires}</div>
+          <div className="mb-3" style={{ color: 'grey' }}>
+            SAS Token Expiration: {expires}
+          </div>
           {isError && <div style={{ color: 'red' }}>This SAS token is expired</div>}
           {isWarning && (
             <div style={{ color: 'yellow' }}>

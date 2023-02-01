@@ -13,6 +13,7 @@ import { Navbar, Row, Col } from 'react-bootstrap';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import { About } from './About';
+import { Plugins } from './Plugins';
 import ReactGA from 'react-ga4';
 
 // TODO: make the google analytics stuff not included when people run a local instance of the site, e.g. move key into an app env var
@@ -31,28 +32,29 @@ const App = () => {
   return (
     <div>
       <Row style={{ marginTop: '10px' }}>
-        <Col></Col>
-        <Col md="7" style={{ textAlign: 'center' }}>
+        <Col md="4"></Col>
+        <Col md="4" style={{ textAlign: 'center' }}>
           <a href="/">
             <img src="/IQEngine.svg" alt="IQEngine" />
           </a>
         </Col>
-        <Col>
+        <Col md="4">
           <Navbar variant="dark">
-            <Container className="nav justify-content-end">
-              <Nav.Link href="/" style={{ fontSize: '24px' }}>
-                Home
-              </Nav.Link>
-              <Nav.Link href="/about" style={{ fontSize: '24px' }}>
+            <Container className="nav justify-content-end" style={{ whiteSpace: 'nowrap' }}>
+              <Nav.Link href="/about" style={{ fontSize: '24px', paddingLeft: '0px', paddingRight: '25px' }}>
                 About
+              </Nav.Link>
+              <Nav.Link href="/plugins" style={{ fontSize: '24px', paddingLeft: '0px', paddingRight: '30px' }}>
+                Plugins
               </Nav.Link>
               <a
                 className="nav-link"
-                style={{ fontSize: '24px' }}
+                style={{ fontSize: '24px', paddingLeft: '0px', paddingRight: '0px' }}
                 target="_blank"
                 rel="noreferrer"
                 href="https://github.com/iqengine/iqengine"
               >
+                <img src="/github.svg" style={{ width: '22px' }} alt="GitHub" />
                 GitHub
               </a>
             </Container>
@@ -62,6 +64,7 @@ const App = () => {
 
       <Routes>
         <Route path="/about" element={<About />} />
+        <Route path="/plugins" element={<Plugins />} />
         <Route exact path="/" element={<RepoBrowserContainer />} />
         <Route path="/recordings/spectrogram/:recording" element={<SpectrogramContainer />} />
         <Route path="/recordings/:accountName?/:containerName?/:sasToken?" element={<RecordingsListContainer />} />

@@ -32,33 +32,21 @@ export const About = () => {
           <Col xs={3}></Col>
           <Col xs={3}>
             <div className="container">
-              <ul style={{ padding: '10px', fontSize: '30px' }}>
-                <li class="list-group-item">
-                  <i class="bi bi-soundwave">- RFML</i>
-                </li>
-                <li class="list-group-item">
-                  <i class="bi bi-soundwave">- Wireless CTFs</i>
-                </li>
-                <li class="list-group-item">
-                  <i class="bi bi-soundwave">- SIGINT</i>
-                </li>
+              <ul style={{ padding: '10px', fontSize: '25px' }}>
+                <li class="list-group-item">- RFML</li>
+                <li class="list-group-item">- Wireless CTFs</li>
+                <li class="list-group-item">- SIGINT</li>
               </ul>
             </div>
           </Col>
           <Col xs={4}>
-            <ul style={{ padding: '10px', fontSize: '30px' }}>
-              <li class="list-group-item">
-                <i class="bi bi-soundwave"> - Spectrum Awareness </i>
-              </li>
-              <li class="list-group-item">
-                <i class="bi bi-soundwave">- Debugging </i>
-              </li>
-              <li class="list-group-item">
-                <i class="bi bi-soundwave">- SDR/DSP/Wireless Students </i>
-              </li>
+            <ul style={{ padding: '10px', fontSize: '25px' }}>
+              <li class="list-group-item">- Spectrum Awareness</li>
+              <li class="list-group-item">- Debugging</li>
+              <li class="list-group-item">- SDR/DSP/Wireless Students</li>
             </ul>
           </Col>
-          <Col></Col>
+          <Col xs={2}></Col>
         </Row>
       </div>
 
@@ -76,36 +64,26 @@ export const About = () => {
               Example Use-Cases
             </h1>
           </center>
-          <Col></Col>
+          <Col xs={1}></Col>
           <Col xs={5}>
             <div className="container">
-              <ul style={{ padding: '10px', fontSize: '30px' }}>
-                <li class="list-group-item">
-                  <i class="bi bi-soundwave">- Analyze RF recordings</i>
-                </li>
-                <li class="list-group-item">
-                  <i class="bi bi-soundwave">- Organize lots of RF recordings</i>
-                </li>
-                <li class="list-group-item">
-                  <i class="bi bi-soundwave">- Test signal detection/classification algorithms and share them easily</i>
-                </li>
+              <ul style={{ padding: '10px', fontSize: '25px' }}>
+                <li class="list-group-item">- Analyze RF recordings</li>
+                <li class="list-group-item">- Organize lots of RF recordings</li>
+                <li class="list-group-item">- Test signal detection/classification algorithms and share them easily</li>
               </ul>
             </div>
           </Col>
           <Col xs={5}>
-            <ul style={{ padding: '10px', fontSize: '30px' }}>
+            <ul style={{ padding: '10px', fontSize: '25px' }}>
               <li class="list-group-item">
-                <i class="bi bi-soundwave">
-                  {' '}
-                  - Share RF recordings/datasets with others, without them having to download files or install software{' '}
-                </i>
+                - Share RF recordings/datasets with others, without them having to download files or install software
               </li>
-              <li class="list-group-item">
-                <i class="bi bi-soundwave">- Learn DSP basics (e.g., FFTs, filtering, wavelets) </i>
-              </li>
+              <li class="list-group-item">- Learn DSP basics (e.g., FFTs, filtering, wavelets)</li>
+              <li class="list-group-item">- Run a local instance of IQEngine for sensitive data</li>
             </ul>
           </Col>
-          <Col></Col>
+          <Col xs={1}></Col>
         </Row>
       </div>
 
