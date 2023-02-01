@@ -13,6 +13,7 @@ import { Navbar, Row, Col } from 'react-bootstrap';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import { About } from './About';
+import { Plugins } from './Plugins';
 import ReactGA from 'react-ga4';
 
 // TODO: make the google analytics stuff not included when people run a local instance of the site, e.g. move key into an app env var
@@ -40,11 +41,11 @@ const App = () => {
         <Col md="4">
           <Navbar variant="dark">
             <Container className="nav justify-content-end" style={{ whiteSpace: 'nowrap' }}>
-              <Nav.Link href="/" style={{ fontSize: '24px', paddingLeft: '0px', paddingRight: '30px' }}>
-                Home
-              </Nav.Link>
               <Nav.Link href="/about" style={{ fontSize: '24px', paddingLeft: '0px', paddingRight: '25px' }}>
                 About
+              </Nav.Link>
+              <Nav.Link href="/plugins" style={{ fontSize: '24px', paddingLeft: '0px', paddingRight: '30px' }}>
+                Plugins
               </Nav.Link>
               <a
                 className="nav-link"
@@ -63,6 +64,7 @@ const App = () => {
 
       <Routes>
         <Route path="/about" element={<About />} />
+        <Route path="/plugins" element={<Plugins />} />
         <Route exact path="/" element={<RepoBrowserContainer />} />
         <Route path="/recordings/spectrogram/:recording" element={<SpectrogramContainer />} />
         <Route path="/recordings/:accountName?/:containerName?/:sasToken?" element={<RecordingsListContainer />} />
