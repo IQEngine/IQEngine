@@ -53,6 +53,7 @@ const App = () => {
                 rel="noreferrer"
                 href="https://github.com/iqengine/iqengine"
               >
+                <img src="/github.svg" style={{ width: '12%' }} alt="GitHub" />
                 GitHub
               </a>
             </Container>
