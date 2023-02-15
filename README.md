@@ -27,6 +27,8 @@ Through the optional backend API, IQEngine supports three different classes of p
 
 ## Local Install
 
+(Note that there's no need to run your own instance of IQEngine, unless you are messing with the code, or want to use it in a sensitive environment.  The canonical instance at www.iqengine.org can be used to view local files or your private storage account.)
+
 1. Install Node for your OS from https://nodejs.org/en/download/
 2. `npm install react-scripts`
 3. Create an .env file using the example.env and paste in your SAS token for the container, or leave blank to do local-only
