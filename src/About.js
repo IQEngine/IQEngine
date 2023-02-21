@@ -138,7 +138,7 @@ export const About = () => {
             </center>
             <ul>
               <li>
-                Join the <a href="https://discord.gg/yZ3YqpjQ">IQEngine Discord</a>
+                Join the <a href="https://discord.gg/k7C8kp3b76">IQEngine Discord</a>
               </li>
               <li>Post GitHub Issues/PRs</li>
               <li>Email Marc questions/comments about IQEngine - iqengine@vt.edu</li>
