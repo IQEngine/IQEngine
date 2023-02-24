@@ -42,10 +42,9 @@ Through the optional backend API, IQEngine supports three different classes of p
 
 &nbsp;
 
-<center><h1>IQEngine is Supported By:</h1>
+<p align="center"><h1>IQEngine is Supported By:</h1></p>
 
-<img width=250 src="public/microsoft-logo.svg" />
+<p align="center"><img width=250 src="public/microsoft-logo.svg" /></p>
 
-<a href="https://www.qoherent.ai/"><img width=250 src="public/clogo-black.png" /></a>
+<p align="center"><a href="https://www.qoherent.ai/"><img width=250 src="public/clogo-black.png" /></a></p>
 
-</center>
