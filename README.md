@@ -39,3 +39,13 @@ Through the optional backend API, IQEngine supports three different classes of p
     - `npm install -g serve`
     - `Set-ExecutionPolicy RemoteSigned -Scope CurrentUser`
     - `serve -s build`
+
+&nbsp;
+
+<center><h1>IQEngine is Supported By:</h1>
+
+<img width=150 src="public/microsoft-logo.svg" />
+&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="https://www.qoherent.ai/"><img width=150 src="public/clogo-black.png" /></a>
+
+</center>
