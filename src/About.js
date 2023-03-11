@@ -33,17 +33,17 @@ export const About = () => {
           <Col xs={3}>
             <div className="container">
               <ul style={{ padding: '10px', fontSize: '25px' }}>
-                <li class="list-group-item">- RFML</li>
-                <li class="list-group-item">- Wireless CTFs</li>
-                <li class="list-group-item">- SIGINT</li>
+                <li className="list-group-item">- RFML</li>
+                <li className="list-group-item">- Wireless CTFs</li>
+                <li className="list-group-item">- SIGINT</li>
               </ul>
             </div>
           </Col>
           <Col xs={4}>
             <ul style={{ padding: '10px', fontSize: '25px' }}>
-              <li class="list-group-item">- Spectrum Awareness</li>
-              <li class="list-group-item">- Debugging</li>
-              <li class="list-group-item">- SDR/DSP/Wireless Students</li>
+              <li className="list-group-item">- Spectrum Awareness</li>
+              <li className="list-group-item">- Debugging</li>
+              <li className="list-group-item">- SDR/DSP/Wireless Students</li>
             </ul>
           </Col>
           <Col xs={2}></Col>
@@ -68,19 +68,21 @@ export const About = () => {
           <Col xs={5}>
             <div className="container">
               <ul style={{ padding: '10px', fontSize: '25px' }}>
-                <li class="list-group-item">- Analyze RF recordings</li>
-                <li class="list-group-item">- Organize lots of RF recordings</li>
-                <li class="list-group-item">- Test signal detection/classification algorithms and share them easily</li>
+                <li className="list-group-item">- Analyze RF recordings</li>
+                <li className="list-group-item">- Organize lots of RF recordings</li>
+                <li className="list-group-item">
+                  - Test signal detection/classification algorithms and share them easily
+                </li>
               </ul>
             </div>
           </Col>
           <Col xs={5}>
             <ul style={{ padding: '10px', fontSize: '25px' }}>
-              <li class="list-group-item">
+              <li className="list-group-item">
                 - Share RF recordings/datasets with others, without them having to download files or install software
               </li>
-              <li class="list-group-item">- Learn DSP basics (e.g., FFTs, filtering, wavelets)</li>
-              <li class="list-group-item">- Run a local instance of IQEngine for sensitive data</li>
+              <li className="list-group-item">- Learn DSP basics (e.g., FFTs, filtering, wavelets)</li>
+              <li className="list-group-item">- Run a local instance of IQEngine for sensitive data</li>
             </ul>
           </Col>
           <Col xs={1}></Col>
@@ -167,9 +169,11 @@ export const About = () => {
                 the software installation barrier, SDR/DSP tooling, and education, could be made more accessible. Next
                 came several ideas for SigMF-centric features beyond what existing software provided, such as the
                 ability to organize hundreds of recordings or visually edit annotations.
-                <p></p> Implementation of IQEngine began during a 1-week internal hackathon at Microsoft, where Marc and
-                several of his SDR coworkers built a proof-of-concept prototype. It was open sourced and shown off at
-                GNU Radio Conference '22. The first full version was completed in January '23 with help from a group of
+                <br></br>
+                <br></br>
+                Implementation of IQEngine began during a 1-week internal hackathon at Microsoft, where Marc and several
+                of his SDR coworkers built a proof-of-concept prototype. It was open sourced and shown off at GNU Radio
+                Conference '22. The first full version was completed in January '23 with help from a group of
                 undergraduate "sprinterns" at Microsoft, consisting of students from UMD and GMU that were part of the
                 Break Through Tech program.
               </p>
