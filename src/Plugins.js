@@ -34,19 +34,19 @@ export const Plugins = () => {
             {' '}
             <Row style={{ marginBottom: '15px', paddingBottom: '15px', fontSize: '20px' }}>
               <center>Through the optional backend API, IQEngine supports three different classes of plugins:</center>
-              <ol class="list-group list-group-numbered" style={{ marginTop: '25px', marginBottom: '25px' }}>
-                <li class="list-group-item">
+              <ol className="list-group list-group-numbered" style={{ marginTop: '25px', marginBottom: '25px' }}>
+                <li className="list-group-item">
                   A signal detector (with optional classifier) can be triggered in the main spectrogram page, which will
                   display the output annotations as soon as it finishes, convinient for testing new
                   detection/classification algorithms.
                 </li>
-                <li class="list-group-item">
+                <li className="list-group-item">
                   A DSP module runs prior to the FFT calculations, letting you perform a variety of signal processing
                   functions and other IQ sample manipulation. It currently only supports Python snippets, where the
                   samples out must be the same length as samples in (for now). Support for C/C++ and Rust DSP plugins is
                   on the todo list.
                 </li>
-                <li class="list-group-item">
+                <li className="list-group-item">
                   A signal generator creates a new signal given a set of parameters (not yet released)
                 </li>
               </ol>
