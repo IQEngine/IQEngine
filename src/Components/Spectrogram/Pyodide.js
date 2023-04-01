@@ -19,6 +19,7 @@ const Pyodide = (props) => {
     async function main() {
       console.log('Initializing Pyodide');
       let pyodide = await window.loadPyodide();
+      await pyodide.loadPackage('numpy');
       setState({ ...state, pyodide: pyodide });
       console.log(
         pyodide.runPython(`
