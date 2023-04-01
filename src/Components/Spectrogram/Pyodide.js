@@ -18,6 +18,9 @@ import io
 import base64
 import time
 
+from js import testvar
+print(testvar) # example of reading in a var from javascript side
+
 start_t = time.time()
 
 t = np.arange(1024)
@@ -65,6 +68,7 @@ print("elapsed time in ms:", (time.time() - start_t)*1e3)
 
   const onSubmitPythonSnippet = () => {
     console.log('Running python snippet');
+    window.testvar = 1234; // example of reading in a var from javascript side
     if (state.pyodide) {
       state.pyodide
         .runPythonAsync(state.pythonSnippet)
