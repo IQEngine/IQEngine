@@ -10,7 +10,7 @@ _<p align="center"><a href="https://www.iqengine.org">www.iqengine.org</a></p>_
 * Share your RF recordings or RFML datasets with others, without them having to download files or install any software
 * IQEngine only fetches the portion of the samples you're viewing, allowing you to quickly browse very large RF recordings
 * Test signal detection algorithms and visualize results
-* Interactively earn about different Fourier and wavelet transforms and filters by applying them to interesting signals
+* Interactively learn about different Fourier and wavelet transforms and filters by applying them to interesting signals
 * Organize and search through millions of RF recordings via metadata queries
 
 Try IQEngine now using the canonical instance at [www.iqengine.org](http://iqengine.org/) hosted by [GNU Radio](https://www.gnuradio.org/) and connected to the official [SigMF](https://github.com/gnuradio/SigMF) examples repository.  You can use the same website to open local RF recordings, the processing is all done client-side.
@@ -19,7 +19,7 @@ IQEngine is rapidly evolving, so [sign up](https://dashboard.mailerlite.com/form
 
 ## Plugins
 
-Through the optional backend API, IQEngine supports three different classes of plugins (signal generation is not yet released).  The signal detector (with optional classifier) can be triggered in the main spectrogram page, which will display the output annotations as soon as it finishes, convinient for testing new detection/classification algorithms.  The DSP module runs prior to the FFT calculations, letting you perform a variety of signal processing functions and other sample manipulation.  It currently only supports Python snippets, where the samples out must be the same length as samples in (for now).
+Through the optional backend API, IQEngine supports three different classes of plugins (signal generation is not yet released).  The signal detector (with optional classifier) can be triggered in the main spectrogram page, which will display the output annotations as soon as it finishes, convenient for testing new detection/classification algorithms.  The DSP module runs prior to the FFT calculations, letting you perform a variety of signal processing functions and other sample manipulation.  It currently only supports Python snippets, where the samples out must be the same length as samples in (for now).
 
 <p align="center">
   <img width=450 src="public/IQEngine_Plugins.svg" />
