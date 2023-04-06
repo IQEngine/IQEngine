@@ -7,6 +7,7 @@ import { Sidebar } from './Sidebar';
 import { Component } from 'react';
 import Button from 'react-bootstrap/Button';
 import ScrollBar from './ScrollBar';
+import Pyodide from './Pyodide';
 import { TimePlot } from './TimePlot';
 import { FrequencyPlot } from './FrequencyPlot';
 import { IQPlot } from './IQPlot';
@@ -21,6 +22,13 @@ import TimeSelector from './TimeSelector';
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import { Navigate } from 'react-router-dom';
+
+async function initPyodide() {
+  const pyodide = await window.loadPyodide();
+  await pyodide.loadPackage('numpy');
+  await pyodide.loadPackage('matplotlib');
+  return pyodide;
+}
 
 class SpectrogramPage extends Component {
   constructor(props) {
@@ -54,13 +62,13 @@ class SpectrogramPage extends Component {
       currentFftMax: -999999,
       currentFftMin: 999999,
       currentTab: 'spectrogram',
-      pythonSnippet: '',
       redirect: false,
+      pyodide: null,
     };
   }
 
   // This all just happens once when the spectrogram page opens for the first time (or when you make a change in the code)
-  componentDidMount() {
+  async componentDidMount() {
     let { fetchMetaDataBlob, connection } = this.props;
 
     // If someone goes to a spectrogram page directly none of the state will be set so redirect to home
@@ -69,6 +77,11 @@ class SpectrogramPage extends Component {
     window.iq_data = {};
     clear_all_data();
     fetchMetaDataBlob(connection); // fetch the metadata
+
+    if (this.state.pyodide === null) {
+      const pyodide = await initPyodide();
+      this.setState({ pyodide: pyodide });
+    }
   }
 
   componentWillUnmount() {
@@ -116,16 +129,33 @@ class SpectrogramPage extends Component {
     }
     if (props.blob.taps !== prevProps.blob.taps) {
       newState.blob.taps = props.blob.taps;
-      metaIsSet = true; // force a reload of the screen
+
+      // force a reload of the screen
+      metaIsSet = true;
+      window.iq_data = {};
+      window.fft_data = {};
+    }
+    if (props.blob.pythonSnippet !== prevProps.blob.pythonSnippet) {
+      newState.blob.pythonSnippet = props.blob.pythonSnippet;
+
+      // force a reload of the screen
+      metaIsSet = true;
+      window.iq_data = {};
+      window.fft_data = {};
     }
 
     // This kicks things off when you first load into the page
     if (newState.connection.blobClient != null && metaIsSet) {
-      const { bytesPerSample, blob, fftSize, pythonSnippet } = newState;
-      const { lowerTile, upperTile } = calculateTileNumbers(0, bytesPerSample, blob, fftSize);
-      const tiles = range(Math.floor(lowerTile), Math.ceil(upperTile));
-      newState.lowerTile = lowerTile;
-      newState.upperTile = upperTile;
+      const { bytesPerSample, blob, fftSize } = newState;
+
+      // this tells us its the first time the page has loaded, so start at the beginning of the file (y=0)
+      if (newState.lowerTile === -1) {
+        const { lowerTile, upperTile } = calculateTileNumbers(0, bytesPerSample, blob, fftSize);
+        newState.lowerTile = lowerTile;
+        newState.upperTile = upperTile;
+      }
+
+      const tiles = range(Math.floor(newState.lowerTile), Math.ceil(newState.upperTile));
       for (let tile of tiles) {
         if (tile.toString() in window.iq_data) {
           continue;
@@ -137,10 +167,10 @@ class SpectrogramPage extends Component {
           tile: tile,
           offset: tile * TILE_SIZE_IN_BYTES,
           count: TILE_SIZE_IN_BYTES,
-          pythonSnippet: pythonSnippet,
+          pyodide: newState.pyodide,
         });
       }
-      this.renderImage(lowerTile, upperTile);
+      this.renderImage(newState.lowerTile, newState.upperTile);
     }
 
     // Fetch the data we need for the minimap image, but only once we have metadata, and only do it once
@@ -324,14 +354,6 @@ class SpectrogramPage extends Component {
     }, 0);
   }
 
-  updatePythonSnippet = (e) => {
-    window.iq_data = {};
-    window.fft_data = {};
-    this.setState({ pythonSnippet: e }, () => {
-      this.renderImage(this.state.lowerTile, this.state.upperTile);
-    });
-  };
-
   handleMetaChange = (e) => {
     const new_meta = JSON.parse(e.target.value);
     // update meta
@@ -405,7 +427,7 @@ class SpectrogramPage extends Component {
 
   // num is the y pixel coords of the top of the scrollbar handle, so range of 0 to the height of the scrollbar minus height of handle
   fetchAndRender = (handleTop) => {
-    const { blob, connection, data_type, bytesPerSample, fftSize, pythonSnippet } = this.state;
+    const { blob, connection, data_type, bytesPerSample, fftSize, pyodide } = this.state;
     const { upperTile, lowerTile } = calculateTileNumbers(handleTop, bytesPerSample, blob, fftSize);
     this.setState({ lowerTile: lowerTile, upperTile: upperTile });
 
@@ -426,7 +448,7 @@ class SpectrogramPage extends Component {
           data_type: data_type,
           offset: tile * TILE_SIZE_IN_BYTES,
           count: TILE_SIZE_IN_BYTES,
-          pythonSnippet: pythonSnippet,
+          pyodide: pyodide,
         });
       }
     }
@@ -488,7 +510,7 @@ class SpectrogramPage extends Component {
                 cursorsEnabled={cursorsEnabled}
                 handleProcessTime={this.handleProcessTime}
                 toggleCursors={this.toggleCursors}
-                updatePythonSnippet={this.updatePythonSnippet}
+                updatePythonSnippet={this.props.updateBlobPythonSnippet}
               />
             </Col>
             <Col>
@@ -611,6 +633,9 @@ class SpectrogramPage extends Component {
               onChange={this.handleMetaChange}
               value={JSON.stringify(this.state.meta, null, 4)}
             />
+          </Row>
+          <Row>
+            <Pyodide />
           </Row>
         </Container>
       </div>

@@ -3,6 +3,7 @@
 // Licensed under the MIT License
 
 export const UPDATE_BLOB_TAPS = 'UPDATE_BLOB_TAPS';
+export const UPDATE_BLOB_PYTHON_SNIPPET = 'UPDATE_BLOB_PYTHON_SNIPPET';
 export const UPDATE_BLOB_SIZE = 'UPDATE_BLOB_SIZE';
 export const UPDATE_BLOB_TOTAL_BYTES = 'UPDATE_BLOB_TOTAL_BYTES';
 export const FETCH_MORE_DATA_LOADING = 'FetchMoreData/pending';

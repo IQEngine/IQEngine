@@ -14,7 +14,13 @@ import {
   updateConnectionBlobClient,
   resetConnection,
 } from '../Store/Actions/ConnectionActions';
-import { fetchMoreData, resetBlob, updateBlobTaps, updateBlobTotalBytes } from '../Store/Actions/BlobActions';
+import {
+  fetchMoreData,
+  resetBlob,
+  updateBlobTaps,
+  updateBlobPythonSnippet,
+  updateBlobTotalBytes,
+} from '../Store/Actions/BlobActions';
 import { fetchMetaDataBlob, resetMeta } from '../Store/Actions/FetchMetaActions';
 import { fetchMinimap } from '../Store/Actions/MinimapActions';
 
@@ -39,6 +45,7 @@ function mapDispatchToProps(dispatch) {
     updateConnectionRecording: (recording) => dispatch(updateConnectionRecording(recording)),
     updateConnectionBlobClient: (client) => dispatch(updateConnectionBlobClient(client)),
     updateBlobTaps: (taps) => dispatch(updateBlobTaps(taps)),
+    updateBlobPythonSnippet: (pythonSnippet) => dispatch(updateBlobPythonSnippet(pythonSnippet)),
     updateBlobTotalBytes: (n) => dispatch(updateBlobTotalBytes(n)),
     fetchMoreData: (args) => dispatch(fetchMoreData(args)),
     fetchMetaDataBlob: (connection) => dispatch(fetchMetaDataBlob(connection)),
