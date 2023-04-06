@@ -310,13 +310,12 @@ const SettingsPane = (props) => {
         <Form.Label style={{ display: 'flex' }}>
           Python Snippet<br></br>
         </Form.Label>
-        <InputGroup className="mb-3">
-          <textarea rows="3" cols="16" onChange={onChangePythonSnippet} value={state.pythonSnippet} />
-          &nbsp; &nbsp;
-          <Button variant="secondary" onClick={onSubmitPythonSnippet}>
-            <FontAwesomeIcon icon={faArrowRight} />
-          </Button>
-        </InputGroup>
+        <textarea rows="3" cols="23" wrap="off" onChange={onChangePythonSnippet} value={state.pythonSnippet} />
+        <br></br>
+        <Button variant="secondary" style={{ float: 'right' }} onClick={onSubmitPythonSnippet}>
+          Run Python
+        </Button>
+        <br></br>
       </Form.Group>
     </Form>
   );
