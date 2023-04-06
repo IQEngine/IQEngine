@@ -18,7 +18,14 @@ const SettingsPane = (props) => {
   const [state, setState] = useState({
     size: 1024,
     taps: '[1]',
-    pythonSnippet: '',
+
+    // give users an example of how it works
+    pythonSnippet: `import numpy as np
+import time
+start_t = time.time()
+x = x*1
+print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
+
     windowFunction: 'hamming',
     error: { magMax: '', magMin: '', size: '' },
   });
@@ -310,7 +317,7 @@ const SettingsPane = (props) => {
         <Form.Label style={{ display: 'flex' }}>
           Python Snippet<br></br>
         </Form.Label>
-        <textarea rows="3" cols="23" wrap="off" onChange={onChangePythonSnippet} value={state.pythonSnippet} />
+        <textarea rows="6" cols="23" wrap="off" onChange={onChangePythonSnippet} value={state.pythonSnippet} />
         <br></br>
         <Button variant="secondary" style={{ float: 'right' }} onClick={onSubmitPythonSnippet}>
           Run Python

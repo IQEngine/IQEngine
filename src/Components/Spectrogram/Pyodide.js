@@ -43,30 +43,37 @@ print("elapsed time in ms:", (time.time() - start_t)*1e3)
     pyodide: null,
     b64Image: '',
     errorLog: '',
+    clickedYet: false, // so that we only init pyodide the first time someone clicks the run button
   });
 
   useEffect(() => {
-    async function main() {
-      console.log('Initializing Pyodide');
-      let pyodide = await window.loadPyodide();
-      await pyodide.loadPackage('numpy');
-      await pyodide.loadPackage('matplotlib');
-      setState({ ...state, pyodide: pyodide });
-      console.log(
-        pyodide.runPython(`
+    if (state.clickedYet && !state.pyodide) {
+      async function main() {
+        console.log('Initializing Pyodide');
+        let pyodide = await window.loadPyodide();
+        await pyodide.loadPackage('numpy');
+        await pyodide.loadPackage('matplotlib');
+        setState({ ...state, pyodide: pyodide });
+        console.log(
+          pyodide.runPython(`
             import sys
             sys.version
         `)
-      );
+        );
+      }
+      main();
+      alert('Pyodide initialized, click run again');
     }
-    main();
-  }, []);
+  }, [state]);
 
   const onChangePythonSnippet = (event) => {
     setState({ ...state, pythonSnippet: event.target.value });
   };
 
   const onSubmitPythonSnippet = () => {
+    if (!state.clickedYet) {
+      setState({ ...state, clickedYet: true });
+    }
     console.log('Running python snippet');
     window.testvar = 1234; // example of reading in a var from javascript side
     if (state.pyodide) {
@@ -103,7 +110,7 @@ print("elapsed time in ms:", (time.time() - start_t)*1e3)
       </Form>
       <div>
         Image of b64 string stored within img variable:<br></br>
-        <img src={state.b64Image} alt="image output of python" />
+        <img src={state.b64Image} alt="output of python" />
       </div>
       <br></br>
       <div className="display-linebreak">

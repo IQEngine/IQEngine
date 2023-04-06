@@ -10,6 +10,7 @@ import {
   UPDATE_BLOB_SIZE,
   UPDATE_BLOB_TOTAL_BYTES,
   UPDATE_BLOB_TAPS,
+  UPDATE_BLOB_PYTHON_SNIPPET,
 } from '../../Constants/BlobTypes';
 
 const initialState = {
@@ -18,6 +19,7 @@ const initialState = {
   currentMax: 0, // holds current max value of I/Q for that recording so we can scale the spectrogram appropriately
   status: 'idle',
   taps: new Float32Array(1).fill(1),
+  pythonSnippet: '',
   numActiveFetches: 0,
 };
 
@@ -27,6 +29,11 @@ export default function blobReducer(state = initialState, action) {
       return {
         ...state,
         taps: action.payload,
+      };
+    case UPDATE_BLOB_PYTHON_SNIPPET:
+      return {
+        ...state,
+        pythonSnippet: action.payload,
       };
     case UPDATE_BLOB_SIZE:
       return {

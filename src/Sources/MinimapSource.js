@@ -3,7 +3,7 @@
 // Licensed under the MIT License
 
 import { fetchMinimapFailure, fetchMinimapLoading, fetchMinimapSuccess } from '../Store/Actions/MinimapActions';
-import { applyConvolve, readFileAsync } from './FetchMoreDataSource';
+import { applyProcessing, readFileAsync } from './FetchMoreDataSource';
 
 export const FetchMinimap = (args) => async (dispatch) => {
   console.log('running FetchMinimap');
@@ -22,14 +22,14 @@ export const FetchMinimap = (args) => async (dispatch) => {
       const downloadBlockBlobResponse = await blobClient.download(offset, count);
       const blobResp = await downloadBlockBlobResponse.blobBody; // this is how you have to do it in browser, in backend you can use readableStreamBody
       const buffer = await blobResp.arrayBuffer();
-      samples = applyConvolve(buffer, blob.taps, data_type);
+      samples = await applyProcessing(buffer, blob.taps, blob.pythonSnippet, null, data_type);
     } else {
       // Use a local file
       let handle = connection.datafilehandle;
       const fileData = await handle.getFile();
       console.log('offset:', offset, 'count:', count);
       const buffer = await readFileAsync(fileData.slice(offset, offset + count));
-      samples = applyConvolve(buffer, blob.taps, data_type);
+      samples = await applyProcessing(buffer, blob.taps, blob.pythonSnippet, null, data_type);
     }
   } catch (e) {
     dispatch(fetchMinimapFailure(e));

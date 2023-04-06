@@ -10,11 +10,17 @@ import {
   UPDATE_BLOB_SIZE,
   UPDATE_BLOB_TOTAL_BYTES,
   UPDATE_BLOB_TAPS,
+  UPDATE_BLOB_PYTHON_SNIPPET,
 } from '../../Constants/BlobTypes';
 import FetchMoreData from '../../Sources/FetchMoreDataSource';
 
 export const updateBlobTaps = (payload) => ({
   type: UPDATE_BLOB_TAPS,
+  payload,
+});
+
+export const updateBlobPythonSnippet = (payload) => ({
+  type: UPDATE_BLOB_PYTHON_SNIPPET,
   payload,
 });
 
