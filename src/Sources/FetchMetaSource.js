@@ -12,6 +12,7 @@ const { BlobServiceClient } = require('@azure/storage-blob');
 export const FetchMeta = (connection) => async (dispatch) => {
   console.log('running fetchMeta');
   let meta_string = '';
+  let meta_json;
   let blobName = connection.recording + '.sigmf-meta'; // has to go outside of condition or else react gets mad
   if (connection.metafilehandle === null) {
     let { accountName, containerName, sasToken } = connection;
@@ -25,16 +26,26 @@ export const FetchMeta = (connection) => async (dispatch) => {
     const downloadBlockBlobResponse = await blobMetaClient.download();
     const blob = await downloadBlockBlobResponse.blobBody;
     meta_string = await blob.text();
+    meta_json = JSON.parse(meta_string);
   } else {
     const metaFile = await connection.metafilehandle.getFile();
     const dataFile = await connection.datafilehandle.getFile();
     meta_string = await metaFile.text();
-    const numBytes = dataFile.size;
+    meta_json = JSON.parse(meta_string);
 
-    //dispatch(updateBlobTotalIQSamples(numBytes));
+    // we need to set TotalIQSamples here for local files (it has already been set for blob)
+    const dataType = meta_json['global']['core:datatype'];
+    let bytesPerSample;
+    if (dataType === 'ci16_le') {
+      bytesPerSample = 2;
+    } else if (dataType === 'cf32_le') {
+      bytesPerSample = 4;
+    } else {
+      bytesPerSample = 2;
+    }
+    const numBytes = dataFile.size;
+    dispatch(updateBlobTotalIQSamples(numBytes / bytesPerSample / 2));
     dispatch(updateConnectionBlobClient('not null')); // even though we dont use the blobclient for local files, this triggers the initial fetch/render
   }
-
-  const meta_json = JSON.parse(meta_string);
   dispatch(returnMetaDataBlob(meta_json));
 };
