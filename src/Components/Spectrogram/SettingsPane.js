@@ -274,11 +274,6 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
         </a>
       </div>
 
-      <DropdownButton title="Data Type" variant="secondary" className="mb-3" id="dropdown-menu-align-right" onSelect>
-        <Dropdown.Item eventKey="cf32_le">complex float32</Dropdown.Item>
-        <Dropdown.Item eventKey="ci16_le">complex int16</Dropdown.Item>
-      </DropdownButton>
-
       <Form.Label style={{ display: 'flex' }}>
         <DropdownButton
           title="Window"
