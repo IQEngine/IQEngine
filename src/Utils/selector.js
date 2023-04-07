@@ -4,7 +4,7 @@
 
 import { fftshift } from 'fftshift';
 import { colMap } from './colormap';
-import { TILE_SIZE_IN_BYTES } from '../Utils/constants';
+import { TILE_SIZE_IN_IQ_SAMPLES } from '../Utils/constants';
 
 const FFT = require('fft.js');
 
@@ -157,7 +157,6 @@ function calcFftOfTile(
 export const select_fft = (
   lowerTile,
   upperTile,
-  bytes_per_sample,
   fftSize,
   magnitudeMax,
   magnitudeMin,
@@ -169,7 +168,7 @@ export const select_fft = (
   autoscale = false
 ) => {
   let fft_size = fftSize;
-  const num_ffts = TILE_SIZE_IN_BYTES / bytes_per_sample / 2 / fftSize; // per tile
+  const num_ffts = TILE_SIZE_IN_IQ_SAMPLES / fftSize; // per tile
   let magnitude_max = magnitudeMax;
   let magnitude_min = magnitudeMin;
   let tempCurrentFftMax = currentFftMax;
@@ -243,8 +242,8 @@ export const select_fft = (
     let description = meta.annotations[i]['core:description'];
 
     // Calc the sample index of the first FFT being displayed
-    let start_sample_index = (lowerTile * TILE_SIZE_IN_BYTES) / 2 / bytes_per_sample;
-    let samples_in_window = ((upperTile - lowerTile) * TILE_SIZE_IN_BYTES) / 2 / bytes_per_sample;
+    let start_sample_index = lowerTile * TILE_SIZE_IN_IQ_SAMPLES;
+    let samples_in_window = (upperTile - lowerTile) * TILE_SIZE_IN_IQ_SAMPLES;
     let stop_sample_index = start_sample_index + samples_in_window;
     let center_frequency = meta.captures[0]['core:frequency'];
     let sample_rate = meta.global['core:sample_rate'];
@@ -278,10 +277,10 @@ export const select_fft = (
   return select_fft_return;
 };
 
-export function calculateTileNumbers(handleTop, bytesPerSample, blob, fftSize) {
-  const { totalBytes } = blob;
-  const tileSizeInRows = TILE_SIZE_IN_BYTES / bytesPerSample / 2 / fftSize;
-  const totalNumFFTs = totalBytes / bytesPerSample / 2 / fftSize; // divide by 2 because IQ
+export function calculateTileNumbers(handleTop, blob, fftSize) {
+  const { totalIQSamples } = blob;
+  const tileSizeInRows = TILE_SIZE_IN_IQ_SAMPLES / fftSize;
+  const totalNumFFTs = totalIQSamples / fftSize; // divide by 2 because IQ
   const scrollBarHeight = 600; // TODO REPLACE ME WITH ACTUAL WINDOW HEIGHT
   const handleFraction = scrollBarHeight / totalNumFFTs;
   const handleHeightPixels = handleFraction * scrollBarHeight;

@@ -2,7 +2,7 @@
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
 
-import { updateBlobTotalBytes } from '../Store/Actions/BlobActions';
+import { updateBlobTotalIQSamples } from '../Store/Actions/BlobActions';
 import { updateConnectionBlobClient } from '../Store/Actions/ConnectionActions';
 import { returnMetaDataBlob } from '../Store/Actions/FetchMetaActions';
 const { BlobServiceClient } = require('@azure/storage-blob');
@@ -30,7 +30,8 @@ export const FetchMeta = (connection) => async (dispatch) => {
     const dataFile = await connection.datafilehandle.getFile();
     meta_string = await metaFile.text();
     const numBytes = dataFile.size;
-    dispatch(updateBlobTotalBytes(numBytes));
+
+    //dispatch(updateBlobTotalIQSamples(numBytes));
     dispatch(updateConnectionBlobClient('not null')); // even though we dont use the blobclient for local files, this triggers the initial fetch/render
   }
 

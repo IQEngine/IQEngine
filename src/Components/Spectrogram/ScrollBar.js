@@ -6,22 +6,12 @@ import React, { useState, useEffect } from 'react';
 import { Layer, Rect, Image } from 'react-konva';
 import { fftshift } from 'fftshift';
 import { colMap } from '../../Utils/colormap';
-import { MINIMUM_SCROLL_HANDLE_HEIGHT } from '../../Utils/constants';
+import { MINIMUM_SCROLL_HANDLE_HEIGHT_PIXELS } from '../../Utils/constants';
 
 const FFT = require('fft.js');
 
 const ScrollBar = (props) => {
-  let {
-    totalBytes,
-    spectrogram_height,
-    fetchAndRender,
-    bytesPerSample,
-    fftSize,
-    minimapNumFetches,
-    meta,
-    skipNFfts,
-    size,
-  } = props;
+  let { totalIQSamples, spectrogram_height, fetchAndRender, fftSize, minimapNumFetches, meta, skipNFfts, size } = props;
 
   const [minimapImg, setMinimapImg] = useState(null);
   //const [scrollbarWidth, setStageWidth] = useState(50);
@@ -32,10 +22,10 @@ const ScrollBar = (props) => {
 
   // Calc scroll handle height
   useEffect(() => {
-    let x = (spectrogram_height / (totalBytes / bytesPerSample / 2 / fftSize)) * spectrogram_height;
-    if (x < MINIMUM_SCROLL_HANDLE_HEIGHT) x = MINIMUM_SCROLL_HANDLE_HEIGHT;
+    let x = (spectrogram_height / (totalIQSamples / fftSize)) * spectrogram_height;
+    if (x < MINIMUM_SCROLL_HANDLE_HEIGHT_PIXELS) x = MINIMUM_SCROLL_HANDLE_HEIGHT_PIXELS;
     setHandleHeightPixels(x);
-  }, [spectrogram_height, totalBytes, bytesPerSample, fftSize]);
+  }, [spectrogram_height, totalIQSamples, fftSize]);
 
   useEffect(() => {
     if (!minimapNumFetches) {

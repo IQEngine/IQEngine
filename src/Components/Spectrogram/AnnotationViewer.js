@@ -5,10 +5,10 @@
 import { faCropSimple } from '@fortawesome/free-solid-svg-icons';
 import React from 'react';
 import { Layer, Rect, Text } from 'react-konva';
-import { TILE_SIZE_IN_BYTES } from '../../Utils/constants';
+import { TILE_SIZE_IN_IQ_SAMPLES } from '../../Utils/constants';
 
 const AnnotationViewer = (props) => {
-  let { spectrogramWidthScale, annotations, fftSize, meta, lowerTile, bytesPerSample, spectrogramHeight } = props;
+  let { spectrogramWidthScale, annotations, fftSize, meta, lowerTile, spectrogramHeight } = props;
 
   // These two lines are a hack used to force a re-render when an annotation is updated, which for some reason wasnt updating
   const [, updateState] = React.useState();
@@ -27,7 +27,7 @@ const AnnotationViewer = (props) => {
     // Now update the actual meta.annotations
     const f = annotations[annot_indx]['index']; // remember there are 2 different indexes- the ones on the screen and the meta.annotations
     let updatedAnnotations = [...props.meta.annotations];
-    let start_sample_index = (lowerTile * TILE_SIZE_IN_BYTES) / 2 / bytesPerSample;
+    let start_sample_index = lowerTile * TILE_SIZE_IN_IQ_SAMPLES;
     updatedAnnotations[f]['core:sample_start'] =
       (annotations[annot_indx].y1 / Math.sqrt(fftSize / spectrogramHeight / 2)) * fftSize + start_sample_index; // FIXME NOTE SURE WHY I NEED THIS LAST TERM
     updatedAnnotations[f]['core:sample_count'] =
@@ -66,7 +66,7 @@ const AnnotationViewer = (props) => {
     updatedAnnotations.push({});
     const f = updatedAnnotations.length - 1;
     const annot_indx = annotations.length - 1;
-    let start_sample_index = (lowerTile * TILE_SIZE_IN_BYTES) / 2 / bytesPerSample;
+    let start_sample_index = lowerTile * TILE_SIZE_IN_IQ_SAMPLES;
     updatedAnnotations[f]['core:sample_start'] =
       (annotations[annot_indx].y1 / Math.sqrt(fftSize / spectrogramHeight / 2)) * fftSize + start_sample_index; // FIXME NOTE SURE WHY I NEED THIS LAST TERM
     updatedAnnotations[f]['core:sample_count'] =

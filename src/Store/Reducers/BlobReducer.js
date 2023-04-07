@@ -15,7 +15,7 @@ import {
 
 const initialState = {
   size: 0,
-  totalBytes: 0,
+  totalIQSamples: 0,
   currentMax: 0, // holds current max value of I/Q for that recording so we can scale the spectrogram appropriately
   status: 'idle',
   taps: new Float32Array(1).fill(1),
@@ -43,7 +43,7 @@ export default function blobReducer(state = initialState, action) {
     case UPDATE_BLOB_TOTAL_BYTES:
       return {
         ...state,
-        totalBytes: action.payload,
+        totalIQSamples: action.payload,
       };
     case FETCH_MORE_DATA_LOADING: // FetchMoreData/pending, where FetchMoreData is the async thunk function
       return {

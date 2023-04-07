@@ -16,7 +16,7 @@ import { select_fft, clear_all_data, calculateTileNumbers, range } from '../../U
 import { AnnotationViewer } from './AnnotationViewer';
 import { RulerTop } from './RulerTop';
 import { RulerSide } from './RulerSide';
-import { TILE_SIZE_IN_BYTES, MAX_SIMULTANEOUS_FETCHES } from '../../Utils/constants';
+import { TILE_SIZE_IN_IQ_SAMPLES, MAX_SIMULTANEOUS_FETCHES } from '../../Utils/constants';
 import DownloadIcon from '@mui/icons-material/Download';
 import TimeSelector from './TimeSelector';
 import Tab from 'react-bootstrap/Tab';
@@ -45,7 +45,6 @@ class SpectrogramPage extends Component {
       image: null,
       annotations: [], // annotations that are on the screen at that moment (likely a subset of the total annotations)
       sampleRate: 1,
-      bytesPerSample: null,
       data_type: '',
       upperTile: -1,
       lowerTile: -1,
@@ -102,11 +101,6 @@ class SpectrogramPage extends Component {
         console.log('WARNING: Incorrect data type');
       }
       newState.data_type = data_type;
-      if (data_type === 'ci16_le') {
-        newState.bytesPerSample = 2;
-      } else if (data_type === 'cf32_le') {
-        newState.bytesPerSample = 4;
-      }
       metaIsSet = true;
     }
     if (JSON.stringify(props.connection) !== JSON.stringify(prevProps.connection)) {
@@ -118,8 +112,8 @@ class SpectrogramPage extends Component {
       let { lowerTile, upperTile } = newState;
       this.renderImage(lowerTile, upperTile);
     }
-    if (props.blob.totalBytes !== prevProps.blob.totalBytes) {
-      newState.blob.totalBytes = props.blob.totalBytes;
+    if (props.blob.totalIQSamples !== prevProps.blob.totalIQSamples) {
+      newState.blob.totalIQSamples = props.blob.totalIQSamples;
     }
     if (props.blob.numActiveFetches !== prevProps.blob.numActiveFetches) {
       newState.blob.numActiveFetches = props.blob.numActiveFetches;
@@ -146,11 +140,11 @@ class SpectrogramPage extends Component {
 
     // This kicks things off when you first load into the page
     if (newState.connection.blobClient != null && metaIsSet) {
-      const { bytesPerSample, blob, fftSize } = newState;
+      const { blob, fftSize } = newState;
 
       // this tells us its the first time the page has loaded, so start at the beginning of the file (y=0)
       if (newState.lowerTile === -1) {
-        const { lowerTile, upperTile } = calculateTileNumbers(0, bytesPerSample, blob, fftSize);
+        const { lowerTile, upperTile } = calculateTileNumbers(0, blob, fftSize);
         newState.lowerTile = lowerTile;
         newState.upperTile = upperTile;
       }
@@ -165,8 +159,8 @@ class SpectrogramPage extends Component {
           data_type: newState.data_type,
           connection: newState.connection,
           tile: tile,
-          offset: tile * TILE_SIZE_IN_BYTES,
-          count: TILE_SIZE_IN_BYTES,
+          offset: tile * TILE_SIZE_IN_IQ_SAMPLES, // in IQ samples
+          count: TILE_SIZE_IN_IQ_SAMPLES, // in IQ samples
           pyodide: newState.pyodide,
         });
       }
@@ -176,20 +170,18 @@ class SpectrogramPage extends Component {
     // Fetch the data we need for the minimap image, but only once we have metadata, and only do it once
     if (!newState.minimapFetch && newState.data_type) {
       const fft_size = 1024; // for minimap only. there's so much overhead with blob downloading that this might as well be a high value...
-      const skip_N_ffts = Math.floor(newState.blob.totalBytes / 400e3); // sets the decimation rate (manually tweaked)
+      const skip_N_ffts = Math.floor(newState.blob.totalIQSamples / 100e3); // sets the decimation rate (manually tweaked)
       newState.skipNFfts = skip_N_ffts; // so that the scrollbar knows how to place the ticks
       console.log('skip_N_ffts:', skip_N_ffts);
-      const num_ffts = Math.floor(
-        newState.blob.totalBytes / 2 / newState.bytesPerSample / fft_size / (skip_N_ffts + 1)
-      );
+      const num_ffts = Math.floor(newState.blob.totalIQSamples / fft_size / (skip_N_ffts + 1));
       for (let i = 0; i < num_ffts; i++) {
         props.fetchMinimap({
           blob: newState.blob,
           data_type: newState.data_type,
           connection: newState.connection,
           tile: 'minimap' + i.toString(),
-          offset: i * 2 * newState.bytesPerSample * fft_size * (skip_N_ffts + 1),
-          count: fft_size * newState.bytesPerSample * 2,
+          offset: i * fft_size * (skip_N_ffts + 1), // in IQ samples
+          count: fft_size, // in IQ samples
         });
       }
       newState.minimapFetch = true;
@@ -234,40 +226,28 @@ class SpectrogramPage extends Component {
 
     // Concatenate and trim the IQ Data associated with this range of samples
     const tiles = range(Math.floor(timeSelectionStart), Math.ceil(timeSelectionEnd));
-    let bufferLen = tiles.length * TILE_SIZE_IN_BYTES;
+    let bufferLen = tiles.length * TILE_SIZE_IN_IQ_SAMPLES * 2; // number of floats
 
-    let currentSamples;
-    if (this.state.data_type === 'ci16_le') {
-      currentSamples = new Int16Array(bufferLen / this.state.bytesPerSample);
-    } else if (this.state.data_type === 'cf32_le') {
-      currentSamples = new Float32Array(bufferLen / this.state.bytesPerSample);
-    } else {
-      currentSamples = new Float32Array(bufferLen / this.state.bytesPerSample);
-    }
-
+    let currentSamples = new Float32Array(bufferLen);
     let counter = 0;
     for (let tile of tiles) {
       if (tile.toString() in window.iq_data) {
         currentSamples.set(window.iq_data[tile.toString()], counter);
-        counter = counter + TILE_SIZE_IN_BYTES / this.state.bytesPerSample;
+        counter = counter + TILE_SIZE_IN_IQ_SAMPLES * 2; // in floats
       } else {
         console.log('Dont have iq_data of tile', tile, 'yet');
       }
     }
 
     // Trim off the top and bottom
-    let lowerTrim = Math.floor(
-      ((timeSelectionStart - Math.floor(timeSelectionStart)) * TILE_SIZE_IN_BYTES) / this.state.bytesPerSample
-    ); // samples to get rid of
+    let lowerTrim = Math.floor((timeSelectionStart - Math.floor(timeSelectionStart)) * TILE_SIZE_IN_IQ_SAMPLES); // samples to get rid of
     if (lowerTrim % 2 === 1) lowerTrim = lowerTrim + 1; // for I to be first in IQ
-    let upperTrim = Math.floor(
-      ((1 - (timeSelectionEnd - Math.floor(timeSelectionEnd))) * TILE_SIZE_IN_BYTES) / this.state.bytesPerSample
-    ); // samples to get rid of
+    let upperTrim = Math.floor((1 - (timeSelectionEnd - Math.floor(timeSelectionEnd))) * TILE_SIZE_IN_IQ_SAMPLES); // samples to get rid of
     if (upperTrim % 2 === 1) upperTrim = upperTrim + 1;
     const trimmedSamples = currentSamples.slice(lowerTrim, bufferLen - upperTrim);
     this.setState({ currentSamples: trimmedSamples });
 
-    const startSampleOffset = (timeSelectionStart * TILE_SIZE_IN_BYTES) / this.state.bytesPerSample / 2; // in IQ samples
+    const startSampleOffset = timeSelectionStart * TILE_SIZE_IN_IQ_SAMPLES; // in IQ samples
     return { trimmedSamples: trimmedSamples, startSampleOffset: startSampleOffset }; // only used by detector
   };
 
@@ -372,22 +352,12 @@ class SpectrogramPage extends Component {
   };
 
   renderImage = (lowerTile, upperTile) => {
-    const {
-      bytesPerSample,
-      fftSize,
-      magnitudeMax,
-      magnitudeMin,
-      meta,
-      autoscale,
-      currentFftMax,
-      currentFftMin,
-      spectrogramHeight,
-    } = this.state;
+    const { fftSize, magnitudeMax, magnitudeMin, meta, autoscale, currentFftMax, currentFftMin, spectrogramHeight } =
+      this.state;
     // Update the image (eventually this should get moved somewhere else)
     let ret = select_fft(
       lowerTile,
       upperTile,
-      bytesPerSample,
       fftSize,
       magnitudeMax,
       magnitudeMin,
@@ -427,8 +397,8 @@ class SpectrogramPage extends Component {
 
   // num is the y pixel coords of the top of the scrollbar handle, so range of 0 to the height of the scrollbar minus height of handle
   fetchAndRender = (handleTop) => {
-    const { blob, connection, data_type, bytesPerSample, fftSize, pyodide } = this.state;
-    const { upperTile, lowerTile } = calculateTileNumbers(handleTop, bytesPerSample, blob, fftSize);
+    const { blob, connection, data_type, fftSize, pyodide } = this.state;
+    const { upperTile, lowerTile } = calculateTileNumbers(handleTop, blob, fftSize);
     this.setState({ lowerTile: lowerTile, upperTile: upperTile });
 
     // If we already have too many pending fetches then bail
@@ -446,8 +416,8 @@ class SpectrogramPage extends Component {
           connection: connection,
           blob: blob,
           data_type: data_type,
-          offset: tile * TILE_SIZE_IN_BYTES,
-          count: TILE_SIZE_IN_BYTES,
+          offset: tile * TILE_SIZE_IN_IQ_SAMPLES, // in IQ samples
+          count: TILE_SIZE_IN_IQ_SAMPLES, // in IQ samples
           pyodide: pyodide,
         });
       }
@@ -467,7 +437,6 @@ class SpectrogramPage extends Component {
       annotations,
       sampleRate,
       lowerTile,
-      bytesPerSample,
       currentSamples,
       minimapNumFetches,
       rulerSideWidth,
@@ -551,7 +520,6 @@ class SpectrogramPage extends Component {
                           meta={meta}
                           fftSize={fftSize}
                           lowerTile={lowerTile}
-                          bytesPerSample={bytesPerSample}
                           spectrogramHeight={spectrogramHeight}
                         />
                         {cursorsEnabled && (
@@ -572,7 +540,7 @@ class SpectrogramPage extends Component {
                           spectrogram_width={spectrogramWidth}
                           fftSize={fftSize}
                           sampleRate={sampleRate}
-                          currentRowAtTop={(lowerTile * TILE_SIZE_IN_BYTES) / 2 / bytesPerSample / fftSize}
+                          currentRowAtTop={(lowerTile * TILE_SIZE_IN_IQ_SAMPLES) / fftSize}
                         />
                       </Stage>
                     </Col>
@@ -580,9 +548,8 @@ class SpectrogramPage extends Component {
                       <Stage width={50} height={600}>
                         <ScrollBar
                           fetchAndRender={this.fetchAndRender}
-                          totalBytes={blob.totalBytes}
+                          totalIQSamples={blob.totalIQSamples}
                           spectrogram_height={spectrogramHeight}
-                          bytesPerSample={bytesPerSample}
                           fftSize={fftSize}
                           minimapNumFetches={minimapNumFetches}
                           meta={meta}
