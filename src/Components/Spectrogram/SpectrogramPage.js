@@ -222,10 +222,10 @@ class SpectrogramPage extends Component {
   };
 
   handleProcessTime = () => {
-    const { timeSelectionStart, timeSelectionEnd } = this.state;
+    const { timeSelectionStart, timeSelectionEnd } = this.state; // these 2 are in units of tile
 
     // Concatenate and trim the IQ Data associated with this range of samples
-    const tiles = range(Math.floor(timeSelectionStart), Math.ceil(timeSelectionEnd));
+    const tiles = range(Math.floor(timeSelectionStart), Math.ceil(timeSelectionEnd)); //non-inclusive of end
     let bufferLen = tiles.length * TILE_SIZE_IN_IQ_SAMPLES * 2; // number of floats
 
     let currentSamples = new Float32Array(bufferLen);
@@ -240,10 +240,10 @@ class SpectrogramPage extends Component {
     }
 
     // Trim off the top and bottom
-    let lowerTrim = Math.floor((timeSelectionStart - Math.floor(timeSelectionStart)) * TILE_SIZE_IN_IQ_SAMPLES); // samples to get rid of
+    let lowerTrim = Math.floor((timeSelectionStart - Math.floor(timeSelectionStart)) * TILE_SIZE_IN_IQ_SAMPLES * 2); // floats to get rid of
     if (lowerTrim % 2 === 1) lowerTrim = lowerTrim + 1; // for I to be first in IQ
-    let upperTrim = Math.floor((1 - (timeSelectionEnd - Math.floor(timeSelectionEnd))) * TILE_SIZE_IN_IQ_SAMPLES); // samples to get rid of
-    if (upperTrim % 2 === 1) upperTrim = upperTrim + 1;
+    let upperTrim = Math.floor((timeSelectionEnd - Math.floor(timeSelectionEnd)) * TILE_SIZE_IN_IQ_SAMPLES * 2); // floats to get rid of
+    if (upperTrim % 2 === 1) upperTrim = upperTrim + 1; // for I to be first in IQ
     const trimmedSamples = currentSamples.slice(lowerTrim, bufferLen - upperTrim);
     this.setState({ currentSamples: trimmedSamples });
 

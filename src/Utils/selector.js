@@ -297,7 +297,6 @@ export function calculateTileNumbers(handleTop, blob, fftSize) {
 }
 
 // mimicing python's range() function which gives array of integers between two values non-inclusive of end
-
 export function range(start, end) {
   return Array.apply(0, Array(end - start + 1)).map((element, index) => index + start);
 }
