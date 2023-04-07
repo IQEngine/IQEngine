@@ -148,8 +148,8 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
       taps = Float32Array.from(taps);
       props.updateBlobTaps(taps);
       // We apply the taps when we download the IQ data, so we have to clear both
-      window.iq_data = {};
-      window.fft_data = {};
+      window.iqData = {};
+      window.fftData = {};
       console.log('valid taps, found', taps.length, 'taps');
     } else {
       console.error('invalid taps');
@@ -165,8 +165,8 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
       taps = taps.map((x) => parseFloat(x));
       taps = Float32Array.from(taps);
       props.updateBlobTaps(taps);
-      window.iq_data = {};
-      window.fft_data = {};
+      window.iqData = {};
+      window.fftData = {};
       console.log('valid taps, found', taps.length, 'taps');
     } else {
       console.error('invalid taps');
@@ -204,7 +204,7 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
         </InputGroup>
       </Form.Group>
 
-      {/* When you press this button it will make autoscale run during the next call to select_fft, then it will turn itself off */}
+      {/* When you press this button it will make autoscale run during the next call to selectFft, then it will turn itself off */}
       <Button
         className="mb-3"
         variant="secondary"

@@ -12,7 +12,7 @@ import { TimePlot } from './TimePlot';
 import { FrequencyPlot } from './FrequencyPlot';
 import { IQPlot } from './IQPlot';
 import { Layer, Image, Stage } from 'react-konva';
-import { select_fft, clear_all_data, calculateTileNumbers, range } from '../../Utils/selector';
+import { selectFft, clearAllData, calculateTileNumbers, range } from '../../Utils/selector';
 import { AnnotationViewer } from './AnnotationViewer';
 import { RulerTop } from './RulerTop';
 import { RulerSide } from './RulerSide';
@@ -45,7 +45,7 @@ class SpectrogramPage extends Component {
       image: null,
       annotations: [], // annotations that are on the screen at that moment (likely a subset of the total annotations)
       sampleRate: 1,
-      data_type: '',
+      dataType: '',
       upperTile: -1,
       lowerTile: -1,
       currentSamples: [],
@@ -73,8 +73,8 @@ class SpectrogramPage extends Component {
     // If someone goes to a spectrogram page directly none of the state will be set so redirect to home
     if (!connection.accountName && !connection.datafilehandle) this.setState({ redirect: true });
 
-    window.iq_data = {};
-    clear_all_data();
+    window.iqData = {};
+    clearAllData();
     fetchMetaDataBlob(connection); // fetch the metadata
 
     if (this.state.pyodide === null) {
@@ -86,7 +86,7 @@ class SpectrogramPage extends Component {
   componentWillUnmount() {
     // make sure not to resetConnection() here or else it screws up ability to switch between recordings without clicking the browse button again
     this.props.resetMeta();
-    window.iq_data = {};
+    window.iqData = {};
     this.props.resetBlob();
   }
 
@@ -96,11 +96,11 @@ class SpectrogramPage extends Component {
     const props = this.props;
     if (JSON.stringify(this.props.meta) !== JSON.stringify(prevProps.meta)) {
       newState.meta = props.meta;
-      const data_type = newState.meta.global['core:datatype'];
-      if (!data_type) {
+      const dataType = newState.meta.global['core:datatype'];
+      if (!dataType) {
         console.log('WARNING: Incorrect data type');
       }
-      newState.data_type = data_type;
+      newState.dataType = dataType;
       metaIsSet = true;
     }
     if (JSON.stringify(props.connection) !== JSON.stringify(prevProps.connection)) {
@@ -126,16 +126,16 @@ class SpectrogramPage extends Component {
 
       // force a reload of the screen
       metaIsSet = true;
-      window.iq_data = {};
-      window.fft_data = {};
+      window.iqData = {};
+      window.fftData = {};
     }
     if (props.blob.pythonSnippet !== prevProps.blob.pythonSnippet) {
       newState.blob.pythonSnippet = props.blob.pythonSnippet;
 
       // force a reload of the screen
       metaIsSet = true;
-      window.iq_data = {};
-      window.fft_data = {};
+      window.iqData = {};
+      window.fftData = {};
     }
 
     // This kicks things off when you first load into the page
@@ -151,12 +151,12 @@ class SpectrogramPage extends Component {
 
       const tiles = range(Math.floor(newState.lowerTile), Math.ceil(newState.upperTile));
       for (let tile of tiles) {
-        if (tile.toString() in window.iq_data) {
+        if (tile.toString() in window.iqData) {
           continue;
         }
         props.fetchMoreData({
           blob: newState.blob,
-          data_type: newState.data_type,
+          dataType: newState.dataType,
           connection: newState.connection,
           tile: tile,
           offset: tile * TILE_SIZE_IN_IQ_SAMPLES, // in IQ samples
@@ -168,30 +168,30 @@ class SpectrogramPage extends Component {
     }
 
     // Fetch the data we need for the minimap image, but only once we have metadata, and only do it once
-    if (!newState.minimapFetch && newState.data_type) {
-      const fft_size = 1024; // for minimap only. there's so much overhead with blob downloading that this might as well be a high value...
-      const skip_N_ffts = Math.floor(newState.blob.totalIQSamples / 100e3); // sets the decimation rate (manually tweaked)
-      newState.skipNFfts = skip_N_ffts; // so that the scrollbar knows how to place the ticks
-      console.log('skip_N_ffts:', skip_N_ffts);
-      const num_ffts = Math.floor(newState.blob.totalIQSamples / fft_size / (skip_N_ffts + 1));
-      for (let i = 0; i < num_ffts; i++) {
+    if (!newState.minimapFetch && newState.dataType) {
+      const fftSizeScrollbar = 1024; // for minimap only. there's so much overhead with blob downloading that this might as well be a high value...
+      const skipNFfts = Math.floor(newState.blob.totalIQSamples / 100e3); // sets the decimation rate (manually tweaked)
+      newState.skipNFfts = skipNFfts; // so that the scrollbar knows how to place the ticks
+      console.log('skipNFfts:', skipNFfts);
+      const numFfts = Math.floor(newState.blob.totalIQSamples / fftSizeScrollbar / (skipNFfts + 1));
+      for (let i = 0; i < numFfts; i++) {
         props.fetchMinimap({
           blob: newState.blob,
-          data_type: newState.data_type,
+          dataType: newState.dataType,
           connection: newState.connection,
           tile: 'minimap' + i.toString(),
-          offset: i * fft_size * (skip_N_ffts + 1), // in IQ samples
-          count: fft_size, // in IQ samples
+          offset: i * fftSizeScrollbar * (skipNFfts + 1), // in IQ samples
+          count: fftSizeScrollbar, // in IQ samples
         });
       }
       newState.minimapFetch = true;
-      newState.minimapNumFetches = num_ffts;
+      newState.minimapNumFetches = numFfts;
     }
     return { ...newState };
   }
 
   handleFftSize = (size) => {
-    window.fft_data = {};
+    window.fftData = {};
     // need to do it this way because setState is async
     this.setState(
       {
@@ -231,11 +231,11 @@ class SpectrogramPage extends Component {
     let currentSamples = new Float32Array(bufferLen);
     let counter = 0;
     for (let tile of tiles) {
-      if (tile.toString() in window.iq_data) {
-        currentSamples.set(window.iq_data[tile.toString()], counter);
+      if (tile.toString() in window.iqData) {
+        currentSamples.set(window.iqData[tile.toString()], counter);
         counter = counter + TILE_SIZE_IN_IQ_SAMPLES * 2; // in floats
       } else {
-        console.log('Dont have iq_data of tile', tile, 'yet');
+        console.log('Dont have iqData of tile', tile, 'yet');
       }
     }
 
@@ -252,7 +252,7 @@ class SpectrogramPage extends Component {
   };
 
   handleWindowChange = (x) => {
-    window.fft_data = {};
+    window.fftData = {};
     // need to do it this way because setState is async
     this.setState(
       {
@@ -265,7 +265,7 @@ class SpectrogramPage extends Component {
   };
 
   handleMagnitudeMin = (min) => {
-    window.fft_data = {};
+    window.fftData = {};
     // need to do it this way because setState is async
     this.setState(
       {
@@ -278,7 +278,7 @@ class SpectrogramPage extends Component {
   };
 
   handleMagnitudeMax = (max) => {
-    window.fft_data = {};
+    window.fftData = {};
     // need to do it this way because setState is async
     this.setState(
       {
@@ -335,14 +335,14 @@ class SpectrogramPage extends Component {
   }
 
   handleMetaChange = (e) => {
-    const new_meta = JSON.parse(e.target.value);
+    const newMeta = JSON.parse(e.target.value);
     // update meta
     this.setState(
       {
         meta: {
-          annotations: new_meta.annotations,
-          captures: new_meta.captures,
-          global: new_meta.global,
+          annotations: newMeta.annotations,
+          captures: newMeta.captures,
+          global: newMeta.global,
         },
       },
       () => {
@@ -355,7 +355,7 @@ class SpectrogramPage extends Component {
     const { fftSize, magnitudeMax, magnitudeMin, meta, autoscale, currentFftMax, currentFftMin, spectrogramHeight } =
       this.state;
     // Update the image (eventually this should get moved somewhere else)
-    let ret = select_fft(
+    let ret = selectFft(
       lowerTile,
       upperTile,
       fftSize,
@@ -370,13 +370,13 @@ class SpectrogramPage extends Component {
     );
     if (ret) {
       // Draw the spectrogram
-      createImageBitmap(ret.image_data).then((ret) => {
+      createImageBitmap(ret.imageData).then((ret) => {
         this.setState({ image: ret });
         //console.log('Image Updated');
       });
       if (autoscale && ret.autoMax) {
         console.log('New max/min:', ret.autoMax, ret.autoMin);
-        window.fft_data = {};
+        window.fftData = {};
         this.setState(
           {
             autoscale: false, // toggles it off so this only will happen once
@@ -389,7 +389,7 @@ class SpectrogramPage extends Component {
         );
       }
       this.setState({ annotations: ret.annotations });
-      this.setState({ sampleRate: ret.sample_rate });
+      this.setState({ sampleRate: ret.sampleRate });
       this.setState({ currentFftMax: ret.currentFftMax });
       this.setState({ currentFftMin: ret.currentFftMin });
     }
@@ -397,7 +397,7 @@ class SpectrogramPage extends Component {
 
   // num is the y pixel coords of the top of the scrollbar handle, so range of 0 to the height of the scrollbar minus height of handle
   fetchAndRender = (handleTop) => {
-    const { blob, connection, data_type, fftSize, pyodide } = this.state;
+    const { blob, connection, dataType, fftSize, pyodide } = this.state;
     const { upperTile, lowerTile } = calculateTileNumbers(handleTop, blob, fftSize);
     this.setState({ lowerTile: lowerTile, upperTile: upperTile });
 
@@ -410,12 +410,12 @@ class SpectrogramPage extends Component {
     // Fetch the tiles
     const tiles = range(Math.floor(lowerTile), Math.ceil(upperTile));
     for (let tile of tiles) {
-      if (!(tile.toString() in window.iq_data)) {
+      if (!(tile.toString() in window.iqData)) {
         this.props.fetchMoreData({
           tile: tile,
           connection: connection,
           blob: blob,
-          data_type: data_type,
+          dataType: dataType,
           offset: tile * TILE_SIZE_IN_IQ_SAMPLES, // in IQ samples
           count: TILE_SIZE_IN_IQ_SAMPLES, // in IQ samples
           pyodide: pyodide,
@@ -500,9 +500,7 @@ class SpectrogramPage extends Component {
                         <RulerTop
                           fftSize={fftSize}
                           sampleRate={sampleRate}
-                          timescale_width={20}
-                          text_width={10}
-                          spectrogram_width={spectrogramWidth}
+                          spectrogramWidth={spectrogramWidth}
                           fft={fft}
                           meta={meta}
                           blob={blob}
@@ -537,7 +535,7 @@ class SpectrogramPage extends Component {
                     <Col className="col-1" style={{ paddingTop: 20, paddingLeft: 0, paddingRight: 0 }}>
                       <Stage width={rulerSideWidth} height={600}>
                         <RulerSide
-                          spectrogram_width={spectrogramWidth}
+                          spectrogramWidth={spectrogramWidth}
                           fftSize={fftSize}
                           sampleRate={sampleRate}
                           currentRowAtTop={(lowerTile * TILE_SIZE_IN_IQ_SAMPLES) / fftSize}
@@ -549,7 +547,7 @@ class SpectrogramPage extends Component {
                         <ScrollBar
                           fetchAndRender={this.fetchAndRender}
                           totalIQSamples={blob.totalIQSamples}
-                          spectrogram_height={spectrogramHeight}
+                          spectrogramHeight={spectrogramHeight}
                           fftSize={fftSize}
                           minimapNumFetches={minimapNumFetches}
                           meta={meta}

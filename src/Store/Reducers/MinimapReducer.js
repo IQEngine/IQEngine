@@ -19,7 +19,7 @@ export default function minimapReducer(state = initialState, action) {
         status: 'loading',
       };
     case FETCH_MINIMAP_SUCCESS: // FetchMoreData/fulfilled, where FetchMoreData is the async thunk function
-      window.iq_data[action.payload.tile.toString()] = action.payload.samples; // use tile as key to store samples
+      window.iqData[action.payload.tile.toString()] = action.payload.samples; // use tile as key to store samples
       //console.log('Saved tile', action.payload.tile);
       return {
         ...state,

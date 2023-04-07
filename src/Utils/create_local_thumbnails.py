@@ -11,7 +11,7 @@ from PIL import Image
 
 num_bytes = 1000000
 offset = 0
-fft_size = 1024
+fftSize = 1024
 
 def spectro_maker(directory, basename):
 
@@ -47,10 +47,10 @@ def spectro_maker(directory, basename):
         samples = np.zeros(1024)
 
     # Generate spectrogram
-    num_rows = int(np.floor(len(samples)/fft_size))
-    spectrogram = np.zeros((num_rows, fft_size))
+    num_rows = int(np.floor(len(samples)/fftSize))
+    spectrogram = np.zeros((num_rows, fftSize))
     for i in range(num_rows):
-        spectrogram[i,:] = np.log10(np.abs(np.fft.fftshift(np.fft.fft(samples[i*fft_size:(i+1)*fft_size])))**2)
+        spectrogram[i,:] = np.log10(np.abs(np.fft.fftshift(np.fft.fft(samples[i*fftSize:(i+1)*fftSize])))**2)
 
     fig = plt.figure()
     ax = fig.add_subplot(1,1,1)

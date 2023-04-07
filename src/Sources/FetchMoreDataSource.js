@@ -41,15 +41,15 @@ async function callPyodide(pyodide, pythonSnippet, samples) {
 
   // make samples available within python
   //    trick from https://github.com/pyodide/pyodide/blob/main/docs/usage/faq.md#how-can-i-execute-code-in-a-custom-namespace
-  let my_namespace = pyodide.toPy({ x: Array.from(samples) });
+  let myNamespace = pyodide.toPy({ x: Array.from(samples) });
 
   // Add the conversion code to the snippet
   pythonSnippet = 'import numpy as np\nx = np.asarray(x)\n' + pythonSnippet + '\nx = x.tolist()';
 
   // TODO: print python errors to console somehow, look at https://pyodide.org/en/stable/usage/api/python-api/code.html#pyodide.code.eval_code
-  await pyodide.runPythonAsync(pythonSnippet, { globals: my_namespace });
+  await pyodide.runPythonAsync(pythonSnippet, { globals: myNamespace });
 
-  samples = my_namespace.toJs().get('x'); // pull out python variable x
+  samples = myNamespace.toJs().get('x'); // pull out python variable x
 
   return samples;
 }
@@ -64,15 +64,15 @@ export async function applyProcessing(samples, taps, pythonSnippet, pyodide) {
   return samples;
 }
 
-export function convertToFloat32(buffer, data_type) {
-  if (data_type === 'ci16_le') {
+export function convertToFloat32(buffer, dataType) {
+  if (dataType === 'ci16_le') {
     let samples = Float32Array.from(new Int16Array(buffer));
     for (let i = 0; i < samples.length; i++) samples[i] = samples[i] / 32768.0;
     return samples;
-  } else if (data_type === 'cf32_le') {
+  } else if (dataType === 'cf32_le') {
     return new Float32Array(buffer);
   } else {
-    console.error('unsupported data_type');
+    console.error('unsupported dataType');
     return new Int16Array(buffer);
   }
 }
@@ -90,19 +90,19 @@ export function readFileAsync(file) {
 
 const FetchMoreData = createAsyncThunk('FetchMoreData', async (args, thunkAPI) => {
   console.log('running FetchMoreData');
-  const { tile, connection, blob, data_type, offset, count, pyodide } = args;
+  const { tile, connection, blob, dataType, offset, count, pyodide } = args;
 
   // offset and count are in IQ samples, convert to bytes
   let bytesPerSample;
-  if (data_type === 'ci16_le') {
+  if (dataType === 'ci16_le') {
     bytesPerSample = 2;
-  } else if (data_type === 'cf32_le') {
+  } else if (dataType === 'cf32_le') {
     bytesPerSample = 4;
   } else {
     bytesPerSample = 2;
   }
-  const offset_bytes = offset * bytesPerSample * 2;
-  const count_bytes = count * bytesPerSample * 2;
+  const offsetBytes = offset * bytesPerSample * 2;
+  const countBytes = count * bytesPerSample * 2;
 
   let samples;
   let buffer;
@@ -113,20 +113,20 @@ const FetchMoreData = createAsyncThunk('FetchMoreData', async (args, thunkAPI) =
     while (recording === '') {
       console.log('waiting'); // hopefully this doesn't happen, and if it does it should be pretty quick because its the time it takes for the state to set
     }
-    const downloadBlockBlobResponse = await blobClient.download(offset_bytes, count_bytes);
+    const downloadBlockBlobResponse = await blobClient.download(offsetBytes, countBytes);
     const blobResp = await downloadBlockBlobResponse.blobBody; // this is how you have to do it in browser, in backend you can use readableStreamBody
     buffer = await blobResp.arrayBuffer();
   } else {
     // Use a local file
     let handle = connection.datafilehandle;
     const fileData = await handle.getFile();
-    buffer = await readFileAsync(fileData.slice(offset_bytes, offset_bytes + count_bytes));
+    buffer = await readFileAsync(fileData.slice(offsetBytes, offsetBytes + countBytes));
   }
-  samples = convertToFloat32(buffer, data_type); // samples are kept as float32 under the hood for simplicity
+  samples = convertToFloat32(buffer, dataType); // samples are kept as float32 under the hood for simplicity
   samples = await applyProcessing(samples, blob.taps, blob.pythonSnippet, pyodide);
 
   console.log('FetchMoreData() took', performance.now() - startTime, 'ms');
-  return { tile: tile, samples: samples, data_type: data_type }; // these represent the new samples
+  return { tile: tile, samples: samples, dataType: dataType }; // these represent the new samples
 });
 
 export default FetchMoreData;
