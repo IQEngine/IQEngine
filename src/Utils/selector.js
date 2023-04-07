@@ -300,3 +300,19 @@ export function calculateTileNumbers(handleTop, blob, fftSize) {
 export function range(start, end) {
   return Array.apply(0, Array(end - start + 1)).map((element, index) => index + start);
 }
+
+export function dataTypeToBytesPerSample(dataType) {
+  let bytesPerSample = null;
+  if (dataType.includes('8')) {
+    bytesPerSample = 1;
+  } else if (dataType.includes('16')) {
+    bytesPerSample = 2;
+  } else if (dataType.includes('32')) {
+    bytesPerSample = 4;
+  } else if (dataType.includes('64')) {
+    bytesPerSample = 8;
+  } else {
+    console.error('unsupported datatype');
+  }
+  return bytesPerSample;
+}

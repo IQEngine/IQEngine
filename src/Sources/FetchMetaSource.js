@@ -5,6 +5,7 @@
 import { updateBlobTotalIQSamples } from '../Store/Actions/BlobActions';
 import { updateConnectionBlobClient } from '../Store/Actions/ConnectionActions';
 import { returnMetaDataBlob } from '../Store/Actions/FetchMetaActions';
+import { dataTypeToBytesPerSample } from '../Utils/selector';
 const { BlobServiceClient } = require('@azure/storage-blob');
 
 // Thunk function
@@ -34,17 +35,9 @@ export const FetchMeta = (connection) => async (dispatch) => {
     meta_json = JSON.parse(meta_string);
 
     // we need to set TotalIQSamples here for local files (it has already been set for blob)
-    const dataType = meta_json['global']['core:datatype'];
-    let bytesPerSample;
-    if (dataType === 'ci16_le') {
-      bytesPerSample = 2;
-    } else if (dataType === 'cf32_le') {
-      bytesPerSample = 4;
-    } else {
-      bytesPerSample = 2;
-    }
-    const numBytes = dataFile.size;
-    dispatch(updateBlobTotalIQSamples(numBytes / bytesPerSample / 2));
+    dispatch(
+      updateBlobTotalIQSamples(dataFile.size / dataTypeToBytesPerSample(meta_json['global']['core:datatype']) / 2)
+    );
     dispatch(updateConnectionBlobClient('not null')); // even though we dont use the blobclient for local files, this triggers the initial fetch/render
   }
   dispatch(returnMetaDataBlob(meta_json));

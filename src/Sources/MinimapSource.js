@@ -4,6 +4,7 @@
 
 import { fetchMinimapFailure, fetchMinimapLoading, fetchMinimapSuccess } from '../Store/Actions/MinimapActions';
 import { applyProcessing, convertToFloat32, readFileAsync } from './FetchMoreDataSource';
+import { dataTypeToBytesPerSample } from '../Utils/selector';
 
 export const FetchMinimap = (args) => async (dispatch) => {
   console.log('running FetchMinimap');
@@ -11,14 +12,7 @@ export const FetchMinimap = (args) => async (dispatch) => {
   const { tile, connection, blob, dataType, offset, count } = args;
 
   // offset and count are in IQ samples, convert to bytes
-  let bytesPerSample;
-  if (dataType === 'ci16_le') {
-    bytesPerSample = 2;
-  } else if (dataType === 'cf32_le') {
-    bytesPerSample = 4;
-  } else {
-    bytesPerSample = 2;
-  }
+  const bytesPerSample = dataTypeToBytesPerSample(dataType);
   const offsetBytes = offset * bytesPerSample * 2;
   const countBytes = count * bytesPerSample * 2;
 
