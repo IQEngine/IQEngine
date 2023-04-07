@@ -6,7 +6,7 @@ import React, { useState, useEffect } from 'react';
 import { Layer, Rect, Text } from 'react-konva';
 
 const RulerSide = (props) => {
-  let { spectrogram_width, fftSize, sampleRate, currentRowAtTop } = props;
+  let { spectrogramWidth, fftSize, sampleRate, currentRowAtTop } = props;
 
   const [ticks, setTicks] = useState([]);
   const [labels, setLabels] = useState([]);
@@ -38,7 +38,7 @@ const RulerSide = (props) => {
     }
     setTicks(temp_ticks);
     setLabels(temp_labels);
-  }, [fftSize, sampleRate, spectrogram_width, currentRowAtTop]); // updates when currentRowAtTop changes
+  }, [fftSize, sampleRate, spectrogramWidth, currentRowAtTop]); // updates when currentRowAtTop changes
 
   if (ticks.length > 1) {
     return (

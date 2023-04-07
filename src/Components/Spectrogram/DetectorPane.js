@@ -24,7 +24,7 @@ export const DetectorPane = (props) => {
     // this does the tile calc and gets the right samples in currentSamples
     const { trimmedSamples, startSampleOffset } = handleProcessTime();
 
-    const sample_rate = meta['global']['core:sample_rate'];
+    const sampleRate = meta['global']['core:sample_rate'];
     const freq = meta['captures'][0]['core:frequency'];
 
     // We can only send normal Arrays over JSON for some reason, so convert it
@@ -42,7 +42,7 @@ export const DetectorPane = (props) => {
       },
       body: JSON.stringify({
         samples: newSamps,
-        sample_rate: sample_rate,
+        sample_rate: sampleRate,
         center_freq: freq,
         detector_settings: {},
       }),

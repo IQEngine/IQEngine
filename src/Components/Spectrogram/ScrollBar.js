@@ -6,22 +6,12 @@ import React, { useState, useEffect } from 'react';
 import { Layer, Rect, Image } from 'react-konva';
 import { fftshift } from 'fftshift';
 import { colMap } from '../../Utils/colormap';
-import { MINIMUM_SCROLL_HANDLE_HEIGHT } from '../../Utils/constants';
+import { MINIMUM_SCROLL_HANDLE_HEIGHT_PIXELS } from '../../Utils/constants';
 
 const FFT = require('fft.js');
 
 const ScrollBar = (props) => {
-  let {
-    totalBytes,
-    spectrogram_height,
-    fetchAndRender,
-    bytesPerSample,
-    fftSize,
-    minimapNumFetches,
-    meta,
-    skipNFfts,
-    size,
-  } = props;
+  let { totalIQSamples, spectrogramHeight, fetchAndRender, fftSize, minimapNumFetches, meta, skipNFfts, size } = props;
 
   const [minimapImg, setMinimapImg] = useState(null);
   //const [scrollbarWidth, setStageWidth] = useState(50);
@@ -32,10 +22,10 @@ const ScrollBar = (props) => {
 
   // Calc scroll handle height
   useEffect(() => {
-    let x = (spectrogram_height / (totalBytes / bytesPerSample / 2 / fftSize)) * spectrogram_height;
-    if (x < MINIMUM_SCROLL_HANDLE_HEIGHT) x = MINIMUM_SCROLL_HANDLE_HEIGHT;
+    let x = (spectrogramHeight / (totalIQSamples / fftSize)) * spectrogramHeight;
+    if (x < MINIMUM_SCROLL_HANDLE_HEIGHT_PIXELS) x = MINIMUM_SCROLL_HANDLE_HEIGHT_PIXELS;
     setHandleHeightPixels(x);
-  }, [spectrogram_height, totalBytes, bytesPerSample, fftSize]);
+  }, [spectrogramHeight, totalIQSamples, fftSize]);
 
   useEffect(() => {
     if (!minimapNumFetches) {
@@ -43,21 +33,21 @@ const ScrollBar = (props) => {
     }
     // Check if all minimap fetches occured
     if (
-      Object.keys(window.iq_data)
+      Object.keys(window.iqData)
         .map((x) => x.includes('minimap'))
         .filter(Boolean).length === minimapNumFetches
     ) {
       // First refresh the spectrogram (not minimap) data since the maxFft and minFft will be better estimates by the time the minimap data is fetched
-      window.fft_data = {};
+      window.fftData = {};
       props.fetchAndRender(0);
 
       // Loop through the samples we downloaded, calc FFT and produce spectrogram image
-      const fft_size = window.iq_data['minimap0'].length / 2; // just use the first one to find length
-      let magnitudesBuffer = new Float64Array(fft_size * minimapNumFetches); // only typed arrays have set()
+      const fftSizeScrollbar = window.iqData['minimap0'].length / 2; // just use the first one to find length
+      let magnitudesBuffer = new Float64Array(fftSizeScrollbar * minimapNumFetches); // only typed arrays have set()
       for (let i = 0; i < minimapNumFetches; i++) {
-        const samples = window.iq_data['minimap' + i.toString()];
+        const samples = window.iqData['minimap' + i.toString()];
         // Calc PSD
-        const f = new FFT(fft_size);
+        const f = new FFT(fftSizeScrollbar);
         const out = f.createComplexArray(); // creates an empty array the length of fft.size*2
         f.transform(out, samples); // assumes input (2nd arg) is in form IQIQIQIQ and twice the length of fft.size
         let magnitudes = new Array(out.length / 2);
@@ -66,41 +56,41 @@ const ScrollBar = (props) => {
         }
         fftshift(magnitudes); // in-place
         magnitudes = magnitudes.map((x) => 10.0 * Math.log10(x)); // convert to dB
-        magnitudesBuffer.set(magnitudes, i * fft_size);
+        magnitudesBuffer.set(magnitudes, i * fftSizeScrollbar);
       }
 
       // Find max/min magnitudes across entire minimap
-      const maximum_val = Math.max(...magnitudesBuffer);
-      const minimum_val = Math.min(...magnitudesBuffer);
+      const maximumVal = Math.max(...magnitudesBuffer);
+      const minimumVal = Math.min(...magnitudesBuffer);
 
-      let minimap = new Uint8ClampedArray(fft_size * minimapNumFetches * 4);
+      let minimap = new Uint8ClampedArray(fftSizeScrollbar * minimapNumFetches * 4);
       let startOfs = 0;
       for (let i = 0; i < minimapNumFetches; i++) {
-        let magnitudes = magnitudesBuffer.slice(i * fft_size, (i + 1) * fft_size);
+        let magnitudes = magnitudesBuffer.slice(i * fftSizeScrollbar, (i + 1) * fftSizeScrollbar);
         // convert to 0 - 255
-        magnitudes = magnitudes.map((x) => x - minimum_val); // lowest value is now 0
-        magnitudes = magnitudes.map((x) => x / (maximum_val - minimum_val)); // highest value is now 1
+        magnitudes = magnitudes.map((x) => x - minimumVal); // lowest value is now 0
+        magnitudes = magnitudes.map((x) => x / (maximumVal - minimumVal)); // highest value is now 1
         magnitudes = magnitudes.map((x) => x * 255); // now from 0 to 255
 
         // apply magnitude min and max
-        const magnitude_max = 240;
-        const magnitude_min = 80;
-        magnitudes = magnitudes.map((x) => x / ((magnitude_max - magnitude_min) / 255));
-        magnitudes = magnitudes.map((x) => x - magnitude_min);
+        const magnitudeMax = 240;
+        const magnitudeMin = 80;
+        magnitudes = magnitudes.map((x) => x / ((magnitudeMax - magnitudeMin) / 255));
+        magnitudes = magnitudes.map((x) => x - magnitudeMin);
 
         // Clip from 0 to 255 and convert to ints
         magnitudes = magnitudes.map((x) => (x > 255 ? 255 : x)); // clip above 255
         magnitudes = magnitudes.map((x) => (x < 0 ? 0 : x)); // clip below 0
         let ipBuf8 = Uint8ClampedArray.from(magnitudes); // anything over 255 or below 0 at this point will become a random number
-        let line_offset = i * fft_size * 4;
-        for (let sigVal, rgba, opIdx = 0, ipIdx = startOfs; ipIdx < fft_size + startOfs; opIdx += 4, ipIdx++) {
+        let lineOffset = i * fftSizeScrollbar * 4;
+        for (let sigVal, rgba, opIdx = 0, ipIdx = startOfs; ipIdx < fftSizeScrollbar + startOfs; opIdx += 4, ipIdx++) {
           sigVal = ipBuf8[ipIdx] || 0; // if input line too short add zeros
           rgba = colMap[sigVal]; // array of rgba values
           // byte reverse so number aa bb gg rr
-          minimap[line_offset + opIdx] = rgba[0]; // red
-          minimap[line_offset + opIdx + 1] = rgba[1]; // green
-          minimap[line_offset + opIdx + 2] = rgba[2]; // blue
-          minimap[line_offset + opIdx + 3] = rgba[3]; // alpha
+          minimap[lineOffset + opIdx] = rgba[0]; // red
+          minimap[lineOffset + opIdx + 1] = rgba[1]; // green
+          minimap[lineOffset + opIdx + 2] = rgba[2]; // blue
+          minimap[lineOffset + opIdx + 3] = rgba[3]; // alpha
         }
       }
 
@@ -108,16 +98,19 @@ const ScrollBar = (props) => {
       let t = [];
       meta.annotations.forEach((annotation) => {
         t.push({
-          y: (annotation['core:sample_start'] / fft_size / (skipNFfts + 1) / minimapNumFetches) * spectrogram_height,
+          y:
+            (annotation['core:sample_start'] / fftSizeScrollbar / (skipNFfts + 1) / minimapNumFetches) *
+            spectrogramHeight,
           height:
-            (annotation['core:sample_count'] / fft_size / (skipNFfts + 1) / minimapNumFetches) * spectrogram_height,
+            (annotation['core:sample_count'] / fftSizeScrollbar / (skipNFfts + 1) / minimapNumFetches) *
+            spectrogramHeight,
         });
       });
       setTicks(t);
 
       // Render Image
-      const image_data = new ImageData(minimap, fft_size, minimapNumFetches);
-      createImageBitmap(image_data).then((ret) => {
+      const imageData = new ImageData(minimap, fftSizeScrollbar, minimapNumFetches);
+      createImageBitmap(imageData).then((ret) => {
         setMinimapImg(ret);
       });
     }
@@ -130,8 +123,8 @@ const ScrollBar = (props) => {
     if (newY < 0) {
       newY = 0;
     }
-    if (newY > spectrogram_height - handleHeightPixels) {
-      newY = spectrogram_height - handleHeightPixels;
+    if (newY > spectrogramHeight - handleHeightPixels) {
+      newY = spectrogramHeight - handleHeightPixels;
     }
     setY(newY);
     props.fetchAndRender(newY);
@@ -143,9 +136,9 @@ const ScrollBar = (props) => {
       e.target.y(0);
       newY = 0;
     }
-    if (newY > spectrogram_height - handleHeightPixels) {
-      e.target.y(spectrogram_height - handleHeightPixels);
-      newY = spectrogram_height - handleHeightPixels;
+    if (newY > spectrogramHeight - handleHeightPixels) {
+      e.target.y(spectrogramHeight - handleHeightPixels);
+      newY = spectrogramHeight - handleHeightPixels;
     }
     e.target.x(0);
     setY(newY);
@@ -161,7 +154,7 @@ const ScrollBar = (props) => {
             y={0}
             fill="grey"
             width={scrollbarWidth}
-            height={spectrogram_height}
+            height={spectrogramHeight}
             strokeWidth={4}
             onClick={handleClick}
           ></Rect>
@@ -182,7 +175,7 @@ const ScrollBar = (props) => {
   return (
     <>
       <Layer>
-        <Image image={minimapImg} x={0} y={0} width={scrollbarWidth} height={spectrogram_height} />
+        <Image image={minimapImg} x={0} y={0} width={scrollbarWidth} height={spectrogramHeight} />
         {/* This rect is invisible */}
         <Rect
           x={0}
@@ -190,7 +183,7 @@ const ScrollBar = (props) => {
           fill="grey"
           opacity={0}
           width={scrollbarWidth}
-          height={spectrogram_height}
+          height={spectrogramHeight}
           strokeWidth={4}
           onClick={handleClick}
         ></Rect>

@@ -28,7 +28,7 @@ const Directory = ({
   updateConnectionRecording,
   setCurrentFolder,
   currentFolder,
-  updateBlobTotalBytes,
+  updateBlobTotalIQSamples,
   updateConnectionBlobClient,
 }) => {
   //const [isExpanded, toggleExpanded] = useState(item.name === 'root'); // expand by default if its the root dir
@@ -72,7 +72,7 @@ const Directory = ({
             setCurrentFolder={setCurrentFolder}
             currentFolder={currentFolder}
             updateConnectionBlobClient={updateConnectionBlobClient}
-            updateBlobTotalBytes={updateBlobTotalBytes}
+            updateBlobTotalIQSamples={updateBlobTotalIQSamples}
           />
         ))}
       </>
@@ -87,7 +87,7 @@ const Directory = ({
         updateConnectionDataFileHandle={updateConnectionDataFileHandle}
         updateConnectionRecording={updateConnectionRecording}
         updateConnectionBlobClient={updateConnectionBlobClient}
-        updateBlobTotalBytes={updateBlobTotalBytes}
+        updateBlobTotalIQSamples={updateBlobTotalIQSamples}
       />
     </>
   );

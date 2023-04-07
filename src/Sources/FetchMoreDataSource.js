@@ -3,6 +3,7 @@
 // Licensed under the MIT License
 
 import { createAsyncThunk } from '@reduxjs/toolkit';
+import { dataTypeToBytesPerSample } from '../Utils/selector';
 
 export function convolve(array, taps) {
   // make sure its an odd number of taps
@@ -41,43 +42,62 @@ async function callPyodide(pyodide, pythonSnippet, samples) {
 
   // make samples available within python
   //    trick from https://github.com/pyodide/pyodide/blob/main/docs/usage/faq.md#how-can-i-execute-code-in-a-custom-namespace
-  let my_namespace = pyodide.toPy({ x: Array.from(samples) });
+  let myNamespace = pyodide.toPy({ x: Array.from(samples) });
 
   // Add the conversion code to the snippet
   pythonSnippet = 'import numpy as np\nx = np.asarray(x)\n' + pythonSnippet + '\nx = x.tolist()';
 
   // TODO: print python errors to console somehow, look at https://pyodide.org/en/stable/usage/api/python-api/code.html#pyodide.code.eval_code
-  await pyodide.runPythonAsync(pythonSnippet, { globals: my_namespace });
+  await pyodide.runPythonAsync(pythonSnippet, { globals: myNamespace });
 
-  samples = my_namespace.toJs().get('x'); // pull out python variable x
+  samples = myNamespace.toJs().get('x'); // pull out python variable x
 
   return samples;
 }
 
-export async function applyProcessing(buffer, taps, pythonSnippet, pyodide, data_type) {
-  let samples;
-  if (data_type === 'ci16_le') {
-    samples = new Int16Array(buffer);
-    if (taps.length !== 1) {
-      samples = convolve(samples, taps); // we apply the taps here and not in the FFT calcs so transients dont hurt us as much
-    }
-    if (pythonSnippet !== '') {
-      samples = await callPyodide(pyodide, pythonSnippet, samples);
-    }
-    samples = Int16Array.from(samples); // convert back to int TODO: clean this up
-  } else if (data_type === 'cf32_le') {
-    samples = new Float32Array(buffer);
-    if (taps.length !== 1) {
-      samples = convolve(samples, taps);
-    }
-    if (pythonSnippet !== '') {
-      samples = await callPyodide(pyodide, pythonSnippet, samples);
-    }
-  } else {
-    console.error('unsupported data_type');
-    samples = new Int16Array(buffer);
+export async function applyProcessing(samples, taps, pythonSnippet, pyodide) {
+  if (taps.length !== 1) {
+    samples = convolve(samples, taps); // we apply the taps here and not in the FFT calcs so transients dont hurt us as much
+  }
+  if (pythonSnippet !== '') {
+    samples = await callPyodide(pyodide, pythonSnippet, samples);
   }
   return samples;
+}
+
+export function convertToFloat32(buffer, dataType) {
+  if (dataType === 'ci8_le') {
+    let samples = Float32Array.from(new Int8Array(buffer));
+    for (let i = 0; i < samples.length; i++) samples[i] = samples[i] / 255.0;
+    return samples;
+  } else if (dataType === 'cu8_le') {
+    let samples = Float32Array.from(new Uint8Array(buffer));
+    for (let i = 0; i < samples.length; i++) samples[i] = (samples[i] - 255.0) / 255.0;
+    return samples;
+  } else if (dataType === 'ci16_le') {
+    let samples = Float32Array.from(new Int16Array(buffer));
+    for (let i = 0; i < samples.length; i++) samples[i] = samples[i] / 32768.0;
+    return samples;
+  } else if (dataType === 'cu16_le') {
+    let samples = Float32Array.from(new Uint16Array(buffer));
+    for (let i = 0; i < samples.length; i++) samples[i] = (samples[i] - 32768.0) / 32768.0;
+    return samples;
+  } else if (dataType === 'ci32_le') {
+    let samples = Float32Array.from(new Int32Array(buffer));
+    for (let i = 0; i < samples.length; i++) samples[i] = samples[i] / 2147483647.0;
+    return samples;
+  } else if (dataType === 'cu32_le') {
+    let samples = Float32Array.from(new Uint32Array(buffer));
+    for (let i = 0; i < samples.length; i++) samples[i] = (samples[i] - 2147483647.0) / 2147483647.0;
+    return samples;
+  } else if (dataType === 'cf32_le') {
+    return new Float32Array(buffer);
+  } else if (dataType === 'cf64_le') {
+    return Float32Array.from(new Float64Array(buffer));
+  } else {
+    console.error('unsupported dataType');
+    return new Int16Array(buffer);
+  }
 }
 
 export function readFileAsync(file) {
@@ -91,63 +111,38 @@ export function readFileAsync(file) {
   });
 }
 
-/*
-async function fetchUsingPythonSnippet(offset, count, blobName, dataType) {
-  const resp = await fetch('https://iqengine-azure-functions2.azurewebsites.net/pythonsnippet', {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      dataType: dataType,
-      offset: offset,
-      count: count,
-      blobName: blobName,
-    }),
-  });
-  return resp.arrayBuffer(); // not typed- we convert it to the right type later
-}
-*/
-
 const FetchMoreData = createAsyncThunk('FetchMoreData', async (args, thunkAPI) => {
   console.log('running FetchMoreData');
-  const { tile, connection, blob, data_type, offset, count, pyodide } = args;
+  const { tile, connection, blob, dataType, offset, count, pyodide } = args;
+
+  // offset and count are in IQ samples, convert to bytes
+  const bytesPerSample = dataTypeToBytesPerSample(dataType);
+  const offsetBytes = offset * bytesPerSample * 2; // FIXME at some point we need to specify whether real or complex
+  const countBytes = count * bytesPerSample * 2;
 
   let samples;
+  let buffer;
   let startTime = performance.now();
+  // tells us we're using blob storage
   if (connection.datafilehandle === null) {
     let { recording, blobClient } = connection;
     while (recording === '') {
       console.log('waiting'); // hopefully this doesn't happen, and if it does it should be pretty quick because its the time it takes for the state to set
     }
-
-    let buffer;
-    /*
-    if (pythonSnippet !== '') {
-      // About 900 ms
-      const blobName = recording.replaceAll('(slash)', '/') + '.sigmf-data';
-      buffer = await fetchUsingPythonSnippet(offset, count, blobName, data_type, pythonSnippet);
-    } else {
-      */
-    // 600 ms for straight from blob
-    const downloadBlockBlobResponse = await blobClient.download(offset, count);
+    const downloadBlockBlobResponse = await blobClient.download(offsetBytes, countBytes);
     const blobResp = await downloadBlockBlobResponse.blobBody; // this is how you have to do it in browser, in backend you can use readableStreamBody
     buffer = await blobResp.arrayBuffer();
-    //}
-
-    samples = await applyProcessing(buffer, blob.taps, blob.pythonSnippet, pyodide, data_type);
   } else {
     // Use a local file
     let handle = connection.datafilehandle;
     const fileData = await handle.getFile();
-    console.log('offset:', offset, 'count:', count);
-    const buffer = await readFileAsync(fileData.slice(offset, offset + count));
-    samples = await applyProcessing(buffer, blob.taps, blob.pythonSnippet, pyodide, data_type);
+    buffer = await readFileAsync(fileData.slice(offsetBytes, offsetBytes + countBytes));
   }
+  samples = convertToFloat32(buffer, dataType); // samples are kept as float32 under the hood for simplicity
+  samples = await applyProcessing(samples, blob.taps, blob.pythonSnippet, pyodide);
 
-  console.log('Fetching more data took', performance.now() - startTime, 'milliseconds');
-  return { tile: tile, samples: samples, data_type: data_type }; // these represent the new samples
+  console.log('FetchMoreData() took', performance.now() - startTime, 'ms');
+  return { tile: tile, samples: samples, dataType: dataType }; // these represent the new samples
 });
 
 export default FetchMoreData;

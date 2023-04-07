@@ -29,7 +29,7 @@ export const updateBlobSize = (payload) => ({
   payload,
 });
 
-export const updateBlobTotalBytes = (payload) => ({
+export const updateBlobTotalIQSamples = (payload) => ({
   type: UPDATE_BLOB_TOTAL_BYTES,
   payload,
 });

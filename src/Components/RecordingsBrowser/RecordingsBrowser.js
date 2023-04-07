@@ -85,7 +85,7 @@ export default function RecordingsBrowser(props) {
     updateConnectionMetaFileHandle,
     updateConnectionDataFileHandle,
     updateConnectionRecording,
-    updateBlobTotalBytes,
+    updateBlobTotalIQSamples,
     updateConnectionBlobClient,
     updateConnectionAccountName,
     updateConnectionContainerName,
@@ -205,7 +205,7 @@ export default function RecordingsBrowser(props) {
               setCurrentFolder={setCurrentFolder}
               currentFolder={currentFolder}
               updateConnectionBlobClient={updateConnectionBlobClient}
-              updateBlobTotalBytes={updateBlobTotalBytes}
+              updateBlobTotalIQSamples={updateBlobTotalIQSamples}
             />
           </tbody>
         </table>

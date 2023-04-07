@@ -2,9 +2,10 @@
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
 
-import { updateBlobTotalBytes } from '../Store/Actions/BlobActions';
+import { updateBlobTotalIQSamples } from '../Store/Actions/BlobActions';
 import { updateConnectionBlobClient } from '../Store/Actions/ConnectionActions';
 import { returnMetaDataBlob } from '../Store/Actions/FetchMetaActions';
+import { dataTypeToBytesPerSample } from '../Utils/selector';
 const { BlobServiceClient } = require('@azure/storage-blob');
 
 // Thunk function
@@ -12,6 +13,7 @@ const { BlobServiceClient } = require('@azure/storage-blob');
 export const FetchMeta = (connection) => async (dispatch) => {
   console.log('running fetchMeta');
   let meta_string = '';
+  let meta_json;
   let blobName = connection.recording + '.sigmf-meta'; // has to go outside of condition or else react gets mad
   if (connection.metafilehandle === null) {
     let { accountName, containerName, sasToken } = connection;
@@ -25,15 +27,18 @@ export const FetchMeta = (connection) => async (dispatch) => {
     const downloadBlockBlobResponse = await blobMetaClient.download();
     const blob = await downloadBlockBlobResponse.blobBody;
     meta_string = await blob.text();
+    meta_json = JSON.parse(meta_string);
   } else {
     const metaFile = await connection.metafilehandle.getFile();
     const dataFile = await connection.datafilehandle.getFile();
     meta_string = await metaFile.text();
-    const numBytes = dataFile.size;
-    dispatch(updateBlobTotalBytes(numBytes));
+    meta_json = JSON.parse(meta_string);
+
+    // we need to set TotalIQSamples here for local files (it has already been set for blob)
+    dispatch(
+      updateBlobTotalIQSamples(dataFile.size / dataTypeToBytesPerSample(meta_json['global']['core:datatype']) / 2)
+    );
     dispatch(updateConnectionBlobClient('not null')); // even though we dont use the blobclient for local files, this triggers the initial fetch/render
   }
-
-  const meta_json = JSON.parse(meta_string);
   dispatch(returnMetaDataBlob(meta_json));
 };

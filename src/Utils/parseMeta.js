@@ -2,6 +2,8 @@
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
 
+import { dataTypeToBytesPerSample } from './selector';
+
 export default function parseMeta(json_string, baseUrl, fName, metaFileHandle, dataFileHandle) {
   let obj;
   try {
@@ -20,12 +22,8 @@ export default function parseMeta(json_string, baseUrl, fName, metaFileHandle, d
     email = email[0].trim();
     author = author[0].trim();
   }
-  let bytesPerSample;
-  if (obj['global']['core:datatype'] === 'ci16_le') {
-    bytesPerSample = 2;
-  } else if (obj['global']['core:datatype'] === 'cf32_le') {
-    bytesPerSample = 4;
-  }
+
+  const bytesPerSample = dataTypeToBytesPerSample(obj['global']['core:datatype']);
 
   let shortDescription = obj['global']['core:description'] ?? '';
   shortDescription = shortDescription.substring(0, 60);

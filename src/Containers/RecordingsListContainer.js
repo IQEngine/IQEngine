@@ -13,7 +13,7 @@ import {
   updateConnectionSasToken,
 } from '../Store/Actions/ConnectionActions';
 import RecordingsBrowser from '../Components/RecordingsBrowser/RecordingsBrowser';
-import { updateBlobTotalBytes } from '../Store/Actions/BlobActions';
+import { updateBlobTotalIQSamples } from '../Store/Actions/BlobActions';
 import { fetchRecordingsList } from '../Store/Actions/RecordingsListActions';
 
 function mapStateToProps(state) {
@@ -29,7 +29,7 @@ function mapDispatchToProps(dispatch) {
     updateConnectionMetaFileHandle: (handle) => dispatch(updateConnectionMetaFileHandle(handle)),
     updateConnectionDataFileHandle: (handle) => dispatch(updateConnectionDataFileHandle(handle)),
     updateConnectionRecording: (recording) => dispatch(updateConnectionRecording(recording)),
-    updateBlobTotalBytes: (size) => dispatch(updateBlobTotalBytes(size)),
+    updateBlobTotalIQSamples: (size) => dispatch(updateBlobTotalIQSamples(size)),
     updateConnectionBlobClient: (client) => dispatch(updateConnectionBlobClient(client)),
     updateConnectionAccountName: (x) => dispatch(updateConnectionAccountName(x)),
     updateConnectionContainerName: (x) => dispatch(updateConnectionContainerName(x)),

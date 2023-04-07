@@ -16,10 +16,10 @@ export const FrequencyPlot = (props) => {
   useEffect(() => {
     if (currentSamples && currentSamples.length > 0) {
       // Calc PSD
-      const fft_size = Math.pow(2, Math.floor(Math.log2(currentSamples.length / 2)));
-      const f = new FFT(fft_size);
+      const fftSize = Math.pow(2, Math.floor(Math.log2(currentSamples.length / 2)));
+      const f = new FFT(fftSize);
       const out = f.createComplexArray(); // creates an empty array the length of fft.size*2
-      f.transform(out, currentSamples.slice(0, fft_size * 2)); // assumes input (2nd arg) is in form IQIQIQIQ and twice the length of fft.size
+      f.transform(out, currentSamples.slice(0, fftSize * 2)); // assumes input (2nd arg) is in form IQIQIQIQ and twice the length of fft.size
       let mags = new Array(out.length / 2);
       for (let j = 0; j < out.length / 2; j++) {
         mags[j] = Math.sqrt(Math.pow(out[j * 2], 2) + Math.pow(out[j * 2 + 1], 2)); // take magnitude

@@ -13,7 +13,7 @@ export default function FileRow({
   updateConnectionDataFileHandle,
   updateConnectionRecording,
   updateConnectionBlobClient,
-  updateBlobTotalBytes,
+  updateBlobTotalIQSamples,
 }) {
   const [modal, setModal] = useState(false);
   const toggle = () => {
@@ -58,7 +58,7 @@ export default function FileRow({
                 updateConnectionDataFileHandle(item.dataFileHandle);
                 updateConnectionRecording(item.name.replace('.sigmf-meta', ''));
                 updateConnectionBlobClient(item.dataClient);
-                updateBlobTotalBytes(item.lengthInBytes);
+                updateBlobTotalIQSamples(item.lengthInIQSamples);
               }}
             >
               <div className="zoom">
@@ -74,7 +74,7 @@ export default function FileRow({
                 updateConnectionDataFileHandle(item.dataFileHandle);
                 updateConnectionRecording(item.name.replace('.sigmf-meta', ''));
                 updateConnectionBlobClient(item.dataClient);
-                updateBlobTotalBytes(item.lengthInBytes);
+                updateBlobTotalIQSamples(item.lengthInIQSamples);
               }}
             >
               <h5>{item.name.split('(slash)').slice(-1)[0].replace('.sigmf-meta', '')}</h5>
@@ -102,7 +102,7 @@ export default function FileRow({
                 updateConnectionDataFileHandle(item.dataFileHandle);
                 updateConnectionRecording(item.name.replace('.sigmf-meta', ''));
                 updateConnectionBlobClient(item.dataClient);
-                updateBlobTotalBytes(item.lengthInBytes);
+                updateBlobTotalIQSamples(item.lengthInIQSamples);
               }}
             >
               <h5>{item.name.split('(slash)').slice(-1)[0].replace('.sigmf-meta', '')}</h5>

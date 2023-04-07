@@ -4,20 +4,20 @@
 
 import { fftshift } from 'fftshift';
 import { colMap } from './colormap';
-import { TILE_SIZE_IN_BYTES } from '../Utils/constants';
+import { TILE_SIZE_IN_IQ_SAMPLES } from '../Utils/constants';
 
 const FFT = require('fft.js');
 
-window.fft_data = {}; // this is where our FFT outputs are stored
+window.fftData = {}; // this is where our FFT outputs are stored
 window.annotations = []; // gets filled in before return
-window.sample_rate = 1; // will get filled in
+window.sampleRate = 1; // will get filled in
 
 // This will get called when we go to a new spectrogram page
-export const clear_all_data = () => {
-  window.fft_data = {}; // this is where our FFT outputs are stored
+export const clearAllData = () => {
+  window.fftData = {}; // this is where our FFT outputs are stored
   window.annotations = []; // gets filled in before return
-  window.sample_rate = 1; // will get filled in
-  window.iq_data = {}; // initialized in blobSlice.js but we have to clear it each time we go to another spectrogram page
+  window.sampleRate = 1; // will get filled in
+  window.iqData = {}; // initialized in blobSlice.js but we have to clear it each time we go to another spectrogram page
 };
 
 function getStandardDeviation(array) {
@@ -30,7 +30,7 @@ const average = (array) => array.reduce((a, b) => a + b) / array.length;
 
 function calcFftOfTile(
   samples,
-  fft_size,
+  fftSize,
   num_ffts,
   windowFunction,
   magnitude_min,
@@ -40,7 +40,7 @@ function calcFftOfTile(
   currentFftMin
 ) {
   let startTime = performance.now();
-  let new_fft_data = new Uint8ClampedArray(fft_size * num_ffts * 4);
+  let newFftData = new Uint8ClampedArray(fftSize * num_ffts * 4);
   let startOfs = 0;
   let autoMin;
   let autoMax;
@@ -49,36 +49,36 @@ function calcFftOfTile(
 
   // loop through each row
   for (let i = 0; i < num_ffts; i++) {
-    let samples_slice = samples.slice(i * fft_size * 2, (i + 1) * fft_size * 2); // mult by 2 because this is int/floats not IQ samples
+    let samples_slice = samples.slice(i * fftSize * 2, (i + 1) * fftSize * 2); // mult by 2 because this is int/floats not IQ samples
 
     // Apply a hamming window and hanning window
     if (windowFunction === 'hamming') {
-      for (let window_i = 0; window_i < fft_size; window_i++) {
+      for (let window_i = 0; window_i < fftSize; window_i++) {
         samples_slice[window_i] =
-          samples_slice[window_i] * (0.54 - 0.46 * Math.cos((2 * Math.PI * window_i) / (fft_size - 1)));
+          samples_slice[window_i] * (0.54 - 0.46 * Math.cos((2 * Math.PI * window_i) / (fftSize - 1)));
       }
     } else if (windowFunction === 'hanning') {
-      for (let window_i = 0; window_i < fft_size; window_i++) {
+      for (let window_i = 0; window_i < fftSize; window_i++) {
         samples_slice[window_i] =
-          samples_slice[window_i] * (0.5 - 0.5 * Math.cos((2 * Math.PI * window_i) / (fft_size - 1)));
+          samples_slice[window_i] * (0.5 - 0.5 * Math.cos((2 * Math.PI * window_i) / (fftSize - 1)));
       }
     } else if (windowFunction === 'bartlett') {
-      for (let window_i = 0; window_i < fft_size; window_i++) {
+      for (let window_i = 0; window_i < fftSize; window_i++) {
         samples_slice[window_i] =
           samples_slice[window_i] *
-          ((2 / (fft_size - 1)) * ((fft_size - 1) / 2) - Math.abs(window_i - (fft_size - 1) / 2));
+          ((2 / (fftSize - 1)) * ((fftSize - 1) / 2) - Math.abs(window_i - (fftSize - 1) / 2));
       }
     } else if (windowFunction === 'blackman') {
-      for (let window_i = 0; window_i < fft_size; window_i++) {
+      for (let window_i = 0; window_i < fftSize; window_i++) {
         samples_slice[window_i] =
           samples_slice[window_i] *
           (0.42 -
-            0.5 * Math.cos((2 * Math.PI * window_i) / fft_size) +
-            0.08 * Math.cos((4 * Math.PI * window_i) / fft_size));
+            0.5 * Math.cos((2 * Math.PI * window_i) / fftSize) +
+            0.08 * Math.cos((4 * Math.PI * window_i) / fftSize));
       }
     }
 
-    const f = new FFT(fft_size);
+    const f = new FFT(fftSize);
     const out = f.createComplexArray(); // creates an empty array the length of fft.size*2
     f.transform(out, samples_slice); // assumes input (2nd arg) is in form IQIQIQIQ and twice the length of fft.size
     let magnitudes = new Array(out.length / 2);
@@ -131,21 +131,21 @@ function calcFftOfTile(
     let ipBuf8 = Uint8ClampedArray.from(magnitudes); // anything over 255 or below 0 at this point will become a random number, hence clipping above
 
     // Apply colormap
-    let line_offset = i * fft_size * 4;
-    for (let sigVal, rgba, opIdx = 0, ipIdx = startOfs; ipIdx < fft_size + startOfs; opIdx += 4, ipIdx++) {
+    let line_offset = i * fftSize * 4;
+    for (let sigVal, rgba, opIdx = 0, ipIdx = startOfs; ipIdx < fftSize + startOfs; opIdx += 4, ipIdx++) {
       sigVal = ipBuf8[ipIdx] || 0; // if input line too short add zeros
       rgba = colMap[sigVal]; // array of rgba values
       // byte reverse so number aa bb gg rr
-      new_fft_data[line_offset + opIdx] = rgba[0]; // red
-      new_fft_data[line_offset + opIdx + 1] = rgba[1]; // green
-      new_fft_data[line_offset + opIdx + 2] = rgba[2]; // blue
-      new_fft_data[line_offset + opIdx + 3] = rgba[3]; // alpha
+      newFftData[line_offset + opIdx] = rgba[0]; // red
+      newFftData[line_offset + opIdx + 1] = rgba[1]; // green
+      newFftData[line_offset + opIdx + 2] = rgba[2]; // blue
+      newFftData[line_offset + opIdx + 3] = rgba[3]; // alpha
     }
   }
   let endTime = performance.now();
   console.log('Rendering spectrogram took', endTime - startTime, 'milliseconds'); // first cut of our code processed+rendered 0.5M samples in 760ms on marcs computer
   return {
-    new_fft_data: new_fft_data,
+    newFftData: newFftData,
     autoMax: autoMax,
     autoMin: autoMin,
     newCurrentFftMax: tempCurrentFftMax,
@@ -154,10 +154,9 @@ function calcFftOfTile(
 }
 
 // lowerTile and upperTile are in fractions of a tile
-export const select_fft = (
+export const selectFft = (
   lowerTile,
   upperTile,
-  bytes_per_sample,
   fftSize,
   magnitudeMax,
   magnitudeMin,
@@ -168,24 +167,23 @@ export const select_fft = (
   spectrogramHeight,
   autoscale = false
 ) => {
-  let fft_size = fftSize;
-  const num_ffts = TILE_SIZE_IN_BYTES / bytes_per_sample / 2 / fftSize; // per tile
+  const num_ffts = TILE_SIZE_IN_IQ_SAMPLES / fftSize; // per tile
   let magnitude_max = magnitudeMax;
   let magnitude_min = magnitudeMin;
   let tempCurrentFftMax = currentFftMax;
   let tempCurrentFftMin = currentFftMin;
 
-  // Go through each of the tiles and compute the FFT and save in window.fft_data
+  // Go through each of the tiles and compute the FFT and save in window.fftData
   const tiles = range(Math.floor(lowerTile), Math.ceil(upperTile));
   let autoMaxs = [];
   let autoMins = [];
   for (let tile of tiles) {
-    if (!(tile.toString() in window.fft_data)) {
-      if (tile.toString() in window.iq_data) {
-        let samples = window.iq_data[tile.toString()];
-        const { new_fft_data, autoMax, autoMin, newCurrentFftMax, newCurrentFftMin } = calcFftOfTile(
+    if (!(tile.toString() in window.fftData)) {
+      if (tile.toString() in window.iqData) {
+        let samples = window.iqData[tile.toString()];
+        const { newFftData, autoMax, autoMin, newCurrentFftMax, newCurrentFftMin } = calcFftOfTile(
           samples,
-          fft_size,
+          fftSize,
           num_ffts,
           windowFunction,
           magnitude_min,
@@ -196,42 +194,42 @@ export const select_fft = (
         );
         tempCurrentFftMax = newCurrentFftMax;
         tempCurrentFftMin = newCurrentFftMin;
-        window.fft_data[tile.toString()] = new_fft_data;
+        window.fftData[tile.toString()] = newFftData;
         autoMaxs.push(autoMax);
         autoMins.push(autoMin);
         //console.log('Finished processing tile', tile);
       } else {
-        //console.log('Dont have iq_data of tile', tile, 'yet');
+        //console.log('Dont have iqData of tile', tile, 'yet');
       }
     }
   }
 
   // Concatenate the full tiles
-  let total_fft_data = new Uint8ClampedArray(tiles.length * fft_size * num_ffts * 4);
+  let totalFftData = new Uint8ClampedArray(tiles.length * fftSize * num_ffts * 4);
   let counter = 0; // can prob make this cleaner with an iterator in the for loop below
   for (let tile of tiles) {
-    if (tile.toString() in window.fft_data) {
-      total_fft_data.set(window.fft_data[tile.toString()], counter);
-      counter = counter + window.fft_data[tile.toString()].length;
+    if (tile.toString() in window.fftData) {
+      totalFftData.set(window.fftData[tile.toString()], counter);
+      counter = counter + window.fftData[tile.toString()].length;
     } else {
       // If the first slice isnt availabel fill with ones
-      let fake_fft_data = new Uint8ClampedArray(fft_size * num_ffts * 4);
-      fake_fft_data.fill(255); // for debugging its better to have the alpha set to opaque so the missing part isnt invisible
-      total_fft_data.set(fake_fft_data, counter);
-      counter = counter + fake_fft_data.length;
+      let fakeFftData = new Uint8ClampedArray(fftSize * num_ffts * 4);
+      fakeFftData.fill(255); // for debugging its better to have the alpha set to opaque so the missing part isnt invisible
+      totalFftData.set(fakeFftData, counter);
+      counter = counter + fakeFftData.length;
     }
   }
 
   // Trim off the top and bottom
-  let lowerTrim = (lowerTile - Math.floor(lowerTile)) * fft_size * num_ffts; // amount we want to get rid of
-  lowerTrim = lowerTrim - (lowerTrim % fft_size);
-  let upperTrim = (1 - (upperTile - Math.floor(upperTile))) * fft_size * num_ffts; // amount we want to get rid of
-  upperTrim = upperTrim - (upperTrim % fft_size);
-  const trimmed_fft_data = total_fft_data.slice(lowerTrim * 4, total_fft_data.length - upperTrim * 4);
-  const num_final_ffts = trimmed_fft_data.length / fft_size / 4;
+  let lowerTrim = (lowerTile - Math.floor(lowerTile)) * fftSize * num_ffts; // amount we want to get rid of
+  lowerTrim = lowerTrim - (lowerTrim % fftSize);
+  let upperTrim = (1 - (upperTile - Math.floor(upperTile))) * fftSize * num_ffts; // amount we want to get rid of
+  upperTrim = upperTrim - (upperTrim % fftSize);
+  const trimmedFftData = totalFftData.slice(lowerTrim * 4, totalFftData.length - upperTrim * 4);
+  const num_final_ffts = trimmedFftData.length / fftSize / 4;
 
   // Render Image
-  const image_data = new ImageData(trimmed_fft_data, fft_size, num_final_ffts);
+  const imageData = new ImageData(trimmedFftData, fftSize, num_final_ffts);
 
   // Annotation portion
   let annotations_list = [];
@@ -243,45 +241,45 @@ export const select_fft = (
     let description = meta.annotations[i]['core:description'];
 
     // Calc the sample index of the first FFT being displayed
-    let start_sample_index = (lowerTile * TILE_SIZE_IN_BYTES) / 2 / bytes_per_sample;
-    let samples_in_window = ((upperTile - lowerTile) * TILE_SIZE_IN_BYTES) / 2 / bytes_per_sample;
+    let start_sample_index = lowerTile * TILE_SIZE_IN_IQ_SAMPLES;
+    let samples_in_window = (upperTile - lowerTile) * TILE_SIZE_IN_IQ_SAMPLES;
     let stop_sample_index = start_sample_index + samples_in_window;
     let center_frequency = meta.captures[0]['core:frequency'];
-    let sample_rate = meta.global['core:sample_rate'];
-    window.sample_rate = sample_rate;
-    let lower_freq = center_frequency - sample_rate / 2;
-    const mystery_factor = Math.sqrt(fft_size / spectrogramHeight / 2); // no idea where this comes from, was found empirically
+    let sampleRate = meta.global['core:sample_rate'];
+    window.sampleRate = sampleRate;
+    let lower_freq = center_frequency - sampleRate / 2;
+    const mystery_factor = Math.sqrt(fftSize / spectrogramHeight / 2); // no idea where this comes from, was found empirically
     if (
       (sample_start >= start_sample_index && sample_start * mystery_factor < stop_sample_index) ||
       (sample_start + sample_count >= start_sample_index && sample_start * mystery_factor < stop_sample_index)
     ) {
       annotations_list.push({
-        x1: ((freq_lower_edge - lower_freq) / sample_rate) * fft_size, // left side. units are in fractions of an FFT size, e.g. 0-1024
-        x2: ((freq_upper_edge - lower_freq) / sample_rate) * fft_size, // right side
-        y1: ((sample_start - start_sample_index) / fft_size) * mystery_factor, // top. NOTE SURE WHY I NEED THIS LAST TERM
-        y2: ((sample_start - start_sample_index + sample_count) / fft_size) * mystery_factor, // bottom. NOTE SURE WHY I NEED THIS LAST TERM
+        x1: ((freq_lower_edge - lower_freq) / sampleRate) * fftSize, // left side. units are in fractions of an FFT size, e.g. 0-1024
+        x2: ((freq_upper_edge - lower_freq) / sampleRate) * fftSize, // right side
+        y1: ((sample_start - start_sample_index) / fftSize) * mystery_factor, // top. NOTE SURE WHY I NEED THIS LAST TERM
+        y2: ((sample_start - start_sample_index + sample_count) / fftSize) * mystery_factor, // bottom. NOTE SURE WHY I NEED THIS LAST TERM
         description: description,
         index: i, // so we can keep track of which annotation it was in the full list
       });
     }
   }
   window.annotations = annotations_list;
-  let select_fft_return = {
-    image_data: image_data,
+  let selectFftReturn = {
+    imageData: imageData,
     annotations: window.annotations,
-    sample_rate: window.sample_rate,
+    sampleRate: window.sampleRate,
     autoMax: autoMaxs.length ? average(autoMaxs) : 255,
     autoMin: autoMins.length ? average(autoMins) : 0,
     currentFftMax: tempCurrentFftMax,
     currentFftMin: tempCurrentFftMin,
   };
-  return select_fft_return;
+  return selectFftReturn;
 };
 
-export function calculateTileNumbers(handleTop, bytesPerSample, blob, fftSize) {
-  const { totalBytes } = blob;
-  const tileSizeInRows = TILE_SIZE_IN_BYTES / bytesPerSample / 2 / fftSize;
-  const totalNumFFTs = totalBytes / bytesPerSample / 2 / fftSize; // divide by 2 because IQ
+export function calculateTileNumbers(handleTop, blob, fftSize) {
+  const { totalIQSamples } = blob;
+  const tileSizeInRows = TILE_SIZE_IN_IQ_SAMPLES / fftSize;
+  const totalNumFFTs = totalIQSamples / fftSize; // divide by 2 because IQ
   const scrollBarHeight = 600; // TODO REPLACE ME WITH ACTUAL WINDOW HEIGHT
   const handleFraction = scrollBarHeight / totalNumFFTs;
   const handleHeightPixels = handleFraction * scrollBarHeight;
@@ -299,7 +297,22 @@ export function calculateTileNumbers(handleTop, bytesPerSample, blob, fftSize) {
 }
 
 // mimicing python's range() function which gives array of integers between two values non-inclusive of end
-
 export function range(start, end) {
   return Array.apply(0, Array(end - start + 1)).map((element, index) => index + start);
+}
+
+export function dataTypeToBytesPerSample(dataType) {
+  let bytesPerSample = null;
+  if (dataType.includes('8')) {
+    bytesPerSample = 1;
+  } else if (dataType.includes('16')) {
+    bytesPerSample = 2;
+  } else if (dataType.includes('32')) {
+    bytesPerSample = 4;
+  } else if (dataType.includes('64')) {
+    bytesPerSample = 8;
+  } else {
+    console.error('unsupported datatype');
+  }
+  return bytesPerSample;
 }
