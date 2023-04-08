@@ -46,9 +46,16 @@ plt.grid()
 plt.xlabel("Time")
 plt.ylabel("Sample")
 `,
+    iqPlotSnippet: `plt.plot(x.real[0:1000], x.imag[0:1000], '.')
+plt.legend(['I','Q'])
+plt.grid()
+plt.xlabel("I")
+plt.ylabel("Q")
+`,
     pyodide: null,
     b64ImageFreq: '',
     b64ImageTime: '',
+    b64ImageIQ: '',
     errorLog: '',
     buttonDisabled: true,
     buttonText: 'Python Initializing...',
@@ -62,16 +69,23 @@ plt.ylabel("Sample")
     [state]
   );
 
-  const onChangefreqPlotSnippet = React.useCallback(
+  const onChangeFreqPlotSnippet = React.useCallback(
     (value, viewUpdate) => {
       setState({ ...state, freqPlotSnippet: value });
     },
     [state]
   );
 
-  const onChangetimePlotSnippet = React.useCallback(
+  const onChangeTimePlotSnippet = React.useCallback(
     (value, viewUpdate) => {
       setState({ ...state, timePlotSnippet: value });
+    },
+    [state]
+  );
+
+  const onChangeIQPlotSnippet = React.useCallback(
+    (value, viewUpdate) => {
+      setState({ ...state, iqPlotSnippet: value });
     },
     [state]
   );
@@ -119,11 +133,19 @@ time_img = base64.b64encode(pic_IObytes.read()).decode() # the plot below will d
 plt.clf() 
 `;
 
+  const postIQ = `
+pic_IObytes = io.BytesIO()
+plt.savefig(pic_IObytes, format='png', bbox_inches='tight')
+pic_IObytes.seek(0)
+iq_img = base64.b64encode(pic_IObytes.read()).decode() # the plot below will display whatever b64 is in img
+plt.clf() 
+`;
+
   const postCode = `
 # clear all global vars except img's because anything thats not convertable to javascript will cause an error
 for varname in list(globals().keys()):
    
-   if varname not in ['__name__', '__doc__', '__package__', '__loader__', '__spec__', '__annotations__', '__builtins__', '_pyodide_core', 'sys', 'numpy', 'np', 'plt', 'io', 'base64', 'freq_img', 'time_img']:
+   if varname not in ['__name__', '__doc__', '__package__', '__loader__', '__spec__', '__annotations__', '__builtins__', '_pyodide_core', 'sys', 'numpy', 'np', 'plt', 'io', 'base64', 'freq_img', 'time_img', 'iq_img']:
        globals()[varname] = None
 #del x, n
 `;
@@ -134,17 +156,27 @@ for varname in list(globals().keys()):
     if (state.pyodide) {
       state.pyodide
         .runPythonAsync(
-          state.pythonSnippet + prePlot + state.freqPlotSnippet + postFreq + state.timePlotSnippet + postTime + postCode
+          state.pythonSnippet +
+            prePlot +
+            state.freqPlotSnippet +
+            postFreq +
+            state.timePlotSnippet +
+            postTime +
+            state.iqPlotSnippet +
+            postIQ +
+            postCode
         )
         .then((output) => {
           console.log(output);
           const freqImgStr = state.pyodide.globals.toJs().get('freq_img') || '';
           const timeImgStr = state.pyodide.globals.toJs().get('time_img') || '';
+          const iqImgStr = state.pyodide.globals.toJs().get('iq_img') || '';
           setState({
             ...state,
             errorLog: '',
             b64ImageFreq: 'data:image/png;base64, ' + freqImgStr,
             b64ImageTime: 'data:image/png;base64, ' + timeImgStr,
+            b64ImageIQ: 'data:image/png;base64, ' + iqImgStr,
           }); // also clear errors
         })
         .catch((err) => {
@@ -158,7 +190,7 @@ for varname in list(globals().keys()):
       <Container>
         <br></br>
         <center>
-          <h2 style={{ color: '#00bc8c' }}>Signal Generator</h2>
+          <h2 style={{ color: '#00bc8c' }}>Python-Based Signal Generator</h2>
         </center>
         <Row>
           <Col>
@@ -195,9 +227,9 @@ for varname in list(globals().keys()):
                 <CodeMirror
                   value={state.freqPlotSnippet}
                   height="300px"
-                  width="400px"
+                  width="490px"
                   extensions={[python()]}
-                  onChange={onChangefreqPlotSnippet}
+                  onChange={onChangeFreqPlotSnippet}
                   theme="dark"
                 />
                 <br></br>
@@ -207,16 +239,25 @@ for varname in list(globals().keys()):
                 <CodeMirror
                   value={state.timePlotSnippet}
                   height="300px"
-                  width="400px"
+                  width="490px"
                   extensions={[python()]}
-                  onChange={onChangetimePlotSnippet}
+                  onChange={onChangeTimePlotSnippet}
                   theme="dark"
                 />
                 <br></br>
                 <img src={state.b64ImageTime} width="400px" alt="hit run to load" />
               </Tab>
               <Tab eventKey="iq" title="IQ">
-                asdasdasdsss
+                <CodeMirror
+                  value={state.iqPlotSnippet}
+                  height="300px"
+                  width="490px"
+                  extensions={[python()]}
+                  onChange={onChangeIQPlotSnippet}
+                  theme="dark"
+                />
+                <br></br>
+                <img src={state.b64ImageIQ} width="400px" alt="hit run to load" />
               </Tab>
               <Tab eventKey="spectrogram" title="Spectrogram">
                 asdasdasd
