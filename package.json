@@ -13,6 +13,7 @@
     "@mui/icons-material": "^5.10.6",
     "@mui/material": "^5.11.3",
     "@reduxjs/toolkit": "^1.8.5",
+    "@uiw/codemirror-theme-vscode": "^4.19.15",
     "@uiw/react-codemirror": "^4.19.14",
     "bootstrap": "^5.2.1",
     "bootstrap-icons": "^1.10.3",

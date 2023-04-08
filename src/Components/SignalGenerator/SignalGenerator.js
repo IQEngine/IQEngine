@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { Container, Row, Col } from 'react-bootstrap';
+import { vscodeDark } from '@uiw/codemirror-theme-vscode';
 import CodeMirror from '@uiw/react-codemirror';
 import { python } from '@codemirror/lang-python';
 import Tab from 'react-bootstrap/Tab';
@@ -248,7 +249,7 @@ print('NumPy Version:', numpy.version.version)
                   width="600px"
                   extensions={[python()]}
                   onChange={onChangePythonSnippet}
-                  theme="dark"
+                  theme={vscodeDark}
                 />
                 <br></br>
                 <Button variant="secondary" disabled={state.buttonDisabled} onClick={onSubmitPythonSnippet}>
@@ -276,7 +277,7 @@ print('NumPy Version:', numpy.version.version)
                   width="490px"
                   extensions={[python()]}
                   onChange={onChangeFreqPlotSnippet}
-                  theme="dark"
+                  theme={vscodeDark}
                 />
                 <br></br>
                 <img src={state.b64ImageFreq} width="490px" alt="hit run to load" />
@@ -288,7 +289,7 @@ print('NumPy Version:', numpy.version.version)
                   width="490px"
                   extensions={[python()]}
                   onChange={onChangeTimePlotSnippet}
-                  theme="dark"
+                  theme={vscodeDark}
                 />
                 <br></br>
                 <img src={state.b64ImageTime} width="490px" alt="hit run to load" />
@@ -300,7 +301,7 @@ print('NumPy Version:', numpy.version.version)
                   width="490px"
                   extensions={[python()]}
                   onChange={onChangeIQPlotSnippet}
-                  theme="dark"
+                  theme={vscodeDark}
                 />
                 <br></br>
                 <img src={state.b64ImageIQ} width="490px" alt="hit run to load" />
@@ -312,7 +313,7 @@ print('NumPy Version:', numpy.version.version)
                   width="490px"
                   extensions={[python()]}
                   onChange={onChangeSpectrogramPlotSnippet}
-                  theme="dark"
+                  theme={vscodeDark}
                 />
                 <br></br>
                 <img src={state.b64ImageSpectrogram} width="490px" alt="hit run to load" />
