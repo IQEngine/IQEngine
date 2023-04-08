@@ -47,7 +47,6 @@ plt.xlabel("Time")
 plt.ylabel("Sample")
 `,
     iqPlotSnippet: `plt.plot(x.real[0:1000], x.imag[0:1000], '.')
-plt.legend(['I','Q'])
 plt.grid()
 plt.xlabel("I")
 plt.ylabel("Q")
@@ -61,6 +60,43 @@ plt.ylabel("Q")
     buttonText: 'Python Initializing...',
     currentTab: 'frequency',
   });
+
+  const prePlot = `
+plt.rc('axes', labelsize=14) # fontsize of the x and y labels
+plt.style.use('dark_background')
+`;
+
+  // keep newline in case prev block doesnt have one
+  const postFreq = `
+pic_IObytes = io.BytesIO()
+plt.savefig(pic_IObytes, format='png', bbox_inches='tight')
+pic_IObytes.seek(0)
+freq_img = base64.b64encode(pic_IObytes.read()).decode() # the plot below will display whatever b64 is in img
+plt.clf() 
+`;
+
+  const postTime = `
+pic_IObytes = io.BytesIO()
+plt.savefig(pic_IObytes, format='png', bbox_inches='tight')
+pic_IObytes.seek(0)
+time_img = base64.b64encode(pic_IObytes.read()).decode() # the plot below will display whatever b64 is in img
+plt.clf() 
+`;
+
+  const postIQ = `
+pic_IObytes = io.BytesIO()
+plt.savefig(pic_IObytes, format='png', bbox_inches='tight')
+pic_IObytes.seek(0)
+iq_img = base64.b64encode(pic_IObytes.read()).decode() # the plot below will display whatever b64 is in img
+plt.clf() 
+`;
+
+  const postCode = `
+# clear all global vars except img's because anything thats not convertable to javascript will cause an error
+for varname in list(globals().keys()):
+    if varname not in ['__name__', '__doc__', '__package__', '__loader__', '__spec__', '__annotations__', '__builtins__', '_pyodide_core', 'sys', 'numpy', 'np', 'plt', 'io', 'base64', 'freq_img', 'time_img', 'iq_img']:
+        globals()[varname] = None
+`;
 
   const onChangePythonSnippet = React.useCallback(
     (value, viewUpdate) => {
@@ -110,45 +146,6 @@ plt.ylabel("Q")
       main();
     }
   }, [state]);
-
-  const prePlot = `
-plt.rc('axes', labelsize=18) # fontsize of the x and y labels
-plt.style.use('dark_background')
-`;
-
-  // keep newline in case prev block doesnt have one
-  const postFreq = `
-pic_IObytes = io.BytesIO()
-plt.savefig(pic_IObytes, format='png', bbox_inches='tight')
-pic_IObytes.seek(0)
-freq_img = base64.b64encode(pic_IObytes.read()).decode() # the plot below will display whatever b64 is in img
-plt.clf() 
-`;
-
-  const postTime = `
-pic_IObytes = io.BytesIO()
-plt.savefig(pic_IObytes, format='png', bbox_inches='tight')
-pic_IObytes.seek(0)
-time_img = base64.b64encode(pic_IObytes.read()).decode() # the plot below will display whatever b64 is in img
-plt.clf() 
-`;
-
-  const postIQ = `
-pic_IObytes = io.BytesIO()
-plt.savefig(pic_IObytes, format='png', bbox_inches='tight')
-pic_IObytes.seek(0)
-iq_img = base64.b64encode(pic_IObytes.read()).decode() # the plot below will display whatever b64 is in img
-plt.clf() 
-`;
-
-  const postCode = `
-# clear all global vars except img's because anything thats not convertable to javascript will cause an error
-for varname in list(globals().keys()):
-   
-   if varname not in ['__name__', '__doc__', '__package__', '__loader__', '__spec__', '__annotations__', '__builtins__', '_pyodide_core', 'sys', 'numpy', 'np', 'plt', 'io', 'base64', 'freq_img', 'time_img', 'iq_img']:
-       globals()[varname] = None
-#del x, n
-`;
 
   const onSubmitPythonSnippet = () => {
     console.log('Running python snippet');
@@ -233,7 +230,7 @@ for varname in list(globals().keys()):
                   theme="dark"
                 />
                 <br></br>
-                <img src={state.b64ImageFreq} width="400px" alt="hit run to load" />
+                <img src={state.b64ImageFreq} width="490px" alt="hit run to load" />
               </Tab>
               <Tab eventKey="time" title="Time">
                 <CodeMirror
@@ -245,7 +242,7 @@ for varname in list(globals().keys()):
                   theme="dark"
                 />
                 <br></br>
-                <img src={state.b64ImageTime} width="400px" alt="hit run to load" />
+                <img src={state.b64ImageTime} width="490px" alt="hit run to load" />
               </Tab>
               <Tab eventKey="iq" title="IQ">
                 <CodeMirror
@@ -257,7 +254,7 @@ for varname in list(globals().keys()):
                   theme="dark"
                 />
                 <br></br>
-                <img src={state.b64ImageIQ} width="400px" alt="hit run to load" />
+                <img src={state.b64ImageIQ} width="490px" alt="hit run to load" />
               </Tab>
               <Tab eventKey="spectrogram" title="Spectrogram">
                 asdasdasd
