@@ -7,6 +7,8 @@ import Form from 'react-bootstrap/Form';
 import { Container, Row, Col } from 'react-bootstrap';
 import CodeMirror from '@uiw/react-codemirror';
 import { python } from '@codemirror/lang-python';
+import Tab from 'react-bootstrap/Tab';
+import Tabs from 'react-bootstrap/Tabs';
 
 export default function SignalGenerator(props) {
   const [state, setState] = useState({
@@ -23,7 +25,7 @@ print(testvar) # example of reading in a var from javascript side
 start_t = time.time()
 
 t = np.arange(1024)
-x = np.exp(2j*np.pi*0.1*t) # tone
+x = np.exp(2j*np.pi*0.05*t) # tone
 n = np.random.randn(len(x)) + 1j*np.random.randn(len(x))
 x = x + 0.1*n # add some complex noise
 
@@ -32,19 +34,25 @@ print("elapsed time in ms:", (time.time() - start_t)*1e3)
     freqPlotSnippet: `X = 10*np.log10(np.abs(np.fft.fftshift(np.fft.fft(x)))**2)
 f = np.linspace(-0.5, 0.5, len(X))
 
-plt.rc('axes', labelsize=18) # fontsize of the x and y labels
-plt.style.use('dark_background')
-plt.cla() # clear any previous plots
 plt.plot(f, X)
 plt.grid()
 plt.xlabel("Frequency [Hz Normalized]")
 plt.ylabel("PSD [dB]")
 `,
+    timePlotSnippet: `plt.plot(x.real[0:100])
+plt.plot(x.imag[0:100])
+plt.legend(['I','Q'])
+plt.grid()
+plt.xlabel("Time")
+plt.ylabel("Sample")
+`,
     pyodide: null,
-    b64Image: '',
+    b64ImageFreq: '',
+    b64ImageTime: '',
     errorLog: '',
     buttonDisabled: true,
     buttonText: 'Python Initializing...',
+    currentTab: 'frequency',
   });
 
   const onChangePythonSnippet = React.useCallback(
@@ -57,6 +65,13 @@ plt.ylabel("PSD [dB]")
   const onChangefreqPlotSnippet = React.useCallback(
     (value, viewUpdate) => {
       setState({ ...state, freqPlotSnippet: value });
+    },
+    [state]
+  );
+
+  const onChangetimePlotSnippet = React.useCallback(
+    (value, viewUpdate) => {
+      setState({ ...state, timePlotSnippet: value });
     },
     [state]
   );
@@ -82,19 +97,33 @@ plt.ylabel("PSD [dB]")
     }
   }, [state]);
 
+  const prePlot = `
+plt.rc('axes', labelsize=18) # fontsize of the x and y labels
+plt.style.use('dark_background')
+`;
+
   // keep newline in case prev block doesnt have one
-  const b64ImageGenCode = `
+  const postFreq = `
 pic_IObytes = io.BytesIO()
 plt.savefig(pic_IObytes, format='png', bbox_inches='tight')
 pic_IObytes.seek(0)
-img = base64.b64encode(pic_IObytes.read()).decode() # the plot below will display whatever b64 is in img  
+freq_img = base64.b64encode(pic_IObytes.read()).decode() # the plot below will display whatever b64 is in img
+plt.clf() 
+`;
+
+  const postTime = `
+pic_IObytes = io.BytesIO()
+plt.savefig(pic_IObytes, format='png', bbox_inches='tight')
+pic_IObytes.seek(0)
+time_img = base64.b64encode(pic_IObytes.read()).decode() # the plot below will display whatever b64 is in img
+plt.clf() 
 `;
 
   const postCode = `
-# clear all global vars except img because anything thats not convertable to javascript will cause an error
+# clear all global vars except img's because anything thats not convertable to javascript will cause an error
 for varname in list(globals().keys()):
    
-   if varname not in ['__name__', '__doc__', '__package__', '__loader__', '__spec__', '__annotations__', '__builtins__', '_pyodide_core', 'sys', 'numpy', 'np', 'plt', 'io', 'base64', 'img']:
+   if varname not in ['__name__', '__doc__', '__package__', '__loader__', '__spec__', '__annotations__', '__builtins__', '_pyodide_core', 'sys', 'numpy', 'np', 'plt', 'io', 'base64', 'freq_img', 'time_img']:
        globals()[varname] = None
 #del x, n
 `;
@@ -104,11 +133,19 @@ for varname in list(globals().keys()):
     window.testvar = 1234; // example of reading in a var from javascript side
     if (state.pyodide) {
       state.pyodide
-        .runPythonAsync(state.pythonSnippet + state.freqPlotSnippet + b64ImageGenCode + postCode)
+        .runPythonAsync(
+          state.pythonSnippet + prePlot + state.freqPlotSnippet + postFreq + state.timePlotSnippet + postTime + postCode
+        )
         .then((output) => {
           console.log(output);
-          let imgStr = state.pyodide.globals.toJs().get('img') || '';
-          setState({ ...state, errorLog: '', b64Image: 'data:image/png;base64, ' + imgStr }); // also clear errors
+          const freqImgStr = state.pyodide.globals.toJs().get('freq_img') || '';
+          const timeImgStr = state.pyodide.globals.toJs().get('time_img') || '';
+          setState({
+            ...state,
+            errorLog: '',
+            b64ImageFreq: 'data:image/png;base64, ' + freqImgStr,
+            b64ImageTime: 'data:image/png;base64, ' + timeImgStr,
+          }); // also clear errors
         })
         .catch((err) => {
           setState({ ...state, errorLog: String(err) });
@@ -146,17 +183,45 @@ for varname in list(globals().keys()):
             </div>
           </Col>
           <Col>
-            Frequency Domain Plot
-            <CodeMirror
-              value={state.freqPlotSnippet}
-              height="300px"
-              width="400px"
-              extensions={[python()]}
-              onChange={onChangefreqPlotSnippet}
-              theme="dark"
-            />
-            <br></br>
-            <img src={state.b64Image} width="400px" alt="hit run to load" />
+            <Tabs
+              id="tabs"
+              activeKey={state.currentTab}
+              onSelect={(k) => {
+                setState({ ...state, currentTab: k });
+              }}
+              className="mb-3"
+            >
+              <Tab eventKey="frequency" title="Freq">
+                <CodeMirror
+                  value={state.freqPlotSnippet}
+                  height="300px"
+                  width="400px"
+                  extensions={[python()]}
+                  onChange={onChangefreqPlotSnippet}
+                  theme="dark"
+                />
+                <br></br>
+                <img src={state.b64ImageFreq} width="400px" alt="hit run to load" />
+              </Tab>
+              <Tab eventKey="time" title="Time">
+                <CodeMirror
+                  value={state.timePlotSnippet}
+                  height="300px"
+                  width="400px"
+                  extensions={[python()]}
+                  onChange={onChangetimePlotSnippet}
+                  theme="dark"
+                />
+                <br></br>
+                <img src={state.b64ImageTime} width="400px" alt="hit run to load" />
+              </Tab>
+              <Tab eventKey="iq" title="IQ">
+                asdasdasdsss
+              </Tab>
+              <Tab eventKey="spectrogram" title="Spectrogram">
+                asdasdasd
+              </Tab>
+            </Tabs>
           </Col>
         </Row>
       </Container>
