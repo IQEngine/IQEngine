@@ -90,8 +90,14 @@ pic_IObytes.seek(0)
 img = base64.b64encode(pic_IObytes.read()).decode() # the plot below will display whatever b64 is in img  
 `;
 
-  // TODO: there might be a way to keep everything done in a function except for img so that there are no other globals
-  const postCode = `del x, n`;
+  const postCode = `
+# clear all global vars except img because anything thats not convertable to javascript will cause an error
+for varname in list(globals().keys()):
+   
+   if varname not in ['__name__', '__doc__', '__package__', '__loader__', '__spec__', '__annotations__', '__builtins__', '_pyodide_core', 'sys', 'numpy', 'np', 'plt', 'io', 'base64', 'img']:
+       globals()[varname] = None
+#del x, n
+`;
 
   const onSubmitPythonSnippet = () => {
     console.log('Running python snippet');
