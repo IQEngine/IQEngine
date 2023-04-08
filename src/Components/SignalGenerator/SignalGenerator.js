@@ -45,7 +45,8 @@ x = tone + bpsk + 0.1*noise
 
 print("elapsed time:", (time.time() - start_t)*1e3, 'ms')
 `,
-    freqPlotSnippet: `X = 10*np.log10(np.abs(np.fft.fftshift(np.fft.fft(x)))**2)
+    freqPlotSnippet: `\
+X = 10*np.log10(np.abs(np.fft.fftshift(np.fft.fft(x)))**2)
 f = np.linspace(-0.5, 0.5, len(X))
 
 plt.plot(f, X)
@@ -53,19 +54,21 @@ plt.grid()
 plt.xlabel("Frequency [Hz Normalized]")
 plt.ylabel("PSD [dB]")
 `,
-    timePlotSnippet: `plt.plot(x.real[0:100])
+    timePlotSnippet: `\
+plt.plot(x.real[0:100])
 plt.plot(x.imag[0:100])
 plt.legend(['I','Q'])
 plt.grid()
 plt.xlabel("Time")
 plt.ylabel("Sample")
 `,
-    iqPlotSnippet: `plt.plot(x.real[0:1000], x.imag[0:1000], '.')
+    iqPlotSnippet: `\
+plt.plot(x.real[0:1000], x.imag[0:1000], '.')
 plt.grid()
 plt.xlabel("I")
 plt.ylabel("Q")
 `,
-    spectrogramPlotSnippet: `
+    spectrogramPlotSnippet: `\
 fft_size = 1024
 sample_rate = 1e6
 num_rows = int(np.floor(len(x)/fft_size))
