@@ -193,6 +193,7 @@ print('NumPy Version:', numpy.version.version)
   }, [state]);
 
   const onSubmitPythonSnippet = () => {
+    setState({ ...state, buttonDisabled: true, buttonText: 'Running' });
     console.log('Running python snippet');
     const startTime = performance.now();
     if (state.pyodide) {
@@ -218,6 +219,8 @@ print('NumPy Version:', numpy.version.version)
           setState({
             ...state,
             errorLog: '',
+            buttonDisabled: false,
+            buttonText: 'Run',
             b64ImageFreq: 'data:image/png;base64, ' + freqImgStr,
             b64ImageTime: 'data:image/png;base64, ' + timeImgStr,
             b64ImageIQ: 'data:image/png;base64, ' + iqImgStr,
@@ -226,7 +229,7 @@ print('NumPy Version:', numpy.version.version)
           console.log('Call to runPythonAsync took', performance.now() - startTime, 'milliseconds');
         })
         .catch((err) => {
-          setState({ ...state, errorLog: String(err) });
+          setState({ ...state, buttonDisabled: false, buttonText: 'Run', errorLog: String(err) });
           console.log('Call to runPythonAsync took', performance.now() - startTime, 'milliseconds');
         });
     }
