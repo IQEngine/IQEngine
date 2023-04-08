@@ -15,21 +15,16 @@ export default function SignalGenerator(props) {
     pythonSnippet: `\
 import numpy as np
 import matplotlib.pyplot as plt
-import io
-import base64
 import time
-
-from js import testvar
-print(testvar) # example of reading in a var from javascript side
 
 start_t = time.time()
 
-t = np.arange(1024)
+t = np.arange(102400)
 x = np.exp(2j*np.pi*0.05*t) # tone
 n = np.random.randn(len(x)) + 1j*np.random.randn(len(x))
 x = x + 0.1*n # add some complex noise
 
-print("elapsed time in ms:", (time.time() - start_t)*1e3)  
+print("elapsed time:", (time.time() - start_t)*1e3, 'ms')  
 `,
     freqPlotSnippet: `X = 10*np.log10(np.abs(np.fft.fftshift(np.fft.fft(x)))**2)
 f = np.linspace(-0.5, 0.5, len(X))
@@ -51,6 +46,18 @@ plt.grid()
 plt.xlabel("I")
 plt.ylabel("Q")
 `,
+    spectrogramPlotSnippet: `
+fft_size = 1024
+sample_rate = 1e6
+num_rows = int(np.floor(len(x)/fft_size))
+spectrogram = np.zeros((num_rows, fft_size))
+for i in range(num_rows):
+    spectrogram[i,:] = 10*np.log10(np.abs(np.fft.fftshift(np.fft.fft(x[i*fft_size:(i+1)*fft_size])))**2)
+
+plt.imshow(spectrogram, aspect='auto', extent = [sample_rate/-2, sample_rate/2, 0, len(x)/sample_rate])
+plt.xlabel("Frequency [Hz]")
+plt.ylabel("Time [s]")
+`,
     pyodide: null,
     b64ImageFreq: '',
     b64ImageTime: '',
@@ -68,6 +75,8 @@ plt.style.use('dark_background')
 
   // keep newline in case prev block doesnt have one
   const postFreq = `
+import io
+import base64
 pic_IObytes = io.BytesIO()
 plt.savefig(pic_IObytes, format='png', bbox_inches='tight')
 pic_IObytes.seek(0)
@@ -91,10 +100,18 @@ iq_img = base64.b64encode(pic_IObytes.read()).decode() # the plot below will dis
 plt.clf() 
 `;
 
+  const postSpectrogram = `
+pic_IObytes = io.BytesIO()
+plt.savefig(pic_IObytes, format='png', bbox_inches='tight')
+pic_IObytes.seek(0)
+spectrogram_img = base64.b64encode(pic_IObytes.read()).decode() # the plot below will display whatever b64 is in img
+plt.clf() 
+`;
+
   const postCode = `
 # clear all global vars except img's because anything thats not convertable to javascript will cause an error
 for varname in list(globals().keys()):
-    if varname not in ['__name__', '__doc__', '__package__', '__loader__', '__spec__', '__annotations__', '__builtins__', '_pyodide_core', 'sys', 'numpy', 'np', 'plt', 'io', 'base64', 'freq_img', 'time_img', 'iq_img']:
+    if varname not in ['__name__', '__doc__', '__package__', '__loader__', '__spec__', '__annotations__', '__builtins__', '_pyodide_core', 'sys', 'numpy', 'np', 'plt', 'io', 'base64', 'freq_img', 'time_img', 'iq_img', 'spectrogram_img']:
         globals()[varname] = None
 `;
 
@@ -126,6 +143,13 @@ for varname in list(globals().keys()):
     [state]
   );
 
+  const onChangeSpectrogramPlotSnippet = React.useCallback(
+    (value, viewUpdate) => {
+      setState({ ...state, spectrogramPlotSnippet: value });
+    },
+    [state]
+  );
+
   useEffect(() => {
     if (!state.pyodide) {
       async function main() {
@@ -133,14 +157,12 @@ for varname in list(globals().keys()):
         let pyodide = await window.loadPyodide();
         await pyodide.loadPackage('numpy');
         await pyodide.loadPackage('matplotlib');
-        console.log(
-          pyodide.runPython(`
-            import sys
-            import numpy
-            print('Python Version:', sys.version)
-            print('NumPy Version:', numpy.version.version)
-        `)
-        );
+        pyodide.runPython(`
+import sys
+import numpy
+print('Python Version:', sys.version)
+print('NumPy Version:', numpy.version.version)
+`);
         setState({ ...state, pyodide: pyodide, buttonText: 'Run', buttonDisabled: false });
       }
       main();
@@ -149,7 +171,7 @@ for varname in list(globals().keys()):
 
   const onSubmitPythonSnippet = () => {
     console.log('Running python snippet');
-    window.testvar = 1234; // example of reading in a var from javascript side
+    const startTime = performance.now();
     if (state.pyodide) {
       state.pyodide
         .runPythonAsync(
@@ -161,23 +183,28 @@ for varname in list(globals().keys()):
             postTime +
             state.iqPlotSnippet +
             postIQ +
+            state.spectrogramPlotSnippet +
+            postSpectrogram +
             postCode
         )
-        .then((output) => {
-          console.log(output);
+        .then(() => {
           const freqImgStr = state.pyodide.globals.toJs().get('freq_img') || '';
           const timeImgStr = state.pyodide.globals.toJs().get('time_img') || '';
           const iqImgStr = state.pyodide.globals.toJs().get('iq_img') || '';
+          const spectrogramImgStr = state.pyodide.globals.toJs().get('spectrogram_img') || '';
           setState({
             ...state,
             errorLog: '',
             b64ImageFreq: 'data:image/png;base64, ' + freqImgStr,
             b64ImageTime: 'data:image/png;base64, ' + timeImgStr,
             b64ImageIQ: 'data:image/png;base64, ' + iqImgStr,
+            b64ImageSpectrogram: 'data:image/png;base64, ' + spectrogramImgStr,
           }); // also clear errors
+          console.log('Call to runPythonAsync took', performance.now() - startTime, 'milliseconds');
         })
         .catch((err) => {
           setState({ ...state, errorLog: String(err) });
+          console.log('Call to runPythonAsync took', performance.now() - startTime, 'milliseconds');
         });
     }
   };
@@ -257,7 +284,16 @@ for varname in list(globals().keys()):
                 <img src={state.b64ImageIQ} width="490px" alt="hit run to load" />
               </Tab>
               <Tab eventKey="spectrogram" title="Spectrogram">
-                asdasdasd
+                <CodeMirror
+                  value={state.spectrogramPlotSnippet}
+                  height="300px"
+                  width="490px"
+                  extensions={[python()]}
+                  onChange={onChangeSpectrogramPlotSnippet}
+                  theme="dark"
+                />
+                <br></br>
+                <img src={state.b64ImageSpectrogram} width="490px" alt="hit run to load" />
               </Tab>
             </Tabs>
           </Col>
