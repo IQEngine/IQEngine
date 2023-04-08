@@ -7,7 +7,6 @@ import { Sidebar } from './Sidebar';
 import { Component } from 'react';
 import Button from 'react-bootstrap/Button';
 import ScrollBar from './ScrollBar';
-import Pyodide from './Pyodide';
 import { TimePlot } from './TimePlot';
 import { FrequencyPlot } from './FrequencyPlot';
 import { IQPlot } from './IQPlot';
@@ -598,9 +597,6 @@ class SpectrogramPage extends Component {
               onChange={this.handleMetaChange}
               value={JSON.stringify(this.state.meta, null, 4)}
             />
-          </Row>
-          <Row>
-            <Pyodide />
           </Row>
         </Container>
       </div>
