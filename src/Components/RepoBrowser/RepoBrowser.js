@@ -6,6 +6,7 @@ import React from 'react';
 import LocalFileBrowser from './LocalFileBrowser';
 import AzureBlobBrowser from './AzureBlobBrowser';
 import RepositoryTile from './RepositoryTile';
+import SiggenTile from './SiggenTile';
 
 const RepoBrowser = (props) => {
   const tileObjInfo = JSON.parse(process.env.REACT_APP_CONNECTION_INFO).settings;
@@ -35,6 +36,7 @@ const RepoBrowser = (props) => {
         updateConnectionContainerName={props.updateConnectionContainerName}
         updateConnectionSasToken={props.updateConnectionSasToken}
       />
+      <SiggenTile />
     </div>
   );
 };

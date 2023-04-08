@@ -8,6 +8,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import RepoBrowserContainer from './Containers/RepoBrowserContainer';
 import SpectrogramContainer from './Containers/SpectrogramContainer';
+import SignalGenerator from './Components/SignalGenerator/SignalGenerator';
 import RecordingsListContainer from './Containers/RecordingsListContainer';
 import { Navbar, Row, Col } from 'react-bootstrap';
 import Container from 'react-bootstrap/Container';
@@ -64,6 +65,7 @@ const App = () => {
 
       <Routes>
         <Route path="/about" element={<About />} />
+        <Route path="/siggen" element={<SignalGenerator />} />
         <Route path="/plugins" element={<Plugins />} />
         <Route exact path="/" element={<RepoBrowserContainer />} />
         <Route path="/recordings/spectrogram/:recording" element={<SpectrogramContainer />} />
