@@ -85,7 +85,7 @@ plt.ylabel("Time [s]")
     b64ImageFreq: '',
     b64ImageTime: '',
     b64ImageIQ: '',
-    errorLog: '',
+    errorLog: '<no errors>',
     buttonDisabled: true,
     buttonText: 'Python Initializing...',
     currentTab: 'frequency',
@@ -218,7 +218,7 @@ print('NumPy Version:', numpy.version.version)
           const spectrogramImgStr = state.pyodide.globals.toJs().get('spectrogram_img') || '';
           setState({
             ...state,
-            errorLog: '',
+            errorLog: '<no errors>',
             buttonDisabled: false,
             buttonText: 'Run',
             b64ImageFreq: 'data:image/png;base64, ' + freqImgStr,
