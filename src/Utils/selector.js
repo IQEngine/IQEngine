@@ -31,16 +31,16 @@ const average = (array) => array.reduce((a, b) => a + b) / array.length;
 function calcFftOfTile(
   samples,
   fftSize,
-  num_ffts,
+  numFfts,
   windowFunction,
-  magnitude_min,
-  magnitude_max,
+  magnitudeMin,
+  magnitudeMax,
   autoscale,
   currentFftMax,
   currentFftMin
 ) {
   let startTime = performance.now();
-  let newFftData = new Uint8ClampedArray(fftSize * num_ffts * 4);
+  let newFftData = new Uint8ClampedArray(fftSize * numFfts * 4);
   let startOfs = 0;
   let autoMin;
   let autoMax;
@@ -48,7 +48,7 @@ function calcFftOfTile(
   let tempCurrentFftMin = currentFftMin;
 
   // loop through each row
-  for (let i = 0; i < num_ffts; i++) {
+  for (let i = 0; i < numFfts; i++) {
     let samples_slice = samples.slice(i * fftSize * 2, (i + 1) * fftSize * 2); // mult by 2 because this is int/floats not IQ samples
 
     // Apply a hamming window and hanning window
@@ -122,8 +122,8 @@ function calcFftOfTile(
     }
 
     // apply magnitude min and max
-    magnitudes = magnitudes.map((x) => x / ((magnitude_max - magnitude_min) / 255));
-    magnitudes = magnitudes.map((x) => x - magnitude_min);
+    magnitudes = magnitudes.map((x) => x / ((magnitudeMax - magnitudeMin) / 255));
+    magnitudes = magnitudes.map((x) => x - magnitudeMin);
 
     // Clip from 0 to 255 and convert to ints
     magnitudes = magnitudes.map((x) => (x > 255 ? 255 : x)); // clip above 255
@@ -167,9 +167,9 @@ export const selectFft = (
   spectrogramHeight,
   autoscale = false
 ) => {
-  const num_ffts = TILE_SIZE_IN_IQ_SAMPLES / fftSize; // per tile
-  let magnitude_max = magnitudeMax;
-  let magnitude_min = magnitudeMin;
+  const numFfts = TILE_SIZE_IN_IQ_SAMPLES / fftSize; // per tile
+  let magnitudeMax = magnitudeMax;
+  let magnitudeMin = magnitudeMin;
   let tempCurrentFftMax = currentFftMax;
   let tempCurrentFftMin = currentFftMin;
 
@@ -184,10 +184,10 @@ export const selectFft = (
         const { newFftData, autoMax, autoMin, newCurrentFftMax, newCurrentFftMin } = calcFftOfTile(
           samples,
           fftSize,
-          num_ffts,
+          numFfts,
           windowFunction,
-          magnitude_min,
-          magnitude_max,
+          magnitudeMin,
+          magnitudeMax,
           autoscale,
           tempCurrentFftMax,
           tempCurrentFftMin
@@ -205,7 +205,7 @@ export const selectFft = (
   }
 
   // Concatenate the full tiles
-  let totalFftData = new Uint8ClampedArray(tiles.length * fftSize * num_ffts * 4);
+  let totalFftData = new Uint8ClampedArray(tiles.length * fftSize * numFfts * 4);
   let counter = 0; // can prob make this cleaner with an iterator in the for loop below
   for (let tile of tiles) {
     if (tile.toString() in window.fftData) {
@@ -213,7 +213,7 @@ export const selectFft = (
       counter = counter + window.fftData[tile.toString()].length;
     } else {
       // If the first slice isnt availabel fill with ones
-      let fakeFftData = new Uint8ClampedArray(fftSize * num_ffts * 4);
+      let fakeFftData = new Uint8ClampedArray(fftSize * numFfts * 4);
       fakeFftData.fill(255); // for debugging its better to have the alpha set to opaque so the missing part isnt invisible
       totalFftData.set(fakeFftData, counter);
       counter = counter + fakeFftData.length;
@@ -221,9 +221,9 @@ export const selectFft = (
   }
 
   // Trim off the top and bottom
-  let lowerTrim = (lowerTile - Math.floor(lowerTile)) * fftSize * num_ffts; // amount we want to get rid of
+  let lowerTrim = (lowerTile - Math.floor(lowerTile)) * fftSize * numFfts; // amount we want to get rid of
   lowerTrim = lowerTrim - (lowerTrim % fftSize);
-  let upperTrim = (1 - (upperTile - Math.floor(upperTile))) * fftSize * num_ffts; // amount we want to get rid of
+  let upperTrim = (1 - (upperTile - Math.floor(upperTile))) * fftSize * numFfts; // amount we want to get rid of
   upperTrim = upperTrim - (upperTrim % fftSize);
   const trimmedFftData = totalFftData.slice(lowerTrim * 4, totalFftData.length - upperTrim * 4);
   const num_final_ffts = trimmedFftData.length / fftSize / 4;
