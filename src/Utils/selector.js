@@ -248,7 +248,7 @@ export const selectFft = (
     let sampleRate = meta.global['core:sample_rate'];
     window.sampleRate = sampleRate;
     let lower_freq = center_frequency - sampleRate / 2;
-    const mystery_factor = Math.sqrt(fftSize / spectrogramHeight / 2); // no idea where this comes from, was found empirically
+    const mystery_factor = 0.75; // no idea where this comes from, was found empirically
     if (
       (sample_start >= start_sample_index && sample_start * mystery_factor < stop_sample_index) ||
       (sample_start + sample_count >= start_sample_index && sample_start * mystery_factor < stop_sample_index)
