@@ -3,7 +3,7 @@
 // Licensed under the MIT License
 
 import { faCropSimple } from '@fortawesome/free-solid-svg-icons';
-import React from 'react';
+import React, { Fragment } from 'react';
 import { Layer, Rect, Text } from 'react-konva';
 import { TILE_SIZE_IN_IQ_SAMPLES } from '../../Utils/constants';
 
@@ -145,7 +145,7 @@ const AnnotationViewer = (props) => {
         // for params of Rect see https://konvajs.org/api/Konva.Rect.html
         // for Text params see https://konvajs.org/api/Konva.Text.html
         // Note that index is for the list of annotations currently on the screen, not for meta.annotations which contains all
-        <>
+        <Fragment key={index}>
           {/* Main rectangle */}
           <Rect
             x={annotation.x1 * spectrogramWidthScale}
@@ -238,7 +238,7 @@ const AnnotationViewer = (props) => {
             onClick={handleTextClick}
             id={index.toString()} // tells the event which annotation to update
           />
-        </>
+        </Fragment>
       ))}
     </Layer>
   );

@@ -50,7 +50,7 @@ export default function InfoPane(props) {
     <div>
       <Form key={'InfoPane'}>
         {Object.entries(metaGlobal).map(([key, value]) => (
-          <Form.Group className="mb-3" controlId="formBasicEmail">
+          <Form.Group className="mb-3" controlId="formBasicEmail" key={key}>
             <Form.Label>
               {titleCase(key.replace('core:', '').replace(':', ' ').replace('_', ' ').replace('hw', 'Hardware'))}
             </Form.Label>
