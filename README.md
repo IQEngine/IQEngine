@@ -48,3 +48,14 @@ Through the optional backend API, IQEngine supports three different classes of p
 
 <p align="center"><a href="https://www.qoherent.ai/"><img width=250 src="public/clogo-black.png" /></a></p>
 
+
+## Docker Install
+
+The IQEngine frontend is a React app and can be deployed many different ways, the canonical instance at iqengine.org is deployed in Azure using an App Service (serverless computing) with the Node stack, but if you prefer to run it containerized, here is an example to get you started:
+
+```
+docker build . -t iqengine
+docker run -p 3000:3000 -d iqengine
+```
+
+The build step will take 3-5 minutes.  After running it you should be able to access IQEngine in a browser at http://localhost:3000/.  
