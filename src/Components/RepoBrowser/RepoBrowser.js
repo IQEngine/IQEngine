@@ -9,7 +9,11 @@ import RepositoryTile from './RepositoryTile';
 import SiggenTile from './SiggenTile';
 
 const RepoBrowser = (props) => {
-  const tileObjInfo = JSON.parse(process.env.REACT_APP_CONNECTION_INFO).settings;
+  let tileObjInfo = [];
+  // In local mode, CONNECTION_INFO isn't defined
+  if (process.env.REACT_APP_CONNECTION_INFO) {
+      tileObjInfo = JSON.parse(process.env.REACT_APP_CONNECTION_INFO).settings;
+  }
 
   return (
     <div className="homePage">
