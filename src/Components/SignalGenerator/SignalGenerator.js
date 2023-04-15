@@ -89,6 +89,7 @@ plt.ylabel("Time [s]")
     buttonDisabled: true,
     buttonText: 'Python Initializing...',
     currentTab: 'frequency',
+    downloadChecked: false,
   });
 
   const prePlot = `
@@ -132,9 +133,16 @@ plt.clf()
 `;
 
   const postCode = `
+try:
+    x = x.astype(np.complex64)
+    x_bytes = x.tobytes()
+except BaseException as e:
+    print("Ran into issue during converting x to bytes:")
+    print(e)
+
 # clear all global vars except img's because anything thats not convertable to javascript will cause an error
 for varname in list(globals().keys()):
-    if varname not in ['__name__', '__doc__', '__package__', '__loader__', '__spec__', '__annotations__', '__builtins__', '_pyodide_core', 'sys', 'numpy', 'np', 'plt', 'io', 'base64', 'freq_img', 'time_img', 'iq_img', 'spectrogram_img']:
+    if varname not in ['__name__', '__doc__', '__package__', '__loader__', '__spec__', '__annotations__', '__builtins__', '_pyodide_core', 'sys', 'numpy', 'np', 'plt', 'io', 'x_bytes', 'base64', 'freq_img', 'time_img', 'iq_img', 'spectrogram_img']:
         globals()[varname] = None
 `;
 
@@ -216,6 +224,7 @@ print('NumPy Version:', numpy.version.version)
           const timeImgStr = state.pyodide.globals.toJs().get('time_img') || '';
           const iqImgStr = state.pyodide.globals.toJs().get('iq_img') || '';
           const spectrogramImgStr = state.pyodide.globals.toJs().get('spectrogram_img') || '';
+          const xBytes = state.pyodide.globals.toJs().get('x_bytes') || null;
           setState({
             ...state,
             errorLog: '<no errors>',
@@ -227,12 +236,57 @@ print('NumPy Version:', numpy.version.version)
             b64ImageSpectrogram: 'data:image/png;base64, ' + spectrogramImgStr,
           }); // also clear errors
           console.log('Call to runPythonAsync took', performance.now() - startTime, 'milliseconds');
+
+          // Create/Download SigMF recording file if requested
+          if (state.downloadChecked) {
+            // Data file
+            const a = document.createElement('a');
+            document.body.appendChild(a);
+            a.style = 'display: none';
+            var blob = new Blob([xBytes], { type: 'octet/stream' }),
+              url = window.URL.createObjectURL(blob);
+            a.href = url;
+            a.download = 'samples.sigmf-data';
+            a.click();
+            window.URL.revokeObjectURL(url);
+
+            // Meta file (assume user will fill it in with their details)
+            const metaText = `\
+{
+  "global": {
+      "core:datatype": "cf32_le",
+      "core:sample_rate": 1000000,
+      "core:hw": "IQEngine Python-Based Signal Generator",
+      "core:author": "IQEngine User",
+      "core:version": "1.0.0"
+  },
+  "captures": [
+      {
+          "core:sample_start": 0,
+          "core:frequency": 123456789
+      }
+  ],
+  "annotations": []
+}
+`;
+            var a2 = document.createElement('a');
+            a2.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(metaText));
+            a2.setAttribute('download', 'samples.sigmf-meta');
+            a2.style.display = 'none';
+            document.body.appendChild(a2);
+            a2.click();
+            document.body.removeChild(a2);
+          }
         })
         .catch((err) => {
           setState({ ...state, buttonDisabled: false, buttonText: 'Run', errorLog: String(err) });
           console.log('Call to runPythonAsync took', performance.now() - startTime, 'milliseconds');
         });
     }
+  };
+
+  const onChangeDownloadChecked = () => {
+    setState({ ...state, downloadChecked: !state.downloadChecked });
   };
 
   return (
@@ -258,6 +312,14 @@ print('NumPy Version:', numpy.version.version)
                 <Button variant="secondary" disabled={state.buttonDisabled} onClick={onSubmitPythonSnippet}>
                   {state.buttonText}
                 </Button>
+                <br></br>
+                <input
+                  type="checkbox"
+                  value={state.downloadChecked}
+                  checked={state.downloadChecked}
+                  onChange={() => onChangeDownloadChecked()}
+                />
+                &nbsp; Download "x" as SigMF Recording
               </Form.Group>
             </Form>
             <div className="display-linebreak">
