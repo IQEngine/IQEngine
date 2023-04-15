@@ -1,0 +1,14 @@
+# DO NOT include azure-functions-worker in this file
+# The Python Worker is managed by Azure Functions platform
+# Manually managing azure-functions-worker may cause unexpected issues
+
+azure-functions
+azure-storage-blob
+numpy
+matplotlib
+Pillow
+urllib3
+json5
+pymongo==4.2.0
+fastapi
+opencv-python
