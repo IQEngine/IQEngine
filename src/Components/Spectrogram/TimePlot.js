@@ -3,13 +3,14 @@
 // Licensed under the MIT License
 
 import Plot from 'react-plotly.js';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, setState } from 'react';
 import { template } from '../../Utils/plotlyTemplate';
 
 export const TimePlot = (props) => {
   let { currentSamples } = props;
   const [I, setI] = useState();
   const [Q, setQ] = useState();
+  const [plot, setPlot] = useState(null);
 
   useEffect(() => {
     if (currentSamples && currentSamples.length > 0) {
@@ -26,6 +27,31 @@ export const TimePlot = (props) => {
       );
     }
   }, [currentSamples]); // TODO make sure this isnt going to be sluggish when currentSamples is huge
+
+  // Should only happen once when page loads
+  useEffect(() => {
+    const options = {};
+    const tempPlot = new window.sigplot.Plot(document.getElementById('timePlot'), options);
+
+    var data = currentSamples; // the series of y-values
+    var data_header = {
+      xunits: 'Time',
+      //xstart: 100, // the start of the x-axis
+      xdelta: 1e-6, // TODO: USE SAMPLE RATE. the x-axis step between each data point
+      yunits: 'Sample',
+    };
+    var layer_options = {
+      name: 'I',
+    };
+    tempPlot.overlay_array(data, data_header, layer_options);
+
+    setPlot(tempPlot);
+  }, [currentSamples]);
+
+  useEffect(() => {
+    if (plot) {
+    }
+  }, [currentSamples]);
 
   if (!props.cursorsEnabled) {
     return (
@@ -71,6 +97,8 @@ export const TimePlot = (props) => {
           scrollZoom: true,
         }}
       />
+
+      <div style={{ width: '600px', height: '400px' }} id="timePlot"></div>
     </div>
   );
 };
