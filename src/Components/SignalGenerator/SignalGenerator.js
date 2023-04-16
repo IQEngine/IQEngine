@@ -12,6 +12,7 @@ import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import { examplesList } from './examples/exampleList';
 import Select from 'react-select';
+import InputGroup from 'react-bootstrap/InputGroup';
 
 export default function SignalGenerator(props) {
   const [state, setState] = useState({
@@ -304,29 +305,35 @@ print('NumPy Version:', numpy.version.version)
                 options={examplesList}
                 onChange={onChangeDropdown}
               />
-              <Form.Group className="mb-3" controlId="formPythonSnippet">
-                <CodeMirror
-                  value={state.pythonSnippet}
-                  height="700px"
-                  width="600px"
-                  extensions={[python()]}
-                  onChange={onChangePythonSnippet}
-                  theme={vscodeDark}
-                />
-                <br></br>
-                <Button variant="secondary" disabled={state.buttonDisabled} onClick={onSubmitPythonSnippet}>
-                  {state.buttonText}
-                </Button>
-                <br></br>
-                <input
+              <CodeMirror
+                value={state.pythonSnippet}
+                height="700px"
+                width="600px"
+                extensions={[python()]}
+                onChange={onChangePythonSnippet}
+                theme={vscodeDark}
+              />
+              <br></br>
+              <Button
+                className="mb-3"
+                variant="secondary"
+                disabled={state.buttonDisabled}
+                onClick={onSubmitPythonSnippet}
+              >
+                {state.buttonText}
+              </Button>
+              <br></br>
+              <InputGroup>
+                <Form.Check
                   type="checkbox"
                   value={state.downloadChecked}
                   checked={state.downloadChecked}
                   onChange={() => onChangeDownloadChecked()}
                 />
-                &nbsp; Download "x" as SigMF Recording
-              </Form.Group>
+                <Form.Label> &nbsp; Download "x" as SigMF Recording</Form.Label>
+              </InputGroup>
             </Form>
+            <br></br>
             <div className="display-linebreak">
               Error log: <br></br> {state.errorLog}
             </div>
