@@ -10,42 +10,12 @@ import CodeMirror from '@uiw/react-codemirror';
 import { python } from '@codemirror/lang-python';
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
+import { examplesList } from './examples/exampleList';
+import Select from 'react-select';
 
 export default function SignalGenerator(props) {
   const [state, setState] = useState({
-    pythonSnippet: `\
-import numpy as np
-import matplotlib.pyplot as plt
-import time
-
-# For a guide on DSP in Python check out www.pysdr.org
-
-N = 102400 # number of samples to simulate
-t = np.arange(N)
-tone = np.exp(2j*np.pi*0.15*t) # tone
-start_t = time.time() # measure how long this code takes
-
-sps = 8
-num_symbols = int(N/sps)
-bits = np.random.randint(0, 2, num_symbols) # Our data to be transmitted, 1's and 0's
-bpsk = np.array([])
-for bit in bits:
-    pulse = np.zeros(sps)
-    pulse[0] = bit*2-1 # set the first value to either a 1 or -1
-    bpsk = np.concatenate((bpsk, pulse)) # add the 8 samples to the signal
-num_taps = 101 # for our RRC filter
-beta = 0.35
-t = np.arange(num_taps) - (num_taps-1)//2
-h = np.sinc(t/sps) * np.cos(np.pi*beta*t/sps) / (1 - (2*beta*t/sps)**2)
-bpsk = np.convolve(bpsk, h) # Filter our signal, in order to apply the pulse shaping
-bpsk = bpsk[0:N] # bspk will be a few samples too long because of pulse shaping filter
-
-noise = np.random.randn(N) + 1j*np.random.randn(N)
-
-x = tone + bpsk + 0.1*noise
-
-print("elapsed time:", (time.time() - start_t)*1e3, 'ms')
-`,
+    pythonSnippet: examplesList[0].value,
     freqPlotSnippet: `\
 X = 10*np.log10(np.abs(np.fft.fftshift(np.fft.fft(x)))**2)
 f = np.linspace(-0.5, 0.5, len(X))
@@ -90,6 +60,7 @@ plt.ylabel("Time [s]")
     buttonText: 'Python Initializing...',
     currentTab: 'frequency',
     downloadChecked: false,
+    currentExample: 0,
   });
 
   const prePlot = `
@@ -187,6 +158,7 @@ for varname in list(globals().keys()):
         console.log('Initializing Pyodide');
         let pyodide = await window.loadPyodide();
         await pyodide.loadPackage('numpy');
+        await pyodide.loadPackage('scipy');
         await pyodide.loadPackage('matplotlib');
         pyodide.runPython(`
 import sys
@@ -289,6 +261,33 @@ print('NumPy Version:', numpy.version.version)
     setState({ ...state, downloadChecked: !state.downloadChecked });
   };
 
+  const onChangeDropdown = (v) => {
+    setState({ ...state, pythonSnippet: v.value });
+  };
+
+  // list of categories here https://react-select.com/styles#inner-components
+  const dropdownStyle = {
+    control: (base) => ({
+      ...base,
+      background: '#222222',
+    }),
+    menuList: (base) => ({
+      ...base,
+      background: '#222222',
+    }),
+    option: (base, state) => ({
+      ...base,
+      color: 'white',
+      // the one being highlighted at the moment
+      background: state.isFocused ? '#00bc8c' : '#222222',
+    }),
+    singleValue: (base) => ({
+      ...base,
+      // whats shown when you dont click the dropdown
+      color: 'white',
+    }),
+  };
+
   return (
     <div style={{ marginTop: '30px' }}>
       <Container>
@@ -299,6 +298,12 @@ print('NumPy Version:', numpy.version.version)
         <Row>
           <Col>
             <Form>
+              <Select
+                defaultValue={examplesList[0]}
+                styles={dropdownStyle}
+                options={examplesList}
+                onChange={onChangeDropdown}
+              />
               <Form.Group className="mb-3" controlId="formPythonSnippet">
                 <CodeMirror
                   value={state.pythonSnippet}
