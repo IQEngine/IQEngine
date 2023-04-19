@@ -31,7 +31,7 @@ const average = (array) => array.reduce((a, b) => a + b) / array.length;
 function calcFftOfTile(
   samples,
   fftSize,
-  num_ffts,
+  numFftsPerTile,
   windowFunction,
   magnitude_min,
   magnitude_max,
@@ -40,7 +40,7 @@ function calcFftOfTile(
   currentFftMin
 ) {
   let startTime = performance.now();
-  let newFftData = new Uint8ClampedArray(fftSize * num_ffts * 4);
+  let newFftData = new Uint8ClampedArray(fftSize * numFftsPerTile * 4); // 4 because RGBA
   let startOfs = 0;
   let autoMin;
   let autoMax;
@@ -48,7 +48,7 @@ function calcFftOfTile(
   let tempCurrentFftMin = currentFftMin;
 
   // loop through each row
-  for (let i = 0; i < num_ffts; i++) {
+  for (let i = 0; i < numFftsPerTile; i++) {
     let samples_slice = samples.slice(i * fftSize * 2, (i + 1) * fftSize * 2); // mult by 2 because this is int/floats not IQ samples
 
     // Apply a hamming window and hanning window
@@ -157,7 +157,7 @@ function calcFftOfTile(
 export const selectFft = (
   lowerTile,
   upperTile,
-  fftSize,
+  fftSize, // in units of IQ samples
   magnitudeMax,
   magnitudeMin,
   meta,
@@ -167,7 +167,7 @@ export const selectFft = (
   spectrogramHeight,
   autoscale = false
 ) => {
-  const num_ffts = TILE_SIZE_IN_IQ_SAMPLES / fftSize; // per tile
+  const numFftsPerTile = TILE_SIZE_IN_IQ_SAMPLES / fftSize;
   let magnitude_max = magnitudeMax;
   let magnitude_min = magnitudeMin;
   let tempCurrentFftMax = currentFftMax;
@@ -184,7 +184,7 @@ export const selectFft = (
         const { newFftData, autoMax, autoMin, newCurrentFftMax, newCurrentFftMin } = calcFftOfTile(
           samples,
           fftSize,
-          num_ffts,
+          numFftsPerTile,
           windowFunction,
           magnitude_min,
           magnitude_max,
@@ -205,27 +205,26 @@ export const selectFft = (
   }
 
   // Concatenate the full tiles
-  let totalFftData = new Uint8ClampedArray(tiles.length * fftSize * num_ffts * 4);
+  let totalFftData = new Uint8ClampedArray(tiles.length * fftSize * numFftsPerTile * 4); // 4 because RGBA
   let counter = 0; // can prob make this cleaner with an iterator in the for loop below
   for (let tile of tiles) {
     if (tile.toString() in window.fftData) {
       totalFftData.set(window.fftData[tile.toString()], counter);
-      counter = counter + window.fftData[tile.toString()].length;
     } else {
-      // If the first slice isnt availabel fill with ones
-      let fakeFftData = new Uint8ClampedArray(fftSize * num_ffts * 4);
+      // If the tile isnt available, fill with ones (white)
+      let fakeFftData = new Uint8ClampedArray(fftSize * numFftsPerTile * 4);
       fakeFftData.fill(255); // for debugging its better to have the alpha set to opaque so the missing part isnt invisible
       totalFftData.set(fakeFftData, counter);
-      counter = counter + fakeFftData.length;
     }
+    counter = counter + fftSize * numFftsPerTile * 4;
   }
 
   // Trim off the top and bottom
-  let lowerTrim = (lowerTile - Math.floor(lowerTile)) * fftSize * num_ffts; // amount we want to get rid of
-  lowerTrim = lowerTrim - (lowerTrim % fftSize);
-  let upperTrim = (1 - (upperTile - Math.floor(upperTile))) * fftSize * num_ffts; // amount we want to get rid of
+  let lowerTrim = (lowerTile - Math.floor(lowerTile)) * fftSize * numFftsPerTile; // amount we want to get rid of
+  lowerTrim = lowerTrim - (lowerTrim % fftSize); // make it an even FFT size. TODO We need this rounding to happen earlier, so we get a consistent 600 ffts in the image
+  let upperTrim = (1 - (upperTile - Math.floor(upperTile))) * fftSize * numFftsPerTile; // amount we want to get rid of
   upperTrim = upperTrim - (upperTrim % fftSize);
-  const trimmedFftData = totalFftData.slice(lowerTrim * 4, totalFftData.length - upperTrim * 4);
+  const trimmedFftData = totalFftData.slice(lowerTrim * 4, totalFftData.length - upperTrim * 4); // totalFftData.length already includes the *4
   const num_final_ffts = trimmedFftData.length / fftSize / 4;
 
   // Render Image
@@ -248,16 +247,15 @@ export const selectFft = (
     let sampleRate = meta.global['core:sample_rate'];
     window.sampleRate = sampleRate;
     let lower_freq = center_frequency - sampleRate / 2;
-    const mystery_factor = 0.75; // no idea where this comes from, was found empirically
     if (
-      (sample_start >= start_sample_index && sample_start * mystery_factor < stop_sample_index) ||
-      (sample_start + sample_count >= start_sample_index && sample_start * mystery_factor < stop_sample_index)
+      (sample_start >= start_sample_index && sample_start < stop_sample_index) ||
+      (sample_start + sample_count >= start_sample_index && sample_start < stop_sample_index)
     ) {
       annotations_list.push({
         x1: ((freq_lower_edge - lower_freq) / sampleRate) * fftSize, // left side. units are in fractions of an FFT size, e.g. 0-1024
         x2: ((freq_upper_edge - lower_freq) / sampleRate) * fftSize, // right side
-        y1: ((sample_start - start_sample_index) / fftSize) * mystery_factor, // top. NOTE SURE WHY I NEED THIS LAST TERM
-        y2: ((sample_start - start_sample_index + sample_count) / fftSize) * mystery_factor, // bottom. NOTE SURE WHY I NEED THIS LAST TERM
+        y1: (sample_start - start_sample_index) / fftSize, // top. NOTE SURE WHY I NEED THIS LAST TERM
+        y2: (sample_start - start_sample_index + sample_count) / fftSize, // bottom. NOTE SURE WHY I NEED THIS LAST TERM
         description: description,
         index: i, // so we can keep track of which annotation it was in the full list
       });
@@ -278,19 +276,21 @@ export const selectFft = (
 
 export function calculateTileNumbers(handleTop, blob, fftSize) {
   const { totalIQSamples } = blob;
-  const tileSizeInRows = TILE_SIZE_IN_IQ_SAMPLES / fftSize;
-  const totalNumFFTs = totalIQSamples / fftSize; // divide by 2 because IQ
-  const scrollBarHeight = 600; // TODO REPLACE ME WITH ACTUAL WINDOW HEIGHT
-  const handleFraction = scrollBarHeight / totalNumFFTs;
-  const handleHeightPixels = handleFraction * scrollBarHeight;
+  const tileSizeInRows = TILE_SIZE_IN_IQ_SAMPLES / fftSize; // remember, we are assuming that 1 row of pixels = 1 FFT
+  const totalNumFFTs = totalIQSamples / fftSize;
+  const spectrogramHeight = 600; // TODO REPLACE ME WITH ACTUAL WINDOW HEIGHT ONCE ITS NOT ALWAYS 600!
 
-  // Find which tiles are within view
-  const lowerTile = (totalNumFFTs / tileSizeInRows) * (handleTop / scrollBarHeight);
-  let upperTile = (totalNumFFTs / tileSizeInRows) * ((handleTop + handleHeightPixels) / scrollBarHeight);
+  // scrollbar handle size
+  const handleFraction = spectrogramHeight / totalNumFFTs;
+  const handleHeightPixels = handleFraction * spectrogramHeight;
 
-  // Make sure we dont try to fetch more than exists in the file
+  // Find which tiles are within view (in units of tiles incl fraction)
+  const lowerTile = (totalIQSamples / TILE_SIZE_IN_IQ_SAMPLES) * (handleTop / spectrogramHeight);
+  let upperTile = (totalIQSamples / TILE_SIZE_IN_IQ_SAMPLES) * ((handleTop + handleHeightPixels) / spectrogramHeight);
+
+  // Because we grab whole tiles at a time, we can't get the last partial tile without getting end-of-file errors, so just get the entire prev tile for now
   if (Math.ceil(upperTile) * tileSizeInRows > totalNumFFTs) {
-    upperTile = Math.floor(upperTile) - 1 + 0.9999; // show the whole tile but dont go to the next one, which would go past the end of the file
+    upperTile = Math.floor(upperTile) - 0.0001; // very end of the prev tile
   }
 
   return { lowerTile: lowerTile, upperTile: upperTile };
@@ -298,7 +298,7 @@ export function calculateTileNumbers(handleTop, blob, fftSize) {
 
 // mimicing python's range() function which gives array of integers between two values non-inclusive of end
 export function range(start, end) {
-  return Array.apply(0, Array(end - start + 1)).map((element, index) => index + start);
+  return Array.apply(0, Array(end - start)).map((element, index) => index + start);
 }
 
 export function dataTypeToBytesPerSample(dataType) {

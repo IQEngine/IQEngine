@@ -7,8 +7,7 @@ import { Layer, Rect } from 'react-konva';
 
 const TimeSelector = (props) => {
   const { spectrogramHeight, upperTile, lowerTile, handleTimeSelectionStart, handleTimeSelectionEnd } = props;
-
-  const tileDiff = upperTile - lowerTile;
+  const tileDiff = upperTile - lowerTile; // amount of samples displayed on the spectrogram in units of tiles
 
   const [startTileNum, setStartTileNum] = useState(lowerTile + 0.25 * tileDiff || 2);
   const [endTileNum, setEndTileNum] = useState(lowerTile + 0.75 * tileDiff || 7);
@@ -25,12 +24,12 @@ const TimeSelector = (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // dont put dep here
 
-  // Not start of the drag, its the sample-start bar
+  // Sample-start bar
   const handleDragMoveStart = (e) => {
     setStartTileNum(handleMovement(e));
   };
 
-  // Not end of the drag, its the sample-end bar
+  // Sample-end bar
   const handleDragMoveEnd = (e) => {
     setEndTileNum(handleMovement(e));
   };
@@ -41,7 +40,7 @@ const TimeSelector = (props) => {
     if (newY > spectrogramHeight - 2) newY = spectrogramHeight - 2;
     e.target.y(newY);
     e.target.x(0); // keep line in the same x location
-    return (newY / 600) * tileDiff + lowerTile;
+    return (newY / 600) * tileDiff + lowerTile; // FIXME: at some point the spectrogram wont always be 600 pixels tall!
   };
 
   return (
