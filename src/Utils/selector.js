@@ -276,22 +276,16 @@ export const selectFft = (
 
 export function calculateTileNumbers(handleTop, blob, fftSize) {
   const { totalIQSamples } = blob;
-  const tileSizeInRows = TILE_SIZE_IN_IQ_SAMPLES / fftSize; // remember, we are assuming that 1 row of pixels = 1 FFT
   const totalNumFFTs = totalIQSamples / fftSize;
   const spectrogramHeight = 600; // TODO REPLACE ME WITH ACTUAL WINDOW HEIGHT ONCE ITS NOT ALWAYS 600!
 
   // scrollbar handle size
-  const handleFraction = spectrogramHeight / totalNumFFTs;
+  const handleFraction = spectrogramHeight / totalNumFFTs; // remember, we are assuming that 1 row of pixels = 1 FFT
   const handleHeightPixels = handleFraction * spectrogramHeight;
 
   // Find which tiles are within view (in units of tiles incl fraction)
   const lowerTile = (totalIQSamples / TILE_SIZE_IN_IQ_SAMPLES) * (handleTop / spectrogramHeight);
   let upperTile = (totalIQSamples / TILE_SIZE_IN_IQ_SAMPLES) * ((handleTop + handleHeightPixels) / spectrogramHeight);
-
-  // Because we grab whole tiles at a time, we can't get the last partial tile without getting end-of-file errors, so just get the entire prev tile for now
-  if (Math.ceil(upperTile) * tileSizeInRows > totalNumFFTs) {
-    upperTile = Math.floor(upperTile) - 0.0001; // very end of the prev tile
-  }
 
   return { lowerTile: lowerTile, upperTile: upperTile };
 }
