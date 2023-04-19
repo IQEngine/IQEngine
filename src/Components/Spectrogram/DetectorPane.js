@@ -3,6 +3,7 @@
 // Licensed under the MIT License
 
 import React, { useState } from 'react';
+import { DETECTOR_ENDPOINT } from '../../Utils/constants';
 
 export const DetectorPane = (props) => {
   let { meta, handleMeta, cursorsEnabled, handleProcessTime } = props;
@@ -34,7 +35,7 @@ export const DetectorPane = (props) => {
       newSamps[i] = trimmedSamples[i]; // might want to do some math on ints here
     }
 
-    fetch('https://iqengine-azure-functions2.azurewebsites.net/detect/' + detectorName, {
+    fetch(DETECTOR_ENDPOINT + detectorName, {
       method: 'POST',
       headers: {
         Accept: 'application/json',

@@ -6,6 +6,8 @@ cd detectors
 uvicorn detector_api:app --reload
 ```
 
+IQEngine is currently set up to use http://127.0.0.1:8000/detect/ as the detection endpoint so as long as your uvicorn chose port 8000 you should be able to go to www.iqengine.org or run the webapp locally and using the detection menu will hit your locally running detector app.  
+
 To run the example call, install the vscode extension called "REST Client" then when you open the .http file there should be a "send request" button
 
 The way it works is the detector name must match the directory and .py file within that directory, for fastapi to see it (e.g. markos_detector/markos_detector.py).  It must also have the top-level function called detect with the following params:
