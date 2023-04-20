@@ -5,19 +5,9 @@ import numpy as np
 import time
 import json
 from pydantic.dataclasses import dataclass
-from pydantic import BaseModel
-import pydantic_numpy.dtype as pnd
-from pydantic_numpy import NDArray, NDArrayComplex64
-
-# https://github.com/cheind/pydantic-numpy
-class MyPydanticNumpyModel(BaseModel):
-    K: NDArray[pnd.complex64]
-    C: NDArrayComplex64
-
 
 @dataclass
 class Detector:
-    samples: MyPydanticNumpyModel = np.zeros(1)
     sample_rate: int = 0
     center_freq: int = 0
     # Your custom params are below, call them whatever you want
@@ -25,9 +15,9 @@ class Detector:
     param2: str = 'test2'
     param3: float = 5.67
 
-    def detect(self):
+    def detect(self, samples):
 
-        print(self.samples)
+        print(samples[0:10])
         print(self.sample_rate)
         print(self.center_freq)
         print(self.param1)
@@ -54,6 +44,11 @@ class Detector:
 
 
 if __name__ == "__main__":
+    params = {'sample_rate': 0, 'center_freq': 0, 'param1': 1, 'param2': 'test2', 'param3': 5.67}
+    Detector(**params)
+    print("worked")
+    exit()
+
     # Example of how to test your detector locally
     fname = "C:\\Users\\marclichtman\\Downloads\\synthetic"
     with open(fname + '.sigmf-meta', 'r') as f:

@@ -42,7 +42,6 @@ async def get_detect(detectorname: str):
         schema = copy.deepcopy(Detector.__pydantic_model__.schema()['properties'])
         del Detector
         # Remove the standard params
-        del schema['samples']
         del schema['sample_rate']
         del schema['center_freq']
         print(schema)
@@ -61,9 +60,10 @@ async def detect(info : fastapi.Request, detectorname):
         return {"status" : "FAILED - detector does not exist", "annotations": []}
 
     function_input = await info.json()
+    samples = function_input.pop("samples") # Assumed to be real or floats in IQIQIQIQ (cant send complex over JSON)
     print(function_input)
-    samples = function_input["samples"] # Assumed to be real or floats in IQIQIQIQ (cant send complex over JSON)
-    if not samples:
+
+    if not samples: 
         return {
         "status" : "FAILED",
         "annotations" : []
@@ -73,9 +73,9 @@ async def detect(info : fastapi.Request, detectorname):
         samples = samples[:-1]
     samples = samples[::2] + 1j*samples[1::2]
     samples = samples.astype(np.complex64)
-    function_input["samples"] = samples
-    DetectorInstance = Detector(function_input)
-    annotations = DetectorInstance.detect()
+
+    DetectorInstance = Detector(**function_input) # a way to provide params as a single dict
+    annotations = DetectorInstance.detect(samples)
     logging.info(annotations)
     return {
         "status" : "SUCCESS",
