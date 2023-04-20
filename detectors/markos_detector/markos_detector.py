@@ -9,8 +9,7 @@ import time
 import cv2 as cv
 import json
 
-def detect(samples, sample_rate, center_freq, detector_settings):
-    time_window_size = detector_settings.get('time_window_size', 10)
+def detect(samples, sample_rate, center_freq, time_window_size: 10, power_threshold_db: 20, time_margin_seconds: 0.001, min_bw):
     noise_params = get_noise_floor(samples, sample_rate, n_floor_window_bins=time_window_size)
     start_time = time.time()
     anots = highlight_energy(samples=samples,
@@ -18,10 +17,10 @@ def detect(samples, sample_rate, center_freq, detector_settings):
                              fft_size=1024,
                              window_size=time_window_size,
                              noise_power=noise_params['min_pwr'],
-                             pwr_thresh_db=detector_settings.get('power_threshold_db', 20),
-                             time_margin=detector_settings.get('time_margin_seconds', 0.001),
+                             pwr_thresh_db=power_threshold_db,
+                             time_margin=time_margin_seconds,
                              center_freq=center_freq,
-                             min_bw=detector_settings.get('min_bw', 10e3))
+                             min_bw=min_bw)
     print(f"detection took {time.time() - start_time} seconds")
 
     rects = []
@@ -183,7 +182,5 @@ if __name__ == "__main__":
     center_freq = meta_data["captures"][0]['core:frequency']
     samples = np.fromfile(fname + '.sigmf-data', dtype=np.complex64)
 
-    detector_settings = {'time_window_size': 10, 'power_threshold_db': 20, 'time_margin_seconds': 0.001, 'min_bw': 10e3}
-
-    annotations = detect(samples, sample_rate, center_freq, detector_settings)
+    annotations = detect(samples, sample_rate, center_freq, time_window_size=10, power_threshold_db=20, time_margin_seconds=0.001, min_bw=10e3)
     print(annotations)

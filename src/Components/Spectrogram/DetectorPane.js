@@ -2,16 +2,46 @@
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { DETECTOR_ENDPOINT } from '../../Utils/constants';
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
 
 export const DetectorPane = (props) => {
   let { meta, handleMeta, cursorsEnabled, handleProcessTime } = props;
 
-  const [detectorName, setDetectorName] = useState('markos_detector');
+  const [detectorList, setDetectorList] = useState([]);
+  const [selectedDetector, setSelectedDetector] = useState('default');
+  const [detectorParams, setDetectorParams] = useState({});
+  const [value, setValue] = useState(0); // integer state used to force rerender
+
+  // on component load perform a GET on /detectors to get list of detectors
+  useEffect(() => {
+    fetch(DETECTOR_ENDPOINT, { method: 'GET' })
+      .then(function (response) {
+        return response.json();
+      })
+      .then(function (data) {
+        console.log('Detectors:', data);
+        setDetectorList(data);
+      });
+  }, []);
 
   const handleChangeDetector = (e) => {
-    setDetectorName(e.target.value);
+    setSelectedDetector(e.target.value);
+    setDetectorParams({}); // in case something goes wrong
+    // Fetch the custom params for this detector
+    fetch(DETECTOR_ENDPOINT + e.target.value, { method: 'GET' })
+      .then(function (response) {
+        if (response.status === 404) {
+          return {};
+        }
+        return response.json();
+      })
+      .then(function (data) {
+        console.log('Detector Params:', data);
+        setDetectorParams(data);
+      });
   };
 
   const handleSubmit = (e) => {
@@ -35,18 +65,30 @@ export const DetectorPane = (props) => {
       newSamps[i] = trimmedSamples[i]; // might want to do some math on ints here
     }
 
-    fetch(DETECTOR_ENDPOINT + detectorName, {
+    let body = {
+      samples: newSamps,
+      sample_rate: sampleRate,
+      center_freq: freq,
+    };
+    // Add custom params
+    for (const [key, value] of Object.entries(detectorParams)) {
+      if (value['type'] === 'integer') {
+        body[key] = parseInt(value['default']); // remember, we updated default with whatever the user enters
+      } else if (value['type'] === 'number') {
+        body[key] = parseFloat(value['default']);
+      } else {
+        body[key] = value['default'];
+      }
+    }
+    console.log(body);
+
+    fetch(DETECTOR_ENDPOINT + selectedDetector, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        samples: newSamps,
-        sample_rate: sampleRate,
-        center_freq: freq,
-        detector_settings: {},
-      }),
+      body: JSON.stringify(body),
     })
       .then(function (response) {
         return response.json();
@@ -61,17 +103,48 @@ export const DetectorPane = (props) => {
       });
   };
 
+  const handleChange = (e) => {
+    detectorParams[e.target.name]['default'] = e.target.value; // the schema uses default so we'll just replace it with the new value
+    setDetectorParams(detectorParams);
+    setValue((value) => value + 1); // update state to force render
+  };
+
   return (
-    <form onSubmit={handleSubmit}>
-      <label>
-        Detector:
-        <select value={detectorName} onChange={handleChangeDetector}>
-          <option value="markos_detector">markos_detector</option>
-          <option value="placeholder1">placeholder1</option>
-          <option value="placeholder2">placeholder2</option>
-        </select>
-      </label>
-      <input type="submit" value="Submit" />
-    </form>
+    <Form className="detectForm" controlId="detectFormId" onSubmit={handleSubmit}>
+      <Form.Label>Detector:</Form.Label>
+      <select value={selectedDetector} onChange={handleChangeDetector}>
+        <option disabled value="default">
+          Select a Detector
+        </option>
+        {detectorList.map((detectorName, index) => (
+          <option key={index} value={detectorName}>
+            {detectorName}
+          </option>
+        ))}
+      </select>
+      {Object.keys(detectorParams).length > 0 && (
+        <>
+          <Form.Label>Params:</Form.Label>
+          <br></br>{' '}
+          <Form.Group className="mb-3">
+            {Object.keys(detectorParams).map((key, index) => (
+              <Form.Label key={index}>
+                {detectorParams[key]['title']} - {detectorParams[key]['type']}
+                <Form.Control
+                  type="text"
+                  name={key}
+                  value={detectorParams[key]['default']}
+                  onChange={handleChange}
+                  className="form-control"
+                />
+              </Form.Label>
+            ))}
+          </Form.Group>
+          <Button type="submit" variant="primary">
+            Run Detector
+          </Button>
+        </>
+      )}
+    </Form>
   );
 };

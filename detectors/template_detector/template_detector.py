@@ -4,26 +4,53 @@
 import numpy as np
 import time
 import json
+from pydantic.dataclasses import dataclass
+from pydantic import BaseModel
+import pydantic_numpy.dtype as pnd
+from pydantic_numpy import NDArray, NDArrayComplex64
 
-def detect(samples, sample_rate, center_freq, detector_settings): # dont change anything on this line
+# https://github.com/cheind/pydantic-numpy
+class MyPydanticNumpyModel(BaseModel):
+    K: NDArray[pnd.complex64]
+    C: NDArrayComplex64
 
-    # Your detection (and optionally, classification) code here
-    
-    # Make sure detector_settings is a dict with key/value pairs, only 1 layer deep (no values that are a dict themselves)
 
-    # For the return, make a list, then for each detected emission, add one of these dicts to the list:   
-    annotations = []
+@dataclass
+class Detector:
+    samples: MyPydanticNumpyModel = np.zeros(1)
+    sample_rate: int = 0
+    center_freq: int = 0
+    # Your custom params are below, call them whatever you want
+    param1: int = 1
+    param2: str = 'test2'
+    param3: float = 5.67
 
-    an = {}
-    an['core:freq_lower_edge'] = 1 # Hz
-    an['core:freq_upper_edge'] = 2 # Hz
-    an['core:sample_start'] = 3
-    an['core:sample_count'] = 4
-    an["core:description"] = "Unknown"
+    def detect(self):
 
-    annotations.append(an)
+        print(self.samples)
+        print(self.sample_rate)
+        print(self.center_freq)
+        print(self.param1)
+        print(self.param2)
+        print(self.param3)
 
-    return annotations
+        # Your detection (and optionally, classification) code here
+        
+        # Make sure detector_settings is a dict with key/value pairs, only 1 layer deep (no values that are a dict themselves)
+
+        # For the return, make a list, then for each detected emission, add one of these dicts to the list:   
+        annotations = []
+
+        an = {}
+        an['core:freq_lower_edge'] = 1 # Hz
+        an['core:freq_upper_edge'] = 2 # Hz
+        an['core:sample_start'] = 3
+        an['core:sample_count'] = 4
+        an["core:description"] = "Unknown"
+
+        annotations.append(an)
+
+        return annotations
 
 
 if __name__ == "__main__":

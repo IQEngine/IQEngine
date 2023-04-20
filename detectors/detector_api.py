@@ -3,6 +3,7 @@ import fastapi
 import numpy as np
 from fastapi.middleware.cors import CORSMiddleware
 import os
+import copy
 
 app = fastapi.FastAPI()
 
@@ -21,39 +22,46 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/sample")
-async def index():
-    return {
-        "info": "Try /hello/Shivani for parameterized route.",
-    }
+@app.get("/detectors")
+async def get_detector_list():
+    # This just looks at the list of dirs to figure out the detectors available, each dir is assumed to be 1 detector
+    dirs = []
+    for file in os.listdir('.'):
+        d = os.path.join('.', file)
+        if os.path.isdir(d):
+            dirs.append(file)
+    dirs.remove('__pycache__')
+    dirs.remove('azure_functions')
+    return(dirs)
 
-@app.get("/hello/{name}")
-async def get_name(name: str):
-    return {
-        "name": name,
-    }
-
-@app.get("/detect/{detectorname}")
+@app.get("/detectors/{detectorname}")
 async def get_detect(detectorname: str):
-    logging.info("got here")
     try:
-        detect_func = getattr(__import__(detectorname + '.' + detectorname, fromlist=["detect"]), "detect")
-        logging.info("loaded detector")
-    except ModuleNotFoundError as e:
-        return {"status" : "FAILED - detector does not exist", "annotations": []}
-    return {
-        "detectorname": detectorname,
-    }
+        print('detectorname:', detectorname)
+        Detector = getattr(__import__(detectorname + '.' + detectorname, fromlist=["Detector"]), "Detector")
+        schema = copy.deepcopy(Detector.__pydantic_model__.schema()['properties'])
+        del Detector
+        # Remove the standard params
+        del schema['samples']
+        del schema['sample_rate']
+        del schema['center_freq']
+        print(schema)
+        return(schema)
+    except AttributeError:
+        raise fastapi.HTTPException(status_code=404, detail="Detector schema could not be generated")
+    except KeyError as err:
+        print(err)
 
-@app.post("/detect/{detectorname}")
+@app.post("/detectors/{detectorname}")
 async def detect(info : fastapi.Request, detectorname):
     try:
-        detect_func = getattr(__import__(detectorname + '.' + detectorname, fromlist=["detect"]), "detect")
+        Detector = getattr(__import__(detectorname + '.' + detectorname, fromlist=["Detector"]), "Detector")
         logging.info("loaded detector")
     except ModuleNotFoundError as e:
         return {"status" : "FAILED - detector does not exist", "annotations": []}
 
     function_input = await info.json()
+    print(function_input)
     samples = function_input["samples"] # Assumed to be real or floats in IQIQIQIQ (cant send complex over JSON)
     if not samples:
         return {
@@ -65,10 +73,9 @@ async def detect(info : fastapi.Request, detectorname):
         samples = samples[:-1]
     samples = samples[::2] + 1j*samples[1::2]
     samples = samples.astype(np.complex64)
-    annotations = detect_func(samples,
-                              function_input.get("sample_rate", 1),
-                              function_input.get("center_freq", 0),
-                              function_input.get("detector_settings",{}))
+    function_input["samples"] = samples
+    DetectorInstance = Detector(function_input)
+    annotations = DetectorInstance.detect()
     logging.info(annotations)
     return {
         "status" : "SUCCESS",
