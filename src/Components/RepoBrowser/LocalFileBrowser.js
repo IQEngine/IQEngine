@@ -44,6 +44,8 @@ async function handleDirectoryEntry(handle, out, dir) {
 const LocalFileBrowser = (props) => {
   const navigate = useNavigate();
 
+  const directoryPickerAvailable = typeof window.showDirectoryPicker !== 'undefined'; // not all browsers support it yet
+
   const openFile = async () => {
     const [handle1, handle2] = await window.showOpenFilePicker({ multiple: true });
     const file1 = await handle1.getFile();
@@ -77,11 +79,15 @@ const LocalFileBrowser = (props) => {
       <Card.Header>Browse Local Files</Card.Header>
       <Card.Body className="cardBodyCenter">
         <center>
-          <Button onClick={openDir} style={styleMargin} variant="success">
-            Open Local Directory
-          </Button>
-          <br />
-          OR
+          {directoryPickerAvailable && (
+            <>
+              <Button onClick={openDir} style={styleMargin} variant="success">
+                Open Local Directory
+              </Button>
+              <br />
+              OR
+            </>
+          )}
           <br />
           <Button onClick={openFile} style={styleMargin} variant="success">
             Select 1 .sigmf-meta
