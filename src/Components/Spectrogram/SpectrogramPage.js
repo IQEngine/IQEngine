@@ -54,8 +54,8 @@ class SpectrogramPage extends Component {
       skipNFfts: null,
       spectrogramHeight: 600,
       spectrogramWidth: 600,
-      timeSelectionStart: 0,
-      timeSelectionEnd: 10,
+      timeSelectionStart: 0, // in units of tiles
+      timeSelectionEnd: 10, // in units of tiles
       cursorsEnabled: false,
       currentFftMax: -999999,
       currentFftMin: 999999,
@@ -221,10 +221,10 @@ class SpectrogramPage extends Component {
   };
 
   handleProcessTime = () => {
-    const { timeSelectionStart, timeSelectionEnd } = this.state; // these 2 are in units of tile
+    const { timeSelectionStart, timeSelectionEnd } = this.state; // these 2 are in units of tile (incl fraction of a tile)
 
     // Concatenate and trim the IQ Data associated with this range of samples
-    const tiles = range(Math.floor(timeSelectionStart), Math.ceil(timeSelectionEnd)); //non-inclusive of end
+    const tiles = range(Math.floor(timeSelectionStart), Math.ceil(timeSelectionEnd)); //non-inclusive of end, e.g. if it ends with tile 7.2 we only want tile 7 not 8
     let bufferLen = tiles.length * TILE_SIZE_IN_IQ_SAMPLES * 2; // number of floats
 
     let currentSamples = new Float32Array(bufferLen);
@@ -232,18 +232,16 @@ class SpectrogramPage extends Component {
     for (let tile of tiles) {
       if (tile.toString() in window.iqData) {
         currentSamples.set(window.iqData[tile.toString()], counter);
-        counter = counter + TILE_SIZE_IN_IQ_SAMPLES * 2; // in floats
       } else {
         console.log('Dont have iqData of tile', tile, 'yet');
       }
+      counter = counter + TILE_SIZE_IN_IQ_SAMPLES * 2; // in floats
     }
 
     // Trim off the top and bottom
-    let lowerTrim = Math.floor((timeSelectionStart - Math.floor(timeSelectionStart)) * TILE_SIZE_IN_IQ_SAMPLES * 2); // floats to get rid of
-    if (lowerTrim % 2 === 1) lowerTrim = lowerTrim + 1; // for I to be first in IQ
-    let upperTrim = Math.floor((timeSelectionEnd - Math.floor(timeSelectionEnd)) * TILE_SIZE_IN_IQ_SAMPLES * 2); // floats to get rid of
-    if (upperTrim % 2 === 1) upperTrim = upperTrim + 1; // for I to be first in IQ
-    const trimmedSamples = currentSamples.slice(lowerTrim, bufferLen - upperTrim);
+    let lowerTrim = Math.floor((timeSelectionStart - Math.floor(timeSelectionStart)) * TILE_SIZE_IN_IQ_SAMPLES * 2); // floats to get rid of at start
+    let upperTrim = Math.floor((1 - (timeSelectionEnd - Math.floor(timeSelectionEnd))) * TILE_SIZE_IN_IQ_SAMPLES * 2); // floats to get rid of at end
+    const trimmedSamples = currentSamples.slice(lowerTrim, bufferLen - upperTrim); // slice uses (start, end]
     this.setState({ currentSamples: trimmedSamples });
 
     const startSampleOffset = timeSelectionStart * TILE_SIZE_IN_IQ_SAMPLES; // in IQ samples
@@ -402,7 +400,7 @@ class SpectrogramPage extends Component {
 
     // If we already have too many pending fetches then bail
     if (blob.numActiveFetches > MAX_SIMULTANEOUS_FETCHES) {
-      console.log('Hit limit of simultaenous fetches!');
+      console.log('Hit limit of simultaneous fetches!');
       return false;
     }
 
@@ -523,8 +521,8 @@ class SpectrogramPage extends Component {
                           <TimeSelector
                             spectrogramWidth={spectrogramWidth}
                             spectrogramHeight={spectrogramHeight}
-                            upperTile={parseInt(upperTile)}
-                            lowerTile={parseInt(lowerTile)}
+                            upperTile={upperTile}
+                            lowerTile={lowerTile}
                             handleTimeSelectionStart={this.handleTimeSelectionStart}
                             handleTimeSelectionEnd={this.handleTimeSelectionEnd}
                           />

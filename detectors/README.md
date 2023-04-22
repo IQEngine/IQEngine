@@ -6,15 +6,13 @@ cd detectors
 uvicorn detector_api:app --reload
 ```
 
+IQEngine is currently set up to use http://127.0.0.1:8000/detectors/ as the detection endpoint so as long as your uvicorn chose port 8000 you should be able to go to www.iqengine.org or run the webapp locally and using the detection menu will hit your locally running detector app.  
+
 To run the example call, install the vscode extension called "REST Client" then when you open the .http file there should be a "send request" button
 
-The way it works is the detector name must match the directory and .py file within that directory, for fastapi to see it (e.g. markos_detector/markos_detector.py).  It must also have the top-level function called detect with the following params:
-```
-detect(samples, sample_rate, center_freq, detector_settings)
-```
-where samples is a 1D numpy array of complex64,  sample_rate/center_freq are scalars in Hz, and detector_settings is a dictionary for your custom detector settings that is only 1 level deep (i.e. a python dict full of key/value pairs).  The return of detect() must be a list of SigMF annotations, see markos_detector.py for an example (it also helps to reference the annotations part of the SigMF standard).  Aside from that detect() function you can organize your detector code however you want.
+The way it works is the detector name must match the directory and .py file within that directory, for fastapi to see it (e.g. markos_detector/markos_detector.py).  
 
-TODO: instructions for how to make your own detector
+See the template_detector for how the input and outputs of the function work, if you want to create your own detector.
 
 ## Notes
 

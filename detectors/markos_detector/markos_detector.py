@@ -1,4 +1,5 @@
-# Copyright (c) Microsoft Corporation.
+# Copyright (c) 2022 Microsoft Corporation.
+# Copyright (c) 2023 Marc Lichtman.
 # Licensed under the MIT License.
 
 import numpy as np
@@ -8,32 +9,42 @@ from collections import deque
 import time
 import cv2 as cv
 import json
+from pydantic.dataclasses import dataclass
 
-def detect(samples, sample_rate, center_freq, detector_settings):
-    time_window_size = detector_settings.get('time_window_size', 10)
-    noise_params = get_noise_floor(samples, sample_rate, n_floor_window_bins=time_window_size)
-    start_time = time.time()
-    anots = highlight_energy(samples=samples,
-                             samp_rate=sample_rate,
-                             fft_size=1024,
-                             window_size=time_window_size,
-                             noise_power=noise_params['min_pwr'],
-                             pwr_thresh_db=detector_settings.get('power_threshold_db', 20),
-                             time_margin=detector_settings.get('time_margin_seconds', 0.001),
-                             center_freq=center_freq,
-                             min_bw=detector_settings.get('min_bw', 10e3))
-    print(f"detection took {time.time() - start_time} seconds")
+@dataclass
+class Detector:
+    sample_rate: int = 0
+    center_freq: int = 0
+    # Your custom params are below, call them whatever you want
+    time_window_size: int = 10
+    power_threshold_db: float = 20.0
+    time_margin_seconds: float = 0.001
+    min_bw: float = 10e3
 
-    rects = []
-    for a in anots:
-        td = {'start_samp':a['core:sample_start'],'end_samp':a['core:sample_start']+a['core:sample_count'],'start_freq':a['core:freq_lower_edge']-center_freq,'end_freq': a['core:freq_upper_edge']-center_freq, 'min_pwr':123}
-        rects.append(td)
+    def detect(self, samples):
+        noise_params = get_noise_floor(samples, self.sample_rate, n_floor_window_bins=self.time_window_size)
+        start_time = time.time()
+        anots = highlight_energy(samples=samples,
+                                samp_rate=self.sample_rate,
+                                fft_size=1024,
+                                window_size=self.time_window_size,
+                                noise_power=noise_params['min_pwr'],
+                                pwr_thresh_db=self.power_threshold_db,
+                                time_margin=self.time_margin_seconds,
+                                center_freq=self.center_freq,
+                                min_bw=self.min_bw)
+        print(f"detection took {time.time() - start_time} seconds")
 
-    # Creates spectrogram with rectangles and saves to png file
-    if False:
-        plot_spectrogram(samples, sample_rate, rects)
+        rects = []
+        for a in anots:
+            td = {'start_samp':a['core:sample_start'],'end_samp':a['core:sample_start']+a['core:sample_count'],'start_freq':a['core:freq_lower_edge']-self.center_freq,'end_freq': a['core:freq_upper_edge']-self.center_freq, 'min_pwr':123}
+            rects.append(td)
 
-    return anots
+        # Creates spectrogram with rectangles and saves to png file
+        if False:
+            plot_spectrogram(samples, sample_rate, rects)
+
+        return anots
 
 def get_noise_floor(samps, sample_rate, fft_size=1024, n_floor_window_bins=10, n_random_spots=5):
     # this function does an fft of size {fft_size} at {n_random_spots} different locations
@@ -183,7 +194,5 @@ if __name__ == "__main__":
     center_freq = meta_data["captures"][0]['core:frequency']
     samples = np.fromfile(fname + '.sigmf-data', dtype=np.complex64)
 
-    detector_settings = {'time_window_size': 10, 'power_threshold_db': 20, 'time_margin_seconds': 0.001, 'min_bw': 10e3}
-
-    annotations = detect(samples, sample_rate, center_freq, detector_settings)
+    annotations = detect(samples, sample_rate, center_freq, time_window_size=10, power_threshold_db=20, time_margin_seconds=0.001, min_bw=10e3)
     print(annotations)

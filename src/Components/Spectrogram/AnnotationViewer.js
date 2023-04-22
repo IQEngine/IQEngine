@@ -28,11 +28,8 @@ const AnnotationViewer = (props) => {
     const f = annotations[annot_indx]['index']; // remember there are 2 different indexes- the ones on the screen and the meta.annotations
     let updatedAnnotations = [...props.meta.annotations];
     let start_sample_index = lowerTile * TILE_SIZE_IN_IQ_SAMPLES;
-    const mystery_factor = 0.75; // no idea where this comes from, was found empirically
-    updatedAnnotations[f]['core:sample_start'] =
-      (annotations[annot_indx].y1 / mystery_factor) * fftSize + start_sample_index;
-    updatedAnnotations[f]['core:sample_count'] =
-      ((annotations[annot_indx].y2 - annotations[annot_indx].y1) / mystery_factor) * fftSize;
+    updatedAnnotations[f]['core:sample_start'] = annotations[annot_indx].y1 * fftSize + start_sample_index;
+    updatedAnnotations[f]['core:sample_count'] = (annotations[annot_indx].y2 - annotations[annot_indx].y1) * fftSize;
     let lower_freq = meta.captures[0]['core:frequency'] - meta.global['core:sample_rate'] / 2;
     updatedAnnotations[f]['core:freq_lower_edge'] =
       (annotations[annot_indx].x1 / fftSize) * meta.global['core:sample_rate'] + lower_freq;
@@ -67,11 +64,8 @@ const AnnotationViewer = (props) => {
     const f = updatedAnnotations.length - 1;
     const annot_indx = annotations.length - 1;
     let start_sample_index = lowerTile * TILE_SIZE_IN_IQ_SAMPLES;
-    const mystery_factor = 0.75; // no idea where this comes from, was found empirically
-    updatedAnnotations[f]['core:sample_start'] =
-      (annotations[annot_indx].y1 / mystery_factor) * fftSize + start_sample_index;
-    updatedAnnotations[f]['core:sample_count'] =
-      ((annotations[annot_indx].y2 - annotations[annot_indx].y1) / mystery_factor) * fftSize;
+    updatedAnnotations[f]['core:sample_start'] = annotations[annot_indx].y1 * fftSize + start_sample_index;
+    updatedAnnotations[f]['core:sample_count'] = (annotations[annot_indx].y2 - annotations[annot_indx].y1) * fftSize;
     let lower_freq = meta.captures[0]['core:frequency'] - meta.global['core:sample_rate'] / 2;
     updatedAnnotations[f]['core:freq_lower_edge'] =
       (annotations[annot_indx].x1 / fftSize) * meta.global['core:sample_rate'] + lower_freq;
