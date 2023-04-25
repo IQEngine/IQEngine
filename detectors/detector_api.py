@@ -11,7 +11,8 @@ origins = [
     "http://localhost",
     "http://localhost:3000",
     "http://localhost:3001",
-    "http://localhost:8000"
+    "http://localhost:8000",
+    "https://www.iqengine.org"
 ]
 
 app.add_middleware(
