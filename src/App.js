@@ -5,17 +5,14 @@
 import React, { useEffect } from 'react';
 import '@fortawesome/react-fontawesome';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Routes, Route, useLocation } from 'react-router-dom';
-import RepoBrowserContainer from './Containers/RepoBrowserContainer';
-import SpectrogramContainer from './Containers/SpectrogramContainer';
-import SignalGenerator from './Components/SignalGenerator/SignalGenerator';
-import RecordingsListContainer from './Containers/RecordingsListContainer';
+import 'bootswatch/dist/darkly/bootstrap.min.css'; // needs to come before any css imports
+import { useLocation } from 'react-router-dom';
 import { Navbar, Row, Col } from 'react-bootstrap';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
-import { About } from './About';
-import { Plugins } from './Plugins';
 import ReactGA from 'react-ga4';
+import { Outlet } from "react-router-dom";
+import './index.css';
 import { RedocStandalone } from 'redoc';
 import { redocTheme } from './Utils/redocTheme';
 
@@ -24,7 +21,7 @@ if (process.env.GOOGLE_ANALYTICS_KEY) {
   ReactGA.initialize(process.env.GOOGLE_ANALYTICS_KEY);
 }
 
-const App = () => {
+export const App = () => {
   // Set up google analytics (if enabled) to only share the page path (does not include names of local files)
   const location = useLocation();
   useEffect(() => {
@@ -87,17 +84,18 @@ const App = () => {
         <Route path="/about" element={<About />} />
         <Route path="/siggen" element={<SignalGenerator />} />
         <Route path="/plugins" element={<Plugins />} />
-        <Route path="/openapi" element={<RedocStandalone 
+        <Route path="/openapi" element={<RedocStandalone
           options={{
             disableSidebar: false,
             theme: redocTheme,
             hideDownloadButton: true,
           }}
-           specUrl="https://raw.githubusercontent.com/IQEngine/IQEngine/main/detectors/openapi.yaml" />} />
+          specUrl="https://raw.githubusercontent.com/IQEngine/IQEngine/main/detectors/openapi.yaml" />} />
         <Route exact path="/" element={<RepoBrowserContainer />} />
         <Route path="/recordings/spectrogram/:recording" element={<SpectrogramContainer />} />
         <Route path="/recordings/:accountName?/:containerName?/:sasToken?" element={<RecordingsListContainer />} />
       </Routes>
+      <Outlet />
 
       {/* TODO Figure out how to use mailerlites embedded form*/}
       <div className="container">
@@ -116,4 +114,5 @@ const App = () => {
     </div>
   );
 };
+
 export default App;
