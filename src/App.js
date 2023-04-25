@@ -1,10 +1,9 @@
 // Copyright (c) 2022 Microsoft Corporation
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
-
 import React, { useEffect } from 'react';
 import '@fortawesome/react-fontawesome';
-import 'bootstrap/dist/css/bootstrap.min.css';
+// import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootswatch/dist/darkly/bootstrap.min.css'; // needs to come before any css imports
 import { useLocation } from 'react-router-dom';
 import { Navbar, Row, Col } from 'react-bootstrap';

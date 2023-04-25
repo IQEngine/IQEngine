@@ -5,8 +5,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import 'bootstrap/dist/css/bootstrap.min.css';
-// @ts-ignore
-import { App } from './App';
+
 // @ts-ignore
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
@@ -31,7 +30,8 @@ import RepoBrowserContainer from './Containers/RepoBrowserContainer';
 import SpectrogramContainer from './Containers/SpectrogramContainer';
 // @ts-ignore
 import RecordingsListContainer from './Containers/RecordingsListContainer';
-
+// @ts-ignore
+import { App } from './App';
 // @ts-ignore
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -39,12 +39,12 @@ root.render(
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<App />}>
-          <Route path="/about" element={<About />} />
-          <Route path="/siggen" element={<SignalGenerator />} />
-          <Route path="/plugins" element={<Plugins />} />
+          <Route path="about" element={<About />} />
+          <Route path="siggen" element={<SignalGenerator />} />
+          <Route path="plugins" element={<Plugins />} />
           <Route path="/" element={<RepoBrowserContainer />} />
-          <Route path="/recordings/spectrogram/:recording" element={<SpectrogramContainer />} />
-          <Route path="/recordings/:accountName?/:containerName?/:sasToken?" element={<RecordingsListContainer />} />
+          <Route path="recordings/spectrogram/:recording" element={<SpectrogramContainer />} />
+          <Route path="recordings/:accountName?/:containerName?/:sasToken?" element={<RecordingsListContainer />} />
         </Route>
         <Route path="/v2" element={<Layout />} >
           <Route path="/v2/" element={<Home />} />

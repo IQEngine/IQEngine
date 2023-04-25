@@ -8,6 +8,7 @@ import Spinner from 'react-bootstrap/Spinner';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { useLocation, useSearchParams } from 'react-router-dom';
 
+
 function isFolder(file) {
   return file.name.endsWith('/');
 }
