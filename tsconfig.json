@@ -22,7 +22,8 @@
       "esModuleInterop": true,
       "suppressImplicitAnyIndexErrors": true,
       "allowSyntheticDefaultImports": true,
-      "experimentalDecorators": true
+      "experimentalDecorators": true,
+      "resolveJsonModule": true,
     },
     "include": ["src/**/*"],
     "exclude": ["node_modules", "build", "scripts"]
