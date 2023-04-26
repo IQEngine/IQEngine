@@ -1,5 +1,4 @@
 import * as React from "react";
-import Nav from 'react-bootstrap/Nav';
 
 function Footer() {
   return (
@@ -19,23 +18,23 @@ function Footer() {
     <div className="col mb-3">
       <h5>IQEngine</h5>
       <ul className="nav flex-column">
-        <li className="nav-item mb-2"><Nav.Link href="/v2/" className="nav-link p-0 text-body-secondary">Home</Nav.Link></li>
-        <li className="nav-item mb-2"><Nav.Link href="/v2/about" className="nav-link p-0 text-body-secondary">About</Nav.Link></li>
-        <li className="nav-item mb-2"><Nav.Link href="https://github.com/IQEngine/IQEngine" className="nav-link p-0 text-body-secondary">Github</Nav.Link></li>
+        <li className="nav-item mb-2"><a href="/v2/" className="nav-link p-0 text-body-secondary">Home</a></li>
+        <li className="nav-item mb-2"><a href="/v2/about" className="nav-link p-0 text-body-secondary">About</a></li>
+        <li className="nav-item mb-2"><a href="https://github.com/IQEngine/IQEngine" className="nav-link p-0 text-body-secondary">Github</a></li>
       </ul>
     </div>
 
     <div className="col mb-3">
       <h5>Admin</h5>
       <ul className="nav flex-column">
-        <li className="nav-item mb-2"><Nav.Link href="/v2/admin" className="nav-link p-0 text-body-secondary">Admin</Nav.Link></li>
+        <li className="nav-item mb-2"><a href="/v2/admin" className="nav-link p-0 text-body-secondary">Admin</a></li>
       </ul>
     </div>
 
     <div className="col mb-3">
       <h5>Upload</h5>
       <ul className="nav flex-column">
-        <li className="nav-item mb-2"><Nav.Link href="/v2/upload" className="nav-link p-0 text-body-secondary">Upload</Nav.Link></li>
+        <li className="nav-item mb-2"><a href="/v2/upload" className="nav-link p-0 text-body-secondary">Upload</a></li>
       </ul>
     </div>
   </footer>
