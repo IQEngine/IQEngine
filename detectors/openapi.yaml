@@ -76,31 +76,28 @@ paths:
             schema:
               type: object
               properties:
-                testapi:
-                  type: object
-                  properties:
-                    samples: # IQ samples but as an array of floats or ints, in form IQIQIQIQ...
-                      example: [1, 2, 3, 4, 5, 6] # means [1+2j, 3+4j, 5+6j], can be ints or floats
-                      type: array
-                      items:
-                        anyOf:
-                          - type: number
-                          - type: integer
-                    sample_rate:
-                      type: number
-                    center_freq:
-                      type: number
-                    additionalProperties: # Custom params
-                      anyOf:
-                        # Should always match GET above
-                        - type: string
-                        - type: number # (float)
-                        - type: integer
-                        - type: boolean
-                  required:
-                    - samples
-                    - sample_rate
-                    - center_freq
+                samples: # IQ samples but as an array of floats or ints, in form IQIQIQIQ...
+                  example: [1, 2, 3, 4, 5, 6] # means [1+2j, 3+4j, 5+6j], can be ints or floats
+                  type: array
+                  items:
+                    anyOf:
+                      - type: number
+                      - type: integer
+                sample_rate:
+                  type: number
+                center_freq:
+                  type: number
+                additionalProperties: # Custom params
+                  anyOf:
+                    # Should always match GET above
+                    - type: string
+                    - type: number # (float)
+                    - type: integer
+                    - type: boolean
+              required:
+                - samples
+                - sample_rate
+                - center_freq
       responses:
         "400":
           description: Bad request. Detector does not exist.
