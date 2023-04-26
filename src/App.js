@@ -80,7 +80,7 @@ const App = () => {
             theme: redocTheme,
             hideDownloadButton: true,
           }}
-           specUrl="https://raw.githubusercontent.com/IQEngine/IQEngine/3bbbb60a1bd78c16a87ed1c3ce86adc367cb19b5/detectors/openapi.yaml" />} />
+           specUrl="https://raw.githubusercontent.com/IQEngine/IQEngine/main/detectors/openapi.yaml" />} />
         <Route exact path="/" element={<RepoBrowserContainer />} />
         <Route path="/recordings/spectrogram/:recording" element={<SpectrogramContainer />} />
         <Route path="/recordings/:accountName?/:containerName?/:sasToken?" element={<RecordingsListContainer />} />
