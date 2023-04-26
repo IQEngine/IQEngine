@@ -1,6 +1,5 @@
 import React from "react";
 import { SourceObject } from "./Source";
-import Nav from "react-bootstrap/esm/Nav";
 
 interface SourceCardsProps {
     sources: SourceObject[]
@@ -10,7 +9,7 @@ interface SourceCardsProps {
 const SourcesCards = ({ sources }: SourceCardsProps) => {
     return (
         <>
-            <h2 className="pb-2 border-bottom">Collections</h2>
+            <h2 className="text-3xl font-bold underline">Collections</h2>
             <div className="row g-4 py-5 row-cols-1 row-cols-lg-3">
                 {sources.map((source) => (
                     <div className="feature col">
@@ -19,7 +18,7 @@ const SourcesCards = ({ sources }: SourceCardsProps) => {
                         </div>
                         <h3 className="fs-2">{source.name}</h3>
                         <p>{source.description}</p>
-                        <Nav.Link href={`/v2/source/${source.id}`} className="btn btn-primary">Details </Nav.Link>
+                        <a href={`/v2/source/${source.id}`} className="btn btn-primary">Details </a>
                     </div>
                 ))}
             </div>

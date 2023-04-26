@@ -20,7 +20,6 @@
       "baseUrl": "src",
       "forceConsistentCasingInFileNames": true,
       "esModuleInterop": true,
-      "suppressImplicitAnyIndexErrors": true,
       "allowSyntheticDefaultImports": true,
       "experimentalDecorators": true,
       "resolveJsonModule": true,

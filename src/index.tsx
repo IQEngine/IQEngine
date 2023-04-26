@@ -4,7 +4,6 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import 'bootstrap/dist/css/bootstrap.min.css';
 
 // @ts-ignore
 import reportWebVitals from './reportWebVitals';
@@ -34,25 +33,33 @@ import RecordingsListContainer from './Containers/RecordingsListContainer';
 import { App } from './App';
 // @ts-ignore
 const root = ReactDOM.createRoot(document.getElementById('root'));
+var new_version: boolean = false
+// Select wich version to run based on an environment variable
+if (process.env.REACT_APP_IQENGINE_APP_VERSION === 'v2') {
+  new_version = true
+}
+
 root.render(
   <Provider store={store}>
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<App />}>
-          <Route path="about" element={<About />} />
-          <Route path="siggen" element={<SignalGenerator />} />
-          <Route path="plugins" element={<Plugins />} />
-          <Route path="/" element={<RepoBrowserContainer />} />
-          <Route path="recordings/spectrogram/:recording" element={<SpectrogramContainer />} />
-          <Route path="recordings/:accountName?/:containerName?/:sasToken?" element={<RecordingsListContainer />} />
-        </Route>
-        <Route path="/v2" element={<Layout />} >
-          <Route path="/v2/" element={<Home />} />
-          <Route path="admin" element={<Admin />} />
-          <Route path="query" element={<Query />} />
-          <Route path="upload" element={<Upload />} />
-          <Route path='visualization' element={<Visualization />} />
-        </Route>
+        {new_version ?
+          <Route path="/" element={<Layout />} >
+            <Route path="/" element={<Home />} />
+            <Route path="admin" element={<Admin />} />
+            <Route path="query" element={<Query />} />
+            <Route path="upload" element={<Upload />} />
+            <Route path='visualization' element={<Visualization />} />
+          </Route> :
+          <Route path="/" element={<App />}>
+            <Route path="about" element={<About />} />
+            <Route path="siggen" element={<SignalGenerator />} />
+            <Route path="plugins" element={<Plugins />} />
+            <Route path="/" element={<RepoBrowserContainer />} />
+            <Route path="recordings/spectrogram/:recording" element={<SpectrogramContainer />} />
+            <Route path="recordings/:accountName?/:containerName?/:sasToken?" element={<RecordingsListContainer />} />
+          </Route>
+        }
       </Routes>
     </BrowserRouter>
   </Provider>

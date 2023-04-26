@@ -1,15 +1,16 @@
 import * as React from "react";
-import {Outlet} from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import Navbar from "../Components/Navbar/Navbar";
 import Footer from "Components/Footer/Footer";
+import ThemeSelector from "Components/Styles/ThemeSelector";
 
 const Layout = () => {
   return (
-    <div className="col-lg-8 mx-auto p-4 py-md-5">
+    <ThemeSelector>
       <Navbar />
       <Outlet />
       <Footer />
-    </div>
+    </ThemeSelector>
   );
 };
 
