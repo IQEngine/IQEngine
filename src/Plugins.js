@@ -38,7 +38,7 @@ export const Plugins = () => {
                 <li className="list-group-item">
                   A signal detector (with optional classifier) can be triggered in the main spectrogram page, which will
                   display the output annotations as soon as it finishes, convinient for testing new
-                  detection/classification algorithms.
+                  detection/classification algorithms.  <a href="openapi">Link to our OpenAPI Spec</a>
                 </li>
                 <li className="list-group-item">
                   A DSP module runs prior to the FFT calculations, letting you perform a variety of signal processing

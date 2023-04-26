@@ -4,6 +4,11 @@ import numpy as np
 from fastapi.middleware.cors import CORSMiddleware
 import os
 import copy
+from jsonschema import validate
+import yaml
+
+with open('openapi.yaml', 'r') as file:
+    schema = yaml.safe_load(file)
 
 app = fastapi.FastAPI()
 
@@ -11,7 +16,8 @@ origins = [
     "http://localhost",
     "http://localhost:3000",
     "http://localhost:3001",
-    "http://localhost:8000"
+    "http://localhost:8000",
+    "https://www.iqengine.org"
 ]
 
 app.add_middleware(
@@ -60,6 +66,13 @@ async def detect(info : fastapi.Request, detectorname):
         return {"status" : "FAILED - detector does not exist", "annotations": []}
 
     function_input = await info.json()
+
+    # Validate with our schema
+    try:
+        validate(instance=function_input, schema=schema["paths"]["/detectors/{detectorname}"]['post']['requestBody']['content']['application/json']['schema'])
+    except Exception as e:
+        print("POST body failed schema validation, error:", e)
+
     samples = function_input.pop("samples") # Assumed to be real or floats in IQIQIQIQ (cant send complex over JSON)
     print(function_input)
 
@@ -77,6 +90,13 @@ async def detect(info : fastapi.Request, detectorname):
     DetectorInstance = Detector(**function_input) # a way to provide params as a single dict
     annotations = DetectorInstance.detect(samples)
     logging.info(annotations)
+
+    # Validate with our schema
+    try:
+        validate(instance=function_input, schema=schema["paths"]["/detectors/{detectorname}"]['post']['responses']['200']['content']['application/json']['schema'])
+    except Exception as e:
+        print("Detector's return annotations failed schema validation, error:", e)
+
     return {
         "status" : "SUCCESS",
         "annotations" : annotations
