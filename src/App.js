@@ -52,9 +52,22 @@ const App = () => {
               <Nav.Link href="/about" style={{ fontSize: '24px', paddingLeft: '0px', paddingRight: '25px' }}>
                 About
               </Nav.Link>
-              <Nav.Link href="/plugins" style={{ fontSize: '24px', paddingLeft: '0px', paddingRight: '30px' }}>
+
+              <Nav.Link href="/plugins" style={{ fontSize: '24px', paddingLeft: '0px', paddingRight: '20px' }}>
                 Plugins
               </Nav.Link>
+
+              <a
+                className="nav-link"
+                style={{ fontSize: '24px', paddingLeft: '0px', paddingRight: '20px' }}
+                target="_blank"
+                rel="noreferrer"
+                href="https://discord.gg/k7C8kp3b76"
+              >
+                <img src="/discord.svg" style={{ width: '22px' }} alt="GitHub" />
+                Discord
+              </a>
+
               <a
                 className="nav-link"
                 style={{ fontSize: '24px', paddingLeft: '0px', paddingRight: '0px' }}
