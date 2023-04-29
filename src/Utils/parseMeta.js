@@ -48,6 +48,7 @@ export default function parseMeta(json_string, baseUrl, fName, metaFileHandle, d
     frequency: (obj['captures'][0]['core:frequency'] ?? 1e6) / 1e6, // in MHz
     annotations: obj['annotations'],
     numberOfAnnotation: obj['annotations'].length,
+    numberOfCaptures: obj['captures'].length,
     author: author,
     email: email,
     type: 'file',

@@ -192,7 +192,6 @@ export default function RecordingsBrowser(props) {
               <th>Sample Rate</th>
               <th>Number of Annotations</th>
               <th style={{ width: '10%' }}>Author</th>
-              <th style={{ width: '10%' }}>Email</th>
             </tr>
           </thead>
           <tbody>

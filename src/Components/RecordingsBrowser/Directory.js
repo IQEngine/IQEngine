@@ -59,7 +59,6 @@ const Directory = ({
             <td></td>
             <td></td>
             <td></td>
-            <td></td>
           </tr>
         )}
         {item.children.map((item) => (
