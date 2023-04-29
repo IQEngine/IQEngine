@@ -5,6 +5,9 @@
 import React from 'react';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import Container from 'react-bootstrap/Container';
+import { Card } from 'react-bootstrap';
+import { CardContent } from '@mui/material';
 
 const styleMargins = {
   marginTop: 20,
@@ -100,40 +103,122 @@ export const About = () => {
                 marginBottom: '50px',
               }}
             >
-              Leadership Team
+              Leadership Teams
             </h1>
           </center>
         </Row>
-        <Row style={{ marginBottom: '15px', paddingBottom: '15px', fontSize: '20px' }}>
-          <center>IQEngine is a community effort, lead by the following individuals (and seeking more!):</center>
+
+        <Row className="mt-0 mb-5">
+          <Col xs={2}></Col>
+          <Col className="ms-0 me-5">
+            <Card>
+              <Card.Header className="leadership-card-header">Core Leadership</Card.Header>
+              <Card.Body className="leadership-card-body">
+                Manages the overall direction of IQEngine<br></br>
+                <br></br>
+                Team Lead: Marc Lichtman
+              </Card.Body>
+            </Card>
+          </Col>
+          <Col className="ms-5 me-5">
+            <Card>
+              <Card.Header className="leadership-card-header">Frontend – Functionality</Card.Header>
+              <Card.Body className="leadership-card-body">
+                The IQEngine frontend <br></br>
+                <br></br>
+                Team Lead: Maheen
+              </Card.Body>
+            </Card>
+          </Col>
+          <Col className="ms-5 me-0">
+            <Card>
+              <Card.Header className="leadership-card-header">Frontend - User Experience</Card.Header>
+              <Card.Body className="leadership-card-body">
+                UX design and surveying <br></br>
+                <br></br>
+                Team Lead: Luke/Robotastic
+              </Card.Body>
+            </Card>
+          </Col>
+          <Col xs={2}></Col>
         </Row>
-        <Row style={{ marginBottom: '15px', paddingBottom: '15px', fontSize: '20px' }}>
-          <Col></Col>
-          <Col>
-            <center>
-              <img style={{ width: '50%' }} src="./Marc.png" alt="marc"></img>
-              <p></p>
-              Marc
-            </center>
+
+        <Row className="mt-5 mb-5">
+          <Col xs={2}></Col>
+          <Col className="ms-0 me-5">
+            <Card>
+              <Card.Header className="leadership-card-header">Backend/Plugins</Card.Header>
+              <Card.Body className="leadership-card-body">
+                Backend design including plugin API and implementation <br></br>
+                <br></br>
+                Team Lead: Eric
+              </Card.Body>
+            </Card>
           </Col>
-          <Col>
-            <center>
-              <img style={{ width: '50%' }} src="./Maheen.png" alt="maheen"></img>
-              <p></p>
-              Maheen
-            </center>
+          <Col className="ms-5 me-5">
+            <Card>
+              <Card.Header className="leadership-card-header">Education-Oriented Features</Card.Header>
+              <Card.Body className="leadership-card-body">
+                Making IQEngine the perfect place for students <br></br>
+                <br></br>
+                Team Lead: Seeking Volunteer!
+              </Card.Body>
+            </Card>
           </Col>
-          <Col>
-            <center>
-              <img style={{ width: '50%' }} src="./Luke.png" alt="luke avatar"></img>
-              <p></p>
-              Luke
-            </center>
+          <Col className="ms-5 me-0">
+            <Card>
+              <Card.Header className="leadership-card-header">RFML</Card.Header>
+              <Card.Body className="leadership-card-body">
+                RF Machine Learning oriented functionality <br></br>
+                <br></br>
+                Team Lead: Clay
+              </Card.Body>
+            </Card>
           </Col>
-          <Col></Col>
+          <Col xs={2}></Col>
         </Row>
+
+        <Row className="mt-5 mb-5">
+          <Col xs={2}></Col>
+          <Col className="ms-0 me-5">
+            <Card>
+              <Card.Header className="leadership-card-header">Community</Card.Header>
+              <Card.Body className="leadership-card-body">
+                Manages the Discord and other community engagements <br></br>
+                <br></br>
+                Team Lead: Jumbotron
+              </Card.Body>
+            </Card>
+          </Col>
+          <Col className="ms-5 me-5">
+            <Card>
+              <Card.Header className="leadership-card-header">SigMF Integration</Card.Header>
+              <Card.Body className="leadership-card-body">
+                Expanding and verifying IQEngine's use of SigMF <br></br>
+                <br></br>
+                Team Lead: Marc Lichtman
+              </Card.Body>
+            </Card>
+          </Col>
+          <Col className="ms-5 me-0">
+            <Card>
+              <Card.Header className="leadership-card-header">Maps Interface</Card.Header>
+              <Card.Body className="leadership-card-body">
+                The IQEngine Maps interface (coming soon!) <br></br>
+                <br></br>
+                Team Lead: TBD
+              </Card.Body>
+            </Card>
+          </Col>
+          <Col xs={2}></Col>
+        </Row>
+
+        <Row style={{ marginBottom: '15px', paddingBottom: '15px', fontSize: '20px' }}>
+          <center>IQEngine is a community effort, lead by the above individuals (and seeking more!):</center>
+        </Row>
+
         <Row style={{ marginBottom: '15px', fontSize: '20px' }}>
-          <Col></Col>
+          <Col xs={3}></Col>
           <Col>
             <center>
               <h4>Ways to get Involved:</h4>
@@ -143,10 +228,10 @@ export const About = () => {
                 Join the <a href="https://discord.gg/k7C8kp3b76">IQEngine Discord</a>
               </li>
               <li>Post GitHub Issues/PRs</li>
-              <li>Email Marc questions/comments about IQEngine - iqengine@vt.edu</li>
+              <li>Email questions/comments about IQEngine to iqengine@vt.edu</li>
             </ul>
           </Col>
-          <Col></Col>
+          <Col xs={3}></Col>
         </Row>
       </div>
 
@@ -188,9 +273,6 @@ export const About = () => {
             Winter '23 Sprinterns from UMD and GMU
           </center>
         </Row>
-      </div>
-      <div style={{ backgroundColor: '#303030', width: 'auto' }}>
-        <Row style={{ paddingTop: '30px' }}></Row>
       </div>
     </div>
   );
