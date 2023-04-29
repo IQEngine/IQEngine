@@ -274,9 +274,6 @@ export const About = () => {
           </center>
         </Row>
       </div>
-      <div style={{ backgroundColor: '#303030', width: 'auto' }}>
-        <Row style={{ paddingTop: '30px' }}></Row>
-      </div>
     </div>
   );
 };
