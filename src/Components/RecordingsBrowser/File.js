@@ -119,10 +119,9 @@ export default function FileRow({
       <td className="align-middle">{item.sampleRate} MHz</td>
       <td className="align-middle">
         <div>
-          <Button type="button" variant="secondary" onClick={toggle}>
+          <Button type="button" variant="secondary" style={{ marginBottom: '7px' }} onClick={toggle}>
             {item.numberOfAnnotation}
           </Button>
-
           <Modal isOpen={modal} toggle={toggle} size="lg">
             <ModalHeader toggle={toggle}>{item.name}</ModalHeader>
             <ModalBody>
@@ -141,10 +140,14 @@ export default function FileRow({
               </table>
             </ModalBody>
           </Modal>
+          <br></br>({item.numberOfCaptures} Capture{item.numberOfCaptures > 1 && 's'})
         </div>
       </td>
-      <td className="align-middle">{item.author}</td>
-      <td className="align-middle">{item.email}</td>
+      <td className="align-middle">
+        {item.author}
+        <br></br>
+        {item.email}
+      </td>
     </tr>
   );
 }
