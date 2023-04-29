@@ -26,40 +26,37 @@ export const Plugins = () => {
                 marginBottom: '10px',
               }}
             >
-              Plugins Concepts
+              Plugins Concept
             </h1>
           </center>
           <Col xs={3}></Col>
           <Col xs={6}>
-            {' '}
             <Row style={{ marginBottom: '15px', paddingBottom: '15px', fontSize: '20px' }}>
-              <center>Through the optional backend API, IQEngine supports three different classes of plugins:</center>
-              <ol className="list-group list-group-numbered" style={{ marginTop: '25px', marginBottom: '25px' }}>
-                <li className="list-group-item">
-                  A signal detector (with optional classifier) can be triggered in the main spectrogram page, which will
-                  display the output annotations as soon as it finishes, convinient for testing new
-                  detection/classification algorithms.  <a href="openapi">Link to our OpenAPI Spec</a>
+              <center>
+                Through an optional backend API, IQEngine will support various plugins (currently, only signal
+                detection/classification is supported). IQEngine is still in its infancy and we are looking for people
+                to help develop the concept and create example plugins!
+              </center>
+              <ul style={{ marginTop: '25px', marginBottom: '25px' }}>
+                <li>
+                  A signal detector (with optional classifier) can be triggered in the main spectrogram page, which
+                  displays the output in the form of SigMF annotations, convinient for testing new
+                  detection/classification algorithms - <a href="openapi">Link to our OpenAPI Spec</a>
                 </li>
-                <li className="list-group-item">
-                  A DSP module runs prior to the FFT calculations, letting you perform a variety of signal processing
-                  functions and other IQ sample manipulation. It currently only supports Python snippets, where the
-                  samples out must be the same length as samples in (for now). Support for C/C++ and Rust DSP plugins is
-                  on the todo list.
+                <li>Signal demodulators/decoders that take in IQ and output bytes, imagery, audio, etc</li>
+                <li>
+                  Other DSP modules letting you perform a variety of signal processing functions and other IQ sample
+                  manipulation
                 </li>
-                <li className="list-group-item">
-                  A signal generator creates a new signal given a set of parameters (not yet released)
-                </li>
-              </ol>
+              </ul>
+              Current concept plan:
+              <br></br> <br></br>
               <center>
                 <img
-                  src="./IQEngine_Plugins.svg"
+                  src="./plugins_concept.png"
                   style={{ width: '600px', paddingBottom: '15px' }}
                   alt="plugins concept"
                 ></img>
-              </center>
-              <center>
-                Plugins within IQEngine is still in its infancy and we are looking for people to help develop the
-                concept and create example plugins!
               </center>
             </Row>
           </Col>
