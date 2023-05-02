@@ -10,7 +10,10 @@ function Navbar() {
         <nav className="py-2 bg-body-tertiary">
           <div className="">
             <ul className="">
-              <li className=""><a href="/v2">Home</a></li>
+              <li className=""><a href="/v2">
+                <i className="bi bi-house-door-fill"></i>
+                Home
+                </a></li>
               <li className=""><a href="admin">Admin</a></li>
               <li className=""><a href="query">Query</a></li>
             </ul>

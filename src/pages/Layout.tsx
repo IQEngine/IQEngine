@@ -7,9 +7,11 @@ import ThemeSelector from "Components/Styles/ThemeSelector";
 const Layout = () => {
   return (
     <ThemeSelector>
-      <Navbar />
-      <Outlet />
-      <Footer />
+      <div className="bg-white">
+        <Navbar />
+        <Outlet />
+        <Footer />
+      </div>
     </ThemeSelector>
   );
 };
