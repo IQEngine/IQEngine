@@ -66,11 +66,11 @@ export async function applyProcessing(samples, taps, pythonSnippet, pyodide) {
 }
 
 export function convertToFloat32(buffer, dataType) {
-  if (dataType === 'ci8_le') {
+  if (dataType === 'ci8_le' || dataType === 'ci8') {
     let samples = Float32Array.from(new Int8Array(buffer));
     for (let i = 0; i < samples.length; i++) samples[i] = samples[i] / 255.0;
     return samples;
-  } else if (dataType === 'cu8_le') {
+  } else if (dataType === 'cu8_le' || dataType === 'cu8') {
     let samples = Float32Array.from(new Uint8Array(buffer));
     for (let i = 0; i < samples.length; i++) samples[i] = (samples[i] - 255.0) / 255.0;
     return samples;
