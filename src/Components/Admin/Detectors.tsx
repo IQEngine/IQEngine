@@ -1,7 +1,7 @@
-import React from "react";
+import React from 'react';
 
 const Detectors = () => {
-    return <h1></h1>;
+  return <h1></h1>;
 };
 
 export default Detectors;

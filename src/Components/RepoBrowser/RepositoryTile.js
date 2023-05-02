@@ -62,11 +62,11 @@ const RepositoryTile = (props) => {
     // so we can fetch when someone is linked to a repo directly
     navigate(
       '/recordings/?accountName=' +
-      accountName +
-      '&containerName=' +
-      containerName +
-      '&sasToken=' +
-      encodeURIComponent(sasToken)
+        accountName +
+        '&containerName=' +
+        containerName +
+        '&sasToken=' +
+        encodeURIComponent(sasToken)
     );
   };
 

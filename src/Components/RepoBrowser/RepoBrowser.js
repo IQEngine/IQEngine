@@ -12,7 +12,7 @@ const RepoBrowser = (props) => {
   let tileObjInfo = [];
   // In local mode, CONNECTION_INFO isn't defined
   if (process.env.REACT_APP_CONNECTION_INFO) {
-      tileObjInfo = JSON.parse(process.env.REACT_APP_CONNECTION_INFO).settings;
+    tileObjInfo = JSON.parse(process.env.REACT_APP_CONNECTION_INFO).settings;
   }
 
   return (

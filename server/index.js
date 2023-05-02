@@ -1,16 +1,13 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-const {
-  StorageSharedKeyCredential,
-  BlobServiceClient
-} = require('@azure/storage-blob');
+const { StorageSharedKeyCredential, BlobServiceClient } = require('@azure/storage-blob');
 const { AbortController } = require('@azure/abort-controller');
-const fs = require("fs");
-const path = require("path");
+const fs = require('fs');
+const path = require('path');
 
-if (process.env.NODE_ENV !== "production") {
-  require("dotenv").config();
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config();
 }
 
 const STORAGE_ACCOUNT_NAME = process.env.AZURE_STORAGE_ACCOUNT_NAME;
@@ -55,15 +52,10 @@ async function uploadStream(aborter, containerClient, filePath) {
     maxBuffers: 5,
   };
 
-  return await blockBlobClient.uploadStream(
-    stream,
-    uploadOptions.bufferSize,
-    uploadOptions.maxBuffers,
-    aborter);
+  return await blockBlobClient.uploadStream(stream, uploadOptions.bufferSize, uploadOptions.maxBuffers, aborter);
 }
 
 async function showBlobNames(aborter, containerClient) {
-
   let iter = await containerClient.listBlobsFlat(aborter);
   for await (const blob of iter) {
     console.log(` - ${blob.name}`);
@@ -74,22 +66,21 @@ async function showBlobNames(aborter, containerClient) {
 async function streamToString(readableStream) {
   return new Promise((resolve, reject) => {
     const chunks = [];
-    readableStream.on("data", (data) => {
+    readableStream.on('data', (data) => {
       chunks.push(data.toString());
     });
-    readableStream.on("end", () => {
-      resolve(chunks.join(""));
+    readableStream.on('end', () => {
+      resolve(chunks.join(''));
     });
-    readableStream.on("error", reject);
+    readableStream.on('error', reject);
   });
 }
 
 async function execute() {
-
-  const containerName = "demo";
-  const blobName = "quickstart.txt";
-  const content = "Hello Node SDK";
-  const localFilePath = "../README.md";
+  const containerName = 'demo';
+  const blobName = 'quickstart.txt';
+  const content = 'Hello Node SDK';
+  const localFilePath = '../README.md';
 
   const credentials = new StorageSharedKeyCredential(STORAGE_ACCOUNT_NAME, ACCOUNT_ACCESS_KEY);
 
@@ -104,7 +95,7 @@ async function execute() {
   await containerClient.create();
   console.log(`Container: "${containerName}" is created`);
 
-  console.log("Containers:");
+  console.log('Containers:');
   await showContainerNames(aborter, blobServiceClient);
 
   await blockBlobClient.upload(content, content.length, aborter);
@@ -132,4 +123,6 @@ async function execute() {
   console.log(`Container "${containerName}" is deleted`);
 }
 
-execute().then(() => console.log("Done")).catch((e) => console.log(e));
+execute()
+  .then(() => console.log('Done'))
+  .catch((e) => console.log(e));

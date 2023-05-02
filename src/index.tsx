@@ -34,43 +34,51 @@ import RecordingsListContainer from './Containers/RecordingsListContainer';
 import { App } from './App';
 // @ts-ignore
 const root = document.getElementById('root');
-var new_version: boolean = false
+var new_version: boolean = false;
 // Select wich version to run based on an environment variable
 if (process.env.REACT_APP_IQENGINE_APP_VERSION === 'v2') {
-  new_version = true
+  new_version = true;
 }
 
 render(
   <Provider store={store}>
     <BrowserRouter>
       <Routes>
-        {new_version ?
-          <Route path="/" element={<Layout />} >
+        {new_version ? (
+          <Route path="/" element={<Layout />}>
             <Route path="/" element={<Home />} />
             <Route path="admin" element={<Admin />} />
             <Route path="query" element={<Query />} />
             <Route path="upload" element={<Upload />} />
-            <Route path='visualization' element={<Visualization />} />
-          </Route> :
+            <Route path="visualization" element={<Visualization />} />
+          </Route>
+        ) : (
           <Route path="/" element={<App />}>
             <Route path="about" element={<About />} />
             <Route path="siggen" element={<SignalGenerator />} />
             <Route path="plugins" element={<Plugins />} />
-            <Route path="/openapi" element={<RedocStandalone
-            options={{            
-              theme: redocTheme,
-              hideDownloadButton: true,
-            }}
-            specUrl="https://raw.githubusercontent.com/IQEngine/IQEngine/main/detectors/openapi.yaml" />} />
+            <Route
+              path="/openapi"
+              element={
+                <RedocStandalone
+                  options={{
+                    theme: redocTheme,
+                    hideDownloadButton: true,
+                  }}
+                  specUrl="https://raw.githubusercontent.com/IQEngine/IQEngine/main/detectors/openapi.yaml"
+                />
+              }
+            />
             <Route path="/" element={<RepoBrowserContainer />} />
             <Route path="recordings/spectrogram/:recording" element={<SpectrogramContainer />} />
             <Route path="recordings/:accountName?/:containerName?/:sasToken?" element={<RecordingsListContainer />} />
           </Route>
-        }
+        )}
       </Routes>
     </BrowserRouter>
-  </Provider>
-, root);
+  </Provider>,
+  root
+);
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

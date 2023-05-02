@@ -7,7 +7,7 @@ import { Navbar, Row, Col } from 'react-bootstrap';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import ReactGA from 'react-ga4';
-import { Outlet } from "react-router-dom";
+import { Outlet } from 'react-router-dom';
 import ThemeSelector from './Components/Styles/ThemeSelector';
 
 // If env var is set, initialize google analytics
