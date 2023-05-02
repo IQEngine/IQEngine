@@ -3,8 +3,9 @@
 // Licensed under the MIT License
 
 import React from 'react';
-import ReactDOM from 'react-dom/client';
-
+import { render } from 'react-dom';
+import { RedocStandalone } from 'redoc';
+import { redocTheme } from './Utils/redocTheme';
 // @ts-ignore
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
@@ -32,14 +33,14 @@ import RecordingsListContainer from './Containers/RecordingsListContainer';
 // @ts-ignore
 import { App } from './App';
 // @ts-ignore
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const root = document.getElementById('root');
 var new_version: boolean = false
 // Select wich version to run based on an environment variable
 if (process.env.REACT_APP_IQENGINE_APP_VERSION === 'v2') {
   new_version = true
 }
 
-root.render(
+render(
   <Provider store={store}>
     <BrowserRouter>
       <Routes>
@@ -55,6 +56,12 @@ root.render(
             <Route path="about" element={<About />} />
             <Route path="siggen" element={<SignalGenerator />} />
             <Route path="plugins" element={<Plugins />} />
+            <Route path="/openapi" element={<RedocStandalone
+            options={{            
+              theme: redocTheme,
+              hideDownloadButton: true,
+            }}
+            specUrl="https://raw.githubusercontent.com/IQEngine/IQEngine/main/detectors/openapi.yaml" />} />
             <Route path="/" element={<RepoBrowserContainer />} />
             <Route path="recordings/spectrogram/:recording" element={<SpectrogramContainer />} />
             <Route path="recordings/:accountName?/:containerName?/:sasToken?" element={<RecordingsListContainer />} />
@@ -63,7 +70,7 @@ root.render(
       </Routes>
     </BrowserRouter>
   </Provider>
-);
+, root);
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

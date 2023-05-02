@@ -104,7 +104,7 @@ export const redocTheme = {
         visited: '#0ea5e9',
       },
     },
-    extensionsHook: (c) => {
+    extensionsHook: (c: any) => {
       if (c === 'UnderlinedHeader') {
         return {
           color: '#a1a1aa',
@@ -112,9 +112,10 @@ export const redocTheme = {
           borderBottom: '1px solid #3f3f46',
         };
       }
+      return {};
     },
   };
-  
+  // @ts-ignore
   const themeAsString = `{
     codeBlock: {
       backgroundColor: '#18181b',

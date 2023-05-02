@@ -9,8 +9,6 @@ import Nav from 'react-bootstrap/Nav';
 import ReactGA from 'react-ga4';
 import { Outlet } from "react-router-dom";
 import ThemeSelector from './Components/Styles/ThemeSelector';
-import { RedocStandalone } from 'redoc';
-import { redocTheme } from './Utils/redocTheme';
 
 // If env var is set, initialize google analytics
 if (process.env.GOOGLE_ANALYTICS_KEY) {
@@ -76,24 +74,7 @@ export const App = () => {
             </Navbar>
           </Col>
         </Row>
-
-        <Routes>
-          <Route path="/about" element={<About />} />
-          <Route path="/siggen" element={<SignalGenerator />} />
-          <Route path="/plugins" element={<Plugins />} />
-          <Route path="/openapi" element={<RedocStandalone
-            options={{
-              disableSidebar: false,
-              theme: redocTheme,
-              hideDownloadButton: true,
-            }}
-            specUrl="https://raw.githubusercontent.com/IQEngine/IQEngine/main/detectors/openapi.yaml" />} />
-          <Route exact path="/" element={<RepoBrowserContainer />} />
-          <Route path="/recordings/spectrogram/:recording" element={<SpectrogramContainer />} />
-          <Route path="/recordings/:accountName?/:containerName?/:sasToken?" element={<RecordingsListContainer />} />
-        </Routes>
         <Outlet />
-
         {/* TODO Figure out how to use mailerlites embedded form*/}
         <div className="container">
           <Row style={{ marginTop: '30px', marginBottom: '30px' }}>
