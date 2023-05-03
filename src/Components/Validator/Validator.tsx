@@ -1,7 +1,8 @@
+// Copyright (c) 2023 Marc Lichtman
+// Licensed under the MIT License
+
 import React from 'react';
 import v8Validator from '@rjsf/validator-ajv8';
-
-//import Layout from './layout';
 import Playground, { PlaygroundProps } from './components';
 
 const validators: PlaygroundProps['validators'] = {
