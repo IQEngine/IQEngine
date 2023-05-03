@@ -1,6 +1,4 @@
 export const sigmfSchema = {
-  $id: 'https://github.com/sigmf/SigMF/spec/1.0.0/schema-meta',
-  $schema: 'https://json-schema.org/draft/2020-12/schema',
   default: ['global', 'captures', 'annotations'],
   required: ['global', 'captures', 'annotations'],
   title: 'Schema for SigMF -meta file.',
