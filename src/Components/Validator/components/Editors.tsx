@@ -50,7 +50,7 @@ function Editor({ title, code, onChange }: EditorProps) {
         value={code}
         theme="vs-light"
         onChange={onCodeChange}
-        height={400}
+        height={1000}
         options={monacoEditorOptions}
       />
     </div>
@@ -117,12 +117,17 @@ export default function Editors({
 
   return (
     <>
+      <br></br>
       <div className="row">
         <div className="col-sm-6">
-          <Editor title="JSONSchema" code={toJson(schema)} onChange={onSchemaEdited} />
+          <Editor
+            title="SigMF JSON Schema (don't edit unless you know what you're doing)"
+            code={toJson(schema)}
+            onChange={onSchemaEdited}
+          />
         </div>
         <div className="col-sm-6">
-          <Editor title="formData" code={toJson(formData)} onChange={onFormDataEdited} />
+          <Editor title="Your .sigmf-meta JSON to be validated" code={toJson(formData)} onChange={onFormDataEdited} />
         </div>
       </div>
       {extraErrors && (
