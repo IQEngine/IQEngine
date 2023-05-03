@@ -12,7 +12,8 @@ import {
   ValidatorType,
 } from '@rjsf/utils';
 
-import { samples } from '../samples';
+import { sigmfSchema } from '../SigMFSchema';
+import { sigmfFormData } from '../FormData';
 import Header, { LiveSettings } from './Header';
 import DemoFrame from './DemoFrame';
 import ErrorBoundary from './ErrorBoundary';
@@ -27,8 +28,8 @@ export interface PlaygroundProps {
 
 export default function Playground({ themes, validators }: PlaygroundProps) {
   const [loaded, setLoaded] = useState(false);
-  const [schema, setSchema] = useState<RJSFSchema>(samples.Simple.schema as RJSFSchema);
-  const [formData, setFormData] = useState<any>(samples.Simple.formData);
+  const [schema, setSchema] = useState<RJSFSchema>(sigmfSchema as RJSFSchema);
+  const [formData, setFormData] = useState<any>(sigmfFormData);
   const [extraErrors, setExtraErrors] = useState<ErrorSchema | undefined>();
   const [shareURL, setShareURL] = useState<string | null>(null);
   const [theme, setTheme] = useState<string>('default');

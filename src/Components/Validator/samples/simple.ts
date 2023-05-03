@@ -1,6 +1,6 @@
 export default {
   schema: {
-    title: 'A registration form',
+    title: 'AS registration form',
     description: 'A simple form example.',
     type: 'object',
     required: ['firstName', 'lastName'],
