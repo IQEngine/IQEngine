@@ -30,16 +30,17 @@ def spectro_maker(container_client, basename):
     try:
         data_bytes = container_client.download_blob(dataname, offset=offset, length=num_bytes).readall()
     except Exception as e:
-        print(e)
+        print(basename + '.sigmf-data not found')
         return
 
     # Download meta file
     try:
         metainfo = container_client.download_blob(metaname).readall().decode('utf-8')
-        metainfo = json.loads(metainfo)
     except Exception as e:
-        print(e)
+        print(basename + '.sigmf-meta not found')
         return
+
+    metainfo = json.loads(metainfo)
     
     dtype = metainfo['global']['core:datatype']
     if dtype == 'ci16_le' or dtype == 'ci16':
