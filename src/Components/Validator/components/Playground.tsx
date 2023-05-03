@@ -9,7 +9,6 @@ import {
   RJSFSchema,
   RJSFValidationError,
   TemplatesType,
-  UiSchema,
   ValidatorType,
 } from '@rjsf/utils';
 
@@ -29,7 +28,6 @@ export interface PlaygroundProps {
 export default function Playground({ themes, validators }: PlaygroundProps) {
   const [loaded, setLoaded] = useState(false);
   const [schema, setSchema] = useState<RJSFSchema>(samples.Simple.schema as RJSFSchema);
-  const [uiSchema, setUiSchema] = useState<UiSchema>(samples.Simple.uiSchema);
   const [formData, setFormData] = useState<any>(samples.Simple.formData);
   const [extraErrors, setExtraErrors] = useState<ErrorSchema | undefined>();
   const [shareURL, setShareURL] = useState<string | null>(null);
@@ -67,16 +65,13 @@ export default function Playground({ themes, validators }: PlaygroundProps) {
     (data: any) => {
       // Reset the ArrayFieldTemplate whenever you load new data
       const { ArrayFieldTemplate, ObjectFieldTemplate, extraErrors, liveSettings } = data;
-      // uiSchema is missing on some examples. Provide a default to
-      // clear the field in all cases.
-      const { schema, uiSchema = {}, formData, theme: dataTheme = theme } = data;
+      const { schema, formData, theme: dataTheme = theme } = data;
 
       onThemeSelected(dataTheme, themes[dataTheme]);
 
       // force resetting form component instance
       setShowForm(false);
       setSchema(schema);
-      setUiSchema(uiSchema);
       setFormData(formData);
       setExtraErrors(extraErrors);
       setTheme(dataTheme);
@@ -139,7 +134,6 @@ export default function Playground({ themes, validators }: PlaygroundProps) {
     <>
       <Header
         schema={schema}
-        uiSchema={uiSchema}
         formData={formData}
         shareURL={shareURL}
         themes={themes}
@@ -186,7 +180,6 @@ export default function Playground({ themes, validators }: PlaygroundProps) {
                 templates={templates}
                 extraErrors={extraErrors}
                 schema={schema}
-                uiSchema={uiSchema}
                 formData={formData}
                 fields={{ geo: GeoPosition }}
                 validator={validators[validator]}

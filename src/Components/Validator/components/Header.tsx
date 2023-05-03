@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import Form, { IChangeEvent } from '@rjsf/core';
-import { RJSFSchema, UiSchema, ValidatorType } from '@rjsf/utils';
+import { RJSFSchema, ValidatorType } from '@rjsf/utils';
 import localValidator from '@rjsf/validator-ajv8';
 
 import CopyLink from './CopyLink';
@@ -74,7 +74,6 @@ export interface LiveSettings {
 
 type HeaderProps = {
   schema: RJSFSchema;
-  uiSchema: UiSchema;
   formData: any;
   shareURL: string | null;
   themes: { [themeName: string]: ThemesType };
@@ -96,7 +95,6 @@ type HeaderProps = {
 
 export default function Header({
   schema,
-  uiSchema,
   formData,
   shareURL,
   themes,
@@ -145,7 +143,6 @@ export default function Header({
         JSON.stringify({
           formData,
           schema,
-          uiSchema,
           theme,
           liveSettings,
         })
@@ -156,7 +153,7 @@ export default function Header({
       setShareURL(null);
       console.error(error);
     }
-  }, [formData, liveSettings, schema, theme, uiSchema, setShareURL]);
+  }, [formData, liveSettings, schema, theme, setShareURL]);
 
   return (
     <div className="page-header">
