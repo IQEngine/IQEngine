@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import MonacoEditor from '@monaco-editor/react';
-import { ErrorSchema, RJSFSchema, UiSchema } from '@rjsf/utils';
+import { ErrorSchema, RJSFSchema } from '@rjsf/utils';
 //import isEqualWith from 'lodash/isEqualWith';
 
 const monacoEditorOptions = {
@@ -62,8 +62,6 @@ const toJson = (val: unknown) => JSON.stringify(val, null, 2);
 type EditorsProps = {
   schema: RJSFSchema;
   setSchema: React.Dispatch<React.SetStateAction<RJSFSchema>>;
-  uiSchema: UiSchema;
-  setUiSchema: React.Dispatch<React.SetStateAction<UiSchema>>;
   formData: any;
   setFormData: React.Dispatch<React.SetStateAction<any>>;
   extraErrors: ErrorSchema | undefined;
@@ -75,12 +73,10 @@ export default function Editors({
   extraErrors,
   formData,
   schema,
-  uiSchema,
   setExtraErrors,
   setFormData,
   setSchema,
   setShareURL,
-  setUiSchema,
 }: EditorsProps) {
   const onSchemaEdited = useCallback(
     (newSchema) => {
@@ -88,14 +84,6 @@ export default function Editors({
       setShareURL(null);
     },
     [setSchema, setShareURL]
-  );
-
-  const onUISchemaEdited = useCallback(
-    (newUiSchema) => {
-      setUiSchema(newUiSchema);
-      setShareURL(null);
-    },
-    [setUiSchema, setShareURL]
   );
 
   const onFormDataEdited = useCallback(
@@ -131,9 +119,6 @@ export default function Editors({
     <div className="col-sm-7">
       <Editor title="JSONSchema" code={toJson(schema)} onChange={onSchemaEdited} />
       <div className="row">
-        <div className="col-sm-6">
-          <Editor title="UISchema" code={toJson(uiSchema)} onChange={onUISchemaEdited} />
-        </div>
         <div className="col-sm-6">
           <Editor title="formData" code={toJson(formData)} onChange={onFormDataEdited} />
         </div>

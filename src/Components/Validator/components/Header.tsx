@@ -5,7 +5,6 @@ import localValidator from '@rjsf/validator-ajv8';
 
 import CopyLink from './CopyLink';
 import ThemeSelector, { ThemesType } from './ThemeSelector';
-import Selector from './Selector';
 import ValidatorSelector from './ValidatorSelector';
 import SubthemeSelector from './SubthemeSelector';
 import RawValidatorTest from './RawValidatorTest';
@@ -87,7 +86,6 @@ type HeaderProps = {
   validator: string;
   liveSettings: LiveSettings;
   playGroundFormRef: React.MutableRefObject<any>;
-  load: (data: any) => void;
   onThemeSelected: (theme: string, themeObj: ThemesType) => void;
   setSubtheme: React.Dispatch<React.SetStateAction<string | null>>;
   setStylesheet: React.Dispatch<React.SetStateAction<string | null>>;
@@ -108,7 +106,6 @@ export default function Header({
   validator,
   liveSettings,
   playGroundFormRef,
-  load,
   onThemeSelected,
   setSubtheme,
   setStylesheet,
@@ -163,11 +160,7 @@ export default function Header({
 
   return (
     <div className="page-header">
-      <h1>react-jsonschema-form</h1>
       <div className="row">
-        <div className="col-sm-6">
-          <Selector onSelected={load} />
-        </div>
         <div className="col-sm-2">
           <Form
             idPrefix="rjsf_options"

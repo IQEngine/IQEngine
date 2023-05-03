@@ -149,7 +149,6 @@ export default function Playground({ themes, validators }: PlaygroundProps) {
         validator={validator}
         liveSettings={liveSettings}
         playGroundFormRef={playGroundFormRef}
-        load={load}
         onThemeSelected={onThemeSelected}
         setSubtheme={setSubtheme}
         setStylesheet={setStylesheet}
@@ -162,8 +161,6 @@ export default function Playground({ themes, validators }: PlaygroundProps) {
         setFormData={setFormData}
         schema={schema}
         setSchema={setSchema}
-        uiSchema={uiSchema}
-        setUiSchema={setUiSchema}
         extraErrors={extraErrors}
         setExtraErrors={setExtraErrors}
         setShareURL={setShareURL}
