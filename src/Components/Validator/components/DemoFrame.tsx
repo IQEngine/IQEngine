@@ -41,9 +41,17 @@ export default function DemoFrame(props: DemoFrameProps) {
   let body: ReactNode = children;
 
   return (
-    <Frame head={head} {...frameProps}>
-      <div id="demo-frame-jss" />
-      {body}
-    </Frame>
+    <>
+      <br></br>
+      <div className="row">
+        <div className="col-sm-3"></div>
+        <div className="col-sm-9">
+          <Frame head={head} {...frameProps}>
+            <div id="demo-frame-jss" />
+            {body}
+          </Frame>
+        </div>
+      </div>
+    </>
   );
 }

@@ -116,9 +116,11 @@ export default function Editors({
   );
 
   return (
-    <div className="col-sm-7">
-      <Editor title="JSONSchema" code={toJson(schema)} onChange={onSchemaEdited} />
+    <>
       <div className="row">
+        <div className="col-sm-6">
+          <Editor title="JSONSchema" code={toJson(schema)} onChange={onSchemaEdited} />
+        </div>
         <div className="col-sm-6">
           <Editor title="formData" code={toJson(formData)} onChange={onFormDataEdited} />
         </div>
@@ -130,6 +132,6 @@ export default function Editors({
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
