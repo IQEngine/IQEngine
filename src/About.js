@@ -5,9 +5,7 @@
 import React from 'react';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import Container from 'react-bootstrap/Container';
 import { Card } from 'react-bootstrap';
-import { CardContent } from '@mui/material';
 
 const styleMargins = {
   marginTop: 20,
@@ -260,7 +258,7 @@ export const About = () => {
                 of his SDR coworkers built a proof-of-concept prototype. It was open sourced and shown off at GNU Radio
                 Conference '22. The first full version was completed in January '23 with help from a group of
                 undergraduate "sprinterns" at Microsoft, consisting of students from UMD and GMU that were part of the
-                Break Through Tech program.  In February '23 it was transitioned from an open source Microsoft project to
+                Break Through Tech program. In February '23 it was transitioned from an open source Microsoft project to
                 a community-led FOSS project with representation from several organizations and individuals.
               </p>
             </center>
