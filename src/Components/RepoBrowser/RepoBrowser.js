@@ -7,6 +7,7 @@ import LocalFileBrowser from './LocalFileBrowser';
 import AzureBlobBrowser from './AzureBlobBrowser';
 import RepositoryTile from './RepositoryTile';
 import SiggenTile from './SiggenTile';
+import ValidatorTile from './ValidatorTile';
 
 const RepoBrowser = (props) => {
   let tileObjInfo = [];
@@ -41,6 +42,7 @@ const RepoBrowser = (props) => {
         updateConnectionSasToken={props.updateConnectionSasToken}
       />
       <SiggenTile />
+      <ValidatorTile />
     </div>
   );
 };
