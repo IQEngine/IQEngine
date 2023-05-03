@@ -2,11 +2,9 @@ import React, { useCallback } from 'react';
 import Form, { IChangeEvent } from '@rjsf/core';
 import { RJSFSchema, ValidatorType } from '@rjsf/utils';
 import localValidator from '@rjsf/validator-ajv8';
-
 import CopyLink from './CopyLink';
-import ThemeSelector, { ThemesType } from './ThemeSelector';
+import { ThemesType } from './ThemeSelector';
 import ValidatorSelector from './ValidatorSelector';
-import SubthemeSelector from './SubthemeSelector';
 import RawValidatorTest from './RawValidatorTest';
 
 const HeaderButton: React.FC<
@@ -97,28 +95,15 @@ export default function Header({
   schema,
   formData,
   shareURL,
-  themes,
   theme,
-  subtheme,
   validators,
   validator,
   liveSettings,
   playGroundFormRef,
-  onThemeSelected,
-  setSubtheme,
-  setStylesheet,
   setValidator,
   setLiveSettings,
   setShareURL,
 }: HeaderProps) {
-  const onSubthemeSelected = useCallback(
-    (subtheme: any, { stylesheet }: { stylesheet: any }) => {
-      setSubtheme(subtheme);
-      setStylesheet(stylesheet);
-    },
-    [setSubtheme, setStylesheet]
-  );
-
   const onValidatorSelected = useCallback(
     (validator: string) => {
       setValidator(validator);
@@ -170,10 +155,6 @@ export default function Header({
           </Form>
         </div>
         <div className="col-sm-2">
-          <ThemeSelector themes={themes} theme={theme} select={onThemeSelected} />
-          {themes[theme] && themes[theme].subthemes && subtheme && (
-            <SubthemeSelector subthemes={themes[theme].subthemes!} subtheme={subtheme} select={onSubthemeSelected} />
-          )}
           <ValidatorSelector validators={validators} validator={validator} select={onValidatorSelected} />
           <HeaderButtons playGroundFormRef={playGroundFormRef} />
           <div style={{ marginTop: '5px' }} />
