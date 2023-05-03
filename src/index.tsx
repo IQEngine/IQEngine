@@ -25,6 +25,8 @@ import SignalGenerator from './Components/SignalGenerator/SignalGenerator';
 // @ts-ignore
 import { Plugins } from './Plugins';
 // @ts-ignore
+import Validator from './Components/Validator/Validator';
+// @ts-ignore
 import RepoBrowserContainer from './Containers/RepoBrowserContainer';
 // @ts-ignore
 import SpectrogramContainer from './Containers/SpectrogramContainer';
@@ -57,6 +59,7 @@ render(
             <Route path="about" element={<About />} />
             <Route path="siggen" element={<SignalGenerator />} />
             <Route path="plugins" element={<Plugins />} />
+            <Route path="validator" element={<Validator />} />
             <Route
               path="/openapi"
               element={
