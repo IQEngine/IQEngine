@@ -133,6 +133,7 @@ export default function Playground({ themes, validators }: PlaygroundProps) {
 
   return (
     <>
+      <br></br>
       <Header
         schema={schema}
         formData={formData}
