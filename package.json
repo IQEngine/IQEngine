@@ -25,7 +25,6 @@
     "fft.js": "^4.0.4",
     "fftshift": "^1.0.1",
     "konva": "^8.3.14",
-    "lodash": "^4.17.21",
     "plotly.js": "^2.17.1",
     "react": "^17.0.0",
     "react-bootstrap": "^2.5.0",
