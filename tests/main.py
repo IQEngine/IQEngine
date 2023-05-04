@@ -15,8 +15,7 @@ except:
             driver = webdriver.Chrome(f"{homedir}/chromedriver/stable/chromedriver")
             print("Using webdriver.Chrome(~/chromedriver/stable/chromedriver")
         except:
-            print("Couldn't find a working webdriver")
-            exit()
+            raise Exception('Couldnt find a working webdriver')
 
 if os.getenv('STAGING_URL'):
     url = os.getenv('STAGING_URL')
