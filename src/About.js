@@ -223,7 +223,10 @@ export const About = () => {
             </center>
             <ul>
               <li>
-                Join the <a href="https://discord.gg/k7C8kp3b76">IQEngine Discord</a>
+                Join the{' '}
+                <a href="https://discord.gg/k7C8kp3b76" target="_blank">
+                  IQEngine Discord
+                </a>
               </li>
               <li>Post GitHub Issues/PRs</li>
               <li>Email questions/comments about IQEngine to iqengine@vt.edu</li>
@@ -235,6 +238,7 @@ export const About = () => {
 
       <div style={{}}>
         <Row>
+          <Col xs={2}></Col>
           <Col>
             <center>
               <h1
@@ -257,12 +261,16 @@ export const About = () => {
                 Implementation of IQEngine began during a 1-week internal hackathon at Microsoft, where Marc and several
                 of his SDR coworkers built a proof-of-concept prototype. It was open sourced and shown off at GNU Radio
                 Conference '22. The first full version was completed in January '23 with help from a group of
-                undergraduate "sprinterns" at Microsoft, consisting of students from UMD and GMU that were part of the
-                Break Through Tech program. In February '23 it was transitioned from an open source Microsoft project to
-                a community-led FOSS project with representation from several organizations and individuals.
+                undergraduate "sprinterns" at Microsoft, consisting of students from UMD and GMU that were part of the{' '}
+                <a href="https://www.breakthroughtech.org/" target="_blank">
+                  Break Through Tech
+                </a>{' '}
+                program. In February '23 it was transitioned from an open source Microsoft project to a community-led
+                FOSS project with representation from several organizations and individuals.
               </p>
             </center>
           </Col>
+          <Col xs={2}></Col>
         </Row>
 
         <Row style={{ marginBottom: '15px' }}>

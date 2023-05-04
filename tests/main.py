@@ -7,6 +7,8 @@ try:
     print("Using webdriver.Firefox()")
 except:
     try:
+        import chromedriver_autoinstaller
+        chromedriver_autoinstaller.install()
         driver = webdriver.Chrome()
         print("Using webdriver.Chrome()")
     except:

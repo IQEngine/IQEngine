@@ -82,9 +82,6 @@ jobs:
           sudo apt purge google-chrome-stable
           sudo apt purge chromium-browser
 
-      - name: Install Chromium
-        run: sudo apt install -y chromium-browser
-
       - name: Run Selenium Tests
         env:
           STAGING_URL: https://iqengineweb-staging.azurewebsites.net/
