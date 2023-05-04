@@ -7,8 +7,23 @@ try:
     print("Using webdriver.Firefox()")
 except:
     try:
-        driver = webdriver.Chrome("chromedriver/stable/chromedriver")
-        print("Using webdriver.Chrome(chromedriver/stable/chromedriver")
+        chrome_options = webdriver.ChromeOptions()     
+        options = [
+            "--window-size=1200,1200",
+            "--ignore-certificate-errors"
+            "--headless",
+            #"--disable-gpu",
+            #"--window-size=1920,1200",
+            #"--ignore-certificate-errors",
+            #"--disable-extensions",
+            "--no-sandbox",
+            #"--disable-dev-shm-usage",
+            #'--remote-debugging-port=9222'
+        ]
+        for option in options:
+            chrome_options.add_argument(option)
+        driver = webdriver.Chrome("chromedriver/stable/chromedriver", options = chrome_options)
+        print("Using webdriver.Chrome(chromedriver/stable/chromedriver)")
     except:
         raise Exception('Couldnt find a working webdriver')
 
