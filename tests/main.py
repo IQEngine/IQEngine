@@ -7,15 +7,10 @@ try:
     print("Using webdriver.Firefox()")
 except:
     try:
-        from webdriver_manager.chrome import ChromeDriverManager
-        driver = webdriver.Chrome(ChromeDriverManager().install())
-        print("Using webdriver.Chrome()")
+        driver = webdriver.Chrome("chromedriver/stable/chromedriver")
+        print("Using webdriver.Chrome(chromedriver/stable/chromedriver")
     except:
-        try:
-            driver = webdriver.Chrome("chromedriver/stable/chromedriver")
-            print("Using webdriver.Chrome(chromedriver/stable/chromedriver")
-        except:
-            raise Exception('Couldnt find a working webdriver')
+        raise Exception('Couldnt find a working webdriver')
 
 if os.getenv('STAGING_URL'):
     url = os.getenv('STAGING_URL')
