@@ -63,11 +63,32 @@ jobs:
           slot-name: 'staging'
           publish-profile: ${{ secrets.AzureAppService_PublishProfile_Staging }}
           package: .
+  
+  selenium-tests:
+    name: Run Selenium Tests
+    runs-on: ubuntu-latest
+    needs: deploy-to-staging
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+          
+      - name: Run Selenium Tests
+        env:
+          STAGING_URL: https://iqengineweb-staging.azurewebsites.net/
+        run: |
+          cd tests
+          pip install -r requirements.txt
+          python main.py
 
   release-to-prod:
     name: Release to Prod
     runs-on: ubuntu-latest
-    needs: deploy-to-staging
+    needs: selenium-tests
     environment:
       name: 'Production'
       url: ${{ steps.release-to-prod.outputs.webapp-url }}
