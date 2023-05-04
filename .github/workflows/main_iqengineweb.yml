@@ -37,12 +37,12 @@ jobs:
           name: node-app
           path: release.zip
 
-  deploy:
+  deploy-to-staging:
     runs-on: ubuntu-latest
     needs: build
     environment:
-      name: 'production'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+      name: 'Staging'
+      url: ${{ steps.deploy-to-staging.outputs.webapp-url }}
 
     steps:
       - name: Download artifact from build job
@@ -53,11 +53,23 @@ jobs:
       - name: unzip artifact for deployment
         run: unzip release.zip
 
-      - name: 'Deploy to Azure Web App'
-        id: deploy-to-webapp
+      - name: 'Deploy to Staging Environment'
+        id: deploy-to-staging
         uses: azure/webapps-deploy@v2
         with:
           app-name: 'iqengineweb'
-          slot-name: 'production'
+          slot-name: 'staging'
           publish-profile: ${{ secrets.AzureAppService_PublishProfile_50c7b335d29046f98adf66cde1936d40 }}
           package: .
+
+  release-to-prod:
+    name: Release to Prod
+    needs: deploy-to-staging
+    runs-on: ubuntu-latest
+    environment:
+      name: 'Production'
+      url: 'https://${{ env.WEBAPP_NAME }}.azurewebsites.net/'
+
+    steps:
+    - name: Swap Slots
+      run: az webapp deployment slot swap -s ${{ env.SLOT_NAME }} -n ${{ env.WEBAPP_NAME }} -g ${{ env.RESOURCE_GROUP }}

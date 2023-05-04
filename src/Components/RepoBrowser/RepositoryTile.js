@@ -98,7 +98,7 @@ const RepositoryTile = (props) => {
           )}
         </center>
       </Card.Body>
-      <Button variant="success" disabled={isDisabled} onClick={handleOnClick}>
+      <Button variant="success" disabled={isDisabled} id={name.replaceAll(' ', '')} onClick={handleOnClick}>
         Browse
       </Button>
     </Card>
