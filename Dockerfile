@@ -1,4 +1,4 @@
-FROM node:16-alpine 
+FROM node:18-alpine 
 WORKDIR /app
 COPY . .
 # Install dependencies (npm ci makes sure the exact versions in the lockfile gets installed)
