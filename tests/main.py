@@ -1,6 +1,6 @@
 from selenium import webdriver
-import os.path
 import time
+import os
 
 try:
     driver = webdriver.Firefox()
@@ -12,9 +12,8 @@ except:
         print("Using webdriver.Chrome()")
     except:
         try:
-            homedir = os.path.expanduser("~")
-            driver = webdriver.Chrome(f"{homedir}/chromedriver/stable/chromedriver")
-            print("Using webdriver.Chrome(~/chromedriver/stable/chromedriver")
+            driver = webdriver.Chrome("chromedriver/stable/chromedriver")
+            print("Using webdriver.Chrome(chromedriver/stable/chromedriver")
         except:
             raise Exception('Couldnt find a working webdriver')
 
