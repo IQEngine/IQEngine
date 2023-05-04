@@ -95,6 +95,7 @@ jobs:
         env:
           STAGING_URL: https://iqengineweb-staging.azurewebsites.net/
         run: |
+          cd tests
           pip install -r requirements.txt
           python main.py
 
