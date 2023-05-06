@@ -139,11 +139,11 @@ class SpectrogramPage extends Component {
 
     // This kicks things off when you first load into the page
     if (newState.connection.blobClient != null && metaIsSet) {
-      const { blob, fftSize } = newState;
+      const { blob, fftSize, spectrogramHeight } = newState;
 
       // this tells us its the first time the page has loaded, so start at the beginning of the file (y=0)
       if (newState.lowerTile === -1) {
-        const { lowerTile, upperTile } = calculateTileNumbers(0, blob, fftSize);
+        const { lowerTile, upperTile } = calculateTileNumbers(0, blob, fftSize, spectrogramHeight);
         newState.lowerTile = lowerTile;
         newState.upperTile = upperTile;
       }
@@ -394,8 +394,8 @@ class SpectrogramPage extends Component {
 
   // num is the y pixel coords of the top of the scrollbar handle, so range of 0 to the height of the scrollbar minus height of handle
   fetchAndRender = (handleTop) => {
-    const { blob, connection, dataType, fftSize, pyodide } = this.state;
-    const { upperTile, lowerTile } = calculateTileNumbers(handleTop, blob, fftSize);
+    const { blob, connection, dataType, fftSize, pyodide, spectrogramHeight } = this.state;
+    const { upperTile, lowerTile } = calculateTileNumbers(handleTop, blob, fftSize, spectrogramHeight);
     this.setState({ lowerTile: lowerTile, upperTile: upperTile });
 
     // If we already have too many pending fetches then bail
@@ -493,7 +493,7 @@ class SpectrogramPage extends Component {
                 <Tab eventKey="spectrogram" title="Spectrogram">
                   <Row style={{ marginLeft: 0, marginRight: 0 }}>
                     <Col>
-                      <Stage width={600} height={20}>
+                      <Stage width={spectrogramWidth} height={20}>
                         <RulerTop
                           fftSize={fftSize}
                           sampleRate={sampleRate}
@@ -504,9 +504,9 @@ class SpectrogramPage extends Component {
                           spectrogramWidthScale={spectrogramWidth / fftSize}
                         />
                       </Stage>
-                      <Stage width={600} height={600}>
+                      <Stage width={spectrogramWidth} height={spectrogramHeight}>
                         <Layer>
-                          <Image image={image} x={0} y={0} width={600} height={600} />
+                          <Image image={image} x={0} y={0} width={spectrogramWidth} height={spectrogramHeight} />
                         </Layer>
                         <AnnotationViewer
                           handleMeta={this.handleMeta}
@@ -530,7 +530,7 @@ class SpectrogramPage extends Component {
                       </Stage>
                     </Col>
                     <Col className="col-1" style={{ paddingTop: 20, paddingLeft: 0, paddingRight: 0 }}>
-                      <Stage width={rulerSideWidth} height={600}>
+                      <Stage width={rulerSideWidth} height={spectrogramHeight}>
                         <RulerSide
                           spectrogramWidth={spectrogramWidth}
                           fftSize={fftSize}
@@ -540,7 +540,7 @@ class SpectrogramPage extends Component {
                       </Stage>
                     </Col>
                     <Col style={{ justifyContent: 'left', paddingTop: 20, paddingLeft: 0, paddingRight: 0 }}>
-                      <Stage width={50} height={600}>
+                      <Stage width={50} height={spectrogramHeight}>
                         <ScrollBar
                           fetchAndRender={this.fetchAndRender}
                           totalIQSamples={blob.totalIQSamples}

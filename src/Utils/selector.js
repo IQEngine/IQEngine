@@ -274,10 +274,9 @@ export const selectFft = (
   return selectFftReturn;
 };
 
-export function calculateTileNumbers(handleTop, blob, fftSize) {
+export function calculateTileNumbers(handleTop, blob, fftSize, spectrogramHeight) {
   const { totalIQSamples } = blob;
   const totalNumFFTs = totalIQSamples / fftSize;
-  const spectrogramHeight = 600; // TODO REPLACE ME WITH ACTUAL WINDOW HEIGHT ONCE ITS NOT ALWAYS 600!
 
   // scrollbar handle size
   const handleFraction = spectrogramHeight / totalNumFFTs; // remember, we are assuming that 1 row of pixels = 1 FFT
