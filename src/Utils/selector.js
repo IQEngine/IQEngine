@@ -174,7 +174,8 @@ export const selectFft = (
   let tempCurrentFftMin = currentFftMin;
 
   // Go through each of the tiles and compute the FFT and save in window.fftData
-  const tiles = range(Math.floor(lowerTile), Math.ceil(upperTile));
+  const tiles = range(Math.floor(lowerTile), Math.floor(upperTile) + 1);
+  console.log('tiles:', tiles);
   let autoMaxs = [];
   let autoMins = [];
   for (let tile of tiles) {
@@ -226,6 +227,7 @@ export const selectFft = (
   upperTrim = upperTrim - (upperTrim % fftSize);
   const trimmedFftData = totalFftData.slice(lowerTrim * 4, totalFftData.length - upperTrim * 4); // totalFftData.length already includes the *4
   const num_final_ffts = trimmedFftData.length / fftSize / 4;
+  console.log('num_final_ffts:', num_final_ffts);
 
   // Render Image
   const imageData = new ImageData(trimmedFftData, fftSize, num_final_ffts);
@@ -274,18 +276,16 @@ export const selectFft = (
   return selectFftReturn;
 };
 
-export function calculateTileNumbers(handleTop, blob, fftSize, spectrogramHeight) {
-  const { totalIQSamples } = blob;
-  const totalNumFFTs = totalIQSamples / fftSize;
-
-  // scrollbar handle size
-  const handleFraction = spectrogramHeight / totalNumFFTs; // remember, we are assuming that 1 row of pixels = 1 FFT
-  const handleHeightPixels = handleFraction * spectrogramHeight;
+export function calculateTileNumbers(handleTop, totalIQSamples, fftSize, spectrogramHeight) {
+  const fftsOnScreen = spectrogramHeight; // remember, we are assuming that 1 row of pixels = 1 FFT
+  const fftsPerTile = TILE_SIZE_IN_IQ_SAMPLES / fftSize;
+  const fractionIntoFile = handleTop / spectrogramHeight; // because of the way the scrollbar works and is always same height as spectrogram
 
   // Find which tiles are within view (in units of tiles incl fraction)
-  const lowerTile = (totalIQSamples / TILE_SIZE_IN_IQ_SAMPLES) * (handleTop / spectrogramHeight);
-  let upperTile = (totalIQSamples / TILE_SIZE_IN_IQ_SAMPLES) * ((handleTop + handleHeightPixels) / spectrogramHeight);
+  const lowerTile = (totalIQSamples * fractionIntoFile) / TILE_SIZE_IN_IQ_SAMPLES;
+  const upperTile = fftsOnScreen / fftsPerTile + lowerTile;
 
+  console.log('lowerTile:', lowerTile, 'upperTile:', upperTile);
   return { lowerTile: lowerTile, upperTile: upperTile };
 }
 

@@ -52,7 +52,7 @@ class SpectrogramPage extends Component {
       minimapNumFetches: null,
       rulerSideWidth: 50,
       skipNFfts: null,
-      spectrogramHeight: 600,
+      spectrogramHeight: 800,
       spectrogramWidth: 600,
       timeSelectionStart: 0, // in units of tiles
       timeSelectionEnd: 10, // in units of tiles
@@ -143,7 +143,7 @@ class SpectrogramPage extends Component {
 
       // this tells us its the first time the page has loaded, so start at the beginning of the file (y=0)
       if (newState.lowerTile === -1) {
-        const { lowerTile, upperTile } = calculateTileNumbers(0, blob, fftSize, spectrogramHeight);
+        const { lowerTile, upperTile } = calculateTileNumbers(0, blob.totalIQSamples, fftSize, spectrogramHeight);
         newState.lowerTile = lowerTile;
         newState.upperTile = upperTile;
       }
@@ -395,7 +395,7 @@ class SpectrogramPage extends Component {
   // num is the y pixel coords of the top of the scrollbar handle, so range of 0 to the height of the scrollbar minus height of handle
   fetchAndRender = (handleTop) => {
     const { blob, connection, dataType, fftSize, pyodide, spectrogramHeight } = this.state;
-    const { upperTile, lowerTile } = calculateTileNumbers(handleTop, blob, fftSize, spectrogramHeight);
+    const { upperTile, lowerTile } = calculateTileNumbers(handleTop, blob.totalIQSamples, fftSize, spectrogramHeight);
     this.setState({ lowerTile: lowerTile, upperTile: upperTile });
 
     // If we already have too many pending fetches then bail
