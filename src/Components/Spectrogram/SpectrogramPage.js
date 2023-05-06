@@ -536,6 +536,7 @@ class SpectrogramPage extends Component {
                           fftSize={fftSize}
                           sampleRate={sampleRate}
                           currentRowAtTop={(lowerTile * TILE_SIZE_IN_IQ_SAMPLES) / fftSize}
+                          spectrogramHeight={spectrogramHeight}
                         />
                       </Stage>
                     </Col>

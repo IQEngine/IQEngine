@@ -6,14 +6,14 @@ import React, { useState, useEffect } from 'react';
 import { Layer, Rect, Text } from 'react-konva';
 
 const RulerSide = (props) => {
-  let { spectrogramWidth, fftSize, sampleRate, currentRowAtTop } = props;
+  let { spectrogramWidth, fftSize, sampleRate, currentRowAtTop, spectrogramHeight } = props;
 
   const [ticks, setTicks] = useState([]);
   const [labels, setLabels] = useState([]);
 
   useEffect(() => {
     // Draw the vertical scales
-    let num_ticks = 61;
+    let num_ticks = spectrogramHeight / 10 + 1;
     let time_per_row = fftSize / sampleRate;
     const temp_ticks = [];
     const temp_labels = [];
