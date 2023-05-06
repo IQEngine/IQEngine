@@ -52,6 +52,7 @@ class SpectrogramPage extends Component {
       minimapNumFetches: null,
       rulerSideWidth: 50,
       rulerTopHeight: 30,
+      marginTop: 30,
       skipNFfts: null,
       spectrogramHeight: 800,
       spectrogramWidth: 600,
@@ -63,8 +64,34 @@ class SpectrogramPage extends Component {
       currentTab: 'spectrogram',
       redirect: false,
       pyodide: null,
+      handleTop: 0,
     };
   }
+
+  windowResized = () => {
+    const { rulerTopHeight, marginTop, blob, fftSize, handleTop } = this.state;
+
+    // Calc the area to be filled by the spectrogram
+    const windowHeight = window.innerHeight;
+    const topRowHeight = document.getElementById('topRow').offsetHeight;
+    const tabsHeight = document.getElementById('tabs-tab-spectrogram').offsetHeight;
+    const newSpectrogramHeight = windowHeight - topRowHeight - marginTop - tabsHeight - rulerTopHeight - 30;
+
+    // Recalc tiles in view
+    const { lowerTile, upperTile } = calculateTileNumbers(
+      handleTop,
+      blob.totalIQSamples,
+      fftSize,
+      newSpectrogramHeight
+    );
+
+    this.setState({ spectrogramHeight: newSpectrogramHeight, lowerTile: lowerTile, upperTile: upperTile });
+
+    // Trigger re-render, but not when the window first loads
+    if (window.iqData) {
+      this.renderImage(lowerTile, upperTile);
+    }
+  };
 
   // This all just happens once when the spectrogram page opens for the first time (or when you make a change in the code)
   async componentDidMount() {
@@ -73,10 +100,9 @@ class SpectrogramPage extends Component {
     // If someone goes to a spectrogram page directly none of the state will be set so redirect to home
     if (!connection.accountName && !connection.datafilehandle) this.setState({ redirect: true });
 
-    console.log('=======', window.innerHeight);
-    console.log(document.getElementById('topRow').offsetHeight);
-    console.log(document.getElementById('tabs-tab-spectrogram').offsetHeight);
-    // + rulerTopHeight
+    // Ability to resize spectrogram when window size is changed
+    window.addEventListener('resize', this.windowResized);
+    this.windowResized(); // also call it once at the start
 
     window.iqData = {};
     clearAllData();
@@ -402,7 +428,7 @@ class SpectrogramPage extends Component {
   fetchAndRender = (handleTop) => {
     const { blob, connection, dataType, fftSize, pyodide, spectrogramHeight } = this.state;
     const { upperTile, lowerTile } = calculateTileNumbers(handleTop, blob.totalIQSamples, fftSize, spectrogramHeight);
-    this.setState({ lowerTile: lowerTile, upperTile: upperTile });
+    this.setState({ lowerTile: lowerTile, upperTile: upperTile, handleTop: handleTop });
 
     // If we already have too many pending fetches then bail
     if (blob.numActiveFetches > MAX_SIMULTANEOUS_FETCHES) {
@@ -451,6 +477,7 @@ class SpectrogramPage extends Component {
       currentTab,
       redirect,
       rulerTopHeight,
+      marginTop,
     } = this.state;
 
     const fft = {
@@ -464,7 +491,7 @@ class SpectrogramPage extends Component {
     }
 
     return (
-      <div style={{ marginTop: '30px' }}>
+      <div style={{ marginTop: marginTop }}>
         <Container>
           <Row id="mainRow" className="flex-nowrap">
             <Col className="col-3">
@@ -534,7 +561,7 @@ class SpectrogramPage extends Component {
                         )}
                       </Stage>
                     </Col>
-                    <Col className="col-1" style={{ paddingTop: 20, paddingLeft: 0, paddingRight: 0 }}>
+                    <Col className="col-1" style={{ paddingTop: rulerTopHeight, paddingLeft: 0, paddingRight: 0 }}>
                       <Stage width={rulerSideWidth} height={spectrogramHeight}>
                         <RulerSide
                           spectrogramWidth={spectrogramWidth}
@@ -545,7 +572,9 @@ class SpectrogramPage extends Component {
                         />
                       </Stage>
                     </Col>
-                    <Col style={{ justifyContent: 'left', paddingTop: 20, paddingLeft: 0, paddingRight: 0 }}>
+                    <Col
+                      style={{ justifyContent: 'left', paddingTop: rulerTopHeight, paddingLeft: 0, paddingRight: 0 }}
+                    >
                       <Stage width={50} height={spectrogramHeight}>
                         <ScrollBar
                           fetchAndRender={this.fetchAndRender}
