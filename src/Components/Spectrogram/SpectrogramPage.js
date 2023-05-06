@@ -51,6 +51,7 @@ class SpectrogramPage extends Component {
       minimapFetch: false,
       minimapNumFetches: null,
       rulerSideWidth: 50,
+      rulerTopHeight: 30,
       skipNFfts: null,
       spectrogramHeight: 800,
       spectrogramWidth: 600,
@@ -71,6 +72,11 @@ class SpectrogramPage extends Component {
 
     // If someone goes to a spectrogram page directly none of the state will be set so redirect to home
     if (!connection.accountName && !connection.datafilehandle) this.setState({ redirect: true });
+
+    console.log('=======', window.innerHeight);
+    console.log(document.getElementById('topRow').offsetHeight);
+    console.log(document.getElementById('tabs-tab-spectrogram').offsetHeight);
+    // + rulerTopHeight
 
     window.iqData = {};
     clearAllData();
@@ -444,6 +450,7 @@ class SpectrogramPage extends Component {
       cursorsEnabled,
       currentTab,
       redirect,
+      rulerTopHeight,
     } = this.state;
 
     const fft = {
@@ -459,7 +466,7 @@ class SpectrogramPage extends Component {
     return (
       <div style={{ marginTop: '30px' }}>
         <Container>
-          <Row className="flex-nowrap">
+          <Row id="mainRow" className="flex-nowrap">
             <Col className="col-3">
               <Sidebar
                 updateBlobTaps={this.props.updateBlobTaps}
@@ -487,13 +494,11 @@ class SpectrogramPage extends Component {
                   this.handleProcessTime();
                   this.setState({ currentTab: k });
                 }}
-                className="mb-3"
-                //fill
               >
                 <Tab eventKey="spectrogram" title="Spectrogram">
                   <Row style={{ marginLeft: 0, marginRight: 0 }}>
                     <Col>
-                      <Stage width={spectrogramWidth} height={20}>
+                      <Stage width={spectrogramWidth} height={rulerTopHeight}>
                         <RulerTop
                           fftSize={fftSize}
                           sampleRate={sampleRate}

@@ -31,7 +31,7 @@ export const App = () => {
   return (
     <ThemeSelector>
       <div>
-        <Row style={{ marginTop: '10px' }}>
+        <Row id="topRow" style={{ marginTop: '10px' }}>
           <Col md="4"></Col>
           <Col md="4" style={{ textAlign: 'center' }}>
             <a href="/">

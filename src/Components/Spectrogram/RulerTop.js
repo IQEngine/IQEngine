@@ -18,10 +18,15 @@ const RulerTop = (props) => {
     for (let i = 0; i <= num_ticks; i++) {
       if (i % (num_ticks / 4) === 0) {
         const text = (((i / num_ticks) * sampleRate - sampleRate / 2) / 1e6).toString();
-        temp_labels.push({ text: text, x: (fftSize / num_ticks) * i * spectrogramWidthScale - 7 / 2, y: 0 }); // in ms
-        temp_ticks.push({ x: (fftSize / num_ticks) * i * spectrogramWidthScale, y: 20, width: 0, height: 5 });
+        temp_labels.push({
+          text: text,
+          x: (spectrogramWidth / num_ticks) * i - 5,
+          y: 5,
+          width: text.length * 10, // rough approx
+        }); // in ms
+        temp_ticks.push({ x: (spectrogramWidth / num_ticks) * i, y: 20, width: 0, height: 5 });
       } else {
-        temp_ticks.push({ x: (fftSize / num_ticks) * i * spectrogramWidthScale, y: 10, width: 0, height: 15 });
+        temp_ticks.push({ x: (spectrogramWidth / num_ticks) * i, y: 15, width: 0, height: 10 });
       }
     }
     setTicks(temp_ticks);
@@ -54,7 +59,9 @@ const RulerTop = (props) => {
             y={label.y}
             fill="white"
             key={index}
-            align="center"
+            width={label.width}
+            wrap={'none'}
+            align="center" // only works if the width is set properly
           />
         ))}
       </Layer>
