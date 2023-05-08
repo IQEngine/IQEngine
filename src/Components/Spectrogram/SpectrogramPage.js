@@ -104,8 +104,8 @@ class SpectrogramPage extends Component {
     window.addEventListener('resize', this.windowResized);
     this.windowResized(); // also call it once at the start
 
-    window.iqData = {};
-    clearAllData();
+    clearAllData(); // clears iqData, fftData, local annotations
+
     fetchMetaDataBlob(connection); // fetch the metadata
 
     if (this.state.pyodide === null) {
@@ -118,12 +118,13 @@ class SpectrogramPage extends Component {
     // make sure not to resetConnection() here or else it screws up ability to switch between recordings without clicking the browse button again
     this.props.resetMeta();
     window.iqData = {};
-    this.props.resetBlob();
+    //this.props.resetBlob();  // cant reset this either or when you make code changes with the live server it will screw up after each change
+    window.removeEventListener('resize', this.windowResized);
   }
 
   componentDidUpdate(prevProps, prevState) {
     let newState = prevState;
-    let metaIsSet = false;
+    let reload = false;
     const props = this.props;
     if (JSON.stringify(this.props.meta) !== JSON.stringify(prevProps.meta)) {
       newState.meta = props.meta;
@@ -132,7 +133,7 @@ class SpectrogramPage extends Component {
         console.log('WARNING: Incorrect data type');
       }
       newState.dataType = dataType;
-      metaIsSet = true;
+      reload = true;
     }
     if (JSON.stringify(props.connection) !== JSON.stringify(prevProps.connection)) {
       newState.connection = props.connection;
@@ -156,7 +157,7 @@ class SpectrogramPage extends Component {
       newState.blob.taps = props.blob.taps;
 
       // force a reload of the screen
-      metaIsSet = true;
+      reload = true;
       window.iqData = {};
       window.fftData = {};
     }
@@ -164,13 +165,13 @@ class SpectrogramPage extends Component {
       newState.blob.pythonSnippet = props.blob.pythonSnippet;
 
       // force a reload of the screen
-      metaIsSet = true;
+      reload = true;
       window.iqData = {};
       window.fftData = {};
     }
 
     // This kicks things off when you first load into the page
-    if (newState.connection.blobClient != null && metaIsSet) {
+    if (newState.connection.blobClient != null && reload) {
       const { blob, fftSize, spectrogramHeight } = newState;
 
       // this tells us its the first time the page has loaded, so start at the beginning of the file (y=0)
@@ -487,6 +488,7 @@ class SpectrogramPage extends Component {
     };
 
     if (redirect) {
+      window.removeEventListener('resize', this.windowResized);
       return <Navigate to="/" />;
     }
 
