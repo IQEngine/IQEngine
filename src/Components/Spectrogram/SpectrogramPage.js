@@ -587,7 +587,7 @@ class SpectrogramPage extends Component {
                     <Col
                       style={{ justifyContent: 'left', paddingTop: rulerTopHeight, paddingLeft: 0, paddingRight: 0 }}
                     >
-                      <Stage width={60} height={spectrogramHeight}>
+                      <Stage width={55} height={spectrogramHeight}>
                         <ScrollBar
                           fetchAndRender={this.fetchAndRender}
                           totalIQSamples={blob.totalIQSamples}

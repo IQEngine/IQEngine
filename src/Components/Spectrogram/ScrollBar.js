@@ -228,7 +228,7 @@ const ScrollBar = (props) => {
           <Rect
             x={scrollbarWidth}
             y={parseInt(tile) * TILE_SIZE_IN_IQ_SAMPLES * scalingFactor}
-            width={10}
+            width={5}
             height={TILE_SIZE_IN_IQ_SAMPLES * scalingFactor}
             fillEnabled="true"
             fill="white"
