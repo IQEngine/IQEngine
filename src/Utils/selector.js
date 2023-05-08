@@ -175,7 +175,6 @@ export const selectFft = (
 
   // Go through each of the tiles and compute the FFT and save in window.fftData
   const tiles = range(Math.floor(lowerTile), Math.floor(upperTile) + 1);
-  console.log('tiles:', tiles);
   let autoMaxs = [];
   let autoMins = [];
   for (let tile of tiles) {
@@ -227,7 +226,7 @@ export const selectFft = (
   upperTrim = upperTrim - (upperTrim % fftSize);
   const trimmedFftData = totalFftData.slice(lowerTrim * 4, totalFftData.length - upperTrim * 4); // totalFftData.length already includes the *4
   const num_final_ffts = trimmedFftData.length / fftSize / 4;
-  console.log('num_final_ffts:', num_final_ffts);
+  //console.log('num_final_ffts:', num_final_ffts);
 
   // Render Image
   const imageData = new ImageData(trimmedFftData, fftSize, num_final_ffts);
@@ -285,7 +284,7 @@ export function calculateTileNumbers(handleTop, totalIQSamples, fftSize, spectro
   const lowerTile = (totalIQSamples * fractionIntoFile) / TILE_SIZE_IN_IQ_SAMPLES;
   const upperTile = fftsOnScreen / fftsPerTile + lowerTile;
 
-  console.log('lowerTile:', lowerTile, 'upperTile:', upperTile);
+  //console.log('lowerTile:', lowerTile, 'upperTile:', upperTile);
   return { lowerTile: lowerTile, upperTile: upperTile };
 }
 
