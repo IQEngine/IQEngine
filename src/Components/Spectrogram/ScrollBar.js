@@ -6,12 +6,22 @@ import React, { useState, useEffect } from 'react';
 import { Layer, Rect, Image } from 'react-konva';
 import { fftshift } from 'fftshift';
 import { colMap } from '../../Utils/colormap';
-import { MINIMUM_SCROLL_HANDLE_HEIGHT_PIXELS } from '../../Utils/constants';
+import { MINIMUM_SCROLL_HANDLE_HEIGHT_PIXELS, TILE_SIZE_IN_IQ_SAMPLES } from '../../Utils/constants';
 
 const FFT = require('fft.js');
 
 const ScrollBar = (props) => {
-  let { totalIQSamples, spectrogramHeight, fetchAndRender, fftSize, minimapNumFetches, meta, skipNFfts, size } = props;
+  let {
+    totalIQSamples,
+    spectrogramHeight,
+    fetchAndRender,
+    fftSize,
+    minimapNumFetches,
+    meta,
+    skipNFfts,
+    size,
+    downloadedTiles,
+  } = props;
 
   const [minimapImg, setMinimapImg] = useState(null);
   //const [scrollbarWidth, setStageWidth] = useState(50);
@@ -19,6 +29,7 @@ const ScrollBar = (props) => {
   const [y, setY] = useState(0);
   const [ticks, setTicks] = useState([]);
   const [handleHeightPixels, setHandleHeightPixels] = useState();
+  const [scalingFactor, setScalingFactor] = useState();
 
   // Calc scroll handle height
   useEffect(() => {
@@ -27,6 +38,7 @@ const ScrollBar = (props) => {
     setHandleHeightPixels(x);
   }, [spectrogramHeight, totalIQSamples, fftSize]);
 
+  // This only runs once, once all the minimap fetches have occured
   useEffect(() => {
     if (!minimapNumFetches) {
       return;
@@ -38,11 +50,14 @@ const ScrollBar = (props) => {
         .filter(Boolean).length === minimapNumFetches
     ) {
       // First refresh the spectrogram (not minimap) data since the maxFft and minFft will be better estimates by the time the minimap data is fetched
+      // TODO: it's messy to have behavior unrelated to the minimap here, just because the minimap loading is a convinient way to delay a bit
       window.fftData = {};
       props.fetchAndRender(0);
 
       // Loop through the samples we downloaded, calc FFT and produce spectrogram image
       const fftSizeScrollbar = window.iqData['minimap0'].length / 2; // just use the first one to find length
+      const newScalingFactor = spectrogramHeight / fftSizeScrollbar / (skipNFfts + 1) / minimapNumFetches;
+      setScalingFactor(newScalingFactor);
       let magnitudesBuffer = new Float64Array(fftSizeScrollbar * minimapNumFetches); // only typed arrays have set()
       for (let i = 0; i < minimapNumFetches; i++) {
         const samples = window.iqData['minimap' + i.toString()];
@@ -98,12 +113,8 @@ const ScrollBar = (props) => {
       let t = [];
       meta.annotations.forEach((annotation) => {
         t.push({
-          y:
-            (annotation['core:sample_start'] / fftSizeScrollbar / (skipNFfts + 1) / minimapNumFetches) *
-            spectrogramHeight,
-          height:
-            (annotation['core:sample_count'] / fftSizeScrollbar / (skipNFfts + 1) / minimapNumFetches) *
-            spectrogramHeight,
+          y: annotation['core:sample_start'] * newScalingFactor,
+          height: annotation['core:sample_count'] * newScalingFactor,
         });
       });
       setTicks(t);
@@ -210,6 +221,20 @@ const ScrollBar = (props) => {
             stroke="black"
             strokeWidth={2}
             key={'annotation' + index.toString()}
+          />
+        ))}
+
+        {downloadedTiles.map((tile, index) => (
+          <Rect
+            x={scrollbarWidth}
+            y={parseInt(tile) * TILE_SIZE_IN_IQ_SAMPLES * scalingFactor}
+            width={10}
+            height={TILE_SIZE_IN_IQ_SAMPLES * scalingFactor}
+            fillEnabled="true"
+            fill="white"
+            stroke="black"
+            strokeWidth={0}
+            key={tile}
           />
         ))}
       </Layer>
