@@ -21,6 +21,8 @@ import Visualization from './pages/Visualization';
 // @ts-ignore
 import { About } from './About';
 // @ts-ignore
+import { SigMF } from './SigMF';
+// @ts-ignore
 import SignalGenerator from './Components/SignalGenerator/SignalGenerator';
 // @ts-ignore
 import { Plugins } from './Plugins';
@@ -57,6 +59,7 @@ render(
         ) : (
           <Route path="/" element={<App />}>
             <Route path="about" element={<About />} />
+            <Route path="sigmf" element={<SigMF />} />
             <Route path="siggen" element={<SignalGenerator />} />
             <Route path="plugins" element={<Plugins />} />
             <Route path="validator" element={<Validator />} />

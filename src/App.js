@@ -39,16 +39,25 @@ export const App = () => {
             </a>
           </Col>
           <Col md="4">
-            <Navbar variant="dark">
+            <Row>
+              <Container className="nav justify-content-end">
+                <Navbar variant="dark" style={{ paddingTop: '0px', paddingBottom: '0px' }}>
+                  <Nav.Link href="/about" style={{ fontSize: '24px', paddingLeft: '0px', paddingRight: '25px' }}>
+                    About
+                  </Nav.Link>
+
+                  <Nav.Link href="/sigmf" style={{ fontSize: '24px', paddingLeft: '0px', paddingRight: '25px' }}>
+                    SigMF
+                  </Nav.Link>
+
+                  <Nav.Link href="/plugins" style={{ fontSize: '24px', paddingLeft: '0px', paddingRight: '10px' }}>
+                    Plugins
+                  </Nav.Link>
+                </Navbar>
+              </Container>
+            </Row>
+            <Row className="mb0 mt0">
               <Container className="nav justify-content-end" style={{ whiteSpace: 'nowrap' }}>
-                <Nav.Link href="/about" style={{ fontSize: '24px', paddingLeft: '0px', paddingRight: '25px' }}>
-                  About
-                </Nav.Link>
-
-                <Nav.Link href="/plugins" style={{ fontSize: '24px', paddingLeft: '0px', paddingRight: '20px' }}>
-                  Plugins
-                </Nav.Link>
-
                 <a
                   className="nav-link"
                   style={{ fontSize: '24px', paddingLeft: '0px', paddingRight: '20px' }}
@@ -62,7 +71,7 @@ export const App = () => {
 
                 <a
                   className="nav-link"
-                  style={{ fontSize: '24px', paddingLeft: '0px', paddingRight: '0px' }}
+                  style={{ fontSize: '24px', paddingLeft: '0px', paddingRight: '10px' }}
                   target="_blank"
                   rel="noreferrer"
                   href="https://github.com/iqengine/iqengine"
@@ -71,7 +80,7 @@ export const App = () => {
                   GitHub
                 </a>
               </Container>
-            </Navbar>
+            </Row>
           </Col>
         </Row>
         <Outlet />
