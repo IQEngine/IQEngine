@@ -24,6 +24,9 @@ export const DetectorPane = (props) => {
       .then(function (data) {
         console.log('Detectors:', data);
         setDetectorList(data);
+      })
+      .catch((error) => {
+        console.log(error);
       });
   }, []);
 
@@ -110,7 +113,7 @@ export const DetectorPane = (props) => {
   };
 
   return (
-    <Form className="detectForm" controlId="detectFormId" onSubmit={handleSubmit}>
+    <Form className="detectForm" controlid="detectFormId" onSubmit={handleSubmit}>
       <Form.Label>Detector:</Form.Label>
       <select value={selectedDetector} onChange={handleChangeDetector}>
         <option disabled value="default">
