@@ -118,7 +118,7 @@ class SpectrogramPage extends Component {
     // make sure not to resetConnection() here or else it screws up ability to switch between recordings without clicking the browse button again
     this.props.resetMeta();
     window.iqData = {};
-    //this.props.resetBlob();
+    //this.props.resetBlob();  // cant reset this either or when you make code changes with the live server it will screw up after each change
     window.removeEventListener('resize', this.windowResized);
   }
 
