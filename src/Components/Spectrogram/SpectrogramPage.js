@@ -65,6 +65,7 @@ class SpectrogramPage extends Component {
       redirect: false,
       pyodide: null,
       handleTop: 0,
+      downloadedTiles: [], // used by minimap
     };
   }
 
@@ -437,10 +438,14 @@ class SpectrogramPage extends Component {
       return false;
     }
 
+    // Update list of which tiles have been downloaded which minimap displays
+    let downloadedTiles = Object.keys(window.iqData);
+
     // Fetch the tiles
     const tiles = range(Math.floor(lowerTile), Math.ceil(upperTile));
     for (let tile of tiles) {
       if (!(tile.toString() in window.iqData)) {
+        downloadedTiles.push(tile.toString());
         this.props.fetchMoreData({
           tile: tile,
           connection: connection,
@@ -452,6 +457,10 @@ class SpectrogramPage extends Component {
         });
       }
     }
+
+    downloadedTiles = downloadedTiles.filter((e) => !e.includes('minimap')); // remove minimap ones
+    this.setState({ downloadedTiles: downloadedTiles });
+
     this.renderImage(lowerTile, upperTile);
     return true;
   };
@@ -479,6 +488,7 @@ class SpectrogramPage extends Component {
       redirect,
       rulerTopHeight,
       marginTop,
+      downloadedTiles,
     } = this.state;
 
     const fft = {
@@ -577,7 +587,7 @@ class SpectrogramPage extends Component {
                     <Col
                       style={{ justifyContent: 'left', paddingTop: rulerTopHeight, paddingLeft: 0, paddingRight: 0 }}
                     >
-                      <Stage width={50} height={spectrogramHeight}>
+                      <Stage width={55} height={spectrogramHeight}>
                         <ScrollBar
                           fetchAndRender={this.fetchAndRender}
                           totalIQSamples={blob.totalIQSamples}
@@ -587,6 +597,7 @@ class SpectrogramPage extends Component {
                           meta={meta}
                           skipNFfts={skipNFfts}
                           size={this.props.minimap.size}
+                          downloadedTiles={downloadedTiles}
                         />
                       </Stage>
                     </Col>
