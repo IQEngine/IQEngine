@@ -15,8 +15,8 @@ args = parser.parse_args()
 
 connection_string = args.connectionstring
 
-fftSize = 512
-num_bytes = fftSize*256
+fftSize = 1024
+num_bytes = fftSize*512
 offset = 8000 # some might have a header from when they were converted to sigmf the lazy way
 
 container_names = ['iqengine', 'estevez', 'northeastern']

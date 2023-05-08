@@ -6,12 +6,19 @@ import React, { useState, useEffect } from 'react';
 import { Layer, Rect } from 'react-konva';
 
 const TimeSelector = (props) => {
-  const { spectrogramHeight, upperTile, lowerTile, handleTimeSelectionStart, handleTimeSelectionEnd } = props;
+  const {
+    spectrogramHeight,
+    spectrogramWidth,
+    upperTile,
+    lowerTile,
+    handleTimeSelectionStart,
+    handleTimeSelectionEnd,
+  } = props;
   const tileDiff = upperTile - lowerTile; // amount of samples displayed on the spectrogram in units of tiles
 
   const [startTileNum, setStartTileNum] = useState(lowerTile + 0.25 * tileDiff || 2);
   const [endTileNum, setEndTileNum] = useState(lowerTile + 0.75 * tileDiff || 7);
-  const [width, setWidth] = useState(600);
+  const [width, setWidth] = useState(spectrogramWidth);
 
   useEffect(() => {
     setWidth(props.spectrogramWidth);
@@ -40,7 +47,7 @@ const TimeSelector = (props) => {
     if (newY > spectrogramHeight - 2) newY = spectrogramHeight - 2;
     e.target.y(newY);
     e.target.x(0); // keep line in the same x location
-    return (newY / 600) * tileDiff + lowerTile; // FIXME: at some point the spectrogram wont always be 600 pixels tall!
+    return (newY / spectrogramHeight) * tileDiff + lowerTile;
   };
 
   return (
@@ -49,15 +56,15 @@ const TimeSelector = (props) => {
         <>
           <Rect
             x={0}
-            y={((startTileNum - lowerTile) / tileDiff) * 600}
+            y={((startTileNum - lowerTile) / tileDiff) * spectrogramHeight}
             width={width}
-            height={((endTileNum - startTileNum) / tileDiff) * 600}
+            height={((endTileNum - startTileNum) / tileDiff) * spectrogramHeight}
             fill="black"
             opacity={0.4}
           />
           <Rect
             x={0}
-            y={((startTileNum - lowerTile) / tileDiff) * 600}
+            y={((startTileNum - lowerTile) / tileDiff) * spectrogramHeight}
             width={width}
             height={0}
             draggable={true}
@@ -69,7 +76,7 @@ const TimeSelector = (props) => {
           ></Rect>
           <Rect
             x={0}
-            y={((endTileNum - lowerTile) / tileDiff) * 600}
+            y={((endTileNum - lowerTile) / tileDiff) * spectrogramHeight}
             width={width}
             height={0}
             draggable={true}
