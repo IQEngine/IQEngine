@@ -119,6 +119,7 @@ class SpectrogramPage extends Component {
     this.props.resetMeta();
     window.iqData = {};
     this.props.resetBlob();
+    window.removeEventListener('resize', this.windowResized);
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -487,6 +488,7 @@ class SpectrogramPage extends Component {
     };
 
     if (redirect) {
+      window.removeEventListener('resize', this.windowResized);
       return <Navigate to="/" />;
     }
 
