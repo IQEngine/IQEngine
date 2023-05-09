@@ -30,7 +30,10 @@ jobs:
           CI: false
 
       - name: Zip artifact for deployment
-        run: zip release.zip ./build/* -r
+        run: |
+          pushd build
+          zip -r ../release.zip .
+          popd
         
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
