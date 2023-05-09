@@ -28,18 +28,14 @@ jobs:
           npm run build --if-present
         env:
           CI: false
+          VITE_CONNECTION_INFO: ${{ secrets.VITE_CONNECTION_INFO }}
+          VITE_IQENGINE_APP_VERSION: $${{ secrets.VITE_IQENGINE_APP_VERSION }}
 
-      - name: Zip artifact for deployment
-        run: |
-          pushd build
-          zip -r ../release.zip .
-          popd
-        
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
         with:
           name: node-app
-          path: release.zip
+          path: build/
 
   deploy-to-staging:
     name: Deploy to Staging
