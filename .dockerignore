@@ -1,0 +1,9 @@
+.vscode
+.git
+.gitignore
+tests/
+node_modules/
+detectors/
+server/
+Dockerfile
+Dockerfile.fe
