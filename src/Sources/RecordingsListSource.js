@@ -8,8 +8,7 @@ import {
   fetchRecordingsListSuccess,
 } from '../Store/Actions/RecordingsListActions';
 import parseMeta from '../Utils/parseMeta';
-
-const { BlobServiceClient } = require('@azure/storage-blob');
+import { BlobServiceClient } from '@azure/storage-blob';
 
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 

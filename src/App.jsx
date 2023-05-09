@@ -11,8 +11,8 @@ import { Outlet } from 'react-router-dom';
 import ThemeSelector from './Components/Styles/ThemeSelector';
 
 // If env var is set, initialize google analytics
-if (process.env.GOOGLE_ANALYTICS_KEY) {
-  ReactGA.initialize(process.env.GOOGLE_ANALYTICS_KEY);
+if (import.meta.env.GOOGLE_ANALYTICS_KEY) {
+  ReactGA.initialize(import.meta.env.GOOGLE_ANALYTICS_KEY);
 }
 
 export const App = () => {

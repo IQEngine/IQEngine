@@ -2,11 +2,20 @@
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
 
+// @ts-ignore
 import { fftshift } from 'fftshift';
 import { colMap } from './colormap';
-import { TILE_SIZE_IN_IQ_SAMPLES } from '../Utils/constants';
+import { TILE_SIZE_IN_IQ_SAMPLES } from './constants';
+import * as FFT from 'fft.js';
 
-const FFT = require('fft.js');
+declare global {
+  interface Window {
+    fftData: any;
+    annotations: Array<any>;
+    sampleRate: number;
+    iqData: any;
+  }
+}
 
 window.fftData = {}; // this is where our FFT outputs are stored
 window.annotations = []; // gets filled in before return
@@ -20,24 +29,24 @@ export const clearAllData = () => {
   window.iqData = {}; // initialized in blobSlice.js but we have to clear it each time we go to another spectrogram page
 };
 
-function getStandardDeviation(array) {
+function getStandardDeviation(array: Array<any>) {
   const n = array.length;
   const mean = array.reduce((a, b) => a + b) / n;
   return Math.sqrt(array.map((x) => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n);
 }
 
-const average = (array) => array.reduce((a, b) => a + b) / array.length;
+const average = (array: Array<any>) => array.reduce((a, b) => a + b) / array.length;
 
 function calcFftOfTile(
-  samples,
-  fftSize,
-  numFftsPerTile,
-  windowFunction,
-  magnitude_min,
-  magnitude_max,
-  autoscale,
-  currentFftMax,
-  currentFftMin
+  samples: any,
+  fftSize: any,
+  numFftsPerTile: any,
+  windowFunction: any,
+  magnitude_min: any,
+  magnitude_max: any,
+  autoscale: any,
+  currentFftMax: any,
+  currentFftMin: any
 ) {
   let startTime = performance.now();
   let newFftData = new Uint8ClampedArray(fftSize * numFftsPerTile * 4); // 4 because RGBA
@@ -155,16 +164,16 @@ function calcFftOfTile(
 
 // lowerTile and upperTile are in fractions of a tile
 export const selectFft = (
-  lowerTile,
-  upperTile,
-  fftSize, // in units of IQ samples
-  magnitudeMax,
-  magnitudeMin,
-  meta,
-  windowFunction,
-  currentFftMax,
-  currentFftMin,
-  spectrogramHeight,
+  lowerTile: any,
+  upperTile: any,
+  fftSize: any, // in units of IQ samples
+  magnitudeMax: any,
+  magnitudeMin: any,
+  meta: any,
+  windowFunction: any,
+  currentFftMax: any,
+  currentFftMin: any,
+  spectrogramHeight: any,
   autoscale = false
 ) => {
   const numFftsPerTile = TILE_SIZE_IN_IQ_SAMPLES / fftSize;
@@ -275,7 +284,7 @@ export const selectFft = (
   return selectFftReturn;
 };
 
-export function calculateTileNumbers(handleTop, totalIQSamples, fftSize, spectrogramHeight) {
+export function calculateTileNumbers(handleTop: any, totalIQSamples: any, fftSize: any, spectrogramHeight: any) {
   const fftsOnScreen = spectrogramHeight; // remember, we are assuming that 1 row of pixels = 1 FFT
   const fftsPerTile = TILE_SIZE_IN_IQ_SAMPLES / fftSize;
   const fractionIntoFile = handleTop / spectrogramHeight; // because of the way the scrollbar works and is always same height as spectrogram
@@ -289,11 +298,11 @@ export function calculateTileNumbers(handleTop, totalIQSamples, fftSize, spectro
 }
 
 // mimicing python's range() function which gives array of integers between two values non-inclusive of end
-export function range(start, end) {
+export function range(start: any, end: any) {
   return Array.apply(0, Array(end - start)).map((element, index) => index + start);
 }
 
-export function dataTypeToBytesPerSample(dataType) {
+export function dataTypeToBytesPerSample(dataType: any) {
   let bytesPerSample = null;
   if (dataType.includes('8')) {
     bytesPerSample = 1;

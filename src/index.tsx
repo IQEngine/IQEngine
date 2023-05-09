@@ -3,7 +3,6 @@
 // Licensed under the MIT License
 
 import React from 'react';
-import { render } from 'react-dom';
 // import { RedocStandalone } from 'redoc';
 // import { redocTheme } from './Utils/redocTheme';
 // @ts-ignore
@@ -36,15 +35,20 @@ import SpectrogramContainer from './Containers/SpectrogramContainer';
 import RecordingsListContainer from './Containers/RecordingsListContainer';
 // @ts-ignore
 import { App } from './App';
+import { createRoot } from 'react-dom/client';
 // @ts-ignore
-const root = document.getElementById('root');
+
 var new_version: boolean = false;
 // Select wich version to run based on an environment variable
-if (process.env.REACT_APP_IQENGINE_APP_VERSION === 'v2') {
+if (import.meta.env.VITE_IQENGINE_APP_VERSION === 'v2') {
   new_version = true;
+} else {
+  new_version = false;
 }
-
-render(
+const container = document.getElementById('root');
+if (!container) throw new Error('No root element found');
+const root = createRoot(container);
+root.render(
   <Provider store={store}>
     <BrowserRouter>
       <Routes>
@@ -65,8 +69,8 @@ render(
             <Route path="validator" element={<Validator />} />
 
             {
-            // Remove redoc until we can get it to work with the new version of React
-            /* <Route
+              // Remove redoc until we can get it to work with the new version of React
+              /* <Route
               path="/openapi"
               element={
                 <RedocStandalone
@@ -77,7 +81,8 @@ render(
                   specUrl="https://raw.githubusercontent.com/IQEngine/IQEngine/main/detectors/openapi.yaml"
                 />
               }
-            /> */}
+            /> */
+            }
             <Route path="/" element={<RepoBrowserContainer />} />
             <Route path="recordings/spectrogram/:recording" element={<SpectrogramContainer />} />
             <Route path="recordings/:accountName?/:containerName?/:sasToken?" element={<RecordingsListContainer />} />
@@ -85,8 +90,7 @@ render(
         )}
       </Routes>
     </BrowserRouter>
-  </Provider>,
-  root
+  </Provider>
 );
 
 // If you want to start measuring performance in your app, pass a function
