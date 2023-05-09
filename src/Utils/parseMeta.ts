@@ -4,7 +4,13 @@
 
 import { dataTypeToBytesPerSample } from './selector';
 
-export default function parseMeta(json_string, baseUrl, fName, metaFileHandle, dataFileHandle) {
+export default function parseMeta(
+  json_string: any,
+  baseUrl: any,
+  fName: any,
+  metaFileHandle: any,
+  dataFileHandle: any
+) {
   let obj;
   try {
     obj = JSON.parse(json_string); // string to JSON

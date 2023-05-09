@@ -12,8 +12,8 @@ import ValidatorTile from './ValidatorTile';
 const RepoBrowser = (props) => {
   let tileObjInfo = [];
   // In local mode, CONNECTION_INFO isn't defined
-  if (process.env.REACT_APP_CONNECTION_INFO) {
-    tileObjInfo = JSON.parse(process.env.REACT_APP_CONNECTION_INFO).settings;
+  if (import.meta.env.VITE_CONNECTION_INFO) {
+    tileObjInfo = JSON.parse(import.meta.env.VITE_CONNECTION_INFO).settings;
   }
 
   return (

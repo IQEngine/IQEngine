@@ -6,7 +6,7 @@ import { updateBlobTotalIQSamples } from '../Store/Actions/BlobActions';
 import { updateConnectionBlobClient } from '../Store/Actions/ConnectionActions';
 import { returnMetaDataBlob } from '../Store/Actions/FetchMetaActions';
 import { dataTypeToBytesPerSample } from '../Utils/selector';
-const { BlobServiceClient } = require('@azure/storage-blob');
+import { BlobServiceClient } from '@azure/storage-blob';
 
 // Thunk function
 
