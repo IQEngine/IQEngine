@@ -7,7 +7,7 @@
     "skipLibCheck": false,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "strict": true,
+    "strict": false,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "module": "ESNext",
@@ -16,7 +16,6 @@
     "isolatedModules": true,
     "importHelpers": true,
     "noEmit": true,
-    "jsx": "react-jsx",
     "paths": {
       "@/*": ["./src/*"]
     }

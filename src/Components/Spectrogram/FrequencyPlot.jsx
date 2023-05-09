@@ -6,7 +6,7 @@ import Plot from 'react-plotly.js';
 import React, { useEffect, useState } from 'react';
 import { fftshift } from 'fftshift';
 import { template } from '../../Utils/plotlyTemplate';
-import * as FFT from 'fft.js';
+import { FFT } from '@/Utils/fft';
 
 export const FrequencyPlot = (props) => {
   let { currentSamples } = props;

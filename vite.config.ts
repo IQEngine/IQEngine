@@ -14,23 +14,19 @@ export default defineConfig({
     port: 3000,
     open: true,
   },
+  preview: {
+    port: 3001,
+    open: true,
+  },
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
+      './runtimeConfig': './runtimeConfig.browser',
     },
   },
   build: {
     outDir: 'build',
+    sourcemap: true,
   },
-  plugins: [
-    react({
-      jsxImportSource: '@emotion/react',
-      babel: {
-        plugins: ['@emotion/babel-plugin'],
-      },
-    }),
-    viteTsconfigPaths(),
-    svgrPlugin(),
-    envCompatible(),
-  ],
+  plugins: [react(), viteTsconfigPaths(), svgrPlugin(), envCompatible()],
 });
