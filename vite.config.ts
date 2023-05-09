@@ -26,7 +26,9 @@ export default defineConfig({
   },
   build: {
     outDir: 'build',
-    sourcemap: true,
+    // if tou change the sourcemap to true you need to also increate the max heap size
+    // export NODE_OPTIONS=--max-old-space-size=32768
+    sourcemap: false,
   },
   plugins: [react(), viteTsconfigPaths(), svgrPlugin(), envCompatible()],
 });
