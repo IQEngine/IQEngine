@@ -4,8 +4,8 @@
 
 import React from 'react';
 import { render } from 'react-dom';
-import { RedocStandalone } from 'redoc';
-import { redocTheme } from './Utils/redocTheme';
+// import { RedocStandalone } from 'redoc';
+// import { redocTheme } from './Utils/redocTheme';
 // @ts-ignore
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
@@ -63,7 +63,10 @@ render(
             <Route path="siggen" element={<SignalGenerator />} />
             <Route path="plugins" element={<Plugins />} />
             <Route path="validator" element={<Validator />} />
-            <Route
+
+            {
+            // Remove redoc until we can get it to work with the new version of React
+            /* <Route
               path="/openapi"
               element={
                 <RedocStandalone
@@ -74,7 +77,7 @@ render(
                   specUrl="https://raw.githubusercontent.com/IQEngine/IQEngine/main/detectors/openapi.yaml"
                 />
               }
-            />
+            /> */}
             <Route path="/" element={<RepoBrowserContainer />} />
             <Route path="recordings/spectrogram/:recording" element={<SpectrogramContainer />} />
             <Route path="recordings/:accountName?/:containerName?/:sasToken?" element={<RecordingsListContainer />} />

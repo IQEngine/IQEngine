@@ -176,7 +176,12 @@ class SpectrogramPage extends Component {
       const { blob, fftSize, spectrogramHeight } = newState;
 
       // this tells us its the first time the page has loaded, so start at the beginning of the file (y=0)
-      if (newState.lowerTile === -1) {
+      if (
+        newState.lowerTile === -1 ||
+        newState.upperTile === -1 ||
+        isNaN(newState.lowerTile) ||
+        isNaN(newState.upperTile)
+      ) {
         const { lowerTile, upperTile } = calculateTileNumbers(0, blob.totalIQSamples, fftSize, spectrogramHeight);
         newState.lowerTile = lowerTile;
         newState.upperTile = upperTile;
