@@ -51,9 +51,6 @@ jobs:
         with:
           name: node-app
 
-      - name: unzip artifact for deployment
-        run: unzip release.zip
-
       - name: 'Deploy to Staging Environment'
         id: deploy-to-staging
         uses: azure/webapps-deploy@v2
