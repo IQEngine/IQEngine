@@ -62,7 +62,8 @@ The build step will take 3-5 minutes.  After running it you should be able to ac
 
 ## Azure App Service Config Notes
 
-* Startup command needs to include --spa or react-router-dom wont work: `pm2 serve /home/site/wwwroot/build --no-daemon --spa`
-* Node 18
+* Startup command needs to be `pm2 serve /home/site/wwwroot --spa --no-daemon`
+* Node 16
 * There needs to be a deployment slot called staging
 * within the github repo settings under Secrets and vars > Actions, there needs to be a Repository secret with AZUREAPPSERVICE_PUBLISHPROFILE...
+* Connection settings live in GitHub Secrets > Actions (not Azure App Service anymore), enter it in without the outter double quotes and don't escape any quotes.
