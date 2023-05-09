@@ -6,7 +6,7 @@
 import { fftshift } from 'fftshift';
 import { colMap } from './colormap';
 import { TILE_SIZE_IN_IQ_SAMPLES } from './constants';
-import * as FFT from 'fft.js';
+import { FFT } from '@/Utils/fft';
 
 declare global {
   interface Window {
