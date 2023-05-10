@@ -2,8 +2,9 @@ name: A workflow for ensuring credentials are not pushed
 on: push
 jobs:
   build:
-    name: TruffleHog Cred Checker
+    name: Trufflehog Cred Checker
     runs-on: ubuntu-latest
     steps:
-       - name: TruffleHog OSS
-         uses: trufflesecurity/trufflehog@v3.34.0
+       - uses: actions/checkout@master
+       - name:  trufflehog-actions-scan
+         uses: edplato/trufflehog-actions-scan
