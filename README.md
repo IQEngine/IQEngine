@@ -59,8 +59,6 @@ The build step will take 3-5 minutes.  After running it you should be able to ac
 * within the github repo settings under Secrets and vars > Actions, there needs to be a Repository secret with AZUREAPPSERVICE_PUBLISHPROFILE...
 * Connection settings live in GitHub Secrets > Actions (not Azure App Service anymore), enter it in without the outter double quotes and don't escape any quotes.
 
-&nbsp;
-
 <p align="center"><h1>IQEngine is Supported By:</h1></p>
 
 <p align="center"><img width=250 src="public/microsoft-logo.svg" /></p>
