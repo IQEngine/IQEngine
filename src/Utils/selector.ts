@@ -173,8 +173,8 @@ export const selectFft = (
   windowFunction: any,
   currentFftMax: any,
   currentFftMin: any,
-  spectrogramHeight: any,
-  autoscale = false
+  autoscale = false,
+  zoomLevel: any
 ) => {
   const numFftsPerTile = TILE_SIZE_IN_IQ_SAMPLES / fftSize;
   let magnitude_max = magnitudeMax;
@@ -233,8 +233,24 @@ export const selectFft = (
   lowerTrim = lowerTrim - (lowerTrim % fftSize); // make it an even FFT size. TODO We need this rounding to happen earlier, so we get a consistent 600 ffts in the image
   let upperTrim = (1 - (upperTile - Math.floor(upperTile))) * fftSize * numFftsPerTile; // amount we want to get rid of
   upperTrim = upperTrim - (upperTrim % fftSize);
-  const trimmedFftData = totalFftData.slice(lowerTrim * 4, totalFftData.length - upperTrim * 4); // totalFftData.length already includes the *4
-  const num_final_ffts = trimmedFftData.length / fftSize / 4;
+  let trimmedFftData = totalFftData.slice(lowerTrim * 4, totalFftData.length - upperTrim * 4); // totalFftData.length already includes the *4
+  let num_final_ffts = trimmedFftData.length / fftSize / 4;
+
+  // zoomLevel portion (decimate by N)
+  if (zoomLevel !== 1) {
+    num_final_ffts = Math.floor(num_final_ffts / zoomLevel);
+    console.log(num_final_ffts);
+    let zoomedFftData = new Uint8ClampedArray(num_final_ffts * fftSize * 4);
+    // loop through ffts
+    for (let i = 0; i < num_final_ffts; i++) {
+      zoomedFftData.set(
+        trimmedFftData.slice(i * zoomLevel * fftSize * 4, (i * zoomLevel + 1) * fftSize * 4),
+        i * fftSize * 4 // item offset for this data to be inserted
+      );
+    }
+    trimmedFftData = zoomedFftData;
+  }
+
   //console.log('num_final_ffts:', num_final_ffts);
 
   // Render Image
@@ -264,8 +280,8 @@ export const selectFft = (
       annotations_list.push({
         x1: ((freq_lower_edge - lower_freq) / sampleRate) * fftSize, // left side. units are in fractions of an FFT size, e.g. 0-1024
         x2: ((freq_upper_edge - lower_freq) / sampleRate) * fftSize, // right side
-        y1: (sample_start - start_sample_index) / fftSize, // top. NOTE SURE WHY I NEED THIS LAST TERM
-        y2: (sample_start - start_sample_index + sample_count) / fftSize, // bottom. NOTE SURE WHY I NEED THIS LAST TERM
+        y1: (sample_start - start_sample_index) / fftSize / zoomLevel, // top
+        y2: (sample_start - start_sample_index + sample_count) / fftSize / zoomLevel, // bottom
         description: description,
         index: i, // so we can keep track of which annotation it was in the full list
       });
@@ -284,8 +300,14 @@ export const selectFft = (
   return selectFftReturn;
 };
 
-export function calculateTileNumbers(handleTop: any, totalIQSamples: any, fftSize: any, spectrogramHeight: any) {
-  const fftsOnScreen = spectrogramHeight; // remember, we are assuming that 1 row of pixels = 1 FFT
+export function calculateTileNumbers(
+  handleTop: any,
+  totalIQSamples: any,
+  fftSize: any,
+  spectrogramHeight: any,
+  zoomLevel: any
+) {
+  const fftsOnScreen = spectrogramHeight * zoomLevel; // remember, we are assuming that 1 row of pixels = 1 FFT, times zoomLevel
   const fftsPerTile = TILE_SIZE_IN_IQ_SAMPLES / fftSize;
   const fractionIntoFile = handleTop / spectrogramHeight; // because of the way the scrollbar works and is always same height as spectrogram
 

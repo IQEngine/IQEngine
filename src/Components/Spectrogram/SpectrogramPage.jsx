@@ -65,12 +65,13 @@ class SpectrogramPage extends Component {
       redirect: false,
       pyodide: null,
       handleTop: 0,
+      zoomLevel: 1,
       downloadedTiles: [], // used by minimap
     };
   }
 
   windowResized = () => {
-    const { rulerTopHeight, marginTop, blob, fftSize, handleTop } = this.state;
+    const { rulerTopHeight, marginTop, blob, fftSize, handleTop, zoomLevel } = this.state;
 
     // Calc the area to be filled by the spectrogram
     const windowHeight = window.innerHeight;
@@ -83,7 +84,8 @@ class SpectrogramPage extends Component {
       handleTop,
       blob.totalIQSamples,
       fftSize,
-      newSpectrogramHeight
+      newSpectrogramHeight,
+      zoomLevel
     );
 
     this.setState({ spectrogramHeight: newSpectrogramHeight, lowerTile: lowerTile, upperTile: upperTile });
@@ -173,7 +175,7 @@ class SpectrogramPage extends Component {
 
     // This kicks things off when you first load into the page
     if (newState.connection.blobClient != null && reload) {
-      const { blob, fftSize, spectrogramHeight } = newState;
+      const { blob, fftSize, spectrogramHeight, zoomLevel } = newState;
 
       // this tells us its the first time the page has loaded, so start at the beginning of the file (y=0)
       if (
@@ -182,7 +184,13 @@ class SpectrogramPage extends Component {
         isNaN(newState.lowerTile) ||
         isNaN(newState.upperTile)
       ) {
-        const { lowerTile, upperTile } = calculateTileNumbers(0, blob.totalIQSamples, fftSize, spectrogramHeight);
+        const { lowerTile, upperTile } = calculateTileNumbers(
+          0,
+          blob.totalIQSamples,
+          fftSize,
+          spectrogramHeight,
+          zoomLevel
+        );
         newState.lowerTile = lowerTile;
         newState.upperTile = upperTile;
       }
@@ -326,6 +334,12 @@ class SpectrogramPage extends Component {
     );
   };
 
+  handleZoomLevel = (newLevel) => {
+    this.setState({ zoomLevel: newLevel }, () => {
+      this.fetchAndRender(this.state.handleTop);
+    });
+  };
+
   handleAutoScale = () => {
     this.setState({
       autoscale: true,
@@ -388,8 +402,9 @@ class SpectrogramPage extends Component {
   };
 
   renderImage = (lowerTile, upperTile) => {
-    const { fftSize, magnitudeMax, magnitudeMin, meta, autoscale, currentFftMax, currentFftMin, spectrogramHeight } =
+    const { fftSize, magnitudeMax, magnitudeMin, meta, autoscale, currentFftMax, currentFftMin, zoomLevel } =
       this.state;
+
     // Update the image (eventually this should get moved somewhere else)
     let ret = selectFft(
       lowerTile,
@@ -401,8 +416,8 @@ class SpectrogramPage extends Component {
       this.state.window, // dont want to conflict with the main window var
       currentFftMax,
       currentFftMin,
-      spectrogramHeight,
-      autoscale
+      autoscale,
+      zoomLevel
     );
     if (ret) {
       // Draw the spectrogram
@@ -433,8 +448,14 @@ class SpectrogramPage extends Component {
 
   // num is the y pixel coords of the top of the scrollbar handle, so range of 0 to the height of the scrollbar minus height of handle
   fetchAndRender = (handleTop) => {
-    const { blob, connection, dataType, fftSize, pyodide, spectrogramHeight } = this.state;
-    const { upperTile, lowerTile } = calculateTileNumbers(handleTop, blob.totalIQSamples, fftSize, spectrogramHeight);
+    const { blob, connection, dataType, fftSize, pyodide, spectrogramHeight, zoomLevel } = this.state;
+    const { upperTile, lowerTile } = calculateTileNumbers(
+      handleTop,
+      blob.totalIQSamples,
+      fftSize,
+      spectrogramHeight,
+      zoomLevel
+    );
     this.setState({ lowerTile: lowerTile, upperTile: upperTile, handleTop: handleTop });
 
     // If we already have too many pending fetches then bail
@@ -494,6 +515,7 @@ class SpectrogramPage extends Component {
       rulerTopHeight,
       marginTop,
       downloadedTiles,
+      zoomLevel,
     } = this.state;
 
     const fft = {
@@ -528,6 +550,7 @@ class SpectrogramPage extends Component {
                 handleProcessTime={this.handleProcessTime}
                 toggleCursors={this.toggleCursors}
                 updatePythonSnippet={this.props.updateBlobPythonSnippet}
+                updateZoomLevel={this.handleZoomLevel}
               />
             </Col>
             <Col>
@@ -564,7 +587,7 @@ class SpectrogramPage extends Component {
                           meta={meta}
                           fftSize={fftSize}
                           lowerTile={lowerTile}
-                          spectrogramHeight={spectrogramHeight}
+                          zoomLevel={zoomLevel}
                         />
                         {cursorsEnabled && (
                           <TimeSelector
@@ -603,6 +626,7 @@ class SpectrogramPage extends Component {
                           skipNFfts={skipNFfts}
                           size={this.props.minimap.size}
                           downloadedTiles={downloadedTiles}
+                          zoomLevel={zoomLevel}
                         />
                       </Stage>
                     </Col>
