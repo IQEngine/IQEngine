@@ -14,6 +14,7 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import Toggle from 'react-toggle';
 import RangeSlider from 'react-bootstrap-range-slider';
+import 'react-bootstrap-range-slider/dist/react-bootstrap-range-slider.css';
 
 const SettingsPane = (props) => {
   const [state, setState] = useState({
@@ -185,8 +186,19 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
   return (
     <Form>
       <Form.Group className="mb-3" controlId="formZoom">
-        <Form.Label>Zoom Level</Form.Label>
-        <RangeSlider value={state.zoomLevel} min={1} max={10} step={1} onChange={onChangeZoomLevel} />
+        <Form.Label className="text-center" style={{ width: '100%' }}>
+          Zoom Level
+        </Form.Label>
+        <RangeSlider
+          value={state.zoomLevel}
+          tooltip="on"
+          tooltipPlacement="top"
+          variant="secondary"
+          min={1}
+          max={10}
+          step={1}
+          onChange={onChangeZoomLevel}
+        />
       </Form.Group>
 
       <Form.Group className="mb-3" controlId="toggle">
