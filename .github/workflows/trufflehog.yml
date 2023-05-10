@@ -8,3 +8,4 @@ jobs:
        - uses: actions/checkout@master
        - name: trufflehog-actions-scan
          uses: edplato/trufflehog-actions-scan@v0.9l-beta
+ 
