@@ -12,17 +12,9 @@ with open('openapi.yaml', 'r') as file:
 
 app = fastapi.FastAPI()
 
-origins = [
-    "http://localhost",
-    "http://localhost:3000",
-    "http://localhost:3001",
-    "http://localhost:8000",
-    "https://www.iqengine.org"
-]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -67,11 +59,11 @@ async def detect(info : fastapi.Request, detectorname):
 
     function_input = await info.json()
 
-    # Validate with our schema
-    try:
-        validate(instance=function_input, schema=schema["paths"]["/detectors/{detectorname}"]['post']['requestBody']['content']['application/json']['schema'])
-    except Exception as e:
-        print("POST body failed schema validation, error:", e)
+    # Validate with our schema TOOK TOO LONG
+    #try:
+    #    validate(instance=function_input, schema=schema["paths"]["/detectors/{detectorname}"]['post']['requestBody']['content']['application/json']['schema'])
+    #except Exception as e:
+    #    print("POST body failed schema validation, error:", e)
 
     samples = function_input.pop("samples") # Assumed to be real or floats in IQIQIQIQ (cant send complex over JSON)
     print(function_input)
@@ -82,8 +74,8 @@ async def detect(info : fastapi.Request, detectorname):
         "annotations" : []
     }
     samples = np.asarray(samples)
-    if samples.size % 2 == 1: # in case it comes in odd just remove the last element
-        samples = samples[:-1]
+    if samples.size % 2 == 1:
+        return {"status" : "FAILED - number of samples was not an even number", "annotations": []}
     samples = samples[::2] + 1j*samples[1::2]
     samples = samples.astype(np.complex64)
 

@@ -193,6 +193,5 @@ if __name__ == "__main__":
     sample_rate = meta_data["global"]["core:sample_rate"]
     center_freq = meta_data["captures"][0]['core:frequency']
     samples = np.fromfile(fname + '.sigmf-data', dtype=np.complex64)
-
     annotations = detect(samples, sample_rate, center_freq, time_window_size=10, power_threshold_db=20, time_margin_seconds=0.001, min_bw=10e3)
     print(annotations)
