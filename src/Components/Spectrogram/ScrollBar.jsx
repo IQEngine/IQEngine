@@ -20,6 +20,7 @@ const ScrollBar = (props) => {
     skipNFfts,
     size,
     downloadedTiles,
+    zoomLevel,
   } = props;
 
   const [minimapImg, setMinimapImg] = useState(null);
@@ -32,10 +33,10 @@ const ScrollBar = (props) => {
 
   // Calc scroll handle height
   useEffect(() => {
-    let x = (spectrogramHeight / (totalIQSamples / fftSize)) * spectrogramHeight;
+    let x = (spectrogramHeight / (totalIQSamples / fftSize / zoomLevel)) * spectrogramHeight;
     if (x < MINIMUM_SCROLL_HANDLE_HEIGHT_PIXELS) x = MINIMUM_SCROLL_HANDLE_HEIGHT_PIXELS;
     setHandleHeightPixels(x);
-  }, [spectrogramHeight, totalIQSamples, fftSize]);
+  }, [spectrogramHeight, totalIQSamples, fftSize, zoomLevel]);
 
   // This only runs once, once all the minimap fetches have occured
   useEffect(() => {

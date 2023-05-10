@@ -2,13 +2,12 @@
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
 
-import { faCropSimple } from '@fortawesome/free-solid-svg-icons';
 import React, { Fragment } from 'react';
 import { Layer, Rect, Text } from 'react-konva';
 import { TILE_SIZE_IN_IQ_SAMPLES } from '../../Utils/constants';
 
 const AnnotationViewer = (props) => {
-  let { spectrogramWidthScale, annotations, fftSize, meta, lowerTile, spectrogramHeight } = props;
+  let { spectrogramWidthScale, annotations, fftSize, meta, lowerTile, zoomLevel } = props;
 
   // These two lines are a hack used to force a re-render when an annotation is updated, which for some reason wasnt updating
   const [, updateState] = React.useState();
@@ -28,8 +27,9 @@ const AnnotationViewer = (props) => {
     const f = annotations[annot_indx]['index']; // remember there are 2 different indexes- the ones on the screen and the meta.annotations
     let updatedAnnotations = [...props.meta.annotations];
     let start_sample_index = lowerTile * TILE_SIZE_IN_IQ_SAMPLES;
-    updatedAnnotations[f]['core:sample_start'] = annotations[annot_indx].y1 * fftSize + start_sample_index;
-    updatedAnnotations[f]['core:sample_count'] = (annotations[annot_indx].y2 - annotations[annot_indx].y1) * fftSize;
+    updatedAnnotations[f]['core:sample_start'] = annotations[annot_indx].y1 * fftSize * zoomLevel + start_sample_index;
+    updatedAnnotations[f]['core:sample_count'] =
+      (annotations[annot_indx].y2 - annotations[annot_indx].y1) * fftSize * zoomLevel;
     let lower_freq = meta.captures[0]['core:frequency'] - meta.global['core:sample_rate'] / 2;
     updatedAnnotations[f]['core:freq_lower_edge'] =
       (annotations[annot_indx].x1 / fftSize) * meta.global['core:sample_rate'] + lower_freq;
@@ -64,8 +64,9 @@ const AnnotationViewer = (props) => {
     const f = updatedAnnotations.length - 1;
     const annot_indx = annotations.length - 1;
     let start_sample_index = lowerTile * TILE_SIZE_IN_IQ_SAMPLES;
-    updatedAnnotations[f]['core:sample_start'] = annotations[annot_indx].y1 * fftSize + start_sample_index;
-    updatedAnnotations[f]['core:sample_count'] = (annotations[annot_indx].y2 - annotations[annot_indx].y1) * fftSize;
+    updatedAnnotations[f]['core:sample_start'] = annotations[annot_indx].y1 * fftSize * zoomLevel + start_sample_index;
+    updatedAnnotations[f]['core:sample_count'] =
+      (annotations[annot_indx].y2 - annotations[annot_indx].y1) * fftSize * zoomLevel;
     let lower_freq = meta.captures[0]['core:frequency'] - meta.global['core:sample_rate'] / 2;
     updatedAnnotations[f]['core:freq_lower_edge'] =
       (annotations[annot_indx].x1 / fftSize) * meta.global['core:sample_rate'] + lower_freq;
