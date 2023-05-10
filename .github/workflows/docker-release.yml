@@ -1,3 +1,4 @@
+---
 name: Release Drafter
 
 on:
@@ -15,9 +16,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Draft a release
+        id: draft_a_release
         uses: release-drafter/release-drafter@v5
         with:
-            config-name: release-drafter.yml
+          config-name: release-drafter.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Checkout the repository
@@ -36,6 +38,6 @@ jobs:
           push: false
           tags: |
             ghcr.io/${{ github.repository }}:${{ github.ref }}
-            ghcr.io/${{ github.repository }}:${{ steps.create_release.outputs.tag_name }}
+            ghcr.io/${{ github.repository }}:${{ steps.draft_a_release.outputs.tag_name }}
             ghcr.io/${{ github.repository }}:latest
       
