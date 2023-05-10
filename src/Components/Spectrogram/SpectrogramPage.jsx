@@ -21,6 +21,7 @@ import TimeSelector from './TimeSelector';
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import { Navigate } from 'react-router-dom';
+import Table from '../Table/Table';
 
 async function initPyodide() {
   const pyodide = await window.loadPyodide();
@@ -234,6 +235,25 @@ class SpectrogramPage extends Component {
       newState.minimapNumFetches = numFfts;
     }
     return { ...newState };
+  }
+
+  calculateData = (metadata) => {
+    let data = [];
+    let counter = 1;
+    
+    metadata.annotations.forEach(annotation =>  {
+      let currentData =   {
+        annotation: counter++,
+        frequencyRange: annotation["core:freq_lower_edge"] + ', ' + annotation["core:freq_upper_edge"],
+        label: annotation["core:description"],
+        timeRange: annotation["core:sample_start"] + ', ' + annotation["core:sample_count"],
+        actions: <Button variant="secondary">Edit</Button>
+      }
+
+      data.push(currentData);
+    })
+
+    return data;
   }
 
   handleFftSize = (size) => {
@@ -649,6 +669,10 @@ class SpectrogramPage extends Component {
               </Tabs>
             </Col>
           </Row>
+          
+          <Row>
+            <Table columns={columns} data={this.calculateData(this.state.meta)} />
+          </Row>
           <Row style={{ paddingBottom: '5px', paddingTop: '30px' }}>
             <Col className="col-3">
               <Button
@@ -680,3 +704,27 @@ class SpectrogramPage extends Component {
 }
 
 export default SpectrogramPage;
+
+
+const columns = [
+  {
+    title: 'Annotation',
+    dataIndex: 'annotation',
+  },  
+  {
+    title: 'Frequency Range',
+    dataIndex: 'frequencyRange',
+  },  
+  {
+    title: 'Label',
+    dataIndex: 'label',
+  },
+  {
+    title: 'Time Range',
+    dataIndex: 'timeRange',
+  },
+  {
+    title: 'Actions',
+    dataIndex: 'actions'
+  }
+];
