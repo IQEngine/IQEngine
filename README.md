@@ -40,15 +40,6 @@ Through the optional backend API, IQEngine supports three different classes of p
     - `Set-ExecutionPolicy RemoteSigned -Scope CurrentUser`
     - `serve -s build`
 
-&nbsp;
-
-<p align="center"><h1>IQEngine is Supported By:</h1></p>
-
-<p align="center"><img width=250 src="public/microsoft-logo.svg" /></p>
-
-<p align="center"><a href="https://www.qoherent.ai/"><img width=250 src="public/clogo-black.png" /></a></p>
-
-
 ## Docker Install
 
 The IQEngine frontend is a React app and can be deployed many different ways, the canonical instance at iqengine.org is deployed in Azure using an App Service (serverless computing) with the Node stack, but if you prefer to run it containerized, here is an example to get you started:
@@ -67,3 +58,11 @@ The build step will take 3-5 minutes.  After running it you should be able to ac
 * There needs to be a deployment slot called staging
 * within the github repo settings under Secrets and vars > Actions, there needs to be a Repository secret with AZUREAPPSERVICE_PUBLISHPROFILE...
 * Connection settings live in GitHub Secrets > Actions (not Azure App Service anymore), enter it in without the outter double quotes and don't escape any quotes.
+
+&nbsp;
+
+<p align="center"><h1>IQEngine is Supported By:</h1></p>
+
+<p align="center"><img width=250 src="public/microsoft-logo.svg" /></p>
+
+<p align="center"><a href="https://www.qoherent.ai/"><img width=250 src="public/clogo-black.png" /></a></p>
