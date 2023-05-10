@@ -11,15 +11,15 @@ import { Outlet } from 'react-router-dom';
 import ThemeSelector from './Components/Styles/ThemeSelector';
 
 // If env var is set, initialize google analytics
-if (import.meta.env.GOOGLE_ANALYTICS_KEY) {
-  ReactGA.initialize(import.meta.env.GOOGLE_ANALYTICS_KEY);
+if (import.meta.env.VITE_GOOGLE_ANALYTICS_KEY) {
+  ReactGA.initialize(import.meta.env.VITE_GOOGLE_ANALYTICS_KEY);
 }
 
 export const App = () => {
   // Set up google analytics (if enabled) to only share the page path (does not include names of local files)
   const location = useLocation();
   useEffect(() => {
-    if (process.env.GOOGLE_ANALYTICS_KEY) {
+    if (process.env.VITE_GOOGLE_ANALYTICS_KEY) {
       window.gtag('event', 'page_view', {
         page_path: location.pathname + location.search + location.hash, // Note- we make sure to not include local file names in the urls, so they wont get sent to google analytics
         page_search: location.search,
