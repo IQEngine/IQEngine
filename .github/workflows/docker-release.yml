@@ -37,7 +37,7 @@ jobs:
         with:
           push: false
           tags: |
-            ghcr.io/${{ github.repository }}:${{ github.ref }}
+            ghcr.io/${{ github.repository }}:${{ github.sha }}
             ghcr.io/${{ github.repository }}:${{ steps.draft_a_release.outputs.tag_name }}
             ghcr.io/${{ github.repository }}:latest
       
