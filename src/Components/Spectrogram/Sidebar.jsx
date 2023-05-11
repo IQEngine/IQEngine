@@ -30,6 +30,7 @@ const Sidebar = (props) => {
                 magnitudeMax={props.fft.magnitudeMax}
                 magnitudeMin={props.fft.magnitudeMin}
                 toggleCursors={props.toggleCursors}
+                toggleIncludeRfFreq={props.toggleIncludeRfFreq}
                 updatePythonSnippet={props.updatePythonSnippet}
                 updateZoomLevel={props.updateZoomLevel}
               />

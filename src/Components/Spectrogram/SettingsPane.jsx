@@ -332,6 +332,11 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
         </a>
       </Form.Label>
 
+      <Form.Group className="mt-3" controlId="toggleFreq">
+        <Toggle id="toggle" defaultChecked={false} onChange={props.toggleIncludeRfFreq} />
+        <Form.Label style={{ marginLeft: '10px' }}> Display RF Freq</Form.Label>
+      </Form.Group>
+
       <Form.Group className="mb-3" controlId="formPythonSnippet">
         <Form.Label style={{ display: 'flex' }}>
           Python Snippet<br></br>
