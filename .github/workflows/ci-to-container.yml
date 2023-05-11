@@ -55,5 +55,6 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           push: true  
-          tags: v1:latest
+          tags: |
+            ghcr.io/${{ steps.set_variables.outputs.repository }}:${{ steps.set_variables.outputs.sha }}
 
