@@ -23,6 +23,7 @@ jobs:
           node-version: '18.x'
 
       - name: npm install and build
+        working-directory: client
         run: |
           npm install
           npm run build --if-present
@@ -37,7 +38,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: node-app
-          path: build/
+          path: client/build/
 
   deploy-to-staging:
     name: Deploy to Staging
