@@ -1,5 +1,5 @@
 <p align="center">
-  <img width=250 src="https://raw.githubusercontent.com/IQEngine/IQEngine/main/public/IQEngine_Black.svg" />
+  <img width=250 src="https://raw.githubusercontent.com/IQEngine/IQEngine/main/client/public/IQEngine_Black.svg" />
 </p>
 
 _<p align="center"><a href="https://www.iqengine.org">www.iqengine.org</a></p>_
