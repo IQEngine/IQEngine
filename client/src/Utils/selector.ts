@@ -97,6 +97,7 @@ function calcFftOfTile(
     fftshift(magnitudes); // in-place
 
     magnitudes = magnitudes.map((x) => 10.0 * Math.log10(x)); // convert to dB
+    magnitudes = magnitudes.map((x) => (isFinite(x) ? x : 0)); // get rid of -infinity which happens when the input is all 0s
 
     const tempFftMax = Math.max(...magnitudes);
     if (tempFftMax > tempCurrentFftMax) tempCurrentFftMax = tempFftMax;

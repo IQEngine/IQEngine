@@ -6,17 +6,19 @@ COPY client/package*.json ./
 RUN npm ci
 COPY ./client/public ./public
 COPY ./client ./
-COPY .env ./
+COPY .en[v] ./
 RUN npm run build
 
 # Build step #2: build the API with the client as static files
 FROM docker.io/python:3.10
 LABEL org.opencontainers.image.source="https://github.com/IQEngine/IQEngine"
+LABEL org.opencontainers.image.description="IQEngine is a container image that provides a concise and efficient visualization and exploration tool for RF data in the SIGMF format."
+LABEL org.opencontainers.image.licenses=MIT
 WORKDIR /app
 COPY api/requirements.txt ./
 RUN pip install -r ./requirements.txt
 COPY api ./
-COPY .env ./
+COPY .en[v] ./
 COPY --from=build-step /app/build ./build
 ENV FLASK_ENV production
 EXPOSE 3000

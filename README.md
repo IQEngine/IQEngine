@@ -1,5 +1,5 @@
 <p align="center">
-  <img width=250 src="https://raw.githubusercontent.com/IQEngine/IQEngine/main/public/IQEngine_Black.svg" />
+  <img width=250 src="client/public/IQEngine_Black.svg" />
 </p>
 
 _<p align="center"><a href="https://www.iqengine.org">www.iqengine.org</a></p>_
@@ -22,7 +22,7 @@ IQEngine is rapidly evolving, so [sign up](https://dashboard.mailerlite.com/form
 Through the optional backend API, IQEngine supports three different classes of plugins (signal generation is not yet released).  The signal detector (with optional classifier) can be triggered in the main spectrogram page, which will display the output annotations as soon as it finishes, convenient for testing new detection/classification algorithms.  The DSP module runs prior to the FFT calculations, letting you perform a variety of signal processing functions and other sample manipulation.  It currently only supports Python snippets, where the samples out must be the same length as samples in (for now).
 
 <p align="center">
-  <img width=450 src="public/plugins_concept.png" />
+  <img width=450 src="client/public/plugins_concept.png" />
 </p>
 
 ## Local Install
@@ -61,6 +61,6 @@ The build step will take 3-5 minutes.  After running it you should be able to ac
 
 <p align="center"><h1>IQEngine is Supported By:</h1></p>
 
-<p align="center"><img width=250 src="public/microsoft-logo.svg" /></p>
+<p align="center"><img width=250 src="client/public/microsoft-logo.svg" /></p>
 
-<p align="center"><a href="https://www.qoherent.ai/"><img width=250 src="public/clogo-black.png" /></a></p>
+<p align="center"><a href="https://www.qoherent.ai/"><img width=250 src="client/public/clogo-black.png" /></a></p>
