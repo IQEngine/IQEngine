@@ -57,26 +57,25 @@ export const App = () => {
               </Container>
             </Row>
             <Row className="mb0 mt0">
-              <Container className="nav justify-content-end" style={{ whiteSpace: 'nowrap' }}>
+              <Container className="nav justify-content-end">
                 <a
                   className="nav-link"
-                  style={{ fontSize: '24px', paddingLeft: '0px', paddingRight: '20px' }}
+                  style={{ display: 'inline-flex', fontSize: '24px', paddingLeft: '0px', paddingRight: '20px' }}
                   target="_blank"
                   rel="noreferrer"
                   href="https://discord.gg/k7C8kp3b76"
                 >
-                  <img src="/discord.svg" style={{ width: '22px' }} alt="GitHub" />
+                  <img src="/discord.svg" style={{ width: '22px' }} alt="Discord" />
                   Discord
                 </a>
-
                 <a
                   className="nav-link"
-                  style={{ fontSize: '24px', paddingLeft: '0px', paddingRight: '10px' }}
+                  style={{ display: 'inline-flex', fontSize: '24px', paddingLeft: '0px', paddingRight: '10px' }}
                   target="_blank"
                   rel="noreferrer"
                   href="https://github.com/iqengine/iqengine"
                 >
-                  <img src="/github.svg" style={{ width: '22px' }} alt="GitHub" />
+                  <img src="/github.svg" style={{ width: '20px', verticalAlign: 'middle' }} alt="GitHub" />
                   GitHub
                 </a>
               </Container>
