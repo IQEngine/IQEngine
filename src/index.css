@@ -2,10 +2,6 @@
 /* Copyright (c) 2023 Marc Lichtman */
 /* Licensed under the MIT License */
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 .zoom {
   transition: transform 0.2s; /* Animation */
   width: 200px;
@@ -216,4 +212,3 @@ a:hover {
 a:active {
   text-decoration: none;
 }
-
