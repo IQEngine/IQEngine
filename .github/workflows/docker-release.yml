@@ -4,7 +4,6 @@ name: Release Drafter
 on:
   workflow_dispatch:
 
-
 permissions:
   contents: read
 
@@ -15,6 +14,15 @@ jobs:
       pull-requests: write
     runs-on: ubuntu-latest
     steps:
+      - id: set_variables
+        run: |
+          # make the repository lowercase
+          echo "repository=${GITHUB_REPOSITORY,,}" >> $GITHUB_OUTPUT
+          # truncate sha to 11 characters
+          echo "sha=${GITHUB_SHA::11}" >> $GITHUB_OUTPUT
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_SHA: ${{ github.sha }}
       - name: Draft a release
         id: draft_a_release
         uses: release-drafter/release-drafter@v5
@@ -37,7 +45,7 @@ jobs:
         with:
           push: false
           tags: |
-            ghcr.io/${{ github.repository }}:${{ github.sha }}
-            ghcr.io/${{ github.repository }}:${{ steps.draft_a_release.outputs.tag_name }}
-            ghcr.io/${{ github.repository }}:latest
+            ghcr.io/${{ steps.set_variables.outputs.repository }}:${{ steps.set_variables.outputs.sha }}
+            ghcr.io/${{ steps.set_variables.outputs.repository }}:${{ steps.draft_a_release.outputs.tag_name }}
+            ghcr.io/${{ steps.set_variables.outputs.repository }}:latest
       
