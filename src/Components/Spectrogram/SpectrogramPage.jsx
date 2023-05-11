@@ -684,9 +684,9 @@ class SpectrogramPage extends Component {
             </Col>
           </Row>
           
-          <Row>
+          {/*<Row>
             <Table columns={columns} data={this.calculateData(this.state.meta)} />
-          </Row>
+            </Row>*/}
           <Row style={{ paddingBottom: '5px', paddingTop: '30px' }}>
             <Col className="col-3">
               <Button

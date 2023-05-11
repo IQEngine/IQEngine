@@ -1,6 +1,6 @@
-/* Copyright (c) 2022 Microsoft Corporation */
-/* Copyright (c) 2023 Marc Lichtman */
-/* Licensed under the MIT License */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 .zoom {
   transition: transform 0.2s; /* Animation */
@@ -212,3 +212,4 @@ a:hover {
 a:active {
   text-decoration: none;
 }
+
