@@ -16,11 +16,11 @@ interface TableProps {
 
 const Table: React.FC<TableProps> = ({ columns, data }) => {
   return (
-    <table className="table-auto w-full">
+    <table className="tw-table-auto tw-w-full">
       <thead>
         <tr>
           {columns?.map((column) => (
-            <th key={column.dataIndex} className="px-4 py-2">
+            <th key={column.dataIndex} className="tw-px-4 tw-py-2">
               {column.title}
             </th>
           ))}
@@ -30,7 +30,7 @@ const Table: React.FC<TableProps> = ({ columns, data }) => {
         {data?.map((row, rowIndex) => (
           <tr key={rowIndex}>
             {columns?.map((column, colIndex) => (
-              <td key={`${rowIndex}-${colIndex}`} className="border px-4 py-2">
+              <td key={`${rowIndex}-${colIndex}`} className="tw-border tw-px-4 tw-py-2">
                 {row[column.dataIndex]}
               </td>
             ))}
