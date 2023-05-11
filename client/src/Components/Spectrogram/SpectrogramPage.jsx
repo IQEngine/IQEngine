@@ -5,7 +5,6 @@
 import { Container, Row, Col } from 'react-bootstrap';
 import { Sidebar } from './Sidebar';
 import { Component } from 'react';
-import Button from 'react-bootstrap/Button';
 import ScrollBar from './ScrollBar';
 import { TimePlot } from './TimePlot';
 import { FrequencyPlot } from './FrequencyPlot';
@@ -21,7 +20,12 @@ import TimeSelector from './TimeSelector';
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import { Navigate } from 'react-router-dom';
+import Button from '../Button/Button';
+import Collapsible from '../Collapsible/Collapsible';
 import Table from '../Table/Table';
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPencil, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 
 async function initPyodide() {
   const pyodide = await window.loadPyodide();
@@ -238,24 +242,46 @@ class SpectrogramPage extends Component {
     return { ...newState };
   }
 
+  getActions() {
+    return (
+      <div>
+        <Button
+          onClick={() => {
+            alert('Awaiting implementation');
+          }}
+        >
+          <FontAwesomeIcon icon={faPencil} />
+        </Button>
+
+        <Button
+          onClick={() => {
+            alert('Awaiting implementation');
+          }}
+        >
+          <FontAwesomeIcon icon={faArrowRight} />
+        </Button>
+      </div>
+    );
+  }
+
   calculateData = (metadata) => {
     let data = [];
     let counter = 1;
-    
-    metadata.annotations.forEach(annotation =>  {
-      let currentData =   {
+
+    metadata.annotations.forEach((annotation) => {
+      let currentData = {
         annotation: counter++,
-        frequencyRange: annotation["core:freq_lower_edge"] + ', ' + annotation["core:freq_upper_edge"],
-        label: annotation["core:description"],
-        timeRange: annotation["core:sample_start"] + ', ' + annotation["core:sample_count"],
-        actions: <Button variant="secondary">Edit</Button>
-      }
+        frequencyRange: annotation['core:freq_lower_edge'] + ', ' + annotation['core:freq_upper_edge'],
+        label: annotation['core:description'],
+        timeRange: annotation['core:sample_start'] + ', ' + annotation['core:sample_count'],
+        actions: this.getActions(),
+      };
 
       data.push(currentData);
-    })
+    });
 
     return data;
-  }
+  };
 
   handleFftSize = (size) => {
     window.fftData = {};
@@ -683,33 +709,36 @@ class SpectrogramPage extends Component {
               </Tabs>
             </Col>
           </Row>
-          
-          {/*<Row>
-            <Table columns={columns} data={this.calculateData(this.state.meta)} />
-            </Row>*/}
           <Row style={{ paddingBottom: '5px', paddingTop: '30px' }}>
-            <Col className="col-3">
-              <Button
-                className="text-right"
-                variant="secondary"
-                onClick={() => {
-                  this.handleMeta();
-                  this.downloadInfo();
-                }}
-              >
-                <DownloadIcon></DownloadIcon>
-                Download meta JSON
-              </Button>
-            </Col>
-            <Col></Col>
-          </Row>
-          <Row>
-            <textarea
-              rows="20"
-              cols="100"
-              onChange={this.handleMetaChange}
-              value={JSON.stringify(this.state.meta, null, 4)}
-            />
+            <Collapsible title="Annotations">
+              <Table columns={columns} data={this.calculateData(this.state.meta)} rows="5" cols="100" />
+            </Collapsible>
+            <Collapsible title="Metadata" style={{ paddingBottom: '5px', paddingTop: '30px' }}>
+              <Row>
+                <Col className="col-3">
+                  <Button
+                    className="text-right"
+                    variant="secondary"
+                    onClick={() => {
+                      this.handleMeta();
+                      this.downloadInfo();
+                    }}
+                  >
+                    <DownloadIcon></DownloadIcon>
+                    Download meta JSON
+                  </Button>
+                </Col>
+                <Col></Col>
+              </Row>
+              <Row>
+                <textarea
+                  rows="20"
+                  cols="100"
+                  onChange={this.handleMetaChange}
+                  value={JSON.stringify(this.state.meta, null, 4)}
+                />
+              </Row>
+            </Collapsible>
           </Row>
         </Container>
       </div>
@@ -719,16 +748,15 @@ class SpectrogramPage extends Component {
 
 export default SpectrogramPage;
 
-
 const columns = [
   {
     title: 'Annotation',
     dataIndex: 'annotation',
-  },  
+  },
   {
     title: 'Frequency Range',
     dataIndex: 'frequencyRange',
-  },  
+  },
   {
     title: 'Label',
     dataIndex: 'label',
@@ -739,6 +767,6 @@ const columns = [
   },
   {
     title: 'Actions',
-    dataIndex: 'actions'
-  }
+    dataIndex: 'actions',
+  },
 ];
