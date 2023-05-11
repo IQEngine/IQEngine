@@ -2,8 +2,5 @@
 .git
 .gitignore
 tests/
-node_modules/
-detectors/
-server/
+**/node_modules/
 Dockerfile
-Dockerfile.fe

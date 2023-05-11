@@ -9,9 +9,6 @@ node_modules
 # testing
 /coverage
 
-# production
-/build
-
 # misc
 .DS_Store
 .env.local
@@ -26,3 +23,8 @@ yarn-error.log*
 .env
 detectors/markos_detector/__pycache__/markos_detector.cpython-310.pyc
 tests/geckodriver.log
+
+venv/
+__pycache__
+client/build
+api/build
