@@ -62,11 +62,7 @@ export const DetectorPane = (props) => {
     const freq = meta['captures'][0]['core:frequency'];
 
     // We can only send normal Arrays over JSON for some reason, so convert it
-    const len = trimmedSamples.length;
-    var newSamps = new Array(len);
-    for (let i = 0; i < len; i = i + 1) {
-      newSamps[i] = trimmedSamples[i]; // might want to do some math on ints here
-    }
+    const newSamps = Array.from(trimmedSamples);
 
     let body = {
       samples: newSamps,
