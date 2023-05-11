@@ -56,5 +56,5 @@ jobs:
         with:
           push: true  
           tags: |
-            ghcr.io/iqengine:v1
+            ghcr.io/sebastus/iqengine:v1
 
