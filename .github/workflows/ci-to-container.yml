@@ -41,6 +41,7 @@ jobs:
     needs: test
     permissions:
       packages: write
+      contents: write
 
     steps:
       - name: Login to GHCR
