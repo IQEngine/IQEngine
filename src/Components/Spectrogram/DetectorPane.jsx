@@ -3,9 +3,17 @@
 // Licensed under the MIT License
 
 import React, { useState, useEffect } from 'react';
-import { DETECTOR_ENDPOINT } from '../../Utils/constants';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
+
+let DETECTOR_ENDPOINT;
+// Check for DETECTOR_ENDPOINT env var
+if (import.meta.env.VITE_DETECTOR_ENDPOINT) {
+  DETECTOR_ENDPOINT = import.meta.env.VITE_DETECTOR_ENDPOINT;
+} else {
+  DETECTOR_ENDPOINT = 'http://127.0.0.1:8000/detectors/';
+  //const DETECTOR_ENDPOINT = https://iqengine-azure-functions2.azurewebsites.net/detect/';
+}
 
 export const DetectorPane = (props) => {
   let { meta, handleMeta, cursorsEnabled, handleProcessTime } = props;
@@ -62,11 +70,7 @@ export const DetectorPane = (props) => {
     const freq = meta['captures'][0]['core:frequency'];
 
     // We can only send normal Arrays over JSON for some reason, so convert it
-    const len = trimmedSamples.length;
-    var newSamps = new Array(len);
-    for (let i = 0; i < len; i = i + 1) {
-      newSamps[i] = trimmedSamples[i]; // might want to do some math on ints here
-    }
+    const newSamps = Array.from(trimmedSamples);
 
     let body = {
       samples: newSamps,

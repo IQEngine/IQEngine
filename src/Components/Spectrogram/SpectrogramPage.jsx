@@ -287,7 +287,9 @@ class SpectrogramPage extends Component {
 
     // Trim off the top and bottom
     let lowerTrim = Math.floor((timeSelectionStart - Math.floor(timeSelectionStart)) * TILE_SIZE_IN_IQ_SAMPLES * 2); // floats to get rid of at start
+    if (lowerTrim % 2 == 1) lowerTrim--; // must be even, since IQ
     let upperTrim = Math.floor((1 - (timeSelectionEnd - Math.floor(timeSelectionEnd))) * TILE_SIZE_IN_IQ_SAMPLES * 2); // floats to get rid of at end
+    if (upperTrim % 2 == 1) upperTrim--; // must be even, since IQ
     const trimmedSamples = currentSamples.slice(lowerTrim, bufferLen - upperTrim); // slice uses (start, end]
     this.setState({ currentSamples: trimmedSamples });
 
