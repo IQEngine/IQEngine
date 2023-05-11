@@ -67,6 +67,7 @@ class SpectrogramPage extends Component {
       handleTop: 0,
       zoomLevel: 1,
       downloadedTiles: [], // used by minimap
+      includeRfFreq: false,
     };
   }
 
@@ -252,6 +253,12 @@ class SpectrogramPage extends Component {
   toggleCursors = (e) => {
     this.setState({
       cursorsEnabled: e.target.checked,
+    });
+  };
+
+  toggleIncludeRfFreq = (e) => {
+    this.setState({
+      includeRfFreq: e.target.checked,
     });
   };
 
@@ -518,6 +525,7 @@ class SpectrogramPage extends Component {
       marginTop,
       downloadedTiles,
       zoomLevel,
+      includeRfFreq,
     } = this.state;
 
     const fft = {
@@ -551,6 +559,7 @@ class SpectrogramPage extends Component {
                 cursorsEnabled={cursorsEnabled}
                 handleProcessTime={this.handleProcessTime}
                 toggleCursors={this.toggleCursors}
+                toggleIncludeRfFreq={this.toggleIncludeRfFreq}
                 updatePythonSnippet={this.props.updateBlobPythonSnippet}
                 updateZoomLevel={this.handleZoomLevel}
               />
@@ -567,7 +576,7 @@ class SpectrogramPage extends Component {
                 <Tab eventKey="spectrogram" title="Spectrogram">
                   <Row style={{ marginLeft: 0, marginRight: 0 }}>
                     <Col>
-                      <Stage width={spectrogramWidth} height={rulerTopHeight}>
+                      <Stage width={spectrogramWidth + 110} height={rulerTopHeight}>
                         <RulerTop
                           fftSize={fftSize}
                           sampleRate={sampleRate}
@@ -576,8 +585,13 @@ class SpectrogramPage extends Component {
                           meta={meta}
                           blob={blob}
                           spectrogramWidthScale={spectrogramWidth / fftSize}
+                          includeRfFreq={includeRfFreq}
                         />
                       </Stage>
+                    </Col>
+                  </Row>
+                  <Row style={{ marginLeft: 0, marginRight: 0 }}>
+                    <Col>
                       <Stage width={spectrogramWidth} height={spectrogramHeight}>
                         <Layer>
                           <Image image={image} x={0} y={0} width={spectrogramWidth} height={spectrogramHeight} />
@@ -603,7 +617,7 @@ class SpectrogramPage extends Component {
                         )}
                       </Stage>
                     </Col>
-                    <Col className="col-1" style={{ paddingTop: rulerTopHeight, paddingLeft: 0, paddingRight: 0 }}>
+                    <Col className="col-1" style={{ paddingTop: 0, paddingLeft: 0, paddingRight: 0 }}>
                       <Stage width={rulerSideWidth} height={spectrogramHeight}>
                         <RulerSide
                           spectrogramWidth={spectrogramWidth}
@@ -614,9 +628,7 @@ class SpectrogramPage extends Component {
                         />
                       </Stage>
                     </Col>
-                    <Col
-                      style={{ justifyContent: 'left', paddingTop: rulerTopHeight, paddingLeft: 0, paddingRight: 0 }}
-                    >
+                    <Col style={{ justifyContent: 'left', paddingTop: 0, paddingLeft: 0, paddingRight: 0 }}>
                       <Stage width={55} height={spectrogramHeight}>
                         <ScrollBar
                           fetchAndRender={this.fetchAndRender}
