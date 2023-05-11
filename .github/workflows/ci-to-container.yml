@@ -1,0 +1,45 @@
+name: Build, test, containerize and store in registry Node.js app
+
+on: [push,workflow_dispatch]
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Node.js version
+        uses: actions/setup-node@v1
+        with:
+          node-version: '18.x'
+
+      - name: npm install and build
+        run: |
+          npm install
+          npm run build --if-present
+        env:
+          CI: false
+          VITE_CONNECTION_INFO: '${{ secrets.VITE_CONNECTION_INFO }}'
+          VITE_IQENGINE_APP_VERSION: '$${{ secrets.VITE_IQENGINE_APP_VERSION }}'
+          VITE_GOOGLE_ANALYTICS_KEY: '${{ secrets.VITE_GOOGLE_ANALYTICS_KEY }}'
+          VITE_DETECTOR_ENDPOINT: '${{ secrets.VITE_DETECTOR_ENDPOINT }}'
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - run: |
+          echo "Testing"
+
+  buildandpush:
+    name: Build And Push
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: docker/build-push-action@v4
+        with:
+            tags: v1:latest
+
