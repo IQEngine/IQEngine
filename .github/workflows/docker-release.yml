@@ -12,6 +12,7 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+      packages: write
     runs-on: ubuntu-latest
     steps:
       - id: set_variables
