@@ -6,7 +6,7 @@ COPY client/package*.json ./
 RUN npm ci
 COPY ./client/public ./public
 COPY ./client ./
-COPY .env ./
+COPY .en[v] ./
 RUN npm run build
 
 # Build step #2: build the API with the client as static files
@@ -16,7 +16,7 @@ WORKDIR /app
 COPY api/requirements.txt ./
 RUN pip install -r ./requirements.txt
 COPY api ./
-COPY .env ./
+COPY .en[v] ./
 COPY --from=build-step /app/build ./build
 ENV FLASK_ENV production
 EXPOSE 3000
