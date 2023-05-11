@@ -3,15 +3,15 @@
 // Licensed under the MIT License
 
 import React, { useState, useEffect } from 'react';
-import { DETECTOR_ENDPOINT } from '../../Utils/constants';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 
+let DETECTOR_ENDPOINT;
 // Check for DETECTOR_ENDPOINT env var
 if (import.meta.env.VITE_DETECTOR_ENDPOINT) {
-  const DETECTOR_ENDPOINT = import.meta.env.VITE_DETECTOR_ENDPOINT;
+  DETECTOR_ENDPOINT = import.meta.env.VITE_DETECTOR_ENDPOINT;
 } else {
-  const DETECTOR_ENDPOINT = 'http://127.0.0.1:8000/detectors/';
+  DETECTOR_ENDPOINT = 'http://127.0.0.1:8000/detectors/';
   //const DETECTOR_ENDPOINT = https://iqengine-azure-functions2.azurewebsites.net/detect/';
 }
 
