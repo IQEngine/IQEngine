@@ -56,5 +56,5 @@ jobs:
         with:
           push: true  
           tags: |
-            ghcr.io/${{ steps.set_variables.outputs.repository }}:${{ steps.set_variables.outputs.sha }}
+            ghcr.io/iqengine:v1
 
