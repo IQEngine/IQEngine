@@ -39,7 +39,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: docker/build-push-action@v4
+      - name: Login to GHCR
+        uses: docker/login-action@v2
         with:
-            tags: v1:latest
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Push 
+        uses: docker/build-push-action@v4
+        with:
+          push: true  
+          tags: v1:latest
 
