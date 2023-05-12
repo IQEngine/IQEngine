@@ -7,7 +7,7 @@ import React, { useEffect, useState } from 'react';
 import { template } from '../../Utils/plotlyTemplate';
 
 export const IQPlot = (props) => {
-  let { currentSamples } = props;
+  let { currentSamples, plotWidth, plotHeight } = props;
   const [I, setI] = useState();
   const [Q, setQ] = useState();
 
@@ -51,8 +51,8 @@ export const IQPlot = (props) => {
         ]}
         layout={{
           title: 'IQ Plot',
-          width: 700,
-          height: 600,
+          width: plotWidth,
+          height: plotHeight,
           dragmode: 'pan',
           template: template,
           xaxis: {

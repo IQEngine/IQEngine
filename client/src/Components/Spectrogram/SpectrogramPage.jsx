@@ -56,7 +56,7 @@ class SpectrogramPage extends Component {
       marginTop: 30,
       skipNFfts: null,
       spectrogramHeight: 800,
-      spectrogramWidth: 600,
+      spectrogramWidth: 1000,
       timeSelectionStart: 0, // in units of tiles
       timeSelectionEnd: 10, // in units of tiles
       cursorsEnabled: false,
@@ -69,6 +69,8 @@ class SpectrogramPage extends Component {
       zoomLevel: 1,
       downloadedTiles: [], // used by minimap
       includeRfFreq: false,
+      plotWidth: 0,
+      plotHeight: 0,
     };
   }
 
@@ -78,8 +80,10 @@ class SpectrogramPage extends Component {
     // Calc the area to be filled by the spectrogram
     const windowHeight = window.innerHeight;
     const topRowHeight = document.getElementById('topRow').offsetHeight;
-    const tabsHeight = document.getElementById('tabs-tab-spectrogram').offsetHeight;
+    const tabsHeight = document.getElementById('tabsbar').offsetHeight;
     const newSpectrogramHeight = windowHeight - topRowHeight - marginTop - tabsHeight - rulerTopHeight - 30;
+
+    const newSpectrogramWidth = window.innerWidth - 430; // hand-tuned for now
 
     // Recalc tiles in view
     const { lowerTile, upperTile } = calculateTileNumbers(
@@ -90,7 +94,18 @@ class SpectrogramPage extends Component {
       zoomLevel
     );
 
-    this.setState({ spectrogramHeight: newSpectrogramHeight, lowerTile: lowerTile, upperTile: upperTile });
+    // Time/Freq/IQ Plot width/height
+    const newplotWidth = window.innerWidth - 330;
+    const newPlotHeight = newSpectrogramHeight - 100;
+
+    this.setState({
+      spectrogramHeight: newSpectrogramHeight,
+      spectrogramWidth: newSpectrogramWidth,
+      lowerTile: lowerTile,
+      upperTile: upperTile,
+      plotWidth: newplotWidth,
+      plotHeight: newPlotHeight,
+    });
 
     // Trigger re-render, but not when the window first loads
     if (window.iqData) {
@@ -241,21 +256,21 @@ class SpectrogramPage extends Component {
   calculateData = (metadata) => {
     let data = [];
     let counter = 1;
-    
-    metadata.annotations.forEach(annotation =>  {
-      let currentData =   {
+
+    metadata.annotations.forEach((annotation) => {
+      let currentData = {
         annotation: counter++,
-        frequencyRange: annotation["core:freq_lower_edge"] + ', ' + annotation["core:freq_upper_edge"],
-        label: annotation["core:description"],
-        timeRange: annotation["core:sample_start"] + ', ' + annotation["core:sample_count"],
-        actions: <Button variant="secondary">Edit</Button>
-      }
+        frequencyRange: annotation['core:freq_lower_edge'] + ', ' + annotation['core:freq_upper_edge'],
+        label: annotation['core:description'],
+        timeRange: annotation['core:sample_start'] + ', ' + annotation['core:sample_count'],
+        actions: <Button variant="secondary">Edit</Button>,
+      };
 
       data.push(currentData);
-    })
+    });
 
     return data;
-  }
+  };
 
   handleFftSize = (size) => {
     window.fftData = {};
@@ -546,6 +561,8 @@ class SpectrogramPage extends Component {
       downloadedTiles,
       zoomLevel,
       includeRfFreq,
+      plotWidth,
+      plotHeight,
     } = this.state;
 
     const fft = {
@@ -560,130 +577,191 @@ class SpectrogramPage extends Component {
     }
 
     return (
-      <div style={{ marginTop: marginTop }}>
-        <Container>
-          <Row id="mainRow" className="flex-nowrap">
-            <Col className="col-3">
-              <Sidebar
-                updateBlobTaps={this.props.updateBlobTaps}
-                updateMagnitudeMax={this.handleMagnitudeMax}
-                updateMagnitudeMin={this.handleMagnitudeMin}
-                updateFftsize={this.handleFftSize}
-                updateWindowChange={this.handleWindowChange}
-                fft={fft}
-                blob={blob}
-                meta={meta}
-                handleAutoScale={this.handleAutoScale}
-                handleMetaGlobal={this.handleMetaGlobal}
-                handleMeta={this.handleMeta}
-                cursorsEnabled={cursorsEnabled}
-                handleProcessTime={this.handleProcessTime}
-                toggleCursors={this.toggleCursors}
-                toggleIncludeRfFreq={this.toggleIncludeRfFreq}
-                updatePythonSnippet={this.props.updateBlobPythonSnippet}
-                updateZoomLevel={this.handleZoomLevel}
-              />
-            </Col>
-            <Col>
-              <Tabs
-                id="tabs"
-                activeKey={currentTab}
-                onSelect={(k) => {
-                  this.handleProcessTime();
-                  this.setState({ currentTab: k });
-                }}
-              >
-                <Tab eventKey="spectrogram" title="Spectrogram">
-                  <Row style={{ marginLeft: 0, marginRight: 0 }}>
-                    <Col>
-                      <Stage width={spectrogramWidth + 110} height={rulerTopHeight}>
-                        <RulerTop
-                          fftSize={fftSize}
-                          sampleRate={sampleRate}
+      <div className="mt-3 mb-0 ml-0 mr-0 p-0">
+        <div className="flex flex-row">
+          <Sidebar
+            updateBlobTaps={this.props.updateBlobTaps}
+            updateMagnitudeMax={this.handleMagnitudeMax}
+            updateMagnitudeMin={this.handleMagnitudeMin}
+            updateFftsize={this.handleFftSize}
+            updateWindowChange={this.handleWindowChange}
+            fft={fft}
+            blob={blob}
+            meta={meta}
+            handleAutoScale={this.handleAutoScale}
+            handleMetaGlobal={this.handleMetaGlobal}
+            handleMeta={this.handleMeta}
+            cursorsEnabled={cursorsEnabled}
+            handleProcessTime={this.handleProcessTime}
+            toggleCursors={this.toggleCursors}
+            toggleIncludeRfFreq={this.toggleIncludeRfFreq}
+            updatePythonSnippet={this.props.updateBlobPythonSnippet}
+            updateZoomLevel={this.handleZoomLevel}
+          />
+          <div className="flex flex-col ">
+            <ul className="flex space-x-2 border-b border-iqengine-green w-fit" id="tabsbar">
+              <li>
+                <a
+                  href="#"
+                  onClick={() => {
+                    this.handleProcessTime();
+                    this.setState({ currentTab: 'spectrogram' });
+                  }}
+                  className={` ${
+                    currentTab === 'spectrogram' ? 'bg-iqengine-green text-black' : ''
+                  } inline-block px-4 py-2  rounded-t outline  outline-iqengine-green outline-1`}
+                >
+                  <h5>Spectrogram</h5>
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  onClick={() => {
+                    this.handleProcessTime();
+                    this.setState({ currentTab: 'time' });
+                  }}
+                  className={` ${
+                    currentTab === 'time' ? 'bg-iqengine-green text-black' : ''
+                  } inline-block px-4 py-2  rounded-t outline  outline-iqengine-green outline-1`}
+                >
+                  <h5>Time</h5>
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  onClick={() => {
+                    this.handleProcessTime();
+                    this.setState({ currentTab: 'frequency' });
+                  }}
+                  className={` ${
+                    currentTab === 'frequency' ? 'bg-iqengine-green text-black' : ''
+                  } inline-block px-4 py-2  rounded-t outline  outline-iqengine-green outline-1`}
+                >
+                  <h5>Frequency</h5>
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  onClick={() => {
+                    this.handleProcessTime();
+                    this.setState({ currentTab: 'iq' });
+                  }}
+                  className={` ${
+                    currentTab === 'iq' ? 'bg-iqengine-green text-black' : ''
+                  } inline-block px-4 py-2  rounded-t outline  outline-iqengine-green outline-1`}
+                >
+                  <h5>IQ Plot</h5>
+                </a>
+              </li>
+            </ul>
+            <div className="p-0 ml-0 mr-0 mb-0 mt-2">
+              <div className={currentTab === 'spectrogram' ? 'block' : 'hidden'}>
+                <div className="flex flex-col">
+                  <Stage width={spectrogramWidth + 110} height={rulerTopHeight}>
+                    <RulerTop
+                      fftSize={fftSize}
+                      sampleRate={sampleRate}
+                      spectrogramWidth={spectrogramWidth}
+                      fft={fft}
+                      meta={meta}
+                      blob={blob}
+                      spectrogramWidthScale={spectrogramWidth / fftSize}
+                      includeRfFreq={includeRfFreq}
+                    />
+                  </Stage>
+
+                  <div className="flex flex-row">
+                    <Stage width={spectrogramWidth} height={spectrogramHeight}>
+                      <Layer>
+                        <Image image={image} x={0} y={0} width={spectrogramWidth} height={spectrogramHeight} />
+                      </Layer>
+                      <AnnotationViewer
+                        handleMeta={this.handleMeta}
+                        annotations={annotations}
+                        spectrogramWidthScale={spectrogramWidth / fftSize}
+                        meta={meta}
+                        fftSize={fftSize}
+                        lowerTile={lowerTile}
+                        zoomLevel={zoomLevel}
+                      />
+                      {cursorsEnabled && (
+                        <TimeSelector
                           spectrogramWidth={spectrogramWidth}
-                          fft={fft}
-                          meta={meta}
-                          blob={blob}
-                          spectrogramWidthScale={spectrogramWidth / fftSize}
-                          includeRfFreq={includeRfFreq}
-                        />
-                      </Stage>
-                    </Col>
-                  </Row>
-                  <Row style={{ marginLeft: 0, marginRight: 0 }}>
-                    <Col>
-                      <Stage width={spectrogramWidth} height={spectrogramHeight}>
-                        <Layer>
-                          <Image image={image} x={0} y={0} width={spectrogramWidth} height={spectrogramHeight} />
-                        </Layer>
-                        <AnnotationViewer
-                          handleMeta={this.handleMeta}
-                          annotations={annotations}
-                          spectrogramWidthScale={spectrogramWidth / fftSize}
-                          meta={meta}
-                          fftSize={fftSize}
+                          spectrogramHeight={spectrogramHeight}
+                          upperTile={upperTile}
                           lowerTile={lowerTile}
-                          zoomLevel={zoomLevel}
+                          handleTimeSelectionStart={this.handleTimeSelectionStart}
+                          handleTimeSelectionEnd={this.handleTimeSelectionEnd}
                         />
-                        {cursorsEnabled && (
-                          <TimeSelector
-                            spectrogramWidth={spectrogramWidth}
-                            spectrogramHeight={spectrogramHeight}
-                            upperTile={upperTile}
-                            lowerTile={lowerTile}
-                            handleTimeSelectionStart={this.handleTimeSelectionStart}
-                            handleTimeSelectionEnd={this.handleTimeSelectionEnd}
-                          />
-                        )}
-                      </Stage>
-                    </Col>
-                    <Col className="col-1" style={{ paddingTop: 0, paddingLeft: 0, paddingRight: 0 }}>
-                      <Stage width={rulerSideWidth} height={spectrogramHeight}>
-                        <RulerSide
-                          spectrogramWidth={spectrogramWidth}
-                          fftSize={fftSize}
-                          sampleRate={sampleRate}
-                          currentRowAtTop={(lowerTile * TILE_SIZE_IN_IQ_SAMPLES) / fftSize}
-                          spectrogramHeight={spectrogramHeight}
-                        />
-                      </Stage>
-                    </Col>
-                    <Col style={{ justifyContent: 'left', paddingTop: 0, paddingLeft: 0, paddingRight: 0 }}>
-                      <Stage width={55} height={spectrogramHeight}>
-                        <ScrollBar
-                          fetchAndRender={this.fetchAndRender}
-                          totalIQSamples={blob.totalIQSamples}
-                          spectrogramHeight={spectrogramHeight}
-                          fftSize={fftSize}
-                          minimapNumFetches={minimapNumFetches}
-                          meta={meta}
-                          skipNFfts={skipNFfts}
-                          size={this.props.minimap.size}
-                          downloadedTiles={downloadedTiles}
-                          zoomLevel={zoomLevel}
-                        />
-                      </Stage>
-                    </Col>
-                  </Row>
-                </Tab>
-                <Tab eventKey="time" title="Time Plot">
-                  {/* Reduces lag by only rendering the time/freq/iq components when they are selected */}
-                  {currentTab === 'time' && (
-                    <TimePlot currentSamples={currentSamples} cursorsEnabled={cursorsEnabled} />
-                  )}
-                </Tab>
-                <Tab eventKey="frequency" title="Frequency Plot">
-                  {currentTab === 'frequency' && (
-                    <FrequencyPlot currentSamples={currentSamples} cursorsEnabled={cursorsEnabled} />
-                  )}
-                </Tab>
-                <Tab eventKey="iq" title="IQ Plot">
-                  {currentTab === 'iq' && <IQPlot currentSamples={currentSamples} cursorsEnabled={cursorsEnabled} />}
-                </Tab>
-              </Tabs>
-            </Col>
-          </Row>
-          
+                      )}
+                    </Stage>
+
+                    <Stage width={rulerSideWidth} height={spectrogramHeight} className="mr-1">
+                      <RulerSide
+                        spectrogramWidth={spectrogramWidth}
+                        fftSize={fftSize}
+                        sampleRate={sampleRate}
+                        currentRowAtTop={(lowerTile * TILE_SIZE_IN_IQ_SAMPLES) / fftSize}
+                        spectrogramHeight={spectrogramHeight}
+                      />
+                    </Stage>
+
+                    <Stage width={55} height={spectrogramHeight}>
+                      <ScrollBar
+                        fetchAndRender={this.fetchAndRender}
+                        totalIQSamples={blob.totalIQSamples}
+                        spectrogramHeight={spectrogramHeight}
+                        fftSize={fftSize}
+                        minimapNumFetches={minimapNumFetches}
+                        meta={meta}
+                        skipNFfts={skipNFfts}
+                        size={this.props.minimap.size}
+                        downloadedTiles={downloadedTiles}
+                        zoomLevel={zoomLevel}
+                      />
+                    </Stage>
+                  </div>
+                </div>
+              </div>
+              <div className={currentTab === 'time' ? 'block' : 'hidden'}>
+                {/* Reduces lag by only rendering the time/freq/iq components when they are selected */}
+                {currentTab === 'time' && (
+                  <TimePlot
+                    currentSamples={currentSamples}
+                    cursorsEnabled={cursorsEnabled}
+                    plotWidth={plotWidth}
+                    plotHeight={plotHeight}
+                  />
+                )}
+              </div>
+              <div className={currentTab === 'frequency' ? 'block' : 'hidden'}>
+                {currentTab === 'frequency' && (
+                  <FrequencyPlot
+                    currentSamples={currentSamples}
+                    cursorsEnabled={cursorsEnabled}
+                    plotWidth={plotWidth}
+                    plotHeight={plotHeight}
+                  />
+                )}
+              </div>
+              <div className={currentTab === 'iq' ? 'block' : 'hidden'}>
+                {currentTab === 'iq' && (
+                  <IQPlot
+                    currentSamples={currentSamples}
+                    cursorsEnabled={cursorsEnabled}
+                    plotWidth={plotWidth}
+                    plotHeight={plotHeight}
+                  />
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <Container>
           {/*<Row>
             <Table columns={columns} data={this.calculateData(this.state.meta)} />
             </Row>*/}
@@ -719,16 +797,15 @@ class SpectrogramPage extends Component {
 
 export default SpectrogramPage;
 
-
 const columns = [
   {
     title: 'Annotation',
     dataIndex: 'annotation',
-  },  
+  },
   {
     title: 'Frequency Range',
     dataIndex: 'frequencyRange',
-  },  
+  },
   {
     title: 'Label',
     dataIndex: 'label',
@@ -739,6 +816,6 @@ const columns = [
   },
   {
     title: 'Actions',
-    dataIndex: 'actions'
-  }
+    dataIndex: 'actions',
+  },
 ];
