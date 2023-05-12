@@ -77,7 +77,7 @@ const Table: React.FC<TableProps> = ({ columns, data }) => {
           {currentPageData?.map((row, rowIndex) => (
             <tr key={rowIndex}>
               {columns?.map((column, colIndex) => (
-                <td key={`${rowIndex}-${colIndex}`} className="border bg-zinc-800 px-4 py-2">
+                <td key={`${rowIndex}-${colIndex}`} className="border px-4 py-2">
                   {row[column.dataIndex]}
                 </td>
               ))}

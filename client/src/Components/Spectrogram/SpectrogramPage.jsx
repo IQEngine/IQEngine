@@ -20,10 +20,10 @@ import TimeSelector from './TimeSelector';
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import { Navigate } from 'react-router-dom';
-import Button from '../Button/Button';
-import Collapsible from '../Collapsible/Collapsible';
-import Table from '../Table/Table';
-
+import Button from '@/Components/Button/Button';
+import Collapsible from '@/Components/Collapsible/Collapsible';
+import Table from '@/Components/Table/Table';
+import { calculateDate, calculateFrequency } from '@/Utils/rfFunctions';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPencil, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 
@@ -242,12 +242,12 @@ class SpectrogramPage extends Component {
     return { ...newState };
   }
 
-  getActions() {
+  getActions = () => {
     return (
       <div>
         <Button
           onClick={() => {
-            alert('Awaiting implementation');
+            alert('Awaiting implementation for annotation ' + test);
           }}
         >
           <FontAwesomeIcon icon={faPencil} />
@@ -255,30 +255,46 @@ class SpectrogramPage extends Component {
 
         <Button
           onClick={() => {
-            alert('Awaiting implementation');
+            alert('Awaiting implementation for annotation ' + test);
           }}
         >
           <FontAwesomeIcon icon={faArrowRight} />
         </Button>
       </div>
     );
-  }
+  };
 
   calculateData = (metadata) => {
     let data = [];
-    let counter = 1;
 
-    metadata.annotations.forEach((annotation) => {
+    for (let i = 0; i < metadata.annotations?.length; i++) {
+      let annotation = metadata.annotations[i];
+      let description = annotation['core:description'];
+      let sample_rate = Number(metadata.global['core:sample_rate']);
+      let start_date = new Date(metadata?.captures[0]['core:datetime']);
+      let start_sample_count = new Number(annotation['core:sample_start']);
+      let end_sample_count = start_sample_count + new Number(annotation['core:sample_count']);
+
+      // Get frequency range
+      let startFreqRange = calculateFrequency(annotation['core:freq_lower_edge']);
+      let endFreqRange = calculateFrequency(annotation['core:freq_upper_edge']);
+      let frequencyRange = startFreqRange + ' - ' + endFreqRange;
+
+      // Get time range
+      let startTimeRange = calculateDate(start_date, start_sample_count, sample_rate);
+      let endTimeRange = calculateDate(start_date, end_sample_count, sample_rate);
+      let timeRange = startTimeRange === endTimeRange ? startTimeRange : startTimeRange + ' - ' + endTimeRange;
+
       let currentData = {
-        annotation: counter++,
-        frequencyRange: annotation['core:freq_lower_edge'] + ', ' + annotation['core:freq_upper_edge'],
-        label: annotation['core:description'],
-        timeRange: annotation['core:sample_start'] + ', ' + annotation['core:sample_count'],
+        annotation: i,
+        frequencyRange: frequencyRange,
+        label: description,
+        timeRange: timeRange,
         actions: this.getActions(),
       };
 
       data.push(currentData);
-    });
+    }
 
     return data;
   };
