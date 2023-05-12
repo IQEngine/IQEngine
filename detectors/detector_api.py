@@ -12,7 +12,6 @@ with open('openapi.yaml', 'r') as file:
 
 app = fastapi.FastAPI()
 
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

@@ -17,4 +17,3 @@ See the template_detector for how the input and outputs of the function work, if
 ## Notes
 
 When deploying with Azure remember to go into the function apps Configuration and under Application Settings there needs to be one for AzureWebJobsStorage which is the storage account connection string, as well as MongoDBConnString
-
