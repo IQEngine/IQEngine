@@ -63,4 +63,4 @@ The build step will take 3-5 minutes.  After running it you should be able to ac
 
 <p align="center"><img width=250 src="public/microsoft-logo.svg" /></p>
 
-<p align="center"><a href="https://www.qoherent.ai/"><img width=250 src="public/clogo-black.png" /></a></p>
+<p align="center"><a href="https://www.qoherent.ai/"><img width=250 src="public/clogo-black.png" /></a></p>     
