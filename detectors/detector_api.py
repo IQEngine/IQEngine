@@ -98,4 +98,6 @@ async def detect(info : fastapi.Request, detectorname):
 if os.getenv('ON_AZURE'):
     import azure.functions as func
     async def main(req: func.HttpRequest, context: func.Context) -> func.HttpResponse:
-        return await func.AsgiMiddleware(app).handle_async(req, context)
+        return await func.AsgiMiddleware(app).handle_async(req, context)     
+       
+       
