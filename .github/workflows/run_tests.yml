@@ -1,11 +1,10 @@
-name: Run tests
+name: Run client tests
 
 on:
   pull_request:
     # only runs on PRs that target main
     branches:
       - main
-  push:
   workflow_dispatch:
 
 jobs:
