@@ -1,0 +1,29 @@
+name: Run tests
+
+on:
+  pull_request:
+    # only runs on PRs that target main
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  vitest:
+    name: RunVITests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Node.js version
+        uses: actions/setup-node@v1
+        with:
+          node-version: '18.x'
+
+      - name: Run vite tests
+        working-directory: client
+        run: |
+          npm install
+          npm run test 
+        env:
+          CI: false
