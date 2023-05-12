@@ -247,7 +247,7 @@ class SpectrogramPage extends Component {
       <div>
         <Button
           onClick={() => {
-            alert('Awaiting implementation for annotation ' + test);
+            alert('Awaiting implementation');
           }}
         >
           <FontAwesomeIcon icon={faPencil} />
@@ -255,7 +255,7 @@ class SpectrogramPage extends Component {
 
         <Button
           onClick={() => {
-            alert('Awaiting implementation for annotation ' + test);
+            alert('Awaiting implementation');
           }}
         >
           <FontAwesomeIcon icon={faArrowRight} />

@@ -14,7 +14,7 @@ interface TableProps {
   data: RowData[];
 }
 
-const Table: React.FC<TableProps> = ({ columns, data }) => {
+export const Table = ({ columns, data }: TableProps) => {
   const [filterInput, setFilterInput] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
