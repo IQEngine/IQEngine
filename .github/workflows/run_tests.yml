@@ -7,9 +7,6 @@ on:
       - main
     paths:
       - client/**
-  push:
-    paths:
-      - client/**
   workflow_dispatch:
 
 jobs:
