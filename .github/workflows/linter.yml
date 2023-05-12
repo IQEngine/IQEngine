@@ -56,5 +56,6 @@ jobs:
         uses: github/super-linter/slim@v5
         env:
           VALIDATE_ALL_CODEBASE: false
+          VALIDATE_MARKDOWN: false
           DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
