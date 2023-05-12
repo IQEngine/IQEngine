@@ -8,7 +8,7 @@ interface CollapsibleProps {
   children: React.ReactNode;
 }
 
-const Collapsible: React.FC<CollapsibleProps> = ({ title, children }) => {
+const Collapsible: React.FC<CollapsibleProps> = ({ title, children, ...rest }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleCollapsible = () => {
@@ -16,7 +16,7 @@ const Collapsible: React.FC<CollapsibleProps> = ({ title, children }) => {
   };
 
   return (
-    <div className="border rounded-md shadow-md">
+    <div className="border rounded-md shadow-md" {...rest}>
       <div className="flex items-center justify-between cursor-pointer" onClick={toggleCollapsible}>
         <h3 className="text-lg py-2 pl-3">{title}</h3>
         {isOpen ? <FontAwesomeIcon icon={faAngleUp} /> : <FontAwesomeIcon icon={faAngleDown} />}

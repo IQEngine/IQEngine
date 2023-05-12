@@ -725,11 +725,11 @@ class SpectrogramPage extends Component {
               </Tabs>
             </Col>
           </Row>
-          <Row style={{ paddingBottom: '5px', paddingTop: '30px' }}>
-            <Collapsible title="Annotations">
+          <Row style={{ marginLeft: '15px' }}>
+            <Collapsible title="Annotations" style={{ marginTop: '5px' }}>
               <Table columns={columns} data={this.calculateData(this.state.meta)} rows="5" cols="100" />
             </Collapsible>
-            <Collapsible title="Metadata" style={{ paddingBottom: '5px', paddingTop: '30px' }}>
+            <Collapsible title="Metadata" style={{ marginTop: '5px' }}>
               <Row>
                 <Col className="col-3">
                   <Button
