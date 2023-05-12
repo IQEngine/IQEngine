@@ -5,6 +5,7 @@ on:
     # only runs on PRs that target main
     branches:
       - main
+  push:
   workflow_dispatch:
 
 jobs:
