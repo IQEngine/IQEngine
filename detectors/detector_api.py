@@ -68,7 +68,7 @@ async def detect(info : fastapi.Request, detectorname):
     samples = function_input.pop("samples") # Assumed to be real or floats in IQIQIQIQ (cant send complex over JSON)
     print(function_input)
 
-    if not samples: 
+    if not samples:
         return {
         "status" : "FAILED",
         "annotations" : []
@@ -98,6 +98,4 @@ async def detect(info : fastapi.Request, detectorname):
 if os.getenv('ON_AZURE'):
     import azure.functions as func
     async def main(req: func.HttpRequest, context: func.Context) -> func.HttpResponse:
-        return await func.AsgiMiddleware(app).handle_async(req, context)     
-       
-       
+        return await func.AsgiMiddleware(app).handle_async(req, context)
