@@ -5,6 +5,11 @@ on:
     # only runs on PRs that target main
     branches:
       - main
+    paths:
+      - client/**
+  push:
+    paths:
+      - client/**
   workflow_dispatch:
 
 jobs:
