@@ -12,7 +12,7 @@ class Detector:
     center_freq: int = 0
 
     # Custom Params
-    threshold_dBasd: float = 40.0
+    threshold_dB: float = 40.0
 
 
     def detect(self, samples):
