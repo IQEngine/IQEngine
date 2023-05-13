@@ -3,63 +3,60 @@
 // Licensed under the MIT License
 
 import React from 'react';
-import { Nav } from 'react-bootstrap';
 import SettingsPane from './SettingsPane';
 import { DetectorPane } from './DetectorPane';
 import InfoPane from './InfoPane';
-import Accordion from 'react-bootstrap/Accordion';
 
 const Sidebar = (props) => {
-  //from: https://stackoverflow.com/questions/60482018/make-a-sidebar-from-react-bootstrap
   return (
-    <Nav className="d-flex flex-column align-items-center align-items-sm-start p-0">
-      <Nav.Item>
-        <Accordion defaultActiveKey="0">
-          <Accordion.Item eventKey="0">
-            <Accordion.Header>Settings</Accordion.Header>
-            <Accordion.Body>
-              <SettingsPane
-                updateBlobTaps={props.updateBlobTaps}
-                updateMagnitudeMax={props.updateMagnitudeMax}
-                updateMagnitudeMin={props.updateMagnitudeMin}
-                updateFftsize={props.updateFftsize}
-                updateWindowChange={props.updateWindowChange}
-                meta={props.meta}
-                handleAutoScale={props.handleAutoScale}
-                autoscale={props.autoscale}
-                magnitudeMax={props.fft.magnitudeMax}
-                magnitudeMin={props.fft.magnitudeMin}
-                toggleCursors={props.toggleCursors}
-                toggleIncludeRfFreq={props.toggleIncludeRfFreq}
-                updatePythonSnippet={props.updatePythonSnippet}
-                updateZoomLevel={props.updateZoomLevel}
-              />
-            </Accordion.Body>
-          </Accordion.Item>
-          <Accordion.Item eventKey="1">
-            <Accordion.Header>Detector</Accordion.Header>
-            <Accordion.Body>
-              <DetectorPane
-                meta={props.meta}
-                handleMeta={props.handleMeta}
-                cursorsEnabled={props.cursorsEnabled}
-                handleProcessTime={props.handleProcessTime}
-              />
-            </Accordion.Body>
-          </Accordion.Item>
-          <Accordion.Item eventKey="2">
-            <Accordion.Header>Info</Accordion.Header>
-            <Accordion.Body>
-              <InfoPane meta={props.meta} handleMetaGlobal={props.handleMetaGlobal} />
-            </Accordion.Body>
-          </Accordion.Item>
-          <Accordion.Item eventKey="3">
-            <Accordion.Header>Annotations</Accordion.Header>
-            <Accordion.Body></Accordion.Body>
-          </Accordion.Item>
-        </Accordion>
-      </Nav.Item>
-    </Nav>
+    <div className="flex flex-col w-64 ml-3">
+      <details open>
+        <summary className="pl-2 bg-iqengine-green outline outline-1 outline-iqengine-green text-lg text-black">
+          Settings
+        </summary>
+        <div className="outline outline-1 outline-iqengine-green p-2">
+          <SettingsPane
+            updateBlobTaps={props.updateBlobTaps}
+            updateMagnitudeMax={props.updateMagnitudeMax}
+            updateMagnitudeMin={props.updateMagnitudeMin}
+            updateFftsize={props.updateFftsize}
+            updateWindowChange={props.updateWindowChange}
+            meta={props.meta}
+            handleAutoScale={props.handleAutoScale}
+            autoscale={props.autoscale}
+            magnitudeMax={props.fft.magnitudeMax}
+            magnitudeMin={props.fft.magnitudeMin}
+            toggleCursors={props.toggleCursors}
+            toggleIncludeRfFreq={props.toggleIncludeRfFreq}
+            updatePythonSnippet={props.updatePythonSnippet}
+            updateZoomLevel={props.updateZoomLevel}
+          />
+        </div>
+      </details>
+
+      <details>
+        <summary className="pl-2 mt-2 bg-iqengine-green outline outline-1 outline-iqengine-green text-lg text-black">
+          Detector
+        </summary>
+        <div className="outline outline-1 outline-iqengine-green p-2">
+          <DetectorPane
+            meta={props.meta}
+            handleMeta={props.handleMeta}
+            cursorsEnabled={props.cursorsEnabled}
+            handleProcessTime={props.handleProcessTime}
+          />
+        </div>
+      </details>
+
+      <details>
+        <summary className="pl-2 mt-2 bg-iqengine-green outline outline-1 outline-iqengine-green text-lg text-black">
+          Metadata
+        </summary>
+        <div className="outline outline-1 outline-iqengine-green p-2">
+          <InfoPane meta={props.meta} handleMetaGlobal={props.handleMetaGlobal} />
+        </div>
+      </details>
+    </div>
   );
 };
 

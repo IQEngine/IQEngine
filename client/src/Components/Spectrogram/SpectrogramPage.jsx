@@ -608,7 +608,7 @@ class SpectrogramPage extends Component {
                   }}
                   className={` ${
                     currentTab === 'spectrogram' ? 'bg-iqengine-green text-black' : ''
-                  } inline-block px-4 py-2  rounded-t outline  outline-iqengine-green outline-1 text-lg text-iqengine-green hover:text-green-900`}
+                  } inline-block px-3 py-0 outline  outline-iqengine-green outline-1 text-lg text-iqengine-green hover:text-green-900`}
                 >
                   Spectrogram
                 </button>
@@ -621,7 +621,7 @@ class SpectrogramPage extends Component {
                   }}
                   className={` ${
                     currentTab === 'time' ? 'bg-iqengine-green text-black' : ''
-                  } inline-block px-4 py-2 rounded-t outline outline-iqengine-green outline-1 text-lg text-iqengine-green hover:text-green-900`}
+                  } inline-block px-3 py-0 outline outline-iqengine-green outline-1 text-lg text-iqengine-green hover:text-green-900`}
                 >
                   Time
                 </button>
@@ -634,7 +634,7 @@ class SpectrogramPage extends Component {
                   }}
                   className={` ${
                     currentTab === 'frequency' ? 'bg-iqengine-green text-black' : ''
-                  } inline-block px-4 py-2  rounded-t outline  outline-iqengine-green outline-1 text-lg text-iqengine-green hover:text-green-900`}
+                  } inline-block px-3 py-0 outline  outline-iqengine-green outline-1 text-lg text-iqengine-green hover:text-green-900`}
                 >
                   Frequency
                 </button>
@@ -647,7 +647,7 @@ class SpectrogramPage extends Component {
                   }}
                   className={` ${
                     currentTab === 'iq' ? 'bg-iqengine-green text-black' : ''
-                  } inline-block px-4 py-2  rounded-t outline  outline-iqengine-green outline-1 text-lg text-iqengine-green hover:text-green-900`}
+                  } inline-block px-3 py-0 outline  outline-iqengine-green outline-1 text-lg text-iqengine-green hover:text-green-900`}
                 >
                   IQ Plot
                 </button>
