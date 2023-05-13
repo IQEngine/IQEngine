@@ -598,68 +598,64 @@ class SpectrogramPage extends Component {
             updatePythonSnippet={this.props.updateBlobPythonSnippet}
             updateZoomLevel={this.handleZoomLevel}
           />
-          <div className="flex flex-col ">
-            <ul className="flex space-x-2 border-b border-iqengine-green w-fit" id="tabsbar">
+          <div className="flex flex-col">
+            <ul className="flex space-x-2 border-b border-iqengine-green w-full sm:pl-12 lg:pl-32" id="tabsbar">
               <li>
-                <a
-                  href="#"
+                <button
                   onClick={() => {
                     this.handleProcessTime();
                     this.setState({ currentTab: 'spectrogram' });
                   }}
                   className={` ${
                     currentTab === 'spectrogram' ? 'bg-iqengine-green text-black' : ''
-                  } inline-block px-4 py-2  rounded-t outline  outline-iqengine-green outline-1`}
+                  } inline-block px-4 py-2  rounded-t outline  outline-iqengine-green outline-1 text-lg text-iqengine-green hover:text-green-900`}
                 >
-                  <h5>Spectrogram</h5>
-                </a>
+                  Spectrogram
+                </button>
               </li>
               <li>
-                <a
-                  href="#"
+                <button
                   onClick={() => {
                     this.handleProcessTime();
                     this.setState({ currentTab: 'time' });
                   }}
                   className={` ${
                     currentTab === 'time' ? 'bg-iqengine-green text-black' : ''
-                  } inline-block px-4 py-2  rounded-t outline  outline-iqengine-green outline-1`}
+                  } inline-block px-4 py-2 rounded-t outline outline-iqengine-green outline-1 text-lg text-iqengine-green hover:text-green-900`}
                 >
-                  <h5>Time</h5>
-                </a>
+                  Time
+                </button>
               </li>
               <li>
-                <a
-                  href="#"
+                <button
                   onClick={() => {
                     this.handleProcessTime();
                     this.setState({ currentTab: 'frequency' });
                   }}
                   className={` ${
                     currentTab === 'frequency' ? 'bg-iqengine-green text-black' : ''
-                  } inline-block px-4 py-2  rounded-t outline  outline-iqengine-green outline-1`}
+                  } inline-block px-4 py-2  rounded-t outline  outline-iqengine-green outline-1 text-lg text-iqengine-green hover:text-green-900`}
                 >
-                  <h5>Frequency</h5>
-                </a>
+                  Frequency
+                </button>
               </li>
               <li>
-                <a
-                  href="#"
+                <button
                   onClick={() => {
                     this.handleProcessTime();
                     this.setState({ currentTab: 'iq' });
                   }}
                   className={` ${
                     currentTab === 'iq' ? 'bg-iqengine-green text-black' : ''
-                  } inline-block px-4 py-2  rounded-t outline  outline-iqengine-green outline-1`}
+                  } inline-block px-4 py-2  rounded-t outline  outline-iqengine-green outline-1 text-lg text-iqengine-green hover:text-green-900`}
                 >
-                  <h5>IQ Plot</h5>
-                </a>
+                  IQ Plot
+                </button>
               </li>
             </ul>
             <div className="p-0 ml-0 mr-0 mb-0 mt-2">
               <div className={currentTab === 'spectrogram' ? 'block' : 'hidden'}>
-                <div className="flex flex-col">
+                <div className="flex flex-col pl-3">
                   <Stage width={spectrogramWidth + 110} height={rulerTopHeight}>
                     <RulerTop
                       fftSize={fftSize}

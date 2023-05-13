@@ -12,7 +12,7 @@ import Accordion from 'react-bootstrap/Accordion';
 const Sidebar = (props) => {
   //from: https://stackoverflow.com/questions/60482018/make-a-sidebar-from-react-bootstrap
   return (
-    <Nav className="d-flex flex-column align-items-center align-items-sm-start px-3 pt-0">
+    <Nav className="d-flex flex-column align-items-center align-items-sm-start p-0">
       <Nav.Item>
         <Accordion defaultActiveKey="0">
           <Accordion.Item eventKey="0">
