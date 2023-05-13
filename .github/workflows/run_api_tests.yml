@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  vitest:
+  pytest:
     name: RunAPITests
     runs-on: ubuntu-latest
 
