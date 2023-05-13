@@ -1,0 +1,18 @@
+name: Run API tests
+
+on:
+  pull_request:
+    # only runs on PRs that target main
+    branches:
+      - main
+    paths:
+      - api/**
+  workflow_dispatch:
+
+jobs:
+  vitest:
+    name: RunAPITests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
