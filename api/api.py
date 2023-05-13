@@ -1,4 +1,3 @@
-# change for test trigger 123
 from flask import Flask
 
 def create_app():

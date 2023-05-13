@@ -7,9 +7,6 @@ on:
       - main
     paths:
       - api/**
-  push:
-    paths:
-      - api/**
   workflow_dispatch:
 
 jobs:
