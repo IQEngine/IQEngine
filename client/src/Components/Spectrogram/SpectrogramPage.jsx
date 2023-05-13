@@ -81,7 +81,7 @@ class SpectrogramPage extends Component {
     const windowHeight = window.innerHeight;
     const topRowHeight = document.getElementById('topRow').offsetHeight;
     const tabsHeight = document.getElementById('tabsbar').offsetHeight;
-    const newSpectrogramHeight = windowHeight - topRowHeight - marginTop - tabsHeight - rulerTopHeight - 30;
+    const newSpectrogramHeight = windowHeight - topRowHeight - marginTop - tabsHeight - rulerTopHeight - 140;
 
     const newSpectrogramWidth = window.innerWidth - 430; // hand-tuned for now
 

@@ -50,7 +50,6 @@ export const IQPlot = (props) => {
           },
         ]}
         layout={{
-          title: 'IQ Plot',
           width: plotWidth,
           height: plotHeight,
           dragmode: 'pan',

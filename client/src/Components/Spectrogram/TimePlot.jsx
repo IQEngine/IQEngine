@@ -51,7 +51,6 @@ export const TimePlot = (props) => {
           },
         ]}
         layout={{
-          title: 'Time Domain Plot',
           width: plotWidth,
           height: plotHeight,
           dragmode: 'pan',

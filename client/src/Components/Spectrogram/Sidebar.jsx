@@ -11,7 +11,7 @@ const Sidebar = (props) => {
   return (
     <div className="flex flex-col w-64 ml-3">
       <details open>
-        <summary className="pl-2 bg-iqengine-green outline outline-1 outline-iqengine-green text-lg text-black">
+        <summary className="pl-2 bg-iqengine-green outline outline-1 outline-iqengine-green text-lg text-black hover:bg-green-800">
           Settings
         </summary>
         <div className="outline outline-1 outline-iqengine-green p-2">
@@ -35,7 +35,7 @@ const Sidebar = (props) => {
       </details>
 
       <details>
-        <summary className="pl-2 mt-2 bg-iqengine-green outline outline-1 outline-iqengine-green text-lg text-black">
+        <summary className="pl-2 mt-2 bg-iqengine-green outline outline-1 outline-iqengine-green text-lg text-black hover:bg-green-800">
           Detector
         </summary>
         <div className="outline outline-1 outline-iqengine-green p-2">
@@ -49,7 +49,7 @@ const Sidebar = (props) => {
       </details>
 
       <details>
-        <summary className="pl-2 mt-2 bg-iqengine-green outline outline-1 outline-iqengine-green text-lg text-black">
+        <summary className="pl-2 mt-2 bg-iqengine-green outline outline-1 outline-iqengine-green text-lg text-black hover:bg-green-800">
           Metadata
         </summary>
         <div className="outline outline-1 outline-iqengine-green p-2">

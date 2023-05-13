@@ -47,7 +47,6 @@ export const FrequencyPlot = (props) => {
           },
         ]}
         layout={{
-          title: 'Frequency Domain Plot',
           width: plotWidth,
           height: plotHeight,
           dragmode: 'pan',
