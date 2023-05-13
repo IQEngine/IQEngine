@@ -16,3 +16,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+
+      - run: pip install -r ./requirements.txt
+
+      - run: pytest
