@@ -7,6 +7,9 @@ on:
       - main
     paths:
       - api/**
+  push:
+    paths:
+      - api/**
   workflow_dispatch:
 
 jobs:
@@ -17,6 +20,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - run: pip install -r ./requirements.txt
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.10
 
-      - run: pytest
+      - run: |
+          pip install -r ./requirements.txt
+          pytest
+        working-directory: api
