@@ -5,7 +5,6 @@
 import { Container, Row, Col } from 'react-bootstrap';
 import { Sidebar } from './Sidebar';
 import { Component } from 'react';
-import Button from 'react-bootstrap/Button';
 import ScrollBar from './ScrollBar';
 import { TimePlot } from './TimePlot';
 import { FrequencyPlot } from './FrequencyPlot';
@@ -21,7 +20,11 @@ import TimeSelector from './TimeSelector';
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import { Navigate } from 'react-router-dom';
-import Table from '../Table/Table';
+import Button from '@/Components/Button/Button';
+import Collapsible from '@/Components/Collapsible/Collapsible';
+import Table from '@/Components/Table/Table';
+import { calculateDate, calculateFrequency } from '@/Utils/rfFunctions';
+import { PencilSquareIcon, ArrowRightIcon } from '@heroicons/react/24/solid';
 
 async function initPyodide() {
   const pyodide = await window.loadPyodide();
@@ -238,24 +241,65 @@ class SpectrogramPage extends Component {
     return { ...newState };
   }
 
+  getActions = () => {
+    return (
+      <div>
+        <Button
+          onClick={() => {
+            alert('Awaiting implementation');
+          }}
+        >
+          <PencilSquareIcon className="h-6 w-6" />
+        </Button>
+
+        <Button
+          onClick={() => {
+            alert('Awaiting implementation');
+          }}
+        >
+          <ArrowRightIcon className="h-6 w-6" />
+        </Button>
+      </div>
+    );
+  };
+
   calculateData = (metadata) => {
     let data = [];
-    let counter = 1;
-    
-    metadata.annotations.forEach(annotation =>  {
-      let currentData =   {
-        annotation: counter++,
-        frequencyRange: annotation["core:freq_lower_edge"] + ', ' + annotation["core:freq_upper_edge"],
-        label: annotation["core:description"],
-        timeRange: annotation["core:sample_start"] + ', ' + annotation["core:sample_count"],
-        actions: <Button variant="secondary">Edit</Button>
+
+    let startCapture = metadata?.captures[0];
+
+    if (startCapture && startCapture['core:datetime']) {
+      for (let i = 0; i < metadata.annotations?.length; i++) {
+        let annotation = metadata.annotations[i];
+        let description = annotation['core:description'];
+        let sampleRate = Number(metadata.global['core:sample_rate']);
+        let startDate = new Date(startCapture['core:datetime']);
+        let startSampleCount = new Number(annotation['core:sample_start']);
+        let endSampleCount = startSampleCount + new Number(annotation['core:sample_count']);
+
+        // Get frequency range
+        let startFreqRange = calculateFrequency(annotation['core:freq_lower_edge']);
+        let endFreqRange = calculateFrequency(annotation['core:freq_upper_edge']);
+        let frequencyRange = startFreqRange + ' - ' + endFreqRange;
+
+        // Get time range
+        let startTimeRange = calculateDate(startDate, startSampleCount, sampleRate);
+        let endTimeRange = calculateDate(startDate, endSampleCount, sampleRate);
+        let timeRange = startTimeRange === endTimeRange ? startTimeRange : startTimeRange + ' - ' + endTimeRange;
+
+        let currentData = {
+          annotation: i,
+          frequencyRange: frequencyRange,
+          label: description,
+          timeRange: timeRange,
+          actions: this.getActions(),
+        };
+
+        data.push(currentData);
       }
-
-      data.push(currentData);
-    })
-
+    }
     return data;
-  }
+  };
 
   handleFftSize = (size) => {
     window.fftData = {};
@@ -683,33 +727,36 @@ class SpectrogramPage extends Component {
               </Tabs>
             </Col>
           </Row>
-          
-          {/*<Row>
-            <Table columns={columns} data={this.calculateData(this.state.meta)} />
-            </Row>*/}
-          <Row style={{ paddingBottom: '5px', paddingTop: '30px' }}>
-            <Col className="col-3">
-              <Button
-                className="text-right"
-                variant="secondary"
-                onClick={() => {
-                  this.handleMeta();
-                  this.downloadInfo();
-                }}
-              >
-                <DownloadIcon></DownloadIcon>
-                Download meta JSON
-              </Button>
-            </Col>
-            <Col></Col>
-          </Row>
-          <Row>
-            <textarea
-              rows="20"
-              cols="100"
-              onChange={this.handleMetaChange}
-              value={JSON.stringify(this.state.meta, null, 4)}
-            />
+          <Row style={{ marginLeft: '15px' }}>
+            <Collapsible title="Annotations" style={{ marginTop: '5px' }}>
+              <Table columns={columns} data={this.calculateData(this.state.meta)} rows="5" cols="100" />
+            </Collapsible>
+            <Collapsible title="Metadata" style={{ marginTop: '5px' }}>
+              <Row>
+                <Col className="col-3">
+                  <Button
+                    className="text-right"
+                    variant="secondary"
+                    onClick={() => {
+                      this.handleMeta();
+                      this.downloadInfo();
+                    }}
+                  >
+                    <DownloadIcon></DownloadIcon>
+                    Download meta JSON
+                  </Button>
+                </Col>
+                <Col></Col>
+              </Row>
+              <Row>
+                <textarea
+                  rows="20"
+                  cols="100"
+                  onChange={this.handleMetaChange}
+                  value={JSON.stringify(this.state.meta, null, 4)}
+                />
+              </Row>
+            </Collapsible>
           </Row>
         </Container>
       </div>
@@ -719,16 +766,15 @@ class SpectrogramPage extends Component {
 
 export default SpectrogramPage;
 
-
 const columns = [
   {
     title: 'Annotation',
     dataIndex: 'annotation',
-  },  
+  },
   {
     title: 'Frequency Range',
     dataIndex: 'frequencyRange',
-  },  
+  },
   {
     title: 'Label',
     dataIndex: 'label',
@@ -739,6 +785,6 @@ const columns = [
   },
   {
     title: 'Actions',
-    dataIndex: 'actions'
-  }
+    dataIndex: 'actions',
+  },
 ];
