@@ -10,6 +10,7 @@ import {
   updateConnectionBlobClient,
   updateConnectionAccountName,
   updateConnectionContainerName,
+  updateConnectionDomainName,
   updateConnectionSasToken,
 } from '../Store/Actions/ConnectionActions';
 import RecordingsBrowser from '../Components/RecordingsBrowser/RecordingsBrowser';
@@ -33,6 +34,7 @@ function mapDispatchToProps(dispatch) {
     updateConnectionBlobClient: (client) => dispatch(updateConnectionBlobClient(client)),
     updateConnectionAccountName: (x) => dispatch(updateConnectionAccountName(x)),
     updateConnectionContainerName: (x) => dispatch(updateConnectionContainerName(x)),
+    updateConnectionDomainName: (x) => dispatch(updateConnectionDomainName(x)),
     updateConnectionSasToken: (x) => dispatch(updateConnectionSasToken(x)),
     fetchRecordingsList: (x) => dispatch(fetchRecordingsList(x)),
   };

@@ -89,6 +89,7 @@ export default function RecordingsBrowser(props) {
     updateConnectionBlobClient,
     updateConnectionAccountName,
     updateConnectionContainerName,
+    updateConnectionDomainName,
     updateConnectionSasToken,
     fetchRecordingsList,
   } = props;
@@ -109,11 +110,18 @@ export default function RecordingsBrowser(props) {
       console.log('Updating connection info and fetching recordings list!');
       const accountName = searchParams.get('accountName');
       const containerName = searchParams.get('containerName');
+      const domainName = searchParams.get('domainName');
       const sasToken = searchParams.get('sasToken');
       updateConnectionAccountName(accountName);
       updateConnectionContainerName(containerName);
+      updateConnectionDomainName(domainName);
       updateConnectionSasToken(sasToken);
-      fetchRecordingsList({ accountName: accountName, containerName: containerName, sasToken: sasToken });
+      fetchRecordingsList({
+        accountName: accountName,
+        containerName: containerName,
+        domainName: domainName,
+        sasToken: sasToken,
+      });
     }
   });
 

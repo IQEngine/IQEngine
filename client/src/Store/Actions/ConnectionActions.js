@@ -6,6 +6,7 @@ import {
   RESET_CONNECTION_OBJ,
   UPDATE_CONNECTION_ACCOUNT_NAME,
   UPDATE_CONNECTION_CONTAINER_NAME,
+  UPDATE_CONNECTION_DOMAIN_NAME,
   UPDATE_CONNECTION_DATA_FILE_HANDLE,
   UPDATE_CONNECTION_META_FILE_HANDLE,
   UPDATE_CONNECTION_RECORDING,
@@ -20,6 +21,11 @@ export const updateConnectionAccountName = (payload) => ({
 
 export const updateConnectionContainerName = (payload) => ({
   type: UPDATE_CONNECTION_CONTAINER_NAME,
+  payload,
+});
+
+export const updateConnectionDomainName = (payload) => ({
+  type: UPDATE_CONNECTION_DOMAIN_NAME,
   payload,
 });
 

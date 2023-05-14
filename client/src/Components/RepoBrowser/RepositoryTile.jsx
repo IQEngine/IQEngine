@@ -12,6 +12,7 @@ const RepositoryTile = (props) => {
     item,
     updateConnectionAccountName,
     updateConnectionContainerName,
+    updateConnectionDomainName,
     updateConnectionSasToken,
     fetchRecordingsList,
   } = props;
@@ -57,14 +58,22 @@ const RepositoryTile = (props) => {
   const handleOnClick = () => {
     updateConnectionAccountName(accountName);
     updateConnectionContainerName(containerName);
+    updateConnectionDomainName('blob.core.windows.net'); // at some point we'll add this to the setting json
     updateConnectionSasToken(sasToken);
-    fetchRecordingsList({ accountName: accountName, containerName: containerName, sasToken: sasToken });
+    fetchRecordingsList({
+      accountName: accountName,
+      containerName: containerName,
+      domainName: 'blob.core.windows.net',
+      sasToken: sasToken,
+    });
     // so we can fetch when someone is linked to a repo directly
     navigate(
       '/recordings/?accountName=' +
         accountName +
         '&containerName=' +
         containerName +
+        '&domainName=' +
+        'blob.core.windows.net' +
         '&sasToken=' +
         encodeURIComponent(sasToken)
     );

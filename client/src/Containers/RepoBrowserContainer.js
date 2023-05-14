@@ -7,6 +7,7 @@ import RepoBrowser from '../Components/RepoBrowser/RepoBrowser';
 import {
   updateConnectionAccountName,
   updateConnectionContainerName,
+  updateConnectionDomainName,
   updateConnectionSasToken,
   updateConnectionMetaFileHandle,
   updateConnectionDataFileHandle,
@@ -25,6 +26,7 @@ function mapDispatchToProps(dispatch) {
   return {
     updateConnectionAccountName: (accountName) => dispatch(updateConnectionAccountName(accountName)),
     updateConnectionContainerName: (containerName) => dispatch(updateConnectionContainerName(containerName)),
+    updateConnectionDomainName: (containerName) => dispatch(updateConnectionDomainName(containerName)),
     updateConnectionSasToken: (token) => dispatch(updateConnectionSasToken(token)),
     updateConnectionMetaFileHandle: (handle) => dispatch(updateConnectionMetaFileHandle(handle)),
     updateConnectionDataFileHandle: (handle) => dispatch(updateConnectionDataFileHandle(handle)),

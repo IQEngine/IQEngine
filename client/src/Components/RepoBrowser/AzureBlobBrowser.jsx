@@ -11,14 +11,21 @@ import { useNavigate } from 'react-router-dom';
 const AzureBlobBrowser = (props) => {
   const [accountName, setAccountName] = useState(props.accountName);
   const [containerName, setContainerName] = useState(props.containerName);
+  const [domainName, setDomainName] = useState('blob.core.windows.net');
   const [sasToken, setSasToken] = useState(props.sasToken);
+
   const navigate = useNavigate();
+
   const onAccountNameChange = (event) => {
     setAccountName(event.target.value);
   };
 
   const onContainerNameChange = (event) => {
     setContainerName(event.target.value);
+  };
+
+  const onDomainNameChange = (event) => {
+    setDomainName(event.target.value);
   };
 
   const onSasTokenChange = (event) => {
@@ -29,9 +36,20 @@ const AzureBlobBrowser = (props) => {
     event.preventDefault();
     props.updateConnectionAccountName(accountName);
     props.updateConnectionContainerName(containerName);
+    props.updateConnectionDomainName(domainName);
     props.updateConnectionSasToken(sasToken);
-    props.fetchRecordingsList({ accountName: accountName, containerName: containerName, sasToken: sasToken });
-    navigate('/recordings', { accountName: accountName, containerName: containerName, sasToken: sasToken }); // include args in URL for linking-sake
+    props.fetchRecordingsList({
+      accountName: accountName,
+      containerName: containerName,
+      domainName: domainName,
+      sasToken: sasToken,
+    });
+    navigate('/recordings', {
+      accountName: accountName,
+      containerName: containerName,
+      domainName: domainName,
+      sasToken: sasToken,
+    }); // include args in URL for linking-sake
   };
 
   return (
@@ -43,6 +61,8 @@ const AzureBlobBrowser = (props) => {
           <Form.Control className="mb-3" type="text" defaultValue={accountName} onChange={onAccountNameChange} />
           <Form.Label>Container Name:</Form.Label>
           <Form.Control className="mb-3" type="text" defaultValue={containerName} onChange={onContainerNameChange} />
+          <Form.Label>Domain Name:</Form.Label>
+          <Form.Control className="mb-3" type="text" defaultValue={domainName} onChange={onDomainNameChange} />
           <Form.Label>SAS Token for Container:</Form.Label>
           <Form.Control type="password" defaultValue={sasToken} onChange={onSasTokenChange} />
         </Form.Group>

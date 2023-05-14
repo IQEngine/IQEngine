@@ -16,12 +16,12 @@ export const FetchMeta = (connection) => async (dispatch) => {
   let meta_json;
   let blobName = connection.recording + '.sigmf-meta'; // has to go outside of condition or else react gets mad
   if (connection.metafilehandle === null) {
-    let { accountName, containerName, sasToken } = connection;
+    let { accountName, containerName, domainName, sasToken } = connection;
     if (containerName === '') {
       console.error('container name was not filled out for some reason');
     }
     // Get the blob client.  TODO: REPLACE THIS WITH THE HANDLE WE ALREADY FOUND
-    const blobServiceClient = new BlobServiceClient(`https://${accountName}.blob.core.windows.net?${sasToken}`);
+    const blobServiceClient = new BlobServiceClient(`https://${accountName}.${domainName}?${sasToken}`);
     const containerClient = blobServiceClient.getContainerClient(containerName);
     const blobMetaClient = containerClient.getBlobClient(blobName.replaceAll('(slash)', '/'));
     const downloadBlockBlobResponse = await blobMetaClient.download();

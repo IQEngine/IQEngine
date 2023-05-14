@@ -44,12 +44,36 @@ Through the optional backend API, IQEngine supports three different classes of p
 
 The IQEngine frontend is a React app and can be deployed many different ways, the canonical instance at iqengine.org is deployed in Azure using an App Service (serverless computing) with the Node stack, but if you prefer to run it containerized, here is an example to get you started:
 
-```
+```bash
 docker build . -t iqengine
 docker run -p 3000:3000 -d iqengine
 ```
 
 The build step will take 3-5 minutes.  After running it you should be able to access IQEngine in a browser at http://localhost:3000/.
+
+## Host a local file server with Azurite
+
+```bash
+npm install -g azurite
+azurite -v
+(make sure it's 3.x.x)
+azurite --location /home/marc/azurite_server_folder/ --debug /tmp/debug.log
+```
+
+In a locally running IQEngine (run with http) connect to it with
+
+Storage Account Name: devstoreaccount1
+Container Name: testdir
+SAS Token for Container: Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==
+
+DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;
+
+
+
+Allow remote requests with `--blobHost 0.0.0.0` and change port with `--blobPort 8888` and avoid blocking unsupported request headers and parameters with `-L`.  For more flags see https://learn.microsoft.com/en-us/azure/storage/common/storage-use-azurite?tabs=npm
+
+
+
 
 ## Azure App Service Config Notes
 

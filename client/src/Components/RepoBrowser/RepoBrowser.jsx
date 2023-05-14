@@ -25,6 +25,7 @@ const RepoBrowser = (props) => {
           fetchRecordingsList={props.fetchRecordingsList}
           updateConnectionAccountName={props.updateConnectionAccountName}
           updateConnectionContainerName={props.updateConnectionContainerName}
+          updateConnectionDomainName={props.updateConnectionDomainName}
           updateConnectionSasToken={props.updateConnectionSasToken}
         />
       ))}
@@ -39,6 +40,7 @@ const RepoBrowser = (props) => {
         fetchRecordingsList={props.fetchRecordingsList}
         updateConnectionAccountName={props.updateConnectionAccountName}
         updateConnectionContainerName={props.updateConnectionContainerName}
+        updateConnectionDomainName={props.updateConnectionDomainName}
         updateConnectionSasToken={props.updateConnectionSasToken}
       />
       <SiggenTile />

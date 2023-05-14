@@ -6,6 +6,7 @@ import {
   RESET_CONNECTION_OBJ,
   UPDATE_CONNECTION_ACCOUNT_NAME,
   UPDATE_CONNECTION_CONTAINER_NAME,
+  UPDATE_CONNECTION_DOMAIN_NAME,
   UPDATE_CONNECTION_DATA_FILE_HANDLE,
   UPDATE_CONNECTION_META_FILE_HANDLE,
   UPDATE_CONNECTION_RECORDING,
@@ -15,6 +16,7 @@ import {
 const initialState = {
   accountName: '',
   containerName: '',
+  domainName: '',
   sasToken: '',
   recording: '',
   metafilehandle: '',
@@ -33,6 +35,11 @@ export default function connectionReducer(state = initialState, action) {
       return {
         ...state,
         containerName: action.payload,
+      };
+    case UPDATE_CONNECTION_DOMAIN_NAME:
+      return {
+        ...state,
+        domainName: action.payload,
       };
     case UPDATE_CONNECTION_RECORDING:
       return {

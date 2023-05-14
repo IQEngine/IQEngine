@@ -31,9 +31,9 @@ export const FetchRecordingsList = (connection) => async (dispatch) => {
     dispatch(fetchRecordingsListSuccess(connection.entries));
   }
 
-  const { accountName, containerName, sasToken } = connection;
-  const baseUrl = `https://${accountName}.blob.core.windows.net/${containerName}/`;
-  const blobServiceClient = new BlobServiceClient(`https://${accountName}.blob.core.windows.net?${sasToken}`);
+  const { accountName, containerName, domainName, sasToken } = connection;
+  const baseUrl = `https://${accountName}.${domainName}/${containerName}/`;
+  const blobServiceClient = new BlobServiceClient(`https://${accountName}.${domainName}?${sasToken}`);
   const containerClient = blobServiceClient.getContainerClient(containerName);
 
   // List the blob(s) in the container.
