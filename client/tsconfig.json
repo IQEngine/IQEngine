@@ -6,7 +6,7 @@
     "types": ["vite/client", "vite-plugin-svgr/client"],
     "allowJs": false,
     "skipLibCheck": false,
-    "esModuleInterop": true,
+    "esModuleInterop": false,
     "allowSyntheticDefaultImports": true,
     "strict": false,
     "forceConsistentCasingInFileNames": true,

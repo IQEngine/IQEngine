@@ -30,7 +30,7 @@ export const SampleRecordings: RecordingObject[] = [
     description: 'This is a recording',
     annotationsCount: 1,
     capturesCount: 1,
-    source: 'Kleos',
+    source: 'Kleos1',
     spectogram: '/spectogram.png',
     samples: 1000000,
     frequency: 1000000,
