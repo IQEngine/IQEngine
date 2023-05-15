@@ -16,7 +16,6 @@ describe('Recording list component', () => {
 });
 
 const assertValues = async (recording: RecordingObject) => {
-  console.log(recording.title);
   expect(await screen.getAllByText(recording.title)[0]).toBeInTheDocument();
 
   expect(await screen.getAllByText(recording.source)[0]).toBeInTheDocument();
