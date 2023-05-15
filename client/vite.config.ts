@@ -1,3 +1,6 @@
+/// <reference types="vitest" />
+/// <reference types="vite/client" />
+
 import { resolve } from 'path';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
@@ -36,4 +39,8 @@ export default defineConfig({
     sourcemap: false,
   },
   plugins: [react(), viteTsconfigPaths(), svgrPlugin(), envCompatible()],
+  test: {
+    globals: true,
+    environment: 'jsdom',
+  },
 });
