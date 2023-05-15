@@ -9,6 +9,7 @@ import {
 } from '../Store/Actions/RecordingsListActions';
 import parseMeta from '../Utils/parseMeta';
 import { BlobServiceClient } from '@azure/storage-blob';
+import { DefaultAzureCredential } from '@azure/identity';
 
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
@@ -32,8 +33,18 @@ export const FetchRecordingsList = (connection) => async (dispatch) => {
   }
 
   const { accountName, containerName, domainName, sasToken } = connection;
-  const baseUrl = `https://${accountName}.${domainName}/${containerName}/`;
-  const blobServiceClient = new BlobServiceClient(`https://${accountName}.${domainName}?${sasToken}`);
+  let baseUrl;
+  let blobServiceClient;
+  try {
+    blobServiceClient = new BlobServiceClient(`https://${accountName}.${domainName}?${sasToken}`);
+    baseUrl = `https://${domainName}/${containerName}/`;
+  } catch (e) {
+    console.error(e);
+    console.log('Trying azurite instead');
+    const defaultAzureCredential = new DefaultAzureCredential();
+    blobServiceClient = new BlobServiceClient(`https://${domainName}`, defaultAzureCredential);
+    console.log('GOT HERE');
+  }
   const containerClient = blobServiceClient.getContainerClient(containerName);
 
   // List the blob(s) in the container.
