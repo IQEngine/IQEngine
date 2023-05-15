@@ -15,7 +15,7 @@ export const Collapsible = ({ title, children, ...rest }: CollapsibleProps) => {
   };
 
   return (
-    <div className="border rounded-md shadow-md" {...rest}>
+    <div className="outline outline-1 outline-iqengine-green rounded-md" {...rest}>
       <div className="flex items-center justify-between cursor-pointer" onClick={toggleCollapsible}>
         <h3 className="text-lg py-2 pl-3">{title}</h3>
         {isOpen ? <ChevronUpIcon className="h-6 w-6" /> : <ChevronDownIcon className="h-6 w-6" />}

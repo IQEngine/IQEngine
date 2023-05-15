@@ -7,7 +7,7 @@ import React, { useEffect, useState } from 'react';
 import { template } from '../../Utils/plotlyTemplate';
 
 export const TimePlot = (props) => {
-  let { currentSamples } = props;
+  let { currentSamples, plotWidth, plotHeight } = props;
   const [I, setI] = useState();
   const [Q, setQ] = useState();
 
@@ -51,9 +51,8 @@ export const TimePlot = (props) => {
           },
         ]}
         layout={{
-          title: 'Time Domain Plot',
-          width: 700,
-          height: 600,
+          width: plotWidth,
+          height: plotHeight,
           dragmode: 'pan',
           showlegend: true,
           template: template,

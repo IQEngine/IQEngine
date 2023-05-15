@@ -341,7 +341,7 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
         <Form.Label style={{ display: 'flex' }}>
           Python Snippet<br></br>
         </Form.Label>
-        <textarea rows="6" cols="23" wrap="off" onChange={onChangePythonSnippet} value={state.pythonSnippet} />
+        <textarea rows="6" cols="28" wrap="off" onChange={onChangePythonSnippet} value={state.pythonSnippet} />
         <br></br>
         <Button variant="secondary" style={{ float: 'right' }} onClick={onSubmitPythonSnippet}>
           Run Python

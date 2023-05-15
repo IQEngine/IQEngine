@@ -25,6 +25,7 @@ export const About = () => {
                 fontWeight: 'bold',
                 marginTop: '30px',
                 marginBottom: '10px',
+                fontSize: '28px',
               }}
             >
               Great For...
@@ -60,6 +61,7 @@ export const About = () => {
                 fontWeight: 'bold',
                 marginTop: '20px',
                 marginBottom: '10px',
+                fontSize: '28px',
               }}
             >
               Example Use-Cases
@@ -99,6 +101,7 @@ export const About = () => {
                 fontWeight: 'bold',
                 marginTop: '50px',
                 marginBottom: '50px',
+                fontSize: '28px',
               }}
             >
               Leadership Teams
@@ -246,6 +249,7 @@ export const About = () => {
                   color: '#04b889',
                   fontWeight: 'bold',
                   marginTop: '20px',
+                  fontSize: '28px',
                 }}
               >
                 Origin
