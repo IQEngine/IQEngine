@@ -24,8 +24,7 @@ import Button from '@/Components/Button/Button';
 import Collapsible from '@/Components/Collapsible/Collapsible';
 import Table from '@/Components/Table/Table';
 import { calculateDate, calculateFrequency } from '@/Utils/rfFunctions';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPencil, faArrowRight } from '@fortawesome/free-solid-svg-icons';
+import { PencilSquareIcon, ArrowRightIcon } from '@heroicons/react/24/solid';
 
 async function initPyodide() {
   const pyodide = await window.loadPyodide();
@@ -250,7 +249,7 @@ class SpectrogramPage extends Component {
             alert('Awaiting implementation');
           }}
         >
-          <FontAwesomeIcon icon={faPencil} />
+          <PencilSquareIcon className="h-6 w-6" />
         </Button>
 
         <Button
@@ -258,7 +257,7 @@ class SpectrogramPage extends Component {
             alert('Awaiting implementation');
           }}
         >
-          <FontAwesomeIcon icon={faArrowRight} />
+          <ArrowRightIcon className="h-6 w-6" />
         </Button>
       </div>
     );
@@ -267,35 +266,38 @@ class SpectrogramPage extends Component {
   calculateData = (metadata) => {
     let data = [];
 
-    for (let i = 0; i < metadata.annotations?.length; i++) {
-      let annotation = metadata.annotations[i];
-      let description = annotation['core:description'];
-      let sample_rate = Number(metadata.global['core:sample_rate']);
-      let start_date = new Date(metadata?.captures[0]['core:datetime']);
-      let start_sample_count = new Number(annotation['core:sample_start']);
-      let end_sample_count = start_sample_count + new Number(annotation['core:sample_count']);
+    let startCapture = metadata?.captures[0];
 
-      // Get frequency range
-      let startFreqRange = calculateFrequency(annotation['core:freq_lower_edge']);
-      let endFreqRange = calculateFrequency(annotation['core:freq_upper_edge']);
-      let frequencyRange = startFreqRange + ' - ' + endFreqRange;
+    if (startCapture && startCapture['core:datetime']) {
+      for (let i = 0; i < metadata.annotations?.length; i++) {
+        let annotation = metadata.annotations[i];
+        let description = annotation['core:description'];
+        let sampleRate = Number(metadata.global['core:sample_rate']);
+        let startDate = new Date(startCapture['core:datetime']);
+        let startSampleCount = new Number(annotation['core:sample_start']);
+        let endSampleCount = startSampleCount + new Number(annotation['core:sample_count']);
 
-      // Get time range
-      let startTimeRange = calculateDate(start_date, start_sample_count, sample_rate);
-      let endTimeRange = calculateDate(start_date, end_sample_count, sample_rate);
-      let timeRange = startTimeRange === endTimeRange ? startTimeRange : startTimeRange + ' - ' + endTimeRange;
+        // Get frequency range
+        let startFreqRange = calculateFrequency(annotation['core:freq_lower_edge']);
+        let endFreqRange = calculateFrequency(annotation['core:freq_upper_edge']);
+        let frequencyRange = startFreqRange + ' - ' + endFreqRange;
 
-      let currentData = {
-        annotation: i,
-        frequencyRange: frequencyRange,
-        label: description,
-        timeRange: timeRange,
-        actions: this.getActions(),
-      };
+        // Get time range
+        let startTimeRange = calculateDate(startDate, startSampleCount, sampleRate);
+        let endTimeRange = calculateDate(startDate, endSampleCount, sampleRate);
+        let timeRange = startTimeRange === endTimeRange ? startTimeRange : startTimeRange + ' - ' + endTimeRange;
 
-      data.push(currentData);
+        let currentData = {
+          annotation: i,
+          frequencyRange: frequencyRange,
+          label: description,
+          timeRange: timeRange,
+          actions: this.getActions(),
+        };
+
+        data.push(currentData);
+      }
     }
-
     return data;
   };
 

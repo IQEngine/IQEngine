@@ -1,7 +1,6 @@
 import React from 'react';
 import { useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAngleUp, faAngleDown } from '@fortawesome/free-solid-svg-icons';
+import { ChevronUpIcon, ChevronDownIcon } from '@heroicons/react/24/solid';
 
 interface CollapsibleProps {
   title: string;
@@ -19,7 +18,7 @@ export const Collapsible = ({ title, children, ...rest }: CollapsibleProps) => {
     <div className="border rounded-md shadow-md" {...rest}>
       <div className="flex items-center justify-between cursor-pointer" onClick={toggleCollapsible}>
         <h3 className="text-lg py-2 pl-3">{title}</h3>
-        {isOpen ? <FontAwesomeIcon icon={faAngleUp} /> : <FontAwesomeIcon icon={faAngleDown} />}
+        {isOpen ? <ChevronUpIcon className="h-6 w-6" /> : <ChevronDownIcon className="h-6 w-6" />}
       </div>
       {isOpen && <div className="p-3">{children}</div>}
     </div>
