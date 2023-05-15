@@ -6,7 +6,7 @@ import { RecordingObject, SampleRecordings } from './Recording';
 import React from 'react';
 
 describe('Recording list component', () => {
-  test('renders', async () => {
+  test('renders recordings', async () => {
     render(<RecordingList recordings={SampleRecordings} />);
 
     for (const recording of SampleRecordings) {
