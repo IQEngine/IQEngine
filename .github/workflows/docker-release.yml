@@ -2,6 +2,9 @@
 name: Release Drafter
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
@@ -44,10 +47,24 @@ jobs:
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v2
         with:
+          labels: |
+            org.opencontainers.image.source=https://github.com/IQEngine/IQEngine
           push: true
           tags: |
             ghcr.io/${{ steps.set_variables.outputs.repository }}:${{ steps.set_variables.outputs.sha }}
             ghcr.io/${{ steps.set_variables.outputs.repository }}:${{ steps.draft_a_release.outputs.tag_name }}
             ghcr.io/${{ steps.set_variables.outputs.repository }}:latest
+        env:
+          VITE_CONNECTION_INFO: '${{ secrets.VITE_CONNECTION_INFO }}'
+          VITE_IQENGINE_APP_VERSION: '$${{ secrets.VITE_IQENGINE_APP_VERSION }}'
+          VITE_GOOGLE_ANALYTICS_KEY: '${{ secrets.VITE_GOOGLE_ANALYTICS_KEY }}'
+          VITE_DETECTOR_ENDPOINT: '${{ secrets.VITE_DETECTOR_ENDPOINT }}'
+      - name: Publish a release
+        uses: eregon/publish-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_id: ${{ steps.draft_a_release.outputs.id }}
+        
       
       
