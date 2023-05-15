@@ -814,33 +814,6 @@ class SpectrogramPage extends Component {
         </div>
 
         <Container>
-          {/*<Row>
-            <Table columns={columns} data={this.calculateData(this.state.meta)} />
-            </Row>*/}
-          <Row style={{ paddingBottom: '5px', paddingTop: '30px' }}>
-            <Col className="col-3">
-              <Button
-                className="text-right"
-                variant="secondary"
-                onClick={() => {
-                  this.handleMeta();
-                  this.downloadInfo();
-                }}
-              >
-                <DownloadIcon></DownloadIcon>
-                Download meta JSON
-              </Button>
-            </Col>
-            <Col></Col>
-          </Row>
-          <Row>
-            <textarea
-              rows="20"
-              cols="100"
-              onChange={this.handleMetaChange}
-              value={JSON.stringify(this.state.meta, null, 4)}
-            />
-          </Row>
           <Row style={{ marginLeft: '15px' }}>
             <Collapsible title="Annotations" style={{ marginTop: '5px' }}>
               <Table columns={columns} data={this.calculateData(this.state.meta)} rows="5" cols="100" />
