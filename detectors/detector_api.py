@@ -68,7 +68,7 @@ async def detect(info : fastapi.Request, detectorname):
     samples = function_input.pop("samples") # Assumed to be real or floats in IQIQIQIQ (cant send complex over JSON)
     print(function_input)
 
-    if not samples: 
+    if not samples:
         return {
         "status" : "FAILED",
         "annotations" : []
