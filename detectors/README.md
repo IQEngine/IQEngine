@@ -17,3 +17,8 @@ See the template_detector for how the input and outputs of the function work, if
 ## Notes
 
 When deploying with Azure remember to go into the function apps Configuration and under Application Settings there needs to be one for AzureWebJobsStorage which is the storage account connection string, as well as MongoDBConnString
+
+To set up certs, configure the DNS name for the VM (under Overview) then fill out "DNS name label" to get a xxx.cloudapp.azure.com domain, then follow these instructions https://certbot.eff.org/instructions?ws=other&os=ubuntufocal.  Certs get saved in /etc/letsencrypt/live/xxx so the new uvicorn command is:
+```
+sudo uvicorn detector_api:app --host 0.0.0.0 --port 8000 --ssl-keyfile=/etc/letsencrypt/live/iqengine-detector.eastus2.cloudapp.azure.com/privkey.pem --ssl-certfile=/etc/letsencrypt/live/iqengine-detector.eastus2.cloudapp.azure.com/fullchain.pem
+```
