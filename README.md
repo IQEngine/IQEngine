@@ -31,10 +31,15 @@ Through the optional backend API, IQEngine supports three different classes of p
 
 1. Install Node for your OS from https://nodejs.org/en/download/
 2. `npm install react-scripts`
-3. Create an .env file using the example.env and paste in your SAS token for the container, or leave blank to do local-only
-4. `npm start` to run app in development mode, it will auto-refresh when you change the code
-5. Open local browser to the ip/port displayed in the terminal, typically http://localhost:3000/
-6. (Optional, and likely not needed) `npm run build` to use production mode (e.g. to make sure all the deps still work when bundled).
+3. If you do not have Vite installed run: 
+    ```
+    npm i -D @vitejs/plugin-react
+    npm i -D @types/node
+    ```
+4. Create an .env file using the example.env and paste in your SAS token for the container, or leave blank to do local-only
+5. `npm start` to run app in development mode, it will auto-refresh when you change the code
+6. Open local browser to the ip/port displayed in the terminal, typically http://localhost:3000/
+7. (Optional, and likely not needed) `npm run build` to use production mode (e.g. to make sure all the deps still work when bundled).
     - You can serve the built files with:
     - `npm install -g serve`
     - `Set-ExecutionPolicy RemoteSigned -Scope CurrentUser`
