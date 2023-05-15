@@ -199,16 +199,28 @@ div.datatypetext {
 
 a:link {
   text-decoration: none;
+  color: #00bc8c;
 }
 
 a:visited {
   text-decoration: none;
-}
-
-a:hover {
-  text-decoration: none;
+  color: #00bc8c;
 }
 
 a:active {
   text-decoration: none;
+  color: #00bc8c;
+}
+
+a:hover {
+  text-decoration: none;
+  color: #007356;
+}
+
+h1 {
+  font-size: 28px;
+}
+
+h5 {
+  font-size: 18px;
 }
