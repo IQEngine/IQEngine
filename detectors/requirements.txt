@@ -2,4 +2,3 @@ numpy
 fastapi
 jsonschema
 PyYAML
-pre-commit
