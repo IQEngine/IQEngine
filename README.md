@@ -86,7 +86,7 @@ The following roadmap highlights the current and future work items across multip
   - [x] A couple example signal detector plugins people can play with and a template
   - [ ] Allow existing RFML implementations to be supported by the IQEngine plugins API without excess work required
   - [ ] Colored annotation boxes
-* Utility for spectrum awareness
+* Utility within spectrum awareness system
   - [x] List all RF recordings available in a directory or storage account in a table
   - [x] Spectrogram thumbnails
   - [ ] Ability to search/query over millions of recordings by parsing metadata into database
