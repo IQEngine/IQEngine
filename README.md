@@ -70,7 +70,7 @@ The following roadmap highlights the current and future work items across multip
   - [ ] PFB channelizer or wavelet in place of FFT
 * Becoming the ultimate SigMF visualization and editing tool
   - [x] Viewable/editable global params and annotations, including adding a new annotation
-  - [p] Ability to save changes to annotations/captures/global to the file
+  - [ ] Ability to save changes to annotations/captures/global to the file
   - [ ] If you click an annotation in the table it jumps to that point in time in the spectrogram
   - [ ] Support for multiple captures
   - [ ] Zooming out in time with decimating to reduce data transferred to client
@@ -78,7 +78,7 @@ The following roadmap highlights the current and future work items across multip
   - [ ] Method of converting other common meta and data types to SigMF (e.g., recordings from test equipment)
 * Extendable with Plugins (detection, classification, demod/decode, generic DSP)
   - [x] Example proof of concept for running plugins within IQEngine
-  - [p] Finalize and implement OpenAPI spec
+  - [ ] Finalize and implement OpenAPI spec
   - [ ] Include examples of functioning plugins and templates for authors to follow
   - [ ] Ability for 3rd party hosted plugins to be made available to anyone
   - [ ] User/admin system for controlling access to certain plugins
@@ -89,7 +89,7 @@ The following roadmap highlights the current and future work items across multip
 * Utility within spectrum awareness systems
   - [x] Table of all RF recordings available in a directory or blob storage account
   - [x] Spectrogram thumbnails
-  - [p] Ability to search/query over millions of recordings by parsing metadata into database
+  - [ ] Ability to search/query over millions of recordings by parsing metadata into database
   - [ ] Maps based interface to show sensor location
   - [ ] Bandwidth stitching of multiple simultaneous recordings at different frequencies
   - [ ] User/admin system for controlling access to certain recordings
