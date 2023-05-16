@@ -800,39 +800,34 @@ class SpectrogramPage extends Component {
           </div>
         </div>
 
-        <Container>
-          <Row style={{ marginLeft: '15px' }}>
-            <Collapsible title="Annotations" style={{ marginTop: '5px' }}>
-              <Table columns={columns} data={this.calculateData(this.state.meta)} rows="5" cols="100" />
-            </Collapsible>
-            <Collapsible title="Metadata" style={{ marginTop: '5px' }}>
-              <Row>
-                <Col className="col-3">
-                  <Button
-                    className="text-right"
-                    variant="secondary"
-                    onClick={() => {
-                      this.handleMeta();
-                      this.downloadInfo();
-                    }}
-                  >
-                    <DownloadIcon></DownloadIcon>
-                    Download meta JSON
-                  </Button>
-                </Col>
-                <Col></Col>
-              </Row>
-              <Row>
-                <textarea
-                  rows="20"
-                  cols="100"
-                  onChange={this.handleMetaChange}
-                  value={JSON.stringify(this.state.meta, null, 4)}
-                />
-              </Row>
-            </Collapsible>
-          </Row>
-        </Container>
+        <div className="mt-3 mb-0 ml-0 mr-0 p-0" style={{ margin: '5px' }}>
+          <Collapsible title="Annotations" style={{ marginTop: '5px', width: '100%' }}>
+            <Table columns={columns} data={this.calculateData(this.state.meta)} />
+          </Collapsible>
+          <Collapsible title="Metadata" style={{ marginTop: '5px' }}>
+            <div>
+              <Button
+                className="text-right"
+                variant="secondary"
+                onClick={() => {
+                  this.handleMeta();
+                  this.downloadInfo();
+                }}
+              >
+                <DownloadIcon></DownloadIcon>
+                Download meta JSON
+              </Button>
+            </div>
+            <div>
+              <textarea
+                rows="20"
+                style={{ width: '100%' }}
+                onChange={this.handleMetaChange}
+                value={JSON.stringify(this.state.meta, null, 4)}
+              />
+            </div>
+          </Collapsible>
+        </div>
       </div>
     );
   }
