@@ -42,6 +42,7 @@ jobs:
           path: client/build/
 
   deploy-to-most-recent-pr-slot:
+    if: github.repository_owner == 'IQEngine'
     name: Deploy to Most Recent PR Slot
     runs-on: ubuntu-latest
     needs: build
