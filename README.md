@@ -63,6 +63,7 @@ The following roadmap highlights the current and future work items across multip
 * Becoming the best analysis tool for raw RF recordings
   - [x] Spectrogram + time + freq + IQ plots with zooming and adjustable scales
   - [x] Filtering and arbitrary Python snippets prior to FFT
+  - [x] Time domain cursors to select samples for other plots or to send to plugins
   - [ ] Frequency domain cursors and ability to extract region to a new file using tune-filter-decimate
   - [ ] Faster client-side FFTs (e.g., using a C webasm module + SIMD for the FFTs)
   - [ ] Configurable colormap
