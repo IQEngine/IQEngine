@@ -58,7 +58,7 @@ The build step will take 3-5 minutes.  After running it you should be able to ac
 
 ## Project Roadmap
 
-The following roadmap highlights the current and future work items across multiple (simultaneous) focus areas.  Not included in this list are ongoing efforts to make IQEngine valuable for use in education, as well as user experience (UX) improvements.
+The following roadmap highlights the past, current, and future work items across multiple (simultaneous) focus areas.  Not included in this list are ongoing efforts to make IQEngine valuable for use in education, as well as user experience (UX) improvements.
 
 * Becoming the best analysis tool for raw RF recordings
   - [x] Spectrogram + time + freq + IQ plots with zooming and adjustable scales
@@ -93,6 +93,8 @@ The following roadmap highlights the current and future work items across multip
   - [ ] Maps based interface to show sensor location
   - [ ] Bandwidth stitching of multiple simultaneous recordings at different frequencies
   - [ ] User/admin system for controlling access to certain recordings
+
+- [x] Indicates completed
 
 ## Azure App Service Config Notes
 
