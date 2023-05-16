@@ -69,7 +69,7 @@ The following roadmap highlights the current and future work items across multip
   - [ ] Configurable colormap
   - [ ] PFB channelizer or wavelet in place of FFT
 * Becoming the ultimate SigMF visualization and editing tool
-  - [x] Editable global params and annotations, including adding a new annotation
+  - [x] Viewable/editable global params and annotations, including adding a new annotation
   - [ ] Ability to save changes to annotations/captures/global to the file
   - [ ] If you click an annotation in the table it jumps to that point in time in the spectrogram
   - [ ] Support for multiple captures
