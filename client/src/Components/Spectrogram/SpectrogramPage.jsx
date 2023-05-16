@@ -280,21 +280,8 @@ class SpectrogramPage extends Component {
 
   calculateData = (metadata) => {
     let data = [];
-    let counter = 1;
-
-    metadata.annotations.forEach((annotation) => {
-      let currentData = {
-        annotation: counter++,
-        frequencyRange: annotation['core:freq_lower_edge'] + ', ' + annotation['core:freq_upper_edge'],
-        label: annotation['core:description'],
-        timeRange: annotation['core:sample_start'] + ', ' + annotation['core:sample_count'],
-        actions: <Button variant="secondary">Edit</Button>,
-      };
-
-      data.push(currentData);
-    });
-
     let startCapture = metadata?.captures[0];
+
     if (startCapture && startCapture['core:datetime']) {
       for (let i = 0; i < metadata.annotations?.length; i++) {
         let annotation = metadata.annotations[i];
