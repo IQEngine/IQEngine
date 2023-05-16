@@ -51,6 +51,46 @@ docker run -p 3000:3000 -d iqengine
 
 The build step will take 3-5 minutes.  After running it you should be able to access IQEngine in a browser at http://localhost:3000/.
 
+## Project Roadmap
+
+The following roadmap highlights the past, current, and future work items across multiple (simultaneous) focus areas.  Not included in this list are ongoing efforts to make IQEngine valuable for use in education, as well as user experience (UX) improvements.
+
+* Becoming the best analysis tool for raw RF recordings
+  - [x] Spectrogram + time + freq + IQ plots with zooming and adjustable scales
+  - [x] Filtering and arbitrary Python snippets prior to FFT
+  - [x] Time domain cursors to select samples for other plots or to send to plugins
+  - [ ] Frequency domain cursors and ability to extract region to a new file using tune-filter-decimate
+  - [ ] Faster client-side FFTs (e.g., using a C webasm module + SIMD for the FFTs)
+  - [ ] Configurable colormap
+  - [ ] PFB channelizer or wavelet in place of FFT
+* Becoming the ultimate SigMF visualization and editing tool
+  - [x] Viewable/editable global params and annotations, including adding a new annotation
+  - [ ] Ability to save changes to annotations/captures/global to the file
+  - [ ] If you click an annotation in the table it jumps to that point in time in the spectrogram
+  - [ ] Support for multiple captures
+  - [ ] Zooming out in time with decimating to reduce data transferred to client
+  - [ ] Ability to link to a specific point in time within a recording
+  - [ ] Method of converting other common meta and data types to SigMF (e.g., recordings from test equipment)
+* Extendable with Plugins (detection, classification, demod/decode, generic DSP)
+  - [x] Example proof of concept for running plugins within IQEngine
+  - [ ] Finalize and implement OpenAPI spec
+  - [ ] Include examples of functioning plugins and templates for authors to follow
+  - [ ] Ability for 3rd party hosted plugins to be made available to anyone
+  - [ ] User/admin system for controlling access to certain plugins
+* Adding value to RFML research and development
+  - [x] A couple example signal detector plugins people can play with and a template
+  - [ ] Allow existing RFML implementations to be supported by the IQEngine plugins API without excess work required
+  - [ ] Colored annotation boxes
+* Utility within spectrum awareness systems
+  - [x] Table of all RF recordings available in a directory or blob storage account
+  - [x] Spectrogram thumbnails
+  - [ ] Ability to search/query over millions of recordings by parsing metadata into database
+  - [ ] Maps based interface to show sensor location
+  - [ ] Bandwidth stitching of multiple simultaneous recordings at different frequencies
+  - [ ] User/admin system for controlling access to certain recordings
+
+- [x] Indicates completed
+
 ## Azure App Service Config Notes
 
 * Startup command needs to be `pm2 serve /home/site/wwwroot --spa --no-daemon`

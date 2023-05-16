@@ -2,7 +2,11 @@
 module.exports = {
   content: ['./src/**/*.{js,jsx,ts,tsx}'],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        'iqengine-green': '#04b889',
+      },
+    },
   },
   plugins: [],
 };

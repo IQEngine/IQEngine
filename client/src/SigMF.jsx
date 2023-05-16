@@ -34,6 +34,7 @@ export const SigMF = () => {
                 fontWeight: 'bold',
                 marginTop: '30px',
                 marginBottom: '30px',
+                fontSize: '28px',
               }}
             >
               What is SigMF?
