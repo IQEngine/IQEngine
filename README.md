@@ -58,7 +58,7 @@ The build step will take 3-5 minutes.  After running it you should be able to ac
 
 ## Project Roadmap
 
-The following roadmap highlights the current and future work items across multiple (simultaneous) focus areas:
+The following roadmap highlights the current and future work items across multiple (simultaneous) focus areas.  Not included here include ongoing efforts to make IQEngine valuable for use in education, as well as user experience (UX) improvements.
 
 * Becoming the best analysis tool for raw RF recordings
   - [x] Spectrogram + time + freq + IQ plots with zooming and adjustable scales
