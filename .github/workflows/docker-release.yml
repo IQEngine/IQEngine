@@ -5,6 +5,12 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'api/**'
+      - 'client/**'
+      - 'Dockerfile'
+      - '.dockerignore'
+      - '.github/workflows/docker-release.yml'
   workflow_dispatch:
 
 permissions:
@@ -32,6 +38,9 @@ jobs:
         uses: release-drafter/release-drafter@v5
         with:
           config-name: release-drafter.yml
+          publish: true
+          prerelease: true
+          header: "## This is a pre-release"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Checkout the repository
@@ -52,19 +61,12 @@ jobs:
           push: true
           tags: |
             ghcr.io/${{ steps.set_variables.outputs.repository }}:${{ steps.set_variables.outputs.sha }}
-            ghcr.io/${{ steps.set_variables.outputs.repository }}:${{ steps.draft_a_release.outputs.tag_name }}
+            ghcr.io/${{ steps.set_variables.outputs.repository }}:${{ steps.draft_a_release.outputs.tag_name }}-beta
             ghcr.io/${{ steps.set_variables.outputs.repository }}:latest
         env:
           VITE_CONNECTION_INFO: '${{ secrets.VITE_CONNECTION_INFO }}'
           VITE_IQENGINE_APP_VERSION: '$${{ secrets.VITE_IQENGINE_APP_VERSION }}'
           VITE_GOOGLE_ANALYTICS_KEY: '${{ secrets.VITE_GOOGLE_ANALYTICS_KEY }}'
           VITE_DETECTOR_ENDPOINT: '${{ secrets.VITE_DETECTOR_ENDPOINT }}'
-      - name: Publish a release
-        uses: eregon/publish-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          release_id: ${{ steps.draft_a_release.outputs.id }}
-        
       
       

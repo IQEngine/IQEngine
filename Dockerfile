@@ -15,7 +15,7 @@ LABEL org.opencontainers.image.description="IQEngine is a container image that p
 LABEL org.opencontainers.image.licenses=MIT
 WORKDIR /app
 COPY api/requirements.txt ./
-RUN pip install -r ./requirements.txt
+RUN pip install --no-cache-dir -r ./requirements.txt
 COPY api ./
 COPY .en[v] ./
 COPY --from=build-step /app/build ./build
