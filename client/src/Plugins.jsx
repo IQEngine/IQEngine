@@ -24,6 +24,7 @@ export const Plugins = () => {
                 fontWeight: 'bold',
                 marginTop: '30px',
                 marginBottom: '10px',
+                fontSize: '28px',
               }}
             >
               Plugins Concept
