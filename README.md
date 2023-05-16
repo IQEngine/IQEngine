@@ -13,7 +13,7 @@ _<p align="center"><a href="https://www.iqengine.org">www.iqengine.org</a></p>_
 * Interactively learn about different Fourier and wavelet transforms and filters by applying them to interesting signals
 * Organize and search through millions of RF recordings via metadata queries
 
-Try IQEngine now using the canonical instance at [www.iqengine.org](http://iqengine.org/) hosted by [GNU Radio](https://www.gnuradio.org/) and connected to the official [SigMF](https://github.com/gnuradio/SigMF) examples repository.  You can use the same website to open local RF recordings, the processing is all done client-side.
+Try IQEngine now using the canonical instance at [www.iqengine.org](http://iqengine.org/) hosted by [GNU Radio](https://www.gnuradio.org/) and connected to the official [SigMF](https://github.com/gnuradio/SigMF) examples repository.  You can use the same site to open local RF recordings, the processing is all done client-side.
 
 IQEngine is rapidly evolving, so [sign up](https://dashboard.mailerlite.com/forms/299501/77960409531811734/share) for a once-a-month email update, including new features, demos, and more!  There is also an IQEngine [Discord](https://discord.gg/k7C8kp3b76) chat channel if you want to get involved in the development.  You may also contact Marc at iqengine@vt.edu for questions/comments/suggestions.
 
@@ -75,7 +75,7 @@ The following roadmap highlights the past, current, and future work items across
   - [x] Example proof of concept for running plugins within IQEngine
   - [ ] Finalize and implement OpenAPI spec
   - [ ] Include examples of functioning plugins and templates for authors to follow
-  - [ ] Ability for 3rd party hosted plugins to be made available to anyone
+  - [ ] Ability for third-party hosted plugins to be made available to anyone
   - [ ] User/admin system for controlling access to certain plugins
 * Adding value to RFML research and development
   - [x] A couple example signal detector plugins people can play with and a template
@@ -96,7 +96,7 @@ The following roadmap highlights the past, current, and future work items across
 * Startup command needs to be `pm2 serve /home/site/wwwroot --spa --no-daemon`
 * Node 16
 * There needs to be a deployment slot called staging
-* within the github repo settings under Secrets and vars > Actions, there needs to be a Repository secret with AZUREAPPSERVICE_PUBLISHPROFILE...
+* within the GitHub repository settings under Secrets and vars > Actions, there needs to be a Repository secret with AZUREAPPSERVICE_PUBLISHPROFILE...
 * Connection settings live in GitHub Secrets > Actions (not Azure App Service anymore), enter it in without the outter double quotes and don't escape any quotes.
 
 <p align="center"><h1>IQEngine is Supported By:</h1></p>
