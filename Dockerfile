@@ -21,4 +21,4 @@ COPY .en[v] ./
 COPY --from=build-step /app/build ./build
 ENV FLASK_ENV production
 EXPOSE 3000
-CMD ["gunicorn", "-b", ":3000", "api:app"]
+CMD ["gunicorn", "-b", ":3000", "api:create_app()"]
