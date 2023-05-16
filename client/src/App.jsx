@@ -31,57 +31,48 @@ export const App = () => {
   return (
     <ThemeSelector>
       <div>
-        <Row id="topRow" style={{ marginTop: '10px' }}>
-          <Col md="4"></Col>
-          <Col md="4" style={{ textAlign: 'center' }}>
-            <a href="/">
-              <img src="/IQEngine.svg" alt="IQEngine" />
-            </a>
-          </Col>
-          <Col md="4">
-            <Row>
-              <Container className="nav justify-content-end">
-                <Navbar variant="dark" style={{ paddingTop: '0px', paddingBottom: '0px' }}>
-                  <Nav.Link href="/about" style={{ fontSize: '24px', paddingLeft: '0px', paddingRight: '25px' }}>
-                    About
-                  </Nav.Link>
+        <div className="container flex mb-40" id="topRow">
+          <a href="/" className="absolute mt-4 pt-2 top-0 left-1/2 transform -translate-x-1/2">
+            <img src="/IQEngine.svg" alt="IQEngine" />
+          </a>
 
-                  <Nav.Link href="/sigmf" style={{ fontSize: '24px', paddingLeft: '0px', paddingRight: '25px' }}>
-                    SigMF
-                  </Nav.Link>
+          <div className="absolute right-0 py-2 mr-2">
+            <ul className="flex-row flex mb-4 mt-0 space-x-5 text-sm font-medium">
+              <li>
+                <a href="/about" className="text-lg ">
+                  About
+                </a>
+              </li>
+              <li>
+                <a href="/sigmf" className="text-lg">
+                  SigMF
+                </a>
+              </li>
+              <li>
+                <a href="/plugins" className="text-lg ">
+                  Plugins
+                </a>
+              </li>
+              <li>
+                <a href="https://discord.gg/k7C8kp3b76" target="_blank" rel="noreferrer" className="text-lg">
+                  <div className="flex">
+                    <img src="/discord.svg" className="w-6 pr-1" alt="Discord" />
+                    Discord
+                  </div>
+                </a>
+              </li>
+              <li>
+                <a href="https://github.com/iqengine/iqengine" target="_blank" rel="noreferrer" className="text-lg ">
+                  <div className="flex">
+                    <img src="/github.svg" className="w-6 h-6 pr-1 pt-1" alt="GitHub" />
+                    GitHub
+                  </div>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
 
-                  <Nav.Link href="/plugins" style={{ fontSize: '24px', paddingLeft: '0px', paddingRight: '10px' }}>
-                    Plugins
-                  </Nav.Link>
-                </Navbar>
-              </Container>
-            </Row>
-            <Row className="mb0 mt0">
-              <Container className="nav justify-content-end">
-                <a
-                  className="nav-link"
-                  style={{ display: 'inline-flex', fontSize: '24px', paddingLeft: '0px', paddingRight: '20px' }}
-                  target="_blank"
-                  rel="noreferrer"
-                  href="https://discord.gg/k7C8kp3b76"
-                >
-                  <img src="/discord.svg" style={{ width: '22px' }} alt="Discord" />
-                  Discord
-                </a>
-                <a
-                  className="nav-link"
-                  style={{ display: 'inline-flex', fontSize: '24px', paddingLeft: '0px', paddingRight: '10px' }}
-                  target="_blank"
-                  rel="noreferrer"
-                  href="https://github.com/iqengine/iqengine"
-                >
-                  <img src="/github.svg" style={{ width: '20px', verticalAlign: 'middle' }} alt="GitHub" />
-                  GitHub
-                </a>
-              </Container>
-            </Row>
-          </Col>
-        </Row>
         <Outlet />
         {/* TODO Figure out how to use mailerlites embedded form*/}
         <div className="container">

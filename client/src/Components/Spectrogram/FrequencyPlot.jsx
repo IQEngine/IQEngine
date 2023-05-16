@@ -9,7 +9,7 @@ import { template } from '../../Utils/plotlyTemplate';
 import { FFT } from '@/Utils/fft';
 
 export const FrequencyPlot = (props) => {
-  let { currentSamples } = props;
+  let { currentSamples, plotWidth, plotHeight } = props;
   const [magnitudes, setMagnitudes] = useState();
 
   useEffect(() => {
@@ -47,9 +47,8 @@ export const FrequencyPlot = (props) => {
           },
         ]}
         layout={{
-          title: 'Frequency Domain Plot',
-          width: 700,
-          height: 600,
+          width: plotWidth,
+          height: plotHeight,
           dragmode: 'pan',
           template: template,
           xaxis: {

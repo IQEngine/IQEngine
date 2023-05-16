@@ -77,7 +77,7 @@ export default function FileRow({
                 updateBlobTotalIQSamples(item.lengthInIQSamples);
               }}
             >
-              <h5>{item.name.split('(slash)').slice(-1)[0].replace('.sigmf-meta', '')}</h5>
+              <h5 style={{ fontSize: '20px' }}>{item.name.split('(slash)').slice(-1)[0].replace('.sigmf-meta', '')}</h5>
             </Link>
             <div title={item.description}>{item.shortDescription}</div>
             {/* File download links */}
