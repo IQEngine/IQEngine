@@ -39,6 +39,7 @@ version-resolver:
       - 'refactor'
   default: patch
 template: |
+  
   ## Changes
 
   $CHANGES
