@@ -1,13 +1,24 @@
-FROM node:18-alpine 
-LABEL org.opencontainers.image.source="https://github.com/IQEngine/IQEngine"
+# Build step #1: build the React front end
+FROM docker.io/node:18-alpine as build-step
 WORKDIR /app
-COPY package*.json ./
-# Install dependencies (npm ci makes sure the exact versions in the lockfile gets installed)
-RUN npm ci 
-COPY . .
+ENV PATH /app/node_modules/.bin:$PATH
+COPY client/package*.json ./
+RUN npm ci
+COPY ./client/public ./public
+COPY ./client ./
+COPY .en[v] ./
 RUN npm run build
-# Set the environment to production
-ENV NODE_ENV production
+
+# Build step #2: build the API with the client as static files
+FROM docker.io/python:3.10
+LABEL org.opencontainers.image.description="IQEngine is a container image that provides a concise and efficient visualization and exploration tool for RF data in the SIGMF format."
+LABEL org.opencontainers.image.licenses=MIT
+WORKDIR /app
+COPY api/requirements.txt ./
+RUN pip install -r ./requirements.txt
+COPY api ./
+COPY .en[v] ./
+COPY --from=build-step /app/build ./build
+ENV FLASK_ENV production
 EXPOSE 3000
-# Start the app
-CMD [ "npx", "serve", "build" ]
+CMD ["gunicorn", "-b", ":3000", "api:app"]

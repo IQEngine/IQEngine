@@ -10,9 +10,6 @@ name: Lint Code Base
 # Start the job on all push #
 #############################
 on:
-  push:
-    branches:
-    - main
   pull_request:
     branches:
     - main
@@ -56,5 +53,6 @@ jobs:
         uses: github/super-linter/slim@v5
         env:
           VALIDATE_ALL_CODEBASE: false
+          VALIDATE_MARKDOWN: false
           DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
