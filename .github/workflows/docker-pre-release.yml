@@ -27,9 +27,9 @@ jobs:
       - id: set_variables
         run: |
           # make the repository lowercase
-          echo "repository=${GITHUB_REPOSITORY,,}" >> $GITHUB_OUTPUT
+          echo "repository=${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
           # truncate sha to 11 characters
-          echo "sha=${GITHUB_SHA::11}" >> $GITHUB_OUTPUT
+          echo "sha=${GITHUB_SHA::11}" >> "$GITHUB_OUTPUT"
         env:
           GITHUB_REPOSITORY: ${{ github.repository }}
           GITHUB_SHA: ${{ github.sha }}
