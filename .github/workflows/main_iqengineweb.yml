@@ -41,7 +41,7 @@ jobs:
           path: client/build/
 
   deploy-to-staging:
-    if: github.repository_owner == 'IQEngine'
+    if: github.repository == 'IQEngine/IQEngine'
     name: Deploy to Staging
     runs-on: ubuntu-latest
     needs: build
