@@ -1,4 +1,4 @@
-name-template: '$RESOLVED_VERSION ⚠️PRE-RELEASE⚠️ 🚀'
+name-template: '$RESOLVED_VERSION 🚀'
 tag-template: '$RESOLVED_VERSION'
 categories:
   - title: '🚀 Features'
@@ -39,8 +39,6 @@ version-resolver:
       - 'refactor'
   default: patch
 template: |
-  # This is a ⚠️PRE-RELEASE⚠️ version treat it as such
-
   ## Changes
 
   $CHANGES
