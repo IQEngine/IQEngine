@@ -2,7 +2,7 @@ import { describe, expect, test } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
-import { DataColumn, DataRow, TableProps, DataTable } from '@/Components/DataTable/DataTable';
+import { DataColumn, DataRow, DataTable } from '@/Components/DataTable/DataTable';
 import React from 'react';
 
 describe('Data table component', () => {
@@ -14,9 +14,9 @@ describe('Data table component', () => {
     // Act
     render(<DataTable dataColumns={dataColumns} dataRows={dataRows} />);
 
-    // Assert
     const table = screen.getByRole('table');
 
+    // Assert
     // Head plus ten elements
     expect(table.querySelectorAll('tr').length).toBe(11);
 
@@ -33,9 +33,9 @@ describe('Data table component', () => {
     // Act
     render(<DataTable dataColumns={dataColumns} dataRows={dataRows} />);
 
-    // Assert
     const previous = screen.getAllByRole('button').find((button) => button.textContent === 'Prev');
 
+    // Assert
     expect(previous.hasAttribute('disabled')).toBeTruthy();
   });
 
@@ -47,12 +47,12 @@ describe('Data table component', () => {
     // Act
     render(<DataTable dataColumns={dataColumns} dataRows={dataRows} />);
 
-    // Assert
     const table = screen.getByRole('table');
     const next = screen.getAllByRole('button').find((button) => button.textContent === 'Next');
 
     await userEvent.click(next);
 
+    // Assert
     // Head plus ten elements
     expect(next.hasAttribute('disabled')).toBeFalsy();
     expect(table.querySelectorAll('tr').length).toBe(11);
