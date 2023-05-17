@@ -24,12 +24,17 @@ jobs:
       packages: write
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - id: set_variables
         run: |
-          # make the repository lowercase
-          echo "repository=${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
-          # truncate sha to 11 characters
-          echo "sha=${GITHUB_SHA::11}" >> "$GITHUB_OUTPUT"
+          {
+            echo "repository=${GITHUB_REPOSITORY,,}"
+            echo "sha=${GITHUB_SHA::11}"
+            echo "build_time=$(date +'%Y%m%d%H%M')" 
+          } >> "$GITHUB_OUTPUT"
         env:
           GITHUB_REPOSITORY: ${{ github.repository }}
           GITHUB_SHA: ${{ github.sha }}
@@ -40,17 +45,13 @@ jobs:
           config-name: release-drafter.yml
           publish: true
           prerelease: true
-          tag: "$RESOLVED_VERSION-beta"
-          name: "$RESOLVED_VERSION-beta"
+          tag: "$RESOLVED_VERSION-pre-${{ steps.set_variables.outputs.build_time }}"
+          name: "$RESOLVED_VERSION-pre-${{ steps.set_variables.outputs.build_time }}"
           header: |
             ## This is a pre-release version of IQEngine
             
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Checkout the repository
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v1
         with:
