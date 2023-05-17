@@ -5,12 +5,12 @@ import '@testing-library/jest-dom';
 import { DataColumn, DataRow, DataTable } from '@/Components/DataTable/DataTable';
 import React from 'react';
 
+// Arrange
+const dataColumns: DataColumn[] = require('./data-table.test.data-columns.json');
+const dataRows: DataRow[] = require('./data-table.test.data-rows.json');
+
 describe('Data table component', () => {
   test('Display first 10 annotations on intial view', async () => {
-    // Arrange
-    const dataColumns: DataColumn[] = require('./data-table.test.data-columns.json');
-    const dataRows: DataRow[] = require('./data-table.test.data-rows.json');
-
     // Act
     render(<DataTable dataColumns={dataColumns} dataRows={dataRows} />);
 
@@ -26,10 +26,6 @@ describe('Data table component', () => {
   });
 
   test('Previous button disabled on intial view', async () => {
-    // Arrange
-    const dataColumns: DataColumn[] = require('./data-table.test.data-columns.json');
-    const dataRows: DataRow[] = require('./data-table.test.data-rows.json');
-
     // Act
     render(<DataTable dataColumns={dataColumns} dataRows={dataRows} />);
 
@@ -40,10 +36,6 @@ describe('Data table component', () => {
   });
 
   test('Display next 10 values when clicking next', async () => {
-    // Arrange
-    const dataColumns: DataColumn[] = require('./data-table.test.data-columns.json');
-    const dataRows: DataRow[] = require('./data-table.test.data-rows.json');
-
     // Act
     render(<DataTable dataColumns={dataColumns} dataRows={dataRows} />);
 
@@ -68,7 +60,7 @@ describe('Data table component', () => {
     const dataRows: DataRow[] = require('./data-table.test.data-rows.json').slice(0, 10);
 
     // Act
-    render(<DataTable dataColumns={dataColumns} dataRows={dataRows} />);
+    render(<DataTable dataColumns={dataColumns} dataRows={dataRows.slice(0, 10)} />);
 
     const table = screen.getByRole('table');
     const next = screen.getAllByRole('button').find((button) => button.textContent === 'Next');
@@ -78,10 +70,6 @@ describe('Data table component', () => {
   });
 
   test('Filter only returns associated values', async () => {
-    // Arrange
-    const dataColumns: DataColumn[] = require('./data-table.test.data-columns.json');
-    const dataRows: DataRow[] = require('./data-table.test.data-rows.json');
-
     // Act
     render(<DataTable dataColumns={dataColumns} dataRows={dataRows} />);
 
@@ -100,10 +88,6 @@ describe('Data table component', () => {
 });
 
 test('Selecting 50 returns 50', async () => {
-  // Arrange
-  const dataColumns: DataColumn[] = require('./data-table.test.data-columns.json');
-  const dataRows: DataRow[] = require('./data-table.test.data-rows.json');
-
   // Act
   render(<DataTable dataColumns={dataColumns} dataRows={dataRows} />);
 
