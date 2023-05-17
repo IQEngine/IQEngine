@@ -1,26 +1,28 @@
 import React, { useState } from 'react';
+import Button from '@/Components/Button/Button';
+import { Table, Input, Select } from 'react-daisyui';
 
-interface Column {
+export interface DataColumn {
   title: string;
   dataIndex: string;
 }
 
-interface RowData {
+export interface DataRow {
   [key: string]: any;
 }
 
-interface TableProps {
-  columns: Column[];
-  data: RowData[];
+export interface TableProps {
+  dataColumns: DataColumn[];
+  dataRows: DataRow[];
 }
 
-export const Table = ({ columns, data }: TableProps) => {
+export const DataTable = ({ dataColumns, dataRows }: TableProps) => {
   const [filterInput, setFilterInput] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
   // Define a custom filtering function
-  const filteredData = data.filter((row) =>
+  const filteredData = dataRows.filter((row) =>
     Object.values(row).some((value) => String(value).toLowerCase().includes(filterInput.toLowerCase()))
   );
 
@@ -35,8 +37,8 @@ export const Table = ({ columns, data }: TableProps) => {
       <div className="mb-4 flex flex-row justify-between items-center">
         <div className="flex flex-row items-center">
           <span className="mr-2">Show</span>
-          <select
-            className="px-2 py-1 text-white-700 rounded-md"
+          <Select
+            data-testid="pagesize"
             value={pageSize}
             onChange={(e) => {
               setPageSize(Number(e.target.value));
@@ -48,43 +50,39 @@ export const Table = ({ columns, data }: TableProps) => {
                 {size}
               </option>
             ))}
-          </select>
+          </Select>
           <span className="ml-2">entries</span>
         </div>
         <div>
-          <input
-            className="px-2 py-1 text-white-700 rounded-md"
+          <Input
             value={filterInput}
             onChange={(e) => {
               setFilterInput(e.target.value);
               setCurrentPage(1);
             }}
-            placeholder={`Search ${data.length} records...`}
+            name="search"
+            placeholder={`Search ${dataRows.length} records...`}
           />
         </div>
       </div>
-      <table className="table-auto w-full">
+      <Table>
         <thead>
           <tr>
-            {columns?.map((column) => (
-              <th key={column.dataIndex} className="border bg-zinc-800 px-4 py-2">
-                {column.title}
-              </th>
+            {dataColumns?.map((column) => (
+              <th key={column.dataIndex}>{column.title}</th>
             ))}
           </tr>
         </thead>
         <tbody>
           {currentPageData?.map((row, rowIndex) => (
             <tr key={rowIndex}>
-              {columns?.map((column, colIndex) => (
-                <td key={`${rowIndex}-${colIndex}`} className="border px-4 py-2">
-                  {row[column.dataIndex]}
-                </td>
+              {dataColumns?.map((column, colIndex) => (
+                <td key={`${rowIndex}-${colIndex}`}>{row[column.dataIndex]}</td>
               ))}
             </tr>
           ))}
         </tbody>
-      </table>
+      </Table>
       <div className="mt-4 flex flex-row justify-between items-center">
         <div>
           Page{' '}
@@ -94,24 +92,19 @@ export const Table = ({ columns, data }: TableProps) => {
           ({filteredData.length} records)
         </div>
         <div className="flex flex-row">
-          <button
-            className="px-2 py-1 mr-2 text-white-700 rounded-md bg-zinc-800 hover:bg-zinc-500 disabled:opacity-50"
-            onClick={() => setCurrentPage((page) => Math.max(page - 1, 1))}
-            disabled={currentPage === 1}
-          >
+          <Button onClick={() => setCurrentPage((page) => Math.max(page - 1, 1))} disabled={currentPage === 1}>
             Prev
-          </button>
-          <button
-            className="px-2 py-1 text-white-700 rounded-md bg-zinc-800 hover:bg-zinc-500 disabled:opacity-50"
+          </Button>
+          <Button
             onClick={() => setCurrentPage((page) => Math.min(page + 1, maxPage))}
             disabled={currentPage === maxPage}
           >
             Next
-          </button>
+          </Button>
         </div>
       </div>
     </div>
   );
 };
 
-export default Table;
+export default DataTable;
