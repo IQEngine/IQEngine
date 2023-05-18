@@ -45,6 +45,7 @@ const RepositoryTile = (props) => {
   const styleRW = {
     border: '2px solid lightblue',
     width: 'fit-content',
+    height: 'fit-content',
     padding: '1px',
     borderRadius: '5px',
     borderColor: 'black',
