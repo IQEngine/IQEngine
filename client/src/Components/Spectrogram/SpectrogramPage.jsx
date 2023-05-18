@@ -14,14 +14,14 @@ import { AnnotationViewer } from './AnnotationViewer';
 import { RulerTop } from './RulerTop';
 import { RulerSide } from './RulerSide';
 import { TILE_SIZE_IN_IQ_SAMPLES, MAX_SIMULTANEOUS_FETCHES } from '../../Utils/constants';
-import DownloadIcon from '@mui/icons-material/Download';
 import TimeSelector from './TimeSelector';
 import { Navigate } from 'react-router-dom';
 import Button from '@/Components/Button/Button';
 import Collapsible from '@/Components/Collapsible/Collapsible';
 import Table from '@/Components/Table/Table';
 import { calculateDate, printFrequency, printSeconds } from '@/Utils/rfFunctions';
-import { PencilSquareIcon, ArrowRightIcon } from '@heroicons/react/24/solid';
+import DataTable from '@/Components/DataTable/DataTable';
+import { PencilSquareIcon, ArrowRightIcon, ArrowDownTrayIcon } from '@heroicons/react/24/solid';
 
 async function initPyodide() {
   const pyodide = await window.loadPyodide();
@@ -807,8 +807,8 @@ class SpectrogramPage extends Component {
 
         <div className="mt-3 mb-0 ml-0 mr-0 p-0" style={{ margin: '5px' }}>
           <Collapsible title="Annotations" style={{ marginTop: '5px', width: '100%' }}>
-            <Table
-              columns={[
+            <DataTable
+              dataColumns={[
                 { title: 'Annotation', dataIndex: 'annotation' },
                 { title: 'Frequency Range', dataIndex: 'frequencyRange' },
                 { title: 'BW', dataIndex: 'bandwidthHz' },
@@ -817,7 +817,7 @@ class SpectrogramPage extends Component {
                 { title: 'Duration', dataIndex: 'duration' },
                 { title: 'Actions', dataIndex: 'actions' },
               ]}
-              data={this.calculateData(this.state.meta)}
+              dataRows={this.calculateData(this.state.meta)}
             />
           </Collapsible>
           <Collapsible title="Metadata" style={{ marginTop: '5px' }}>
@@ -830,7 +830,7 @@ class SpectrogramPage extends Component {
                   this.downloadInfo();
                 }}
               >
-                <DownloadIcon></DownloadIcon>
+                <ArrowDownTrayIcon className="inline-block mr-2 h-6 w-6" />
                 Download meta JSON
               </Button>
             </div>
