@@ -20,7 +20,7 @@ export const SigMF = () => {
     <div>
       <Modal show={show} onHide={() => setShow(false)}>
         <Modal.Body className="modal-body-centered">
-          <img src="./sigmf-diagram.svg" alt="What is SigMF? Larger" width="800" onClick={() => setShow(true)} />
+          <img src="./sigmf-diagram.svg" alt="What is SigMF? Larger" width="1000" onClick={() => setShow(true)} />
         </Modal.Body>
       </Modal>
 
@@ -68,13 +68,13 @@ export const SigMF = () => {
                   </a>
                   <br></br>
                   <br></br>
-                  <img src="./sigmf_logo_cropped.gif" alt="SigMF animated logo" width="200" />
+                  <img src="./sigmf_logo_cropped.gif" alt="SigMF animated logo" width="400" />
                 </center>
               </p>
             </div>
           </Col>
           <Col xs={4}>
-            <img src="./sigmf-diagram.svg" alt="What is SigMF?" width="600" onClick={() => setShow(true)} />
+            <img src="./sigmf-diagram.svg" alt="What is SigMF?" onClick={() => setShow(true)} />
             <br></br>
             <br></br>
           </Col>
