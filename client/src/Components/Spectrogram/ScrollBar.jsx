@@ -40,6 +40,16 @@ const ScrollBar = (props) => {
       const fftSizeScrollbar = window.iqData['minimap0'].length / 2; // just use the first one to find length
       const newScalingFactor = spectrogramHeight / fftSizeScrollbar / (skipNFfts + 1) / minimapNumFetches;
       setScalingFactor(newScalingFactor);
+
+      // Recalc annotation tick placement
+      let t = [];
+      meta.annotations.forEach((annotation) => {
+        t.push({
+          y: annotation['core:sample_start'] * newScalingFactor,
+          height: annotation['core:sample_count'] * newScalingFactor,
+        });
+      });
+      setTicks(t);
     }
   }, [spectrogramHeight, totalIQSamples, fftSize, zoomLevel]);
 
@@ -214,6 +224,8 @@ const ScrollBar = (props) => {
           draggable={true}
           onDragMove={handleDragMove}
         ></Rect>
+
+        {/* box for each annotation */}
         {ticks.map((tick, index) => (
           <Rect
             x={0}
@@ -228,6 +240,7 @@ const ScrollBar = (props) => {
           />
         ))}
 
+        {/* white boxes showing what has been downloaded */}
         {downloadedTiles.map((tile, index) => (
           <Rect
             x={scrollbarWidth}
