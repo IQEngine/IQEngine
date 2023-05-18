@@ -73,12 +73,12 @@ export const SigMF = () => {
               </p>
             </div>
           </Col>
-          <Col xs={4}>
+          <Col xs={5}>
             <img src="./sigmf-diagram.svg" alt="What is SigMF?" onClick={() => setShow(true)} />
             <br></br>
             <br></br>
           </Col>
-          <Col xs={2}></Col>
+          <Col xs={1}></Col>
         </Row>
       </div>
     </div>
