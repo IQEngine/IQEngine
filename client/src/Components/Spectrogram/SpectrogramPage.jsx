@@ -1,6 +1,7 @@
 // Copyright (c) 2022 Microsoft Corporation
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
+
 import { Sidebar } from './Sidebar';
 import { Component } from 'react';
 import ScrollBar from './ScrollBar';
@@ -17,8 +18,8 @@ import TimeSelector from './TimeSelector';
 import { Navigate } from 'react-router-dom';
 import Button from '@/Components/Button/Button';
 import Collapsible from '@/Components/Collapsible/Collapsible';
+import { calculateDate, printFrequency, printSeconds } from '@/Utils/rfFunctions';
 import DataTable from '@/Components/DataTable/DataTable';
-import { calculateDate, calculateFrequency } from '@/Utils/rfFunctions';
 import { PencilSquareIcon, ArrowRightIcon, ArrowDownTrayIcon } from '@heroicons/react/24/solid';
 
 async function initPyodide() {
@@ -63,7 +64,7 @@ class SpectrogramPage extends Component {
       currentTab: 'spectrogram',
       redirect: false,
       pyodide: null,
-      handleTop: 0,
+      handleTop: 0, // in units of pixels, wrt spectrogram height
       zoomLevel: 1,
       downloadedTiles: [], // used by minimap
       includeRfFreq: false,
@@ -251,7 +252,7 @@ class SpectrogramPage extends Component {
     return { ...newState };
   }
 
-  getActions = () => {
+  getActions = (startSampleCount) => {
     return (
       <div>
         <Button
@@ -259,15 +260,17 @@ class SpectrogramPage extends Component {
             alert('Awaiting implementation');
           }}
         >
-          <PencilSquareIcon className="h-6 w-6" />
+          <PencilSquareIcon className="h-4 w-4 bg-green-950" />
         </Button>
 
         <Button
           onClick={() => {
-            alert('Awaiting implementation');
+            const fractionIntoFile = startSampleCount / this.state.blob.totalIQSamples;
+            const handleTop = fractionIntoFile * this.state.spectrogramHeight;
+            this.fetchAndRender(handleTop);
           }}
         >
-          <ArrowRightIcon className="h-6 w-6" />
+          <ArrowRightIcon className="h-4 w-4 bg-green-950" />
         </Button>
       </div>
     );
@@ -275,33 +278,37 @@ class SpectrogramPage extends Component {
 
   calculateData = (metadata) => {
     let data = [];
-    let startCapture = metadata?.captures[0];
+    const startCapture = metadata?.captures[0];
 
     if (startCapture && startCapture['core:datetime']) {
       for (let i = 0; i < metadata.annotations?.length; i++) {
-        let annotation = metadata.annotations[i];
-        let description = annotation['core:description'];
-        let sampleRate = Number(metadata.global['core:sample_rate']);
-        let startDate = new Date(startCapture['core:datetime']);
-        let startSampleCount = new Number(annotation['core:sample_start']);
-        let endSampleCount = startSampleCount + new Number(annotation['core:sample_count']);
+        const annotation = metadata.annotations[i];
+        const description = annotation['core:description'];
+        const sampleRate = Number(metadata.global['core:sample_rate']);
+        const startDate = new Date(startCapture['core:datetime']);
+        const startSampleCount = new Number(annotation['core:sample_start']);
+        const endSampleCount = startSampleCount + new Number(annotation['core:sample_count']);
+        const duration = printSeconds(Number(annotation['core:sample_count']) / sampleRate);
 
         // Get frequency range
-        let startFreqRange = calculateFrequency(annotation['core:freq_lower_edge']);
-        let endFreqRange = calculateFrequency(annotation['core:freq_upper_edge']);
-        let frequencyRange = startFreqRange + ' - ' + endFreqRange;
+        const startFreqRange = printFrequency(annotation['core:freq_lower_edge']);
+        const endFreqRange = printFrequency(annotation['core:freq_upper_edge']);
+        const frequencyRange = startFreqRange + ' - ' + endFreqRange;
+        const bandwidthHz = printFrequency(annotation['core:freq_upper_edge'] - annotation['core:freq_lower_edge']);
 
         // Get time range
-        let startTimeRange = calculateDate(startDate, startSampleCount, sampleRate);
-        let endTimeRange = calculateDate(startDate, endSampleCount, sampleRate);
-        let timeRange = startTimeRange === endTimeRange ? startTimeRange : startTimeRange + ' - ' + endTimeRange;
+        const startTime = calculateDate(startDate, startSampleCount, sampleRate);
+        const endTime = calculateDate(startDate, endSampleCount, sampleRate);
 
         let currentData = {
           annotation: i,
           frequencyRange: frequencyRange,
+          bandwidthHz: bandwidthHz,
           label: description,
-          timeRange: timeRange,
-          actions: this.getActions(),
+          startTime: startTime,
+          endTime: endTime,
+          duration: duration,
+          actions: this.getActions(startSampleCount),
         };
 
         data.push(currentData);
@@ -601,6 +608,7 @@ class SpectrogramPage extends Component {
       includeRfFreq,
       plotWidth,
       plotHeight,
+      handleTop,
     } = this.state;
 
     const fft = {
@@ -755,6 +763,7 @@ class SpectrogramPage extends Component {
                         size={this.props.minimap.size}
                         downloadedTiles={downloadedTiles}
                         zoomLevel={zoomLevel}
+                        handleTop={handleTop}
                       />
                     </Stage>
                   </div>
@@ -797,7 +806,18 @@ class SpectrogramPage extends Component {
 
         <div className="mt-3 mb-0 ml-0 mr-0 p-0" style={{ margin: '5px' }}>
           <Collapsible title="Annotations" style={{ marginTop: '5px', width: '100%' }}>
-            <DataTable dataColumns={columns} dataRows={this.calculateData(this.state.meta)} />
+            <DataTable
+              dataColumns={[
+                { title: 'Annotation', dataIndex: 'annotation' },
+                { title: 'Frequency Range', dataIndex: 'frequencyRange' },
+                { title: 'BW', dataIndex: 'bandwidthHz' },
+                { title: 'Label', dataIndex: 'label' },
+                { title: 'Start Time', dataIndex: 'startTime' },
+                { title: 'Duration', dataIndex: 'duration' },
+                { title: 'Actions', dataIndex: 'actions' },
+              ]}
+              dataRows={this.calculateData(this.state.meta)}
+            />
           </Collapsible>
           <Collapsible title="Metadata" style={{ marginTop: '5px' }}>
             <div>
@@ -829,26 +849,3 @@ class SpectrogramPage extends Component {
 }
 
 export default SpectrogramPage;
-
-const columns = [
-  {
-    title: 'Annotation',
-    dataIndex: 'annotation',
-  },
-  {
-    title: 'Frequency Range',
-    dataIndex: 'frequencyRange',
-  },
-  {
-    title: 'Label',
-    dataIndex: 'label',
-  },
-  {
-    title: 'Time Range',
-    dataIndex: 'timeRange',
-  },
-  {
-    title: 'Actions',
-    dataIndex: 'actions',
-  },
-];

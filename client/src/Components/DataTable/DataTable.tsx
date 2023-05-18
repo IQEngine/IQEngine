@@ -65,6 +65,7 @@ export const DataTable = ({ dataColumns, dataRows }: TableProps) => {
           />
         </div>
       </div>
+
       <Table>
         <thead>
           <tr>
