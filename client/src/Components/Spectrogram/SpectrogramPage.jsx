@@ -17,6 +17,7 @@ import { RulerSide } from './RulerSide';
 import { TILE_SIZE_IN_IQ_SAMPLES, MAX_SIMULTANEOUS_FETCHES } from '../../Utils/constants';
 import DownloadIcon from '@mui/icons-material/Download';
 import TimeSelector from './TimeSelector';
+import { InfoViewer } from './InfoViewer';
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import { Navigate } from 'react-router-dom';
@@ -799,7 +800,7 @@ class SpectrogramPage extends Component {
             </div>
           </div>
         </div>
-
+        <InfoViewer {...meta?.global}/>
         <div className="mt-3 mb-0 ml-0 mr-0 p-0" style={{ margin: '5px' }}>
           <Collapsible title="Annotations" style={{ marginTop: '5px', width: '100%' }}>
             <Table columns={columns} data={this.calculateData(this.state.meta)} />
