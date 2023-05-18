@@ -20,6 +20,7 @@
     "bootstrap": "^5.2.3",
     "bootswatch": "^5.2.3",
     "codemirror": "^6.0.1",
+    "daisyui": "^2.51.6",
     "fftshift": "^1.0.1",
     "konva": "^8.3.14",
     "plotly.js": "^2.22.0",
@@ -28,6 +29,7 @@
     "react": "^18.2.0",
     "react-bootstrap": "^2.7.4",
     "react-bootstrap-range-slider": "^3.0.8",
+    "react-daisyui": "^3.1.2",
     "react-dom": "^18.2.0",
     "react-frame-component": "^5.2.6",
     "react-ga4": "^2.0.0",
@@ -70,8 +72,10 @@
     ]
   },
   "devDependencies": {
+    "@testing-library/dom": "^9.3.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",
+    "@testing-library/user-event": "^14.4.3",
     "@vitejs/plugin-react": "^4.0.0",
     "autoprefixer": "^10.4.14",
     "jsdom": "^22.0.0",
