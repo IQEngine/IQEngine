@@ -6,27 +6,35 @@
   a {
     @apply text-iqengine-primary;
   }
+
   h1 {
     @apply text-iqengine-primary text-2xl my-4 font-bold;
   }
+
   h2 {
     @apply text-iqengine-primary text-lg;
   }
+
   h5 {
     @apply text-iqengine-primary;
   }
+
   body {
     @apply bg-iqengine-bg;
   }
+
   .repocard {
     @apply border border-iqengine-primary border-0 shadow-md shadow-iqengine-primary rounded-t-xl;
   }
+
   .repocardheader {
     @apply bg-iqengine-primary opacity-75 text-iqengine-bg text-lg font-bold;
   }
+
   .repocardbody {
     @apply bg-iqengine-bg bg-opacity-60;
   }
+
   .repocardbutton {
     @apply bg-iqengine-primary opacity-75 text-iqengine-bg font-bold rounded-t-none border-0;
   }
