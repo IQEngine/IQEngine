@@ -41,7 +41,7 @@ plugins:
 #########
 # Rules #
 #########
-rules: {"comma-dangle": 0}
+rules: {}
 
 ##############################
 # Overrides for JSON parsing #
