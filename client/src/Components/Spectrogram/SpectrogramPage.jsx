@@ -20,7 +20,7 @@ import { Navigate } from 'react-router-dom';
 import Button from '@/Components/Button/Button';
 import Collapsible from '@/Components/Collapsible/Collapsible';
 import Table from '@/Components/Table/Table';
-import { calculateDate, printFrequency } from '@/Utils/rfFunctions';
+import { calculateDate, printFrequency, printSeconds } from '@/Utils/rfFunctions';
 import { PencilSquareIcon, ArrowRightIcon } from '@heroicons/react/24/solid';
 
 async function initPyodide() {
@@ -268,16 +268,6 @@ class SpectrogramPage extends Component {
           onClick={() => {
             const fractionIntoFile = startSampleCount / this.state.blob.totalIQSamples;
             const handleTop = fractionIntoFile * this.state.spectrogramHeight;
-            /*
-            const fftsOnScreen = this.state.spectrogramHeight * this.state.zoomLevel; // remember, we are assuming that 1 row of pixels = 1 FFT, times zoomLevel
-            const fftsPerTile = TILE_SIZE_IN_IQ_SAMPLES / this.state.fftSize;
-            const lowerTile = (this.state.blob.totalIQSamples * fractionIntoFile) / TILE_SIZE_IN_IQ_SAMPLES;
-            const upperTile = fftsOnScreen / fftsPerTile + lowerTile;
-            const handleTop = 0; // TBD
-            this.setState({ lowerTile: lowerTile, upperTile: upperTile, handleTop: handleTop });
-            this.renderImage(lowerTile, upperTile);
-            */
-
             this.fetchAndRender(handleTop);
           }}
         >
@@ -299,7 +289,7 @@ class SpectrogramPage extends Component {
         const startDate = new Date(startCapture['core:datetime']);
         const startSampleCount = new Number(annotation['core:sample_start']);
         const endSampleCount = startSampleCount + new Number(annotation['core:sample_count']);
-        const durationMilliseconds = Number(annotation['core:sample_count']) / sampleRate;
+        const duration = printSeconds(Number(annotation['core:sample_count']) / sampleRate);
 
         // Get frequency range
         const startFreqRange = printFrequency(annotation['core:freq_lower_edge']);
@@ -318,7 +308,7 @@ class SpectrogramPage extends Component {
           label: description,
           startTime: startTime,
           endTime: endTime,
-          durationMilliseconds: durationMilliseconds,
+          duration: duration,
           actions: this.getActions(startSampleCount),
         };
 
@@ -824,7 +814,7 @@ class SpectrogramPage extends Component {
                 { title: 'BW', dataIndex: 'bandwidthHz' },
                 { title: 'Label', dataIndex: 'label' },
                 { title: 'Start Time', dataIndex: 'startTime' },
-                { title: 'Duration [ms]', dataIndex: 'durationMilliseconds' },
+                { title: 'Duration', dataIndex: 'duration' },
                 { title: 'Actions', dataIndex: 'actions' },
               ]}
               data={this.calculateData(this.state.meta)}

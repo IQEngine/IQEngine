@@ -20,3 +20,21 @@ export function printFrequency(freq: number) {
 
   return freq.toString() + ' Hz';
 }
+
+// Prints a number in seconds, using units most appropriate
+export function printSeconds(time: number) {
+  const timePico = time * 1e12;
+  if (timePico.toString().length >= 10) {
+    return (timePico / 1e9).toString() + ' ms';
+  }
+
+  if (timePico.toString().length >= 7) {
+    return (timePico / 1e6).toString() + ' us';
+  }
+
+  if (timePico.toString().length >= 4) {
+    return (timePico / 1e3).toString() + ' ns';
+  }
+
+  return timePico.toString() + ' ps';
+}
