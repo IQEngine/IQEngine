@@ -42,5 +42,8 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
+    testMatch: ['**/*.test.ts'],
+    testEnvironment: 'jsdom',
+    
   },
 });
