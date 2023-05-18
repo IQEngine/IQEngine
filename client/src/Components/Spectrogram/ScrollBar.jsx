@@ -141,7 +141,6 @@ const ScrollBar = (props) => {
         setMinimapImg(ret);
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [size, minimapNumFetches]); // dont add anymore here, so that this triggers ONLY at the start
 
   const handleClick = (e) => {
