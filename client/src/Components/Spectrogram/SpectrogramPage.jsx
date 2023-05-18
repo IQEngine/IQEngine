@@ -18,7 +18,6 @@ import TimeSelector from './TimeSelector';
 import { Navigate } from 'react-router-dom';
 import Button from '@/Components/Button/Button';
 import Collapsible from '@/Components/Collapsible/Collapsible';
-import Table from '@/Components/Table/Table';
 import { calculateDate, printFrequency, printSeconds } from '@/Utils/rfFunctions';
 import DataTable from '@/Components/DataTable/DataTable';
 import { PencilSquareIcon, ArrowRightIcon, ArrowDownTrayIcon } from '@heroicons/react/24/solid';
