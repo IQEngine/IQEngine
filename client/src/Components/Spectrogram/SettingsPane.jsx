@@ -157,7 +157,7 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
         <div className="text-center font-bold">Magnitude Color Mapping</div>
         <InputGroup className="mb-3 mt-1">
           <Form.Label>Max:</Form.Label>
-          <Form.Label className="pl-2 pr-2">{magnitudeMin + 1}</Form.Label>
+          <Form.Label className="text-xs pl-2 pr-2">{magnitudeMin + 1}</Form.Label>
           <RangeSlider
             value={magnitudeMax}
             tooltip="on"
@@ -168,12 +168,12 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
             step={1}
             onChange={onChangeMagnitudeMax}
           />
-          <Form.Label className="pl-2">255</Form.Label>
+          <Form.Label className="text-xs pl-2">255</Form.Label>
         </InputGroup>
 
         <InputGroup>
           <Form.Label>Min:</Form.Label>
-          <Form.Label className="pl-2 pr-2">0</Form.Label>
+          <Form.Label className="text-xs pl-2 pr-2">0</Form.Label>
           <RangeSlider
             value={magnitudeMin}
             tooltip="on"
@@ -184,7 +184,7 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
             step={1}
             onChange={onChangeMagnitudeMin}
           />
-          <Form.Label className="pl-2">{magnitudeMax - 1}</Form.Label>
+          <Form.Label className="text-xs pl-2">{magnitudeMax - 1}</Form.Label>
         </InputGroup>
 
         {/* When you press this button it will make autoscale run during the next call to selectFft, then it will turn itself off */}
