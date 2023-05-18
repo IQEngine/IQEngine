@@ -430,6 +430,7 @@ class SpectrogramPage extends Component {
   };
 
   handleAutoScale = () => {
+    alert('Now drag/click the scrollbar');
     this.setState({
       autoscale: true,
     });
