@@ -19,11 +19,11 @@ const SiggenTile = (props) => {
   };
 
   return (
-    <Card className="flexOne">
-      <Card.Header style={{ display: 'flex', justifyContent: 'space-between' }}>
-        {<div style={{ marginTop: 'auto' }}>Signal Generator</div>}
+    <Card className="flexOne repocard">
+      <Card.Header className="repocardheader" style={{ display: 'flex', justifyContent: 'space-between' }}>
+        Signal Generator
       </Card.Header>
-      <Card.Body>
+      <Card.Body className="repocardbody">
         <center>
           <br />
           <Card.Img
@@ -38,7 +38,7 @@ const SiggenTile = (props) => {
           Save as a SigMF recording!
         </center>
       </Card.Body>
-      <Button variant="success" onClick={handleOnClick}>
+      <Button className="repocardbutton" variant="success" onClick={handleOnClick}>
         Siggen
       </Button>
     </Card>

@@ -45,8 +45,9 @@ const RepositoryTile = (props) => {
   const styleRW = {
     border: '2px solid lightblue',
     width: 'fit-content',
-    padding: '3px',
+    padding: '1px',
     borderRadius: '5px',
+    borderColor: 'black',
   };
 
   const styleHeight = {
@@ -71,22 +72,14 @@ const RepositoryTile = (props) => {
   };
 
   return (
-    <Card className="flexOne">
-      <Card.Header style={{ display: 'flex', justifyContent: 'space-between' }}>
+    <Card className="flexOne repocard">
+      <Card.Header className="repocardheader" style={{ display: 'flex', justifyContent: 'space-between' }}>
         {<div style={{ marginTop: 'auto' }}>{name}</div>} <div style={styleRW}>{writeableBool}</div>
       </Card.Header>
-      <Card.Body>
+      <Card.Body className="repocardbody">
         <center>
           {imageURL && <Card.Img variant="top" src={imageURL} style={styleHeight}></Card.Img>}
-          <br />
-          {/*
-          <div className="mb-2" style={{ marginTop: '10px' }}>
-            Account Name: {accountName}
-          </div>
-          <div className="mb-2">Container Name: {containerName}</div>
-          */}
-          <br></br>
-          <div className="mb-2">{description}</div>
+          <div className="mb-2 mt-4">{description}</div>
           <div className="mb-3" style={{ color: 'grey' }}>
             SAS Token Expiration: {expires}
           </div>
@@ -98,7 +91,13 @@ const RepositoryTile = (props) => {
           )}
         </center>
       </Card.Body>
-      <Button variant="success" disabled={isDisabled} id={name.replaceAll(' ', '')} onClick={handleOnClick}>
+      <Button
+        className="repocardbutton"
+        variant="success"
+        disabled={isDisabled}
+        id={name.replaceAll(' ', '')}
+        onClick={handleOnClick}
+      >
         Browse
       </Button>
     </Card>

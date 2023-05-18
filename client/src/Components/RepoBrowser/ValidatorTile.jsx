@@ -19,11 +19,11 @@ const ValidatorTile = (props) => {
   };
 
   return (
-    <Card className="flexOne">
-      <Card.Header style={{ display: 'flex', justifyContent: 'space-between' }}>
-        {<div style={{ marginTop: 'auto' }}>SigMF Meta Validator</div>}
+    <Card className="flexOne repocard">
+      <Card.Header className="repocardheader" style={{ display: 'flex', justifyContent: 'space-between' }}>
+        SigMF Meta Validator
       </Card.Header>
-      <Card.Body>
+      <Card.Body className="repocardbody">
         <center>
           <br />
           <Card.Img
@@ -36,7 +36,7 @@ const ValidatorTile = (props) => {
           Validate your .sigmf-meta file using an interactive JSON schema validator
         </center>
       </Card.Body>
-      <Button variant="success" onClick={handleOnClick}>
+      <Button className="repocardbutton" variant="success" onClick={handleOnClick}>
         Validator
       </Button>
     </Card>

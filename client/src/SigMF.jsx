@@ -25,12 +25,12 @@ export const SigMF = () => {
       </Modal>
 
       <Row style={{ padding: '10px' }}></Row>
-      <div style={{ backgroundColor: '#303030', width: 'auto' }}>
+      <div style={{ width: 'auto' }}>
         <Row style={{ styleMargins }}>
           <center>
             <h1
+              className="text-iqengine-primary"
               style={{
-                color: '#04b889',
                 fontWeight: 'bold',
                 marginTop: '30px',
                 marginBottom: '30px',

@@ -16,20 +16,10 @@ export const About = () => {
   return (
     <div>
       <Row style={{ padding: '10px' }}></Row>
-      <div style={{ backgroundColor: '#303030', width: 'auto' }}>
+      <div className="bg-iqengine-tertiary bg-opacity-10" style={{ width: 'auto' }}>
         <Row style={{ styleMargins }}>
           <center>
-            <h1
-              style={{
-                color: '#04b889',
-                fontWeight: 'bold',
-                marginTop: '30px',
-                marginBottom: '10px',
-                fontSize: '28px',
-              }}
-            >
-              Great For...
-            </h1>
+            <h1>Great For...</h1>
           </center>
           <Col xs={3}></Col>
           <Col xs={3}>
@@ -55,17 +45,7 @@ export const About = () => {
       <div style={{ width: 'auto' }}>
         <Row style={{ styleMargins }}>
           <center>
-            <h1
-              style={{
-                color: '#04b889',
-                fontWeight: 'bold',
-                marginTop: '20px',
-                marginBottom: '10px',
-                fontSize: '28px',
-              }}
-            >
-              Example Use-Cases
-            </h1>
+            <h1>Example Use-Cases</h1>
           </center>
           <Col xs={1}></Col>
           <Col xs={5}>
@@ -92,20 +72,10 @@ export const About = () => {
         </Row>
       </div>
 
-      <div style={{ backgroundColor: '#303030', width: 'auto', paddingBottom: '15px' }}>
+      <div className="bg-iqengine-tertiary bg-opacity-10" style={{ width: 'auto', paddingBottom: '15px' }}>
         <Row>
           <center>
-            <h1
-              style={{
-                color: '#04b889',
-                fontWeight: 'bold',
-                marginTop: '50px',
-                marginBottom: '50px',
-                fontSize: '28px',
-              }}
-            >
-              Leadership Teams
-            </h1>
+            <h1>Leadership Teams</h1>
           </center>
         </Row>
 
@@ -113,7 +83,9 @@ export const About = () => {
           <Col xs={2}></Col>
           <Col className="ms-0 me-5">
             <Card>
-              <Card.Header className="leadership-card-header">Core Leadership</Card.Header>
+              <Card.Header className="leadership-card-header bg-iqengine-primary text-iqengine-bg">
+                Core Leadership
+              </Card.Header>
               <Card.Body className="leadership-card-body">
                 Manages the overall direction of IQEngine<br></br>
                 <br></br>
@@ -123,7 +95,9 @@ export const About = () => {
           </Col>
           <Col className="ms-5 me-5">
             <Card>
-              <Card.Header className="leadership-card-header">Frontend – Functionality</Card.Header>
+              <Card.Header className="leadership-card-header bg-iqengine-primary text-iqengine-bg">
+                Frontend – Functionality
+              </Card.Header>
               <Card.Body className="leadership-card-body">
                 The IQEngine frontend <br></br>
                 <br></br>
@@ -133,7 +107,9 @@ export const About = () => {
           </Col>
           <Col className="ms-5 me-0">
             <Card>
-              <Card.Header className="leadership-card-header">Frontend - User Experience</Card.Header>
+              <Card.Header className="leadership-card-header bg-iqengine-primary text-iqengine-bg">
+                Frontend - User Experience
+              </Card.Header>
               <Card.Body className="leadership-card-body">
                 UX design and surveying <br></br>
                 <br></br>
@@ -148,7 +124,9 @@ export const About = () => {
           <Col xs={2}></Col>
           <Col className="ms-0 me-5">
             <Card>
-              <Card.Header className="leadership-card-header">Backend/Plugins</Card.Header>
+              <Card.Header className="leadership-card-header bg-iqengine-primary text-iqengine-bg">
+                Backend/Plugins
+              </Card.Header>
               <Card.Body className="leadership-card-body">
                 Backend design including plugin API and implementation <br></br>
                 <br></br>
@@ -158,7 +136,9 @@ export const About = () => {
           </Col>
           <Col className="ms-5 me-5">
             <Card>
-              <Card.Header className="leadership-card-header">Education-Oriented Features</Card.Header>
+              <Card.Header className="leadership-card-header bg-iqengine-primary text-iqengine-bg">
+                Education-Oriented Features
+              </Card.Header>
               <Card.Body className="leadership-card-body">
                 Making IQEngine the perfect place for students <br></br>
                 <br></br>
@@ -168,7 +148,7 @@ export const About = () => {
           </Col>
           <Col className="ms-5 me-0">
             <Card>
-              <Card.Header className="leadership-card-header">RFML</Card.Header>
+              <Card.Header className="leadership-card-header bg-iqengine-primary text-iqengine-bg">RFML</Card.Header>
               <Card.Body className="leadership-card-body">
                 RF Machine Learning oriented functionality <br></br>
                 <br></br>
@@ -183,7 +163,9 @@ export const About = () => {
           <Col xs={2}></Col>
           <Col className="ms-0 me-5">
             <Card>
-              <Card.Header className="leadership-card-header">Community</Card.Header>
+              <Card.Header className="leadership-card-header bg-iqengine-primary text-iqengine-bg">
+                Community
+              </Card.Header>
               <Card.Body className="leadership-card-body">
                 Manages the Discord and other community engagements <br></br>
                 <br></br>
@@ -193,7 +175,9 @@ export const About = () => {
           </Col>
           <Col className="ms-5 me-5">
             <Card>
-              <Card.Header className="leadership-card-header">SigMF Integration</Card.Header>
+              <Card.Header className="leadership-card-header bg-iqengine-primary text-iqengine-bg">
+                SigMF Integration
+              </Card.Header>
               <Card.Body className="leadership-card-body">
                 Expanding and verifying IQEngine's use of SigMF <br></br>
                 <br></br>
@@ -203,7 +187,9 @@ export const About = () => {
           </Col>
           <Col className="ms-5 me-0">
             <Card>
-              <Card.Header className="leadership-card-header">Maps Interface</Card.Header>
+              <Card.Header className="leadership-card-header bg-iqengine-primary text-iqengine-bg">
+                Maps Interface
+              </Card.Header>
               <Card.Body className="leadership-card-body">
                 The IQEngine Maps interface (coming soon!) <br></br>
                 <br></br>
@@ -244,16 +230,7 @@ export const About = () => {
           <Col xs={2}></Col>
           <Col>
             <center>
-              <h1
-                style={{
-                  color: '#04b889',
-                  fontWeight: 'bold',
-                  marginTop: '20px',
-                  fontSize: '28px',
-                }}
-              >
-                Origin
-              </h1>
+              <h1>Origin</h1>
               <p style={{ padding: '10px', fontSize: '20px' }}>
                 The idea for a web-based spectrogram tool started while Marc was teaching an SDR course at UMD, with
                 students who had varying OS's; some ran into trouble installing existing SDR desktop apps. By removing

@@ -75,9 +75,9 @@ const LocalFileBrowser = (props) => {
 
   return (
     // <div className="container-fluid col-4">
-    <Card className="flexOne">
-      <Card.Header>Browse Local Files</Card.Header>
-      <Card.Body className="cardBodyCenter">
+    <Card className="flexOne repocard">
+      <Card.Header className="repocardheader">Browse Local Files</Card.Header>
+      <Card.Body className="repocardbody">
         <center>
           {directoryPickerAvailable && (
             <>

@@ -646,7 +646,7 @@ class SpectrogramPage extends Component {
             updateZoomLevel={this.handleZoomLevel}
           />
           <div className="flex flex-col">
-            <ul className="flex space-x-2 border-b border-iqengine-green w-full sm:pl-12 lg:pl-32" id="tabsbar">
+            <ul className="flex space-x-2 border-b border-iqengine-primary w-full sm:pl-12 lg:pl-32" id="tabsbar">
               <li>
                 <button
                   onClick={() => {
@@ -654,8 +654,8 @@ class SpectrogramPage extends Component {
                     this.setState({ currentTab: 'spectrogram' });
                   }}
                   className={` ${
-                    currentTab === 'spectrogram' ? 'bg-iqengine-green text-black' : ''
-                  } inline-block px-3 py-0 outline  outline-iqengine-green outline-1 text-lg text-iqengine-green hover:text-green-900`}
+                    currentTab === 'spectrogram' ? 'bg-iqengine-primary text-black' : ''
+                  } inline-block px-3 py-0 outline  outline-iqengine-primary outline-1 text-lg text-iqengine-primary hover:text-green-900`}
                 >
                   Spectrogram
                 </button>
@@ -667,8 +667,8 @@ class SpectrogramPage extends Component {
                     this.setState({ currentTab: 'time' });
                   }}
                   className={` ${
-                    currentTab === 'time' ? 'bg-iqengine-green text-black' : ''
-                  } inline-block px-3 py-0 outline outline-iqengine-green outline-1 text-lg text-iqengine-green hover:text-green-900`}
+                    currentTab === 'time' ? 'bg-iqengine-primary text-black' : ''
+                  } inline-block px-3 py-0 outline outline-iqengine-primary outline-1 text-lg text-iqengine-primary hover:text-green-900`}
                 >
                   Time
                 </button>
@@ -680,8 +680,8 @@ class SpectrogramPage extends Component {
                     this.setState({ currentTab: 'frequency' });
                   }}
                   className={` ${
-                    currentTab === 'frequency' ? 'bg-iqengine-green text-black' : ''
-                  } inline-block px-3 py-0 outline  outline-iqengine-green outline-1 text-lg text-iqengine-green hover:text-green-900`}
+                    currentTab === 'frequency' ? 'bg-iqengine-primary text-black' : ''
+                  } inline-block px-3 py-0 outline  outline-iqengine-primary outline-1 text-lg text-iqengine-primary hover:text-green-900`}
                 >
                   Frequency
                 </button>
@@ -693,8 +693,8 @@ class SpectrogramPage extends Component {
                     this.setState({ currentTab: 'iq' });
                   }}
                   className={` ${
-                    currentTab === 'iq' ? 'bg-iqengine-green text-black' : ''
-                  } inline-block px-3 py-0 outline  outline-iqengine-green outline-1 text-lg text-iqengine-green hover:text-green-900`}
+                    currentTab === 'iq' ? 'bg-iqengine-primary text-black' : ''
+                  } inline-block px-3 py-0 outline  outline-iqengine-primary outline-1 text-lg text-iqengine-primary hover:text-green-900`}
                 >
                   IQ Plot
                 </button>

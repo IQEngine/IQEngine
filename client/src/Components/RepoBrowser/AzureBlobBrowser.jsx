@@ -35,9 +35,9 @@ const AzureBlobBrowser = (props) => {
   };
 
   return (
-    <Card className="flexOne">
-      <Card.Header>Browse Your Own Azure Blob Storage</Card.Header>
-      <Card.Body className="cardBodyCenter">
+    <Card className="flexOne repocard">
+      <Card.Header className="repocardheader">Browse Your Azure Blob Storage</Card.Header>
+      <Card.Body className="repocardbody">
         <Form.Group className="mb-3">
           <Form.Label>Storage Account Name:</Form.Label>
           <Form.Control className="mb-3" type="text" defaultValue={accountName} onChange={onAccountNameChange} />
@@ -47,7 +47,7 @@ const AzureBlobBrowser = (props) => {
           <Form.Control type="password" defaultValue={sasToken} onChange={onSasTokenChange} />
         </Form.Group>
       </Card.Body>
-      <Button variant="success" onClick={onSubmit}>
+      <Button className="repocardbutton" variant="success" onClick={onSubmit}>
         Browse
       </Button>
     </Card>
