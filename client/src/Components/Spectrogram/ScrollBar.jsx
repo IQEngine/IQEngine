@@ -21,20 +21,26 @@ const ScrollBar = (props) => {
     size,
     downloadedTiles,
     zoomLevel,
+    handleTop,
   } = props;
 
   const [minimapImg, setMinimapImg] = useState(null);
   const scrollbarWidth = 50;
-  const [y, setY] = useState(0);
   const [ticks, setTicks] = useState([]);
   const [handleHeightPixels, setHandleHeightPixels] = useState();
   const [scalingFactor, setScalingFactor] = useState();
 
-  // Calc scroll handle height
+  // Calc scroll handle height and new scaling factor
   useEffect(() => {
     let x = (spectrogramHeight / (totalIQSamples / fftSize / zoomLevel)) * spectrogramHeight;
     if (x < MINIMUM_SCROLL_HANDLE_HEIGHT_PIXELS) x = MINIMUM_SCROLL_HANDLE_HEIGHT_PIXELS;
     setHandleHeightPixels(x);
+
+    if (window.iqData && window.iqData['minimap0']) {
+      const fftSizeScrollbar = window.iqData['minimap0'].length / 2; // just use the first one to find length
+      const newScalingFactor = spectrogramHeight / fftSizeScrollbar / (skipNFfts + 1) / minimapNumFetches;
+      setScalingFactor(newScalingFactor);
+    }
   }, [spectrogramHeight, totalIQSamples, fftSize, zoomLevel]);
 
   // This only runs once, once all the minimap fetches have occured
@@ -51,7 +57,7 @@ const ScrollBar = (props) => {
       // First refresh the spectrogram (not minimap) data since the maxFft and minFft will be better estimates by the time the minimap data is fetched
       // TODO: it's messy to have behavior unrelated to the minimap here, just because the minimap loading is a convinient way to delay a bit
       window.fftData = {};
-      props.fetchAndRender(0);
+      fetchAndRender(0);
 
       // Loop through the samples we downloaded, calc FFT and produce spectrogram image
       const fftSizeScrollbar = window.iqData['minimap0'].length / 2; // just use the first one to find length
@@ -137,8 +143,7 @@ const ScrollBar = (props) => {
     if (newY > spectrogramHeight - handleHeightPixels) {
       newY = spectrogramHeight - handleHeightPixels;
     }
-    setY(newY);
-    props.fetchAndRender(newY);
+    fetchAndRender(newY);
   };
 
   const handleDragMove = (e) => {
@@ -152,8 +157,7 @@ const ScrollBar = (props) => {
       newY = spectrogramHeight - handleHeightPixels;
     }
     e.target.x(0);
-    setY(newY);
-    fetchAndRender(y);
+    fetchAndRender(newY);
   };
 
   if (!minimapImg) {
@@ -171,7 +175,7 @@ const ScrollBar = (props) => {
           ></Rect>
           <Rect
             x={0}
-            y={y}
+            y={handleTop}
             fill="black"
             width={scrollbarWidth}
             height={handleHeightPixels}
@@ -202,7 +206,7 @@ const ScrollBar = (props) => {
       <Layer>
         <Rect
           x={0}
-          y={y}
+          y={handleTop}
           fill="black"
           opacity={0.6}
           width={scrollbarWidth}

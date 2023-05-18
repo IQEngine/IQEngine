@@ -63,11 +63,11 @@ export const Table = ({ columns, data }: TableProps) => {
           />
         </div>
       </div>
-      <table className="table-auto w-full">
+      <table className="table-auto w-full text-center">
         <thead>
           <tr>
             {columns?.map((column) => (
-              <th key={column.dataIndex} className="border bg-zinc-800 px-4 py-2">
+              <th key={column.dataIndex} className="border bg-zinc-800 px-1 py-1">
                 {column.title}
               </th>
             ))}
@@ -77,7 +77,7 @@ export const Table = ({ columns, data }: TableProps) => {
           {currentPageData?.map((row, rowIndex) => (
             <tr key={rowIndex}>
               {columns?.map((column, colIndex) => (
-                <td key={`${rowIndex}-${colIndex}`} className="border px-4 py-2">
+                <td key={`${rowIndex}-${colIndex}`} className="border px-1 py-1">
                   {row[column.dataIndex]}
                 </td>
               ))}
