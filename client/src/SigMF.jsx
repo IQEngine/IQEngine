@@ -5,8 +5,6 @@
 import React, { useState } from 'react';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import { Card } from 'react-bootstrap';
-import Modal from 'react-bootstrap/Modal';
 
 const styleMargins = {
   marginTop: 20,
@@ -14,16 +12,8 @@ const styleMargins = {
 };
 
 export const SigMF = () => {
-  const [show, setShow] = useState(false);
-
   return (
     <div>
-      <Modal show={show} onHide={() => setShow(false)}>
-        <Modal.Body className="modal-body-centered">
-          <img src="./sigmf-diagram.svg" alt="What is SigMF? Larger" width="1000" onClick={() => setShow(true)} />
-        </Modal.Body>
-      </Modal>
-
       <Row style={{ padding: '10px' }}></Row>
       <div style={{ width: 'auto' }}>
         <Row style={{ styleMargins }}>
@@ -74,7 +64,9 @@ export const SigMF = () => {
             </div>
           </Col>
           <Col xs={5}>
-            <img src="./sigmf-diagram.svg" alt="What is SigMF?" onClick={() => setShow(true)} />
+            <a href="./sigmf-diagram.svg">
+              <img src="./sigmf-diagram.svg" alt="What is SigMF?" />
+            </a>
             <br></br>
             <br></br>
           </Col>
