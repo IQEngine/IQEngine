@@ -20,7 +20,7 @@ const SiggenTile = (props) => {
       <div className="repocardbody">
         <center>
           <img
-            className="my-4"
+            className="my-4 rounded-xl"
             src="/siggen.png"
             width="200px"
             alt="DALLE prompt - signal generator in the style of dr. seuss with a control panel"
