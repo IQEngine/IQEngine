@@ -38,4 +38,12 @@
   .repocardbutton {
     @apply bg-iqengine-primary opacity-75 w-full h-8 text-iqengine-bg hover:bg-iqengine-tertiary hover:opacity-100 font-bold rounded-b-2xl rounded-t-none border-0;
   }
+
+  .leadership-card-header {
+    @apply rounded-t-xl p-2 font-extrabold text-center;
+  }
+
+  .leadership-card-body {
+    @apply bg-iqengine-bg rounded-b-xl p-2 text-center;
+  }
 }

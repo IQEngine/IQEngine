@@ -173,14 +173,3 @@ div.datatypetext {
   -moz-box-shadow: 0px 0px 5px 5px #0099e0;
   box-shadow: 0px 0px 5px 5px #0099e0;
 }
-
-.leadership-card-header {
-  display: flex;
-  justify-content: center;
-  font-weight: 900;
-}
-
-.leadership-card-body {
-  background-color: #222222;
-  text-align: center;
-}

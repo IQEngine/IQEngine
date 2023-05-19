@@ -5,7 +5,6 @@
 import React from 'react';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import { Card } from 'react-bootstrap';
 
 const styleMargins = {
   marginTop: 20,
@@ -82,40 +81,38 @@ export const About = () => {
         <Row className="mt-0 mb-5">
           <Col xs={2}></Col>
           <Col className="ms-0 me-5">
-            <Card>
-              <Card.Header className="leadership-card-header bg-iqengine-primary text-iqengine-bg">
-                Core Leadership
-              </Card.Header>
-              <Card.Body className="leadership-card-body">
+            <div>
+              <div className="leadership-card-header bg-iqengine-primary text-iqengine-bg">Core Leadership</div>
+              <div className="leadership-card-body">
                 Manages the overall direction of IQEngine<br></br>
                 <br></br>
                 Team Lead: Marc Lichtman
-              </Card.Body>
-            </Card>
+              </div>
+            </div>
           </Col>
           <Col className="ms-5 me-5">
-            <Card>
-              <Card.Header className="leadership-card-header bg-iqengine-primary text-iqengine-bg">
+            <div>
+              <div className="leadership-card-header bg-iqengine-primary text-iqengine-bg">
                 Frontend – Functionality
-              </Card.Header>
-              <Card.Body className="leadership-card-body">
+              </div>
+              <div className="leadership-card-body">
                 The IQEngine frontend <br></br>
                 <br></br>
                 Team Lead: Maheen
-              </Card.Body>
-            </Card>
+              </div>
+            </div>
           </Col>
           <Col className="ms-5 me-0">
-            <Card>
-              <Card.Header className="leadership-card-header bg-iqengine-primary text-iqengine-bg">
+            <div>
+              <div className="leadership-card-header bg-iqengine-primary text-iqengine-bg">
                 Frontend - User Experience
-              </Card.Header>
-              <Card.Body className="leadership-card-body">
+              </div>
+              <div className="leadership-card-body">
                 UX design and surveying <br></br>
                 <br></br>
                 Team Lead: Luke/Robotastic
-              </Card.Body>
-            </Card>
+              </div>
+            </div>
           </Col>
           <Col xs={2}></Col>
         </Row>
@@ -123,38 +120,36 @@ export const About = () => {
         <Row className="mt-5 mb-5">
           <Col xs={2}></Col>
           <Col className="ms-0 me-5">
-            <Card>
-              <Card.Header className="leadership-card-header bg-iqengine-primary text-iqengine-bg">
-                Backend/Plugins
-              </Card.Header>
-              <Card.Body className="leadership-card-body">
+            <div>
+              <div className="leadership-card-header bg-iqengine-primary text-iqengine-bg">Backend/Plugins</div>
+              <div className="leadership-card-body">
                 Backend design including plugin API and implementation <br></br>
                 <br></br>
                 Team Lead: Eric
-              </Card.Body>
-            </Card>
+              </div>
+            </div>
           </Col>
           <Col className="ms-5 me-5">
-            <Card>
-              <Card.Header className="leadership-card-header bg-iqengine-primary text-iqengine-bg">
+            <div>
+              <div className="leadership-card-header bg-iqengine-primary text-iqengine-bg">
                 Education-Oriented Features
-              </Card.Header>
-              <Card.Body className="leadership-card-body">
+              </div>
+              <div className="leadership-card-body">
                 Making IQEngine the perfect place for students <br></br>
                 <br></br>
                 Team Lead: Seeking Volunteer!
-              </Card.Body>
-            </Card>
+              </div>
+            </div>
           </Col>
           <Col className="ms-5 me-0">
-            <Card>
-              <Card.Header className="leadership-card-header bg-iqengine-primary text-iqengine-bg">RFML</Card.Header>
-              <Card.Body className="leadership-card-body">
+            <div>
+              <div className="leadership-card-header bg-iqengine-primary text-iqengine-bg">RFML</div>
+              <div className="leadership-card-body">
                 RF Machine Learning oriented functionality <br></br>
                 <br></br>
                 Team Lead: Clay
-              </Card.Body>
-            </Card>
+              </div>
+            </div>
           </Col>
           <Col xs={2}></Col>
         </Row>
@@ -162,40 +157,34 @@ export const About = () => {
         <Row className="mt-5 mb-5">
           <Col xs={2}></Col>
           <Col className="ms-0 me-5">
-            <Card>
-              <Card.Header className="leadership-card-header bg-iqengine-primary text-iqengine-bg">
-                Community
-              </Card.Header>
-              <Card.Body className="leadership-card-body">
+            <div>
+              <div className="leadership-card-header bg-iqengine-primary text-iqengine-bg">Community</div>
+              <div className="leadership-card-body">
                 Manages the Discord and other community engagements <br></br>
                 <br></br>
                 Team Lead: Jumbotron
-              </Card.Body>
-            </Card>
+              </div>
+            </div>
           </Col>
           <Col className="ms-5 me-5">
-            <Card>
-              <Card.Header className="leadership-card-header bg-iqengine-primary text-iqengine-bg">
-                SigMF Integration
-              </Card.Header>
-              <Card.Body className="leadership-card-body">
+            <div>
+              <div className="leadership-card-header bg-iqengine-primary text-iqengine-bg">SigMF Integration</div>
+              <div className="leadership-card-body">
                 Expanding and verifying IQEngine's use of SigMF <br></br>
                 <br></br>
                 Team Lead: Marc Lichtman
-              </Card.Body>
-            </Card>
+              </div>
+            </div>
           </Col>
           <Col className="ms-5 me-0">
-            <Card>
-              <Card.Header className="leadership-card-header bg-iqengine-primary text-iqengine-bg">
-                Maps Interface
-              </Card.Header>
-              <Card.Body className="leadership-card-body">
+            <div>
+              <div className="leadership-card-header bg-iqengine-primary text-iqengine-bg">Maps Interface</div>
+              <div className="leadership-card-body">
                 The IQEngine Maps interface (coming soon!) <br></br>
                 <br></br>
                 Team Lead: TBD
-              </Card.Body>
-            </Card>
+              </div>
+            </div>
           </Col>
           <Col xs={2}></Col>
         </Row>
