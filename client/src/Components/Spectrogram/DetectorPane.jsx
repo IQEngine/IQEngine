@@ -5,15 +5,7 @@
 import React, { useState, useEffect } from 'react';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
-
-let DETECTOR_ENDPOINT;
-// Check for DETECTOR_ENDPOINT env var
-if (import.meta.env.VITE_DETECTOR_ENDPOINT) {
-  DETECTOR_ENDPOINT = import.meta.env.VITE_DETECTOR_ENDPOINT;
-} else {
-  DETECTOR_ENDPOINT = 'http://127.0.0.1:8000/detectors/';
-  //const DETECTOR_ENDPOINT = https://iqengine-azure-functions2.azurewebsites.net/detect/';
-}
+// import { GetConfigIntance } from '../../Config';
 
 export const DetectorPane = (props) => {
   let { meta, handleMeta, cursorsEnabled, handleProcessTime } = props;
@@ -22,10 +14,13 @@ export const DetectorPane = (props) => {
   const [selectedDetector, setSelectedDetector] = useState('default');
   const [detectorParams, setDetectorParams] = useState({});
   const [value, setValue] = useState(0); // integer state used to force rerender
-
+  // if (!config.detectorEndpoint) {
+  //   detectorEndpoint = 'http://127.0.0.1:8000/detectors/';
+  // }
+  const detectorEndpoint = 'http://127.0.0.1:8000/detectors/';
   // on component load perform a GET on /detectors to get list of detectors
   useEffect(() => {
-    fetch(DETECTOR_ENDPOINT, { method: 'GET' })
+    fetch(detectorEndpoint, { method: 'GET' })
       .then(function (response) {
         return response.json();
       })
@@ -42,7 +37,7 @@ export const DetectorPane = (props) => {
     setSelectedDetector(e.target.value);
     setDetectorParams({}); // in case something goes wrong
     // Fetch the custom params for this detector
-    fetch(DETECTOR_ENDPOINT + e.target.value, { method: 'GET' })
+    fetch(detectorEndpoint + e.target.value, { method: 'GET' })
       .then(function (response) {
         if (response.status === 404) {
           return {};
@@ -89,7 +84,7 @@ export const DetectorPane = (props) => {
     }
     console.log(body);
 
-    fetch(DETECTOR_ENDPOINT + selectedDetector, {
+    fetch(detectorEndpoint + selectedDetector, {
       method: 'POST',
       headers: {
         Accept: 'application/json',

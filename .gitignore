@@ -29,3 +29,5 @@ venv/
 __pycache__
 client/build
 api/build
+megalinter-reports/
+.mypy_cache/
