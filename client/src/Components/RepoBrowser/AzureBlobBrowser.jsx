@@ -3,9 +3,7 @@
 // Licensed under the MIT License
 
 import React, { useState } from 'react';
-import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import { Card } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 
 const AzureBlobBrowser = (props) => {
@@ -35,10 +33,10 @@ const AzureBlobBrowser = (props) => {
   };
 
   return (
-    <Card className="flexOne repocard">
-      <Card.Header className="repocardheader">Browse Your Azure Blob Storage</Card.Header>
-      <Card.Body className="repocardbody">
-        <Form.Group className="mb-3">
+    <div className="flexOne repocard">
+      <div className="repocardheader">Browse Your Azure Blob Storage</div>
+      <div className="repocardbody">
+        <Form.Group className="m-3">
           <Form.Label>Storage Account Name:</Form.Label>
           <Form.Control className="mb-3" type="text" defaultValue={accountName} onChange={onAccountNameChange} />
           <Form.Label>Container Name:</Form.Label>
@@ -46,11 +44,11 @@ const AzureBlobBrowser = (props) => {
           <Form.Label>SAS Token for Container:</Form.Label>
           <Form.Control type="password" defaultValue={sasToken} onChange={onSasTokenChange} />
         </Form.Group>
-      </Card.Body>
-      <Button className="repocardbutton" variant="success" onClick={onSubmit}>
+      </div>
+      <button className="repocardbutton" onClick={onSubmit}>
         Browse
-      </Button>
-    </Card>
+      </button>
+    </div>
   );
 };
 

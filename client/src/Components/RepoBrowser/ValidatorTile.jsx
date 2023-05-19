@@ -3,7 +3,6 @@
 // Licensed under the MIT License
 
 import React from 'react';
-import { Card, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 
 const ValidatorTile = (props) => {
@@ -13,33 +12,28 @@ const ValidatorTile = (props) => {
     navigate('/validator');
   };
 
-  const styleHeight = {
-    width: 150,
-    height: 150,
-  };
-
   return (
-    <Card className="flexOne repocard">
-      <Card.Header className="repocardheader" style={{ display: 'flex', justifyContent: 'space-between' }}>
+    <div className="flexOne repocard">
+      <div className="repocardheader" style={{ display: 'flex', justifyContent: 'space-between' }}>
         SigMF Meta Validator
-      </Card.Header>
-      <Card.Body className="repocardbody">
+      </div>
+      <div className="repocardbody">
         <center>
-          <br />
-          <Card.Img
-            variant="top"
+          <img
+            className="my-4"
             src="/validator.png"
+            width="200px"
             alt="DALLE prompt - thumbs up with radio waves in the theme of dr suess solid dark background"
-            style={styleHeight}
-          ></Card.Img>
-          <br /> <br />
+          ></img>
           Validate your .sigmf-meta file using an interactive JSON schema validator
+          <br></br>
+          <br></br>
         </center>
-      </Card.Body>
-      <Button className="repocardbutton" variant="success" onClick={handleOnClick}>
+      </div>
+      <button className="repocardbutton" onClick={handleOnClick}>
         Validator
-      </Button>
-    </Card>
+      </button>
+    </div>
   );
 };
 

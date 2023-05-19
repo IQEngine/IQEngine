@@ -3,7 +3,6 @@
 // Licensed under the MIT License
 
 import React from 'react';
-import { Card, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import parseMeta from '../../Utils/parseMeta';
 
@@ -67,39 +66,39 @@ const LocalFileBrowser = (props) => {
     navigate('/recordings');
   };
 
-  const styleMargin = {
-    marginTop: 30,
-    marginBottom: 30,
-    minWidth: '90%',
-  };
-
   return (
     // <div className="container-fluid col-4">
-    <Card className="flexOne repocard">
-      <Card.Header className="repocardheader">Browse Local Files</Card.Header>
-      <Card.Body className="repocardbody">
+    <div className="flexOne repocard">
+      <div className="repocardheader">Browse Local Files</div>
+      <div className="repocardbody">
         <center>
           {directoryPickerAvailable && (
             <>
-              <Button onClick={openDir} style={styleMargin} variant="success">
+              <button
+                className="p-2 m-3 rounded-lg outline outline-1 outline-iqengine-primary hover:bg-iqengine-tertiary hover:text-black"
+                onClick={openDir}
+              >
                 Open Local Directory
-              </Button>
+              </button>
               <br />
               OR
             </>
           )}
           <br />
-          <Button onClick={openFile} style={styleMargin} variant="success">
+          <button
+            className="p-2 m-3 rounded-lg outline outline-1 outline-iqengine-primary hover:bg-iqengine-tertiary hover:text-black"
+            onClick={openFile}
+          >
             Select 1 .sigmf-meta
             <br />
             and 1 .sigmf-data
-          </Button>
-          <div style={{ color: 'grey' }}>
+          </button>
+          <div className="text-gray-500 mb-3">
             Note: FFTs and visualizations are done client-side (the data won't be uploaded anywhere)
           </div>
         </center>
-      </Card.Body>
-    </Card>
+      </div>
+    </div>
   );
 };
 

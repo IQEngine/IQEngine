@@ -3,7 +3,6 @@
 // Licensed under the MIT License
 
 import React from 'react';
-import { Card, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 
 const SiggenTile = (props) => {
@@ -13,35 +12,29 @@ const SiggenTile = (props) => {
     navigate('/siggen');
   };
 
-  const styleHeight = {
-    width: 150,
-    height: 150,
-  };
-
   return (
-    <Card className="flexOne repocard">
-      <Card.Header className="repocardheader" style={{ display: 'flex', justifyContent: 'space-between' }}>
+    <div className="flexOne repocard">
+      <div className="repocardheader" style={{ display: 'flex', justifyContent: 'space-between' }}>
         Signal Generator
-      </Card.Header>
-      <Card.Body className="repocardbody">
+      </div>
+      <div className="repocardbody">
         <center>
-          <br />
-          <Card.Img
-            variant="top"
+          <img
+            className="my-4"
             src="/siggen.png"
+            width="200px"
             alt="DALLE prompt - signal generator in the style of dr. seuss with a control panel"
-            style={styleHeight}
-          ></Card.Img>
-          <br /> <br />
+          ></img>
           Generate your own signals in Python, with examples!
           <br /> <br />
           Save as a SigMF recording!
+          <br /> <br />
         </center>
-      </Card.Body>
-      <Button className="repocardbutton" variant="success" onClick={handleOnClick}>
+      </div>
+      <button className="repocardbutton" onClick={handleOnClick}>
         Siggen
-      </Button>
-    </Card>
+      </button>
+    </div>
   );
 };
 

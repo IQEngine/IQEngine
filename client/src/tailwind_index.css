@@ -24,18 +24,18 @@
   }
 
   .repocard {
-    @apply border border-iqengine-primary border-0 shadow-md shadow-iqengine-primary rounded-t-xl;
+    @apply rounded-2xl h-fit border-0 border-iqengine-primary shadow-md shadow-iqengine-primary rounded-t-xl;
   }
 
   .repocardheader {
-    @apply bg-iqengine-primary opacity-75 text-iqengine-bg text-lg font-bold;
+    @apply bg-iqengine-primary rounded-t-2xl opacity-75 pl-2 pb-1 text-iqengine-bg text-lg font-bold;
   }
 
   .repocardbody {
-    @apply bg-iqengine-bg bg-opacity-60;
+    @apply bg-iqengine-bg bg-opacity-60 mt-3;
   }
 
   .repocardbutton {
-    @apply bg-iqengine-primary opacity-75 text-iqengine-bg font-bold rounded-t-none border-0;
+    @apply bg-iqengine-primary opacity-75 w-full h-8 text-iqengine-bg hover:bg-iqengine-tertiary font-bold rounded-b-2xl rounded-t-none border-0;
   }
 }
