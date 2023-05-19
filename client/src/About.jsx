@@ -3,254 +3,169 @@
 // Licensed under the MIT License
 
 import React from 'react';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-
-const styleMargins = {
-  marginTop: 20,
-  marginBottom: 20,
-};
 
 export const About = () => {
   return (
     <div>
-      <Row style={{ padding: '10px' }}></Row>
-      <div className="bg-iqengine-tertiary bg-opacity-10" style={{ width: 'auto' }}>
-        <Row style={{ styleMargins }}>
-          <center>
-            <h1>Great For...</h1>
-          </center>
-          <Col xs={3}></Col>
-          <Col xs={3}>
-            <div className="container">
-              <ul style={{ padding: '10px', fontSize: '25px' }}>
-                <li className="list-group-item">- RFML</li>
-                <li className="list-group-item">- Wireless CTFs</li>
-                <li className="list-group-item">- SIGINT</li>
-              </ul>
-            </div>
-          </Col>
-          <Col xs={4}>
-            <ul style={{ padding: '10px', fontSize: '25px' }}>
-              <li className="list-group-item">- Spectrum Awareness</li>
-              <li className="list-group-item">- Debugging</li>
-              <li className="list-group-item">- SDR/DSP/Wireless Students</li>
-            </ul>
-          </Col>
-          <Col xs={2}></Col>
-        </Row>
+      <div className="bg-iqengine-tertiary bg-opacity-10">
+        <h1 className="text-center p-4">Great For...</h1>
+        <div className="columns-2 pl-48 pr-24 pb-4">
+          <ul className="text-lg">
+            <li className="list-group-item">- RFML</li>
+            <li className="list-group-item">- Wireless CTFs</li>
+            <li className="list-group-item">- SIGINT</li>
+          </ul>
+          <ul className="text-lg">
+            <li className="list-group-item">- Spectrum Awareness</li>
+            <li className="list-group-item">- Debugging</li>
+            <li className="list-group-item">- SDR/DSP/Wireless Students</li>
+          </ul>
+        </div>
       </div>
 
-      <div style={{ width: 'auto' }}>
-        <Row style={{ styleMargins }}>
-          <center>
-            <h1>Example Use-Cases</h1>
-          </center>
-          <Col xs={1}></Col>
-          <Col xs={5}>
-            <div className="container">
-              <ul style={{ padding: '10px', fontSize: '25px' }}>
-                <li className="list-group-item">- Analyze RF recordings</li>
-                <li className="list-group-item">- Organize lots of RF recordings</li>
-                <li className="list-group-item">
-                  - Test signal detection/classification algorithms and share them easily
-                </li>
-              </ul>
-            </div>
-          </Col>
-          <Col xs={5}>
-            <ul style={{ padding: '10px', fontSize: '25px' }}>
-              <li className="list-group-item">
-                - Share RF recordings/datasets with others, without them having to download files or install software
-              </li>
-              <li className="list-group-item">- Learn DSP basics (e.g., FFTs, filtering, wavelets)</li>
-              <li className="list-group-item">- Run a local instance of IQEngine for sensitive data</li>
-            </ul>
-          </Col>
-          <Col xs={1}></Col>
-        </Row>
+      <h1 className="text-center">Example Use-Cases</h1>
+      <div className="columns-2 pl-32 pr-24 pb-4">
+        <ul className="text-lg">
+          <li className="list-group-item">- Analyze RF recordings</li>
+          <li className="list-group-item">- Organize lots of RF recordings</li>
+          <li className="list-group-item">- Test signal detection/classification algorithms and share them easily</li>
+        </ul>
+        <ul className="text-lg">
+          <li className="list-group-item">
+            - Share RF recordings/datasets with others, without them having to download files or install software
+          </li>
+          <li className="list-group-item">- Learn DSP basics (e.g., FFTs, filtering, wavelets)</li>
+          <li className="list-group-item">- Run a local instance of IQEngine for sensitive data</li>
+        </ul>
       </div>
 
-      <div className="bg-iqengine-tertiary bg-opacity-10" style={{ width: 'auto', paddingBottom: '15px' }}>
-        <Row>
-          <center>
-            <h1>Leadership Teams</h1>
-          </center>
-        </Row>
+      <div className="bg-iqengine-tertiary bg-opacity-10 pt-1" style={{ width: 'auto', paddingBottom: '15px' }}>
+        <h1 className="text-center">Leadership Teams</h1>
+        <div className="grid grid-cols-3 gap-4 justify-items-center px-32 py-3 text-lg">
+          <div>
+            <div className="leadership-card-header">Core Leadership</div>
+            <div className="leadership-card-body">
+              Manages the overall direction of IQEngine<br></br>
+              <br></br>
+              Team Lead: Marc Lichtman
+            </div>
+          </div>
 
-        <Row className="mt-0 mb-5">
-          <Col xs={2}></Col>
-          <Col className="ms-0 me-5">
-            <div>
-              <div className="leadership-card-header bg-iqengine-primary text-iqengine-bg">Core Leadership</div>
-              <div className="leadership-card-body">
-                Manages the overall direction of IQEngine<br></br>
-                <br></br>
-                Team Lead: Marc Lichtman
-              </div>
+          <div>
+            <div className="leadership-card-header">Frontend – Functionality</div>
+            <div className="leadership-card-body">
+              The IQEngine frontend <br></br>
+              <br></br>
+              Team Lead: Maheen
             </div>
-          </Col>
-          <Col className="ms-5 me-5">
-            <div>
-              <div className="leadership-card-header bg-iqengine-primary text-iqengine-bg">
-                Frontend – Functionality
-              </div>
-              <div className="leadership-card-body">
-                The IQEngine frontend <br></br>
-                <br></br>
-                Team Lead: Maheen
-              </div>
-            </div>
-          </Col>
-          <Col className="ms-5 me-0">
-            <div>
-              <div className="leadership-card-header bg-iqengine-primary text-iqengine-bg">
-                Frontend - User Experience
-              </div>
-              <div className="leadership-card-body">
-                UX design and surveying <br></br>
-                <br></br>
-                Team Lead: Luke/Robotastic
-              </div>
-            </div>
-          </Col>
-          <Col xs={2}></Col>
-        </Row>
+          </div>
 
-        <Row className="mt-5 mb-5">
-          <Col xs={2}></Col>
-          <Col className="ms-0 me-5">
-            <div>
-              <div className="leadership-card-header bg-iqengine-primary text-iqengine-bg">Backend/Plugins</div>
-              <div className="leadership-card-body">
-                Backend design including plugin API and implementation <br></br>
-                <br></br>
-                Team Lead: Eric
-              </div>
+          <div>
+            <div className="leadership-card-header">Frontend - User Experience</div>
+            <div className="leadership-card-body">
+              UX design and surveying <br></br>
+              <br></br>
+              Team Lead: Luke/Robotastic
             </div>
-          </Col>
-          <Col className="ms-5 me-5">
-            <div>
-              <div className="leadership-card-header bg-iqengine-primary text-iqengine-bg">
-                Education-Oriented Features
-              </div>
-              <div className="leadership-card-body">
-                Making IQEngine the perfect place for students <br></br>
-                <br></br>
-                Team Lead: Seeking Volunteer!
-              </div>
-            </div>
-          </Col>
-          <Col className="ms-5 me-0">
-            <div>
-              <div className="leadership-card-header bg-iqengine-primary text-iqengine-bg">RFML</div>
-              <div className="leadership-card-body">
-                RF Machine Learning oriented functionality <br></br>
-                <br></br>
-                Team Lead: Clay
-              </div>
-            </div>
-          </Col>
-          <Col xs={2}></Col>
-        </Row>
+          </div>
 
-        <Row className="mt-5 mb-5">
-          <Col xs={2}></Col>
-          <Col className="ms-0 me-5">
-            <div>
-              <div className="leadership-card-header bg-iqengine-primary text-iqengine-bg">Community</div>
-              <div className="leadership-card-body">
-                Manages the Discord and other community engagements <br></br>
-                <br></br>
-                Team Lead: Jumbotron
-              </div>
+          <div>
+            <div className="leadership-card-header">Backend/Plugins</div>
+            <div className="leadership-card-body">
+              Backend design including plugin API and implementation <br></br>
+              <br></br>
+              Team Lead: Eric
             </div>
-          </Col>
-          <Col className="ms-5 me-5">
-            <div>
-              <div className="leadership-card-header bg-iqengine-primary text-iqengine-bg">SigMF Integration</div>
-              <div className="leadership-card-body">
-                Expanding and verifying IQEngine's use of SigMF <br></br>
-                <br></br>
-                Team Lead: Marc Lichtman
-              </div>
-            </div>
-          </Col>
-          <Col className="ms-5 me-0">
-            <div>
-              <div className="leadership-card-header bg-iqengine-primary text-iqengine-bg">Maps Interface</div>
-              <div className="leadership-card-body">
-                The IQEngine Maps interface (coming soon!) <br></br>
-                <br></br>
-                Team Lead: TBD
-              </div>
-            </div>
-          </Col>
-          <Col xs={2}></Col>
-        </Row>
+          </div>
 
-        <Row style={{ marginBottom: '15px', paddingBottom: '15px', fontSize: '20px' }}>
-          <center>IQEngine is a community effort, lead by the above individuals (and seeking more!):</center>
-        </Row>
+          <div>
+            <div className="leadership-card-header">Education-Oriented Features</div>
+            <div className="leadership-card-body">
+              Making IQEngine the perfect place for students <br></br>
+              <br></br>
+              Team Lead: Seeking Volunteer!
+            </div>
+          </div>
 
-        <Row style={{ marginBottom: '15px', fontSize: '20px' }}>
-          <Col xs={3}></Col>
-          <Col>
-            <center>
-              <h4>Ways to get Involved:</h4>
-            </center>
-            <ul>
-              <li>
-                Join the{' '}
-                <a href="https://discord.gg/k7C8kp3b76" target="_blank">
-                  IQEngine Discord
-                </a>
-              </li>
-              <li>Post GitHub Issues/PRs</li>
-              <li>Email questions/comments about IQEngine to iqengine@vt.edu</li>
-            </ul>
-          </Col>
-          <Col xs={3}></Col>
-        </Row>
+          <div>
+            <div className="leadership-card-header">RFML</div>
+            <div className="leadership-card-body">
+              RF Machine Learning oriented functionality <br></br>
+              <br></br>
+              Team Lead: Clay
+            </div>
+          </div>
+
+          <div>
+            <div className="leadership-card-header">Community</div>
+            <div className="leadership-card-body">
+              Manages the Discord and other community engagements <br></br>
+              <br></br>
+              Team Lead: Jumbotron
+            </div>
+          </div>
+
+          <div>
+            <div className="leadership-card-header">SigMF Integration</div>
+            <div className="leadership-card-body">
+              Expanding and verifying IQEngine's use of SigMF <br></br>
+              <br></br>
+              Team Lead: Marc Lichtman
+            </div>
+          </div>
+
+          <div>
+            <div className="leadership-card-header">Maps Interface</div>
+            <div className="leadership-card-body">
+              The IQEngine Maps interface (coming soon!) <br></br>
+              <br></br>
+              Team Lead: TBD
+            </div>
+          </div>
+        </div>
+
+        <p className="text-center text-lg m-4">
+          IQEngine is a community effort, lead by the above individuals (and seeking more!)
+        </p>
+
+        <p className="text-center text-lg">Ways to get Involved:</p>
+
+        <ul className="list-disc text-lg m-4 pl-32">
+          <li>
+            Join the{' '}
+            <a href="https://discord.gg/k7C8kp3b76" target="_blank">
+              IQEngine Discord
+            </a>
+          </li>
+          <li>Post GitHub Issues/PRs</li>
+          <li>Email questions/comments about IQEngine to iqengine@vt.edu</li>
+        </ul>
       </div>
 
-      <div style={{}}>
-        <Row>
-          <Col xs={2}></Col>
-          <Col>
-            <center>
-              <h1>Origin</h1>
-              <p style={{ padding: '10px', fontSize: '20px' }}>
-                The idea for a web-based spectrogram tool started while Marc was teaching an SDR course at UMD, with
-                students who had varying OS's; some ran into trouble installing existing SDR desktop apps. By removing
-                the software installation barrier, SDR/DSP tooling, and education, could be made more accessible. Next
-                came several ideas for SigMF-centric features beyond what existing software provided, such as the
-                ability to organize hundreds of recordings or visually edit annotations.
-                <br></br>
-                <br></br>
-                Implementation of IQEngine began during a 1-week internal hackathon at Microsoft, where Marc and several
-                of his SDR coworkers built a proof-of-concept prototype. It was open sourced and shown off at GNU Radio
-                Conference '22. The first full version was completed in January '23 with help from a group of
-                undergraduate "sprinterns" at Microsoft, consisting of students from UMD and GMU that were part of the{' '}
-                <a href="https://www.breakthroughtech.org/" target="_blank">
-                  Break Through Tech
-                </a>{' '}
-                program. In February '23 it was transitioned from an open source Microsoft project to a community-led
-                FOSS project with representation from several organizations and individuals.
-              </p>
-            </center>
-          </Col>
-          <Col xs={2}></Col>
-        </Row>
+      <h1 className="text-center">Origin</h1>
+      <p className="text-lg px-24 pb-4">
+        The idea for a web-based spectrogram tool started while Marc was teaching an SDR course at UMD, with students
+        who had varying OS's; some ran into trouble installing existing SDR desktop apps. By removing the software
+        installation barrier, SDR/DSP tooling, and education, could be made more accessible. Next came several ideas for
+        SigMF-centric features beyond what existing software provided, such as the ability to organize hundreds of
+        recordings or visually edit annotations.
+        <br></br>
+        <br></br>
+        Implementation of IQEngine began during a 1-week internal hackathon at Microsoft, where Marc and several of his
+        SDR coworkers built a proof-of-concept prototype. It was open sourced and shown off at GNU Radio Conference '22.
+        The first full version was completed in January '23 with help from a group of undergraduate "sprinterns" at
+        Microsoft, consisting of students from UMD and GMU that were part of the{' '}
+        <a href="https://www.breakthroughtech.org/" target="_blank">
+          Break Through Tech
+        </a>{' '}
+        program. In February '23 it was transitioned from an open source Microsoft project to a community-led FOSS
+        project with representation from several organizations and individuals.
+      </p>
 
-        <Row style={{ marginBottom: '15px' }}>
-          <center>
-            <img style={{ width: '30%' }} alt="sprintern" src="./sprinterns.jpeg"></img>
-            <p></p>
-            Winter '23 Sprinterns from UMD and GMU
-          </center>
-        </Row>
-      </div>
+      <center>
+        <img className="w-1/2" alt="sprintern" src="./sprinterns.jpeg"></img>
+        <p className="text-lg pt-1">Winter '23 Sprinterns from UMD and GMU</p>
+      </center>
     </div>
   );
 };

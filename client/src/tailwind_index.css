@@ -40,10 +40,10 @@
   }
 
   .leadership-card-header {
-    @apply rounded-t-xl p-2 font-extrabold text-center;
+    @apply w-56 rounded-t-xl p-2 font-extrabold text-center bg-iqengine-primary text-iqengine-bg;
   }
 
   .leadership-card-body {
-    @apply bg-iqengine-bg rounded-b-xl p-2 text-center;
+    @apply w-56 bg-iqengine-bg rounded-b-xl p-2 text-center;
   }
 }

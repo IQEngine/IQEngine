@@ -3,66 +3,33 @@
 // Licensed under the MIT License
 
 import React from 'react';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-
-const styleMargins = {
-  marginTop: 20,
-  marginBottom: 20,
-};
 
 export const Plugins = () => {
   return (
     <div>
-      <Row style={{ padding: '10px' }}></Row>
       <div style={{ width: 'auto' }}>
-        <Row style={{ styleMargins }}>
-          <center>
-            <h1
-              className="text-iqengine-primary"
-              style={{
-                fontWeight: 'bold',
-                marginTop: '30px',
-                marginBottom: '10px',
-                fontSize: '28px',
-              }}
-            >
-              Plugins Concept
-            </h1>
-          </center>
-          <Col xs={3}></Col>
-          <Col xs={6}>
-            <Row style={{ marginBottom: '15px', paddingBottom: '15px', fontSize: '20px' }}>
-              <center>
-                Through an optional backend API, IQEngine will support various plugins (currently, only signal
-                detection/classification is supported). IQEngine is still in its infancy and we are looking for people
-                to help develop the concept and create example plugins!
-              </center>
-              <ul style={{ marginTop: '25px', marginBottom: '25px' }}>
-                <li>
-                  A signal detector (with optional classifier) can be triggered in the main spectrogram page, which
-                  displays the output in the form of SigMF annotations, convinient for testing new
-                  detection/classification algorithms - <a href="openapi">Link to our OpenAPI Spec</a>
-                </li>
-                <li>Signal demodulators/decoders that take in IQ and output bytes, imagery, audio, etc</li>
-                <li>
-                  Other DSP modules letting you perform a variety of signal processing functions and other IQ sample
-                  manipulation
-                </li>
-              </ul>
-              Current concept plan:
-              <br></br> <br></br>
-              <center>
-                <img
-                  src="./plugins_concept.png"
-                  style={{ width: '600px', paddingBottom: '15px' }}
-                  alt="plugins concept"
-                ></img>
-              </center>
-            </Row>
-          </Col>
-          <Col xs={3}></Col>
-        </Row>
+        <h1 className="text-iqengine-primary text-center">Plugins Concept</h1>
+        <p className="text-center text-lg mx-56">
+          Through an optional backend API, IQEngine will support various plugins (currently, only signal
+          detection/classification is supported). IQEngine is still in its infancy and we are looking for people to help
+          develop the concept and create example plugins!
+        </p>
+        <ul className="list-disc text-lg mx-72 my-4">
+          <li>
+            A signal detector (with optional classifier) can be triggered in the main spectrogram page, which displays
+            the output in the form of SigMF annotations, convinient for testing new detection/classification algorithms
+            - <a href="openapi">Link to our OpenAPI Spec</a>
+          </li>
+          <li>Signal demodulators/decoders that take in IQ and output bytes, imagery, audio, etc</li>
+          <li>
+            Other DSP modules letting you perform a variety of signal processing functions and other IQ sample
+            manipulation
+          </li>
+        </ul>
+        <p className="text-lg mx-56 mb-3">Current concept plan:</p>
+        <center>
+          <img src="./plugins_concept.png" className="w-1/2" alt="plugins concept"></img>
+        </center>
       </div>
     </div>
   );
