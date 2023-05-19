@@ -5,7 +5,6 @@
 import React, { useState } from 'react';
 import { Modal, ModalHeader, ModalBody } from 'reactstrap';
 import { Link } from 'react-router-dom';
-import Button from 'react-bootstrap/Button';
 
 export default function FileRow({
   item,
@@ -119,9 +118,12 @@ export default function FileRow({
       <td className="align-middle">{item.sampleRate} MHz</td>
       <td className="align-middle">
         <div>
-          <Button type="button" variant="secondary" style={{ marginBottom: '7px' }} onClick={toggle}>
+          <button
+            className="mb-2 rounded border-2 border-iqengine-secondary p-1 hover:bg-iqengine-secondary hover:text-black"
+            onClick={toggle}
+          >
             {item.numberOfAnnotation}
-          </Button>
+          </button>
           <Modal isOpen={modal} toggle={toggle} size="lg">
             <ModalHeader toggle={toggle}>{item.name}</ModalHeader>
             <ModalBody>
