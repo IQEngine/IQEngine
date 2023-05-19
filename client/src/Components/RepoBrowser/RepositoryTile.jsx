@@ -45,11 +45,6 @@ const RepositoryTile = (props) => {
     setDayDifference(tempDayDifference);
   }, [sasToken]);
 
-  const styleHeight = {
-    width: 200,
-    height: 200,
-  };
-
   const handleOnClick = () => {
     updateConnectionAccountName(accountName);
     updateConnectionContainerName(containerName);
@@ -73,8 +68,8 @@ const RepositoryTile = (props) => {
       </div>
       <div className="repocardbody">
         <center>
-          {imageURL && <img src={imageURL} style={styleHeight}></img>}
-          <div className="mb-2 mt-4">{description}</div>
+          {imageURL && <img src={imageURL} className="w-48 rounded-xl"></img>}
+          <div className="mb-2 mt-3">{description}</div>
           <div className="mb-3" style={{ color: 'grey' }}>
             SAS Token Expiration: {expires}
           </div>
