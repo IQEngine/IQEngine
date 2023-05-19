@@ -11,10 +11,10 @@ const Sidebar = (props) => {
   return (
     <div className="flex flex-col w-64 ml-3">
       <details open>
-        <summary className="pl-2 bg-iqengine-green outline outline-1 outline-iqengine-green text-lg text-black hover:bg-green-800">
+        <summary className="pl-2 bg-iqengine-primary outline outline-1 outline-iqengine-primary text-lg text-black hover:bg-green-800">
           Settings
         </summary>
-        <div className="outline outline-1 outline-iqengine-green p-2">
+        <div className="outline outline-1 outline-iqengine-primary p-2">
           <SettingsPane
             updateBlobTaps={props.updateBlobTaps}
             updateMagnitudeMax={props.updateMagnitudeMax}
@@ -35,10 +35,10 @@ const Sidebar = (props) => {
       </details>
 
       <details>
-        <summary className="pl-2 mt-2 bg-iqengine-green outline outline-1 outline-iqengine-green text-lg text-black hover:bg-green-800">
+        <summary className="pl-2 mt-2 bg-iqengine-primary outline outline-1 outline-iqengine-primary text-lg text-black hover:bg-green-800">
           Detector
         </summary>
-        <div className="outline outline-1 outline-iqengine-green p-2">
+        <div className="outline outline-1 outline-iqengine-primary p-2">
           <DetectorPane
             meta={props.meta}
             handleMeta={props.handleMeta}
@@ -49,10 +49,10 @@ const Sidebar = (props) => {
       </details>
 
       <details>
-        <summary className="pl-2 mt-2 bg-iqengine-green outline outline-1 outline-iqengine-green text-lg text-black hover:bg-green-800">
+        <summary className="pl-2 mt-2 bg-iqengine-primary outline outline-1 outline-iqengine-primary text-lg text-black hover:bg-green-800">
           Metadata
         </summary>
-        <div className="outline outline-1 outline-iqengine-green p-2">
+        <div className="outline outline-1 outline-iqengine-primary p-2">
           <InfoPane meta={props.meta} handleMetaGlobal={props.handleMetaGlobal} />
         </div>
       </details>

@@ -30,7 +30,6 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
 
     windowFunction: 'hamming',
     zoomLevel: 1,
-    error: { magMax: '', magMin: '', size: '' },
   });
 
   let [magnitudeMax, setMagnitudeMax] = useState(props.magnitudeMax);
@@ -49,57 +48,18 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
     props.updateWindowChange(event);
   };
 
-  const onChangeTargetMagnitudeMax = (event) => {
-    setMagnitudeMax(parseInt(event.target.value));
+  const onChangeMagnitudeMax = (e) => {
+    setMagnitudeMax(parseInt(e.target.value));
+    props.updateMagnitudeMax(parseInt(e.target.value));
   };
 
-  const onSubmitMagnitudeMax = () => {
-    const min = parseInt(magnitudeMin);
-    const max = parseInt(magnitudeMax);
-    if (parseInt(max) && max > min && max < 256) {
-      props.updateMagnitudeMax(max);
-      setState({
-        ...state,
-        error: {
-          ...state.error,
-          magMax: '',
-        },
-      });
+  const onChangeMagnitudeMin = (e) => {
+    setMagnitudeMin(parseInt(e.target.value));
+    // currently a min of 0 doesnt actually work so just set it to 1
+    if (e.target.value == 0) {
+      props.updateMagnitudeMin(1);
     } else {
-      setState({
-        ...state,
-        error: {
-          ...state.error,
-          magMax: 'Magnitude max must be an integer, greater than the magnitude min, and between 1 and 255',
-        },
-      });
-    }
-  };
-
-  const onChangeTargetMagnitudeMin = (event) => {
-    setMagnitudeMin(parseInt(event.target.value));
-  };
-
-  const onSubmitMagnitudeMin = () => {
-    const min = parseInt(magnitudeMin);
-    const max = parseInt(magnitudeMax);
-    if (min && min >= 0 && min < max) {
-      props.updateMagnitudeMin(magnitudeMin);
-      setState({
-        ...state,
-        error: {
-          ...state.error,
-          magMin: '',
-        },
-      });
-    } else {
-      setState({
-        ...state,
-        error: {
-          ...state.error,
-          magMin: 'Magnitude min must be an integer, less than the magnitude max, and between 1 and 255',
-        },
-      });
+      props.updateMagnitudeMin(parseInt(e.target.value));
     }
   };
 
@@ -111,21 +71,8 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
     const intSize = parseInt(state.size);
     if (intSize >= 32 && Math.log2(intSize) % 1 === 0) {
       props.updateFftsize(state.size);
-      setState({
-        ...state,
-        error: {
-          ...state.error,
-          size: '',
-        },
-      });
     } else {
-      setState({
-        ...state,
-        error: {
-          ...state.error,
-          size: 'Size must be a power of 2 and at least 32',
-        },
-      });
+      alert('Size must be a power of 2 and at least 32');
     }
   };
 
@@ -155,7 +102,7 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
       window.fftData = {};
       console.log('valid taps, found', taps.length, 'taps');
     } else {
-      console.error('invalid taps');
+      console.alert('invalid taps');
     }
     props.updateBlobTaps(taps);
   };
@@ -172,7 +119,7 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
       window.fftData = {};
       console.log('valid taps, found', taps.length, 'taps');
     } else {
-      console.error('invalid taps');
+      console.alert('invalid taps');
     }
     setState({ ...state, taps: taps_string });
     props.updateBlobTaps(taps);
@@ -207,36 +154,49 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
       </Form.Group>
 
       <Form.Group className="mb-3" controlId="formMagMax">
-        <Form.Label>Magnitude Max</Form.Label>
-        <div style={{ color: 'red', marginBottom: '2px' }}>{state.error.magMax}</div>
-        <InputGroup className="mb-3">
-          <Form.Control type="text" defaultValue={magnitudeMax} onChange={onChangeTargetMagnitudeMax} size="sm" />
-          <Button variant="secondary" onClick={onSubmitMagnitudeMax}>
-            <FontAwesomeIcon icon={faArrowRight} />
-          </Button>
+        <div className="text-center font-bold">Magnitude Color Mapping</div>
+        <InputGroup className="mb-3 mt-1">
+          <Form.Label className="pr-3">Max:</Form.Label>
+          <Form.Label className="text-xs">{magnitudeMin + 1}</Form.Label>
+          <RangeSlider
+            value={magnitudeMax}
+            tooltip="on"
+            tooltipPlacement="bottom"
+            variant="secondary"
+            min={magnitudeMin + 1}
+            max={255}
+            step={1}
+            onChange={onChangeMagnitudeMax}
+          />
+          <Form.Label className="text-xs">255</Form.Label>
         </InputGroup>
-      </Form.Group>
 
-      <Form.Group className="mb-3" controlId="formMagMin">
-        <Form.Label>Magnitude Min</Form.Label>
-        <div style={{ color: 'red', marginBottom: '2px' }}>{state.error.magMin}</div>
-        <InputGroup className="mb-3">
-          <Form.Control type="text" defaultValue={magnitudeMin} onChange={onChangeTargetMagnitudeMin} size="sm" />
-          <Button variant="secondary" onClick={onSubmitMagnitudeMin}>
-            <FontAwesomeIcon icon={faArrowRight} />
-          </Button>
+        <InputGroup>
+          <Form.Label className="pr-4">Min:</Form.Label>
+          <Form.Label className="text-xs">0</Form.Label>
+          <RangeSlider
+            value={magnitudeMin}
+            tooltip="on"
+            tooltipPlacement="top"
+            variant="secondary"
+            min={0}
+            max={magnitudeMax - 1}
+            step={1}
+            onChange={onChangeMagnitudeMin}
+          />
+          <Form.Label className="text-xs">{magnitudeMax - 1}</Form.Label>
         </InputGroup>
-      </Form.Group>
 
-      {/* When you press this button it will make autoscale run during the next call to selectFft, then it will turn itself off */}
-      <Button
-        className="mb-3"
-        variant="secondary"
-        onClick={props.handleAutoScale}
-        style={{ width: '100%', marginTop: '5px' }}
-      >
-        Autoscale Max/Min
-      </Button>
+        {/* When you press this button it will make autoscale run during the next call to selectFft, then it will turn itself off */}
+        <Button
+          className="mb-3"
+          variant="secondary"
+          onClick={props.handleAutoScale}
+          style={{ width: '100%', marginTop: '5px' }}
+        >
+          Autoscale Max/Min
+        </Button>
+      </Form.Group>
 
       <Form.Group className="mb-3" controlId="formFFT">
         <Form.Label>
@@ -250,7 +210,6 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
             <HelpOutlineOutlinedIcon />
           </a>
         </Form.Label>
-        <div style={{ color: 'red', marginBottom: '2px' }}>{state.error.size}</div>
         <InputGroup className="mb-3">
           <Form.Control type="text" defaultValue={state.size} onChange={onChangeFftsize} size="sm" />
           <Button variant="secondary" onClick={onSubmitFftsize}>

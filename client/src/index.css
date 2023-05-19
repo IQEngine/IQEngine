@@ -13,33 +13,17 @@
   transform: translate(150px, 0px) scale(3);
 }
 
-/* for IQEngine h1 title at top */
-h1 a {
-  color: rgb(255, 255, 255);
-  text-decoration: none;
-}
-
 /* this is only so that in datatype column we get newlines after each thing */
 div.datatypetext {
   white-space: pre-wrap;
 }
 
-.flexOne {
-  min-width: 250px !important;
-  margin: 5rem;
-  flex: 5;
-}
-
 .homePage {
   display: flex;
   flex-direction: row;
-  margin: 0 5% 0% 5%;
+  margin: 0% 5% 0% 5%;
   flex-wrap: wrap;
   justify-content: space-around;
-}
-
-.cardBodyCenter {
-  margin: 5%;
 }
 
 .react-toggle {
@@ -182,45 +166,4 @@ div.datatypetext {
   -webkit-box-shadow: 0px 0px 5px 5px #0099e0;
   -moz-box-shadow: 0px 0px 5px 5px #0099e0;
   box-shadow: 0px 0px 5px 5px #0099e0;
-}
-
-.leadership-card-header {
-  color: #222222;
-  background-color: #00bc8c;
-  display: flex;
-  justify-content: center;
-  font-weight: 900;
-}
-
-.leadership-card-body {
-  background-color: #222222;
-  text-align: center;
-}
-
-a:link {
-  text-decoration: none;
-  color: #00bc8c;
-}
-
-a:visited {
-  text-decoration: none;
-  color: #00bc8c;
-}
-
-a:active {
-  text-decoration: none;
-  color: #00bc8c;
-}
-
-a:hover {
-  text-decoration: none;
-  color: #007356;
-}
-
-h1 {
-  font-size: 28px;
-}
-
-h5 {
-  font-size: 18px;
 }
