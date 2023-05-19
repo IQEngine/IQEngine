@@ -2,10 +2,8 @@
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
 import React, { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
-import { Row } from 'react-bootstrap';
+import { useLocation, Outlet } from 'react-router-dom';
 import ReactGA from 'react-ga4';
-import { Outlet } from 'react-router-dom';
 import ThemeSelector from './Components/Styles/ThemeSelector';
 
 // If env var is set, initialize google analytics
@@ -72,20 +70,17 @@ export const App = () => {
         </div>
 
         <Outlet />
+
         {/* TODO Figure out how to use mailerlites embedded form*/}
-        <div className="container">
-          <Row style={{ marginTop: '30px', marginBottom: '30px' }}>
-            <a
-              target="_blank"
-              rel="noreferrer"
-              href="https://dashboard.mailerlite.com/forms/299501/77960409531811734/share"
-            >
-              <center>
-                <h5>Sign up for a once-a-month email update on IQEngine, such as new features, demos, and more!</h5>
-              </center>
-            </a>
-          </Row>
-        </div>
+        <a
+          target="_blank"
+          rel="noreferrer"
+          href="https://dashboard.mailerlite.com/forms/299501/77960409531811734/share"
+        >
+          <h2 className="text-center py-2">
+            Sign up for a once-a-month email update on IQEngine, such as new features, demos, and more!
+          </h2>
+        </a>
       </div>
     </ThemeSelector>
   );

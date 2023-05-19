@@ -18,12 +18,6 @@ div.datatypetext {
   white-space: pre-wrap;
 }
 
-.flexOne {
-  min-width: 250px !important;
-  margin: 5rem;
-  flex: 5;
-}
-
 .homePage {
   display: flex;
   flex-direction: row;

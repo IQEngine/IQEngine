@@ -23,6 +23,10 @@
     @apply bg-iqengine-bg;
   }
 
+  .flexOne {
+    @apply w-64 m-8 flex-auto;
+  }
+
   .repocard {
     @apply rounded-2xl h-fit border-0 border-iqengine-primary shadow-md shadow-iqengine-primary rounded-t-xl;
   }
@@ -32,7 +36,7 @@
   }
 
   .repocardbody {
-    @apply bg-iqengine-bg bg-opacity-60 mt-3;
+    @apply bg-iqengine-bg p-1 bg-opacity-60 mt-3;
   }
 
   .repocardbutton {
