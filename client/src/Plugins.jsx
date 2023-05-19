@@ -28,7 +28,11 @@ export const Plugins = () => {
         </ul>
         <p className="text-lg mx-56 mb-3">Current concept plan:</p>
         <center>
-          <img src="./plugins_concept.png" className="w-1/2" alt="plugins concept"></img>
+          <img
+            src="./plugins_concept.svg"
+            className="w-1/2 border-iqengine-tertiary border-1 shadow-md shadow-iqengine-tertiary mb-3"
+            alt="plugins concept"
+          ></img>
         </center>
       </div>
     </div>
