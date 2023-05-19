@@ -3,7 +3,6 @@
 // Licensed under the MIT License
 
 import React, { useState } from 'react';
-import Form from 'react-bootstrap/Form';
 import { useNavigate } from 'react-router-dom';
 
 const AzureBlobBrowser = (props) => {
@@ -36,14 +35,29 @@ const AzureBlobBrowser = (props) => {
     <div className="flexOne repocard">
       <div className="repocardheader">Browse Your Azure Blob Storage</div>
       <div className="repocardbody">
-        <Form.Group className="m-3">
-          <Form.Label>Storage Account Name:</Form.Label>
-          <Form.Control className="mb-3" type="text" defaultValue={accountName} onChange={onAccountNameChange} />
-          <Form.Label>Container Name:</Form.Label>
-          <Form.Control className="mb-3" type="text" defaultValue={containerName} onChange={onContainerNameChange} />
-          <Form.Label>SAS Token for Container:</Form.Label>
-          <Form.Control type="password" defaultValue={sasToken} onChange={onSasTokenChange} />
-        </Form.Group>
+        <form className="m-3 mt-0">
+          <label>Storage Account Name:</label>
+          <input
+            className="mb-3 w-full rounded mt-1 h-8 p-1 bg-iqengine-tertiary text-black"
+            type="text"
+            defaultValue={accountName}
+            onChange={onAccountNameChange}
+          />
+          <label>Container Name:</label>
+          <input
+            className="mb-3 w-full rounded mt-1 h-8 p-1 bg-iqengine-tertiary text-black"
+            type="text"
+            defaultValue={containerName}
+            onChange={onContainerNameChange}
+          />
+          <label>SAS Token for Container:</label>
+          <input
+            className="w-full rounded mt-1 h-8 p-1 bg-iqengine-tertiary text-black"
+            type="password"
+            defaultValue={sasToken}
+            onChange={onSasTokenChange}
+          />
+        </form>
       </div>
       <button className="repocardbutton" onClick={onSubmit}>
         Browse
