@@ -36,6 +36,6 @@
   }
 
   .repocardbutton {
-    @apply bg-iqengine-primary opacity-75 w-full h-8 text-iqengine-bg hover:bg-iqengine-tertiary font-bold rounded-b-2xl rounded-t-none border-0;
+    @apply bg-iqengine-primary opacity-75 w-full h-8 text-iqengine-bg hover:bg-iqengine-tertiary hover:opacity-100 font-bold rounded-b-2xl rounded-t-none border-0;
   }
 }
