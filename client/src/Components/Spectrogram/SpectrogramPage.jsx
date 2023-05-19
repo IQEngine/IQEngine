@@ -17,7 +17,6 @@ import { TILE_SIZE_IN_IQ_SAMPLES, MAX_SIMULTANEOUS_FETCHES } from '../../Utils/c
 import TimeSelector from './TimeSelector';
 import { Navigate } from 'react-router-dom';
 import Button from '@/Components/Button/Button';
-import Collapsible from '@/Components/Collapsible/Collapsible';
 import { calculateDate, printFrequency, printSeconds } from '@/Utils/rfFunctions';
 import DataTable from '@/Components/DataTable/DataTable';
 import { PencilSquareIcon, ArrowRightIcon, ArrowDownTrayIcon } from '@heroicons/react/24/solid';
@@ -646,7 +645,7 @@ class SpectrogramPage extends Component {
             updateZoomLevel={this.handleZoomLevel}
           />
           <div className="flex flex-col">
-            <ul className="flex space-x-2 border-b border-iqengine-green w-full sm:pl-12 lg:pl-32" id="tabsbar">
+            <ul className="flex space-x-2 border-b border-iqengine-primary w-full sm:pl-12 lg:pl-32" id="tabsbar">
               <li>
                 <button
                   onClick={() => {
@@ -654,8 +653,8 @@ class SpectrogramPage extends Component {
                     this.setState({ currentTab: 'spectrogram' });
                   }}
                   className={` ${
-                    currentTab === 'spectrogram' ? 'bg-iqengine-green text-black' : ''
-                  } inline-block px-3 py-0 outline  outline-iqengine-green outline-1 text-lg text-iqengine-green hover:text-green-900`}
+                    currentTab === 'spectrogram' ? 'bg-iqengine-primary text-black' : ''
+                  } inline-block px-3 py-0 outline  outline-iqengine-primary outline-1 text-lg text-iqengine-primary hover:text-green-900`}
                 >
                   Spectrogram
                 </button>
@@ -667,8 +666,8 @@ class SpectrogramPage extends Component {
                     this.setState({ currentTab: 'time' });
                   }}
                   className={` ${
-                    currentTab === 'time' ? 'bg-iqengine-green text-black' : ''
-                  } inline-block px-3 py-0 outline outline-iqengine-green outline-1 text-lg text-iqengine-green hover:text-green-900`}
+                    currentTab === 'time' ? 'bg-iqengine-primary text-black' : ''
+                  } inline-block px-3 py-0 outline outline-iqengine-primary outline-1 text-lg text-iqengine-primary hover:text-green-900`}
                 >
                   Time
                 </button>
@@ -680,8 +679,8 @@ class SpectrogramPage extends Component {
                     this.setState({ currentTab: 'frequency' });
                   }}
                   className={` ${
-                    currentTab === 'frequency' ? 'bg-iqengine-green text-black' : ''
-                  } inline-block px-3 py-0 outline  outline-iqengine-green outline-1 text-lg text-iqengine-green hover:text-green-900`}
+                    currentTab === 'frequency' ? 'bg-iqengine-primary text-black' : ''
+                  } inline-block px-3 py-0 outline  outline-iqengine-primary outline-1 text-lg text-iqengine-primary hover:text-green-900`}
                 >
                   Frequency
                 </button>
@@ -693,8 +692,8 @@ class SpectrogramPage extends Component {
                     this.setState({ currentTab: 'iq' });
                   }}
                   className={` ${
-                    currentTab === 'iq' ? 'bg-iqengine-green text-black' : ''
-                  } inline-block px-3 py-0 outline  outline-iqengine-green outline-1 text-lg text-iqengine-green hover:text-green-900`}
+                    currentTab === 'iq' ? 'bg-iqengine-primary text-black' : ''
+                  } inline-block px-3 py-0 outline  outline-iqengine-primary outline-1 text-lg text-iqengine-primary hover:text-green-900`}
                 >
                   IQ Plot
                 </button>
@@ -805,44 +804,55 @@ class SpectrogramPage extends Component {
           </div>
         </div>
 
-        <div className="mt-3 mb-0 ml-0 mr-0 p-0" style={{ margin: '5px' }}>
-          <Collapsible title="Annotations" style={{ marginTop: '5px', width: '100%' }}>
-            <DataTable
-              dataColumns={[
-                { title: 'Annotation', dataIndex: 'annotation' },
-                { title: 'Frequency Range', dataIndex: 'frequencyRange' },
-                { title: 'BW', dataIndex: 'bandwidthHz' },
-                { title: 'Label', dataIndex: 'label' },
-                { title: 'Start Time', dataIndex: 'startTime' },
-                { title: 'Duration', dataIndex: 'duration' },
-                { title: 'Actions', dataIndex: 'actions' },
-              ]}
-              dataRows={this.calculateData(this.state.meta)}
-            />
-          </Collapsible>
-          <Collapsible title="Metadata" style={{ marginTop: '5px' }}>
-            <div>
-              <Button
-                className="text-right"
-                variant="secondary"
-                onClick={() => {
-                  this.handleMeta();
-                  this.downloadInfo();
-                }}
-              >
-                <ArrowDownTrayIcon className="inline-block mr-2 h-6 w-6" />
-                Download meta JSON
-              </Button>
-            </div>
-            <div>
-              <textarea
-                rows="20"
-                style={{ width: '100%' }}
-                onChange={this.handleMetaChange}
-                value={JSON.stringify(this.state.meta, null, 4)}
+        <div className="mt-3 mb-0 px-2 py-0" style={{ margin: '5px' }}>
+          <details>
+            <summary className="pl-2 mt-2 bg-iqengine-primary outline outline-1 outline-iqengine-primary text-lg text-black hover:bg-green-800">
+              Annotations
+            </summary>
+            <div className="outline outline-1 outline-iqengine-primary p-2">
+              <DataTable
+                dataColumns={[
+                  { title: 'Annotation', dataIndex: 'annotation' },
+                  { title: 'Frequency Range', dataIndex: 'frequencyRange' },
+                  { title: 'BW', dataIndex: 'bandwidthHz' },
+                  { title: 'Label', dataIndex: 'label' },
+                  { title: 'Start Time', dataIndex: 'startTime' },
+                  { title: 'Duration', dataIndex: 'duration' },
+                  { title: 'Actions', dataIndex: 'actions' },
+                ]}
+                dataRows={this.calculateData(this.state.meta)}
               />
             </div>
-          </Collapsible>
+          </details>
+
+          <details>
+            <summary className="pl-2 mt-2 bg-iqengine-primary outline outline-1 outline-iqengine-primary text-lg text-black hover:bg-green-800">
+              Metadata
+            </summary>
+            <div className="outline outline-1 outline-iqengine-primary p-2">
+              <div>
+                <Button
+                  className="text-right"
+                  variant="secondary"
+                  onClick={() => {
+                    this.handleMeta();
+                    this.downloadInfo();
+                  }}
+                >
+                  <ArrowDownTrayIcon className="inline-block mr-2 h-6 w-6" />
+                  Download meta JSON
+                </Button>
+              </div>
+              <div>
+                <textarea
+                  rows="20"
+                  style={{ width: '100%' }}
+                  onChange={this.handleMetaChange}
+                  value={JSON.stringify(this.state.meta, null, 4)}
+                />
+              </div>
+            </div>
+          </details>
         </div>
       </div>
     );

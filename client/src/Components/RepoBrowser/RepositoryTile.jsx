@@ -3,7 +3,6 @@
 // Licensed under the MIT License
 
 import React, { useState, useEffect } from 'react';
-import { Card, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 
 const RepositoryTile = (props) => {
@@ -28,9 +27,13 @@ const RepositoryTile = (props) => {
     const tempExpires = sasToken.slice(sasToken.search('se')).split('&')[0].slice(3, 13); // YEAR-MONTH-DAY
     const writeable = sasToken.slice(sasToken.search('sp')).split('&')[0].includes('w'); // boolean
     if (writeable) {
-      setWriteableBool('R-W');
+      setWriteableBool(<div className="mr-2 mt-2 text-xs">R-W</div>);
     } else {
-      setWriteableBool('R');
+      setWriteableBool(
+        <div className="mr-2 mt-2 text-xs inline">
+          R<div className="inline text-gray-400">/W</div>
+        </div>
+      );
     }
     const todayDate = new Date();
     const todayFormattedDate = todayDate.toISOString().substring(0, 10);
@@ -41,18 +44,6 @@ const RepositoryTile = (props) => {
     setExpires(tempExpires);
     setDayDifference(tempDayDifference);
   }, [sasToken]);
-
-  const styleRW = {
-    border: '2px solid lightblue',
-    width: 'fit-content',
-    padding: '3px',
-    borderRadius: '5px',
-  };
-
-  const styleHeight = {
-    width: 200,
-    height: 200,
-  };
 
   const handleOnClick = () => {
     updateConnectionAccountName(accountName);
@@ -71,22 +62,14 @@ const RepositoryTile = (props) => {
   };
 
   return (
-    <Card className="flexOne">
-      <Card.Header style={{ display: 'flex', justifyContent: 'space-between' }}>
-        {<div style={{ marginTop: 'auto' }}>{name}</div>} <div style={styleRW}>{writeableBool}</div>
-      </Card.Header>
-      <Card.Body>
+    <div className="flexOne repocard">
+      <div className="repocardheader" style={{ display: 'flex', justifyContent: 'space-between' }}>
+        {<div style={{ marginTop: 'auto' }}>{name}</div>} {writeableBool}
+      </div>
+      <div className="repocardbody">
         <center>
-          {imageURL && <Card.Img variant="top" src={imageURL} style={styleHeight}></Card.Img>}
-          <br />
-          {/*
-          <div className="mb-2" style={{ marginTop: '10px' }}>
-            Account Name: {accountName}
-          </div>
-          <div className="mb-2">Container Name: {containerName}</div>
-          */}
-          <br></br>
-          <div className="mb-2">{description}</div>
+          {imageURL && <img src={imageURL} className="w-48 rounded-xl"></img>}
+          <div className="mb-2 mt-3">{description}</div>
           <div className="mb-3" style={{ color: 'grey' }}>
             SAS Token Expiration: {expires}
           </div>
@@ -97,11 +80,11 @@ const RepositoryTile = (props) => {
             </div>
           )}
         </center>
-      </Card.Body>
-      <Button variant="success" disabled={isDisabled} id={name.replaceAll(' ', '')} onClick={handleOnClick}>
+      </div>
+      <button className="repocardbutton" disabled={isDisabled} id={name.replaceAll(' ', '')} onClick={handleOnClick}>
         Browse
-      </Button>
-    </Card>
+      </button>
+    </div>
   );
 };
 

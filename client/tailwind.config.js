@@ -4,7 +4,10 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'iqengine-green': '#04b889',
+        'iqengine-primary': '#4CE091', // emerald
+        'iqengine-secondary': '#136f63', // pine green (darkish green)
+        'iqengine-tertiary': '#84cae7', // sky blue
+        'iqengine-bg': '#05041C', // very dark blue
       },
     },
   },
