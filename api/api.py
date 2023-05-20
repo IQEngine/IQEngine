@@ -22,7 +22,7 @@ metadata_versions = db['versions']
         datasource_id = db.datasources.insert_one(datasource).inserted_id
         return str(datasource_id)
     
-    @app.route('api/datasources', methods=['GET'])
+    @app.route('/api/datasources', methods=['GET'])
     def get_all_datasources():
         datasources = db.datasources.find()
         result = []
@@ -31,7 +31,7 @@ metadata_versions = db['versions']
             result.append(datasource)
         return {"datasources": result}
     
-    @app.route('api/datasources/<datasource_id>/meta', methods=['GET'])
+    @app.route('/api/datasources/<datasource_id>/meta', methods=['GET'])
     def get_all_meta(datasource_id):
         metadata = db.metadata.find({'datasource_id': datasource_id})
         result = []
@@ -40,13 +40,13 @@ metadata_versions = db['versions']
             result.append(datum)
         return {"metadata": result}
 
-    @app.route('api/datasources/<datasource_id>/<filepath>/meta', methods=['GET'])
+    @app.route('/api/datasources/<datasource_id>/<filepath>/meta', methods=['GET'])
     def get_meta(datasource_id, filepath):
         metadata = db.metadata.find_one({'datasource_id': datasource_id, 'filepath': filepath})
         metadata['_id'] = str(metadata['_id'])
         return metadata
 
-    @app.route('api/datasources/<datasource_id>/<filepath>/meta', methods=['POST'])
+    @app.route('/api/datasources/<datasource_id>/<filepath>/meta', methods=['POST'])
     def create_meta(datasource_id, filepath):
         exists = db.metadata.find_one({'datasource_id': datasource_id, 'filepath': filepath})
         if exists:
@@ -62,7 +62,7 @@ metadata_versions = db['versions']
     def get_latest_version(datasource_id, filepath):
         return metadata_versions.find_one({'datasource_id': datasource_id, 'filepath': filepath}, sort=[('version_number', -1)])
     
-    @app.route('api/datasources/<datasource_id>/<filepath>/meta', methods=['PUT'])
+    @app.route('/api/datasources/<datasource_id>/<filepath>/meta', methods=['PUT'])
     def update_meta(datasource_id, filepath):
         current_version = db.metadata.find_one({'datasource_id': datasource_id, 'filepath': filepath})
         latest_version = get_latest_version(datasource_id, filepath)
@@ -76,14 +76,9 @@ metadata_versions = db['versions']
         metadata_versions.insert_one(current_version)
         metadata.update_one({'datasource_id': datasource_id, 'filepath': filepath}, {'$set': new_version})
 
-
     @app.route('/api/status')
     def get_status():
         return "OK"
-
-
-    
-
     
     return app
 
