@@ -16,11 +16,11 @@ describe('Recording list component', () => {
 });
 
 const assertValues = async (recording: RecordingObject) => {
-  expect(await screen.getAllByText(recording.title)[0]).toBeInTheDocument();
+  expect((await screen.findAllByText(recording.title))[0]).toBeInTheDocument();
 
-  expect(await screen.getAllByText(recording.source)[0]).toBeInTheDocument();
+  expect((await screen.findAllByText(recording.source))[0]).toBeInTheDocument();
 
-  expect(await screen.getAllByText(recording.frequency)[0]).toBeInTheDocument();
+  expect((await screen.findAllByText(recording.frequency))[0]).toBeInTheDocument();
 
-  expect(await screen.getAllByAltText('Spectogram')[0]).toHaveAttribute('src', recording.spectogram);
+  expect((await screen.findAllByAltText('Spectogram'))[0]).toHaveAttribute('src', recording.spectogram);
 };

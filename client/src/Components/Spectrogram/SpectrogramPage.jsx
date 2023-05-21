@@ -16,10 +16,16 @@ import { RulerSide } from './RulerSide';
 import { TILE_SIZE_IN_IQ_SAMPLES, MAX_SIMULTANEOUS_FETCHES } from '../../Utils/constants';
 import TimeSelector from './TimeSelector';
 import { Navigate } from 'react-router-dom';
-import Button from '@/Components/Button/Button';
-import { calculateDate, printFrequency, printSeconds } from '@/Utils/rfFunctions';
+import {
+  calculateDate,
+  calculateSampleCount,
+  getOriginalFrequency,
+  getFrequency,
+  getSeconds,
+} from '@/Utils/rfFunctions';
 import DataTable from '@/Components/DataTable/DataTable';
-import { PencilSquareIcon, ArrowRightIcon, ArrowDownTrayIcon } from '@heroicons/react/24/solid';
+import AutoSizeInput from '@/Components/AutoSizeInput/AutoSizeInput';
+import { ArrowRightIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 
 async function initPyodide() {
   const pyodide = await window.loadPyodide();
@@ -254,59 +260,146 @@ class SpectrogramPage extends Component {
   getActions = (startSampleCount) => {
     return (
       <div>
-        <Button
-          onClick={() => {
-            alert('Awaiting implementation');
-          }}
-        >
-          <PencilSquareIcon className="h-4 w-4 bg-green-950" />
-        </Button>
-
-        <Button
+        <button
+          className="btn-primary"
           onClick={() => {
             const fractionIntoFile = startSampleCount / this.state.blob.totalIQSamples;
             const handleTop = fractionIntoFile * this.state.spectrogramHeight;
             this.fetchAndRender(handleTop);
           }}
         >
-          <ArrowRightIcon className="h-4 w-4 bg-green-950" />
-        </Button>
+          <ArrowRightIcon className="h-4 w-4" />
+        </button>
       </div>
     );
   };
 
-  calculateData = (metadata) => {
+  updateAnnotation = (value, parent) => {
+    let newInputValue = value;
+    let newAnnotationValue = value;
+    let metadata = { ...this.state.meta };
+
+    if (parent.name == 'core:freq_lower_edge') {
+      newAnnotationValue = Number(getOriginalFrequency(value, parent.object.unit));
+      newInputValue = getFrequency(newAnnotationValue).freq;
+    } else if (parent.name == 'core:freq_upper_edge') {
+      newAnnotationValue = Number(getOriginalFrequency(value, parent.object.unit));
+      newInputValue = getFrequency(newAnnotationValue).freq;
+    } else if (parent.name == 'core:sample_start') {
+      newAnnotationValue = calculateSampleCount(
+        new Date(metadata.captures[0]['core:datetime']),
+        new Date(value),
+        metadata.global['core:sample_rate']
+      );
+    } else if (parent.name == 'core:sample_count') {
+    }
+
+    let updatedAnnotation = parent.annotation;
+    updatedAnnotation[parent.name] = newAnnotationValue;
+    metadata.annotations[parent.index] = updatedAnnotation;
+
+    this.setState({ metadata });
+    this.fetchAndRender(this.state.handleTop);
+    return newInputValue;
+  };
+
+  calculateAnnotationsData = (metadata) => {
     let data = [];
     const startCapture = metadata?.captures[0];
 
     if (startCapture && startCapture['core:datetime']) {
       for (let i = 0; i < metadata.annotations?.length; i++) {
         const annotation = metadata.annotations[i];
-        const description = annotation['core:description'];
         const sampleRate = Number(metadata.global['core:sample_rate']);
         const startDate = new Date(startCapture['core:datetime']);
         const startSampleCount = new Number(annotation['core:sample_start']);
-        const endSampleCount = startSampleCount + new Number(annotation['core:sample_count']);
-        const duration = printSeconds(Number(annotation['core:sample_count']) / sampleRate);
 
-        // Get frequency range
-        const startFreqRange = printFrequency(annotation['core:freq_lower_edge']);
-        const endFreqRange = printFrequency(annotation['core:freq_upper_edge']);
-        const frequencyRange = startFreqRange + ' - ' + endFreqRange;
-        const bandwidthHz = printFrequency(annotation['core:freq_upper_edge'] - annotation['core:freq_lower_edge']);
+        // Get description
+        const description = annotation['core:description'];
+        const descriptionParent = {
+          index: i,
+          annotation: annotation,
+          object: description,
+          name: 'core:description',
+        };
 
-        // Get time range
+        // Get start frequency range
+        const startFrequency = getFrequency(annotation['core:freq_lower_edge']);
+        const startFrequencyParent = {
+          index: i,
+          annotation: annotation,
+          object: startFrequency,
+          name: 'core:freq_lower_edge',
+        };
+
+        // Get end frequency range
+        const endFrequency = getFrequency(annotation['core:freq_upper_edge']);
+        const endFrequencyParent = {
+          index: i,
+          annotation: annotation,
+          object: endFrequency,
+          name: 'core:freq_upper_edge',
+        };
+
+        // Get bandwidth
+        const bandwidthHz = getFrequency(annotation['core:freq_upper_edge'] - annotation['core:freq_lower_edge']);
+
+        // Get start time range
         const startTime = calculateDate(startDate, startSampleCount, sampleRate);
-        const endTime = calculateDate(startDate, endSampleCount, sampleRate);
+        const startTimeParent = {
+          index: i,
+          annotation: annotation,
+          object: startTime,
+          name: 'core:sample_start',
+        };
+
+        // Get duration
+        const duration = getSeconds(Number(annotation['core:sample_count']) / sampleRate);
+        const durationParent = {
+          index: i,
+          annotation: annotation,
+          object: duration,
+          name: 'core:sample_count',
+        };
 
         let currentData = {
           annotation: i,
-          frequencyRange: frequencyRange,
-          bandwidthHz: bandwidthHz,
-          label: description,
-          startTime: startTime,
-          endTime: endTime,
-          duration: duration,
+          frequencyRange: (
+            <div className="flex flex-row">
+              <div>
+                <AutoSizeInput
+                  type="number"
+                  parent={startFrequencyParent}
+                  value={startFrequency.freq}
+                  onChange={this.updateAnnotation}
+                />
+              </div>
+              <div>{startFrequency.unit} - </div>
+              <div>
+                <AutoSizeInput
+                  type="number"
+                  parent={endFrequencyParent}
+                  value={endFrequency.freq}
+                  onChange={this.updateAnnotation}
+                />
+              </div>
+              <div>{endFrequency.unit}</div>
+            </div>
+          ),
+          bandwidthHz: bandwidthHz.freq + bandwidthHz.unit,
+          label: <AutoSizeInput parent={descriptionParent} value={description} onChange={this.updateAnnotation} />,
+          startTime: <AutoSizeInput parent={startTimeParent} value={startTime} onChange={this.updateAnnotation} />,
+          duration: (
+            <div className="flex flex-row">
+              <AutoSizeInput
+                type="number"
+                parent={durationParent}
+                value={duration.time}
+                onChange={this.updateAnnotation}
+              />
+              {duration.unit}
+            </div>
+          ),
           actions: this.getActions(startSampleCount),
         };
 
@@ -820,7 +913,7 @@ class SpectrogramPage extends Component {
                   { title: 'Duration', dataIndex: 'duration' },
                   { title: 'Actions', dataIndex: 'actions' },
                 ]}
-                dataRows={this.calculateData(this.state.meta)}
+                dataRows={this.calculateAnnotationsData(this.state.meta)}
               />
             </div>
           </details>
@@ -831,9 +924,8 @@ class SpectrogramPage extends Component {
             </summary>
             <div className="outline outline-1 outline-iqengine-primary p-2">
               <div>
-                <Button
-                  className="text-right"
-                  variant="secondary"
+                <button
+                  className="btn-primary text-right"
                   onClick={() => {
                     this.handleMeta();
                     this.downloadInfo();
@@ -841,7 +933,7 @@ class SpectrogramPage extends Component {
                 >
                   <ArrowDownTrayIcon className="inline-block mr-2 h-6 w-6" />
                   Download meta JSON
-                </Button>
+                </button>
               </div>
               <div>
                 <textarea
