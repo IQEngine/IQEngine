@@ -1,7 +1,15 @@
 repos:
--   repo: https://github.com/pre-commit/pre-commit-hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.1.0
     hooks:
-    -   id: check-yaml
-    -   id: end-of-file-fixer
-    -   id: trailing-whitespace
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-added-large-files
+  - repo: local
+    hooks:
+      - id: docker-mega-linter
+        name: docker-mega-linter
+        language: docker_image
+        verbose: true
+        entry: '-u root -v .:/tmp/lint ghcr.io/oxsecurity/megalinter:v6'
