@@ -5,23 +5,28 @@ import React, { useEffect } from 'react';
 import { useLocation, Outlet } from 'react-router-dom';
 import ReactGA from 'react-ga4';
 import ThemeSelector from './Components/Styles/ThemeSelector';
-
-// If env var is set, initialize google analytics
-if (import.meta.env.VITE_GOOGLE_ANALYTICS_KEY) {
-  ReactGA.initialize(import.meta.env.VITE_GOOGLE_ANALYTICS_KEY);
-}
+import { Config } from './Config';
 
 export const App = () => {
   // Set up google analytics (if enabled) to only share the page path (does not include names of local files)
+  // ;
   const location = useLocation();
+  let a = '';
   useEffect(() => {
-    if (process.env.VITE_GOOGLE_ANALYTICS_KEY) {
-      window.gtag('event', 'page_view', {
-        page_path: location.pathname + location.search + location.hash, // Note- we make sure to not include local file names in the urls, so they wont get sent to google analytics
-        page_search: location.search,
-        page_hash: location.hash,
-      });
-    }
+    (async () => {
+      let config = await Config.Initialize();
+      const analytics_key = (Config.Instance ?? (await Config.Initialize())).googleAnalyticsKey;
+      if (analytics_key) {
+        ReactGA.initialize(analytics_key);
+      }
+      if (analytics_key) {
+        window.gtag('event', 'page_view', {
+          page_path: location.pathname + location.search + location.hash, // Note- we make sure to not include local file names in the urls, so they wont get sent to google analytics
+          page_search: location.search,
+          page_hash: location.hash,
+        });
+      }
+    })();
   }, [location]);
 
   return (
