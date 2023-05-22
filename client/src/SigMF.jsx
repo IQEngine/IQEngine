@@ -87,7 +87,6 @@ export const SigMF = () => {
         <br></br>
         <br></br>
       </div>
-
       {/* SigMF Specs TLDR */}
       <h1 className="text-iqengine-primary text-center mt-16">SigMF Specs TLDR</h1>
       <p className="text-lg">
@@ -119,7 +118,7 @@ export const SigMF = () => {
         <br></br>
         <br></br>
         Diving into the .sigmf-meta file, this JSON file is made up of three parts:
-        <ul class="list-disc px-32 my-4">
+        <ul class="list-disc px-16 my-4">
           <li>
             <b>global</b> - Contains datatype, SigMF version, sample_rate, description, and other optional fields such
             as the description of the hardware used to make the Recording. The datatype indicates float (f), signed int
@@ -153,7 +152,45 @@ export const SigMF = () => {
           <div dangerouslySetInnerHTML={{ __html: exampleMeta }} />
         </pre>
         As you can see, it's fairly readable, but most importantly it's extremely machine readable and easy to parse.
+        <br></br>
+        <br></br>
+        The core SigMF standard can support much more than what has been presented above, and for use-cases that it
+        doesn't support, there may be a SigMF extension that does! SigMF extensions add functionality to SigMF, often
+        specific to a certain type of RF application or protocol. Many extenions live within the SigMF{' '}
+        <a href="https://github.com/sigmf/SigMF/tree/sigmf-v1.x/extensions">main repo</a> while others live in external
+        repos, such as <a href="https://github.com/NTIA/sigmf-ns-ntia">NTIA's extensions.</a> As a quick example of why
+        an extension might be useful, the{' '}
+        <a href="https://github.com/sigmf/SigMF/blob/sigmf-v1.x/extensions/signal.sigmf-ext.md">Signal</a> extension is
+        useful for modulation/signal classification, as it adds optional fields for annotations that include
+        enumerations for the standard modulation schemes, multiplexing schemes, spread spectrum, cellular, etc.
+        <br></br>
+        <br></br>
+        In addition to saving your RF recordings using the SigMF standard, you can use SigMF within your software, using
+        one of four ways:
+        <ul class="list-decimal px-16 my-4">
+          <li>
+            Within Python, using the official SigMF Python package{' '}
+            <a href="https://github.com/sigmf/sigmf-python">sigmf</a> available from pip:{' '}
+            <p className="font-mono inline ml-2">pip install sigmf</p>
+          </li>
+          <li>
+            Within C++ using the header-only C++ library <a href="https://github.com/deepsig/libsigmf">libsigmf</a>{' '}
+            maintained by DeepSig
+          </li>
+          <li>
+            Within GNU Radio using the out-of-tree module <a href="https://github.com/skysafe/gr-sigmf">gr-sigmf</a>{' '}
+            maintained by SkySafe
+          </li>
+          <li>
+            Manually, i.e., by pulling out fields directly instead of using a library, which is the case within
+            IQEngine.
+          </li>
+        </ul>
       </p>
+      {/* Full Specs */}
+      <h1 className="text-iqengine-primary text-center mt-16">Full SigMF Specifications</h1>
+      Coming Soon! This will be a version of the main SigMF spec, except presented in a more dev-centric manner than the
+      current sigmf-spec.md file.
     </div>
   );
 };
