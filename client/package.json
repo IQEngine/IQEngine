@@ -17,6 +17,7 @@
     "@rjsf/validator-ajv8": "^5.6.2",
     "@uiw/codemirror-theme-vscode": "^4.19.16",
     "@uiw/react-codemirror": "^4.19.14",
+    "axios": "^1.4.0",
     "bootstrap": "^5.2.3",
     "bootswatch": "^5.2.3",
     "codemirror": "^6.0.1",
@@ -53,12 +54,6 @@
     "pretty-check": "prettier --check \"./**/*.{js,jsx,ts,tsx,json}\"",
     "test": "vitest"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
   "browserslist": {
     "production": [
       ">0.2%",
@@ -79,6 +74,7 @@
     "@vitejs/plugin-react": "^4.0.0",
     "autoprefixer": "^10.4.14",
     "jsdom": "^22.0.0",
+    "msw": "^1.2.1",
     "prettier": "^2.8.8",
     "vite": "^4.3.5",
     "vite-plugin-env-compatible": "^1.1.1",

@@ -1,4 +1,3 @@
---- # General formatting + YAML
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.1.0
@@ -7,3 +6,10 @@ repos:
     -   id: detect-private-key
     -   id: end-of-file-fixer
     -   id: trailing-whitespace
+  - repo: local
+    hooks:
+      - id: docker-mega-linter
+        name: docker-mega-linter
+        language: docker_image
+        verbose: true
+        entry: '-u root -v .:/tmp/lint ghcr.io/oxsecurity/megalinter:v6'
