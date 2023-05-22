@@ -293,6 +293,12 @@ class SpectrogramPage extends Component {
         metadata.global['core:sample_rate']
       );
     } else if (parent.name == 'core:sample_count') {
+      newAnnotationValue =
+        calculateSampleCount(
+          Temporal.Instant.from(metadata.captures[0]['core:datetime']),
+          Temporal.Instant.from(value),
+          metadata.global['core:sample_rate']
+        ) - Number(parent.annotation['core:sample_start']);
     }
 
     let updatedAnnotation = parent.annotation;
@@ -314,6 +320,7 @@ class SpectrogramPage extends Component {
         const sampleRate = Number(metadata.global['core:sample_rate']);
         const startDate = Temporal.Instant.from(startCapture['core:datetime']);
         const startSampleCount = new Number(annotation['core:sample_start']);
+        const sampleCount = new Number(annotation['core:sample_count']);
 
         // Get description
         const description = annotation['core:description'];
@@ -354,14 +361,17 @@ class SpectrogramPage extends Component {
           name: 'core:sample_start',
         };
 
-        // Get duration
-        const duration = getSeconds(Number(annotation['core:sample_count']) / sampleRate);
-        const durationParent = {
+        // Get start time range
+        const endTime = calculateDate(startDate, startSampleCount + sampleCount, sampleRate);
+        const endTimeParent = {
           index: i,
           annotation: annotation,
-          object: duration,
+          object: endTime,
           name: 'core:sample_count',
         };
+
+        // Get duration
+        const duration = getSeconds(sampleCount / sampleRate);
 
         let currentData = {
           annotation: i,
@@ -389,18 +399,18 @@ class SpectrogramPage extends Component {
           ),
           bandwidthHz: bandwidthHz.freq + bandwidthHz.unit,
           label: <AutoSizeInput parent={descriptionParent} value={description} onChange={this.updateAnnotation} />,
-          startTime: <AutoSizeInput parent={startTimeParent} value={startTime} onChange={this.updateAnnotation} />,
-          duration: (
+          timeRange: (
             <div className="flex flex-row">
-              <AutoSizeInput
-                type="number"
-                parent={durationParent}
-                value={duration.time}
-                onChange={this.updateAnnotation}
-              />
-              {duration.unit}
+              <div>
+                <AutoSizeInput parent={startTimeParent} value={startTime} onChange={this.updateAnnotation} />
+              </div>
+              <div> - </div>
+              <div>
+                <AutoSizeInput parent={endTimeParent} value={endTime} onChange={this.updateAnnotation} />
+              </div>
             </div>
           ),
+          duration: duration.time + duration.unit,
           actions: this.getActions(startSampleCount),
         };
 
@@ -910,7 +920,7 @@ class SpectrogramPage extends Component {
                   { title: 'Frequency Range', dataIndex: 'frequencyRange' },
                   { title: 'BW', dataIndex: 'bandwidthHz' },
                   { title: 'Label', dataIndex: 'label' },
-                  { title: 'Start Time', dataIndex: 'startTime' },
+                  { title: 'Time Range', dataIndex: 'timeRange' },
                   { title: 'Duration', dataIndex: 'duration' },
                   { title: 'Actions', dataIndex: 'actions' },
                 ]}
