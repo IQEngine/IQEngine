@@ -25,6 +25,6 @@ export class Config {
   }
 }
 
-export const GetConfigIntance = async () => {
+export const GetConfigInstance = async () => {
   return Config.Instance ?? (await Config.Initialize());
 };

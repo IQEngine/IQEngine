@@ -1,11 +1,11 @@
-repos:
+---repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.1.0
     hooks:
-      - id: check-yaml
+      - id: check-added-large-files
+      - id: detect-private-key
       - id: end-of-file-fixer
       - id: trailing-whitespace
-      - id: check-added-large-files
   - repo: local
     hooks:
       - id: docker-mega-linter
