@@ -63,6 +63,7 @@ The following roadmap highlights the past, current, and future work items across
   - [ ] Faster client-side FFTs (e.g., using a C webasm module + SIMD for the FFTs)
   - [ ] Configurable colormap
   - [ ] PFB channelizer or wavelet in place of FFT
+  - [ ] Time-domain plot utilities like demod, hex viewier, correlator, similar to Universal Radio Hacker
 * Becoming the ultimate SigMF visualization and editing tool
   - [x] Viewable/editable global params and annotations, including adding a new annotation
   - [ ] Ability to save changes to annotations/captures/global to the file
