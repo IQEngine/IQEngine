@@ -1,5 +1,4 @@
-import axios from 'axios';
-
+import { ConfigApi } from './services/config';
 export class Config {
   detectorEndpoint: string;
   connectionInfo: object;
@@ -10,24 +9,18 @@ export class Config {
     config.detectorEndpoint = import.meta.env.VITE_DETECTOR_ENDPOINT;
     config.connectionInfo = JSON.parse(import.meta.env.VITE_CONNECTION_INFO);
     config.googleAnalyticsKey = import.meta.env.VITE_GOOGLE_ANALYTICS_KEY;
-    await axios('/api/config')
-      .then((response) => {
-        if (response.status === 200) {
-          if (response.data.detectorEndpoint) {
-            config.detectorEndpoint = response.data.detectorEndpoint;
-          }
-          if (response.data.connectionInfo) {
-            config.connectionInfo = response.data.connectionInfo;
-          }
-          if (response.data.googleAnalyticsKey) {
-            config.googleAnalyticsKey = response.data.googleAnalyticsKey;
-          }
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    this.Instance = config;
+    let serverConfig = await ConfigApi.GetConfig();
+    if (serverConfig) {
+      if (serverConfig.detectorEndpoint) {
+        config.detectorEndpoint = serverConfig.detectorEndpoint;
+      }
+      if (serverConfig.connectionInfo) {
+        config.connectionInfo = serverConfig.connectionInfo;
+      }
+      if (serverConfig.googleAnalyticsKey) {
+        config.googleAnalyticsKey = serverConfig.googleAnalyticsKey;
+      }
+    }
     return config;
   }
 }

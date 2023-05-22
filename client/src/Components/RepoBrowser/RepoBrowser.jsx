@@ -9,14 +9,14 @@ import AzureBlobBrowser from './AzureBlobBrowser';
 import RepositoryTile from './RepositoryTile';
 import SiggenTile from './SiggenTile';
 import ValidatorTile from './ValidatorTile';
-import { GetConfigIntance } from '../../Config';
+import { GetConfigInstance } from '../../Config';
 
 const RepoBrowser = (props) => {
   let [tileObjInfo, setTitleObjInfo] = useState([]);
 
   useEffect(() => {
     (async () => {
-      let config = await GetConfigIntance();
+      let config = await GetConfigInstance();
       // In local mode, CONNECTION_INFO isn't defined
       if (config.connectionInfo) {
         setTitleObjInfo(config.connectionInfo.settings);

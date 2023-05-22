@@ -5,7 +5,7 @@
 import React, { useState, useEffect } from 'react';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
-// import { GetConfigIntance } from '../../Config';
+import { GetConfigInstance } from '../../Config';
 
 export const DetectorPane = (props) => {
   let { meta, handleMeta, cursorsEnabled, handleProcessTime } = props;
@@ -17,20 +17,28 @@ export const DetectorPane = (props) => {
   // if (!config.detectorEndpoint) {
   //   detectorEndpoint = 'http://127.0.0.1:8000/detectors/';
   // }
-  const detectorEndpoint = 'http://127.0.0.1:8000/detectors/';
   // on component load perform a GET on /detectors to get list of detectors
   useEffect(() => {
-    fetch(detectorEndpoint, { method: 'GET' })
-      .then(function (response) {
-        return response.json();
-      })
-      .then(function (data) {
-        console.log('Detectors:', data);
-        setDetectorList(data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    (async () => {
+      let config = await GetConfigInstance();
+      // In local mode, CONNECTION_INFO isn't defined
+      if (config.detectorEndpoint) {
+        detectorEndpoint = config.detectorEndpoint;
+      } else {
+        detectorEndpoint = 'http://127.0.0.1:8000/detectors/';
+      }
+      fetch(detectorEndpoint, { method: 'GET' })
+        .then(function (response) {
+          return response.json();
+        })
+        .then(function (data) {
+          console.log('Detectors:', data);
+          setDetectorList(data);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    })();
   }, []);
 
   const handleChangeDetector = (e) => {
