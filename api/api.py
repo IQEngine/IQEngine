@@ -1,17 +1,23 @@
+# vim: tabstop=4 shiftwidth=4 expandtab
+    
 import os
 from flask import Flask, request
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 
-connection_string = os.getenv('COSMOS_DB_CONNECTION_STRING')
-app = Flask(__name__)
+db = None
+app = None
 
-client = MongoClient(connection_string)
-db = client.RFDX 
-metadata = db['current']
-metadata_versions = db['versions']
+def create_db_client():
+    connection_string = os.getenv('COSMOS_DB_CONNECTION_STRING')
+    return MongoClient(connection_string)
 
-def create_app():
+def create_app(db_client = None):
+
+    if db_client == None:
+        db_client = create_db_client()
+    db = db_client["RFDX"]
+ 
     app = Flask(__name__, static_folder='./build', static_url_path='/')
 
     @app.route('/')
@@ -61,22 +67,30 @@ def create_app():
             metadata_id = db.metadata.insert_one(metadata).inserted_id
             return str(metadata_id)
     
+    """
     def get_latest_version(datasource_id, filepath):
-        return metadata_versions.find_one({'datasource_id': datasource_id, 'filepath': filepath}, sort=[('version_number', -1)])
+        # Isn't latest version always current version? i.e. in metadata and not versions
+        return db.metadata.find_one({'datasource_id': datasource_id, 'filepath': filepath}, sort=[('version_number', -1)])
+    """
     
     @app.route('/api/datasources/<datasource_id>/<filepath>/meta', methods=['PUT'])
     def update_meta(datasource_id, filepath):
         current_version = db.metadata.find_one({'datasource_id': datasource_id, 'filepath': filepath})
-        latest_version = get_latest_version(datasource_id, filepath)
-        version_number = latest_version['version_number'] + 1
+        if current_version == None:
+          return "Not found", 404
+
+        # This is going to be a race condition
+        version_number = current_version['version_number'] + 1
+
         new_version = {
             'version_number': version_number,
             'datasource_id': datasource_id,
             'filepath': filepath,
             'document': request.json
         }
-        metadata_versions.insert_one(current_version)
-        metadata.update_one({'datasource_id': datasource_id, 'filepath': filepath}, {'$set': new_version})
+        result = db.versions.insert_one(current_version)
+        result = db.metadata.update_one({'datasource_id': datasource_id, 'filepath': filepath}, {'$set': {}})
+        return "Success", 200
 
     @app.route('/api/status')
     def get_status():
