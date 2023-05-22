@@ -30,5 +30,5 @@ Datatype Options, a subset of those in SigMF:
     | sample_count | number | The number of samples that this Segment applies to |
     | freq_lower_edge | number | The frequency (Hz) of the lower edge of the feature described by this annotation |
     | freq_upper_edge | number | The frequency (Hz) of the upper edge of the feature described by this annotation |
-    | description | string | Identifier for signal classification |
+    | label | string | Identifier for signal classification or other purposes |
 
