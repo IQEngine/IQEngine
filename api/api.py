@@ -25,74 +25,18 @@ def create_app(db_client = None):
  
     app = Flask(__name__, static_folder='./build', static_url_path='/')
     
-    #@app.route('/api/datasources', methods=['POST'])
-    def create_datasource():
-        datasource = request.json
-        datasource_id = db.datasources.insert_one(datasource).inserted_id
-        return str(datasource_id),201
-    
-    #@app.route('/api/datasources', methods=['GET'])
-    def get_all_datasources():
-        datasources = db.datasources.find()
-        result = []
-        for datasource in datasources:
-            datasource['_id'] = str(datasource['_id']) 
-            result.append(datasource)
-        return {"datasources": result}
-    
-    #@app.route('/api/datasources/<datasource_id>/meta', methods=['GET'])
-    def get_all_meta(datasource_id):
-        metadata = db.metadata.find({'datasource_id': datasource_id})
-        result = []
-        for datum in metadata:
-            datum['_id'] = str(datum['_id'])
-            result.append(datum)
-        return {"metadata": result}
-
-    #@app.route('/api/datasources/<datasource_id>/<filepath>/meta', methods=['GET'])
-    def get_meta(datasource_id, filepath):
-        metadata = db.metadata.find_one({'datasource_id': datasource_id, 'filepath': filepath})
-        metadata['_id'] = str(metadata['_id'])
-        return metadata
-
-    #@app.route('/api/datasources/<datasource_id>/<filepath>/meta', methods=['POST'])
-    def create_meta(datasource_id, filepath):
-        exists = db.metadata.find_one({'datasource_id': datasource_id, 'filepath': filepath})
-        if exists:
-            return {"error":"record already exists"}, 400
-        else:
-            metadata = request.json
-            metadata['datasource_id'] = datasource_id
-            metadata['filepath'] = filepath
-            metadata['version_number'] = 0
-            metadata_id = db.metadata.insert_one(metadata).inserted_id
-            return str(metadata_id),201
-    
-    #@app.route('/api/datasources/<datasource_id>/<filepath>/meta', methods=['PUT'])
-    def update_meta(datasource_id, filepath):
-        current_version = db.metadata.find_one({'datasource_id': datasource_id, 'filepath': filepath})
-        version_number = current_version['version_number'] + 1
-        new_version = {
-            'version_number': version_number,
-            'datasource_id': datasource_id,
-            'filepath': filepath,
-            'metadata': request.json
-        }
-        db.versions.insert_one(current_version)
-        db.metadata.update_one({'datasource_id': datasource_id, 'filepath': filepath}, {'$set': new_version})
-        return "{message: 'success'}", 204
-
     #@app.route('/')
     def index():
         return app.send_static_file('index.html')
     
-    #@app.route('/api/datasources', methods=['POST'])
+    @app.route('/api/datasources', methods=['POST'])
     def create_datasource():
         datasource = request.json
+        # TODO: Validate input, what about collisions?
         datasource_id = db.datasources.insert_one(datasource).inserted_id
-        return str(datasource_id)
+        return str(datasource_id), 201
     
-    #@app.route('/api/datasources', methods=['GET'])
+    @app.route('/api/datasources', methods=['GET'])
     def get_all_datasources():
         datasources = db.datasources.find()
         result = []
@@ -101,18 +45,19 @@ def create_app(db_client = None):
             result.append(datasource)
         return {"datasources": result}
     
-    #@app.route('/api/datasources/<datasource_id>/meta', methods=['GET'])
+    @app.route('/api/datasources/<datasource_id>/meta', methods=['GET'])
     def get_all_meta(datasource_id):
         metadata = db.metadata.find({'datasource_id': datasource_id})
         result = []
         for datum in metadata:
-            datum['_id'] = str(datum['_id'])
-            result.append(datum)
+            result.append(str(datum['_id']))
         return {"metadata": result}
 
-    #@app.route('/api/datasources/<datasource_id>/<filepath>/meta', methods=['GET'])
+    @app.route('/api/datasources/<datasource_id>/<filepath>/meta', methods=['GET'])
     def get_meta(datasource_id, filepath):
         metadata = db.metadata.find_one({'datasource_id': datasource_id, 'filepath': filepath})
+        if not metadata:
+            return "Not found", 404
         metadata['_id'] = str(metadata['_id'])
         return metadata
 
@@ -127,7 +72,8 @@ def create_app(db_client = None):
             metadata['filepath'] = filepath
             metadata['version_number'] = 0
             metadata_id = db.metadata.insert_one(metadata).inserted_id
-            return str(metadata_id)
+            # I wonder if this should be json.dumps()
+            return str(metadata_id), 201
     
     """
     def get_latest_version(datasource_id, filepath):
@@ -151,7 +97,7 @@ def create_app(db_client = None):
             'document': request.json
         }
         result = db.versions.insert_one(current_version)
-        result = db.metadata.update_one({'datasource_id': datasource_id, 'filepath': filepath}, {'$set': {}})
+        result = db.metadata.update_one({'datasource_id': datasource_id, 'filepath': filepath}, {'$set': new_version})
         return "Success", 200
 
     @app.route('/api/status')
