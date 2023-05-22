@@ -15,11 +15,20 @@ export const AutoSizeInput = ({ value, parent, type, className, onChange }) => {
 
   const changeHandler = (evt) => {
     setContent(evt.target.value);
+    if (evt.charCode === 13) {
+      blurHandler(evt);
+    }
   };
 
   const blurHandler = (evt) => {
     const updated = onChange(evt.target.value, parent);
     setContent(updated);
+  };
+
+  const keyHandler = (evt) => {
+    if (evt.key === 'Enter') {
+      blurHandler(evt);
+    }
   };
 
   return (
@@ -35,6 +44,7 @@ export const AutoSizeInput = ({ value, parent, type, className, onChange }) => {
         autoFocus
         onChange={changeHandler}
         onBlur={blurHandler}
+        onKeyUp={keyHandler}
       />
     </div>
   );
