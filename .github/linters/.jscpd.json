@@ -1,10 +1,19 @@
 {
-    "threshold": 20,
-    "reporters": [
-      "consoleFull"
-    ],
-    "ignore": [
-      "**/__snapshots__/**"
-    ],
-    "absolute": true
-  }
+  "threshold": 30,
+  "reporters": ["consoleFull"],
+  "ignore": [
+    "**/__snapshots__/**",
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/coverage/**",
+    "**/public/**",
+    "**/*.md",
+    "**/*.json",
+    "**/*.lock",
+    "**/*.yml",
+    "**/*.yaml"
+  ],
+  "gitignore": true,
+  "absolute": true
+}

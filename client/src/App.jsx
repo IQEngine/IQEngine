@@ -11,6 +11,7 @@ export const App = () => {
   // Set up google analytics (if enabled) to only share the page path (does not include names of local files)
   // ;
   const location = useLocation();
+  let a = '';
   useEffect(() => {
     (async () => {
       let config = await Config.Initialize();

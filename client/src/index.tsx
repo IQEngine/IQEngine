@@ -34,7 +34,7 @@ import { createRoot } from 'react-dom/client';
 // @ts-ignore
 
 var new_version: boolean = false;
-// Select wich version to run based on an environment variable
+// Select which version to run based on an environment variable
 const container = document.getElementById('root');
 if (!container) throw new Error('No root element found');
 const root = createRoot(container);

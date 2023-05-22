@@ -33,7 +33,7 @@ jobs:
           {
             echo "repository=${GITHUB_REPOSITORY,,}"
             echo "sha=${GITHUB_SHA::11}"
-            echo "build_time=$(date +'%Y%m%d%H%M')" 
+            echo "build_time=$(date +'%Y%m%d%H%M')"
           } >> "$GITHUB_OUTPUT"
         env:
           GITHUB_REPOSITORY: ${{ github.repository }}
@@ -45,11 +45,11 @@ jobs:
           config-name: release-drafter.yml
           publish: true
           prerelease: true
-          tag: "$RESOLVED_VERSION-pre-${{ steps.set_variables.outputs.build_time }}"
-          name: "$RESOLVED_VERSION-pre-${{ steps.set_variables.outputs.build_time }}"
+          tag: '$RESOLVED_VERSION-pre-${{ steps.set_variables.outputs.build_time }}'
+          name: '$RESOLVED_VERSION-pre-${{ steps.set_variables.outputs.build_time }}'
           header: |
             ## This is a pre-release version of IQEngine
-            
+
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Login to GitHub Container Registry
@@ -68,11 +68,9 @@ jobs:
           tags: |
             ghcr.io/${{ steps.set_variables.outputs.repository }}:${{ steps.set_variables.outputs.sha }}
             ghcr.io/${{ steps.set_variables.outputs.repository }}:${{ steps.draft_a_release.outputs.tag_name }}
-            ghcr.io/${{ steps.set_variables.outputs.repository }}:beta
+            ghcr.io/${{ steps.set_variables.outputs.repository }}:pre
         env:
           VITE_CONNECTION_INFO: '${{ secrets.VITE_CONNECTION_INFO }}'
           VITE_IQENGINE_APP_VERSION: '$${{ secrets.VITE_IQENGINE_APP_VERSION }}'
           VITE_GOOGLE_ANALYTICS_KEY: '${{ secrets.VITE_GOOGLE_ANALYTICS_KEY }}'
           VITE_DETECTOR_ENDPOINT: '${{ secrets.VITE_DETECTOR_ENDPOINT }}'
-      
-      
