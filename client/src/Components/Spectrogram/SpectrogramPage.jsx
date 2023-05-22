@@ -380,33 +380,35 @@ class SpectrogramPage extends Component {
               <div>
                 <AutoSizeInput
                   type="number"
+                  className={'input-number'}
                   parent={startFrequencyParent}
                   value={startFrequency.freq}
-                  onChange={this.updateAnnotation}
+                  onBlur={this.updateAnnotation}
                 />
               </div>
               <div>{startFrequency.unit} - </div>
               <div>
                 <AutoSizeInput
                   type="number"
+                  className={'input-number'}
                   parent={endFrequencyParent}
                   value={endFrequency.freq}
-                  onChange={this.updateAnnotation}
+                  onBlur={this.updateAnnotation}
                 />
               </div>
               <div>{endFrequency.unit}</div>
             </div>
           ),
           bandwidthHz: bandwidthHz.freq + bandwidthHz.unit,
-          label: <AutoSizeInput parent={descriptionParent} value={description} onChange={this.updateAnnotation} />,
+          label: <AutoSizeInput parent={descriptionParent} value={description} onBlur={this.updateAnnotation} />,
           timeRange: (
             <div className="flex flex-row">
               <div>
-                <AutoSizeInput parent={startTimeParent} value={startTime} onChange={this.updateAnnotation} />
+                <AutoSizeInput parent={startTimeParent} value={startTime} onBlur={this.updateAnnotation} />
               </div>
               <div> - </div>
               <div>
-                <AutoSizeInput parent={endTimeParent} value={endTime} onChange={this.updateAnnotation} />
+                <AutoSizeInput parent={endTimeParent} value={endTime} onBlur={this.updateAnnotation} />
               </div>
             </div>
           ),

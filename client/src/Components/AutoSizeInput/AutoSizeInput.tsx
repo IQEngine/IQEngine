@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 
-export const AutoSizeInput = ({ value, parent, type, className, onChange }) => {
+export const AutoSizeInput = ({ value, parent, type, className, onBlur }) => {
   const [content, setContent] = useState(value);
   const [width, setWidth] = useState(0);
   const span = useRef(null);
@@ -15,13 +15,10 @@ export const AutoSizeInput = ({ value, parent, type, className, onChange }) => {
 
   const changeHandler = (evt) => {
     setContent(evt.target.value);
-    if (evt.charCode === 13) {
-      blurHandler(evt);
-    }
   };
 
   const blurHandler = (evt) => {
-    const updated = onChange(evt.target.value, parent);
+    const updated = onBlur(evt.target.value, parent);
     setContent(updated);
   };
 
@@ -38,6 +35,7 @@ export const AutoSizeInput = ({ value, parent, type, className, onChange }) => {
       </span>
       <input
         type={type ?? 'text'}
+        title={content}
         value={content}
         className={`bg-iqengine-bg input no-spin ${className}`}
         style={{ width }}

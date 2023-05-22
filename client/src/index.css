@@ -188,5 +188,9 @@ div.datatypetext {
 .input {
   min-width: 1px;
   padding: 0;
-  max-width: 200px;
+  max-width: 220px;
+}
+
+.input-number {
+  max-width:60px;
 }
