@@ -26,6 +26,7 @@ import {
 import DataTable from '@/Components/DataTable/DataTable';
 import AutoSizeInput from '@/Components/AutoSizeInput/AutoSizeInput';
 import { ArrowRightIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
+import { Temporal } from '@js-temporal/polyfill';
 
 async function initPyodide() {
   const pyodide = await window.loadPyodide();
@@ -287,8 +288,8 @@ class SpectrogramPage extends Component {
       newInputValue = getFrequency(newAnnotationValue).freq;
     } else if (parent.name == 'core:sample_start') {
       newAnnotationValue = calculateSampleCount(
-        new Date(metadata.captures[0]['core:datetime']),
-        new Date(value),
+        Temporal.Instant.from(metadata.captures[0]['core:datetime']),
+        Temporal.Instant.from(value),
         metadata.global['core:sample_rate']
       );
     } else if (parent.name == 'core:sample_count') {
@@ -311,7 +312,7 @@ class SpectrogramPage extends Component {
       for (let i = 0; i < metadata.annotations?.length; i++) {
         const annotation = metadata.annotations[i];
         const sampleRate = Number(metadata.global['core:sample_rate']);
-        const startDate = new Date(startCapture['core:datetime']);
+        const startDate = Temporal.Instant.from(startCapture['core:datetime']);
         const startSampleCount = new Number(annotation['core:sample_start']);
 
         // Get description

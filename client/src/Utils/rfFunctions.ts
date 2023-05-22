@@ -1,12 +1,13 @@
-export function calculateDate(start: Date, count: number, sampleRate: number) {
-  let time = start.getTime() + (count / sampleRate) * 1e3; // getTime() returns milliseconds
-  const a = new Date(time); // Date takes in milliseconds
-  return new Date(time).toISOString();
+import { Temporal } from '@js-temporal/polyfill';
+
+export function calculateDate(start: Temporal.Instant, count: number, sampleRate: number) {
+  let date = start.add({ microseconds: (count / sampleRate) * 1e6 }); // getTime() returns milliseconds
+  return date.toString();
 }
 
-export function calculateSampleCount(start: Date, current: Date, sampleRate: number) {
-  let time = current.getTime() - start.getTime();
-  return (time * sampleRate) / 1e3;
+export function calculateSampleCount(start: Temporal.Instant, current: Temporal.Instant, sampleRate: number) {
+  let time = Number(current.epochMicroseconds - start.epochMicroseconds);
+  return (time * sampleRate) / 1e6;
 }
 
 // Prints a number in Hz, using units most appropriate
