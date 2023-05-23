@@ -87,8 +87,9 @@ export const SigMF = () => {
         <br></br>
         <br></br>
       </div>
-      {/* SigMF Specs TLDR */}
-      <h1 className="text-iqengine-primary text-center mt-16">SigMF Specs TLDR</h1>
+
+      {/* SigMF Summary */}
+      <h1 className="text-iqengine-primary text-center mt-16">SigMF in 5 Minutes</h1>
       <p className="text-lg">
         The SigMF{' '}
         <a href="https://github.com/sigmf/SigMF/blob/sigmf-v1.x/sigmf-spec.md" target="_blank">
@@ -187,10 +188,9 @@ export const SigMF = () => {
           </li>
         </ul>
       </p>
-      {/* Full Specs */}
-      <h1 className="text-iqengine-primary text-center mt-16">Full SigMF Specifications</h1>
-      Coming Soon! This will be a version of the main SigMF spec, except presented in a more dev-centric manner than the
-      current sigmf-spec.md file.
+
+      {/* Schema */}
+      <iframe src="sigmf/sigmf.html" className="w-full mb-32" height="800"></iframe>
     </div>
   );
 };
