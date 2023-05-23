@@ -2,15 +2,12 @@
 
 import pytest
 from pymongo_inmemory import MongoClient
-from flask import Flask
-from api.api import create_app
+from fastapi.testclient import TestClient
+
+from ..api import create_app
+from ..database import create_in_memory_db_client
 
 @pytest.fixture
-def app():
-    db_client = MongoClient() 
-    app = create_app(db_client)
-    yield app
-
-@pytest.fixture()
-def client(app):
-    return app.test_client()
+def client():
+    c = TestClient(create_app(create_in_memory_db_client()))
+    yield c
