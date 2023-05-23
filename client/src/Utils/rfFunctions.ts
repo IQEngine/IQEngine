@@ -46,7 +46,7 @@ export function getOriginalFrequency(freq: number, unit: string) {
 
 // Prints a number in seconds, using units most appropriate
 export function getSeconds(time: number) {
-  const timePico = time * 1e12;
+  const timePico = Number((time * 1e12).toFixed(0));
   if (timePico.toString().length >= 10) {
     return { time: timePico / 1e9, unit: 'ms' };
   }

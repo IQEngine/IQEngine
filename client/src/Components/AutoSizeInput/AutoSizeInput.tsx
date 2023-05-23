@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 
-export const AutoSizeInput = ({ value, parent, type, className, onBlur }) => {
+export const AutoSizeInput = ({ value, parent = null, type = 'text', className = null, onBlur = null }) => {
   const [content, setContent] = useState(value);
   const [width, setWidth] = useState(0);
   const span = useRef(null);
@@ -18,8 +18,10 @@ export const AutoSizeInput = ({ value, parent, type, className, onBlur }) => {
   };
 
   const blurHandler = (evt) => {
-    const updated = onBlur(evt.target.value, parent);
-    setContent(updated);
+    if (onBlur !== null) {
+      const updated = onBlur(evt.target.value, parent);
+      setContent(updated);
+    }
   };
 
   const keyHandler = (evt) => {
