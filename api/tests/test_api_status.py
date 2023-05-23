@@ -15,7 +15,7 @@ def test_api_returns_ok(client):
     assert response.status_code == 200 
     assert response.json() == "OK"
 
-def test_api_post_bad_meta_datasource_id(client):
+def test_api_post_meta_bad_datasource_id(client):
     response = client.post(f'/api/datasources/notavalidid/file_path/meta', json = {})
     assert response.status_code == 400
 
