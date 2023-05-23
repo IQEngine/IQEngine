@@ -1,6 +1,7 @@
 import os
-from flask_restplus import Api
-from flask import Flask, request
+#from flask_restx import Api
+#from flask import Flask, request
+from fastapi import FastAPI, Request
 from pymongo import MongoClient
 
 connection_string = os.getenv('COSMOS_DB_CONNECTION_STRING')
@@ -12,7 +13,6 @@ metadata_versions = db['versions']
 
 db = None
 app = None
-api = None
 
 def create_db_client():
     connection_string = os.getenv('COSMOS_DB_CONNECTION_STRING')
@@ -20,29 +20,22 @@ def create_db_client():
 
 def create_app(db_client = None):
 
+    global app, db
+
     if db_client == None:
         db_client = create_db_client()
     db = db_client["RFDX"]
  
-    app = Flask(__name__, static_folder='./build', static_url_path='/')
+    """app = Flask(__name__, static_folder='./build', static_url_path='/')
     api = Api(app)
+    """
 
-    @app.route('/api/datasources', methods=['POST'])
-    def create_datasource():
-        datasource = request.json
-        # TODO: Validate input, what about collisions?
-        datasource_id = db.datasources.insert_one(datasource).inserted_id
-        return str(datasource_id), 201
-    
-    @app.route('/api/datasources', methods=['GET'])
-    def get_all_datasources():
-        datasources = db.datasources.find()
-        result = []
-        for datasource in datasources:
-            datasource['_id'] = str(datasource['_id']) 
-            result.append(datasource)
-        return {"datasources": result}
-    
+    app = FastAPI()
+
+    import status
+    import datasources
+
+    """
     @app.route('/api/datasources/<datasource_id>/meta', methods=['GET'])
     def get_all_meta(datasource_id):
         metadata = db.metadata.find({'datasource_id': datasource_id})
@@ -59,7 +52,7 @@ def create_app(db_client = None):
             return "Not found", 404
         metadata['_id'] = str(metadata['_id'])
         return metadata
-    
+    """ 
     """
     @app.route('/api/datasources/<datasource_id>/<filepath>/meta', methods=['POST'])
     def create_meta(datasource_id, filepath):
@@ -75,7 +68,8 @@ def create_app(db_client = None):
             # I wonder if this should be json.dumps()
             return str(metadata_id), 201
     """
-   
+
+    """ 
     def get_latest_version(datasource_id, filepath):
         # Isn't latest version always current version? i.e. in metadata and not versions
         cursor = db.versions.find({'datasource_id': datasource_id, 'filepath': filepath}).sort('version', -1).limit(1)
@@ -117,14 +111,10 @@ def create_app(db_client = None):
             result = db.versions.insert_one(new_version)
             result = db.metadata.update_one({'_id': doc_id}, {'$set': {'metadata': request.json, 'version_number': version_number}})
             return "Success", 204
+    """
 
-    @app.route('/api/status')
-    def get_status():
-        return "OK"
-    
     return app
-
-
-if "__Name__" == "__main__":
+    
+if __name__ == "__main__":
     app = create_app()
     app.run()

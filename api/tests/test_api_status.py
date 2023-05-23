@@ -5,7 +5,7 @@ import pytest
 def test_api_returns_ok(client):
     response = client.get('/api/status') 
     assert response.status_code == 200 
-    assert response.data == b'OK'
+    assert response.json() == "OK"
 
 """
 def test_api_post_meta(client):
@@ -53,14 +53,20 @@ def test_api_get_all_meta(client):
     assert len(response.json["metadata"]) == 2
 
 def test_api_create_datasource(client):
-    response = client.post('/api/datasources', json = { "filepath" : "record_a" })
+    datasource = {
+      "name" : "name",
+      "accountName" : "accountName",
+      "containerName" : "containerName",
+      "description" : "description"
+    }
+    response = client.post('/api/datasources', json = datasource)
     assert response.status_code == 201
 
 def test_api_get_datasources(client):
     response = client.get('/api/datasources')
     assert response.status_code == 200
-    assert len(response.json["datasources"]) == 0
+    assert len(response.json()["datasources"]) == 0
     response = client.post('/api/datasources', json = { "filepath" : "record_a" })
     response = client.get('/api/datasources')
     assert response.status_code == 200
-    assert len(response.json["datasources"]) == 1
+    assert len(response.json()["datasources"]) == 1
