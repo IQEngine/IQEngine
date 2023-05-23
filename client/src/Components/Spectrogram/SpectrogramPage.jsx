@@ -29,6 +29,7 @@ import DataTable from '@/Components/DataTable/DataTable';
 import AutoSizeInput from '@/Components/AutoSizeInput/AutoSizeInput';
 import { ArrowRightIcon, ArrowDownTrayIcon, DocumentCheckIcon } from '@heroicons/react/24/outline';
 import { Temporal } from '@js-temporal/polyfill';
+import { DataSourceAPI } from '@/services/data-sources';
 
 async function initPyodide() {
   const pyodide = await window.loadPyodide();
@@ -492,7 +493,7 @@ class SpectrogramPage extends Component {
 
     // Concatenate and trim the IQ Data associated with this range of samples
     const tiles = range(Math.floor(timeSelectionStart), Math.ceil(timeSelectionEnd)); //non-inclusive of end, e.g. if it ends with tile 7.2 we only want tile 7 not 8
-    let bufferLen = tiles.length * TILE_SIZE_IN_IQ_SAMPLES * 2; // number of floats
+    let bufferLen = tiles?.length * TILE_SIZE_IN_IQ_SAMPLES * 2; // number of floats
 
     let currentSamples = new Float32Array(bufferLen);
     let counter = 0;
@@ -606,6 +607,18 @@ class SpectrogramPage extends Component {
       window.URL.revokeObjectURL(url);
     }, 0);
   }
+
+  saveMeta = () => {
+    try {
+      const response = DataSourceAPI.PutMetadata(
+        this.state.connection.containerName,
+        this.state.connection.recording,
+        this.state.meta
+      );
+    } catch (e) {
+      console.log(response);
+    }
+  };
 
   handleMetaChange = (e) => {
     const newMeta = JSON.parse(e.target.value);
@@ -968,23 +981,22 @@ class SpectrogramPage extends Component {
                 <button
                   className="btn-primary text-right"
                   onClick={() => {
-                    this.handleMeta();
                     this.downloadInfo();
                   }}
                 >
                   <ArrowDownTrayIcon className="inline-block mr-2 h-6 w-6" />
                   Download meta JSON
                 </button>
-                <button
+                {/* TODO: Add in when PUT is working <button
                   className="btn-primary text-right ml-1"
                   onClick={() => {
                     this.handleMeta();
-                    this.downloadInfo();
+                    this.saveMeta();
                   }}
                 >
                   <DocumentCheckIcon className="inline-block mr-2 h-6 w-6" />
                   Save latest
-                </button>
+                </button>*/}
               </div>
               <div>
                 <textarea
