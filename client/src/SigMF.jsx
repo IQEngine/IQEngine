@@ -192,7 +192,7 @@ export const SigMF = () => {
       </p>
 
       {/* Schema */}
-      <iframe src="sigmf/sigmf.html" className="w-full mb-32" height="800"></iframe>
+      <iframe src="./sigmf/sigmf.html" className="w-full mt-8 mb-32" height="800"></iframe>
     </div>
   );
 };
