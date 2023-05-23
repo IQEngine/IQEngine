@@ -22,8 +22,10 @@ def test_api_post_existing_meta(client):
 #@pytest.mark.skip()
 def test_api_put_meta(client):
     #response = client.post('/api/datasources/source_id/file_path/meta', json = {})
-    response = client.put('/api/datasources/source_id/file_path/meta', json = {})
-    assert response.status_code == 200 
+    response = client.put('/api/datasources/source_id/file_path/meta', json = { "test" : "string" })
+    assert response.status_code == 201
+    response = client.put('/api/datasources/source_id/file_path/meta', json = { "something" : "else"})
+    assert response.status_code == 204 
 
 def test_api_put_meta_not_existing(client):
     response = client.put('/api/datasources/source_id/file_path/meta', json = {})

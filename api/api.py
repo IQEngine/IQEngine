@@ -1,4 +1,5 @@
 import os
+from flask_restplus import Api
 from flask import Flask, request
 from pymongo import MongoClient
 
@@ -11,6 +12,7 @@ metadata_versions = db['versions']
 
 db = None
 app = None
+api = None
 
 def create_db_client():
     connection_string = os.getenv('COSMOS_DB_CONNECTION_STRING')
@@ -23,7 +25,8 @@ def create_app(db_client = None):
     db = db_client["RFDX"]
  
     app = Flask(__name__, static_folder='./build', static_url_path='/')
-    
+    api = Api(app)
+
     @app.route('/api/datasources', methods=['POST'])
     def create_datasource():
         datasource = request.json
@@ -91,7 +94,7 @@ def create_app(db_client = None):
         }
         result = db.metadata.insert_one(initial_version)
         db.versions.insert_one(initial_version)
-        return "Success",200
+        return "Success",201
     
     @app.route('/api/datasources/<datasource_id>/<filepath>/meta', methods=['PUT'])
     def upsert_meta(datasource_id, filepath):
@@ -113,7 +116,7 @@ def create_app(db_client = None):
             }
             result = db.versions.insert_one(new_version)
             result = db.metadata.update_one({'_id': doc_id}, {'$set': {'metadata': request.json, 'version_number': version_number}})
-            return "Success", 200
+            return "Success", 204
 
     @app.route('/api/status')
     def get_status():
