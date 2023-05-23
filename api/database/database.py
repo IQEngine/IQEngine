@@ -1,10 +1,8 @@
 import os
 import pymongo
+import pymongo_inmemory
 
 _db = None
-
-def db():
-    return _db
 
 def create_db_client():
     global _db
@@ -13,7 +11,13 @@ def create_db_client():
     return _db
 
 def create_in_memory_db_client():
-    import pymongo_inmemory
     global _db
     _db = pymongo_inmemory.MongoClient()["RFDX"]
     return _db
+
+def db():
+    global _db
+    if _db == None:
+        _db = create_in_memory_db_client()
+    return _db
+
