@@ -40,4 +40,27 @@ describe('Auto size input component', () => {
     // Assert
     expect(span).toHaveClass('hide');
   });
+
+  test('Error should not be visible', async () => {
+    // Arrange
+    render(<AutoSizeInput value="Test initial input" />);
+
+    // Act
+    const error = await screen.queryByTitle('This is an error');
+
+    // Assert
+    expect(error).toBeNull();
+  });
+
+  test('Error with parent error should be visible', async () => {
+    // Arrange
+    const parent = { error: 'This is an error' };
+    render(<AutoSizeInput value="Test initial input" parent={parent} />);
+
+    // Act
+    const error = await screen.queryByTitle('This is an error');
+
+    // Assert
+    expect(error).toBeInTheDocument();
+  });
 });
