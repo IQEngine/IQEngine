@@ -1,11 +1,13 @@
 # vim: tabstop=4 shiftwidth=4 expandtab
     
 import os
+from flask_restplus import Api
 from flask import Flask, request
 from pymongo import MongoClient
 
 db = None
 app = None
+api = None
 
 def create_db_client():
     connection_string = os.getenv('COSMOS_DB_CONNECTION_STRING')
@@ -18,7 +20,8 @@ def create_app(db_client = None):
     db = db_client["RFDX"]
  
     app = Flask(__name__, static_folder='./build', static_url_path='/')
-    
+    api = Api(app)
+
     @app.route('/api/datasources', methods=['POST'])
     def create_datasource():
         datasource = request.json
@@ -69,7 +72,6 @@ def create_app(db_client = None):
             return "Success",201
    
     def get_latest_version(datasource_id, filepath):
-        # Isn't latest version always current version? i.e. in metadata and not versions
         cursor = db.versions.find({'datasource_id': datasource_id, 'filepath': filepath}).sort('version', -1).limit(1)
         result = list(cursor)
         if not result:

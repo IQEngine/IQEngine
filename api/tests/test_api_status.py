@@ -22,6 +22,7 @@ def test_api_post_existing_meta(client):
 #@pytest.mark.skip()
 def test_api_put_meta(client):
     response = client.post('/api/datasources/source_id/file_path/meta', json = {})
+    assert response.status_code == 201
     response = client.put('/api/datasources/source_id/file_path/meta', json = {})
     assert response.status_code == 204 
 
