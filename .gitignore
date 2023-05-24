@@ -6,6 +6,7 @@ node_modules
 /.pnp
 .pnp.js
 
+
 # testing
 /coverage
 
@@ -25,6 +26,7 @@ detectors/markos_detector/__pycache__/markos_detector.cpython-310.pyc
 tests/geckodriver.log
 geckodriver.log
 
+.venv/
 venv/
 __pycache__
 client/build
