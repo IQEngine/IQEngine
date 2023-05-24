@@ -18,6 +18,13 @@ def create_in_memory_db_client():
 def db():
     global _db
     if _db == None:
+        _db = create_db_client()
+    return _db
+
+def db_inmem():
+    global _db
+    if _db == None:
         _db = create_in_memory_db_client()
     return _db
+
 
