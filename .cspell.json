@@ -11,7 +11,7 @@
     ".mega-linter.yml"
   ],
   "words": [
-    "Intance",
+    "intance",
     "bootswatch",
     "browserslist",
     "codemirror",
@@ -32,6 +32,18 @@
     "rjsf",
     "svgr",
     "tailwindcss",
-    "venv"
+    "venv",
+    "vite",
+    "lichtman",
+    "siggen",
+    "sigmf",
+    "redoc",
+    "vite",
+    "opencontainers",
+    "webapps",
+    "iqengineweb",
+    "datasource",
+    "dotenv",
+    "tanstack"
   ]
 }
