@@ -30,6 +30,7 @@ tests/geckodriver.log
 geckodriver.log
 
 venv/
+*.venv/
 __pycache__
 client/build
 api/build
