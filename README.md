@@ -47,8 +47,10 @@ This command will launch IQEngine, and you can access it at [http://localhost:30
 
 ### Running from Source Code
 
-To run IQEngine from source code, you need to have Node.js and npm installed on your system. If you don't have them, you can download and install them from [here](https://nodejs.org/en/download/).
-Additionally, ensure that you have Python 3.10 or a higher version installed. You can download and install Python from [here](https://www.python.org/downloads/).
+To run IQEngine from source code, you need to have Node.js and npm installed on your system.
+If you don't have them, you can download and install them from [here](https://nodejs.org/en/download/).
+Additionally, ensure that you have Python 3.10 or a higher version installed.
+You can download and install Python from [here](https://www.python.org/downloads/).
 Lastly, you'll need to have "make" installed on your system, which can be obtained from [here](https://www.gnu.org/software/make/).
 
 Once you have Node.js, npm, Python, and make installed, follow these steps:
