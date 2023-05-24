@@ -2,6 +2,8 @@ import database.database
 from pydantic import BaseModel
 from fastapi import APIRouter, Depends, Response
 
+from typing import TypedDict
+
 router = APIRouter()
     
 class Datasource(BaseModel):
@@ -10,8 +12,15 @@ class Datasource(BaseModel):
     containerName: str
     description: str
 
+class GetDatasourcesResponse(BaseModel):
+  datasources: list[Datasource]
+
 @router.post("/api/datasources", status_code = 201)
 def create_datasource(datasource: Datasource, response: Response, db: object = Depends(database.database.db)):
+    """
+      Create a new datasource. The datasource will be henceforth identified by accountName_containerName which
+      must be unique or this function will return a 400.
+    """
     if db.datasources.find_one({"accountName" : datasource.accountName, "containerName" : datasource.containerName }):
         response.status_code = 400
         return "Datasource Already Exists"
@@ -19,7 +28,7 @@ def create_datasource(datasource: Datasource, response: Response, db: object = D
     return str(datasource_id)
 
 @router.get("/api/datasources")
-def get_datasources(db: object = Depends(database.database.db)):
+def get_datasources(db: object = Depends(database.database.db)) -> GetDatasourcesResponse:
     datasources = db.datasources.find()
     result = []
     for datasource in datasources:
