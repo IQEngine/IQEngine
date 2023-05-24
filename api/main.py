@@ -1,9 +1,11 @@
 # vim: tabstop=4 shiftwidth=4 expandtab
     
 import os
+from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 
-from database.database import create_db_client
+load_dotenv()
+
 from handlers.datasources import router as datasources_router
 from handlers.metadata import router as metadata_router
 from handlers.status import router as status_router
