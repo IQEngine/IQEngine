@@ -5,24 +5,29 @@ import React, { useEffect } from 'react';
 import { useLocation, Outlet } from 'react-router-dom';
 import ReactGA from 'react-ga4';
 import ThemeSelector from './Components/Styles/ThemeSelector';
+import { configQuery } from './api/config/queries';
 
-// If env var is set, initialize google analytics
-if (import.meta.env.VITE_GOOGLE_ANALYTICS_KEY) {
-  ReactGA.initialize(import.meta.env.VITE_GOOGLE_ANALYTICS_KEY);
-}
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 export const App = () => {
   // Set up google analytics (if enabled) to only share the page path (does not include names of local files)
+  // ;
   const location = useLocation();
+  const config = configQuery();
   useEffect(() => {
-    if (process.env.VITE_GOOGLE_ANALYTICS_KEY) {
+    if (!config.data) return;
+    const analytics_key = config.data.googleAnalyticsKey;
+    if (analytics_key) {
+      ReactGA.initialize(analytics_key);
+    }
+    if (analytics_key) {
       window.gtag('event', 'page_view', {
         page_path: location.pathname + location.search + location.hash, // Note- we make sure to not include local file names in the urls, so they wont get sent to google analytics
         page_search: location.search,
         page_hash: location.hash,
       });
     }
-  }, [location]);
+  }, [config]);
 
   return (
     <ThemeSelector>
@@ -82,6 +87,7 @@ export const App = () => {
           </h2>
         </a>
       </div>
+      <ReactQueryDevtools initialIsOpen={false} />
     </ThemeSelector>
   );
 };

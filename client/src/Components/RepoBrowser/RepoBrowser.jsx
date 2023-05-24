@@ -2,19 +2,26 @@
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
 
-import React from 'react';
+import React, { useState } from 'react';
+import { useEffect } from 'react';
 import LocalFileBrowser from './LocalFileBrowser';
 import AzureBlobBrowser from './AzureBlobBrowser';
 import RepositoryTile from './RepositoryTile';
 import SiggenTile from './SiggenTile';
 import ValidatorTile from './ValidatorTile';
+import { configQuery } from '../../api/config/queries';
 
 const RepoBrowser = (props) => {
-  let tileObjInfo = [];
-  // In local mode, CONNECTION_INFO isn't defined
-  if (import.meta.env.VITE_CONNECTION_INFO) {
-    tileObjInfo = JSON.parse(import.meta.env.VITE_CONNECTION_INFO).settings;
-  }
+  let [tileObjInfo, setTitleObjInfo] = useState([]);
+  const config = configQuery();
+  useEffect(() => {
+    if (config.data) {
+      // In local mode, CONNECTION_INFO isn't defined
+      if (config.data.connectionInfo) {
+        setTitleObjInfo(config.data.connectionInfo.settings);
+      }
+    }
+  }, [config]);
 
   return (
     <div className="homePage">

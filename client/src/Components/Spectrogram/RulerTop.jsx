@@ -18,8 +18,9 @@ const RulerTop = (props) => {
     const temp_labels = [];
     for (let i = 0; i <= num_ticks; i++) {
       if (i % (num_ticks / 4) === 0) {
-        let f = ((i / num_ticks) * sampleRate - sampleRate / 2) / 1e6;
+        let f = (i / num_ticks) * sampleRate - sampleRate / 2;
         if (includeRfFreq) f = f + meta.captures[0]['core:frequency'];
+        f = f / 1e6; // convert to MHz
         if (f > 1000) {
           f = f.toExponential(); // converts to a string
           f = f.split('e+')[0].slice(0, 6) + 'e' + f.split('e+')[1]; // quick way to round to N digits and remove the + sign
