@@ -33,13 +33,14 @@ def create_meta(datasource_id, filepath, response: Response, db: object = Depend
 
       # Check datasource id is valid
       try:
-        datasource = db.datasources.find_one({"_id" : ObjectId(datasource_id)})
+        accountName, containerName = datasource_id.split("_")
+        datasource = db.datasources.find_one({"accountName" : accountName, "containerName" : containerName})
         if not datasource:
             response.status_code = 404
             return "Datasource Not Found"
-      except InvalidId:
+      except ValueError: # No '_' in datasource_id
           response.status_code = 400
-          return "Invalid ObjectId"
+          return "Invalid Datasource Id"
 
       # Check metadata doesn't already exist
       if db.metadata.find_one({'datasource_id': datasource_id, 'filepath': filepath}):

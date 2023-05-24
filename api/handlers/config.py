@@ -1,9 +1,10 @@
+import os
 from fastapi import APIRouter
 from dotenv import load_dotenv
 
 router = APIRouter()
 
-@router.route("/api/config")
+@router.get("/api/config")
 def get_config():
     load_dotenv()
     return {

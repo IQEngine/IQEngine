@@ -1,6 +1,6 @@
 import database.database
 from pydantic import BaseModel
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Response
 
 router = APIRouter()
     
@@ -11,8 +11,10 @@ class Datasource(BaseModel):
     description: str
 
 @router.post("/api/datasources", status_code = 201)
-def create_datasource(datasource: Datasource, db: object = Depends(database.database.db)):
-    # TODO: Validate input, what about collisions?
+def create_datasource(datasource: Datasource, response: Response, db: object = Depends(database.database.db)):
+    if db.datasources.find_one({"accountName" : datasource.accountName, "containerName" : datasource.containerName }):
+        response.status_code = 400
+        return "Datasource Already Exists"
     datasource_id = db.datasources.insert_one(datasource.dict()).inserted_id
     return str(datasource_id)
 
