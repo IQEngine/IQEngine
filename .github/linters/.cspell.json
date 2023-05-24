@@ -37,6 +37,13 @@
     "Lichtman",
     "Siggen",
     "sigmf",
-    "redoc"
+    "redoc",
+    "VITE",
+    "opencontainers",
+    "webapps",
+    "iqengineweb",
+    "datasource",
+    "dotenv",
+    "tanstack"
   ]
 }
