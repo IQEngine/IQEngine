@@ -163,7 +163,7 @@ The following roadmap highlights the past, current, and future work items across
 * Node 16
 * There needs to be a deployment slot called staging
 * within the GitHub repository settings under Secrets and vars > Actions, there needs to be a Repository secret with AZUREAPPSERVICE_PUBLISHPROFILE...
-* Connection settings live in GitHub Secrets > Actions (not Azure App Service anymore), enter it in without the outter double quotes and don't escape any quotes.
+* Connection settings live in GitHub Secrets > Actions (not Azure App Service anymore), enter it in without the outer double quotes and don't escape any quotes.
 
 <p align="center"><h1>IQEngine is Supported By:</h1></p>
 

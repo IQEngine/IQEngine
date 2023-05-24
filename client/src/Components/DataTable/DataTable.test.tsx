@@ -10,7 +10,7 @@ const dataColumns: DataColumn[] = require('./data-table.test.data-columns.json')
 const dataRows: DataRow[] = require('./data-table.test.data-rows.json');
 
 describe('Data table component', () => {
-  test('Display first 10 annotations on intitial view', async () => {
+  test('Display first 10 annotations on initial view', async () => {
     // Act
     render(<DataTable dataColumns={dataColumns} dataRows={dataRows} />);
 
@@ -25,7 +25,7 @@ describe('Data table component', () => {
     }
   });
 
-  test('Previous button disabled on intitial view', async () => {
+  test('Previous button disabled on initial view', async () => {
     // Act
     render(<DataTable dataColumns={dataColumns} dataRows={dataRows} />);
 
