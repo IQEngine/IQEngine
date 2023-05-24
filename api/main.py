@@ -1,10 +1,15 @@
 # vim: tabstop=4 shiftwidth=4 expandtab
     
 import os
+import sys
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 
 load_dotenv()
+
+if "RFDX_FF_INMEMDB" in os.environ and os.environ["RFDX_FF_INMEMDB"] != str('0'):
+    import database.database
+    database.database.db = database.database.db_inmem
 
 from handlers.datasources import router as datasources_router
 from handlers.metadata import router as metadata_router
