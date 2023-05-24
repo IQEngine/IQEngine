@@ -33,7 +33,7 @@ jobs:
         uses: release-drafter/release-drafter@v5
         with:
           config-name: release-drafter.yml
-          publish: true            
+          publish: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Login to GitHub Container Registry
@@ -57,5 +57,4 @@ jobs:
           VITE_IQENGINE_APP_VERSION: '$${{ secrets.VITE_IQENGINE_APP_VERSION }}'
           VITE_GOOGLE_ANALYTICS_KEY: '${{ secrets.VITE_GOOGLE_ANALYTICS_KEY }}'
           VITE_DETECTOR_ENDPOINT: '${{ secrets.VITE_DETECTOR_ENDPOINT }}'
-      
-      
+          NODE_ENV: production

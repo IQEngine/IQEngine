@@ -5,7 +5,7 @@
 import React, { useState, useEffect } from 'react';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
-import { GetConfigInstance } from '../../Config';
+import { configQuery } from '../../api/config/queries';
 
 export const DetectorPane = (props) => {
   let { meta, handleMeta, cursorsEnabled, handleProcessTime } = props;
@@ -14,32 +14,26 @@ export const DetectorPane = (props) => {
   const [selectedDetector, setSelectedDetector] = useState('default');
   const [detectorParams, setDetectorParams] = useState({});
   const [value, setValue] = useState(0); // integer state used to force rerender
-  // if (!config.detectorEndpoint) {
-  //   detectorEndpoint = 'http://127.0.0.1:8000/detectors/';
-  // }
-  // on component load perform a GET on /detectors to get list of detectors
+  const config = configQuery();
   useEffect(() => {
-    (async () => {
-      let config = await GetConfigInstance();
-      // In local mode, CONNECTION_INFO isn't defined
-      if (config.detectorEndpoint) {
-        detectorEndpoint = config.detectorEndpoint;
-      } else {
-        detectorEndpoint = 'http://127.0.0.1:8000/detectors/';
-      }
-      fetch(detectorEndpoint, { method: 'GET' })
-        .then(function (response) {
-          return response.json();
-        })
-        .then(function (data) {
-          console.log('Detectors:', data);
-          setDetectorList(data);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    })();
-  }, []);
+    if (!config.data) return;
+    let detectorEndpoint = 'http://127.0.0.1:8000/detectors/';
+    // In local mode, CONNECTION_INFO isn't defined
+    if (config.data.detectorEndpoint) {
+      detectorEndpoint = config.data.detectorEndpoint;
+    }
+    fetch(detectorEndpoint, { method: 'GET' })
+      .then(function (response) {
+        return response.json();
+      })
+      .then(function (data) {
+        console.log('Detectors:', data);
+        setDetectorList(data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, [config]);
 
   const handleChangeDetector = (e) => {
     setSelectedDetector(e.target.value);

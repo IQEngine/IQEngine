@@ -30,39 +30,43 @@ import RecordingsListContainer from './Containers/RecordingsListContainer';
 // @ts-ignore
 import { App } from './App';
 import { createRoot } from 'react-dom/client';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // @ts-ignore
-
+const queryClient = new QueryClient();
+queryClient.setQueryDefaults(['config'], { staleTime: Infinity });
 var new_version: boolean = false;
 // Select which version to run based on an environment variable
 const container = document.getElementById('root');
 if (!container) throw new Error('No root element found');
 const root = createRoot(container);
 root.render(
-  <Provider store={store}>
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<App />}>
-          <Route path="about" element={<About />} />
-          <Route path="sigmf" element={<SigMF />} />
-          <Route path="siggen" element={<SignalGenerator />} />
-          <Route path="plugins" element={<Plugins />} />
-          <Route path="validator" element={<Validator />} />
-          <Route
-            path="/openapi"
-            element={
-              <div className="bg-white">
-                <SwaggerUI url="https://raw.githubusercontent.com/IQEngine/IQEngine/main/detectors/openapi.yaml" />
-              </div>
-            }
-          />
-          <Route path="/" element={<RepoBrowserContainer />} />
-          <Route path="recordings/spectrogram/:recording" element={<SpectrogramContainer />} />
-          <Route path="recordings/:accountName?/:containerName?/:sasToken?" element={<RecordingsListContainer />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
-  </Provider>
+  <QueryClientProvider client={queryClient}>
+    <Provider store={store}>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<App />}>
+            <Route path="about" element={<About />} />
+            <Route path="sigmf" element={<SigMF />} />
+            <Route path="siggen" element={<SignalGenerator />} />
+            <Route path="plugins" element={<Plugins />} />
+            <Route path="validator" element={<Validator />} />
+            <Route
+              path="/openapi"
+              element={
+                <div className="bg-white">
+                  <SwaggerUI url="https://raw.githubusercontent.com/IQEngine/IQEngine/main/detectors/openapi.yaml" />
+                </div>
+              }
+            />
+            <Route path="/" element={<RepoBrowserContainer />} />
+            <Route path="recordings/spectrogram/:recording" element={<SpectrogramContainer />} />
+            <Route path="recordings/:accountName?/:containerName?/:sasToken?" element={<RecordingsListContainer />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </Provider>
+  </QueryClientProvider>
 );
 
 // If you want to start measuring performance in your app, pass a function

@@ -1,3 +1,5 @@
+#
+
 <p align="center">
   <img width=250 src="client/public/IQEngine_Black.svg" />
 </p>
@@ -19,7 +21,10 @@ IQEngine is rapidly evolving, so [sign up](https://dashboard.mailerlite.com/form
 
 ## Plugins
 
-Through the optional backend API, IQEngine supports three different classes of plugins (signal generation is not yet released).  The signal detector (with optional classifier) can be triggered in the main spectrogram page, which will display the output annotations as soon as it finishes, convenient for testing new detection/classification algorithms.  The DSP module runs prior to the FFT calculations, letting you perform a variety of signal processing functions and other sample manipulation.  It currently only supports Python snippets, where the samples out must be the same length as samples in (for now).
+Through the optional backend API, IQEngine supports three different classes of plugins (signal generation is not yet released).
+The signal detector (with optional classifier) can be triggered in the main spectrogram page, which will display the output annotations as soon as it finishes, convenient for testing new detection/classification algorithms.
+The DSP module runs prior to the FFT calculations, letting you perform a variety of signal processing functions and other sample manipulation.
+It currently only supports Python snippets, where the samples out must be the same length as samples in (for now).
 
 <p align="center">
   <img width=450 src="client/public/plugins_concept.svg" />
@@ -47,8 +52,10 @@ This command will launch IQEngine, and you can access it at [http://localhost:30
 
 ### Running from Source Code
 
-To run IQEngine from source code, you need to have Node.js and npm installed on your system. If you don't have them, you can download and install them from [here](https://nodejs.org/en/download/).
-Additionally, ensure that you have Python 3.10 or a higher version installed. You can download and install Python from [here](https://www.python.org/downloads/).
+To run IQEngine from source code, you need to have Node.js and npm installed on your system.
+If you don't have them, you can download and install them from [here](https://nodejs.org/en/download/).
+Additionally, ensure that you have Python 3.10 or a higher version installed.
+You can download and install Python from [here](https://www.python.org/downloads/).
 Lastly, you'll need to have "make" installed on your system, which can be obtained from [here](https://www.gnu.org/software/make/).
 
 Once you have Node.js, npm, Python, and make installed, follow these steps:
@@ -87,6 +94,14 @@ docker run -p 3000:3000 -d iqengine-local
 
 This will instantiate IQEngine using your locally built Docker image, and you can access it at [http://localhost:3000](http://localhost:3000).
 
+### Misc Tips
+
+To fix 99% of linting warnings automatically, try running:
+
+```bash
+docker run -d -v $(git rev-parse --show-toplevel):/tmp/lint ghcr.io/oxsecurity/megalinter:v6
+```
+
 ## Project Configuration
 
 To configure the project, you need to set specific environment variables. The currently supported environment variables are as follows:
@@ -99,8 +114,8 @@ To configure the project, you need to set specific environment variables. The cu
 
 * `METADATA_DB_CONNECTION_STRING`: This variable stores the connection string for the Metadata DB. If you don't want to utilize the Metadata DB, you can leave this variable empty. Please note that this variable is only used by the backend API.
 
-
 It's important to note that variables starting with `VITE` will only be available to the frontend during the build process. If you are using a public container image, these variables will not have an effect. To modify the values for the backend, use the corresponding environment variables without the `VITE` prefix.
+
 ## Project Roadmap
 
 The following roadmap highlights the past, current, and future work items across multiple (simultaneous) focus areas.  Not included in this list are ongoing efforts to make IQEngine valuable for use in education, as well as user experience (UX) improvements.
@@ -148,7 +163,7 @@ The following roadmap highlights the past, current, and future work items across
 * Node 16
 * There needs to be a deployment slot called staging
 * within the GitHub repository settings under Secrets and vars > Actions, there needs to be a Repository secret with AZUREAPPSERVICE_PUBLISHPROFILE...
-* Connection settings live in GitHub Secrets > Actions (not Azure App Service anymore), enter it in without the outter double quotes and don't escape any quotes.
+* Connection settings live in GitHub Secrets > Actions (not Azure App Service anymore), enter it in without the outer double quotes and don't escape any quotes.
 
 <p align="center"><h1>IQEngine is Supported By:</h1></p>
 
