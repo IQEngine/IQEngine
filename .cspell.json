@@ -8,7 +8,8 @@
     ".vscode",
     "package-lock.json",
     "megalinter-reports",
-    ".mega-linter.yml"
+    ".mega-linter.yml",
+    "example.env"
   ],
   "words": [
     "intance",
@@ -66,6 +67,8 @@
     "correlator",
     "wwwroot",
     "AZUREAPPSERVICE",
-    "clogo"
+    "clogo",
+    "simd",
+    "PUBLISHPROFILE"
   ]
 }
