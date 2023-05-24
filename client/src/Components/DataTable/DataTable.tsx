@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import Button from '@/Components/Button/Button';
 import { Table, Input, Select } from 'react-daisyui';
 
 export interface DataColumn {
@@ -38,7 +37,7 @@ export const DataTable = ({ dataColumns, dataRows }: TableProps) => {
         <div className="flex flex-row items-center">
           <span className="mr-2">Show</span>
           <Select
-            data-testid="pagesize"
+            aria-label="page size"
             value={pageSize}
             onChange={(e) => {
               setPageSize(Number(e.target.value));
@@ -55,18 +54,17 @@ export const DataTable = ({ dataColumns, dataRows }: TableProps) => {
         </div>
         <div>
           <Input
+            aria-label="filter"
             value={filterInput}
             onChange={(e) => {
               setFilterInput(e.target.value);
               setCurrentPage(1);
             }}
-            name="search"
             placeholder={`Search ${dataRows.length} records...`}
           />
         </div>
       </div>
-
-      <Table>
+      <Table aria-label="data table">
         <thead>
           <tr>
             {dataColumns?.map((column) => (
@@ -93,15 +91,22 @@ export const DataTable = ({ dataColumns, dataRows }: TableProps) => {
           ({filteredData.length} records)
         </div>
         <div className="flex flex-row">
-          <Button onClick={() => setCurrentPage((page) => Math.max(page - 1, 1))} disabled={currentPage === 1}>
+          <button
+            aria-label="previous page"
+            className="btn-primary"
+            onClick={() => setCurrentPage((page) => Math.max(page - 1, 1))}
+            disabled={currentPage === 1}
+          >
             Prev
-          </Button>
-          <Button
+          </button>
+          <button
+            aria-label="next page"
+            className="btn-primary"
             onClick={() => setCurrentPage((page) => Math.min(page + 1, maxPage))}
             disabled={currentPage === maxPage}
           >
             Next
-          </Button>
+          </button>
         </div>
       </div>
     </div>
