@@ -15,17 +15,12 @@ export const DetectorPane = (props) => {
   const [detectorParams, setDetectorParams] = useState({});
   const [value, setValue] = useState(0); // integer state used to force rerender
   const config = configQuery();
-  // if (!config.detectorEndpoint) {
-  //   detectorEndpoint = 'http://127.0.0.1:8000/detectors/';
-  // }
-  // on component load perform a GET on /detectors to get list of detectors
   useEffect(() => {
-    if(!config.data) return;
+    if (!config.data) return;
+    let detectorEndpoint = 'http://127.0.0.1:8000/detectors/';
     // In local mode, CONNECTION_INFO isn't defined
     if (config.data.detectorEndpoint) {
       detectorEndpoint = config.data.detectorEndpoint;
-    } else {
-      detectorEndpoint = 'http://127.0.0.1:8000/detectors/';
     }
     fetch(detectorEndpoint, { method: 'GET' })
       .then(function (response) {
