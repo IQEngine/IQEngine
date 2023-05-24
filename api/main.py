@@ -4,6 +4,7 @@ import os
 import sys
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
+from fastapi.staticfiles import StaticFiles
 
 load_dotenv()
 
@@ -21,6 +22,7 @@ app.include_router(datasources_router)
 app.include_router(metadata_router)
 app.include_router(status_router)
 app.include_router(config_router)
+app.mount("/", StaticFiles(directory="iqengine", html = True), name="iqengine")
 
 if __name__ == "__main__":
     print("Cannot be run standalone. Do 'uvicorn main:app' instead")

@@ -6,6 +6,9 @@ router = APIRouter()
 
 @router.get("/api/config")
 def get_config():
+    """
+      Fetch config info for RFDX
+    """
     load_dotenv()
     return {
         "detectorEndpoint": os.environ.get("DETECTOR_ENDPOINT", None),
