@@ -20,6 +20,7 @@ export const DetectorPane = (props) => {
   // }
   // on component load perform a GET on /detectors to get list of detectors
   useEffect(() => {
+    if(!config.data) return;
     // In local mode, CONNECTION_INFO isn't defined
     if (config.data.detectorEndpoint) {
       detectorEndpoint = config.data.detectorEndpoint;
