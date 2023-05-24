@@ -162,3 +162,30 @@ div.datatypetext {
   box-shadow: 0 0 5px 5px #0099e0;
   box-shadow: 0 0 5px 5px #0099e0;
 }
+
+
+.no-spin::-webkit-inner-spin-button, .no-spin::-webkit-outer-spin-button {
+  -webkit-appearance: none !important;
+  margin: 0 !important;
+}
+
+.no-spin {
+    -moz-appearance:textfield !important;
+}
+
+.hide {
+  position: absolute;
+  opacity: 0;
+  z-index: -100;
+  white-space: pre;
+}
+
+.input {
+  min-width: 1px;
+  padding: 0;
+  max-width: 220px;
+}
+
+.input-number {
+  max-width:60px;
+}

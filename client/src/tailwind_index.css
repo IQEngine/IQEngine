@@ -50,4 +50,8 @@
   .leadership-card-body {
     @apply w-56 bg-iqengine-bg rounded-b-xl p-2 text-center;
   }
+
+  .btn-primary {
+    @apply bg-iqengine-secondary hover:bg-iqengine-secondary hover:bg-opacity-50 text-white py-2 px-3 rounded;
+  }
 }

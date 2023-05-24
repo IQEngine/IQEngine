@@ -3,8 +3,8 @@
 // Licensed under the MIT License
 
 import React from 'react';
-// import { RedocStandalone } from 'redoc';
-// import { redocTheme } from './Utils/redocTheme';
+import SwaggerUI from 'swagger-ui-react';
+import 'swagger-ui-react/swagger-ui.css';
 // @ts-ignore
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
@@ -51,21 +51,14 @@ root.render(
             <Route path="siggen" element={<SignalGenerator />} />
             <Route path="plugins" element={<Plugins />} />
             <Route path="validator" element={<Validator />} />
-            {
-              // Remove redoc until we can get it to work with the new version of React
-              /* <Route
+            <Route
               path="/openapi"
               element={
-                <RedocStandalone
-                  options={{
-                    theme: redocTheme,
-                    hideDownloadButton: true,
-                  }}
-                  specUrl="https://raw.githubusercontent.com/IQEngine/IQEngine/main/detectors/openapi.yaml"
-                />
+                <div className="bg-white">
+                  <SwaggerUI url="https://raw.githubusercontent.com/IQEngine/IQEngine/main/detectors/openapi.yaml" />
+                </div>
               }
-            /> */
-            }
+            />
             <Route path="/" element={<RepoBrowserContainer />} />
             <Route path="recordings/spectrogram/:recording" element={<SpectrogramContainer />} />
             <Route path="recordings/:accountName?/:containerName?/:sasToken?" element={<RecordingsListContainer />} />
