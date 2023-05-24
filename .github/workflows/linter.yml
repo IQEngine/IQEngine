@@ -56,4 +56,3 @@ jobs:
           DEFAULT_BRANCH: main
           APPLY_FIXES: false
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SPELL_CSPELL_RULES_PATH: .github/linters/
