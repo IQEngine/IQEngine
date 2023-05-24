@@ -9,6 +9,10 @@ test_datasource = {
     "containerName" : "containerName",
     "description" : "description"
 }
+
+def test_api_get_config(client):
+    response = client.get("/api/config")
+    assert response.status_code == 200
  
 def test_api_returns_ok(client):
     response = client.get('/api/status') 
