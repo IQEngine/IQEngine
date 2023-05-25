@@ -19,6 +19,5 @@ RUN pip install --no-cache-dir -r ./requirements.txt
 COPY api ./
 COPY .en[v] ./
 COPY --from=build-step /app/build ./iqengine
-ENV FLASK_ENV production
 EXPOSE 3000
 CMD ["uvicorn", "--host", "0.0.0.0", "--port", "3000", "main:app"]
