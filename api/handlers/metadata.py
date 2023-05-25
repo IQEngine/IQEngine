@@ -101,8 +101,8 @@ def update_meta(
         {"accountName": accountName,"containerName":containerName, "filepath": filepath}
     )
     if exists is None:
-        response.status_code = 400
-        return {"error": "record does not exists"}
+        response.status_code = 404
+        return {"error":"Item not found"}
     else:
         latest_version = get_latest_version(db, accountName, containerName, filepath)
 

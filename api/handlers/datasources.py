@@ -23,7 +23,7 @@ def create_datasource(
     db: object = Depends(database.database.db),
 ):
     """
-    Create a new datasource. The datasource will be henceforth identified by accountName_containerName which
+    Create a new datasource. The datasource will be henceforth identified by accountName/containerName which
     must be unique or this function will return a 400.
     """
     if db.datasources.find_one(

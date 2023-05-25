@@ -71,7 +71,7 @@ def test_api_put_meta_not_existing(client):
     response = client.put(
         f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/file_path/meta', json={}
     )
-    assert response.status_code == 400
+    assert response.status_code == 404
 
 
 def test_api_get_meta(client):
