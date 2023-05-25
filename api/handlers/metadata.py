@@ -62,17 +62,25 @@ def create_meta(
         response.status_code = 400
         return {"error": "record already exists"}
 
-    # Create the first metadata record
-    initial_version = {
-        "version_number": 0,
-        "accountName": accountName,
-        "containerName": containerName,
-        "filepath": filepath,
-        "metadata": metadata,
-    }
-    db.metadata.insert_one(initial_version)
-    db.versions.insert_one(initial_version)
-    return "Success"
+    with db.client.start_session() as session:
+        session.start_transaction()
+        try:
+            # Create the first metadata record
+            initial_version = {
+                "version_number": 0,
+                "accountName": accountName,
+                "containerName": containerName,
+                "filepath": filepath,
+                "metadata": metadata,
+            }
+            db.metadata.insert_one(initial_version)
+            db.versions.insert_one(initial_version)
+            session.commit_transaction()
+            return "Success"
+        except:
+            session.abort_transaction()
+            response.status_code = 500
+            return "Transaction collision, try again"
 
 
 def get_latest_version(db, accountName,containerName, filepath):
@@ -106,23 +114,32 @@ def update_meta(
     else:
         latest_version = get_latest_version(db, accountName, containerName, filepath)
 
-        # This is going to be a race condition
-        version_number = latest_version["version_number"] + 1
-        current_version = db.metadata.find_one(
-            {"accountName": accountName,"containerName":containerName, "filepath": filepath}
-        )
-        doc_id = current_version["_id"]
+        with db.client.start_session() as session:
+            session.start_transaction()
+            try:
+                # This is going to be a race condition
+                version_number = latest_version["version_number"] + 1
+                current_version = db.metadata.find_one(
+                    {"accountName": accountName,"containerName":containerName, "filepath": filepath}
+                )
+                doc_id = current_version["_id"]
 
-        new_version = {
-            "version_number": version_number,
-            "accountName": accountName,
-            "containerName": containerName,
-            "filepath": filepath,
-            "metadata": metadata,
-        }
-        db.versions.insert_one(new_version)
-        db.metadata.update_one(
-            {"_id": doc_id},
-            {"$set": {"metadata": metadata, "version_number": version_number}},
-        )
-        return "Success"
+                new_version = {
+                    "version_number": version_number,
+                    "accountName": accountName,
+                    "containerName": containerName,
+                    "filepath": filepath,
+                    "metadata": metadata,
+                }
+                db.versions.insert_one(new_version)
+                db.metadata.update_one(
+                    {"_id": doc_id},
+                    {"$set": {"metadata": metadata, "version_number": version_number}},
+                )
+                session.commit_transaction()
+                response.status_code = 204
+                return "Success"
+            except:
+                session.abort_transaction()
+                response.status_code = 500
+                return "Transaction collision, try again"
