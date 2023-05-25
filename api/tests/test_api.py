@@ -114,9 +114,9 @@ def test_api_create_datasource(client):
 def test_api_get_datasources(client):
     response = client.get("/api/datasources")
     assert response.status_code == 200
-    assert len(response.json()["datasources"]) == 0
+    assert len(response.json()) == 0
 
     response = client.post("/api/datasources", json=test_datasource)
     response = client.get("/api/datasources")
     assert response.status_code == 200
-    assert len(response.json()["datasources"]) == 1
+    assert len(response.json()) == 1

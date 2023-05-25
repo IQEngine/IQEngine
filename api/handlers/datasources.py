@@ -12,8 +12,8 @@ class Datasource(BaseModel):
     description: str
 
 
-class GetDatasourcesResponse(BaseModel):
-    datasources: list[Datasource]
+#class GetDatasourcesResponse(BaseModel):
+#    datasources: list
 
 
 @router.post("/api/datasources", status_code=201)
@@ -41,10 +41,10 @@ def create_datasource(
 @router.get("/api/datasources")
 def get_datasources(
     db: object = Depends(database.database.db),
-) -> GetDatasourcesResponse:
+):
     datasources = db.datasources.find()
     result = []
     for datasource in datasources:
         datasource["_id"] = str(datasource["_id"])
         result.append(datasource)
-    return {"datasources": result}
+    return result
