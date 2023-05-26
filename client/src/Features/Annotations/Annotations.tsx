@@ -18,10 +18,6 @@ export const Annotations = ({ meta, totalIQSamples, updateSpectrogram }) => {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    setParents([]);
-  }, []);
-
-  useEffect(() => {
     setMetadata(meta);
   }, [meta]);
 
