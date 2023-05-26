@@ -3,7 +3,7 @@ import json
 import requests
 import argparse
 from dotenv import load_dotenv
-from azure.storage.blob import BlobServiceClient
+from azure.storage.blob import BlobServiceClient, ContainerClient, BlobClient
 from urllib.parse import quote
 
 # given the datasource details
@@ -22,14 +22,28 @@ def get_config():
         "STORAGE_SAS_KEY": os.environ.get("STORAGE_SAS_KEY")
     }
 
+def call_get_datasources_api(url):
+    return requests.get(url)
 
 def get_datasources(args):
+
+    config = get_config()
+
     url = f'{config["API_URL_BASE"]}/api/datasources'
-    resp = requests.get(url)
+    resp = call_get_datasources_api(url)
+
     print(resp.text)
 
+    return resp.text
+
+
+def call_create_datasource_api(url, data):
+    return requests.post(url, json=data)
 
 def create_datasource(args):
+
+    config = get_config()
+
     url = f'{config["API_URL_BASE"]}/api/datasources'
     data = {
         "name": f'{args.name}',
@@ -37,13 +51,23 @@ def create_datasource(args):
         "containerName": f'{args.containerName}',
         "description": f'{args.description}'
     }
-    resp = requests.post(url, json=data)
+    resp = call_create_datasource_api(url, json=data)
+
     print(resp.text)
 
+    return resp.text
 
+
+def call_get_all_metadata_api(url:str):
+    return requests.get(url)
+    
 def get_all_meta(args):
+    
+    config = get_config()
+    
     url = f'{config["API_URL_BASE"]}/api/datasources/{args.accountName}/{args.containerName}/meta'
-    resp = requests.get(url)
+    resp = call_get_all_metadata_api(url)
+
     items = json.loads(resp.text)
     if len(items) == 0:
         print(f"There are no items in account: {args.accountName}, container: {args.containerName}.")
@@ -51,17 +75,25 @@ def get_all_meta(args):
         for item in items:
             print(f"Account: {item['accountName']}, Container: {item['containerName']}, filepath: {item['filepath'].replace('(slash)', '/')}")
 
+    return resp.text
+
+def call_create_meta_api(url, payload):
+    return requests.post(url, json=payload)
 
 def create_meta(accountName: str, containerName: str, filepath: str, document: str):
-    
+
+    config = get_config()
+
     #quoted_filepath = quote(filepath, safe='')
     quoted_filepath = filepath.replace("/", "(slash)")
     url = f'{config["API_URL_BASE"]}/api/datasources/{accountName}/{containerName}/{quoted_filepath}/meta'
-    resp = requests.post(url, json=document)
-    print(resp.text)
+    resp = call_create_meta_api(url, json=document)
+    return resp.text
 
 
-def initial_load_meta_blob_storage(args):
+def initial_load_meta(args):
+
+    config = get_config()
 
     storage_url = config["STORAGE_ACCOUNT_URL"]
     storage_sas = config["STORAGE_SAS_KEY"]
@@ -69,6 +101,9 @@ def initial_load_meta_blob_storage(args):
     container_client = blob_service_client.get_container_client(container=args.containerName)
 
     blob_list = container_client.list_blobs()
+
+    return blob_list
+
     for blob in blob_list:
         
         # print(blob.name)
@@ -124,11 +159,10 @@ def start():
     metadata_addfolder_parser = metadata_subparsers.add_parser('addfolder')
     metadata_addfolder_parser.add_argument("-accountName")
     metadata_addfolder_parser.add_argument("-containerName")
-    metadata_addfolder_parser.set_defaults(func=initial_load_meta_blob_storage)
+    metadata_addfolder_parser.set_defaults(func=initial_load_meta)
 
     args = parser.parse_args()
     args.func(args)
 
 if __name__ == "__main__":
-    config = get_config()
     start()
