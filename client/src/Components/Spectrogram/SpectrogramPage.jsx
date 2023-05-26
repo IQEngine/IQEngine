@@ -16,20 +16,8 @@ import { RulerSide } from './RulerSide';
 import { TILE_SIZE_IN_IQ_SAMPLES, MAX_SIMULTANEOUS_FETCHES } from '../../Utils/constants';
 import TimeSelector from './TimeSelector';
 import { Navigate } from 'react-router-dom';
-import {
-  calculateDate,
-  calculateSampleCount,
-  getOriginalFrequency,
-  getFrequency,
-  getSeconds,
-  validateFrequency,
-  validateDate,
-} from '@/Utils/rfFunctions';
-import DataTable from '@/Components/DataTable/DataTable';
-import AutoSizeInput from '@/Components/AutoSizeInput/AutoSizeInput';
-import { ArrowRightIcon, ArrowDownTrayIcon, DocumentCheckIcon } from '@heroicons/react/24/outline';
-import { Temporal } from '@js-temporal/polyfill';
-import { DataSourceAPI } from '@/services/data-sources';
+import { ArrowDownTrayIcon } from '@heroicons/react/24/outline';
+import Annotations from '@/Features/Annotations/Annotations';
 
 async function initPyodide() {
   const pyodide = await window.loadPyodide();
@@ -79,7 +67,6 @@ class SpectrogramPage extends Component {
       includeRfFreq: false,
       plotWidth: 0,
       plotHeight: 0,
-      parents: [],
     };
   }
 
@@ -262,195 +249,6 @@ class SpectrogramPage extends Component {
     return { ...newState };
   }
 
-  getActions = (startSampleCount) => {
-    return (
-      <div>
-        <button
-          className="btn-primary"
-          onClick={() => {
-            const fractionIntoFile = startSampleCount / this.state.blob.totalIQSamples;
-            const handleTop = fractionIntoFile * this.state.spectrogramHeight;
-            this.fetchAndRender(handleTop);
-          }}
-        >
-          <ArrowRightIcon className="h-4 w-4" />
-        </button>
-      </div>
-    );
-  };
-
-  updateAnnotation = (value, parent) => {
-    let newInputValue = value;
-    let newAnnotationValue = value;
-    let metadata = { ...this.state.meta };
-
-    // Get the min and max frequencies
-    const minFreq = metadata.captures[0]['core:frequency'] - metadata.global['core:sample_rate'] / 2;
-    const maxFreq = metadata.captures[0]['core:frequency'] + metadata.global['core:sample_rate'] / 2;
-
-    // Get sample rate and sample start
-    const sampleRate = Number(metadata.global['core:sample_rate']);
-    const sampleStart = Number(parent.annotation['core:sample_start']);
-
-    // Get the start and end dates
-    const startDate = metadata.captures[0]['core:datetime'];
-    const endDate = calculateDate(metadata.captures[0]['core:datetime'], this.state.blob.totalIQSamples, sampleRate);
-
-    if (parent.name == 'core:freq_lower_edge') {
-      newAnnotationValue = getOriginalFrequency(value, parent.object.unit);
-      newInputValue = getFrequency(newAnnotationValue).freq;
-      parent.error = validateFrequency(newAnnotationValue, minFreq, maxFreq);
-    } else if (parent.name == 'core:freq_upper_edge') {
-      newAnnotationValue = getOriginalFrequency(value, parent.object.unit);
-      newInputValue = getFrequency(newAnnotationValue).freq;
-      parent.error = validateFrequency(newAnnotationValue, minFreq, maxFreq);
-    } else if (parent.name == 'core:sample_start') {
-      newAnnotationValue = calculateSampleCount(startDate, value, sampleRate);
-      parent.error = validateDate(value, startDate, endDate);
-    } else if (parent.name == 'core:sample_count') {
-      newAnnotationValue = calculateSampleCount(startDate, value, sampleRate) - sampleStart;
-      parent.error = validateDate(value, startDate, endDate);
-    }
-
-    let updatedAnnotation = parent.annotation;
-    updatedAnnotation[parent.name] = newAnnotationValue ? newAnnotationValue : updatedAnnotation[parent.name];
-    metadata.annotations[parent.index] = updatedAnnotation;
-
-    this.setState({ metadata });
-    this.fetchAndRender(this.state.handleTop);
-    return newInputValue;
-  };
-
-  calculateAnnotationsData = (metadata) => {
-    let data = [];
-    const startCapture = metadata?.captures[0];
-
-    if (startCapture && startCapture['core:datetime']) {
-      for (let i = 0; i < metadata.annotations?.length; i++) {
-        const annotation = metadata.annotations[i];
-        const sampleRate = Number(metadata.global['core:sample_rate']);
-        const startDate = Temporal.Instant.from(startCapture['core:datetime']);
-        const startSampleCount = new Number(annotation['core:sample_start']);
-        const sampleCount = new Number(annotation['core:sample_count']);
-
-        // Get description
-        const description = annotation['core:description'];
-
-        // Get start frequency range
-        const startFrequency = getFrequency(annotation['core:freq_lower_edge']);
-
-        // Get end frequency range
-        const endFrequency = getFrequency(annotation['core:freq_upper_edge']);
-
-        // Get bandwidth
-        const bandwidthHz = getFrequency(annotation['core:freq_upper_edge'] - annotation['core:freq_lower_edge']);
-
-        // Get start time range
-        const startTime = calculateDate(startDate, startSampleCount, sampleRate);
-
-        // Get start time range
-        const endTime = calculateDate(startDate, startSampleCount + sampleCount, sampleRate);
-
-        // Get duration
-        const duration = getSeconds(sampleCount / sampleRate);
-
-        this.state.parents[i] = {
-          description: {
-            index: i,
-            annotation: annotation,
-            object: description,
-            name: 'core:description',
-            error: this.state.parents[i]?.description?.error,
-          },
-          startFrequency: {
-            index: i,
-            annotation: annotation,
-            object: startFrequency,
-            name: 'core:freq_lower_edge',
-            error: this.state.parents[i]?.startFrequency?.error,
-          },
-          endFrequency: {
-            index: i,
-            annotation: annotation,
-            object: endFrequency,
-            name: 'core:freq_upper_edge',
-            error: this.state.parents[i]?.endFrequency?.error,
-          },
-          startTime: {
-            index: i,
-            annotation: annotation,
-            object: startTime,
-            name: 'core:sample_start',
-            error: this.state.parents[i]?.startTime?.error,
-          },
-          endTime: {
-            index: i,
-            annotation: annotation,
-            object: endTime,
-            name: 'core:sample_count',
-            error: this.state.parents[i]?.endTime?.error,
-          },
-        };
-
-        let currentData = {
-          annotation: i,
-          frequencyRange: (
-            <div className="flex flex-row">
-              <div>
-                <AutoSizeInput
-                  type="number"
-                  className={'input-number'}
-                  parent={this.state.parents[i].startFrequency}
-                  value={startFrequency.freq}
-                  onBlur={this.updateAnnotation}
-                />
-              </div>
-              <div>{startFrequency.unit} - </div>
-              <div>
-                <AutoSizeInput
-                  type="number"
-                  className={'input-number'}
-                  parent={this.state.parents[i].endFrequency}
-                  value={endFrequency.freq}
-                  onBlur={this.updateAnnotation}
-                />
-              </div>
-              <div>{endFrequency.unit}</div>
-            </div>
-          ),
-          bandwidthHz: bandwidthHz.freq + bandwidthHz.unit,
-          label: (
-            <AutoSizeInput
-              parent={this.state.parents[i].description}
-              value={description}
-              onBlur={this.updateAnnotation}
-            />
-          ),
-          timeRange: (
-            <div className="flex flex-row">
-              <div>
-                <AutoSizeInput
-                  parent={this.state.parents[i].startTime}
-                  value={startTime}
-                  onBlur={this.updateAnnotation}
-                />
-              </div>
-              <div> - </div>
-              <div>
-                <AutoSizeInput parent={this.state.parents[i].endTime} value={endTime} onBlur={this.updateAnnotation} />
-              </div>
-            </div>
-          ),
-          duration: duration.time + duration.unit,
-          actions: this.getActions(startSampleCount),
-        };
-
-        data.push(currentData);
-      }
-    }
-    return data;
-  };
-
   handleFftSize = (size) => {
     window.fftData = {};
     // need to do it this way because setState is async
@@ -608,17 +406,7 @@ class SpectrogramPage extends Component {
     }, 0);
   }
 
-  saveMeta = () => {
-    try {
-      const response = DataSourceAPI.PutMetadata(
-        this.state.connection.containerName,
-        this.state.connection.recording,
-        this.state.meta
-      );
-    } catch (e) {
-      console.log(response);
-    }
-  };
+  saveMeta = () => {};
 
   handleMetaChange = (e) => {
     const newMeta = JSON.parse(e.target.value);
@@ -725,6 +513,16 @@ class SpectrogramPage extends Component {
 
     this.renderImage(lowerTile, upperTile);
     return true;
+  };
+
+  updateSpectrogram = (startSampleCount) => {
+    if (startSampleCount) {
+      const fractionIntoFile = startSampleCount / this.state.blob.totalIQSamples;
+      const handleTop = fractionIntoFile * this.state.spectrogramHeight;
+      this.fetchAndRender(handleTop);
+    } else {
+      this.fetchAndRender(this.state.handleTop);
+    }
   };
 
   render() {
@@ -957,17 +755,10 @@ class SpectrogramPage extends Component {
               Annotations
             </summary>
             <div className="outline outline-1 outline-iqengine-primary p-2">
-              <DataTable
-                dataColumns={[
-                  { title: 'Annotation', dataIndex: 'annotation' },
-                  { title: 'Frequency Range', dataIndex: 'frequencyRange' },
-                  { title: 'BW', dataIndex: 'bandwidthHz' },
-                  { title: 'Label', dataIndex: 'label' },
-                  { title: 'Time Range', dataIndex: 'timeRange' },
-                  { title: 'Duration', dataIndex: 'duration' },
-                  { title: 'Actions', dataIndex: 'actions' },
-                ]}
-                dataRows={this.calculateAnnotationsData(this.state.meta)}
+              <Annotations
+                meta={this.state.meta}
+                totalIQSamples={this.state.blob.totalIQSamples}
+                updateSpectrogram={this.updateSpectrogram}
               />
             </div>
           </details>

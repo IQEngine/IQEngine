@@ -6,8 +6,8 @@ import { DataColumn, DataRow, DataTable } from '@/Components/DataTable/DataTable
 import React from 'react';
 
 // Arrange
-const dataColumns: DataColumn[] = require('./data-table.test.data-columns.json');
-const dataRows: DataRow[] = require('./data-table.test.data-rows.json');
+const dataColumns: DataColumn[] = require('./DataTable.test.columns.json');
+const dataRows: DataRow[] = require('./DataTable.test.rows.json');
 
 describe('Data table component', () => {
   test('Display first 10 annotations on initial view', async () => {
@@ -56,8 +56,8 @@ describe('Data table component', () => {
 
   test('Next button disabled when no more values on next page', async () => {
     // Arrange
-    const dataColumns: DataColumn[] = require('./data-table.test.data-columns.json');
-    const dataRows: DataRow[] = require('./data-table.test.data-rows.json').slice(0, 10);
+    const dataColumns: DataColumn[] = require('./DataTable.test.columns.json');
+    const dataRows: DataRow[] = require('./DataTable.test.rows.json').slice(0, 10);
 
     // Act
     render(<DataTable dataColumns={dataColumns} dataRows={dataRows.slice(0, 10)} />);

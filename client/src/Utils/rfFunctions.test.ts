@@ -142,8 +142,8 @@ describe('Validate date', () => {
   test.each`
     inputDate                 | minDate                   | maxDate                   | expected
     ${'2021-01-01T00:00:00Z'} | ${'2021-01-01T00:00:00Z'} | ${'2021-01-01T00:00:00Z'} | ${null}
-    ${'2021-01-01T00:00:00Z'} | ${'2021-01-02T00:00:00Z'} | ${'2021-01-02T00:00:00Z'} | ${'Start date must be after start of the file'}
-    ${'2021-01-01T00:00:01Z'} | ${'2021-01-01T00:00:00Z'} | ${'2021-01-01T00:00:00Z'} | ${'End date must be before end of the file'}
+    ${'2021-01-01T00:00:00Z'} | ${'2021-01-02T00:00:00Z'} | ${'2021-01-02T00:00:00Z'} | ${'Date must be after start of the file'}
+    ${'2021-01-01T00:00:01Z'} | ${'2021-01-01T00:00:00Z'} | ${'2021-01-01T00:00:00Z'} | ${'Date must be before end of the file'}
     ${'test'}                 | ${'2021-01-01T00:00:00Z'} | ${'2021-01-01T00:00:00Z'} | ${'Invalid date'}
     ${'2021-01-01T00:00:01Z'} | ${'test'}                 | ${'2021-01-01T00:00:00Z'} | ${'Invalid date'}
     ${'2021-01-01T00:00:01Z'} | ${'2021-01-01T00:00:00Z'} | ${'test'}                 | ${'Invalid date'}

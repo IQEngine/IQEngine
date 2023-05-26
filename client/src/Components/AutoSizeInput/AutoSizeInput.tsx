@@ -1,38 +1,49 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
 
-export const AutoSizeInput = ({ value, parent = null, type = 'text', className = null, onBlur = null }) => {
+export const AutoSizeInput = ({
+  value,
+  parent = null,
+  type = 'text',
+  className = null,
+  onBlur = null,
+  label = null,
+}) => {
   const [content, setContent] = useState(value);
   const [width, setWidth] = useState(0);
-  const [error, setError] = useState(parent?.error);
+  const [error, setError] = useState('');
   const span = useRef(null);
 
   useEffect(() => {
     setContent(value);
-    setError(parent?.error);
   }, [value]);
+
+  useEffect(() => {
+    setError(parent?.error);
+  }, [parent]);
 
   useEffect(() => {
     setWidth(span.current.offsetWidth);
   }, [content]);
 
-  const changeHandler = (evt) => {
+  const changeHandler = useCallback((evt) => {
     setContent(evt.target.value);
-  };
+  }, []);
 
-  const blurHandler = (evt) => {
-    if (onBlur !== null) {
-      const updated = onBlur(evt.target.value, parent);
-      setContent(updated);
-      setError(parent?.error);
-    }
-  };
+  const blurHandler = useCallback(
+    (evt) => {
+      if (onBlur !== null) {
+        onBlur(evt.target.value, parent);
+      }
+    },
+    [onBlur, parent]
+  );
 
-  const keyHandler = (evt) => {
+  const keyHandler = useCallback((evt) => {
     if (evt.key === 'Enter') {
       blurHandler(evt);
     }
-  };
+  }, []);
 
   return (
     <div>
@@ -41,6 +52,7 @@ export const AutoSizeInput = ({ value, parent = null, type = 'text', className =
       </span>
       <div className="flex flex-row">
         <input
+          aria-label={label}
           type={type ?? 'text'}
           title={content}
           value={content}
