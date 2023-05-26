@@ -1,9 +1,42 @@
 {
-  // Use IntelliSense to learn about possible attributes.
-  // Hover to view descriptions of existing attributes.
-  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
+    {
+      "name": "datasource list",
+      "type": "python",
+      "request": "launch",
+      "program": "${file}",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "args": ["datasource", "list"]
+    },
+    {
+      "name": "datasource create",
+      "type": "python",
+      "request": "launch",
+      "program": "${file}",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "args": ["datasource", "create", "-name", "golive", "-accountName", "golivemisc", "-containerName", "sigmf-metadata", "-description", "my sigmf metadata"]
+    },
+    {
+      "name": "metadata addfolder",
+      "type": "python",
+      "request": "launch",
+      "program": "${file}",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "args": ["metadata", "addfolder", "-accountName", "golivemisc", "-containerName", "sigmf-metadata"]
+    },
+    {
+      "name": "metadata list",
+      "type": "python",
+      "request": "launch",
+      "program": "${file}",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "args": ["metadata", "list", "-accountName", "golivemisc", "-containerName", "sigmf-metadata"]
+    },
     {
       "type": "msedge",
       "request": "launch",
