@@ -4,16 +4,18 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import {
+  updateConnectionAccountName,
+  updateConnectionContainerName,
+  updateConnectionSasToken,
+} from '../../Store/Actions/ConnectionActions';
+import { fetchRecordingsList } from '../../Store/Actions/RecordingsListActions';
 
 const RepositoryTile = (props) => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const {
-    item,
-    updateConnectionAccountName,
-    updateConnectionContainerName,
-    updateConnectionSasToken,
-    fetchRecordingsList,
-  } = props;
+  const { item } = props;
 
   const { name, accountName, containerName, imageURL, description, sasToken } = item;
   const [isDisabled, setIsDisabled] = useState(false);
@@ -46,10 +48,10 @@ const RepositoryTile = (props) => {
   }, [sasToken]);
 
   const handleOnClick = () => {
-    updateConnectionAccountName(accountName);
-    updateConnectionContainerName(containerName);
-    updateConnectionSasToken(sasToken);
-    fetchRecordingsList({ accountName: accountName, containerName: containerName, sasToken: sasToken });
+    dispatch(updateConnectionAccountName(accountName));
+    dispatch(updateConnectionContainerName(containerName));
+    dispatch(updateConnectionSasToken(sasToken));
+    dispatch(fetchRecordingsList({ accountName: accountName, containerName: containerName, sasToken: sasToken }));
     // so we can fetch when someone is linked to a repo directly
     navigate(
       '/recordings/?accountName=' +

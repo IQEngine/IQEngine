@@ -4,11 +4,19 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {
+  updateConnectionAccountName,
+  updateConnectionContainerName,
+  updateConnectionSasToken,
+} from '../../Store/Actions/ConnectionActions';
+import { useDispatch } from 'react-redux';
+import { fetchRecordingsList } from '../../Store/Actions/RecordingsListActions';
 
-const AzureBlobBrowser = (props) => {
-  const [accountName, setAccountName] = useState(props.accountName);
-  const [containerName, setContainerName] = useState(props.containerName);
-  const [sasToken, setSasToken] = useState(props.sasToken);
+const AzureBlobBrowser = () => {
+  const dispatch = useDispatch();
+  const [accountName, setAccountName] = useState('');
+  const [containerName, setContainerName] = useState('');
+  const [sasToken, setSasToken] = useState('');
   const navigate = useNavigate();
   const onAccountNameChange = (event) => {
     setAccountName(event.target.value);
@@ -24,10 +32,10 @@ const AzureBlobBrowser = (props) => {
 
   const onSubmit = async (event) => {
     event.preventDefault();
-    props.updateConnectionAccountName(accountName);
-    props.updateConnectionContainerName(containerName);
-    props.updateConnectionSasToken(sasToken);
-    props.fetchRecordingsList({ accountName: accountName, containerName: containerName, sasToken: sasToken });
+    dispatch(updateConnectionAccountName(accountName));
+    dispatch(updateConnectionContainerName(containerName));
+    dispatch(updateConnectionSasToken(sasToken));
+    dispatch(fetchRecordingsList({ accountName: accountName, containerName: containerName, sasToken: sasToken }));
     navigate('/recordings', { accountName: accountName, containerName: containerName, sasToken: sasToken }); // include args in URL for linking-sake
   };
 
