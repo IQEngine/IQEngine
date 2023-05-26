@@ -39,11 +39,14 @@ export const AutoSizeInput = ({
     [onBlur, parent]
   );
 
-  const keyHandler = useCallback((evt) => {
-    if (evt.key === 'Enter') {
-      blurHandler(evt);
-    }
-  }, []);
+  const keyHandler = useCallback(
+    (evt) => {
+      if (evt.key === 'Enter') {
+        blurHandler(evt);
+      }
+    },
+    [blurHandler]
+  );
 
   return (
     <div>

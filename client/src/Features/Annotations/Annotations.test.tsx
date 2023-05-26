@@ -11,7 +11,10 @@ describe('Annotations feature component', () => {
     cleanup();
   });
   test('Display correct data on initial view', async () => {
+    //Arrange
+    //Javascript keeps modifying the metadata object, so we have to make a copy of it
     const metadata = JSON.parse(JSON.stringify(metadataJson));
+
     // Act
     render(<Annotations meta={metadata} totalIQSamples={20000000} updateSpectrogram={() => {}} />);
 
@@ -37,7 +40,7 @@ describe('Annotations feature component', () => {
     ${'2022-03-17T16:42:30.0000Z'} | ${'Annotation 0 - End Time'}        | ${'textbox'}    | ${'Date must be after start of the file'}                             | ${8}
     ${'2022-03-17T16:45:30.0000Z'} | ${'Annotation 0 - End Time'}        | ${'textbox'}    | ${'Date must be before end of the file'}                              | ${9}
     ${'Invalid date'}              | ${'Annotation 0 - End Time'}        | ${'textbox'}    | ${'Invalid date'}                                                     | ${10}
-  `('Annotation errors display correctly', async ({ input, label, type, expected }) => {
+  `('Annotation errors display correctly on tab escape', async ({ input, label, type, expected }) => {
     //Arrange
     //Javascript keeps modifying the metadata object, so we have to make a copy of it
     const metadata = JSON.parse(JSON.stringify(metadataJson));
@@ -50,6 +53,35 @@ describe('Annotations feature component', () => {
     await userEvent.clear(start);
     await userEvent.type(start, input);
     await userEvent.tab();
+
+    // Assert
+    expect((await screen.findAllByText(expected))[0]).toBeInTheDocument();
+  });
+
+  test.each`
+    input                          | label                               | type            | expected                                                              | number
+    ${'0'}                         | ${'Annotation 0 - Frequency Start'} | ${'spinbutton'} | ${'Frequency must be greater than the minimum frequency of the file'} | ${1}
+    ${'8888'}                      | ${'Annotation 0 - Frequency Start'} | ${'spinbutton'} | ${'Frequency must be less than the maximum frequency of the file'}    | ${2}
+    ${'0'}                         | ${'Annotation 0 - Frequency End'}   | ${'spinbutton'} | ${'Frequency must be greater than the minimum frequency of the file'} | ${3}
+    ${'8888'}                      | ${'Annotation 0 - Frequency End'}   | ${'spinbutton'} | ${'Frequency must be less than the maximum frequency of the file'}    | ${4}
+    ${'2022-03-17T16:42:30.0000Z'} | ${'Annotation 0 - Start Time'}      | ${'textbox'}    | ${'Date must be after start of the file'}                             | ${5}
+    ${'2022-03-17T16:45:30.0000Z'} | ${'Annotation 0 - Start Time'}      | ${'textbox'}    | ${'Date must be before end of the file'}                              | ${6}
+    ${'Invalid date'}              | ${'Annotation 0 - Start Time'}      | ${'textbox'}    | ${'Invalid date'}                                                     | ${7}
+    ${'2022-03-17T16:42:30.0000Z'} | ${'Annotation 0 - End Time'}        | ${'textbox'}    | ${'Date must be after start of the file'}                             | ${8}
+    ${'2022-03-17T16:45:30.0000Z'} | ${'Annotation 0 - End Time'}        | ${'textbox'}    | ${'Date must be before end of the file'}                              | ${9}
+    ${'Invalid date'}              | ${'Annotation 0 - End Time'}        | ${'textbox'}    | ${'Invalid date'}                                                     | ${10}
+  `('Annotation errors display correctly on enter', async ({ input, label, type, expected }) => {
+    //Arrange
+    //Javascript keeps modifying the metadata object, so we have to make a copy of it
+    const metadata = JSON.parse(JSON.stringify(metadataJson));
+    render(<Annotations meta={metadata} totalIQSamples={20000000} updateSpectrogram={() => {}} />);
+
+    // Act
+    const start = await screen.findByRole(type, { name: label });
+
+    expect(screen.queryByText(expected)).not.toBeInTheDocument();
+    await userEvent.clear(start);
+    await userEvent.type(start, input + '[Enter]');
 
     // Assert
     expect((await screen.findAllByText(expected))[0]).toBeInTheDocument();
