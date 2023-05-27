@@ -1,4 +1,4 @@
-.PHONY: setup run-api run-react build-docker run-docker clean run-dev
+.PHONY: setup run-api run-react build-docker run-docker clean run-dev lint lint-corrections lint-no-corrections all test
 
 setup:
 	@echo "Setting up project dependencies..."
@@ -32,3 +32,14 @@ dev:
 	@cd api && flask run &
 	@cd client && npm run start
 
+
+lint:
+	@echo "Do you want to lint to correct the files? [y/N] " && read ans && if [ $${ans:-'N'} = 'y' ]; then make lint-corrections; else make lint-no-corrections;fi
+
+lint-corrections:
+	@echo "Linting with megalinter and applying corrections..."
+	@docker run -v $(shell git rev-parse --show-toplevel):/tmp/lint ghcr.io/oxsecurity/megalinter:v6
+
+lint-no-corrections:
+	@echo "Linting with megalinter..."
+	@docker run -e APPLY_FIXES=none -v $(shell git rev-parse --show-toplevel):/tmp/lint ghcr.io/oxsecurity/megalinter:v6

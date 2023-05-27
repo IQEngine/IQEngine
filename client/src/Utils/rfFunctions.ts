@@ -92,10 +92,10 @@ export function validateDate(current: string, start: string, end: string) {
     const startDate = Temporal.Instant.from(start);
     const endDate = Temporal.Instant.from(end);
     if (currentDate.epochMicroseconds < startDate.epochMicroseconds) {
-      return 'Start date must be after start of the file';
+      return 'Date must be after start of the file';
     }
     if (currentDate.epochMicroseconds > endDate.epochMicroseconds) {
-      return 'End date must be before end of the file';
+      return 'Date must be before end of the file';
     }
     return null;
   } catch {
