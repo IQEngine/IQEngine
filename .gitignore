@@ -33,3 +33,4 @@ client/build
 api/build
 megalinter-reports/
 .mypy_cache/
+.pytest_cache/

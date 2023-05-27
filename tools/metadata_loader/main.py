@@ -6,13 +6,6 @@ from dotenv import load_dotenv
 from azure.storage.blob import BlobServiceClient, ContainerClient, BlobClient
 from urllib.parse import quote
 
-# given the datasource details
-# given the folder
-# enumerate the files in the folder
-# for each one
-#     read the file
-#     call the create meta api
-
 def get_config():
     load_dotenv()
     return {
@@ -84,7 +77,6 @@ def create_meta(accountName: str, containerName: str, filepath: str, document: s
 
     config = get_config()
 
-    #quoted_filepath = quote(filepath, safe='')
     quoted_filepath = filepath.replace("/", "(slash)")
     url = f'{config["API_URL_BASE"]}/api/datasources/{accountName}/{containerName}/{quoted_filepath}/meta'
     resp = call_create_meta_api(url, payload=document)
@@ -105,10 +97,6 @@ def initial_load_meta(args):
     overall_response = True
     for blob in blob_list:
         
-        # print(blob.name)
-        # if blob.name == "/dir1/dir2/abc.sigmf-meta"
-        # then basename = abc.sigmf-meta, dirname = /dir1/dir2
-
         basename = os.path.basename(blob.name)
         parts = basename.split('.')
         if len(parts)<2 or parts[1] != 'sigmf-meta':
@@ -129,12 +117,14 @@ def initial_load_meta(args):
 
 
 def start():
-# commands
-# python main.py ...
-#    datasource add -name -accountName -containerName -description
-#    datasource list
-#    metadata list
-#    metadata addfolder -accountName -containerName -document
+    """
+        commands
+        python main.py ...
+        datasource add -name -accountName -containerName -description
+        datasource list
+        metadata list
+        metadata addfolder -accountName -containerName -document
+    """
     parser = argparse.ArgumentParser(description='Tools for working with a metadata database.')
     subparsers = parser.add_subparsers()
 
