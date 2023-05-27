@@ -3,7 +3,8 @@ sys.path.insert(0, '../metadata_loader')
 
 from metadata_loader.main import create_datasource, get_datasources, get_config
 from argparse import Namespace
-import json
+from unittest import TestCase
+from unittest.mock import patch
 
 
 def mock_request_get(*args, **kwargs):
@@ -25,22 +26,23 @@ def mock_request_post(*args, **kwargs):
             return self.text
 
     return MockResponse("added")
+
+mock_config = {"API_URL_BASE": "https://some.where.io", "STORAGE_ACCOUNT_URL": "https://acct.blob.core.windows.net", "STORAGE_SAS_KEY": "xyzzy"}
+
+class TestDatasources(TestCase):
     
-def test_get_datasources(mocker):
-    
-    config = {"API_URL_BASE": "", "STORAGE_ACCOUNT_URL": "", "STORAGE_CONNECTION_STRING": "", "STORAGE_SAS_KEY": ""}
-    mocker.patch('metadata_loader.main.get_config', return_value=config)
-    mocker.patch('metadata_loader.main.call_get_datasources_api', side_effect=mock_request_get)
+    @patch('metadata_loader.main.call_get_datasources_api', side_effect=mock_request_get)
+    @patch('metadata_loader.main.get_config', return_value=mock_config)
+    def test_get_datasources(self, mockConfig, mockCallGetDatasources):
 
-    args = Namespace()
-    assert get_datasources(args) == "[{'_id':'2342342342'}]"
+        mock_args = Namespace()
 
-def test_create_datasource(mocker):
+        self.assertEqual(get_datasources(mock_args),"[{'_id':'2342342342'}]")
 
-    config = {"API_URL_BASE": "", "STORAGE_ACCOUNT_URL": "", "STORAGE_CONNECTION_STRING": "", "STORAGE_SAS_KEY": ""}
-    mocker.patch('metadata_loader.main.get_config', return_value=config)
-    mocker.patch('metadata_loader.main.call_create_datasource_api', side_effect=mock_request_post)
+    @patch('metadata_loader.main.call_create_datasource_api', side_effect=mock_request_post)
+    @patch('metadata_loader.main.get_config', return_value=mock_config)
+    def test_create_datasource(self, mockConfig, mockCallCreateDatasource):
 
-    x = {'name': 'name', 'accountName': 'account', 'containerName': 'container', 'description': 'abc 123'}
-    args = Namespace(**x)
-    assert create_datasource(args) == 'added'
+        args = Namespace(**{'name': 'name', 'accountName': 'account', 'containerName': 'container', 'description': 'abc 123'})
+
+        self.assertEqual(create_datasource(args), 'added')

@@ -37,8 +37,8 @@ def get_datasources(args):
     return resp.text
 
 
-def call_create_datasource_api(url, data):
-    return requests.post(url, json=data)
+def call_create_datasource_api(url, payload):
+    return requests.post(url, json=payload)
 
 def create_datasource(args):
 
@@ -51,7 +51,7 @@ def create_datasource(args):
         "containerName": f'{args.containerName}',
         "description": f'{args.description}'
     }
-    resp = call_create_datasource_api(url, json=data)
+    resp = call_create_datasource_api(url, payload=data)
 
     print(resp.text)
 
@@ -87,7 +87,7 @@ def create_meta(accountName: str, containerName: str, filepath: str, document: s
     #quoted_filepath = quote(filepath, safe='')
     quoted_filepath = filepath.replace("/", "(slash)")
     url = f'{config["API_URL_BASE"]}/api/datasources/{accountName}/{containerName}/{quoted_filepath}/meta'
-    resp = call_create_meta_api(url, json=document)
+    resp = call_create_meta_api(url, payload=document)
     return resp.text
 
 
@@ -102,8 +102,7 @@ def initial_load_meta(args):
 
     blob_list = container_client.list_blobs()
 
-    return blob_list
-
+    overall_response = True
     for blob in blob_list:
         
         # print(blob.name)
@@ -122,7 +121,11 @@ def initial_load_meta(args):
         dirname = os.path.dirname(blob.name)
         filepath = f"{dirname}/{parts[0]}"
 
-        create_meta(args.accountName, args.containerName, filepath, blob_text)
+        resp = create_meta(args.accountName, args.containerName, filepath, blob_text)
+
+        overall_response = overall_response and resp == "Success"
+        
+    return overall_response
 
 
 def start():

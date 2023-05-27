@@ -3,8 +3,7 @@ sys.path.insert(0, '../metadata_loader')
 
 from metadata_loader.main import get_all_meta, create_meta, initial_load_meta, BlobServiceClient, ContainerClient, BlobClient
 from argparse import Namespace
-import json
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 from unittest import TestCase
 
 def mock_request_get(*args, **kwargs):
@@ -25,60 +24,71 @@ def mock_request_post(*args, **kwargs):
         def text(self):
             return self.text
 
-    return MockResponse("added")
+    return MockResponse("Success")
 
-def test_get_all_metadata(mocker):
-    
-    config = {"API_URL_BASE": "", "STORAGE_ACCOUNT_URL": "", "STORAGE_SAS_KEY": ""}
-    mocker.patch('metadata_loader.main.get_config', return_value=config)
-    mocker.patch('metadata_loader.main.call_get_all_metadata_api', side_effect=mock_request_get)
+mock_config = {"API_URL_BASE": "https://some.where.io", "STORAGE_ACCOUNT_URL": "https://acct.blob.core.windows.net", "STORAGE_SAS_KEY": "xyzzy"}
 
-    x = {'accountName': 'account', 'containerName': 'container'}
-    args = Namespace(**x)
-    assert get_all_meta(args) == '[]'
+class TestGetAllMetadata(TestCase):
 
-def test_create_metadata(mocker):
+    @patch('metadata_loader.main.call_get_all_metadata_api', side_effect=mock_request_get)
+    @patch('metadata_loader.main.get_config', return_value = mock_config)
+    def test_get_all_meta(self, mockConfig, mockCallGetAllMetadata):
+        
+        mock_args = Namespace(**{'accountName': 'account', 'containerName': 'container'})
 
-    config = {"API_URL_BASE": "", "STORAGE_ACCOUNT_URL": "", "STORAGE_SAS_KEY": ""}
-    mocker.patch('metadata_loader.main.get_config', return_value=config)
-    mocker.patch('metadata_loader.main.call_create_meta_api', side_effect=mock_request_post)
-
-    x = {'accountName': 'account', 'containerName': 'container', 'filepath': '/dir1/dir2/file.sigmf-meta', 'document': '{"abc":"123"}'}
-    args = Namespace(**x)
-    assert create_meta(args.accountName, args.containerName, args.filepath, args.document) == 'added'
+        self.assertEqual(get_all_meta(mock_args), '[]')
 
 
-def mock_list_blobs(*args, **kwargs):
+class TestCreateMetadata(TestCase):
 
-    class blob:
-        def __init__(self, name):
-            self.name = name
-        def name(self):
-            return self.name
+    @patch('metadata_loader.main.call_create_meta_api', side_effect=mock_request_post)
+    @patch('metadata_loader.main.get_config', return_value=mock_config)
+    def test_create_metadata(self, mockConfig, mockCallCreateMetaApi):
 
-    return [blob("abc"), blob('def')]
+        mock_args = Namespace(**{'accountName': 'account', 'containerName': 'container', 'filepath': '/dir1/dir2/file.sigmf-meta', 'document': '{"abc":"123"}'})
 
-class FakeBlobServiceClient:
-    def list_blobs():
-        return mock_list_blobs
+        self.assertEqual(
+            create_meta(mock_args.accountName, 
+            mock_args.containerName, 
+            mock_args.filepath, 
+            mock_args.document),'Success')
 
-class FakeContainer_Client:
+
+class blob:
+    def __init__(self, name):
+        self.name = name
+    def name(self):
+        return self.name
+
+mock_blobs = [blob("/dir1/def.sigmf-meta"), blob('/dir1'), blob('abc.sigmf-meta')]
+
+class MockBlobServiceClient:
     def get_container_client(container):
-        return FakeBlobServiceClient
+        return MockContainer_Client
 
+class MockContainer_Client:
+    def list_blobs():
+        return mock_blobs
+    def get_blob_client(blob):
+        return MockBlob_Client
+
+class MockBlob_Client:
+    def download_blob(**kwargs):
+        return MockDownloader
+
+class MockDownloader:
+    def readall():
+        return "{'some':'sigmf-metadata'}"
+    
 class TestInitialLoadClass(TestCase):
     
-    @patch('metadata_loader.main.BlobServiceClient', return_value = FakeContainer_Client)
-    @patch('metadata_loader.main.get_config')
-    def test_initial_load(self, mockConfig, mockBlobServiceClient):
+    @patch('metadata_loader.main.call_create_meta_api', side_effect=mock_request_post)
+    @patch('metadata_loader.main.BlobServiceClient', return_value = MockBlobServiceClient)
+    @patch('metadata_loader.main.get_config', return_value = mock_config)
+    def test_initial_load(self, mockConfig, mockBlobServiceClient, mockCallCreateMetaApi):
         
-        config = {"API_URL_BASE": "", "STORAGE_ACCOUNT_URL": "", "STORAGE_SAS_KEY": ""}
-        mockConfig.return_value = config
+        mock_args = Namespace(**{'accountName': 'account', 'containerName': 'container'})
 
-        x = {'accountName': 'account', 'containerName': 'container'}
-        args = Namespace(**x)
+        ret = initial_load_meta(mock_args)
 
-        ret = initial_load_meta(args)
-
-        self.assertEqual(ret, mock_list_blobs)
-
+        self.assertEqual(ret, True)
