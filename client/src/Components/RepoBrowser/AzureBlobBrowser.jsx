@@ -8,12 +8,11 @@ import {
   updateConnectionAccountName,
   updateConnectionContainerName,
   updateConnectionSasToken,
-} from '../../Store/Actions/ConnectionActions';
-import { useDispatch } from 'react-redux';
-import { fetchRecordingsList } from '../../Store/Actions/RecordingsListActions';
+} from '@/Store/Reducers/ConnectionReducer';
+import { useAppDispatch } from '@/Store/hooks';
 
 const AzureBlobBrowser = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const [accountName, setAccountName] = useState('');
   const [containerName, setContainerName] = useState('');
   const [sasToken, setSasToken] = useState('');
@@ -35,7 +34,6 @@ const AzureBlobBrowser = () => {
     dispatch(updateConnectionAccountName(accountName));
     dispatch(updateConnectionContainerName(containerName));
     dispatch(updateConnectionSasToken(sasToken));
-    dispatch(fetchRecordingsList({ accountName: accountName, containerName: containerName, sasToken: sasToken }));
     navigate('/recordings', { accountName: accountName, containerName: containerName, sasToken: sasToken }); // include args in URL for linking-sake
   };
 

@@ -22,7 +22,7 @@ import {
   updateBlobTotalIQSamples,
 } from '../Store/Actions/BlobActions';
 import { fetchMetaDataBlob, resetMeta } from '../Store/Actions/FetchMetaActions';
-import { fetchMinimap } from '../Store/Actions/MinimapActions';
+import { fetchMinimap } from '../Store/Reducers/MinimapActions';
 
 function mapStateToProps(state) {
   const { connectionReducer, blobReducer, fetchMetaReducer, minimapReducer } = state;

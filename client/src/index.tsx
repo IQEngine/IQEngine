@@ -24,12 +24,12 @@ import Validator from './Components/Validator/Validator';
 // @ts-ignore
 import SpectrogramContainer from './Containers/SpectrogramContainer';
 // @ts-ignore
-import RecordingsListContainer from './Containers/RecordingsListContainer';
-// @ts-ignore
 import { App } from './App';
 import { createRoot } from 'react-dom/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import RepoBrowser from './Components/RepoBrowser/RepoBrowser';
+import RecordingsBrowser from './Components/RecordingsBrowser/RecordingsBrowser';
+import SpectrogramPage from './Components/Spectrogram/SpectrogramPage';
 
 // @ts-ignore
 const queryClient = new QueryClient();
@@ -59,8 +59,8 @@ root.render(
               }
             />
             <Route path="/" element={<RepoBrowser />} />
-            <Route path="recordings/spectrogram/:recording" element={<SpectrogramContainer />} />
-            <Route path="recordings/:accountName?/:containerName?/:sasToken?" element={<RecordingsListContainer />} />
+            <Route path="recordings/spectrogram/:recording" element={<SpectrogramPage />} />
+            <Route path="recordings/:accountName?/:containerName?/:sasToken?" element={<RecordingsBrowser />} />
           </Route>
         </Routes>
       </BrowserRouter>

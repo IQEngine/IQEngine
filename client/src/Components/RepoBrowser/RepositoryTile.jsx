@@ -4,16 +4,18 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+
 import {
   updateConnectionAccountName,
   updateConnectionContainerName,
   updateConnectionSasToken,
-} from '../../Store/Actions/ConnectionActions';
-import { fetchRecordingsList } from '../../Store/Actions/RecordingsListActions';
+} from '@/Store/Reducers/ConnectionReducer';
+
+import { fetchRecordingsList } from '@/Store/Reducers/RecordingsListReducer';
+import { useAppDispatch } from '@/Store/hooks';
 
 const RepositoryTile = (props) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { item } = props;
 
@@ -47,11 +49,11 @@ const RepositoryTile = (props) => {
     setDayDifference(tempDayDifference);
   }, [sasToken]);
 
-  const handleOnClick = () => {
+  const handleOnClick = async () => {
     dispatch(updateConnectionAccountName(accountName));
     dispatch(updateConnectionContainerName(containerName));
     dispatch(updateConnectionSasToken(sasToken));
-    dispatch(fetchRecordingsList({ accountName: accountName, containerName: containerName, sasToken: sasToken }));
+    dispatch(fetchRecordingsList({ accountName, containerName, sasToken }));
     // so we can fetch when someone is linked to a repo directly
     navigate(
       '/recordings/?accountName=' +

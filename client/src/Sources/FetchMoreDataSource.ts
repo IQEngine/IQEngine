@@ -2,9 +2,6 @@
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
 
-import { createAsyncThunk } from '@reduxjs/toolkit';
-import { dataTypeToBytesPerSample } from '../Utils/selector';
-
 export function convolve(array, taps) {
   // make sure its an odd number of taps
   if (taps.length % 2 !== 1) taps.push(0);
@@ -110,39 +107,3 @@ export function readFileAsync(file) {
     reader.readAsArrayBuffer(file);
   });
 }
-
-const FetchMoreData = createAsyncThunk('FetchMoreData', async (args, thunkAPI) => {
-  console.log('running FetchMoreData');
-  const { tile, connection, blob, dataType, offset, count, pyodide } = args;
-
-  // offset and count are in IQ samples, convert to bytes
-  const bytesPerSample = dataTypeToBytesPerSample(dataType);
-  const offsetBytes = offset * bytesPerSample * 2; // FIXME at some point we need to specify whether real or complex
-  const countBytes = count * bytesPerSample * 2;
-
-  let samples;
-  let buffer;
-  let startTime = performance.now();
-  // tells us we're using blob storage
-  if (connection.datafilehandle === null) {
-    let { recording, blobClient } = connection;
-    while (recording === '') {
-      console.log('waiting'); // hopefully this doesn't happen, and if it does it should be pretty quick because its the time it takes for the state to set
-    }
-    const downloadBlockBlobResponse = await blobClient.download(offsetBytes, countBytes);
-    const blobResp = await downloadBlockBlobResponse.blobBody; // this is how you have to do it in browser, in backend you can use readableStreamBody
-    buffer = await blobResp.arrayBuffer();
-  } else {
-    // Use a local file
-    let handle = connection.datafilehandle;
-    const fileData = await handle.getFile();
-    buffer = await readFileAsync(fileData.slice(offsetBytes, offsetBytes + countBytes));
-  }
-  samples = convertToFloat32(buffer, dataType); // samples are kept as float32 under the hood for simplicity
-  samples = await applyProcessing(samples, blob.taps, blob.pythonSnippet, pyodide);
-
-  console.log('FetchMoreData() took', performance.now() - startTime, 'ms');
-  return { tile: tile, samples: samples, dataType: dataType }; // these represent the new samples
-});
-
-export default FetchMoreData;

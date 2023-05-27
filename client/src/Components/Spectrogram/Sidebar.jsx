@@ -16,7 +16,6 @@ const Sidebar = (props) => {
         </summary>
         <div className="outline outline-1 outline-iqengine-primary p-2">
           <SettingsPane
-            updateBlobTaps={props.updateBlobTaps}
             updateMagnitudeMax={props.updateMagnitudeMax}
             updateMagnitudeMin={props.updateMagnitudeMin}
             updateFftsize={props.updateFftsize}

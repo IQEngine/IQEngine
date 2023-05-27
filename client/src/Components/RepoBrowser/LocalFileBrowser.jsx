@@ -6,8 +6,12 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import parseMeta from '../../Utils/parseMeta';
 import { useDispatch } from 'react-redux';
-import { updateConnectionMetaFileHandle, updateConnectionDataFileHandle } from '../../Store/Actions/ConnectionActions';
-import { fetchRecordingsList } from '../../Store/Actions/RecordingsListActions';
+import {
+  updateConnectionMetaFileHandle,
+  updateConnectionDataFileHandle,
+  resetConnection,
+} from '../../Store/Reducers/ConnectionReducer';
+import { fetchRecordingsList, clearRecordingsList } from '@/Store/Reducers/RecordingsListReducer';
 
 function readFileAsync(file) {
   return new Promise((resolve, reject) => {
@@ -50,6 +54,8 @@ const LocalFileBrowser = () => {
   const directoryPickerAvailable = typeof window.showDirectoryPicker !== 'undefined'; // not all browsers support it yet
 
   const openFile = async () => {
+    dispatch(clearRecordingsList());
+    dispatch(resetConnection());
     const [handle1, handle2] = await window.showOpenFilePicker({ multiple: true });
     const file1 = await handle1.getFile();
     if (file1.name.includes('.sigmf-meta')) {
@@ -63,10 +69,13 @@ const LocalFileBrowser = () => {
   };
 
   const openDir = async () => {
+    dispatch(clearRecordingsList());
+    dispatch(resetConnection());
     const dirHandle = await window.showDirectoryPicker();
     const entries = await handleDirectoryEntry(dirHandle, [], '');
     //console.log(entries);
     dispatch(fetchRecordingsList({ entries: entries }));
+
     navigate('/recordings');
   };
 

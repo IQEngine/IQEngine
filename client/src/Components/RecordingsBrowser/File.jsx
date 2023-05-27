@@ -5,15 +5,18 @@
 import React, { useState } from 'react';
 import { Modal, ModalHeader, ModalBody } from 'reactstrap';
 import { Link } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '@/Store/hooks';
 
-export default function FileRow({
-  item,
+import {
   updateConnectionMetaFileHandle,
   updateConnectionDataFileHandle,
   updateConnectionRecording,
   updateConnectionBlobClient,
-  updateBlobTotalIQSamples,
-}) {
+} from '@/Store/Reducers/ConnectionReducer';
+import { updateBlobTotalIQSamples } from '../../Store/Reducers/BlobReducer';
+
+export default function FileRow({ item }) {
+  const dispatch = useAppDispatch();
   const [modal, setModal] = useState(false);
   const toggle = () => {
     setModal(!modal);
@@ -53,11 +56,11 @@ export default function FileRow({
             <Link
               to={'spectrogram/' + item.name.replace('.sigmf-meta', '')}
               onClick={() => {
-                updateConnectionMetaFileHandle(item.metaFileHandle);
-                updateConnectionDataFileHandle(item.dataFileHandle);
-                updateConnectionRecording(item.name.replace('.sigmf-meta', ''));
-                updateConnectionBlobClient(item.dataClient);
-                updateBlobTotalIQSamples(item.lengthInIQSamples);
+                dispatch(updateConnectionMetaFileHandle(item.metaFileHandle));
+                dispatch(updateConnectionDataFileHandle(item.dataFileHandle));
+                dispatch(updateConnectionRecording(item.name.replace('.sigmf-meta', '')));
+                dispatch(updateConnectionBlobClient(item.dataClient));
+                dispatch(updateBlobTotalIQSamples(item.lengthInIQSamples));
               }}
             >
               <div className="zoom">
@@ -69,11 +72,11 @@ export default function FileRow({
             <Link
               to={'spectrogram/' + item.name.replace('.sigmf-meta', '')}
               onClick={() => {
-                updateConnectionMetaFileHandle(item.metaFileHandle);
-                updateConnectionDataFileHandle(item.dataFileHandle);
-                updateConnectionRecording(item.name.replace('.sigmf-meta', ''));
-                updateConnectionBlobClient(item.dataClient);
-                updateBlobTotalIQSamples(item.lengthInIQSamples);
+                dispatch(updateConnectionMetaFileHandle(item.metaFileHandle));
+                dispatch(updateConnectionDataFileHandle(item.dataFileHandle));
+                dispatch(updateConnectionRecording(item.name.replace('.sigmf-meta', '')));
+                dispatch(updateConnectionBlobClient(item.dataClient));
+                dispatch(updateBlobTotalIQSamples(item.lengthInIQSamples));
               }}
             >
               <h2>{item.name.split('(slash)').slice(-1)[0].replace('.sigmf-meta', '')}</h2>
@@ -97,11 +100,11 @@ export default function FileRow({
             <Link
               to={'spectrogram/localfile'}
               onClick={() => {
-                updateConnectionMetaFileHandle(item.metaFileHandle);
-                updateConnectionDataFileHandle(item.dataFileHandle);
-                updateConnectionRecording(item.name.replace('.sigmf-meta', ''));
-                updateConnectionBlobClient(item.dataClient);
-                updateBlobTotalIQSamples(item.lengthInIQSamples);
+                dispatch(updateConnectionMetaFileHandle(item.metaFileHandle));
+                dispatch(updateConnectionDataFileHandle(item.dataFileHandle));
+                dispatch(updateConnectionRecording(item.name.replace('.sigmf-meta', '')));
+                dispatch(updateConnectionBlobClient(item.dataClient));
+                dispatch(updateBlobTotalIQSamples(item.lengthInIQSamples));
               }}
             >
               <h5>{item.name.split('(slash)').slice(-1)[0].replace('.sigmf-meta', '')}</h5>

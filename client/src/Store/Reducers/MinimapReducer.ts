@@ -2,13 +2,20 @@
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
 
-import { fetchMinimapFailure, fetchMinimapLoading, fetchMinimapSuccess } from '../Store/Actions/MinimapActions';
-import { applyProcessing, convertToFloat32, readFileAsync } from './FetchMoreDataSource';
-import { dataTypeToBytesPerSample } from '../Utils/selector';
+import { applyProcessing, convertToFloat32, readFileAsync } from '@/Sources/FetchMoreDataSource';
+import { dataTypeToBytesPerSample } from '@/Utils/selector';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
-export const FetchMinimap = (args) => async (dispatch) => {
+const initialState = {
+  status: 'idle',
+  minimap: {},
+  error: '',
+  size: 0,
+};
+
+export const fetchMinimap = createAsyncThunk('minimap/fetchMinimap', async (args: any, thunkAPI) => {
   console.log('running FetchMinimap');
-  dispatch(fetchMinimapLoading());
+  thunkAPI.dispatch(fetchMinimapLoading());
   const { tile, connection, blob, dataType, offset, count } = args;
 
   // offset and count are in IQ samples, convert to bytes
@@ -37,9 +44,31 @@ export const FetchMinimap = (args) => async (dispatch) => {
     samples = convertToFloat32(buffer, dataType); // samples are kept as float32 under the hood for simplicity
     samples = await applyProcessing(samples, blob.taps, blob.pythonSnippet, null);
   } catch (e) {
-    dispatch(fetchMinimapFailure(e));
+    thunkAPI.dispatch(fetchMinimapFailure(e));
   }
 
   console.log('Fetching minimap data took', performance.now() - startTime, 'milliseconds');
-  dispatch(fetchMinimapSuccess({ tile: tile, samples: samples, dataType: dataType })); // these represent the new samples
-};
+  thunkAPI.dispatch(fetchMinimapSuccess({ tile: tile, samples: samples, dataType: dataType })); // these represent the new samples
+});
+
+export const minimapSlicer = createSlice({
+  name: 'minimap',
+  initialState,
+  reducers: {
+    fetchMinimapLoading: (state) => {
+      state.status = 'loading';
+    },
+    fetchMinimapSuccess: (state, action) => {
+      state.status = 'idle';
+      state.minimap[action.payload.tile.toString()] = action.payload.samples;
+      state.size += 1;
+    },
+    fetchMinimapFailure: (state, action) => {
+      state.status = 'error';
+      state.error = action.payload;
+    },
+  },
+});
+
+export const { fetchMinimapLoading, fetchMinimapSuccess, fetchMinimapFailure } = minimapSlicer.actions;
+export default minimapSlicer.reducer;
