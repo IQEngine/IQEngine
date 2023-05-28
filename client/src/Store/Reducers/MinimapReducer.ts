@@ -8,7 +8,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   status: 'idle',
-  minimap: {},
+  iqData: {},
   error: '',
   size: 0,
 };
@@ -60,7 +60,7 @@ export const minimapSlicer = createSlice({
     },
     fetchMinimapSuccess: (state, action) => {
       state.status = 'idle';
-      state.minimap[action.payload.tile.toString()] = action.payload.samples;
+      state.iqData[action.payload.tile.toString()] = action.payload.samples;
       state.size += 1;
     },
     fetchMinimapFailure: (state, action) => {

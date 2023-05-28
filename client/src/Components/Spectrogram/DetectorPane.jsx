@@ -6,17 +6,21 @@ import React, { useState, useEffect } from 'react';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import { configQuery } from '../../api/config/queries';
+import { useAppDispatch, useAppSelector } from '@/Store/hooks';
+import { setMetaAnnotations } from '@/Store/Reducers/FetchMetaReducer';
 
 export const DetectorPane = (props) => {
-  let { meta, handleMeta, cursorsEnabled, handleProcessTime } = props;
+  let { cursorsEnabled, handleProcessTime } = props;
 
   const [detectorList, setDetectorList] = useState([]);
   const [selectedDetector, setSelectedDetector] = useState('default');
   const [detectorParams, setDetectorParams] = useState({});
   const [value, setValue] = useState(0); // integer state used to force rerender
+  const dispatch = useAppDispatch();
   const config = configQuery();
+  const meta = useAppSelector((state) => state.meta);
   useEffect(() => {
-    if (!config.data) return;
+    if (!config.data || !config.data.detectorEndpoint) return;
     let detectorEndpoint = 'http://127.0.0.1:8000/detectors/';
     // In local mode, CONNECTION_INFO isn't defined
     if (config.data.detectorEndpoint) {
@@ -36,6 +40,7 @@ export const DetectorPane = (props) => {
   }, [config]);
 
   const handleChangeDetector = (e) => {
+    if (!config.data || !config.data.detectorEndpoint) return;
     setSelectedDetector(e.target.value);
     setDetectorParams({}); // in case something goes wrong
     // Fetch the custom params for this detector
@@ -103,7 +108,7 @@ export const DetectorPane = (props) => {
         for (let i = 0; i < data.annotations.length; i++) {
           data.annotations[i]['core:sample_start'] += startSampleOffset;
         }
-        handleMeta(data.annotations); // update the annotations stored in meta state in SpectrogramPage
+        dispatch(setMetaAnnotations(data.annotations)); // update the annotations stored in meta state in SpectrogramPage
       });
   };
 

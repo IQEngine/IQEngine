@@ -7,27 +7,8 @@ import { fftshift } from 'fftshift';
 import { colMap } from './colormap';
 import { TILE_SIZE_IN_IQ_SAMPLES } from './constants';
 import { FFT } from '@/Utils/fft';
-
-declare global {
-  interface Window {
-    fftData: any;
-    annotations: Array<any>;
-    sampleRate: number;
-    iqData: any;
-  }
-}
-
-window.fftData = {}; // this is where our FFT outputs are stored
-window.annotations = []; // gets filled in before return
-window.sampleRate = 1; // will get filled in
-
-// This will get called when we go to a new spectrogram page
-export const clearAllData = () => {
-  window.fftData = {}; // this is where our FFT outputs are stored
-  window.annotations = []; // gets filled in before return
-  window.sampleRate = 1; // will get filled in
-  window.iqData = {}; // initialized in blobSlice.js but we have to clear it each time we go to another spectrogram page
-};
+import store from '@/Store/store';
+import { updateBlobFFTData } from '@/Store/Reducers/BlobReducer';
 
 function getStandardDeviation(array: Array<any>) {
   const n = array.length;
@@ -182,15 +163,16 @@ export const selectFft = (
   let magnitude_min = magnitudeMin;
   let tempCurrentFftMax = currentFftMax;
   let tempCurrentFftMin = currentFftMin;
+  let blob = store.getState().blob;
 
   // Go through each of the tiles and compute the FFT and save in window.fftData
   const tiles = range(Math.floor(lowerTile), Math.floor(upperTile) + 1);
   let autoMaxs = [];
   let autoMins = [];
   for (let tile of tiles) {
-    if (!(tile.toString() in window.fftData)) {
-      if (tile.toString() in window.iqData) {
-        let samples = window.iqData[tile.toString()];
+    if (blob.fftData[tile.toString()] === undefined) {
+      if (blob.iqData[tile.toString()] !== undefined) {
+        let samples = blob.iqData[tile.toString()];
         const { newFftData, autoMax, autoMin, newCurrentFftMax, newCurrentFftMin } = calcFftOfTile(
           samples,
           fftSize,
@@ -204,7 +186,7 @@ export const selectFft = (
         );
         tempCurrentFftMax = newCurrentFftMax;
         tempCurrentFftMin = newCurrentFftMin;
-        window.fftData[tile.toString()] = newFftData;
+        store.dispatch(updateBlobFFTData({ tile: tile.toString(), fftData: newFftData }));
         autoMaxs.push(autoMax);
         autoMins.push(autoMin);
         //console.log('Finished processing tile', tile);
@@ -213,13 +195,13 @@ export const selectFft = (
       }
     }
   }
-
+  blob = store.getState().blob;
   // Concatenate the full tiles
   let totalFftData = new Uint8ClampedArray(tiles.length * fftSize * numFftsPerTile * 4); // 4 because RGBA
   let counter = 0; // can prob make this cleaner with an iterator in the for loop below
   for (let tile of tiles) {
-    if (tile.toString() in window.fftData) {
-      totalFftData.set(window.fftData[tile.toString()], counter);
+    if (tile.toString() in blob.fftData) {
+      totalFftData.set(blob.fftData[tile.toString()], counter);
     } else {
       // If the tile isnt available, fill with ones (white)
       let fakeFftData = new Uint8ClampedArray(fftSize * numFftsPerTile * 4);
@@ -259,6 +241,7 @@ export const selectFft = (
 
   // Annotation portion
   let annotations_list = [];
+  let sampleRate = 1;
   for (let i = 0; i < meta.annotations.length; i++) {
     let freq_lower_edge = meta.annotations[i]['core:freq_lower_edge'];
     let freq_upper_edge = meta.annotations[i]['core:freq_upper_edge'];
@@ -271,8 +254,6 @@ export const selectFft = (
     let samples_in_window = (upperTile - lowerTile) * TILE_SIZE_IN_IQ_SAMPLES;
     let stop_sample_index = start_sample_index + samples_in_window;
     let center_frequency = meta.captures[0]['core:frequency'];
-    let sampleRate = meta.global['core:sample_rate'];
-    window.sampleRate = sampleRate;
     let lower_freq = center_frequency - sampleRate / 2;
     if (
       (sample_start >= start_sample_index && sample_start < stop_sample_index) ||
@@ -288,11 +269,9 @@ export const selectFft = (
       });
     }
   }
-  window.annotations = annotations_list;
   let selectFftReturn = {
     imageData: imageData,
-    annotations: window.annotations,
-    sampleRate: window.sampleRate,
+    annotations: annotations_list,
     autoMax: autoMaxs.length ? average(autoMaxs) : 255,
     autoMin: autoMins.length ? average(autoMins) : 0,
     currentFftMax: tempCurrentFftMax,

@@ -9,7 +9,7 @@ import { TimePlot } from './TimePlot';
 import { FrequencyPlot } from './FrequencyPlot';
 import { IQPlot } from './IQPlot';
 import { Layer, Image, Stage } from 'react-konva';
-import { selectFft, clearAllData, calculateTileNumbers, range } from '../../Utils/selector';
+import { selectFft, calculateTileNumbers, range } from '../../Utils/selector';
 import { AnnotationViewer } from './AnnotationViewer';
 import { RulerTop } from './RulerTop';
 import { RulerSide } from './RulerSide';
@@ -21,7 +21,7 @@ import { useState } from 'react';
 import { useAppSelector, useAppDispatch } from '@/Store/hooks';
 import { resetMetaObj, setMetaAnnotations, setMetaGlobal, fetchMeta } from '@/Store/Reducers/FetchMetaReducer';
 
-import { fetchMoreData } from '@/Store/Reducers/BlobReducer';
+import { fetchMoreData, resetBlobObject } from '@/Store/Reducers/BlobReducer';
 import { fetchMinimap } from '@/Store/Reducers/MinimapReducer';
 
 async function initPyodide() {
@@ -76,12 +76,12 @@ export const SpectrogramPage = (props) => {
   const connection = useAppSelector((state) => state.connection);
   const blob = useAppSelector((state) => state.blob);
   const meta = useAppSelector((state) => state.meta);
-  const minimap = useAppSelector((state) => state.minimap);
 
   const renderImage = () => {
-    if (!window.fftData || !window.iqData || lowerTile < 0 || upperTile < 0) {
+    if (lowerTile < 0 || upperTile < 0) {
       return;
     }
+    console.log('Rendering image');
     // Update the image (eventually this should get moved somewhere else)
     let ret = selectFft(
       lowerTile,
@@ -103,7 +103,7 @@ export const SpectrogramPage = (props) => {
       });
       if (autoscale && ret.autoMax) {
         console.log('New max/min:', ret.autoMax, ret.autoMin);
-        window.fftData = {};
+        //TODO: Reset fftData
         setAutoscale(false); // toggles it off so this only will happen once
         setMagnitudeMax(ret.autoMax);
         setMagnitudeMin(ret.autoMin);
@@ -126,7 +126,7 @@ export const SpectrogramPage = (props) => {
 
   useEffect(() => {
     renderImage(lowerTile, upperTile);
-  }, [blob]);
+  }, [blob.iqData]);
 
   const windowResized = () => {
     // Calc the area to be filled by the spectrogram
@@ -154,7 +154,7 @@ export const SpectrogramPage = (props) => {
     setPlotHeight(newPlotHeight);
 
     // Trigger re-render, but not when the window first loads
-    if (window.iqData) {
+    if (blob.iqData) {
       renderImage(lowerTile, upperTile);
     }
   };
@@ -176,7 +176,7 @@ export const SpectrogramPage = (props) => {
       }
       const tiles = range(Math.floor(currenlowerTile), Math.ceil(currentUpperTile));
       for (let tile of tiles) {
-        if (tile.toString() in window.iqData) {
+        if (blob.iqData[tile] !== undefined) {
           dispatch(
             fetchMoreData({
               blob: blob,
@@ -219,7 +219,6 @@ export const SpectrogramPage = (props) => {
 
   useEffect(() => {
     window.addEventListener('resize', windowResized);
-    clearAllData();
     if (!pyodide) {
       initPyodide().then((pyodide) => {
         setPyodide(pyodide);
@@ -228,7 +227,7 @@ export const SpectrogramPage = (props) => {
     return () => {
       window.removeEventListener('resize', windowResized);
       dispatch(resetMetaObj());
-      window.iqData = {};
+      dispatch(resetBlobObject());
     };
   }, []);
 
@@ -279,12 +278,12 @@ export const SpectrogramPage = (props) => {
     }
 
     // Update list of which tiles have been downloaded which minimap displays
-    let downloadedTiles = Object.keys(window.iqData);
+    let downloadedTiles = Object.keys(blob.iqData);
 
     // Fetch the tiles
     const tiles = range(Math.floor(calculatedTiles.lowerTile), Math.ceil(calculatedTiles.upperTile));
     for (let tile of tiles) {
-      if (!(tile.toString() in window.iqData)) {
+      if (blob.iqData[tile.toString()] === undefined) {
         downloadedTiles.push(tile.toString());
         dispatch(
           fetchMoreData({
@@ -299,8 +298,6 @@ export const SpectrogramPage = (props) => {
         );
       }
     }
-
-    downloadedTiles = downloadedTiles.filter((e) => !e.includes('minimap')); // remove minimap ones
     setDownloadedTiles(downloadedTiles);
     setUpperTile(calculatedTiles.upperTile);
     setLowerTile(calculatedTiles.lowerTile);
@@ -325,8 +322,8 @@ export const SpectrogramPage = (props) => {
     let currentSamples = new Float32Array(bufferLen);
     let counter = 0;
     for (let tile of tiles) {
-      if (tile.toString() in window.iqData) {
-        currentSamples.set(window.iqData[tile.toString()], counter);
+      if (blob.iqData[tile.toString()] !== undefined) {
+        currentSamples.set(blob.iqData[tile.toString()], counter);
       } else {
         console.log('Dont have iqData of tile', tile, 'yet');
       }
@@ -354,11 +351,7 @@ export const SpectrogramPage = (props) => {
           updateFftsize={setFFTSize}
           updateWindowChange={setFFTWindow}
           fft={fft}
-          blob={blob}
-          meta={meta}
           handleAutoScale={setAutoscale}
-          handleMetaGlobal={handleMetaGlobal}
-          handleMeta={handleMetaAnnotation}
           cursorsEnabled={cursorsEnabled}
           handleProcessTime={handleProcessTime}
           toggleCursors={(e) => {
@@ -434,8 +427,6 @@ export const SpectrogramPage = (props) => {
                     sampleRate={sampleRate}
                     spectrogramWidth={spectrogramWidth}
                     fft={fft}
-                    meta={meta}
-                    blob={blob}
                     spectrogramWidthScale={spectrogramWidth / fftSize}
                     includeRfFreq={includeRfFreq}
                   />
@@ -447,10 +438,8 @@ export const SpectrogramPage = (props) => {
                       <Image image={image} x={0} y={0} width={spectrogramWidth} height={spectrogramHeight} />
                     </Layer>
                     <AnnotationViewer
-                      handleMeta={handleMetaAnnotation}
                       annotations={annotations}
                       spectrogramWidthScale={spectrogramWidth / fftSize}
-                      meta={meta}
                       fftSize={fftSize}
                       lowerTile={lowerTile}
                       zoomLevel={zoomLevel}
@@ -480,13 +469,10 @@ export const SpectrogramPage = (props) => {
                   <Stage width={55} height={spectrogramHeight}>
                     <ScrollBar
                       fetchAndRender={fetchAndRender}
-                      totalIQSamples={blob.totalIQSamples}
                       spectrogramHeight={spectrogramHeight}
                       fftSize={fftSize}
                       minimapNumFetches={minimapNumFetches}
-                      meta={meta}
                       skipNFfts={skipNFfts}
-                      size={minimap.size}
                       downloadedTiles={downloadedTiles}
                       zoomLevel={zoomLevel}
                       handleTop={handleTop}

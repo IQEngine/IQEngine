@@ -5,9 +5,13 @@
 import React, { Fragment } from 'react';
 import { Layer, Rect, Text } from 'react-konva';
 import { TILE_SIZE_IN_IQ_SAMPLES } from '../../Utils/constants';
+import { useAppSelector, useAppDispatch } from '@/Store/hooks';
+import { setMetaAnnotations } from '@/Store/Reducers/FetchMetaReducer';
 
 const AnnotationViewer = (props) => {
-  let { spectrogramWidthScale, annotations, fftSize, meta, lowerTile, zoomLevel } = props;
+  const meta = useAppSelector((state) => state.meta);
+  const dispatch = useAppDispatch();
+  let { spectrogramWidthScale, annotations, fftSize, lowerTile, zoomLevel } = props;
 
   // These two lines are a hack used to force a re-render when an annotation is updated, which for some reason wasnt updating
   const [, updateState] = React.useState();
@@ -25,7 +29,7 @@ const AnnotationViewer = (props) => {
 
     // Now update the actual meta.annotations
     const f = annotations[annot_indx]['index']; // remember there are 2 different indexes- the ones on the screen and the meta.annotations
-    let updatedAnnotations = [...props.meta.annotations];
+    let updatedAnnotations = [...meta.annotations];
     let start_sample_index = lowerTile * TILE_SIZE_IN_IQ_SAMPLES;
     updatedAnnotations[f]['core:sample_start'] = annotations[annot_indx].y1 * fftSize * zoomLevel + start_sample_index;
     updatedAnnotations[f]['core:sample_count'] =
@@ -35,7 +39,7 @@ const AnnotationViewer = (props) => {
       (annotations[annot_indx].x1 / fftSize) * meta.global['core:sample_rate'] + lower_freq;
     updatedAnnotations[f]['core:freq_upper_edge'] =
       (annotations[annot_indx].x2 / fftSize) * meta.global['core:sample_rate'] + lower_freq;
-    props.handleMeta(updatedAnnotations);
+    dispatch(setMetaAnnotations(updatedAnnotations));
   }
 
   // add cursor styling
@@ -58,7 +62,7 @@ const AnnotationViewer = (props) => {
     forceUpdate(); // TODO remove the forceupdate and do it the proper way (possibly using spread?)
 
     // Add it to the meta.annotations as well. TODO: this is duplicate code
-    let updatedAnnotations = [...props.meta.annotations];
+    let updatedAnnotations = [...meta.annotations];
     annotations[annotations.length - 1]['index'] = updatedAnnotations.length;
     updatedAnnotations.push({});
     const f = updatedAnnotations.length - 1;
@@ -73,7 +77,7 @@ const AnnotationViewer = (props) => {
     updatedAnnotations[f]['core:freq_upper_edge'] =
       (annotations[annot_indx].x2 / fftSize) * meta.global['core:sample_rate'] + lower_freq;
     updatedAnnotations[f]['core:description'] = annotations[annot_indx]['description'];
-    props.handleMeta(updatedAnnotations);
+    dispatch(setMetaAnnotations(updatedAnnotations));
   };
 
   // Ability to update annotation labels
@@ -111,9 +115,9 @@ const AnnotationViewer = (props) => {
         console.log(textarea.value, textarea.id);
         annotations[textarea.id]['description'] = textarea.value; // update the local version first
         // Now update the actual meta info
-        let updatedAnnotations = [...props.meta.annotations];
+        let updatedAnnotations = [...meta.annotations];
         updatedAnnotations[annotations[textarea.id]['index']]['core:description'] = textarea.value;
-        props.handleMeta(updatedAnnotations);
+        dispatch(setMetaAnnotations(updatedAnnotations));
         document.body.removeChild(textarea);
         document.body.removeChild(textarea2);
         forceUpdate(); // TODO remove the forceupdate and do it the proper way (possibly using spread?)

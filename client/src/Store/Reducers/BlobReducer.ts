@@ -14,7 +14,9 @@ const initialState = {
   taps: new Float32Array(1).fill(1),
   pythonSnippet: '',
   numActiveFetches: 0,
-  iqdata: {},
+  iqData: {},
+  fftData: {},
+  sampleRate: 1,
 };
 
 export const fetchMoreData = createAsyncThunk('blob/fetchMoreData', async (args: any, thunkAPI) => {
@@ -68,8 +70,14 @@ export const blobSlicer = createSlice({
       state.totalIQSamples = action.payload;
     },
     updateBlobIQData: (state, action: PayloadAction<any>) => {
-      state.iqdata[action.payload.tile.toString()] = action.payload.samples;
+      state.iqData[action.payload.tile.toString()] = action.payload.samples;
       state.size += 1;
+    },
+    updateBlobFFTData: (state, action: PayloadAction<any>) => {
+      state.fftData[action.payload.tile.toString()] = action.payload.fftData;
+    },
+    updateBlobSampleRate: (state, action: PayloadAction<number>) => {
+      state.sampleRate = action.payload;
     },
     resetBlobObject: (state) => {
       state.size = 0;
@@ -79,7 +87,9 @@ export const blobSlicer = createSlice({
       state.taps = new Float32Array(1).fill(1);
       state.pythonSnippet = '';
       state.numActiveFetches = 0;
-      state.iqdata = {};
+      state.iqData = {};
+      state.fftData = {};
+      state.sampleRate = 1;
     },
   },
   extraReducers: (builder) => {
@@ -91,7 +101,7 @@ export const blobSlicer = createSlice({
       .addCase(fetchMoreData.fulfilled, (state, action) => {
         state.status = 'idle';
         state.numActiveFetches -= 1;
-        state.iqdata[action.payload.tile.toString()] = action.payload.samples;
+        state.iqData[action.payload.tile.toString()] = action.payload.samples;
         state.size += 1;
       })
       .addCase(fetchMoreData.rejected, (state) => {
@@ -108,5 +118,7 @@ export const {
   updateBlobTotalIQSamples,
   updateBlobIQData,
   resetBlobObject,
+  updateBlobFFTData,
+  updateBlobSampleRate,
 } = blobSlicer.actions;
 export default blobSlicer.reducer;

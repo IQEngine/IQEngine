@@ -15,11 +15,12 @@ import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import Toggle from 'react-toggle';
 import RangeSlider from 'react-bootstrap-range-slider';
 import 'react-bootstrap-range-slider/dist/react-bootstrap-range-slider.css';
-import { useDispatch } from 'react-redux';
 import { updateBlobTaps } from '../../Store/Reducers/BlobReducer';
+import { useAppSelector, useAppDispatch } from '@/Store/hooks';
 
 const SettingsPane = (props) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
+
   const [state, setState] = useState({
     size: 1024,
     taps: '[1]',
@@ -101,8 +102,7 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
       taps = Float32Array.from(taps);
       dispatch(updateBlobTaps(taps));
       // We apply the taps when we download the IQ data, so we have to clear both
-      window.iqData = {};
-      window.fftData = {};
+      dispatch(updateBlobIqData({}));
       console.log('valid taps, found', taps.length, 'taps');
     } else {
       console.alert('invalid taps');
@@ -118,8 +118,8 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
       taps = taps.map((x) => parseFloat(x));
       taps = Float32Array.from(taps);
       dispatch(updateBlobTaps(taps));
-      window.iqData = {};
-      window.fftData = {};
+      // We apply the taps when we download the IQ data, so we have to clear both
+      dispatch(updateBlobIqData({}));
       console.log('valid taps, found', taps.length, 'taps');
     } else {
       console.alert('invalid taps');
