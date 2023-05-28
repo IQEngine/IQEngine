@@ -21,7 +21,7 @@ import { useState } from 'react';
 import { useAppSelector, useAppDispatch } from '@/Store/hooks';
 import { resetMetaObj, setMetaAnnotations, setMetaGlobal, fetchMeta } from '@/Store/Reducers/FetchMetaReducer';
 
-import { fetchMoreData, resetBlobObject } from '@/Store/Reducers/BlobReducer';
+import { fetchMoreData, resetBlobObject, updateBlobSampleRate } from '@/Store/Reducers/BlobReducer';
 import { fetchMinimap } from '@/Store/Reducers/MinimapReducer';
 
 async function initPyodide() {
@@ -43,7 +43,6 @@ export const SpectrogramPage = (props) => {
   const [autoscale, setAutoscale] = useState(false);
   const [image, setImage] = useState(null);
   const [annotations, setAnnotations] = useState([]);
-  const [sampleRate, setSampleRate] = useState(1);
   const [dataType, setDataType] = useState('');
   const [upperTile, setUpperTile] = useState(-1);
   const [lowerTile, setLowerTile] = useState(-1);
@@ -121,6 +120,12 @@ export const SpectrogramPage = (props) => {
     } else {
       console.log('Data type:', meta.global['core:datatype']);
       setDataType(meta.global['core:datatype']);
+    }
+    if (meta && meta.global && !meta.global['core:sample_rate']) {
+      console.log('WARNING: Incorrect sample rate');
+    } else {
+      console.log('Sample rate:', meta.global['core:sample_rate']);
+      dispatch(updateBlobSampleRate(meta.global['core:sample_rate']));
     }
   }, [meta]);
 
@@ -423,10 +428,8 @@ export const SpectrogramPage = (props) => {
               <div className="flex flex-col pl-3">
                 <Stage width={spectrogramWidth + 110} height={rulerTopHeight}>
                   <RulerTop
-                    fftSize={fftSize}
-                    sampleRate={sampleRate}
+                    sampleRate={blob.sampleRate}
                     spectrogramWidth={spectrogramWidth}
-                    fft={fft}
                     spectrogramWidthScale={spectrogramWidth / fftSize}
                     includeRfFreq={includeRfFreq}
                   />
@@ -460,7 +463,7 @@ export const SpectrogramPage = (props) => {
                     <RulerSide
                       spectrogramWidth={spectrogramWidth}
                       fftSize={fftSize}
-                      sampleRate={sampleRate}
+                      sampleRate={blob.sampleRate}
                       currentRowAtTop={(lowerTile * TILE_SIZE_IN_IQ_SAMPLES) / fftSize}
                       spectrogramHeight={spectrogramHeight}
                     />

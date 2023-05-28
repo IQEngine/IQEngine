@@ -7,9 +7,8 @@ import { Layer, Rect, Text } from 'react-konva';
 import { useAppSelector } from '@/Store/hooks';
 
 const RulerTop = (props) => {
-  const blob = useAppSelector((state) => state.blob);
   const meta = useAppSelector((state) => state.meta);
-  let { fft, windowFunction, spectrogramWidth, fftSize, sampleRate, spectrogramWidthScale, includeRfFreq } = props;
+  let { spectrogramWidth, sampleRate, spectrogramWidthScale, includeRfFreq } = props;
 
   const [ticks, setTicks] = useState([]);
   const [labels, setLabels] = useState([]);
@@ -42,7 +41,7 @@ const RulerTop = (props) => {
 
     setTicks(temp_ticks);
     setLabels(temp_labels);
-  }, [blob, fft, meta, spectrogramWidth, windowFunction, fftSize, sampleRate, spectrogramWidthScale]);
+  }, [meta, spectrogramWidth, sampleRate, spectrogramWidthScale, includeRfFreq]);
 
   if (ticks.length > 1) {
     return (
