@@ -36,7 +36,7 @@ export const TimePlot = (props) => {
   }
 
   return (
-    <div>
+    <div className="px-3">
       <Plot
         data={[
           {
