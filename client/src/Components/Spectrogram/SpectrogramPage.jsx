@@ -141,7 +141,7 @@ export const SpectrogramPage = (props) => {
     if (meta) {
       renderImage(lowerTile, upperTile);
     }
-  }, [meta, fftWindow, zoomLevel, autoscale, fftSize, blob.iqData, lowerTile, upperTile]);
+  }, [meta, zoomLevel, autoscale, fftSize, blob.iqData, lowerTile, upperTile]);
 
   useEffect(() => {
     if (meta) {
@@ -152,7 +152,7 @@ export const SpectrogramPage = (props) => {
 
   useEffect(() => {
     fetchAndRender(handleTop);
-  }, [blob.taps]);
+  }, [blob.taps, fftWindow]);
 
   useEffect(() => {
     if (meta && meta.global && !meta.global['core:datatype']) {
