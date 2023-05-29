@@ -130,7 +130,7 @@ export const SpectrogramPage = (props) => {
 
   useEffect(() => {
     renderImage(lowerTile, upperTile);
-  }, [blob.iqData]);
+  }, [blob.iqData, lowerTile, upperTile]);
 
   const windowResized = () => {
     // Calc the area to be filled by the spectrogram
