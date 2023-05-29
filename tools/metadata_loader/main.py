@@ -12,9 +12,8 @@ def get_config():
     load_dotenv()
     return {
         "API_URL_BASE": os.environ.get("API_URL_BASE"),
-        "STORAGE_ACCOUNT_URL": os.environ.get("STORAGE_ACCOUNT_URL"),
-        "STORAGE_CONNECTION_STRING": os.environ.get("STORAGE_CONNECTION_STRING"),
-        "STORAGE_SAS_KEY": os.environ.get("STORAGE_SAS_KEY")
+        "BLOB_STORAGE_ACCOUNT_URL": os.environ.get("BLOB_STORAGE_ACCOUNT_URL"),
+        "BLOB_STORAGE_SAS_KEY": os.environ.get("BLOB_STORAGE_SAS_KEY")
     }
 
 
@@ -107,8 +106,8 @@ def initial_load_meta(args):
 
     config = get_config()
 
-    storage_url = config["STORAGE_ACCOUNT_URL"]
-    storage_sas = config["STORAGE_SAS_KEY"]
+    storage_url = config["BLOB_STORAGE_ACCOUNT_URL"]
+    storage_sas = config["BLOB_STORAGE_SAS_KEY"]
     blob_service_client = BlobServiceClient(account_url=storage_url,
                                             credential=storage_sas)
     container_client = blob_service_client.get_container_client(
