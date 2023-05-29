@@ -108,7 +108,6 @@ export const SpectrogramPage = (props) => {
         setMagnitudeMin(ret.autoMin);
       }
       setAnnotations(ret.annotations);
-      setSampleRate(ret.sampleRate);
       setCurrentFftMax(ret.currentFftMax);
       setCurrentFftMin(ret.currentFftMin);
     }
