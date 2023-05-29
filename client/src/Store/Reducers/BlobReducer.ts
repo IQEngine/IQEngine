@@ -20,7 +20,6 @@ const initialState = {
 };
 
 export const fetchMoreData = createAsyncThunk('blob/fetchMoreData', async (args: any, thunkAPI) => {
-  console.log('running FetchMoreData');
   const { tile, connection, blob, dataType, offset, count, pyodide } = args;
 
   // offset and count are in IQ samples, convert to bytes

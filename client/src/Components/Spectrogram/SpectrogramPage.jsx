@@ -80,7 +80,6 @@ export const SpectrogramPage = (props) => {
     if (lowerTile < 0 || upperTile < 0) {
       return;
     }
-    console.log('Rendering image');
     // Update the image (eventually this should get moved somewhere else)
     let ret = selectFft(
       lowerTile,
@@ -154,13 +153,11 @@ export const SpectrogramPage = (props) => {
     if (meta && meta.global && !meta.global['core:datatype']) {
       console.log('WARNING: Incorrect data type');
     } else {
-      console.log('Data type:', meta.global['core:datatype']);
       setDataType(meta.global['core:datatype']);
     }
     if (meta && meta.global && !meta.global['core:sample_rate']) {
       console.log('WARNING: Incorrect sample rate');
     } else {
-      console.log('Sample rate:', meta.global['core:sample_rate']);
       dispatch(updateBlobSampleRate(meta.global['core:sample_rate']));
     }
   }, [meta]);

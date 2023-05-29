@@ -60,7 +60,6 @@ const ScrollBar = (props) => {
       return;
     }
     const numIQDataFetch = Object.keys(minimap.iqData).length;
-    console.log(`numIQDataFetch ${numIQDataFetch}`);
     if (numIQDataFetch !== minimapNumFetches) {
       return;
     }

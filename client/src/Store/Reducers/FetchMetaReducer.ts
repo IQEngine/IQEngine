@@ -65,6 +65,9 @@ export const fetchMetaSlicer = createSlice({
     setMetaAnnotations: (state, action) => {
       state.annotations = action.payload;
     },
+    setMetaAnnotation(state, action) {
+      state.annotations[action.payload.index] = action.payload.annotation;
+    },
     setMetaCaptures: (state, action) => {
       state.captures = action.payload;
     },
@@ -85,6 +88,13 @@ export const fetchMetaSlicer = createSlice({
   },
 });
 
-export const { returnMetaDataBlob, resetMetaObj, setMeta, setMetaGlobal, setMetaAnnotations, setMetaCaptures } =
-  fetchMetaSlicer.actions;
+export const {
+  returnMetaDataBlob,
+  resetMetaObj,
+  setMeta,
+  setMetaGlobal,
+  setMetaAnnotations,
+  setMetaCaptures,
+  setMetaAnnotation,
+} = fetchMetaSlicer.actions;
 export default fetchMetaSlicer.reducer;

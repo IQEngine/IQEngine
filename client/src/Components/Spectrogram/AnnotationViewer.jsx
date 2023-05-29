@@ -6,7 +6,7 @@ import React, { Fragment } from 'react';
 import { Layer, Rect, Text } from 'react-konva';
 import { TILE_SIZE_IN_IQ_SAMPLES } from '../../Utils/constants';
 import { useAppSelector, useAppDispatch } from '@/Store/hooks';
-import { setMetaAnnotations } from '@/Store/Reducers/FetchMetaReducer';
+import { setMetaAnnotation } from '@/Store/Reducers/FetchMetaReducer';
 
 const AnnotationViewer = (props) => {
   const meta = useAppSelector((state) => state.meta);
@@ -31,16 +31,19 @@ const AnnotationViewer = (props) => {
     // Now update the actual meta.annotations
     const f = annotations[annot_indx]['index']; // remember there are 2 different indexes- the ones on the screen and the meta.annotations
     let updatedAnnotations = [...meta.annotations];
+    const updatedAnnotation = { ...updatedAnnotations[f] };
+    console.log(updatedAnnotation);
     let start_sample_index = lowerTile * TILE_SIZE_IN_IQ_SAMPLES;
-    updatedAnnotations[f]['core:sample_start'] = annotations[annot_indx].y1 * fftSize * zoomLevel + start_sample_index;
-    updatedAnnotations[f]['core:sample_count'] =
+    updatedAnnotation['core:sample_start'] = annotations[annot_indx].y1 * fftSize * zoomLevel + start_sample_index;
+    updatedAnnotation['core:sample_count'] =
       (annotations[annot_indx].y2 - annotations[annot_indx].y1) * fftSize * zoomLevel;
     let lower_freq = meta.captures[0]['core:frequency'] - meta.global['core:sample_rate'] / 2;
-    updatedAnnotations[f]['core:freq_lower_edge'] =
+    updatedAnnotation['core:freq_lower_edge'] =
       (annotations[annot_indx].x1 / fftSize) * meta.global['core:sample_rate'] + lower_freq;
-    updatedAnnotations[f]['core:freq_upper_edge'] =
+    updatedAnnotation['core:freq_upper_edge'] =
       (annotations[annot_indx].x2 / fftSize) * meta.global['core:sample_rate'] + lower_freq;
-    dispatch(setMetaAnnotations(updatedAnnotations));
+    console.log(updatedAnnotation);
+    dispatch(setMetaAnnotation({ annotation: updatedAnnotation, index: f }));
   }
 
   // add cursor styling
