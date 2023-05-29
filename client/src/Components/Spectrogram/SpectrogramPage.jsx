@@ -310,6 +310,10 @@ export const SpectrogramPage = (props) => {
     dispatch(setMetaAnnotations(newMetaAnnotation));
   };
 
+  const toggleIncludeRfFreq = () => {
+    setIncludeRfFreq(!includeRfFreq);
+  };
+
   const handleProcessTime = () => {
     // these 2 are in units of tile (incl fraction of a tile)
     // Concatenate and trim the IQ Data associated with this range of samples
@@ -354,7 +358,7 @@ export const SpectrogramPage = (props) => {
           toggleCursors={(e) => {
             setCursorsEnabled(e.target.checked);
           }}
-          toggleIncludeRfFreq={setIncludeRfFreq}
+          toggleIncludeRfFreq={toggleIncludeRfFreq}
           updatePythonSnippet={(pythonSnippet) => {
             updateBlobPythonSnippet(pythonSnippet);
           }}
