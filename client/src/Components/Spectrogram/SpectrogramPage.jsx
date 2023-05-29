@@ -3,7 +3,7 @@
 // Licensed under the MIT License
 
 import { Sidebar } from './Sidebar';
-import { Component, useEffect } from 'react';
+import { useEffect } from 'react';
 import ScrollBar from './ScrollBar';
 import { TimePlot } from './TimePlot';
 import { FrequencyPlot } from './FrequencyPlot';
@@ -21,7 +21,6 @@ import { useState } from 'react';
 import { useAppSelector, useAppDispatch } from '@/Store/hooks';
 import { resetMetaObj, setMetaAnnotations, setMetaGlobal, fetchMeta } from '@/Store/Reducers/FetchMetaReducer';
 import { resetBlobFFTData } from '@/Store/Reducers/BlobReducer';
-
 import { fetchMoreData, resetBlobObject, updateBlobSampleRate } from '@/Store/Reducers/BlobReducer';
 import { fetchMinimap } from '@/Store/Reducers/MinimapReducer';
 
@@ -152,6 +151,10 @@ export const SpectrogramPage = (props) => {
   }, [magnitudeMax, magnitudeMin]);
 
   useEffect(() => {
+    fetchAndRender(handleTop);
+  }, [blob.taps]);
+
+  useEffect(() => {
     if (meta && meta.global && !meta.global['core:datatype']) {
       console.log('WARNING: Incorrect data type');
     } else {
@@ -226,7 +229,7 @@ export const SpectrogramPage = (props) => {
     return () => {
       window.removeEventListener('resize', windowResized);
       dispatch(resetMetaObj());
-      dispatch(resetBlobObject());
+      dispatch(resetBlobObject()); // is this needed?
     };
   }, []);
 

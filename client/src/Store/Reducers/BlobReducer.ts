@@ -68,15 +68,19 @@ export const blobSlicer = createSlice({
     updateBlobTotalIQSamples: (state, action: PayloadAction<number>) => {
       state.totalIQSamples = action.payload;
     },
-    updateBlobIQData: (state, action: PayloadAction<any>) => {
-      state.iqData[action.payload.tile.toString()] = action.payload.samples;
-      state.size += 1;
+    // doesnt appear to be used?
+    //updateBlobIQData: (state, action: PayloadAction<any>) => {
+    //  state.iqData[action.payload.tile.toString()] = action.payload.samples;
+    //  state.size += 1;
+    //},
+    resetBlobIQData: (state) => {
+      state.iqData = {};
+      state.fftData = {}; // fftdata should also get cleared if iqdata is cleared
     },
     updateBlobFFTData: (state, action: PayloadAction<any>) => {
       state.fftData[action.payload.tile.toString()] = action.payload.fftData;
     },
     resetBlobFFTData: (state) => {
-      console.log('CLEARED FFTTTTTTTTTTTTTTTT');
       state.fftData = {};
     },
     updateBlobSampleRate: (state, action: PayloadAction<number>) => {
@@ -119,7 +123,8 @@ export const {
   updateBlobPythonSnippet,
   updateBlobSize,
   updateBlobTotalIQSamples,
-  updateBlobIQData,
+  //updateBlobIQData,
+  resetBlobIQData,
   resetBlobObject,
   updateBlobFFTData,
   resetBlobFFTData,

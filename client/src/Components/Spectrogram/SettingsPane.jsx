@@ -15,8 +15,8 @@ import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import Toggle from 'react-toggle';
 import RangeSlider from 'react-bootstrap-range-slider';
 import 'react-bootstrap-range-slider/dist/react-bootstrap-range-slider.css';
-import { updateBlobTaps } from '../../Store/Reducers/BlobReducer';
-import { useAppSelector, useAppDispatch } from '@/Store/hooks';
+import { updateBlobTaps, resetBlobIQData } from '../../Store/Reducers/BlobReducer';
+import { useAppDispatch } from '@/Store/hooks';
 
 const SettingsPane = (props) => {
   const dispatch = useAppDispatch();
@@ -102,7 +102,7 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
       taps = Float32Array.from(taps);
       dispatch(updateBlobTaps(taps));
       // We apply the taps when we download the IQ data, so we have to clear both
-      dispatch(updateBlobIqData({}));
+      dispatch(resetBlobIQData());
       console.log('valid taps, found', taps.length, 'taps');
     } else {
       console.alert('invalid taps');
@@ -119,7 +119,8 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
       taps = Float32Array.from(taps);
       dispatch(updateBlobTaps(taps));
       // We apply the taps when we download the IQ data, so we have to clear both
-      dispatch(updateBlobIqData({}));
+      dispatch(resetBlobIQData());
+
       console.log('valid taps, found', taps.length, 'taps');
     } else {
       console.alert('invalid taps');
