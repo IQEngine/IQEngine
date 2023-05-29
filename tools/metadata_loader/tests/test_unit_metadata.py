@@ -1,7 +1,7 @@
 import sys
 sys.path.insert(0, '../metadata_loader')
 
-from metadata_loader.main import get_all_meta, create_meta, initial_load_meta, BlobServiceClient, ContainerClient, BlobClient
+from metadata_loader.main import get_all_meta, create_meta, initial_load_meta
 from argparse import Namespace
 from unittest.mock import patch
 from unittest import TestCase

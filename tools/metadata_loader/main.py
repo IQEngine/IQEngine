@@ -3,8 +3,7 @@ import json
 import requests
 import argparse
 from dotenv import load_dotenv
-from azure.storage.blob import BlobServiceClient, ContainerClient, BlobClient
-from urllib.parse import quote
+from azure.storage.blob import BlobServiceClient
 
 def get_config():
     load_dotenv()
