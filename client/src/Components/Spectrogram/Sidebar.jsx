@@ -26,7 +26,6 @@ const Sidebar = (props) => {
             magnitudeMin={props.magnitudeMin}
             toggleCursors={props.toggleCursors}
             toggleIncludeRfFreq={props.toggleIncludeRfFreq}
-            updatePythonSnippet={props.updatePythonSnippet}
             updateZoomLevel={props.updateZoomLevel}
           />
         </div>

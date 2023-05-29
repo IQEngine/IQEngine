@@ -17,6 +17,7 @@ import RangeSlider from 'react-bootstrap-range-slider';
 import 'react-bootstrap-range-slider/dist/react-bootstrap-range-slider.css';
 import { updateBlobTaps, resetBlobIQData } from '../../Store/Reducers/BlobReducer';
 import { useAppDispatch } from '@/Store/hooks';
+import { updateBlobPythonSnippet } from '@/Store/Reducers/BlobReducer';
 
 const SettingsPane = (props) => {
   const dispatch = useAppDispatch();
@@ -86,7 +87,8 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
   };
 
   const onSubmitPythonSnippet = () => {
-    props.updatePythonSnippet(state.pythonSnippet);
+    dispatch(resetBlobIQData());
+    dispatch(updateBlobPythonSnippet(state.pythonSnippet));
   };
 
   const onChangeTaps = (event) => {

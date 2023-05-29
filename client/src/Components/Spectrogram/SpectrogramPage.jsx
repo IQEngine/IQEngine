@@ -153,7 +153,7 @@ export const SpectrogramPage = (props) => {
   // Things that should trigger a fetch and render when changed
   useEffect(() => {
     fetchAndRender(handleTop);
-  }, [blob.taps, fftWindow, plotHeight]);
+  }, [blob.taps, fftWindow, plotHeight, zoomLevel, blob.pythonSnippet]);
 
   useEffect(() => {
     if (meta && meta.global && !meta.global['core:datatype']) {
@@ -239,10 +239,6 @@ export const SpectrogramPage = (props) => {
       dispatch(fetchMeta(connection));
     }
   }, [connection]);
-
-  useEffect(() => {
-    fetchAndRender(handleTop);
-  }, [zoomLevel]);
 
   const updateSpectrogram = (startSampleCount) => {
     if (startSampleCount) {
@@ -366,9 +362,6 @@ export const SpectrogramPage = (props) => {
             setCursorsEnabled(e.target.checked);
           }}
           toggleIncludeRfFreq={toggleIncludeRfFreq}
-          updatePythonSnippet={(pythonSnippet) => {
-            updateBlobPythonSnippet(pythonSnippet);
-          }}
           updateZoomLevel={setZoomLevel}
         />
         <div className="flex flex-col">
