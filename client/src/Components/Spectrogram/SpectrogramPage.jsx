@@ -150,9 +150,10 @@ export const SpectrogramPage = (props) => {
     }
   }, [magnitudeMax, magnitudeMin]);
 
+  // Things that should trigger a fetch and render when changed
   useEffect(() => {
     fetchAndRender(handleTop);
-  }, [blob.taps, fftWindow]);
+  }, [blob.taps, fftWindow, plotHeight]);
 
   useEffect(() => {
     if (meta && meta.global && !meta.global['core:datatype']) {
