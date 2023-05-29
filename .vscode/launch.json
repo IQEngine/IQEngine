@@ -24,7 +24,18 @@
       "program": "${file}",
       "console": "integratedTerminal",
       "justMyCode": true,
-      "args": ["datasource", "create", "-name", "golive", "-accountName", "golivemisc", "-containerName", "sigmf-metadata", "-description", "my sigmf metadata"]
+      "args": [
+        "datasource",
+        "create",
+        "-name",
+        "golive",
+        "-accountName",
+        "golivemisc",
+        "-containerName",
+        "sigmf-metadata",
+        "-description",
+        "my sigmf metadata"
+      ]
     },
     {
       "name": "metadata addfolder",

@@ -1,11 +1,12 @@
-import os
-import json
-import requests
 import argparse
-from dotenv import load_dotenv
+import json
+import os
+
+import requests
 from azure.storage.blob import (  # pyright: ignore[reportMissingImports]
-    BlobServiceClient
+    BlobServiceClient,
 )
+from dotenv import load_dotenv
 
 
 def get_config():
@@ -13,7 +14,7 @@ def get_config():
     return {
         "API_URL_BASE": os.environ.get("API_URL_BASE"),
         "BLOB_STORAGE_ACCOUNT_URL": os.environ.get("BLOB_STORAGE_ACCOUNT_URL"),
-        "BLOB_STORAGE_SAS_KEY": os.environ.get("BLOB_STORAGE_SAS_KEY")
+        "BLOB_STORAGE_SAS_KEY": os.environ.get("BLOB_STORAGE_SAS_KEY"),
     }
 
 
@@ -22,7 +23,6 @@ def call_get_datasources_api(url):
 
 
 def get_datasources(args):
-
     config = get_config()
 
     url = f'{config["API_URL_BASE"]}/api/datasources'
@@ -38,15 +38,14 @@ def call_create_datasource_api(url, payload):
 
 
 def create_datasource(args):
-
     config = get_config()
 
     url = f'{config["API_URL_BASE"]}/api/datasources'
     data = {
-        "name": f'{args.name}',
-        "accountName": f'{args.accountName}',
-        "containerName": f'{args.containerName}',
-        "description": f'{args.description}'
+        "name": f"{args.name}",
+        "accountName": f"{args.accountName}",
+        "containerName": f"{args.containerName}",
+        "description": f"{args.description}",
     }
     resp = call_create_datasource_api(url, payload=data)
 
@@ -60,13 +59,12 @@ def call_get_all_metadata_api(url: str):
 
 
 def get_all_meta(args):
-
     config = get_config()
 
     url = (
-            f'{config["API_URL_BASE"]}/api/datasources/'
-            f'{args.accountName}/{args.containerName}/meta'
-          )
+        f'{config["API_URL_BASE"]}/api/datasources/'
+        f"{args.accountName}/{args.containerName}/meta"
+    )
     resp = call_get_all_metadata_api(url)
 
     items = json.loads(resp.text)
@@ -90,41 +88,40 @@ def call_create_meta_api(url, payload):
 
 
 def create_meta(accountName: str, containerName: str, filepath: str, document: str):
-
     config = get_config()
 
     quoted_filepath = filepath.replace("/", "(slash)")
     url = (
         f'{config["API_URL_BASE"]}/api/datasources/{accountName}'
-        f'/{containerName}/{quoted_filepath}/meta'
+        f"/{containerName}/{quoted_filepath}/meta"
     )
     resp = call_create_meta_api(url, payload=document)
     return resp.text
 
 
 def initial_load_meta(args):
-
     config = get_config()
 
     storage_url = config["BLOB_STORAGE_ACCOUNT_URL"]
     storage_sas = config["BLOB_STORAGE_SAS_KEY"]
-    blob_service_client = BlobServiceClient(account_url=storage_url,
-                                            credential=storage_sas)
+    blob_service_client = BlobServiceClient(
+        account_url=storage_url, credential=storage_sas
+    )
     container_client = blob_service_client.get_container_client(
-            container=args.containerName)
+        container=args.containerName
+    )
 
     blob_list = container_client.list_blobs()
 
     overall_response = True
     for blob in blob_list:
-
         basename = os.path.basename(blob.name)
-        parts = basename.split('.')
-        if len(parts) < 2 or parts[1] != 'sigmf-meta':
+        parts = basename.split(".")
+        if len(parts) < 2 or parts[1] != "sigmf-meta":
             continue
 
         blob_client = container_client.get_blob_client(blob=blob.name)
-        downloader = blob_client.download_blob(max_concurrency=1, encoding='UTF-8')
+        downloader = blob_client.download_blob(max_concurrency=1, encoding="UTF-8")
         blob_text = downloader.readall()
 
         dirname = os.path.dirname(blob.name)
@@ -139,21 +136,22 @@ def initial_load_meta(args):
 
 def start():
     """
-        commands
-        python main.py ...
-            datasource add -name -accountName -containerName -description
-            datasource list
-            metadata list
-            metadata addfolder -accountName -containerName -document
+    commands
+    python main.py ...
+        datasource add -name -accountName -containerName -description
+        datasource list
+        metadata list
+        metadata addfolder -accountName -containerName -document
     """
-    parser = argparse.ArgumentParser(description='Metadata database tools.')
+    parser = argparse.ArgumentParser(description="Metadata database tools.")
     subparsers = parser.add_subparsers()
 
-    datasource_parser = subparsers.add_parser('datasource')
+    datasource_parser = subparsers.add_parser("datasource")
     datasource_subparsers = datasource_parser.add_subparsers()
 
     datasource_create_parser = datasource_subparsers.add_parser(
-            'create', description='Create a datasource')
+        "create", description="Create a datasource"
+    )
     datasource_create_parser.add_argument("-name", required=True)
     datasource_create_parser.add_argument("-accountName", required=True)
     datasource_create_parser.add_argument("-containerName", required=True)
@@ -161,19 +159,19 @@ def start():
     datasource_create_parser.set_defaults(func=create_datasource)
 
     datasource_list_parser = datasource_subparsers.add_parser(
-            'list', description='List all datasources'
+        "list", description="List all datasources"
     )
     datasource_list_parser.set_defaults(func=get_datasources)
 
-    metadata_parser = subparsers.add_parser('metadata')
+    metadata_parser = subparsers.add_parser("metadata")
     metadata_subparsers = metadata_parser.add_subparsers()
 
-    metadata_list_parser = metadata_subparsers.add_parser('list')
+    metadata_list_parser = metadata_subparsers.add_parser("list")
     metadata_list_parser.add_argument("-accountName", required=True)
     metadata_list_parser.add_argument("-containerName", required=True)
     metadata_list_parser.set_defaults(func=get_all_meta)
 
-    metadata_addfolder_parser = metadata_subparsers.add_parser('addfolder')
+    metadata_addfolder_parser = metadata_subparsers.add_parser("addfolder")
     metadata_addfolder_parser.add_argument("-accountName")
     metadata_addfolder_parser.add_argument("-containerName")
     metadata_addfolder_parser.set_defaults(func=initial_load_meta)
