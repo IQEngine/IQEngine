@@ -50,25 +50,25 @@ mock_blobs = [blob("/dir1/def.sigmf-meta"), blob('/dir1'), blob('abc.sigmf-meta'
 
 
 class MockBlobServiceClient:
-    def get_container_client(self, container):
+    def get_container_client(container):
         return MockContainer_Client
 
 
 class MockContainer_Client:
-    def list_blobs(self):
+    def list_blobs():  # type: ignore [misc]
         return mock_blobs
 
-    def get_blob_client(self, blob):
+    def get_blob_client(blob):
         return MockBlob_Client
 
 
 class MockBlob_Client:
-    def download_blob(self, **kwargs):
+    def download_blob(**kwargs):
         return MockDownloader
 
 
 class MockDownloader:
-    def readall(self):
+    def readall():  # type: ignore [misc]
         return "{'some':'sigmf-metadata'}"
 
 
