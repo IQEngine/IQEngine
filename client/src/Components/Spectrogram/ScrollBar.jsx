@@ -27,7 +27,6 @@ const ScrollBar = (props) => {
   const [ticks, setTicks] = useState([]);
   const [handleHeightPixels, setHandleHeightPixels] = useState();
   const [scalingFactor, setScalingFactor] = useState();
-  const fftData = useAppSelector((state) => state.blob.fftData);
   const totalIQSamples = useAppSelector((state) => state.blob.totalIQSamples);
   const meta = useAppSelector((state) => state.meta);
   const minimap = useAppSelector((state) => state.minimap);

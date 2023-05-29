@@ -106,6 +106,46 @@ export const SpectrogramPage = (props) => {
     }
   };
 
+  const fetchAndRender = (handleTop) => {
+    if (!meta || Object.keys(meta.global).length === 0) {
+      return;
+    }
+    const calculatedTiles = calculateTileNumbers(handleTop, blob.totalIQSamples, fftSize, spectrogramHeight, zoomLevel);
+
+    // If we already have too many pending fetches then bail
+    if (blob.numActiveFetches > MAX_SIMULTANEOUS_FETCHES) {
+      console.log('Hit limit of simultaneous fetches!');
+      return false;
+    }
+
+    // Update list of which tiles have been downloaded which minimap displays
+    let downloadedTiles = Object.keys(blob.iqData);
+
+    // Fetch the tiles
+    const tiles = range(Math.floor(calculatedTiles.lowerTile), Math.ceil(calculatedTiles.upperTile));
+    for (let tile of tiles) {
+      if (blob.iqData[tile.toString()] === undefined) {
+        downloadedTiles.push(tile.toString());
+        dispatch(
+          fetchMoreData({
+            tile: tile,
+            connection: connection,
+            blob: blob,
+            dataType: dataType,
+            offset: tile * TILE_SIZE_IN_IQ_SAMPLES, // in IQ samples
+            count: TILE_SIZE_IN_IQ_SAMPLES, // in IQ samples
+            pyodide: pyodide,
+          })
+        );
+      }
+    }
+    setDownloadedTiles(downloadedTiles);
+    setUpperTile(calculatedTiles.upperTile);
+    setLowerTile(calculatedTiles.lowerTile);
+    setHandleTop(handleTop);
+    return true;
+  };
+
   const windowResized = () => {
     // Calc the area to be filled by the spectrogram
     const windowHeight = window.innerHeight;
@@ -141,7 +181,7 @@ export const SpectrogramPage = (props) => {
     if (meta) {
       renderImage(lowerTile, upperTile);
     }
-  }, [meta, zoomLevel, autoscale, fftSize, blob.iqData, lowerTile, upperTile]);
+  }, [zoomLevel, autoscale, fftSize, blob.iqData, lowerTile, upperTile]);
 
   useEffect(() => {
     if (meta) {
@@ -166,6 +206,7 @@ export const SpectrogramPage = (props) => {
     } else {
       dispatch(updateBlobSampleRate(meta.global['core:sample_rate']));
     }
+    fetchAndRender(handleTop);
   }, [meta]);
 
   useEffect(() => {
@@ -263,45 +304,6 @@ export const SpectrogramPage = (props) => {
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
     }, 0);
-  };
-  const fetchAndRender = (handleTop) => {
-    if (!meta || Object.keys(meta.global).length === 0) {
-      return;
-    }
-    const calculatedTiles = calculateTileNumbers(handleTop, blob.totalIQSamples, fftSize, spectrogramHeight, zoomLevel);
-
-    // If we already have too many pending fetches then bail
-    if (blob.numActiveFetches > MAX_SIMULTANEOUS_FETCHES) {
-      console.log('Hit limit of simultaneous fetches!');
-      return false;
-    }
-
-    // Update list of which tiles have been downloaded which minimap displays
-    let downloadedTiles = Object.keys(blob.iqData);
-
-    // Fetch the tiles
-    const tiles = range(Math.floor(calculatedTiles.lowerTile), Math.ceil(calculatedTiles.upperTile));
-    for (let tile of tiles) {
-      if (blob.iqData[tile.toString()] === undefined) {
-        downloadedTiles.push(tile.toString());
-        dispatch(
-          fetchMoreData({
-            tile: tile,
-            connection: connection,
-            blob: blob,
-            dataType: dataType,
-            offset: tile * TILE_SIZE_IN_IQ_SAMPLES, // in IQ samples
-            count: TILE_SIZE_IN_IQ_SAMPLES, // in IQ samples
-            pyodide: pyodide,
-          })
-        );
-      }
-    }
-    setDownloadedTiles(downloadedTiles);
-    setUpperTile(calculatedTiles.upperTile);
-    setLowerTile(calculatedTiles.lowerTile);
-    setHandleTop(handleTop);
-    return true;
   };
 
   const handleMetaGlobal = (newMetaGlobal) => {

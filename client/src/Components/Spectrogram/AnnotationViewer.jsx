@@ -42,7 +42,6 @@ const AnnotationViewer = (props) => {
       (annotations[annot_indx].x1 / fftSize) * meta.global['core:sample_rate'] + lower_freq;
     updatedAnnotation['core:freq_upper_edge'] =
       (annotations[annot_indx].x2 / fftSize) * meta.global['core:sample_rate'] + lower_freq;
-    console.log(updatedAnnotation);
     dispatch(setMetaAnnotation({ annotation: updatedAnnotation, index: f }));
   }
 
