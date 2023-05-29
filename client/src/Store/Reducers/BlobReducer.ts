@@ -75,6 +75,10 @@ export const blobSlicer = createSlice({
     updateBlobFFTData: (state, action: PayloadAction<any>) => {
       state.fftData[action.payload.tile.toString()] = action.payload.fftData;
     },
+    resetBlobFFTData: (state) => {
+      console.log('CLEARED FFTTTTTTTTTTTTTTTT');
+      state.fftData = {};
+    },
     updateBlobSampleRate: (state, action: PayloadAction<number>) => {
       state.sampleRate = action.payload;
     },
@@ -118,6 +122,7 @@ export const {
   updateBlobIQData,
   resetBlobObject,
   updateBlobFFTData,
+  resetBlobFFTData,
   updateBlobSampleRate,
 } = blobSlicer.actions;
 export default blobSlicer.reducer;

@@ -22,8 +22,8 @@ const Sidebar = (props) => {
             updateWindowChange={props.updateWindowChange}
             handleAutoScale={props.handleAutoScale}
             autoscale={props.autoscale}
-            magnitudeMax={props.fft.magnitudeMax}
-            magnitudeMin={props.fft.magnitudeMin}
+            magnitudeMax={props.magnitudeMax}
+            magnitudeMin={props.magnitudeMin}
             toggleCursors={props.toggleCursors}
             toggleIncludeRfFreq={props.toggleIncludeRfFreq}
             updatePythonSnippet={props.updatePythonSnippet}

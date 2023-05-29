@@ -20,6 +20,7 @@ import Annotations from '@/Features/Annotations/Annotations';
 import { useState } from 'react';
 import { useAppSelector, useAppDispatch } from '@/Store/hooks';
 import { resetMetaObj, setMetaAnnotations, setMetaGlobal, fetchMeta } from '@/Store/Reducers/FetchMetaReducer';
+import { resetBlobFFTData } from '@/Store/Reducers/BlobReducer';
 
 import { fetchMoreData, resetBlobObject, updateBlobSampleRate } from '@/Store/Reducers/BlobReducer';
 import { fetchMinimap } from '@/Store/Reducers/MinimapReducer';
@@ -65,11 +66,6 @@ export const SpectrogramPage = (props) => {
   const [includeRfFreq, setIncludeRfFreq] = useState(false);
   const [plotWidth, setPlotWidth] = useState(0);
   const [plotHeight, setPlotHeight] = useState(0);
-  const fft = {
-    size: fftSize,
-    magnitudeMax: magnitudeMax,
-    magnitudeMin: magnitudeMin,
-  };
 
   const dispatch = useAppDispatch();
   const connection = useAppSelector((state) => state.connection);
@@ -101,7 +97,6 @@ export const SpectrogramPage = (props) => {
       });
       if (autoscale && ret.autoMax) {
         console.log('New max/min:', ret.autoMax, ret.autoMin);
-        //TODO: Reset fftData
         setAutoscale(false); // toggles it off so this only will happen once
         setMagnitudeMax(ret.autoMax);
         setMagnitudeMin(ret.autoMin);
@@ -147,7 +142,14 @@ export const SpectrogramPage = (props) => {
     if (meta) {
       renderImage(lowerTile, upperTile);
     }
-  }, [meta, magnitudeMax, magnitudeMin, fftWindow, zoomLevel, autoscale, fftSize, blob.iqData, lowerTile, upperTile]);
+  }, [meta, fftWindow, zoomLevel, autoscale, fftSize, blob.iqData, lowerTile, upperTile]);
+
+  useEffect(() => {
+    if (meta) {
+      dispatch(resetBlobFFTData());
+      renderImage(lowerTile, upperTile);
+    }
+  }, [magnitudeMax, magnitudeMin]);
 
   useEffect(() => {
     if (meta && meta.global && !meta.global['core:datatype']) {
@@ -351,7 +353,8 @@ export const SpectrogramPage = (props) => {
           updateMagnitudeMin={setMagnitudeMin}
           updateFftsize={setFFTSize}
           updateWindowChange={setFFTWindow}
-          fft={fft}
+          magnitudeMax={magnitudeMax}
+          magnitudeMin={magnitudeMin}
           handleAutoScale={setAutoscale}
           cursorsEnabled={cursorsEnabled}
           handleProcessTime={handleProcessTime}
