@@ -113,25 +113,6 @@ export const SpectrogramPage = (props) => {
     }
   };
 
-  useEffect(() => {
-    if (meta && meta.global && !meta.global['core:datatype']) {
-      console.log('WARNING: Incorrect data type');
-    } else {
-      console.log('Data type:', meta.global['core:datatype']);
-      setDataType(meta.global['core:datatype']);
-    }
-    if (meta && meta.global && !meta.global['core:sample_rate']) {
-      console.log('WARNING: Incorrect sample rate');
-    } else {
-      console.log('Sample rate:', meta.global['core:sample_rate']);
-      dispatch(updateBlobSampleRate(meta.global['core:sample_rate']));
-    }
-  }, [meta]);
-
-  useEffect(() => {
-    renderImage(lowerTile, upperTile);
-  }, [blob.iqData, lowerTile, upperTile]);
-
   const windowResized = () => {
     // Calc the area to be filled by the spectrogram
     const windowHeight = window.innerHeight;
@@ -167,7 +148,22 @@ export const SpectrogramPage = (props) => {
     if (meta) {
       renderImage(lowerTile, upperTile);
     }
-  }, [meta, magnitudeMax, magnitudeMin, fftWindow, zoomLevel, autoscale, fftSize]);
+  }, [meta, magnitudeMax, magnitudeMin, fftWindow, zoomLevel, autoscale, fftSize, blob.iqData, lowerTile, upperTile]);
+
+  useEffect(() => {
+    if (meta && meta.global && !meta.global['core:datatype']) {
+      console.log('WARNING: Incorrect data type');
+    } else {
+      console.log('Data type:', meta.global['core:datatype']);
+      setDataType(meta.global['core:datatype']);
+    }
+    if (meta && meta.global && !meta.global['core:sample_rate']) {
+      console.log('WARNING: Incorrect sample rate');
+    } else {
+      console.log('Sample rate:', meta.global['core:sample_rate']);
+      dispatch(updateBlobSampleRate(meta.global['core:sample_rate']));
+    }
+  }, [meta]);
 
   useEffect(() => {
     if (dataType) {

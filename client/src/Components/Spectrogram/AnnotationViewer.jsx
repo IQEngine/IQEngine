@@ -16,6 +16,7 @@ const AnnotationViewer = (props) => {
   // These two lines are a hack used to force a re-render when an annotation is updated, which for some reason wasnt updating
   const [, updateState] = React.useState();
   const forceUpdate = React.useCallback(() => updateState({}), []);
+  console.log(annotations);
 
   function onDragEnd(e) {
     const x = e.target.x(); // coords of the corner box

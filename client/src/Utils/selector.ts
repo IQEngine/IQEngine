@@ -241,7 +241,7 @@ export const selectFft = (
 
   // Annotation portion
   let annotations_list = [];
-  let sampleRate = 1;
+  let sampleRate = blob.sampleRate;
   for (let i = 0; i < meta.annotations.length; i++) {
     let freq_lower_edge = meta.annotations[i]['core:freq_lower_edge'];
     let freq_upper_edge = meta.annotations[i]['core:freq_upper_edge'];
