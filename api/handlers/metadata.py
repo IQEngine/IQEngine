@@ -1,5 +1,6 @@
 import database.database
 from fastapi import APIRouter, Body, Depends, Response
+from fastapi.responses import JSONResponse
 from pymongo.database import Database
 
 router = APIRouter()
@@ -23,7 +24,7 @@ def get_all_meta(
     for datum in metadata:
         datum["_id"] = str(datum["_id"])
         result.append(datum)
-    return result
+    return JSONResponse(status_code=200, content=result)
 
 
 @router.get(
@@ -45,10 +46,9 @@ def get_meta(
         }
     )
     if not metadata:
-        response.status_code = 404
-        return "Not Found"
+        return JSONResponse(status_code=404, content={"error": "Metadata not found"})
     metadata["_id"] = str(metadata["_id"])
-    return metadata
+    return JSONResponse(status_code=200, content=metadata)
 
 
 @router.post(
@@ -68,8 +68,7 @@ def create_meta(
         {"accountName": accountName, "containerName": containerName}
     )
     if not datasource:
-        response.status_code = 404
-        return "Datasource Not Found"
+        return JSONResponse(status_code=404, content={"error": "Datasource not found"})
 
     # Check metadata doesn't already exist
     if db.metadata.find_one(
@@ -79,8 +78,9 @@ def create_meta(
             "filepath": filepath,
         }
     ):
-        response.status_code = 400
-        return {"error": "record already exists"}
+        return JSONResponse(
+            status_code=409, content={"error": "Metadata already exists"}
+        )
 
     with db.client.start_session() as session:
         session.start_transaction()
@@ -96,11 +96,11 @@ def create_meta(
             db.metadata.insert_one(initial_version)
             db.versions.insert_one(initial_version)
             session.commit_transaction()
-            return "Success"
+            initial_version["_id"] = str(initial_version["_id"])
+            return JSONResponse(status_code=201, content=initial_version)
         except Exception as e:
             session.abort_transaction()
-            response.status_code = 500
-            return "Transaction collision, try again: %s" % e
+            return JSONResponse(status_code=500, content={"error": str(e)})
 
 
 def get_latest_version(db, accountName, containerName, filepath):
@@ -142,13 +142,13 @@ def update_meta(
         }
     )
     if exists is None:
-        response.status_code = 404
-        return {"error": "Item not found"}
+        return JSONResponse(status_code=404, content={"error": "Metadata not found"})
     else:
         latest_version = get_latest_version(db, accountName, containerName, filepath)
         if latest_version is None:
-            response.status_code = 500
-            return {"error": "No version found"}
+            return JSONResponse(
+                status_code=404, content={"error": "Metadata version not found"}
+            )
         with db.client.start_session() as session:
             session.start_transaction()
             try:
@@ -162,8 +162,9 @@ def update_meta(
                     }
                 )
                 if current_version is None:
-                    response.status_code = 404
-                    return {"error": "Item not found"}
+                    return JSONResponse(
+                        status_code=404, content={"error": "Metadata not found"}
+                    )
                 doc_id = current_version["_id"]
 
                 new_version = {
@@ -179,9 +180,8 @@ def update_meta(
                     {"$set": {"metadata": metadata, "version_number": version_number}},
                 )
                 session.commit_transaction()
-                response.status_code = 204
-                return "Success"
+                new_version["_id"] = str(new_version["_id"])
+                return JSONResponse(status_code=204, content=new_version)
             except Exception as e:
                 session.abort_transaction()
-                response.status_code = 500
-                return "Transaction collision, try again: %s" % e
+                return JSONResponse(status_code=500, content={"error": str(e)})

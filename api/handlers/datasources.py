@@ -1,5 +1,6 @@
 import database.database
 from fastapi import APIRouter, Depends, Response
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from pymongo.database import Database
 
@@ -33,10 +34,11 @@ def create_datasource(
             "containerName": datasource.containerName,
         }
     ):
-        response.status_code = 400
-        return "Datasource Already Exists"
+        return JSONResponse(
+            status_code=409, content={"error": "Datasource Already Exists"}
+        )
     datasource_id = db.datasources.insert_one(datasource.dict()).inserted_id
-    return str(datasource_id)
+    return JSONResponse(status_code=201, content={"datasource_id": str(datasource_id)})
 
 
 @router.get("/api/datasources")
@@ -48,4 +50,4 @@ def get_datasources(
     for datasource in datasources:
         datasource["_id"] = str(datasource["_id"])
         result.append(datasource)
-    return result
+    return JSONResponse(status_code=200, content=result)

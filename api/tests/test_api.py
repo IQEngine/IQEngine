@@ -1,6 +1,8 @@
 # vim: tabstop=4 shiftwidth=4 expandtab
 
 
+import os
+
 test_datasource = {
     "name": "name",
     "accountName": "accountName",
@@ -14,8 +16,16 @@ test_datasource_id = (
 
 
 def test_api_get_config(client):
+    os.environ["DETECTOR_ENDPOINT"] = "http://localhost:5000"
+    os.environ["CONNECTION_INFO"] = "connection_info"
+    os.environ["GOOGLE_ANALYTICS_KEY"] = "google_analytics_key"
     response = client.get("/api/config")
     assert response.status_code == 200
+    assert response.json() == {
+        "detectorEndpoint": "http://localhost:5000",
+        "connectionInfo": "connection_info",
+        "googleAnalyticsKey": "google_analytics_key",
+    }
 
 
 def test_api_returns_ok(client):
@@ -28,12 +38,14 @@ def test_api_returns_ok(client):
 def test_api_post_meta_bad_datasource_id(client):
     response = client.post("/api/datasources/nota/validid/file_path/meta", json={})
     assert response.status_code == 404
+    assert response.json() == {"error": "Datasource not found"}
 
 
 def test_api_post_meta_missing_datasource(client):
     source_id = "madeup/datasource"
     response = client.post(f"/api/datasources/{source_id}/file_path/meta", json={})
     assert response.status_code == 404
+    assert response.json() == {"error": "Datasource not found"}
 
 
 def test_api_post_meta(client):
@@ -43,6 +55,12 @@ def test_api_post_meta(client):
         json={},
     )
     assert response.status_code == 201
+    response_json = response.json()
+    assert response_json["accountName"] == test_datasource["accountName"]
+    assert response_json["containerName"] == test_datasource["containerName"]
+    assert response_json["filepath"] == "file_path"
+    assert response_json["metadata"] == {}
+    assert response_json["version_number"] == 0
 
 
 def test_api_post_existing_meta(client):
@@ -55,7 +73,8 @@ def test_api_post_existing_meta(client):
         f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/file_path/meta',
         json={},
     )
-    assert response.status_code == 400
+    assert response.status_code == 409
+    assert response.json() == {"error": "Metadata already exists"}
 
 
 def test_api_put_meta(client):
@@ -65,11 +84,24 @@ def test_api_put_meta(client):
         json={},
     )
     assert response.status_code == 201
+    assert response.json()["version_number"] == 0
+    assert response.json()["metadata"] == {}
+    assert response.json()["filepath"] == "file_path"
+    assert response.json()["containerName"] == test_datasource["containerName"]
+    assert response.json()["accountName"] == test_datasource["accountName"]
     response = client.put(
         f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/file_path/meta',
-        json={},
+        json={
+            "test": "string",
+        },
     )
     assert response.status_code == 204
+    response_json = response.json()
+    assert response_json["accountName"] == test_datasource["accountName"]
+    assert response_json["containerName"] == test_datasource["containerName"]
+    assert response_json["filepath"] == "file_path"
+    assert response_json["metadata"] == {"test": "string"}
+    assert response_json["version_number"] == 1
 
 
 def test_api_put_meta_not_existing(client):
