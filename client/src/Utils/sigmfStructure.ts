@@ -1,4 +1,3 @@
-
 export interface SigMFMetadata {
     "global": {
       "antenna:gain"?: Number
@@ -21,20 +20,20 @@ export interface SigMFMetadata {
       "core:metadata_only"?: Boolean
       "core:geolocation"?: Object
       "core:extensions"?: Array<Object>
-      "core:collection"?: String;
+      "core:collection"?: String
     }
     "captures": Array<CaptureSegment>
-    "annotations": Array<Annotation>;
+    "annotations": Array<Annotation>
   }
-  
+
   export interface CaptureSegment {
     "core:sample_start": Number
     "core:global_index"?: Number
     "core:header_bytes"?: Number
     "core:frequency"?: Number
-    "core:datetime"?: String;
+    "core:datetime"?: String
   }
-  
+
   export interface Annotation {
     "core:sample_start": Number
     "core:sample_count"?: Number
@@ -44,5 +43,5 @@ export interface SigMFMetadata {
     "core:freq_lower_edge"?: Number
     "core:freq_upper_edge"?: Number
     "core:uuid"?: String
-    "capture_details"?: String;
+    "capture_details"?: String
   }

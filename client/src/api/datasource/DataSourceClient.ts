@@ -10,10 +10,10 @@ export interface DataSourceClient {
 }
 
 export interface DataSource {
-   name: String
-   type: String
-   meta: object
-   path: String;
+  name: String
+  type: String
+  meta: object
+  path: String;
 }
 
 export const CLIENT_TYPE_API = 'api';
