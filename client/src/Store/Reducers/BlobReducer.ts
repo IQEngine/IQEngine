@@ -68,11 +68,6 @@ export const blobSlicer = createSlice({
     updateBlobTotalIQSamples: (state, action: PayloadAction<number>) => {
       state.totalIQSamples = action.payload;
     },
-    // doesnt appear to be used?
-    //updateBlobIQData: (state, action: PayloadAction<any>) => {
-    //  state.iqData[action.payload.tile.toString()] = action.payload.samples;
-    //  state.size += 1;
-    //},
     resetBlobIQData: (state) => {
       state.iqData = {};
       state.fftData = {}; // fftdata should also get cleared if iqdata is cleared
@@ -123,7 +118,6 @@ export const {
   updateBlobPythonSnippet,
   updateBlobSize,
   updateBlobTotalIQSamples,
-  //updateBlobIQData,
   resetBlobIQData,
   resetBlobObject,
   updateBlobFFTData,
