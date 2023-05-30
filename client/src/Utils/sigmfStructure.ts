@@ -1,45 +1,48 @@
 
 export interface SigMFMetadata {
-    global: {
-      datatype: String
-      sample_rate?: Number
-      version: String
-      num_channels?: Number
-      sha512?: String
-      offset?: Number
-      description?: String
-      author?: String
-      meta_doi?: String
-      data_doi?: String
-      recorder?: String
-      license?: String
-      hw?: String
-      dataset?: String
-      trailing_bytes?: Number
-      metadata_only?: Boolean
-      geolocation?: Object
-      extensions?: Array<Object>
-      collection?: String;
+    "global": {
+      "antenna:gain"?: Number
+      "antenna:type"?: String
+      "core:datatype": String
+      "core:sample_rate"?: Number
+      "core:version": String
+      "core:num_channels"?: Number
+      "core:sha512"?: String
+      "core:offset"?: Number
+      "core:description"?: String
+      "core:author"?: String
+      "core:meta_doi"?: String
+      "core:data_doi"?: String
+      "core:recorder"?: String
+      "core:license"?: String
+      "core:hw"?: String
+      "core:dataset"?: String
+      "core:trailing_bytes"?: Number
+      "core:metadata_only"?: Boolean
+      "core:geolocation"?: Object
+      "core:extensions"?: Array<Object>
+      "core:collection"?: String;
     }
-    captures: Array<CaptureSegment>
-    annotations: Array<Annotation>;
+    "captures": Array<CaptureSegment>
+    "annotations": Array<Annotation>;
   }
   
   export interface CaptureSegment {
-    sample_start: Number
-    global_index?: Number
-    header_bytes?: Number
-    frequency?: Number
-    datetime?: String;
+    "core:sample_start": Number
+    "core:global_index"?: Number
+    "core:header_bytes"?: Number
+    "core:frequency"?: Number
+    "core:datetime"?: String;
   }
   
   export interface Annotation {
-    sample_start: Number
-    sample_count?: Number
-    generator?: String
-    label?: String
-    comment?: String
-    freq_lower_edge?: Number
-    freq_upper_edge?: Number
-    uuid?: String;
+    "core:sample_start": Number
+    "core:sample_count"?: Number
+    "core:generator"?: String
+    "core:label"?: String
+    "core:comment"?: String
+    "core:freq_lower_edge"?: Number
+    "core:freq_upper_edge"?: Number
+    "core:uuid"?: String
+    "capture_details"?: String;
   }
