@@ -107,6 +107,7 @@ export const SpectrogramPage = (props) => {
   };
 
   const fetchAndRender = (handleTop) => {
+    console.log(`Fetching and rendering with handleTop ${handleTop} and meta ${JSON.stringify(meta)}`);
     if (!meta || Object.keys(meta.global).length === 0) {
       return;
     }
@@ -143,6 +144,7 @@ export const SpectrogramPage = (props) => {
     setUpperTile(calculatedTiles.upperTile);
     setLowerTile(calculatedTiles.lowerTile);
     setHandleTop(handleTop);
+    renderImage();
     return true;
   };
 
@@ -268,6 +270,7 @@ export const SpectrogramPage = (props) => {
         setPyodide(pyodide);
       });
     }
+    fetchAndRender(handleTop);
     return () => {
       window.removeEventListener('resize', windowResized);
       dispatch(resetMetaObj());

@@ -13,6 +13,8 @@ import {
   updateConnectionSasToken,
 } from '@/Store/Reducers/ConnectionReducer';
 
+import { resetBlobObject } from '@/Store/Reducers/BlobReducer';
+
 import { fetchRecordingsList } from '@/Store/Reducers/RecordingsListReducer';
 import { useAppDispatch, useAppSelector } from '@/Store/hooks';
 
@@ -114,6 +116,7 @@ export default function RecordingsBrowser() {
       dispatch(updateConnectionContainerName(containerName));
       dispatch(updateConnectionSasToken(sasToken));
     }
+    dispatch(resetBlobObject());
   }, []);
 
   useEffect(() => {
