@@ -48,7 +48,13 @@ class blob:
         return self.name
 
 
-mock_blobs = [blob("/dir1/def.sigmf-meta"), blob("/dir1"), blob("abc.sigmf-meta")]
+mock_blobs = [
+    blob("/dir1/def.sigmf-meta"),
+    blob("/dir1"),
+    blob("abc.sigmf-meta"),
+    blob("my.amazing.sigmf.file.sigmf-meta"),
+    blob("/dir1/dir2/my.amazing.sigmf.file.sigmf-meta"),
+]
 
 
 class MockBlobServiceClient:

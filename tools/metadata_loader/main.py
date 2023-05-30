@@ -9,13 +9,14 @@ from azure.storage.blob import (  # pyright: ignore[reportMissingImports]
 )
 from dotenv import load_dotenv
 
+load_dotenv()
+
 
 def get_config():
-    load_dotenv()
     return {
-        "API_URL_BASE": os.environ.get("API_URL_BASE"),
-        "BLOB_STORAGE_ACCOUNT_URL": os.environ.get("BLOB_STORAGE_ACCOUNT_URL"),
-        "BLOB_STORAGE_SAS_KEY": os.environ.get("BLOB_STORAGE_SAS_KEY"),
+        "API_URL_BASE": os.getenv("API_URL_BASE"),
+        "BLOB_STORAGE_ACCOUNT_URL": os.getenv("BLOB_STORAGE_ACCOUNT_URL"),
+        "BLOB_STORAGE_SAS_KEY": os.getenv("BLOB_STORAGE_SAS_KEY"),
     }
 
 
@@ -118,7 +119,8 @@ def initial_load_meta(args):
     for blob in blob_list:
         basename = os.path.basename(blob.name)
         parts = basename.split(".")
-        if len(parts) < 2 or parts[1] != "sigmf-meta":
+        ext_index = len(parts) - 1
+        if len(parts) < 2 or parts[ext_index] != "sigmf-meta":
             continue
 
         blob_client = container_client.get_blob_client(blob=blob.name)
@@ -126,7 +128,7 @@ def initial_load_meta(args):
         blob_text = downloader.readall()
 
         dirname = os.path.dirname(blob.name)
-        filepath = f"{dirname}/{parts[0]}"
+        filepath = f"{dirname}/{'.'.join(parts[0:ext_index])}"
 
         resp = create_meta(args.accountName, args.containerName, filepath, blob_text)
 

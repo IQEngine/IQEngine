@@ -2,14 +2,14 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Python: test metadata loader",
+      "name": "[LOADER] run pytest",
       "type": "python",
       "request": "launch",
       "module": "pytest",
       "cwd": "${workspaceFolder}/tools/metadata_loader"
     },
     {
-      "name": "datasource list",
+      "name": "[LOADER] datasource list",
       "type": "python",
       "request": "launch",
       "program": "${file}",
@@ -18,7 +18,7 @@
       "args": ["datasource", "list"]
     },
     {
-      "name": "datasource create",
+      "name": "[LOADER] datasource create",
       "type": "python",
       "request": "launch",
       "program": "${file}",
@@ -38,7 +38,7 @@
       ]
     },
     {
-      "name": "metadata addfolder",
+      "name": "[LOADER] metadata addfolder",
       "type": "python",
       "request": "launch",
       "program": "${file}",
@@ -47,7 +47,7 @@
       "args": ["metadata", "addfolder", "-accountName", "golivemisc", "-containerName", "sigmf-metadata"]
     },
     {
-      "name": "metadata list",
+      "name": "[LOADER] metadata list",
       "type": "python",
       "request": "launch",
       "program": "${file}",
