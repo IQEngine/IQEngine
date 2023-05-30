@@ -8,7 +8,8 @@ import { fftshift } from 'fftshift';
 import { colMap } from '../../Utils/colormap';
 import { MINIMUM_SCROLL_HANDLE_HEIGHT_PIXELS, TILE_SIZE_IN_IQ_SAMPLES } from '../../Utils/constants';
 import { FFT } from '@/Utils/fft';
-import { useAppSelector } from '@/Store/hooks';
+import { useAppSelector, useAppDispatch } from '@/Store/hooks';
+import { resetBlobFFTData } from '@/Store/Reducers/BlobReducer';
 
 const ScrollBar = (props) => {
   let {
@@ -30,6 +31,9 @@ const ScrollBar = (props) => {
   const totalIQSamples = useAppSelector((state) => state.blob.totalIQSamples);
   const meta = useAppSelector((state) => state.meta);
   const minimap = useAppSelector((state) => state.minimap);
+
+  const dispatch = useAppDispatch();
+
   // Calc scroll handle height and new scaling factor
   useEffect(() => {
     let x = (spectrogramHeight / (totalIQSamples / fftSize / zoomLevel)) * spectrogramHeight;
@@ -68,6 +72,7 @@ const ScrollBar = (props) => {
 
     // First refresh the spectrogram (not minimap) data since the maxFft and minFft will be better estimates by the time the minimap data is fetched
     // TODO: it's messy to have behavior unrelated to the minimap here, just because the minimap loading is a convinient way to delay a bit
+    dispatch(resetBlobFFTData());
     fetchAndRender(0);
 
     // Loop through the samples we downloaded, calc FFT and produce spectrogram image
