@@ -27,7 +27,8 @@ def get_all_meta(
 
 
 @router.get(
-    "/api/datasources/{accountName}/{containerName}/{filepath}/meta", status_code=200
+    "/api/datasources/{accountName}/{containerName}/{filepath:path}/meta",
+    status_code=200,
 )
 def get_meta(
     accountName,
@@ -51,7 +52,8 @@ def get_meta(
 
 
 @router.post(
-    "/api/datasources/{accountName}/{containerName}/{filepath}/meta", status_code=201
+    "/api/datasources/{accountName}/{containerName}/{filepath:path}/meta",
+    status_code=201,
 )
 def create_meta(
     accountName,
@@ -62,7 +64,6 @@ def create_meta(
     metadata=Body(...),
 ):
     # Check datasource id is valid
-
     datasource = db.datasources.find_one(
         {"accountName": accountName, "containerName": containerName}
     )
@@ -122,7 +123,8 @@ def get_latest_version(db, accountName, containerName, filepath):
 
 
 @router.put(
-    "/api/datasources/{accountName}/{containerName}/{filepath}/meta", status_code=204
+    "/api/datasources/{accountName}/{containerName}/{filepath:path}/meta",
+    status_code=204,
 )
 def update_meta(
     accountName,

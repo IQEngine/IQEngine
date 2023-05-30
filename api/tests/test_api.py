@@ -138,3 +138,33 @@ def test_api_get_datasources(client):
     response = client.get("/api/datasources")
     assert response.status_code == 200
     assert len(response.json()) == 1
+
+
+def test_api_filename_url_encoded(client):
+    client.post("/api/datasources", json=test_datasource).json()
+    response = client.post(
+        f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/file%2Fpath/meta',
+        json={"test": "string"},
+    )
+    assert response.status_code == 201
+    response = client.get(
+        f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/file%2Fpath/meta'
+    )
+    assert response.status_code == 200
+    assert response.json()["version_number"] == 0
+    assert response.json()["metadata"] == {"test": "string"}
+
+
+def test_api_filename_non_url_encoded(client):
+    client.post("/api/datasources", json=test_datasource).json()
+    response = client.post(
+        f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/file/path/meta',
+        json={"test": "string"},
+    )
+    assert response.status_code == 201
+    response = client.get(
+        f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/file/path/meta'
+    )
+    assert response.status_code == 200
+    assert response.json()["version_number"] == 0
+    assert response.json()["metadata"] == {"test": "string"}
