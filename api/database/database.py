@@ -22,12 +22,10 @@ def create_in_memory_db_client():
 def db():
     global _db
     if _db is None:
-        _db = create_db_client()
-    return _db
-
-
-def db_inmem():
-    global _db
-    if _db is None:
-        _db = create_in_memory_db_client()
+        if "RFDX_FF_INMEMDB" in os.environ and os.environ["RFDX_FF_INMEMDB"] != str(
+            "0"
+        ):
+            _db = create_in_memory_db_client()
+        else:
+            _db = create_db_client()
     return _db

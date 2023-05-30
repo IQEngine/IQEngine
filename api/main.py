@@ -5,19 +5,12 @@ import os
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
+from handlers.config import router as config_router
+from handlers.datasources import router as datasources_router
+from handlers.metadata import router as metadata_router
+from handlers.status import router as status_router
 
 load_dotenv()
-
-if "RFDX_FF_INMEMDB" in os.environ and os.environ["RFDX_FF_INMEMDB"] != str("0"):
-    import database.database
-
-    database.database.db = database.database.db_inmem
-
-# The routes import need to happen after we have decided what we are going to be using for the database
-from handlers.config import router as config_router  # noqa: E402
-from handlers.datasources import router as datasources_router  # noqa: E402
-from handlers.metadata import router as metadata_router  # noqa: E402
-from handlers.status import router as status_router  # noqa: E402
 
 # check if the iqengine directory exists and create it if not
 if not os.path.exists("iqengine"):
