@@ -11,6 +11,7 @@ CLEAR_REPORT_FOLDER: true
 PYTHON_FLAKE8_CONFIG_FILE: .github/linters/.flake8
 PYTHON_RUFF_CONFIG_FILE: .github/linters/.ruff.toml
 PYTHON_PYRIGHT_CONFIG_FILE: .github/linters/pyrightconfig.json
+GITHUB_COMMENT_REPORTER: false
 EXCLUDED_DIRECTORIES:
   - megalinter-reports
   - node_modules
