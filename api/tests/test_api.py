@@ -3,6 +3,8 @@
 
 import os
 
+from database.models import Metadata
+
 test_datasource = {
     "name": "name",
     "accountName": "accountName",
@@ -13,6 +15,25 @@ test_datasource = {
 test_datasource_id = (
     f'{test_datasource["accountName"]}_{test_datasource["containerName"]}'
 )
+
+valid_metadata = {
+    "global": {
+        "core:datatype": "string",
+        "core:sample_rate": 1,
+        "core:version": "1.0.0",
+    },
+    "captures": [
+        {
+            "core:sample_start": 1,
+        }
+    ],
+    "annotations": [
+        {
+            "core:sample_start": 1,
+            "core:sample_count": 1,
+        }
+    ],
+}
 
 
 def test_api_get_config(client):
@@ -36,79 +57,83 @@ def test_api_returns_ok(client):
 
 # This test no longer valid as URL will never be valid with made up accountName and containerName
 def test_api_post_meta_bad_datasource_id(client):
-    response = client.post("/api/datasources/nota/validid/file_path/meta", json={})
+    response = client.post(
+        "/api/datasources/nota/validid/file_path/meta", json=valid_metadata
+    )
     assert response.status_code == 404
-    assert response.json() == {"error": "Datasource not found"}
+    assert response.json() == {"detail": "Datasource not found"}
 
 
 def test_api_post_meta_missing_datasource(client):
     source_id = "madeup/datasource"
-    response = client.post(f"/api/datasources/{source_id}/file_path/meta", json={})
+    response = client.post(
+        f"/api/datasources/{source_id}/file_path/meta", json=valid_metadata
+    )
     assert response.status_code == 404
-    assert response.json() == {"error": "Datasource not found"}
+    assert response.json() == {"detail": "Datasource not found"}
 
 
 def test_api_post_meta(client):
     client.post("/api/datasources", json=test_datasource).json()
     response = client.post(
         f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/file_path/meta',
-        json={},
+        json=valid_metadata,
     )
     assert response.status_code == 201
-    response_json = response.json()
-    assert response_json["accountName"] == test_datasource["accountName"]
-    assert response_json["containerName"] == test_datasource["containerName"]
-    assert response_json["filepath"] == "file_path"
-    assert response_json["metadata"] == {}
-    assert response_json["version_number"] == 0
+    metadata = Metadata.parse_obj(response.json())
+    assert metadata.globalMetadata.rfdx_version == 0
+    assert metadata.globalMetadata.rfdx_source == {
+        "accountName": test_datasource["accountName"],
+        "containerName": test_datasource["containerName"],
+        "filepath": "file_path",
+    }
+    assert (
+        metadata.annotations[0].core_sample_start
+        == valid_metadata["annotations"][0]["core:sample_start"]
+    )
+    assert (
+        metadata.annotations[0].core_sample_count
+        == valid_metadata["annotations"][0]["core:sample_count"]
+    )
+    assert (
+        metadata.captures[0].core_sample_start
+        == valid_metadata["captures"][0]["core:sample_start"]
+    )
 
 
 def test_api_post_existing_meta(client):
     client.post("/api/datasources", json=test_datasource).json()
     response = client.post(
         f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/file_path/meta',
-        json={},
+        json=valid_metadata,
     )
     response = client.post(
         f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/file_path/meta',
-        json={},
+        json=valid_metadata,
     )
     assert response.status_code == 409
-    assert response.json() == {"error": "Metadata already exists"}
+    assert response.json() == {"detail": "Metadata already exists"}
 
 
 def test_api_put_meta(client):
     client.post("/api/datasources", json=test_datasource).json()
     response = client.post(
         f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/file_path/meta',
-        json={},
+        json=valid_metadata,
     )
     assert response.status_code == 201
-    assert response.json()["version_number"] == 0
-    assert response.json()["metadata"] == {}
-    assert response.json()["filepath"] == "file_path"
-    assert response.json()["containerName"] == test_datasource["containerName"]
-    assert response.json()["accountName"] == test_datasource["accountName"]
     response = client.put(
         f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/file_path/meta',
-        json={
-            "test": "string",
-        },
+        json=valid_metadata,
     )
     assert response.status_code == 204
-    response_json = response.json()
-    assert response_json["accountName"] == test_datasource["accountName"]
-    assert response_json["containerName"] == test_datasource["containerName"]
-    assert response_json["filepath"] == "file_path"
-    assert response_json["metadata"] == {"test": "string"}
-    assert response_json["version_number"] == 1
 
 
 def test_api_put_meta_not_existing(client):
     client.post("/api/datasources", json=test_datasource).json()
     response = client.put(
         f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/file_path/meta',
-        json={},
+        json=valid_metadata,
     )
     assert response.status_code == 404
 
@@ -117,19 +142,17 @@ def test_api_get_meta(client):
     client.post("/api/datasources", json=test_datasource).json()
     response = client.post(
         f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/file_path/meta',
-        json={"test": "string"},
+        json=valid_metadata,
     )
     response = client.get(
         f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/file_path/meta'
     )
     assert response.status_code == 200
-    assert response.json()["version_number"] == 0
-    assert response.json()["metadata"]["test"] == "string"
 
 
 def test_api_get_meta_not_existing(client):
     response = client.get(
-        '/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/file_path/meta'
+        f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/file_path/meta'
     )
     assert response.status_code == 404  # Because the datasource doesn't exist
     client.post("/api/datasources", json=test_datasource).json()
@@ -143,11 +166,11 @@ def test_api_get_all_meta(client):
     client.post("/api/datasources", json=test_datasource).json()
     client.post(
         f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/record_a/meta',
-        json={"record": "a"},
+        json=valid_metadata,
     )
     client.post(
         f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/record_b/meta',
-        json={"record": "b"},
+        json=valid_metadata,
     )
     response = client.get(
         f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/meta'
@@ -176,27 +199,23 @@ def test_api_filename_url_encoded(client):
     client.post("/api/datasources", json=test_datasource).json()
     response = client.post(
         f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/file%2Fpath/meta',
-        json={"test": "string"},
+        json=valid_metadata,
     )
     assert response.status_code == 201
     response = client.get(
         f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/file%2Fpath/meta'
     )
     assert response.status_code == 200
-    assert response.json()["version_number"] == 0
-    assert response.json()["metadata"] == {"test": "string"}
 
 
 def test_api_filename_non_url_encoded(client):
     client.post("/api/datasources", json=test_datasource).json()
     response = client.post(
         f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/file/path/meta',
-        json={"test": "string"},
+        json=valid_metadata,
     )
     assert response.status_code == 201
     response = client.get(
         f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/file/path/meta'
     )
     assert response.status_code == 200
-    assert response.json()["version_number"] == 0
-    assert response.json()["metadata"] == {"test": "string"}

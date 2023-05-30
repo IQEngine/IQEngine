@@ -2,6 +2,8 @@ import os
 
 import pymongo
 import pymongo_inmemory
+from database.models import DataSource, Metadata
+from pymongo.collection import Collection
 
 _db = None
 
@@ -29,3 +31,18 @@ def db():
         else:
             _db = create_db_client()
     return _db
+
+
+def datasources_collection():
+    collection: Collection[DataSource] = db().datasources
+    return collection
+
+
+def metadata_collection():
+    collection: Collection[Metadata] = db().metadatas
+    return collection
+
+
+def metadata_versions_collection():
+    collection: Collection[Metadata] = db().versions
+    return collection

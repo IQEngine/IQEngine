@@ -1,125 +1,108 @@
 import database.database
-from fastapi import APIRouter, Body, Depends, Response
-from fastapi.responses import JSONResponse
-from pymongo.database import Database
+from database.models import DataSource, DataSourceReference, Metadata
+from fastapi import APIRouter, Depends, HTTPException
+from pymongo.database import Collection
 
 router = APIRouter()
 
 
-@router.get("/api/datasources/{accountName}/{containerName}/meta", status_code=200)
+@router.get(
+    "/api/datasources/{accountName}/{containerName}/meta",
+    status_code=200,
+    response_model=list[Metadata],
+)
 def get_all_meta(
     accountName,
     containerName,
-    response: Response,
-    db: Database = Depends(database.database.db),
+    metadatas: Collection[Metadata] = Depends(database.database.metadata_collection),
 ):
     # TODO: Should we validate datasource_id?
 
     # Return all metadata for this datasource, could be an empty
     # list
-    metadata = db.metadata.find(
-        {"accountName": accountName, "containerName": containerName}
+    metadata = metadatas.find(
+        {
+            "global.rfdx:source.accountName": accountName,
+            "global.rfdx:source.containerName": containerName,
+        }
     )
     result = []
     for datum in metadata:
-        datum["_id"] = str(datum["_id"])
         result.append(datum)
-    return JSONResponse(status_code=200, content=result)
+    return result
 
 
 @router.get(
     "/api/datasources/{accountName}/{containerName}/{filepath:path}/meta",
-    status_code=200,
+    response_model=Metadata,
 )
 def get_meta(
     accountName,
     containerName,
     filepath,
-    response: Response,
-    db: Database = Depends(database.database.db),
+    metadatas: Collection[Metadata] = Depends(database.database.metadata_collection),
 ):
-    metadata = db.metadata.find_one(
+    metadata = metadatas.find_one(
         {
-            "accountName": accountName,
-            "containerName": containerName,
-            "filepath": filepath,
+            "global.rfdx:source.accountName": accountName,
+            "global.rfdx:source.containerName": containerName,
+            "global.rfdx:source.filepath": filepath,
         }
     )
     if not metadata:
-        return JSONResponse(status_code=404, content={"error": "Metadata not found"})
-    metadata["_id"] = str(metadata["_id"])
-    return JSONResponse(status_code=200, content=metadata)
+        raise HTTPException(status_code=404, detail="Metadata not found")
+    return metadata
 
 
 @router.post(
     "/api/datasources/{accountName}/{containerName}/{filepath:path}/meta",
     status_code=201,
+    response_model=Metadata,
 )
 def create_meta(
-    accountName,
-    containerName,
-    filepath,
-    response: Response,
-    db: Database = Depends(database.database.db),
-    metadata=Body(...),
+    accountName: str,
+    containerName: str,
+    filepath: str,
+    metadata: Metadata,
+    datasources: Collection[DataSource] = Depends(
+        database.database.datasources_collection
+    ),
+    metadatas: Collection[Metadata] = Depends(database.database.metadata_collection),
+    versions: Collection[Metadata] = Depends(
+        database.database.metadata_versions_collection
+    ),
 ):
     # Check datasource id is valid
-    datasource = db.datasources.find_one(
+    datasource = datasources.find_one(
         {"accountName": accountName, "containerName": containerName}
     )
     if not datasource:
-        return JSONResponse(status_code=404, content={"error": "Datasource not found"})
+        raise HTTPException(status_code=404, detail="Datasource not found")
 
     # Check metadata doesn't already exist
-    if db.metadata.find_one(
+    if metadatas.find_one(
         {
-            "accountName": accountName,
-            "containerName": containerName,
-            "filepath": filepath,
+            "global.rfdx:source.accountName": accountName,
+            "global.rfdx:source.containerName": containerName,
+            "global.rfdx:source.filepath": filepath,
         }
     ):
-        return JSONResponse(
-            status_code=409, content={"error": "Metadata already exists"}
-        )
+        raise HTTPException(status_code=409, detail="Metadata already exists")
 
-    with db.client.start_session() as session:
-        session.start_transaction()
-        try:
-            # Create the first metadata record
-            initial_version = {
-                "version_number": 0,
-                "accountName": accountName,
-                "containerName": containerName,
-                "filepath": filepath,
-                "metadata": metadata,
-            }
-            db.metadata.insert_one(initial_version)
-            db.versions.insert_one(initial_version)
-            session.commit_transaction()
-            initial_version["_id"] = str(initial_version["_id"])
-            return JSONResponse(status_code=201, content=initial_version)
-        except Exception as e:
-            session.abort_transaction()
-            return JSONResponse(status_code=500, content={"error": str(e)})
-
-
-def get_latest_version(db, accountName, containerName, filepath):
-    cursor = (
-        db.versions.find(
-            {
-                "accountName": accountName,
-                "containerName": containerName,
-                "filepath": filepath,
-            }
-        )
-        .sort("version", -1)
-        .limit(1)
+    # Create the first metadata record
+    metadata.globalMetadata.rfdx_source = DataSourceReference(
+        accountName,
+        containerName,
+        filepath,
     )
-    result = list(cursor)
-    if not result:
-        return None
-    else:
-        return result[0]
+    metadata.globalMetadata.rfdx_version = 0
+    metadatas.insert_one(
+        metadata.dict(by_alias=True, exclude_unset=True, exclude_none=True)
+    )
+    versions.insert_one(
+        metadata.dict(by_alias=True, exclude_unset=True, exclude_none=True)
+    )
+    return metadata
 
 
 @router.put(
@@ -130,58 +113,37 @@ def update_meta(
     accountName,
     containerName,
     filepath,
-    response: Response,
-    db: Database = Depends(database.database.db),
-    metadata=Body(...),
+    metadata: Metadata,
+    metadatas: Collection[Metadata] = Depends(database.database.metadata_collection),
+    versions: Collection[Metadata] = Depends(
+        database.database.metadata_versions_collection
+    ),
 ):
-    exists = db.metadata.find_one(
+    current = metadatas.find_one(
         {
-            "accountName": accountName,
-            "containerName": containerName,
-            "filepath": filepath,
+            "global.rfdx:source.accountName": accountName,
+            "global.rfdx:source.containerName": containerName,
+            "global.rfdx:source.filepath": filepath,
         }
     )
-    if exists is None:
-        return JSONResponse(status_code=404, content={"error": "Metadata not found"})
+    if current is None:
+        raise HTTPException(status_code=404, detail="Metadata not found")
     else:
-        latest_version = get_latest_version(db, accountName, containerName, filepath)
-        if latest_version is None:
-            return JSONResponse(
-                status_code=404, content={"error": "Metadata version not found"}
-            )
-        with db.client.start_session() as session:
-            session.start_transaction()
-            try:
-                # This is going to be a race condition
-                version_number = latest_version["version_number"] + 1
-                current_version = db.metadata.find_one(
-                    {
-                        "accountName": accountName,
-                        "containerName": containerName,
-                        "filepath": filepath,
-                    }
+        id = current["_id"]
+        version = current["global"]["rfdx:version"]
+        # This is going to be a race condition
+        version_number = version + 1
+        metadata.globalMetadata.rfdx_version = version_number
+        metadata.globalMetadata.rfdx_source = current["global"]["rfdx:source"]
+        versions.insert_one(
+            metadata.dict(by_alias=True, exclude_unset=True, exclude_none=True)
+        )
+        metadatas.update_one(
+            {"_id": id},
+            {
+                "$set": metadata.dict(
+                    by_alias=True, exclude_unset=True, exclude_none=True
                 )
-                if current_version is None:
-                    return JSONResponse(
-                        status_code=404, content={"error": "Metadata not found"}
-                    )
-                doc_id = current_version["_id"]
-
-                new_version = {
-                    "version_number": version_number,
-                    "accountName": accountName,
-                    "containerName": containerName,
-                    "filepath": filepath,
-                    "metadata": metadata,
-                }
-                db.versions.insert_one(new_version)
-                db.metadata.update_one(
-                    {"_id": doc_id},
-                    {"$set": {"metadata": metadata, "version_number": version_number}},
-                )
-                session.commit_transaction()
-                new_version["_id"] = str(new_version["_id"])
-                return JSONResponse(status_code=204, content=new_version)
-            except Exception as e:
-                session.abort_transaction()
-                return JSONResponse(status_code=500, content={"error": str(e)})
+            },
+        )
+        return
