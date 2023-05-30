@@ -21,6 +21,7 @@ export interface SigMFMetadata {
       "core:geolocation"?: Object
       "core:extensions"?: Array<Object>
       "core:collection"?: String
+      [key: string]: any
     }
     "captures": Array<CaptureSegment>
     "annotations": Array<Annotation>
@@ -32,6 +33,7 @@ export interface SigMFMetadata {
     "core:header_bytes"?: Number
     "core:frequency"?: Number
     "core:datetime"?: String
+    [key: string]: any
   }
 
   export interface Annotation {
@@ -44,4 +46,5 @@ export interface SigMFMetadata {
     "core:freq_upper_edge"?: Number
     "core:uuid"?: String
     "capture_details"?: String
+    [key: string]: any
   }
