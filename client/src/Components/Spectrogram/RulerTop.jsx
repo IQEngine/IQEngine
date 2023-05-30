@@ -4,10 +4,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { Layer, Rect, Text } from 'react-konva';
+import { useAppSelector } from '@/Store/hooks';
 
 const RulerTop = (props) => {
-  let { blob, fft, meta, windowFunction, spectrogramWidth, fftSize, sampleRate, spectrogramWidthScale, includeRfFreq } =
-    props;
+  const meta = useAppSelector((state) => state.meta);
+  let { spectrogramWidth, sampleRate, spectrogramWidthScale, includeRfFreq } = props;
 
   const [ticks, setTicks] = useState([]);
   const [labels, setLabels] = useState([]);
@@ -40,7 +41,7 @@ const RulerTop = (props) => {
 
     setTicks(temp_ticks);
     setLabels(temp_labels);
-  }, [blob, fft, meta, spectrogramWidth, windowFunction, fftSize, sampleRate, spectrogramWidthScale]);
+  }, [meta, spectrogramWidth, sampleRate, spectrogramWidthScale, includeRfFreq]);
 
   if (ticks.length > 1) {
     return (

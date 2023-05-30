@@ -5,15 +5,19 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import {
+  updateConnectionAccountName,
+  updateConnectionContainerName,
+  updateConnectionSasToken,
+} from '@/Store/Reducers/ConnectionReducer';
+
+import { fetchRecordingsList } from '@/Store/Reducers/RecordingsListReducer';
+import { useAppDispatch } from '@/Store/hooks';
+
 const RepositoryTile = (props) => {
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const {
-    item,
-    updateConnectionAccountName,
-    updateConnectionContainerName,
-    updateConnectionSasToken,
-    fetchRecordingsList,
-  } = props;
+  const { item } = props;
 
   const { name, accountName, containerName, imageURL, description, sasToken } = item;
   const [isDisabled, setIsDisabled] = useState(false);
@@ -45,11 +49,11 @@ const RepositoryTile = (props) => {
     setDayDifference(tempDayDifference);
   }, [sasToken]);
 
-  const handleOnClick = () => {
-    updateConnectionAccountName(accountName);
-    updateConnectionContainerName(containerName);
-    updateConnectionSasToken(sasToken);
-    fetchRecordingsList({ accountName: accountName, containerName: containerName, sasToken: sasToken });
+  const handleOnClick = async () => {
+    dispatch(updateConnectionAccountName(accountName));
+    dispatch(updateConnectionContainerName(containerName));
+    dispatch(updateConnectionSasToken(sasToken));
+    dispatch(fetchRecordingsList({ accountName, containerName, sasToken }));
     // so we can fetch when someone is linked to a repo directly
     navigate(
       '/recordings/?accountName=' +

@@ -21,16 +21,7 @@ const StyledFolderIcon = styled(FolderIcon)`
   margin-right: 4px;
 `;
 
-const Directory = ({
-  item,
-  updateConnectionMetaFileHandle,
-  updateConnectionDataFileHandle,
-  updateConnectionRecording,
-  setCurrentFolder,
-  currentFolder,
-  updateBlobTotalIQSamples,
-  updateConnectionBlobClient,
-}) => {
+const Directory = ({ item, setCurrentFolder, currentFolder }) => {
   //const [isExpanded, toggleExpanded] = useState(item.name === 'root'); // expand by default if its the root dir
   if (item.type === 'folder') {
     return (
@@ -65,13 +56,8 @@ const Directory = ({
           <Directory
             key={Math.random()}
             item={item}
-            updateConnectionMetaFileHandle={updateConnectionMetaFileHandle}
-            updateConnectionDataFileHandle={updateConnectionDataFileHandle}
-            updateConnectionRecording={updateConnectionRecording}
             setCurrentFolder={setCurrentFolder}
             currentFolder={currentFolder}
-            updateConnectionBlobClient={updateConnectionBlobClient}
-            updateBlobTotalIQSamples={updateBlobTotalIQSamples}
           />
         ))}
       </>
@@ -79,15 +65,7 @@ const Directory = ({
   }
   return (
     <>
-      <FileRow
-        key={Math.random()}
-        item={item}
-        updateConnectionMetaFileHandle={updateConnectionMetaFileHandle}
-        updateConnectionDataFileHandle={updateConnectionDataFileHandle}
-        updateConnectionRecording={updateConnectionRecording}
-        updateConnectionBlobClient={updateConnectionBlobClient}
-        updateBlobTotalIQSamples={updateBlobTotalIQSamples}
-      />
+      <FileRow key={Math.random()} item={item} />
     </>
   );
 };
