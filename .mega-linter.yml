@@ -8,6 +8,9 @@ JAVASCRIPT_DEFAULT_STYLE: prettier
 COPYPASTE_JSCPD_DISABLE_ERRORS: true
 SPELL_CSPELL_DISABLE_ERRORS: true
 CLEAR_REPORT_FOLDER: true
+PYTHON_FLAKE8_CONFIG_FILE: .github/linters/.flake8
+PYTHON_RUFF_CONFIG_FILE: .github/linters/.ruff.toml
+PYTHON_PYRIGHT_CONFIG_FILE: .github/linters/pyrightconfig.json
 EXCLUDED_DIRECTORIES:
   - megalinter-reports
   - node_modules
@@ -42,5 +45,7 @@ DISABLE_LINTERS:
   - PYTHON_PYLINT
 
 PRE_COMMANDS:
-  - command: pip install -r api/requirements.txt
+  - command: |
+      pip install -r api/requirements.txt
+      pip install -r api/requirements-dev.txt
     cwd: workspace

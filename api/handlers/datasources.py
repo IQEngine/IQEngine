@@ -1,6 +1,7 @@
 import database.database
 from fastapi import APIRouter, Depends, Response
 from pydantic import BaseModel
+from pymongo.database import Database
 
 router = APIRouter()
 
@@ -12,7 +13,7 @@ class Datasource(BaseModel):
     description: str
 
 
-#class GetDatasourcesResponse(BaseModel):
+# class GetDatasourcesResponse(BaseModel):
 #    datasources: list
 
 
@@ -20,7 +21,7 @@ class Datasource(BaseModel):
 def create_datasource(
     datasource: Datasource,
     response: Response,
-    db: object = Depends(database.database.db),
+    db: Database = Depends(database.database.db),
 ):
     """
     Create a new datasource. The datasource will be henceforth identified by accountName/containerName which
@@ -40,7 +41,7 @@ def create_datasource(
 
 @router.get("/api/datasources")
 def get_datasources(
-    db: object = Depends(database.database.db),
+    db: Database = Depends(database.database.db),
 ):
     datasources = db.datasources.find()
     result = []
