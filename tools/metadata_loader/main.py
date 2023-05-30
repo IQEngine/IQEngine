@@ -1,6 +1,7 @@
 import argparse
 import json
 import os
+from urllib.parse import quote
 
 import requests
 from azure.storage.blob import (  # pyright: ignore[reportMissingImports]
@@ -77,7 +78,7 @@ def get_all_meta(args):
         for item in items:
             print(
                 f"Account: {item['accountName']}, Container: {item['containerName']}"
-                f", filepath: {item['filepath'].replace('(slash)', '/')}"
+                f", filepath: {item['filepath']}"
             )
 
     return resp.text
@@ -90,7 +91,7 @@ def call_create_meta_api(url, payload):
 def create_meta(accountName: str, containerName: str, filepath: str, document: str):
     config = get_config()
 
-    quoted_filepath = filepath.replace("/", "(slash)")
+    quoted_filepath = quote(filepath, safe="")
     url = (
         f'{config["API_URL_BASE"]}/api/datasources/{accountName}'
         f"/{containerName}/{quoted_filepath}/meta"
