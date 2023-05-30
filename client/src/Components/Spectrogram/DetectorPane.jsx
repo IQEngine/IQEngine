@@ -37,7 +37,7 @@ export const DetectorPane = (props) => {
       .catch((error) => {
         console.log(error);
       });
-  }, [config]);
+  }, [config.data.detectorEndpoint]);
 
   const handleChangeDetector = (e) => {
     if (!config.data || !config.data.detectorEndpoint) return;
