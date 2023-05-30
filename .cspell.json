@@ -12,6 +12,12 @@
     "example.env"
   ],
   "words": [
+    "ADLS",
+    "RFDX",
+    "addfolder",
+    "datetime",
+    "pytest",
+    "mypy",
     "intance",
     "bootswatch",
     "browserslist",
@@ -44,6 +50,8 @@
     "webapps",
     "iqengineweb",
     "datasource",
+    "datasources",
+    "readall",
     "dotenv",
     "tanstack",
     "gtag",
