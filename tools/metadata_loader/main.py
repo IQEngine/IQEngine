@@ -127,7 +127,7 @@ def initial_load_meta(args):
             continue
 
         dirname = os.path.dirname(blob_name)
-        filename_base = '.'.join(parts[0:ext_index])
+        filename_base = ".".join(parts[0:ext_index])
         filepath = f"{dirname}/{filename_base}"
 
         if f"{filepath}.sigmf-data" not in blob_names:
