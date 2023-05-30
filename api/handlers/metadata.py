@@ -161,6 +161,9 @@ def update_meta(
                         "filepath": filepath,
                     }
                 )
+                if current_version is None:
+                    response.status_code = 404
+                    return {"error": "Item not found"}
                 doc_id = current_version["_id"]
 
                 new_version = {
