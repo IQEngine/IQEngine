@@ -30,12 +30,12 @@ const AnnotationViewer = (props) => {
     // Now update the actual meta.annotations
     const f = annotations[annot_indx]['index']; // remember there are 2 different indexes- the ones on the screen and the meta.annotations
     const updatedAnnotations = [...meta.annotations];
-    const updatedAnnotation = { ...updatedAnnotations[f] };
-    let start_sample_index = lowerTile * TILE_SIZE_IN_IQ_SAMPLES;
+    let updatedAnnotation = { ...updatedAnnotations[f] };
+    const start_sample_index = lowerTile * TILE_SIZE_IN_IQ_SAMPLES;
     updatedAnnotation['core:sample_start'] = annotations[annot_indx].y1 * fftSize * zoomLevel + start_sample_index;
     updatedAnnotation['core:sample_count'] =
       (annotations[annot_indx].y2 - annotations[annot_indx].y1) * fftSize * zoomLevel;
-    let lower_freq = meta.captures[0]['core:frequency'] - meta.global['core:sample_rate'] / 2;
+    const lower_freq = meta.captures[0]['core:frequency'] - meta.global['core:sample_rate'] / 2;
     updatedAnnotation['core:freq_lower_edge'] =
       (annotations[annot_indx].x1 / fftSize) * meta.global['core:sample_rate'] + lower_freq;
     updatedAnnotation['core:freq_upper_edge'] =
