@@ -43,7 +43,6 @@ export const SpectrogramPage = (props) => {
   const [autoscale, setAutoscale] = useState(false);
   const [image, setImage] = useState(null);
   const [annotations, setAnnotations] = useState([]);
-  const [dataType, setDataType] = useState('');
   const [upperTile, setUpperTile] = useState(-1);
   const [lowerTile, setLowerTile] = useState(-1);
   const [currentSamples, setCurrentSamples] = useState([]);
@@ -108,7 +107,8 @@ export const SpectrogramPage = (props) => {
 
   const fetchAndRender = (handleTop) => {
     console.log(`Fetching and rendering with handleTop ${handleTop} and meta ${JSON.stringify(meta)}`);
-    if (!meta || Object.keys(meta.global).length === 0) {
+    if (!meta || Object.keys(meta.global).length === 0 || !connection || !meta.global['core:datatype']) {
+      console.log('No meta or connection! skipping fetch');
       return;
     }
     const calculatedTiles = calculateTileNumbers(handleTop, blob.totalIQSamples, fftSize, spectrogramHeight, zoomLevel);
@@ -132,7 +132,7 @@ export const SpectrogramPage = (props) => {
             tile: tile,
             connection: connection,
             blob: blob,
-            dataType: dataType,
+            dataType: meta.global['core:datatype'],
             offset: tile * TILE_SIZE_IN_IQ_SAMPLES, // in IQ samples
             count: TILE_SIZE_IN_IQ_SAMPLES, // in IQ samples
             pyodide: pyodide,
@@ -198,11 +198,6 @@ export const SpectrogramPage = (props) => {
   }, [blob.taps, fftWindow, plotHeight, zoomLevel, blob.pythonSnippet]);
 
   useEffect(() => {
-    if (meta && meta.global && !meta.global['core:datatype']) {
-      console.log('WARNING: Incorrect data type');
-    } else {
-      setDataType(meta.global['core:datatype']);
-    }
     if (meta && meta.global && !meta.global['core:sample_rate']) {
       console.log('WARNING: Incorrect sample rate');
     } else {
@@ -212,56 +207,54 @@ export const SpectrogramPage = (props) => {
   }, [meta]);
 
   useEffect(() => {
-    if (dataType) {
-      let currenlowerTile = lowerTile;
-      let currentUpperTile = upperTile;
-      if (currenlowerTile === -1 || currentUpperTile === -1 || isNaN(currenlowerTile) || isNaN(currentUpperTile)) {
-        const calculated = calculateTileNumbers(0, blob.totalIQSamples, fftSize, spectrogramHeight, zoomLevel);
-        currenlowerTile = calculated.lowerTile;
-        currentUpperTile = calculated.upperTile;
-      }
-      const tiles = range(Math.floor(currenlowerTile), Math.ceil(currentUpperTile));
-      for (let tile of tiles) {
-        if (blob.iqData[tile] !== undefined) {
-          dispatch(
-            fetchMoreData({
-              blob: blob,
-              dataType: dataType,
-              connection: connection,
-              tile: tile,
-              offset: tile * TILE_SIZE_IN_IQ_SAMPLES, // in IQ samples
-              count: TILE_SIZE_IN_IQ_SAMPLES, // in IQ samples
-              pyodide: pyodide,
-            })
-          );
-          continue;
-        }
-      }
-      if (minimapFetch && dataType) {
-        const fftSizeScrollbar = 1024; // for minimap only. there's so much overhead with blob downloading that this might as well be a high value...
-        const skipNFfts = Math.floor(blob.totalIQSamples / 100e3); // sets the decimation rate (manually tweaked)
-        setSkipNFfts(skipNFfts);
-        console.log('skipNFfts:', skipNFfts);
-        const numFfts = Math.floor(blob.totalIQSamples / fftSizeScrollbar / (skipNFfts + 1));
-        for (let i = 0; i < numFfts; i++) {
-          dispatch(
-            fetchMinimap({
-              blob: blob,
-              dataType: dataType,
-              connection: connection,
-              tile: 'minimap' + i.toString(),
-              offset: i * fftSizeScrollbar * (skipNFfts + 1), // in IQ samples
-              count: fftSizeScrollbar, // in IQ samples
-            })
-          );
-        }
-        setMinimapFetch(false);
-        setMinimapNumFetches(numFfts);
-      }
-      setLowerTile(currenlowerTile);
-      setUpperTile(currentUpperTile);
+    let currenlowerTile = lowerTile;
+    let currentUpperTile = upperTile;
+    if (currenlowerTile === -1 || currentUpperTile === -1 || isNaN(currenlowerTile) || isNaN(currentUpperTile)) {
+      const calculated = calculateTileNumbers(0, blob.totalIQSamples, fftSize, spectrogramHeight, zoomLevel);
+      currenlowerTile = calculated.lowerTile;
+      currentUpperTile = calculated.upperTile;
     }
-  }, [dataType]);
+    const tiles = range(Math.floor(currenlowerTile), Math.ceil(currentUpperTile));
+    for (let tile of tiles) {
+      if (blob.iqData[tile] !== undefined) {
+        dispatch(
+          fetchMoreData({
+            blob: blob,
+            dataType: meta.global['core:datatype'],
+            connection: connection,
+            tile: tile,
+            offset: tile * TILE_SIZE_IN_IQ_SAMPLES, // in IQ samples
+            count: TILE_SIZE_IN_IQ_SAMPLES, // in IQ samples
+            pyodide: pyodide,
+          })
+        );
+        continue;
+      }
+    }
+    if (minimapFetch && meta.global['core:datatype']) {
+      const fftSizeScrollbar = 1024; // for minimap only. there's so much overhead with blob downloading that this might as well be a high value...
+      const skipNFfts = Math.floor(blob.totalIQSamples / 100e3); // sets the decimation rate (manually tweaked)
+      setSkipNFfts(skipNFfts);
+      console.log('skipNFfts:', skipNFfts);
+      const numFfts = Math.floor(blob.totalIQSamples / fftSizeScrollbar / (skipNFfts + 1));
+      for (let i = 0; i < numFfts; i++) {
+        dispatch(
+          fetchMinimap({
+            blob: blob,
+            dataType: meta.global['core:datatype'],
+            connection: connection,
+            tile: 'minimap' + i.toString(),
+            offset: i * fftSizeScrollbar * (skipNFfts + 1), // in IQ samples
+            count: fftSizeScrollbar, // in IQ samples
+          })
+        );
+      }
+      setMinimapFetch(false);
+      setMinimapNumFetches(numFfts);
+    }
+    setLowerTile(currenlowerTile);
+    setUpperTile(currentUpperTile);
+  }, [meta]);
 
   useEffect(() => {
     window.addEventListener('resize', windowResized);

@@ -6,6 +6,7 @@ import React, { useState } from 'react';
 import { Modal, ModalHeader, ModalBody } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/Store/hooks';
+import { TILE_SIZE_IN_IQ_SAMPLES, MAX_SIMULTANEOUS_FETCHES } from '../../Utils/constants';
 
 import {
   updateConnectionMetaFileHandle,
@@ -15,13 +16,42 @@ import {
 } from '@/Store/Reducers/ConnectionReducer';
 import { updateBlobTotalIQSamples } from '../../Store/Reducers/BlobReducer';
 
+import { fetchMoreData } from '@/Store/Reducers/BlobReducer';
+
 export default function FileRow({ item }) {
   const dispatch = useAppDispatch();
   const [modal, setModal] = useState(false);
+  const connection = useAppSelector((state) => state.connection);
+  const blob = useAppSelector((state) => state.blob);
   const toggle = () => {
     setModal(!modal);
   };
-
+  function dispatchUpdatesBeforeMoving(item) {
+    dispatch(updateConnectionMetaFileHandle(item.metaFileHandle));
+    dispatch(updateConnectionDataFileHandle(item.dataFileHandle));
+    dispatch(updateConnectionRecording(item.name.replace('.sigmf-meta', '')));
+    dispatch(updateConnectionBlobClient(item.dataClient));
+    dispatch(updateBlobTotalIQSamples(item.lengthInIQSamples));
+    // copy connection to guaranteee using the new resources
+    const connection_copy = { ...connection };
+    connection_copy.metafilehandle = item.metaFileHandle;
+    connection_copy.datafilehandle = item.dataFileHandle;
+    connection_copy.recording = item.name.replace('.sigmf-meta', '');
+    connection_copy.blobClient = item.dataClient;
+    for (let i = 0; i < MAX_SIMULTANEOUS_FETCHES; i++) {
+      dispatch(
+        fetchMoreData({
+          tile: i,
+          connection: connection_copy,
+          blob: blob,
+          dataType: item.dataType,
+          offset: i * TILE_SIZE_IN_IQ_SAMPLES, // in IQ samples
+          count: TILE_SIZE_IN_IQ_SAMPLES, // in IQ samples
+          pyodide: null,
+        })
+      );
+    }
+  }
   const annotationsData = item.annotations.map((item, index) => {
     const deepItemCopy = JSON.parse(JSON.stringify(item));
     delete deepItemCopy['core:sample_start'];
@@ -56,11 +86,7 @@ export default function FileRow({ item }) {
             <Link
               to={'spectrogram/' + item.name.replace('.sigmf-meta', '')}
               onClick={() => {
-                dispatch(updateConnectionMetaFileHandle(item.metaFileHandle));
-                dispatch(updateConnectionDataFileHandle(item.dataFileHandle));
-                dispatch(updateConnectionRecording(item.name.replace('.sigmf-meta', '')));
-                dispatch(updateConnectionBlobClient(item.dataClient));
-                dispatch(updateBlobTotalIQSamples(item.lengthInIQSamples));
+                dispatchUpdatesBeforeMoving(item);
               }}
             >
               <div className="zoom">
@@ -72,11 +98,7 @@ export default function FileRow({ item }) {
             <Link
               to={'spectrogram/' + item.name.replace('.sigmf-meta', '')}
               onClick={() => {
-                dispatch(updateConnectionMetaFileHandle(item.metaFileHandle));
-                dispatch(updateConnectionDataFileHandle(item.dataFileHandle));
-                dispatch(updateConnectionRecording(item.name.replace('.sigmf-meta', '')));
-                dispatch(updateConnectionBlobClient(item.dataClient));
-                dispatch(updateBlobTotalIQSamples(item.lengthInIQSamples));
+                dispatchUpdatesBeforeMoving(item);
               }}
             >
               <h2>{item.name.split('(slash)').slice(-1)[0].replace('.sigmf-meta', '')}</h2>
@@ -100,11 +122,7 @@ export default function FileRow({ item }) {
             <Link
               to={'spectrogram/localfile'}
               onClick={() => {
-                dispatch(updateConnectionMetaFileHandle(item.metaFileHandle));
-                dispatch(updateConnectionDataFileHandle(item.dataFileHandle));
-                dispatch(updateConnectionRecording(item.name.replace('.sigmf-meta', '')));
-                dispatch(updateConnectionBlobClient(item.dataClient));
-                dispatch(updateBlobTotalIQSamples(item.lengthInIQSamples));
+                dispatchUpdatesBeforeMoving(item);
               }}
             >
               <h5>{item.name.split('(slash)').slice(-1)[0].replace('.sigmf-meta', '')}</h5>

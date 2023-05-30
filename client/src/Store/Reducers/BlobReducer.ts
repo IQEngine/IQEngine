@@ -21,6 +21,18 @@ const initialState = {
 
 export const fetchMoreData = createAsyncThunk('blob/fetchMoreData', async (args: any, thunkAPI) => {
   const { tile, connection, blob, dataType, offset, count, pyodide } = args;
+  console.log(
+    'fetching more data for tile',
+    tile,
+    'offset',
+    offset,
+    'count',
+    count,
+    'dataType',
+    dataType,
+    'connection',
+    connection
+  );
 
   // offset and count are in IQ samples, convert to bytes
   const bytesPerSample = dataTypeToBytesPerSample(dataType);
@@ -82,6 +94,7 @@ export const blobSlicer = createSlice({
       state.sampleRate = action.payload;
     },
     resetBlobObject: (state) => {
+      console.log('resetting blob object');
       state.size = 0;
       state.totalIQSamples = 0;
       state.currentMax = 0;
@@ -101,12 +114,16 @@ export const blobSlicer = createSlice({
         state.numActiveFetches += 1;
       })
       .addCase(fetchMoreData.fulfilled, (state, action) => {
+        console.log('fetchMoreData.fulfilled for tile');
+        console.log(action.meta.arg);
         state.status = 'idle';
         state.numActiveFetches -= 1;
         state.iqData[action.payload.tile.toString()] = action.payload.samples;
         state.size += 1;
       })
-      .addCase(fetchMoreData.rejected, (state) => {
+      .addCase(fetchMoreData.rejected, (state, action) => {
+        console.log('fetchMoreData.rejected for tile');
+        console.log(action.meta.arg);
         state.status = 'idle';
         state.numActiveFetches -= 1;
       });
