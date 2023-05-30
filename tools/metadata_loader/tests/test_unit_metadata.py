@@ -35,8 +35,8 @@ def mock_request_post(*args, **kwargs):
 
 mock_config = {
     "API_URL_BASE": "https://some.where.io",
-    "STORAGE_ACCOUNT_URL": "https://acct.blob.core.windows.net",
-    "STORAGE_SAS_KEY": "xyzzy",
+    "BLOB_STORAGE_ACCOUNT_URL": "https://acct.blob.core.windows.net",
+    "BLOB_STORAGE_SAS_KEY": "xyzzy",
 }
 
 

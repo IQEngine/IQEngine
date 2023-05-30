@@ -19,7 +19,7 @@ def get_config():
 
 
 def call_get_datasources_api(url):
-    return requests.get(url, timeout=5)
+    return requests.get(url, timeout=15)
 
 
 def get_datasources(args):
