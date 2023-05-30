@@ -114,21 +114,28 @@ def initial_load_meta(args):
     )
 
     blob_list = container_client.list_blobs()
+    blob_names = [x.name for x in blob_list]
 
     overall_response = True
-    for blob in blob_list:
-        basename = os.path.basename(blob.name)
+    for blob_name in blob_names:
+        basename = os.path.basename(blob_name)
+
         parts = basename.split(".")
         ext_index = len(parts) - 1
+
         if len(parts) < 2 or parts[ext_index] != "sigmf-meta":
             continue
 
-        blob_client = container_client.get_blob_client(blob=blob.name)
+        dirname = os.path.dirname(blob_name)
+        filename_base = '.'.join(parts[0:ext_index])
+        filepath = f"{dirname}/{filename_base}"
+
+        if f"{filepath}.sigmf-data" not in blob_names:
+            continue
+
+        blob_client = container_client.get_blob_client(blob=blob_name)
         downloader = blob_client.download_blob(max_concurrency=1, encoding="UTF-8")
         blob_text = downloader.readall()
-
-        dirname = os.path.dirname(blob.name)
-        filepath = f"{dirname}/{'.'.join(parts[0:ext_index])}"
 
         resp = create_meta(args.accountName, args.containerName, filepath, blob_text)
 
