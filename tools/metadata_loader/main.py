@@ -137,7 +137,9 @@ def initial_load_meta(args):
         downloader = blob_client.download_blob(max_concurrency=1, encoding="UTF-8")
         blob_text = downloader.readall()
 
-        resp = create_meta(args.accountName, args.containerName, filepath, blob_text)
+        resp = create_meta(
+            args.accountName, args.containerName, filepath, json.loads(blob_text)
+        )
 
         overall_response = overall_response and resp == "Success"
 
