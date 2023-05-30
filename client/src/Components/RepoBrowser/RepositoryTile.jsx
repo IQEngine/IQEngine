@@ -31,7 +31,7 @@ const RepositoryTile = (props) => {
     const tempExpires = sasToken.slice(sasToken.search('se')).split('&')[0].slice(3, 13); // YEAR-MONTH-DAY
     const writeable = sasToken.slice(sasToken.search('sp')).split('&')[0].includes('w'); // boolean
     if (writeable) {
-      setWriteableBool(<div className="mr-2 mt-2 text-xs">R-W</div>);
+      setWriteableBool(<div className="mr-2 mt-2 text-xs">R/W</div>);
     } else {
       setWriteableBool(
         <div className="mr-2 mt-2 text-xs inline">
