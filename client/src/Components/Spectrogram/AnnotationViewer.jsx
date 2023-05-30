@@ -29,7 +29,7 @@ const AnnotationViewer = (props) => {
 
     // Now update the actual meta.annotations
     const f = annotations[annot_indx]['index']; // remember there are 2 different indexes- the ones on the screen and the meta.annotations
-    let updatedAnnotations = [...meta.annotations];
+    const updatedAnnotations = [...meta.annotations];
     const updatedAnnotation = { ...updatedAnnotations[f] };
     let start_sample_index = lowerTile * TILE_SIZE_IN_IQ_SAMPLES;
     updatedAnnotation['core:sample_start'] = annotations[annot_indx].y1 * fftSize * zoomLevel + start_sample_index;
