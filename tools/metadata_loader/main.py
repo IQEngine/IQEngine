@@ -45,8 +45,8 @@ def create_datasource(args):
     url = f'{config["API_URL_BASE"]}/api/datasources'
     data = {
         "name": f"{args.name}",
-        "accountName": f"{args.accountName}",
-        "containerName": f"{args.containerName}",
+        "account": f"{args.accountName}",
+        "container": f"{args.containerName}",
         "description": f"{args.description}",
     }
     resp = call_create_datasource_api(url, payload=data)
