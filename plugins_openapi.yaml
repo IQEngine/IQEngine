@@ -1,0 +1,175 @@
+openapi: 3.0.0
+info:
+  title: IQEngine Plugins Open Interface API
+  description: |
+    This API allows an RF Function to be called from IQEngine, and it is heavily based on the SigMF metadata standard.
+  version: 0.0.1
+paths:
+  /:
+    get:
+      summary: Returns the list of RF Functions available at this ip/host, as a list of strings, must match functionName below.
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                minItems: 1
+                maxItems: 1000
+                uniqueItems: true
+  /{functionName}:
+    get:
+      summary: Gets the RF Function's custom params in the form of a JSON schema that is only 1 layer deep.
+      parameters:
+        - in: path
+          name: functionName
+          schema:
+            type: string
+          required: true
+          description: Name of RF Function
+      responses:
+        "400":
+          description: Bad request. RF Function does not exist.
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                # This object is essentially just a json schema that is at most 1 layer deep
+                # e.g.:
+                # {'param1': {'title': 'Param1', 'default': 1,       'type': 'integer'},
+                #  'param2': {'title': 'Param2', 'default': 'test2', 'type': 'string'},
+                #  'param3': {'title': 'Param3', 'default': 5.67,    'type': 'number'}}
+                type: object
+                minProperties: 1
+                maxProperties: 100
+                additionalProperties:
+                  type: object
+                  properties:
+                    title:
+                      type: string
+                    type:
+                      anyOf:
+                        # For now this is all we'll support
+                        - type: string
+                        - type: number # (float)
+                        - type: integer
+                        - type: boolean
+    post:
+      summary: Run the RF Function, using the provided IQ samples and params
+      parameters:
+        - in: path
+          name: functionName
+          schema:
+            type: string
+          required: true
+          description: Name of RF Function
+      requestBody:
+        description: IQ samples and parameters needed to run the RF Function
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              # Provide either samples (IQ samples) or samples_pointer (pointer to blob storage)
+              oneOf:
+                - required: [samples]
+                - required: [samples_pointer]
+              required:
+                - sample_rate
+                - center_freq
+              properties:
+                samples: # IQ samples but as an array of floats or ints, in form IQIQIQIQ...
+                  example: [1, 2, 3, 4, 5, 6] # means [1+2j, 3+4j, 5+6j], can be ints or floats
+                  type: array
+                  items:
+                    anyOf:
+                      - type: number
+                      - type: integer
+                samples_pointer:
+                  type: object
+                  properties:
+                    accountName:
+                      type: string
+                    containerName:
+                      type: string
+                    filepath:
+                      type: string
+                    sample_start:
+                      type: integer
+                    sample_count:
+                      type: integer
+                # Always provide sample rate and center freq
+                sample_rate:
+                  type: number
+                center_freq:
+                  type: number
+                # Custom params
+                additionalProperties:
+                  anyOf:
+                    - type: string
+                    - type: number # (float)
+                    - type: integer
+                    - type: boolean
+      responses:
+        "400":
+          description: Bad request. RF Function does not exist.
+        "401":
+          description: Bad request. Missing a required param.
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                # The following is taken from SigMF's annotations schema (currently a subset of it)
+                type: object
+                properties:
+                  annotations:
+                    description: See https://github.com/sigmf/SigMF/blob/sigmf-v1.x/sigmf-spec.md#annotations-array
+                    type: array
+                    additionalProperties: true
+                    items:
+                      type: object
+                      required:
+                        - core:sample_start
+                        - core:sample_count
+                      properties:
+                        core:comment:
+                            default: ""
+                            description: A human-readable comment
+                            type: string
+                        core:freq_lower_edge:
+                            description: The frequency (Hz) of the lower edge of the feature described by this annotation.
+                            type: number
+                            minimum: -1.7976931348623157E+308
+                            maximum: 1.7976931348623157E+308
+                        core:freq_upper_edge:
+                            description: The frequency (Hz) of the upper edge of the feature described by this annotation.
+                            type: number
+                            minimum: -1.7976931348623157E+308
+                            maximum: 1.7976931348623157E+308
+                        core:generator:
+                            description: Human-readable name of the entity that created this annotation.
+                            type: string
+                        core:label:
+                            description: A short form human/machine-readable label for the annotation. CAN BE USED TO LABEL CLASSIFIER OUTPUT
+                            type: string
+                        core:sample_count:
+                            description: The number of samples that this Segment applies to.
+                            type: integer
+                            minimum: 0
+                            maximum: 18446744073709551615
+                        core:sample_start:
+                            default: 0
+                            description: The sample index at which this Segment takes effect
+                            minimum: 0
+                            maximum: 18446744073709551615
+                            type: integer
+                        core:uuid:
+                            description: RFC-4122 unique identifier.
+                            format: uuid
+                            type: string
+                      additionalProperties: true
