@@ -91,9 +91,11 @@ def create_meta(
 
     # Create the first metadata record
     metadata.globalMetadata.rfdx_source = DataSourceReference(
-        accountName,
-        containerName,
-        filepath,
+        **{
+            "accountName": accountName,
+            "containerName": containerName,
+            "filepath": filepath,
+        }
     )
     metadata.globalMetadata.rfdx_version = 0
     metadatas.insert_one(
