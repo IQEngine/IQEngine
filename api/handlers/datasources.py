@@ -23,9 +23,7 @@ def create_datasource(
             "containerName": datasource.containerName,
         }
     ):
-        raise HTTPException(
-            status_code=409, content={"error": "Datasource Already Exists"}
-        )
+        raise HTTPException(status_code=409, detail="Datasource Already Exists")
     datasources.insert_one(datasource.dict(by_alias=True, exclude_unset=True))
     return datasource
 
