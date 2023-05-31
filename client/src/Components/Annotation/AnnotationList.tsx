@@ -43,19 +43,18 @@ export const AnnotationList = ({ updateSpectrogram }) => {
   const updateAnnotation = useCallback(
     (value, parent) => {
       let newAnnotationValue = value;
-      let currentMetadata = meta;
 
       // Get the min and max frequencies
-      const minFreq = currentMetadata.captures[0]['core:frequency'] - currentMetadata.global['core:sample_rate'] / 2;
-      const maxFreq = currentMetadata.captures[0]['core:frequency'] + currentMetadata.global['core:sample_rate'] / 2;
+      const minFreq = meta.captures[0]['core:frequency'] - meta.global['core:sample_rate'] / 2;
+      const maxFreq = meta.captures[0]['core:frequency'] + meta.global['core:sample_rate'] / 2;
 
       // Get sample rate and sample start
-      const sampleRate = Number(currentMetadata.global['core:sample_rate']);
+      const sampleRate = Number(meta.global['core:sample_rate']);
       const sampleStart = Number(parent.annotation['core:sample_start']);
 
       // Get the start and end dates
-      const startDate = currentMetadata.captures[0]['core:datetime'];
-      const endDate = calculateDate(currentMetadata.captures[0]['core:datetime'], blob.totalIQSamples, sampleRate);
+      const startDate = meta.captures[0]['core:datetime'];
+      const endDate = calculateDate(meta.captures[0]['core:datetime'], blob.totalIQSamples, sampleRate);
 
       if (parent.name == 'core:freq_lower_edge') {
         newAnnotationValue = getOriginalFrequency(value, parent.object.unit);
@@ -82,9 +81,9 @@ export const AnnotationList = ({ updateSpectrogram }) => {
   );
 
   const calculateAnnotationsData = useCallback(() => {
-    let data = [];
+    const data = [];
     const startCapture = meta?.captures[0];
-    let currentParents = parents;
+    const currentParents = parents;
 
     if (startCapture && startCapture['core:datetime']) {
       for (let i = 0; i < meta.annotations?.length; i++) {
