@@ -18,9 +18,8 @@ export const AnnotationList = ({ updateSpectrogram }) => {
   const [parents, setParents] = useState([]);
   const [data, setData] = useState([]);
 
-  let meta = useAppSelector((state) => state.meta);
+  const meta = useAppSelector((state) => state.meta);
   const blob = useAppSelector((state) => state.blob);
-
   const dispatch = useAppDispatch();
 
   const getActions = useCallback(
