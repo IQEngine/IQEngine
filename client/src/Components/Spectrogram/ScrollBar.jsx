@@ -53,12 +53,12 @@ const ScrollBar = (props) => {
     }
   }, [spectrogramHeight, totalIQSamples, fftSize, zoomLevel]);
 
-  // This only runs once, once all the minimap fetches have occured
+  // This only runs once, once all the minimap fetches have occurred
   useEffect(() => {
     if (!minimapNumFetches) {
       return;
     }
-    // Check if all minimap fetches occured
+    // Check if all minimap fetches occurred
     if (
       Object.keys(window.iqData)
         .map((x) => x.includes('minimap'))

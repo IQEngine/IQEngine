@@ -1,7 +1,7 @@
 import database.database
 from database.models import DataSource
 from fastapi import APIRouter, Depends, HTTPException
-from pymongo.database import Collection
+from pymongo.collection import Collection
 
 router = APIRouter()
 

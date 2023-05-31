@@ -84,7 +84,7 @@ export const FetchRecordingsList = (connection) => async (dispatch) => {
           recording['lengthInIQSamples'] = properties.contentLength / 2 / recording.bytesPerSample;
           const lengthInMillionIQSamples = properties.contentLength / 2 / recording.bytesPerSample / 1e6;
           recording['lengthInMillionIQSamples'] = Math.round(lengthInMillionIQSamples * 1000) / 1000;
-          entries.push(recording); // cant gaurantee what order this happens in
+          entries.push(recording); // cant guarantee what order this happens in
         });
     }
 

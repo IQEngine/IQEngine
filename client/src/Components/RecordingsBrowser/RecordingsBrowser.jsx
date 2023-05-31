@@ -102,7 +102,7 @@ export default function RecordingsBrowser(props) {
 
   // Load in the connection info based on repoId
   useEffect(() => {
-    window.fftData = {}; // prevents the previously viewed spectrogram from showing up breifly at the start of another
+    window.fftData = {}; // prevents the previously viewed spectrogram from showing up briefly at the start of another
 
     // This will happen when someone is linked directly to an azure repo
     if (location.search && !connection.accountName) {
