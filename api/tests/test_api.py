@@ -206,6 +206,16 @@ def test_api_filename_url_encoded(client):
         f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/file%2Fpath/meta'
     )
     assert response.status_code == 200
+    response_object = response.json()
+    assert (
+        response_object["global"]["rfdx:source"]["accountName"]
+        == test_datasource["accountName"]
+    )
+    assert (
+        response_object["global"]["rfdx:source"]["containerName"]
+        == test_datasource["containerName"]
+    )
+    assert response_object["global"]["rfdx:source"]["filepath"] == "file/path"
 
 
 def test_api_filename_non_url_encoded(client):
@@ -219,3 +229,46 @@ def test_api_filename_non_url_encoded(client):
         f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/file/path/meta'
     )
     assert response.status_code == 200
+    response_object = response.json()
+    assert (
+        response_object["global"]["rfdx:source"]["accountName"]
+        == test_datasource["accountName"]
+    )
+    assert (
+        response_object["global"]["rfdx:source"]["containerName"]
+        == test_datasource["containerName"]
+    )
+    assert response_object["global"]["rfdx:source"]["filepath"] == "file/path"
+    assert response_object["global"]["rfdx:version"] == 0
+
+
+def test_api_update_file_version(client):
+    client.post("/api/datasources", json=test_datasource).json()
+    response = client.post(
+        f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/file/path/meta',
+        json=valid_metadata,
+    )
+    assert response.status_code == 201
+    new_metadata = valid_metadata
+    new_metadata["annotations"][0]["core:sample_start"] = 10000
+    response = client.put(
+        f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/file/path/meta',
+        json=new_metadata,
+    )
+    assert response.status_code == 204
+    response = client.get(
+        f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/file/path/meta'
+    )
+    assert response.status_code == 200
+    response_object = response.json()
+    assert response_object["global"]["rfdx:version"] == 1
+    assert (
+        response_object["global"]["rfdx:source"]["accountName"]
+        == test_datasource["accountName"]
+    )
+    assert (
+        response_object["global"]["rfdx:source"]["containerName"]
+        == test_datasource["containerName"]
+    )
+    assert response_object["global"]["rfdx:source"]["filepath"] == "file/path"
+    assert response_object["annotations"][0]["core:sample_start"] == 10000
