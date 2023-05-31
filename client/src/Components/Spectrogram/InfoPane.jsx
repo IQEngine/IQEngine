@@ -7,10 +7,12 @@ import React from 'react';
 import { Form } from 'react-bootstrap/esm';
 import Button from 'react-bootstrap/Button';
 import { useState, useEffect } from 'react';
+import { useAppDispatch, useAppSelector } from '@/Store/hooks';
+import { setMetaGlobal } from '@/Store/Reducers/FetchMetaReducer';
 
 export default function InfoPane(props) {
-  const metaGlobal = props.meta.global;
-  const [newMetaGlobal, setNewMetaGlobal] = useState({});
+  const metaGlobal = useAppSelector((state) => state.meta.global);
+  const [newMetaGlobal, setNewMetaGlobal] = useState(metaGlobal);
   const [error, setError] = useState('');
   useEffect(() => {
     setNewMetaGlobal(metaGlobal);
@@ -43,7 +45,7 @@ export default function InfoPane(props) {
 
   // updates SpectrogramPage state
   function handleClick() {
-    props.handleMetaGlobal(newMetaGlobal);
+    dispatch(setMetaGlobal(newMetaGlobal));
   }
 
   return (

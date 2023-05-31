@@ -11,7 +11,7 @@ import SiggenTile from './SiggenTile';
 import ValidatorTile from './ValidatorTile';
 import { configQuery } from '../../api/config/queries';
 
-const RepoBrowser = (props) => {
+const RepoBrowser = () => {
   let [tileObjInfo, setTitleObjInfo] = useState([]);
   const config = configQuery();
   useEffect(() => {
@@ -26,28 +26,10 @@ const RepoBrowser = (props) => {
   return (
     <div className="homePage">
       {tileObjInfo.map((item, i) => (
-        <RepositoryTile
-          key={i}
-          item={item}
-          fetchRecordingsList={props.fetchRecordingsList}
-          updateConnectionAccountName={props.updateConnectionAccountName}
-          updateConnectionContainerName={props.updateConnectionContainerName}
-          updateConnectionSasToken={props.updateConnectionSasToken}
-        />
+        <RepositoryTile key={i} item={item} />
       ))}
-      <LocalFileBrowser
-        fetchRecordingsList={props.fetchRecordingsList}
-        updateConnectionMetaFileHandle={props.updateConnectionMetaFileHandle}
-        updateConnectionDataFileHandle={props.updateConnectionDataFileHandle}
-        metafilehandle={props.metafilehandle}
-        datafilehandle={props.datafilehandle}
-      />
-      <AzureBlobBrowser
-        fetchRecordingsList={props.fetchRecordingsList}
-        updateConnectionAccountName={props.updateConnectionAccountName}
-        updateConnectionContainerName={props.updateConnectionContainerName}
-        updateConnectionSasToken={props.updateConnectionSasToken}
-      />
+      <LocalFileBrowser />
+      <AzureBlobBrowser />
       <SiggenTile />
       <ValidatorTile />
     </div>

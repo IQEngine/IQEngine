@@ -1,8 +1,8 @@
 To run FastAPI functions locally for testing:
 ```
 sudo apt install uvicorn ffmpeg libsm6 libxext6 -y
-sudo pip install -r requirements.txt
 cd detectors
+sudo pip install -r requirements.txt
 uvicorn detector_api:app --reload
 ```
 
