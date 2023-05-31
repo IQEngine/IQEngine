@@ -5,6 +5,13 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import parseMeta from '../../Utils/parseMeta';
+import { useDispatch } from 'react-redux';
+import {
+  updateConnectionMetaFileHandle,
+  updateConnectionDataFileHandle,
+  resetConnection,
+} from '../../Store/Reducers/ConnectionReducer';
+import { fetchRecordingsList, clearRecordingsList } from '@/Store/Reducers/RecordingsListReducer';
 
 function readFileAsync(file) {
   return new Promise((resolve, reject) => {
@@ -40,29 +47,35 @@ async function handleDirectoryEntry(handle, out, dir) {
   return out;
 }
 
-const LocalFileBrowser = (props) => {
+const LocalFileBrowser = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const directoryPickerAvailable = typeof window.showDirectoryPicker !== 'undefined'; // not all browsers support it yet
 
   const openFile = async () => {
+    dispatch(clearRecordingsList());
+    dispatch(resetConnection());
     const [handle1, handle2] = await window.showOpenFilePicker({ multiple: true });
     const file1 = await handle1.getFile();
     if (file1.name.includes('.sigmf-meta')) {
-      props.updateConnectionMetaFileHandle(handle1); // store it in redux
-      props.updateConnectionDataFileHandle(handle2); // assume other file is data
+      dispatch(updateConnectionMetaFileHandle(handle1)); // store it in redux
+      dispatch(updateConnectionDataFileHandle(handle2)); // assume other file is data
     } else {
-      props.updateConnectionMetaFileHandle(handle2);
-      props.updateConnectionDataFileHandle(handle1);
+      dispatch(updateConnectionMetaFileHandle(handle2)); // store it in redux
+      dispatch(updateConnectionDataFileHandle(handle1)); // assume other file is data
     }
     navigate('/recordings/spectrogram/localfile'); // dont include filename so that it wont get included in google analytics
   };
 
   const openDir = async () => {
+    dispatch(clearRecordingsList());
+    dispatch(resetConnection());
     const dirHandle = await window.showDirectoryPicker();
     const entries = await handleDirectoryEntry(dirHandle, [], '');
     //console.log(entries);
-    props.fetchRecordingsList({ entries: entries });
+    dispatch(fetchRecordingsList({ entries: entries }));
+
     navigate('/recordings');
   };
 

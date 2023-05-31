@@ -1,5 +1,8 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
+# vscode
+.vscode/launch.json
+
 # dependencies
 */node_modules
 node_modules
@@ -26,11 +29,12 @@ detectors/markos_detector/__pycache__/markos_detector.cpython-310.pyc
 tests/geckodriver.log
 geckodriver.log
 
-.venv/
-venv/
-__pycache__
+**/venv/
+**/.venv/
+**/__pycache__
 client/build
 api/build
-megalinter-reports/
-.mypy_cache/
-.pytest_cache/
+**/megalinter-reports/
+**/.mypy_cache/
+**/.ruff_cache/
+*.venv/

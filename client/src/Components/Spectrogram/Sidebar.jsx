@@ -16,19 +16,16 @@ const Sidebar = (props) => {
         </summary>
         <div className="outline outline-1 outline-iqengine-primary p-2">
           <SettingsPane
-            updateBlobTaps={props.updateBlobTaps}
             updateMagnitudeMax={props.updateMagnitudeMax}
             updateMagnitudeMin={props.updateMagnitudeMin}
             updateFftsize={props.updateFftsize}
             updateWindowChange={props.updateWindowChange}
-            meta={props.meta}
             handleAutoScale={props.handleAutoScale}
             autoscale={props.autoscale}
-            magnitudeMax={props.fft.magnitudeMax}
-            magnitudeMin={props.fft.magnitudeMin}
+            magnitudeMax={props.magnitudeMax}
+            magnitudeMin={props.magnitudeMin}
             toggleCursors={props.toggleCursors}
             toggleIncludeRfFreq={props.toggleIncludeRfFreq}
-            updatePythonSnippet={props.updatePythonSnippet}
             updateZoomLevel={props.updateZoomLevel}
           />
         </div>
@@ -39,12 +36,7 @@ const Sidebar = (props) => {
           Detector
         </summary>
         <div className="outline outline-1 outline-iqengine-primary p-2">
-          <DetectorPane
-            meta={props.meta}
-            handleMeta={props.handleMeta}
-            cursorsEnabled={props.cursorsEnabled}
-            handleProcessTime={props.handleProcessTime}
-          />
+          <DetectorPane cursorsEnabled={props.cursorsEnabled} handleProcessTime={props.handleProcessTime} />
         </div>
       </details>
 
@@ -53,7 +45,7 @@ const Sidebar = (props) => {
           Metadata
         </summary>
         <div className="outline outline-1 outline-iqengine-primary p-2">
-          <InfoPane meta={props.meta} handleMetaGlobal={props.handleMetaGlobal} />
+          <InfoPane />
         </div>
       </details>
     </div>

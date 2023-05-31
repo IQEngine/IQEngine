@@ -15,8 +15,13 @@ import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import Toggle from 'react-toggle';
 import RangeSlider from 'react-bootstrap-range-slider';
 import 'react-bootstrap-range-slider/dist/react-bootstrap-range-slider.css';
+import { updateBlobTaps, resetBlobIQData } from '../../Store/Reducers/BlobReducer';
+import { useAppDispatch } from '@/Store/hooks';
+import { updateBlobPythonSnippet } from '@/Store/Reducers/BlobReducer';
 
 const SettingsPane = (props) => {
+  const dispatch = useAppDispatch();
+
   const [state, setState] = useState({
     size: 1024,
     taps: '[1]',
@@ -45,6 +50,7 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
 
   const onChangeWindowFunction = (event) => {
     setState({ ...state, windowFunction: event });
+    dispatch(resetBlobIQData());
     props.updateWindowChange(event);
   };
 
@@ -81,7 +87,8 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
   };
 
   const onSubmitPythonSnippet = () => {
-    props.updatePythonSnippet(state.pythonSnippet);
+    dispatch(resetBlobIQData());
+    dispatch(updateBlobPythonSnippet(state.pythonSnippet));
   };
 
   const onChangeTaps = (event) => {
@@ -96,15 +103,14 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
       taps = taps_string.slice(1, -1).split(',');
       taps = taps.map((x) => parseFloat(x));
       taps = Float32Array.from(taps);
-      props.updateBlobTaps(taps);
+      dispatch(updateBlobTaps(taps));
       // We apply the taps when we download the IQ data, so we have to clear both
-      window.iqData = {};
-      window.fftData = {};
+      dispatch(resetBlobIQData());
       console.log('valid taps, found', taps.length, 'taps');
     } else {
       console.alert('invalid taps');
     }
-    props.updateBlobTaps(taps);
+    dispatch(updateBlobTaps(taps));
   };
 
   const onClickPremadeTaps = (event) => {
@@ -114,15 +120,16 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
       taps = taps_string.slice(1, -1).split(',');
       taps = taps.map((x) => parseFloat(x));
       taps = Float32Array.from(taps);
-      props.updateBlobTaps(taps);
-      window.iqData = {};
-      window.fftData = {};
+      dispatch(updateBlobTaps(taps));
+      // We apply the taps when we download the IQ data, so we have to clear both
+      dispatch(resetBlobIQData());
+
       console.log('valid taps, found', taps.length, 'taps');
     } else {
       console.alert('invalid taps');
     }
     setState({ ...state, taps: taps_string });
-    props.updateBlobTaps(taps);
+    dispatch(updateBlobTaps(taps));
   };
 
   const onChangeZoomLevel = (e) => {

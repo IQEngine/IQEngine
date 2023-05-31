@@ -7,6 +7,16 @@ import Directory from './Directory';
 import Spinner from 'react-bootstrap/Spinner';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { useLocation, useSearchParams } from 'react-router-dom';
+import {
+  updateConnectionAccountName,
+  updateConnectionContainerName,
+  updateConnectionSasToken,
+} from '@/Store/Reducers/ConnectionReducer';
+
+import { resetBlobObject } from '@/Store/Reducers/BlobReducer';
+
+import { fetchRecordingsList } from '@/Store/Reducers/RecordingsListReducer';
+import { useAppDispatch, useAppSelector } from '@/Store/hooks';
 
 function isFolder(file) {
   return file.name.endsWith('/');
@@ -19,9 +29,9 @@ function GroupByFolder(files, root) {
   };
 
   files.map((file) => {
-    file.relativeKey = file.name.substr(root.length);
+    const relativeKey = file.name.substr(root.length);
     let currentFolder = fileTree;
-    const folders = file.relativeKey.split('/');
+    const folders = relativeKey.split('/');
     folders.forEach((folder, folderIndex) => {
       if (folderIndex === folders.length - 1 && isFolder(file)) {
         for (const key in file) {
@@ -35,6 +45,7 @@ function GroupByFolder(files, root) {
       if (isAFile) {
         currentFolder.contents.push({
           ...file,
+          relativeKey: relativeKey,
           keyDerived: true,
           type: 'file',
           name: file.name.replaceAll('/', '(slash)'), // because we cant use slashes in the url, we undo this replace before grabbing the blob, as well as displaying it in the table
@@ -50,7 +61,10 @@ function GroupByFolder(files, root) {
         currentFolder = currentFolder.children[folder];
       }
     });
-    return file;
+    return {
+      ...file,
+      relativeKey: relativeKey,
+    };
   });
 
   function addAllChildren(level, prefix) {
@@ -78,22 +92,12 @@ function GroupByFolder(files, root) {
   return files;
 }
 
-export default function RecordingsBrowser(props) {
-  const {
-    recording,
-    connection,
-    updateConnectionMetaFileHandle,
-    updateConnectionDataFileHandle,
-    updateConnectionRecording,
-    updateBlobTotalIQSamples,
-    updateConnectionBlobClient,
-    updateConnectionAccountName,
-    updateConnectionContainerName,
-    updateConnectionSasToken,
-    fetchRecordingsList,
-  } = props;
+export default function RecordingsBrowser() {
+  const connection = useAppSelector((state) => state.connection);
+  const recording = useAppSelector((state) => state.recordingsList);
   const location = useLocation();
   const [searchParams] = useSearchParams();
+  const dispatch = useAppDispatch();
 
   const data = recording.recordingsList;
 
@@ -102,20 +106,25 @@ export default function RecordingsBrowser(props) {
 
   // Load in the connection info based on repoId
   useEffect(() => {
-    window.fftData = {}; // prevents the previously viewed spectrogram from showing up breifly at the start of another
-
     // This will happen when someone is linked directly to an azure repo
     if (location.search && !connection.accountName) {
       console.log('Updating connection info and fetching recordings list!');
       const accountName = searchParams.get('accountName');
       const containerName = searchParams.get('containerName');
       const sasToken = searchParams.get('sasToken');
-      updateConnectionAccountName(accountName);
-      updateConnectionContainerName(containerName);
-      updateConnectionSasToken(sasToken);
-      fetchRecordingsList({ accountName: accountName, containerName: containerName, sasToken: sasToken });
+      dispatch(updateConnectionAccountName(accountName));
+      dispatch(updateConnectionContainerName(containerName));
+      dispatch(updateConnectionSasToken(sasToken));
     }
-  });
+    dispatch(resetBlobObject());
+  }, []);
+
+  useEffect(() => {
+    // This will happen when someone is linked directly to an azure repo
+    if (connection && connection.accountName && connection.containerName && connection.sasToken) {
+      dispatch(fetchRecordingsList(connection));
+    }
+  }, [connection]);
 
   useEffect(() => {
     toggleLoader(recording.loading);
@@ -200,13 +209,8 @@ export default function RecordingsBrowser(props) {
             <Directory
               key={Math.random()}
               item={currentDataTree}
-              updateConnectionMetaFileHandle={updateConnectionMetaFileHandle}
-              updateConnectionDataFileHandle={updateConnectionDataFileHandle}
-              updateConnectionRecording={updateConnectionRecording}
               setCurrentFolder={setCurrentFolder}
               currentFolder={currentFolder}
-              updateConnectionBlobClient={updateConnectionBlobClient}
-              updateBlobTotalIQSamples={updateBlobTotalIQSamples}
             />
           </tbody>
         </table>

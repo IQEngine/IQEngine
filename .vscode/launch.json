@@ -56,11 +56,17 @@
       "args": ["metadata", "list", "-accountName", "golivemisc", "-containerName", "sigmf-metadata"]
     },
     {
-      "type": "msedge",
-      "request": "launch",
-      "name": "Launch Edge against localhost",
-      "url": "http://localhost:3001",
-      "webRoot": "${workspaceFolder}"
+        "name": "[API]: FastAPI",
+        "type": "python",
+        "request": "launch",
+        "cwd": "${workspaceFolder}/api",
+        "module": "uvicorn",
+        "args": [
+            "main:app",
+            "--reload"
+        ],
+        "jinja": true,
+        "justMyCode": true
     }
   ]
 }
