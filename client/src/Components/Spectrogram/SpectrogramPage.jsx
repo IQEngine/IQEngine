@@ -10,13 +10,13 @@ import { FrequencyPlot } from './FrequencyPlot';
 import { IQPlot } from './IQPlot';
 import { Layer, Image, Stage } from 'react-konva';
 import { selectFft, calculateTileNumbers, range } from '../../Utils/selector';
-import { AnnotationViewer } from './AnnotationViewer';
+import { AnnotationViewer } from '@/Components/Annotation/AnnotationViewer';
 import { RulerTop } from './RulerTop';
 import { RulerSide } from './RulerSide';
 import { TILE_SIZE_IN_IQ_SAMPLES, MAX_SIMULTANEOUS_FETCHES } from '../../Utils/constants';
 import TimeSelector from './TimeSelector';
 import { ArrowDownTrayIcon } from '@heroicons/react/24/outline';
-import Annotations from '@/Features/Annotations/Annotations';
+import AnnotationList from '@/Components/Annotation/AnnotationList';
 import { useState } from 'react';
 import { useAppSelector, useAppDispatch } from '@/Store/hooks';
 import { resetMetaObj, setMetaAnnotations, setMetaGlobal, fetchMeta } from '@/Store/Reducers/FetchMetaReducer';
@@ -519,7 +519,7 @@ export const SpectrogramPage = (props) => {
             Annotations
           </summary>
           <div className="outline outline-1 outline-iqengine-primary p-2">
-            <Annotations meta={meta} totalIQSamples={blob.totalIQSamples} updateSpectrogram={updateSpectrogram} />
+            <AnnotationList meta={meta} totalIQSamples={blob.totalIQSamples} updateSpectrogram={updateSpectrogram} />
           </div>
         </details>
 
