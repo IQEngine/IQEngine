@@ -7,12 +7,24 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
-import { updateBlobTaps, resetBlobIQData } from '../../Store/Reducers/BlobReducer';
 import { useAppDispatch } from '@/Store/hooks';
-import { updateBlobPythonSnippet } from '@/Store/Reducers/BlobReducer';
 import DualRangeSlider from '@/Components/DualRangeSlider/DualRangeSlider';
 
-const SettingsPane = (props) => {
+export class SettingsPaneProps {
+  magnitudeMax: number;
+  magnitudeMin: number;
+  taps: Float32Array = Float32Array.from([1]);
+  // TODO: QUERY add type to he parameters
+  updateWindowChange: any;
+  updateMagnitudeMax: any;
+  updateMagnitudeMin: any;
+  updateFftsize: any;
+  toggleIncludeRfFreq: any;
+  handleAutoScale: any;
+  toggleCursors: any;
+}
+
+const SettingsPane = (props: SettingsPaneProps) => {
   const dispatch = useAppDispatch();
 
   const [state, setState] = useState({
@@ -44,7 +56,6 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
   const onChangeWindowFunction = (event) => {
     const windowFunction = event.currentTarget.dataset.value;
     setState({ ...state, windowFunction: windowFunction });
-    dispatch(resetBlobIQData());
     props.updateWindowChange(windowFunction);
   };
 
@@ -66,8 +77,7 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
   };
 
   const onSubmitFftsize = () => {
-    const intSize = parseInt(state.size);
-    if (intSize >= 32 && Math.log2(intSize) % 1 === 0) {
+    if (state.size >= 32 && Math.log2(state.size) % 1 === 0) {
       props.updateFftsize(state.size);
     } else {
       alert('Size must be a power of 2 and at least 32');
@@ -79,54 +89,46 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
   };
 
   const onSubmitPythonSnippet = () => {
-    dispatch(resetBlobIQData());
-    dispatch(updateBlobPythonSnippet(state.pythonSnippet));
+    // TODO: QUERY update the maind page python snippet
+    //dispatch(updateBlobPythonSnippet(state.pythonSnippet));
   };
 
   const onChangeTaps = (event) => {
     setState({ ...state, taps: event.target.value });
   };
 
+  const updateTaps = (taps_string: string) => {
+    if (taps_string[0] === '[' && taps_string.slice(-1) === ']') {
+      let temp_taps = taps_string.slice(1, -1).split(',');
+      let temp_number_taps = temp_taps.map((x) => parseFloat(x));
+      props.taps = Float32Array.from(temp_number_taps);
+      // TODO: QUERY Update the taps in the main component
+      // dispatch(updateBlobTaps(taps));
+      // We apply the taps when we download the IQ data, so we have to clear both
+      console.debug('valid taps, found', props.taps.length, 'taps');
+    } else {
+      console.warn('invalid taps');
+    }
+  };
+
   const onSubmitTaps = () => {
-    let taps = new Array(1).fill(1);
     // make sure the string is a valid array
     let taps_string = state.taps;
-    if (taps_string[0] === '[' && taps_string.slice(-1) === ']') {
-      taps = taps_string.slice(1, -1).split(',');
-      taps = taps.map((x) => parseFloat(x));
-      taps = Float32Array.from(taps);
-      dispatch(updateBlobTaps(taps));
-      // We apply the taps when we download the IQ data, so we have to clear both
-      dispatch(resetBlobIQData());
-      console.log('valid taps, found', taps.length, 'taps');
-    } else {
-      console.alert('invalid taps');
-    }
-    dispatch(updateBlobTaps(taps));
+    updateTaps(taps_string);
   };
 
   const onClickPremadeTaps = (event) => {
-    let taps = new Array(1).fill(1);
     let taps_string = event.currentTarget.dataset.value;
-    if (taps_string[0] === '[' && taps_string.slice(-1) === ']') {
-      taps = taps_string.slice(1, -1).split(',');
-      taps = taps.map((x) => parseFloat(x));
-      taps = Float32Array.from(taps);
-      dispatch(updateBlobTaps(taps));
-      // We apply the taps when we download the IQ data, so we have to clear both
-      dispatch(resetBlobIQData());
-
-      console.log('valid taps, found', taps.length, 'taps');
-    } else {
-      console.alert('invalid taps');
-    }
+    updateTaps(taps_string);
     setState({ ...state, taps: taps_string });
-    dispatch(updateBlobTaps(taps));
+    // TODO: QUERY Update taps
+    // dispatch(updateBlobTaps(taps));
   };
 
   const onChangeZoomLevel = (e) => {
     setState({ ...state, zoomLevel: e.target.value });
-    props.updateZoomLevel(e.target.value);
+    // TODO: QUERY Update zoom level
+    // props.updateZoomLevel(e.target.value);
   };
 
   return (
@@ -198,7 +200,6 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
             className="h-12 w-40 rounded-l text-base-100 ml-1 pl-2"
             defaultValue={state.size}
             onChange={onChangeFftsize}
-            size="sm"
           />
           <button className="btn btn-primary rounded-none rounded-r" onClick={onSubmitFftsize}>
             <FontAwesomeIcon icon={faArrowRight} />
@@ -226,7 +227,6 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
             className="h-12 w-40 rounded-l text-base-100 ml-1 pl-2"
             defaultValue={state.taps}
             onChange={onChangeTaps}
-            size="sm"
           />
           <button className="btn btn-primary rounded-none rounded-r" onClick={onSubmitTaps}>
             <FontAwesomeIcon icon={faArrowRight} />
@@ -310,8 +310,8 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
         </label>
         <textarea
           className="bg-neutral text-base-100 p-1"
-          rows="6"
-          cols="28"
+          rows={6}
+          cols={28}
           wrap="off"
           onChange={onChangePythonSnippet}
           value={state.pythonSnippet}

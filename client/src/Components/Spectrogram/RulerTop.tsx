@@ -4,11 +4,17 @@
 
 import React, { useState, useEffect } from 'react';
 import { Layer, Rect, Text } from 'react-konva';
-import { useAppSelector } from '@/Store/hooks';
 
-const RulerTop = (props) => {
-  const meta = useAppSelector((state) => state.meta);
-  let { spectrogramWidth, sampleRate, spectrogramWidthScale, includeRfFreq } = props;
+interface RulerTopProps {
+  spectrogramWidth: number;
+  sampleRate: number;
+  spectrogramWidthScale: number;
+  includeRfFreq: boolean;
+  coreFrequency: number;
+}
+
+const RulerTop = (props: RulerTopProps) => {
+  let { spectrogramWidth, sampleRate, spectrogramWidthScale, includeRfFreq, coreFrequency } = props;
 
   const [ticks, setTicks] = useState([]);
   const [labels, setLabels] = useState([]);
@@ -20,13 +26,13 @@ const RulerTop = (props) => {
     for (let i = 0; i <= num_ticks; i++) {
       if (i % (num_ticks / 4) === 0) {
         let f = (i / num_ticks) * sampleRate - sampleRate / 2;
-        if (includeRfFreq) f = f + meta.captures[0]['core:frequency'];
+        if (includeRfFreq) f = f + coreFrequency;
         f = f / 1e6; // convert to MHz
-        if (f > 1000) {
-          f = f.toExponential(); // converts to a string
-          f = f.split('e+')[0].slice(0, 6) + 'e' + f.split('e+')[1]; // quick way to round to N digits and remove the + sign
-        }
         let text = f.toString();
+        if (f > 1000) {
+          let fe = f.toExponential(); // converts to a string
+          text = fe.split('e+')[0].slice(0, 6) + 'e' + fe.split('e+')[1]; // quick way to round to N digits and remove the + sign
+        }
         if (i == num_ticks) text = text + ' MHz';
         temp_labels.push({
           text: text,
@@ -38,10 +44,11 @@ const RulerTop = (props) => {
         temp_ticks.push({ x: (spectrogramWidth / num_ticks) * i, y: 20, width: 0, height: 5 });
       }
     }
+    console.debug('RulerTop: useEffect', temp_ticks, temp_labels);
 
     setTicks(temp_ticks);
     setLabels(temp_labels);
-  }, [meta, spectrogramWidth, sampleRate, spectrogramWidthScale, includeRfFreq]);
+  }, [spectrogramWidth, sampleRate, spectrogramWidthScale, includeRfFreq]);
 
   if (ticks.length > 1) {
     return (
@@ -53,7 +60,7 @@ const RulerTop = (props) => {
             y={tick.y}
             width={tick.width}
             height={tick.height}
-            fillEnabled="false"
+            fillEnabled={false}
             stroke="white"
             strokeWidth={1}
             key={index}

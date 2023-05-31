@@ -4,25 +4,22 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  updateConnectionAccountName,
-  updateConnectionContainerName,
-  updateConnectionSasToken,
-} from '@/Store/Reducers/ConnectionReducer';
+import { upsertDataSource } from '@/Store/Reducers/ConnectionReducer';
 import { useAppDispatch } from '@/Store/hooks';
+import { CLIENT_TYPE_BLOB, DataSource } from '@/api/Models';
 
 const AzureBlobBrowser = () => {
   const dispatch = useAppDispatch();
-  const [accountName, setAccountName] = useState('');
-  const [containerName, setContainerName] = useState('');
+  const [account, setAccount] = useState('');
+  const [container, setContainer] = useState('');
   const [sasToken, setSasToken] = useState('');
   const navigate = useNavigate();
   const onAccountNameChange = (event) => {
-    setAccountName(event.target.value);
+    setAccount(event.target.value);
   };
 
   const onContainerNameChange = (event) => {
-    setContainerName(event.target.value);
+    setContainer(event.target.value);
   };
 
   const onSasTokenChange = (event) => {
@@ -31,10 +28,16 @@ const AzureBlobBrowser = () => {
 
   const onSubmit = async (event) => {
     event.preventDefault();
-    dispatch(updateConnectionAccountName(accountName));
-    dispatch(updateConnectionContainerName(containerName));
-    dispatch(updateConnectionSasToken(sasToken));
-    navigate('/recordings', { accountName: accountName, containerName: containerName, sasToken: sasToken }); // include args in URL for linking-sake
+    var dataSource = {
+      name: account + '/' + container,
+      type: 'blob',
+      account: account,
+      container: container,
+      sasToken: sasToken,
+      description: 'Azure Blob Storage',
+    } as DataSource;
+    dispatch(upsertDataSource(dataSource));
+    navigate(`/recordings/${CLIENT_TYPE_BLOB}/${account}/${container}/${encodeURIComponent(sasToken)}`);
   };
 
   return (
@@ -46,14 +49,14 @@ const AzureBlobBrowser = () => {
           <input
             className="mb-3 w-full rounded mt-1 h-8 p-1 bg-iqengine-tertiary text-black"
             type="text"
-            defaultValue={accountName}
+            defaultValue={account}
             onChange={onAccountNameChange}
           />
           <label>Container Name:</label>
           <input
             className="mb-3 w-full rounded mt-1 h-8 p-1 bg-iqengine-tertiary text-black"
             type="text"
-            defaultValue={containerName}
+            defaultValue={container}
             onChange={onContainerNameChange}
           />
           <label>SAS Token for Container:</label>

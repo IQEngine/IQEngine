@@ -29,11 +29,11 @@ export function convolve(array, taps) {
 }
 
 async function callPyodide(pyodide, pythonSnippet, samples) {
-  console.log('Running Python Snippet');
+  console.debug('Running Python Snippet');
 
   // if for some reason it's still not initialized, return samples without modification
   if (!pyodide) {
-    console.log('Pyodide isnt initialized yet');
+    console.debug('Pyodide isnt initialized yet');
     return samples;
   }
 
@@ -93,7 +93,7 @@ export function convertToFloat32(buffer, dataType) {
     return Float32Array.from(new Float64Array(buffer));
   } else {
     console.error('unsupported dataType');
-    return new Int16Array(buffer);
+    return new Float32Array(buffer);
   }
 }
 

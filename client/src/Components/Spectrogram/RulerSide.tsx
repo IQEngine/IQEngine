@@ -50,7 +50,7 @@ const RulerSide = (props) => {
             y={tick.y}
             width={tick.width}
             height={tick.height}
-            fillEnabled="false"
+            fillEnabled={false}
             stroke="white"
             strokeWidth={1}
             key={index + 2000000}

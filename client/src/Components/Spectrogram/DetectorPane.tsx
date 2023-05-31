@@ -4,8 +4,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { configQuery } from '../../api/config/queries';
-import { useAppDispatch, useAppSelector } from '@/Store/hooks';
-import { setMetaAnnotations } from '@/Store/Reducers/FetchMetaReducer';
+import { useAppDispatch } from '@/Store/hooks';
 
 export const DetectorPane = (props) => {
   let { cursorsEnabled, handleProcessTime } = props;
@@ -16,7 +15,6 @@ export const DetectorPane = (props) => {
   const [value, setValue] = useState(0); // integer state used to force rerender
   const dispatch = useAppDispatch();
   const config = configQuery();
-  const meta = useAppSelector((state) => state.meta);
   useEffect(() => {
     if (!config.data || !config.data.detectorEndpoint) return;
     let detectorEndpoint = 'http://127.0.0.1:8000/detectors/';
@@ -29,20 +27,20 @@ export const DetectorPane = (props) => {
         return response.json();
       })
       .then(function (data) {
-        console.log('Detectors:', data);
+        console.debug('Detectors:', data);
         setDetectorList(data);
       })
       .catch((error) => {
-        console.log(error);
+        console.debug(error);
       });
-  }, [config.data.detectorEndpoint]);
+  }, [config?.data?.detectorEndpoint]);
 
   const handleChangeDetector = (e) => {
     if (!config.data || !config.data.detectorEndpoint) return;
     setSelectedDetector(e.target.value);
     setDetectorParams({}); // in case something goes wrong
     // Fetch the custom params for this detector
-    fetch(detectorEndpoint + e.target.value, { method: 'GET' })
+    fetch(config.data.detectorEndpoint + e.target.value, { method: 'GET' })
       .then(function (response) {
         if (response.status === 404) {
           return {};
@@ -50,7 +48,7 @@ export const DetectorPane = (props) => {
         return response.json();
       })
       .then(function (data) {
-        console.log('Detector Params:', data);
+        console.debug('Detector Params:', data);
         setDetectorParams(data);
       });
   };
@@ -66,8 +64,8 @@ export const DetectorPane = (props) => {
     // this does the tile calc and gets the right samples in currentSamples
     const { trimmedSamples, startSampleOffset } = handleProcessTime();
 
-    const sampleRate = meta['global']['core:sample_rate'];
-    const freq = meta['captures'][0]['core:frequency'];
+    const sampleRate = props.meta['global']['core:sample_rate'];
+    const freq = props.meta['captures'][0]['core:frequency'];
 
     // We can only send normal Arrays over JSON for some reason, so convert it
     const newSamps = Array.from(trimmedSamples);
@@ -87,9 +85,9 @@ export const DetectorPane = (props) => {
         body[key] = value['default'];
       }
     }
-    console.log(body);
+    console.debug(body);
 
-    fetch(detectorEndpoint + selectedDetector, {
+    fetch(config.data.detectorEndpoint + selectedDetector, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -101,12 +99,13 @@ export const DetectorPane = (props) => {
         return response.json();
       })
       .then(function (data) {
-        console.log('Detector Status:', data.status);
-        console.log('Results:', data.annotations);
+        console.debug('Detector Status:', data.status);
+        console.debug('Results:', data.annotations);
         for (let i = 0; i < data.annotations.length; i++) {
           data.annotations[i]['core:sample_start'] += startSampleOffset;
         }
-        dispatch(setMetaAnnotations(data.annotations)); // update the annotations stored in meta state in SpectrogramPage
+        // TODO: QUERY fix on how to update meta
+        // dispatch(setMetaAnnotations(data.annotations)); // update the annotations stored in meta state in SpectrogramPage
       });
   };
 

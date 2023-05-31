@@ -12,14 +12,17 @@ import {
 } from '@/Utils/rfFunctions';
 import { useAppSelector, useAppDispatch } from '@/Store/hooks';
 import AutoSizeInput from '@/Components/AutoSizeInput/AutoSizeInput';
-import { setMetaAnnotation } from '@/Store/Reducers/FetchMetaReducer';
+import { SigMFMetadata } from '@/Utils/sigmfMetadata';
 
-export const AnnotationList = ({ updateSpectrogram }) => {
+interface AnnotationListProps {
+  meta: SigMFMetadata;
+  setHandleTop: any;
+  spectrogramHeight: number;
+}
+
+export const AnnotationList = ({ meta, setHandleTop, spectrogramHeight }: AnnotationListProps) => {
   const [parents, setParents] = useState([]);
   const [data, setData] = useState([]);
-
-  const meta = useAppSelector((state) => state.meta);
-  const blob = useAppSelector((state) => state.blob);
   const dispatch = useAppDispatch();
 
   const getActions = useCallback(
@@ -29,7 +32,9 @@ export const AnnotationList = ({ updateSpectrogram }) => {
           <button
             className="btn-primary"
             onClick={() => {
-              updateSpectrogram(startSampleCount);
+              const fractionIntoFile = startSampleCount / meta.getLengthInIQSamples();
+              const handleTop = fractionIntoFile * spectrogramHeight;
+              setHandleTop(handleTop);
             }}
           >
             <ArrowRightIcon className="h-4 w-4" />
@@ -37,24 +42,25 @@ export const AnnotationList = ({ updateSpectrogram }) => {
         </div>
       );
     },
-    [updateSpectrogram]
+    [meta, spectrogramHeight, setHandleTop]
   );
 
   const updateAnnotation = useCallback(
     (value, parent) => {
+      if (!meta) return;
       let newAnnotationValue = value;
 
       // Get the min and max frequencies
-      const minFreq = meta.captures[0]['core:frequency'] - meta.global['core:sample_rate'] / 2;
-      const maxFreq = meta.captures[0]['core:frequency'] + meta.global['core:sample_rate'] / 2;
+      const minFreq = meta.getCenterFrequency() - meta.getSampleRate() / 2;
+      const maxFreq = meta.getCenterFrequency() + meta.getSampleRate() / 2;
 
       // Get sample rate and sample start
-      const sampleRate = Number(meta.global['core:sample_rate']);
+      const sampleRate = Number(meta.getSampleRate());
       const sampleStart = Number(parent.annotation['core:sample_start']);
 
       // Get the start and end dates
       const startDate = meta.captures[0]['core:datetime'];
-      const endDate = calculateDate(meta.captures[0]['core:datetime'], blob.totalIQSamples, sampleRate);
+      const endDate = calculateDate(meta.captures[0]['core:datetime'], meta.getTotalSamples(), sampleRate);
 
       if (parent.name == 'core:freq_lower_edge') {
         newAnnotationValue = getOriginalFrequency(value, parent.object.unit);
@@ -74,10 +80,11 @@ export const AnnotationList = ({ updateSpectrogram }) => {
       updatedAnnotation[parent.name] = newAnnotationValue ? newAnnotationValue : updatedAnnotation[parent.name];
 
       setData(calculateAnnotationsData());
-      dispatch(setMetaAnnotation({ index: parent.index, annotation: updatedAnnotation }));
-      updateSpectrogram();
+      // TODO: QUERY update annotations
+      // dispatch(setMetaAnnotation({ index: parent.index, annotation: updatedAnnotation }));
+      // updateSpectrogram();
     },
-    [meta, blob]
+    [meta]
   );
 
   const calculateAnnotationsData = useCallback(() => {

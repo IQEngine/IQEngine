@@ -15,7 +15,7 @@ export default function parseMeta(
   try {
     obj = JSON.parse(json_string); // string to JSON
   } catch (e) {
-    console.log('Error parsing meta file:', fName);
+    console.debug('Error parsing meta file:', fName);
     return null;
   }
   const emailName = obj['global']['core:author'] ?? '';

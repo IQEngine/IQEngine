@@ -5,3 +5,4 @@
 export const TILE_SIZE_IN_IQ_SAMPLES = 50 * 1024 * 4; // must lead to doing a power of 2 FFT, and we *4 for datatypes with 4 bytes per sample
 export const MINIMUM_SCROLL_HANDLE_HEIGHT_PIXELS = 10;
 export const MAX_SIMULTANEOUS_FETCHES = 48; // when you drag the scrollbar it can accumulate many real quick, this limits them
+export const DEFAULT_IQ_SLICE_SIZE = TILE_SIZE_IN_IQ_SAMPLES * 10; // 10 tiles
