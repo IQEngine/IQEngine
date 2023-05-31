@@ -14,13 +14,13 @@ def create_datasource(
     ),
 ):
     """
-    Create a new datasource. The datasource will be henceforth identified by accountName/containerName which
+    Create a new datasource. The datasource will be henceforth identified by account/container which
     must be unique or this function will return a 400.
     """
     if datasources.find_one(
         {
-            "accountName": datasource.accountName,
-            "containerName": datasource.containerName,
+            "account": datasource.account,
+            "container": datasource.container,
         }
     ):
         raise HTTPException(status_code=409, detail="Datasource Already Exists")

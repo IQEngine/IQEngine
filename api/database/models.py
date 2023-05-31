@@ -3,15 +3,15 @@ from pydantic import BaseModel, Extra, Field
 
 class DataSource(BaseModel):
     name: str
-    accountName: str
-    containerName: str
+    account: str
+    container: str
     description: str
 
 
 class DataSourceReference(BaseModel):
-    accountName: str
-    containerName: str
-    filepath: str
+    account: str
+    container: str
+    file_path: str
 
 
 class MetadataGlobal(BaseModel):
@@ -36,8 +36,8 @@ class MetadataGlobal(BaseModel):
     core_geolocation: dict | None = Field(alias="core:geolocation")
     core_extensions: list[dict] | None = Field(alias="core:extensions")
     core_collection: str | None = Field(alias="core:collection")
-    rfdx_version: int | None = Field(alias="rfdx:version")
-    rfdx_source: DataSourceReference | None = Field(alias="rfdx:source")
+    traceability_revision: int | None = Field(alias="traceability:revision")
+    traceability_origin: DataSourceReference | None = Field(alias="traceability:origin")
 
     class Config:
         extra = Extra.allow

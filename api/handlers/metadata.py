@@ -7,13 +7,13 @@ router = APIRouter()
 
 
 @router.get(
-    "/api/datasources/{accountName}/{containerName}/meta",
+    "/api/datasources/{account}/{container}/meta",
     status_code=200,
     response_model=list[Metadata],
 )
 def get_all_meta(
-    accountName,
-    containerName,
+    account,
+    container,
     metadatas: Collection[Metadata] = Depends(database.database.metadata_collection),
 ):
     # TODO: Should we validate datasource_id?
@@ -22,8 +22,8 @@ def get_all_meta(
     # list
     metadata = metadatas.find(
         {
-            "global.rfdx:source.accountName": accountName,
-            "global.rfdx:source.containerName": containerName,
+            "global.traceability:origin.account": account,
+            "global.traceability:origin.container": container,
         }
     )
     result = []
@@ -33,20 +33,20 @@ def get_all_meta(
 
 
 @router.get(
-    "/api/datasources/{accountName}/{containerName}/{filepath:path}/meta",
+    "/api/datasources/{account}/{container}/{filepath:path}/meta",
     response_model=Metadata,
 )
 def get_meta(
-    accountName,
-    containerName,
+    account,
+    container,
     filepath,
     metadatas: Collection[Metadata] = Depends(database.database.metadata_collection),
 ):
     metadata = metadatas.find_one(
         {
-            "global.rfdx:source.accountName": accountName,
-            "global.rfdx:source.containerName": containerName,
-            "global.rfdx:source.filepath": filepath,
+            "global.traceability:origin.account": account,
+            "global.traceability:origin.container": container,
+            "global.traceability:origin.file_path": filepath,
         }
     )
     if not metadata:
@@ -55,13 +55,13 @@ def get_meta(
 
 
 @router.post(
-    "/api/datasources/{accountName}/{containerName}/{filepath:path}/meta",
+    "/api/datasources/{account}/{container}/{filepath:path}/meta",
     status_code=201,
     response_model=Metadata,
 )
 def create_meta(
-    accountName: str,
-    containerName: str,
+    account: str,
+    container: str,
     filepath: str,
     metadata: Metadata,
     datasources: Collection[DataSource] = Depends(
@@ -73,31 +73,29 @@ def create_meta(
     ),
 ):
     # Check datasource id is valid
-    datasource = datasources.find_one(
-        {"accountName": accountName, "containerName": containerName}
-    )
+    datasource = datasources.find_one({"account": account, "container": container})
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
 
     # Check metadata doesn't already exist
     if metadatas.find_one(
         {
-            "global.rfdx:source.accountName": accountName,
-            "global.rfdx:source.containerName": containerName,
-            "global.rfdx:source.filepath": filepath,
+            "global.traceability:origin.account": account,
+            "global.traceability:origin.container": container,
+            "global.traceability:origin.file_path": filepath,
         }
     ):
         raise HTTPException(status_code=409, detail="Metadata already exists")
 
     # Create the first metadata record
-    metadata.globalMetadata.rfdx_source = DataSourceReference(
+    metadata.globalMetadata.traceability_origin = DataSourceReference(
         **{
-            "accountName": accountName,
-            "containerName": containerName,
-            "filepath": filepath,
+            "account": account,
+            "container": container,
+            "file_path": filepath,
         }
     )
-    metadata.globalMetadata.rfdx_version = 0
+    metadata.globalMetadata.traceability_revision = 0
     metadatas.insert_one(
         metadata.dict(by_alias=True, exclude_unset=True, exclude_none=True)
     )
@@ -108,12 +106,12 @@ def create_meta(
 
 
 @router.put(
-    "/api/datasources/{accountName}/{containerName}/{filepath:path}/meta",
+    "/api/datasources/{account}/{container}/{filepath:path}/meta",
     status_code=204,
 )
 def update_meta(
-    accountName,
-    containerName,
+    account,
+    container,
     filepath,
     metadata: Metadata,
     metadatas: Collection[Metadata] = Depends(database.database.metadata_collection),
@@ -123,20 +121,22 @@ def update_meta(
 ):
     current = metadatas.find_one(
         {
-            "global.rfdx:source.accountName": accountName,
-            "global.rfdx:source.containerName": containerName,
-            "global.rfdx:source.filepath": filepath,
+            "global.traceability:origin.account": account,
+            "global.traceability:origin.container": container,
+            "global.traceability:origin.file_path": filepath,
         }
     )
     if current is None:
         raise HTTPException(status_code=404, detail="Metadata not found")
     else:
         id = current["_id"]
-        version = current["global"]["rfdx:version"]
+        version = current["global"]["traceability:revision"]
         # This is going to be a race condition
         version_number = version + 1
-        metadata.globalMetadata.rfdx_version = version_number
-        metadata.globalMetadata.rfdx_source = current["global"]["rfdx:source"]
+        metadata.globalMetadata.traceability_revision = version_number
+        metadata.globalMetadata.traceability_origin = current["global"][
+            "traceability:origin"
+        ]
         versions.insert_one(
             metadata.dict(by_alias=True, exclude_unset=True, exclude_none=True)
         )

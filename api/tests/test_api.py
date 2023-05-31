@@ -7,14 +7,12 @@ from database.models import Metadata
 
 test_datasource = {
     "name": "name",
-    "accountName": "accountName",
-    "containerName": "containerName",
+    "account": "account",
+    "container": "container",
     "description": "description",
 }
 
-test_datasource_id = (
-    f'{test_datasource["accountName"]}_{test_datasource["containerName"]}'
-)
+test_datasource_id = f'{test_datasource["account"]}_{test_datasource["container"]}'
 
 valid_metadata = {
     "global": {
@@ -55,7 +53,7 @@ def test_api_returns_ok(client):
     assert response.json() == "OK"
 
 
-# This test no longer valid as URL will never be valid with made up accountName and containerName
+# This test no longer valid as URL will never be valid with made up account and container
 def test_api_post_meta_bad_datasource_id(client):
     response = client.post(
         "/api/datasources/nota/validid/file_path/meta", json=valid_metadata
@@ -76,16 +74,16 @@ def test_api_post_meta_missing_datasource(client):
 def test_api_post_meta(client):
     client.post("/api/datasources", json=test_datasource).json()
     response = client.post(
-        f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/file_path/meta',
+        f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path/meta',
         json=valid_metadata,
     )
     assert response.status_code == 201
     metadata = Metadata.parse_obj(response.json())
-    assert metadata.globalMetadata.rfdx_version == 0
-    assert metadata.globalMetadata.rfdx_source == {
-        "accountName": test_datasource["accountName"],
-        "containerName": test_datasource["containerName"],
-        "filepath": "file_path",
+    assert metadata.globalMetadata.traceability_revision == 0
+    assert metadata.globalMetadata.traceability_origin == {
+        "account": test_datasource["account"],
+        "container": test_datasource["container"],
+        "file_path": "file_path",
     }
     assert (
         metadata.annotations[0].core_sample_start
@@ -104,11 +102,11 @@ def test_api_post_meta(client):
 def test_api_post_existing_meta(client):
     client.post("/api/datasources", json=test_datasource).json()
     response = client.post(
-        f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/file_path/meta',
+        f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path/meta',
         json=valid_metadata,
     )
     response = client.post(
-        f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/file_path/meta',
+        f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path/meta',
         json=valid_metadata,
     )
     assert response.status_code == 409
@@ -118,12 +116,12 @@ def test_api_post_existing_meta(client):
 def test_api_put_meta(client):
     client.post("/api/datasources", json=test_datasource).json()
     response = client.post(
-        f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/file_path/meta',
+        f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path/meta',
         json=valid_metadata,
     )
     assert response.status_code == 201
     response = client.put(
-        f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/file_path/meta',
+        f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path/meta',
         json=valid_metadata,
     )
     assert response.status_code == 204
@@ -132,7 +130,7 @@ def test_api_put_meta(client):
 def test_api_put_meta_not_existing(client):
     client.post("/api/datasources", json=test_datasource).json()
     response = client.put(
-        f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/file_path/meta',
+        f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path/meta',
         json=valid_metadata,
     )
     assert response.status_code == 404
@@ -141,23 +139,23 @@ def test_api_put_meta_not_existing(client):
 def test_api_get_meta(client):
     client.post("/api/datasources", json=test_datasource).json()
     response = client.post(
-        f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/file_path/meta',
+        f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path/meta',
         json=valid_metadata,
     )
     response = client.get(
-        f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/file_path/meta'
+        f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path/meta'
     )
     assert response.status_code == 200
 
 
 def test_api_get_meta_not_existing(client):
     response = client.get(
-        f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/file_path/meta'
+        f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path/meta'
     )
     assert response.status_code == 404  # Because the datasource doesn't exist
     client.post("/api/datasources", json=test_datasource).json()
     response = client.get(
-        '/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/file_path/meta'
+        '/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path/meta'
     )
     assert response.status_code == 404  # Because the metadata doesn't exist
 
@@ -165,15 +163,15 @@ def test_api_get_meta_not_existing(client):
 def test_api_get_all_meta(client):
     client.post("/api/datasources", json=test_datasource).json()
     client.post(
-        f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/record_a/meta',
+        f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/record_a/meta',
         json=valid_metadata,
     )
     client.post(
-        f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/record_b/meta',
+        f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/record_b/meta',
         json=valid_metadata,
     )
     response = client.get(
-        f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/meta'
+        f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/meta'
     )
     assert response.status_code == 200
     assert len(response.json()) == 2
@@ -198,77 +196,77 @@ def test_api_get_datasources(client):
 def test_api_filename_url_encoded(client):
     client.post("/api/datasources", json=test_datasource).json()
     response = client.post(
-        f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/file%2Fpath/meta',
+        f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file%2Fpath/meta',
         json=valid_metadata,
     )
     assert response.status_code == 201
     response = client.get(
-        f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/file%2Fpath/meta'
+        f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file%2Fpath/meta'
     )
     assert response.status_code == 200
     response_object = response.json()
     assert (
-        response_object["global"]["rfdx:source"]["accountName"]
-        == test_datasource["accountName"]
+        response_object["global"]["traceability:origin"]["account"]
+        == test_datasource["account"]
     )
     assert (
-        response_object["global"]["rfdx:source"]["containerName"]
-        == test_datasource["containerName"]
+        response_object["global"]["traceability:origin"]["container"]
+        == test_datasource["container"]
     )
-    assert response_object["global"]["rfdx:source"]["filepath"] == "file/path"
+    assert response_object["global"]["traceability:origin"]["file_path"] == "file/path"
 
 
 def test_api_filename_non_url_encoded(client):
     client.post("/api/datasources", json=test_datasource).json()
     response = client.post(
-        f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/file/path/meta',
+        f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file/path/meta',
         json=valid_metadata,
     )
     assert response.status_code == 201
     response = client.get(
-        f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/file/path/meta'
+        f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file/path/meta'
     )
     assert response.status_code == 200
     response_object = response.json()
     assert (
-        response_object["global"]["rfdx:source"]["accountName"]
-        == test_datasource["accountName"]
+        response_object["global"]["traceability:origin"]["account"]
+        == test_datasource["account"]
     )
     assert (
-        response_object["global"]["rfdx:source"]["containerName"]
-        == test_datasource["containerName"]
+        response_object["global"]["traceability:origin"]["container"]
+        == test_datasource["container"]
     )
-    assert response_object["global"]["rfdx:source"]["filepath"] == "file/path"
-    assert response_object["global"]["rfdx:version"] == 0
+    assert response_object["global"]["traceability:origin"]["file_path"] == "file/path"
+    assert response_object["global"]["traceability:revision"] == 0
 
 
 def test_api_update_file_version(client):
     client.post("/api/datasources", json=test_datasource).json()
     response = client.post(
-        f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/file/path/meta',
+        f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file/path/meta',
         json=valid_metadata,
     )
     assert response.status_code == 201
     new_metadata = valid_metadata
     new_metadata["annotations"][0]["core:sample_start"] = 10000
     response = client.put(
-        f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/file/path/meta',
+        f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file/path/meta',
         json=new_metadata,
     )
     assert response.status_code == 204
     response = client.get(
-        f'/api/datasources/{test_datasource["accountName"]}/{test_datasource["containerName"]}/file/path/meta'
+        f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file/path/meta'
     )
     assert response.status_code == 200
     response_object = response.json()
-    assert response_object["global"]["rfdx:version"] == 1
+    assert response_object["global"]["traceability:revision"] == 1
     assert (
-        response_object["global"]["rfdx:source"]["accountName"]
-        == test_datasource["accountName"]
+        response_object["global"]["traceability:origin"]["account"]
+        == test_datasource["account"]
     )
     assert (
-        response_object["global"]["rfdx:source"]["containerName"]
-        == test_datasource["containerName"]
+        response_object["global"]["traceability:origin"]["container"]
+        == test_datasource["container"]
     )
-    assert response_object["global"]["rfdx:source"]["filepath"] == "file/path"
+    assert response_object["global"]["traceability:origin"]["file_path"] == "file/path"
     assert response_object["annotations"][0]["core:sample_start"] == 10000
