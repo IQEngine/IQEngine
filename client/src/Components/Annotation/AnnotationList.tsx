@@ -10,16 +10,18 @@ import {
   validateFrequency,
   validateDate,
 } from '@/Utils/rfFunctions';
+import { useAppSelector, useAppDispatch } from '@/Store/hooks';
 import AutoSizeInput from '@/Components/AutoSizeInput/AutoSizeInput';
+import { setMetaAnnotation } from '@/Store/Reducers/FetchMetaReducer';
 
-export const Annotations = ({ meta, totalIQSamples, updateSpectrogram }) => {
-  const [metadata, setMetadata] = useState(meta);
+export const AnnotationList = ({ updateSpectrogram }) => {
   const [parents, setParents] = useState([]);
   const [data, setData] = useState([]);
 
-  useEffect(() => {
-    setMetadata(meta);
-  }, [meta]);
+  let meta = useAppSelector((state) => state.meta);
+  const blob = useAppSelector((state) => state.blob);
+
+  const dispatch = useAppDispatch();
 
   const getActions = useCallback(
     (startSampleCount) => {
@@ -42,7 +44,7 @@ export const Annotations = ({ meta, totalIQSamples, updateSpectrogram }) => {
   const updateAnnotation = useCallback(
     (value, parent) => {
       let newAnnotationValue = value;
-      let currentMetadata = metadata;
+      let currentMetadata = meta;
 
       // Get the min and max frequencies
       const minFreq = currentMetadata.captures[0]['core:frequency'] - currentMetadata.global['core:sample_rate'] / 2;
@@ -54,7 +56,7 @@ export const Annotations = ({ meta, totalIQSamples, updateSpectrogram }) => {
 
       // Get the start and end dates
       const startDate = currentMetadata.captures[0]['core:datetime'];
-      const endDate = calculateDate(currentMetadata.captures[0]['core:datetime'], totalIQSamples, sampleRate);
+      const endDate = calculateDate(currentMetadata.captures[0]['core:datetime'], blob.totalIQSamples, sampleRate);
 
       if (parent.name == 'core:freq_lower_edge') {
         newAnnotationValue = getOriginalFrequency(value, parent.object.unit);
@@ -70,25 +72,25 @@ export const Annotations = ({ meta, totalIQSamples, updateSpectrogram }) => {
         parent.error = validateDate(value, startDate, endDate);
       }
 
-      let updatedAnnotation = parent.annotation;
+      let updatedAnnotation = { ...parent.annotation };
       updatedAnnotation[parent.name] = newAnnotationValue ? newAnnotationValue : updatedAnnotation[parent.name];
-      currentMetadata.annotations[parent.index] = updatedAnnotation;
-      setMetadata(currentMetadata);
+
       setData(calculateAnnotationsData());
+      dispatch(setMetaAnnotation({ index: parent.index, annotation: updatedAnnotation }));
       updateSpectrogram();
     },
-    [metadata, totalIQSamples]
+    [meta, blob]
   );
 
   const calculateAnnotationsData = useCallback(() => {
     let data = [];
-    const startCapture = metadata?.captures[0];
+    const startCapture = meta?.captures[0];
     let currentParents = parents;
 
     if (startCapture && startCapture['core:datetime']) {
-      for (let i = 0; i < metadata.annotations?.length; i++) {
-        const annotation = metadata.annotations[i];
-        const sampleRate = Number(metadata.global['core:sample_rate']);
+      for (let i = 0; i < meta.annotations?.length; i++) {
+        const annotation = meta.annotations[i];
+        const sampleRate = Number(meta.global['core:sample_rate']);
         const startDate = startCapture['core:datetime'];
         const startSampleCount = Number(annotation['core:sample_start']);
         const sampleCount = Number(annotation['core:sample_count']);
@@ -220,7 +222,7 @@ export const Annotations = ({ meta, totalIQSamples, updateSpectrogram }) => {
 
     setParents(currentParents);
     return data;
-  }, [metadata, parents, updateAnnotation]);
+  }, [meta, parents, updateAnnotation]);
 
   useEffect(() => {
     setData(calculateAnnotationsData());
@@ -242,4 +244,4 @@ export const Annotations = ({ meta, totalIQSamples, updateSpectrogram }) => {
   );
 };
 
-export default Annotations;
+export default AnnotationList;

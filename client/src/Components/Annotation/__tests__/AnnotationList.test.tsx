@@ -1,23 +1,51 @@
-import { describe, expect, test, vi } from 'vitest';
-import { render, cleanup, screen } from '@testing-library/react';
+import { describe, expect, test } from 'vitest';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
-import { Annotations } from '@/Features/Annotations/Annotations';
+import { AnnotationList } from '@/Components/Annotation/AnnotationList';
 import React from 'react';
-import metadataJson from './Annotations.test.meta.json';
+import metadataJson from './AnnotationList.test.meta.json';
+import { configureStore } from '@reduxjs/toolkit';
+import blobReducer from '@/Store/Reducers/BlobReducer';
+import fetchMetaReducer from '@/Store/Reducers/FetchMetaReducer';
+import { Provider } from 'react-redux';
 
-describe('Annotations feature component', () => {
+describe('Annotation list component', () => {
   beforeEach(() => {
-    cleanup();
-  });
-  test('Display correct data on initial view', async () => {
     //Arrange
     //Javascript keeps modifying the metadata object, so we have to make a copy of it
-    const metadata = JSON.parse(JSON.stringify(metadataJson));
+    const meta = JSON.parse(JSON.stringify(metadataJson));
+
+    const blob = {
+      size: 0,
+      totalIQSamples: 20000000,
+      currentMax: 0,
+      status: 'idle',
+      taps: null,
+      pythonSnippet: '',
+      numActiveFetches: 0,
+      iqData: {},
+      fftData: {},
+      sampleRate: 1,
+    };
+
+    const store = configureStore({
+      reducer: {
+        blob: blobReducer || (() => {}),
+        meta: fetchMetaReducer || (() => {}),
+      },
+      preloadedState: { blob, meta },
+    });
 
     // Act
-    render(<Annotations meta={metadata} totalIQSamples={20000000} updateSpectrogram={() => {}} />);
+    render(
+      <Provider store={store}>
+        <AnnotationList updateSpectrogram={() => {}}></AnnotationList>
+      </Provider>
+    );
+  });
 
+  test('Display correct data on initial view', async () => {
     // Assert
     expect(await screen.findByText('883.275')).toBeInTheDocument();
     expect(await screen.findByText('884.625')).toBeInTheDocument();
@@ -41,11 +69,6 @@ describe('Annotations feature component', () => {
     ${'2022-03-17T16:45:30.0000Z'} | ${'Annotation 0 - End Time'}        | ${'textbox'}    | ${'Date must be before end of the file'}                              | ${9}
     ${'Invalid date'}              | ${'Annotation 0 - End Time'}        | ${'textbox'}    | ${'Invalid date'}                                                     | ${10}
   `('Annotation errors display correctly on tab escape', async ({ input, label, type, expected }) => {
-    //Arrange
-    //Javascript keeps modifying the metadata object, so we have to make a copy of it
-    const metadata = JSON.parse(JSON.stringify(metadataJson));
-    render(<Annotations meta={metadata} totalIQSamples={20000000} updateSpectrogram={() => {}} />);
-
     // Act
     const start = await screen.findByRole(type, { name: label });
 
@@ -71,11 +94,6 @@ describe('Annotations feature component', () => {
     ${'2022-03-17T16:45:30.0000Z'} | ${'Annotation 0 - End Time'}        | ${'textbox'}    | ${'Date must be before end of the file'}                              | ${9}
     ${'Invalid date'}              | ${'Annotation 0 - End Time'}        | ${'textbox'}    | ${'Invalid date'}                                                     | ${10}
   `('Annotation errors display correctly on enter', async ({ input, label, type, expected }) => {
-    //Arrange
-    //Javascript keeps modifying the metadata object, so we have to make a copy of it
-    const metadata = JSON.parse(JSON.stringify(metadataJson));
-    render(<Annotations meta={metadata} totalIQSamples={20000000} updateSpectrogram={() => {}} />);
-
     // Act
     const start = await screen.findByRole(type, { name: label });
 
@@ -96,14 +114,9 @@ describe('Annotations feature component', () => {
     ${'2022-03-17T16:43:30.002Z'} | ${'Annotation 0 - Start Time'}      | ${'textbox'}    | ${'2022-03-17T16:43:30.002Z'}
     ${'2022-03-17T16:45:30.003Z'} | ${'Annotation 0 - End Time'}        | ${'textbox'}    | ${'2022-03-17T16:45:30.003Z'}
   `('Annotation updates values correctly', async ({ input, label, type, expected }) => {
-    //Arrange
-    //Javascript keeps modifying the metadata object, so we have to make a copy of it
-    const metadata = JSON.parse(JSON.stringify(metadataJson));
-    render(<Annotations meta={metadata} totalIQSamples={20000000} updateSpectrogram={() => {}} />);
-
+    // Act
     expect(await screen.queryByText(expected)).not.toBeInTheDocument();
 
-    // Act
     const start = await screen.findByRole(type, { name: label });
     await userEvent.clear(start);
     await userEvent.type(start, input);
