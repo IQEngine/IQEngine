@@ -57,7 +57,9 @@ export const fetchMetaSlicer = createSlice({
       state.global = initialState.global;
     },
     setMeta: (state, action) => {
-      state = action.payload;
+      state.global = action.payload.global;
+      state.annotations = action.payload.annotations;
+      state.captures = action.payload.captures;
     },
     setMetaGlobal: (state, action) => {
       state.global = action.payload;
