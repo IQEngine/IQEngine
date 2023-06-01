@@ -1,5 +1,7 @@
 export interface SigMFMetadata {
     "global": {
+      "antenna:gain"?: Number
+      "antenna:type"?: String
       "core:datatype": String
       "core:sample_rate"?: Number
       "core:version": String
