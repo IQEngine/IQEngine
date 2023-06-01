@@ -42,7 +42,7 @@ const Sidebar = (props) => {
 
       <details>
         <summary className="pl-2 mt-2 bg-iqengine-primary outline outline-1 outline-iqengine-primary text-lg text-black hover:bg-green-800">
-          Metadata
+          Global Properties
         </summary>
         <div className="outline outline-1 outline-iqengine-primary p-2">
           <InfoPane />

@@ -1,11 +1,7 @@
 // Copyright (c) 2022 Microsoft Corporation
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
-
-import InputGroup from 'react-bootstrap/InputGroup';
 import React from 'react';
-import { Form } from 'react-bootstrap/esm';
-import Button from 'react-bootstrap/Button';
 import { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/Store/hooks';
 import { setMetaGlobal } from '@/Store/Reducers/FetchMetaReducer';
@@ -14,6 +10,8 @@ export default function InfoPane(props) {
   const metaGlobal = useAppSelector((state) => state.meta.global);
   const [newMetaGlobal, setNewMetaGlobal] = useState(metaGlobal);
   const [error, setError] = useState('');
+  const dispatch = useAppDispatch();
+
   useEffect(() => {
     setNewMetaGlobal(metaGlobal);
   }, [metaGlobal]);
@@ -50,27 +48,28 @@ export default function InfoPane(props) {
 
   return (
     <div>
-      <Form key={'InfoPane'}>
+      <div key={'InfoPane'}>
         {Object.entries(metaGlobal).map(([key, value]) => (
-          <Form.Group className="mb-3" controlId="formBasicEmail" key={key}>
-            <Form.Label>
+          <div className="mb-3" controlId="formBasicEmail" key={key}>
+            <label className="label-text text-base">
               {titleCase(key.replace('core:', '').replace(':', ' ').replace('_', ' ').replace('hw', 'Hardware'))}
-            </Form.Label>
+            </label>
             {key === 'core:extensions' && <div style={{ color: 'red' }}>{error}</div>}
-            <InputGroup className="mb-3">
-              <Form.Control
+            <div className="mb-3">
+              <input
                 type="text"
                 defaultValue={key === 'core:extensions' ? JSON.stringify(value) : value}
                 onChange={(event) => handleChange(event, key)}
                 size="sm"
+                className="h-8 rounded text-base-100 ml-1 pl-2"
               />
-            </InputGroup>
-          </Form.Group>
+            </div>
+          </div>
         ))}
-        <Button variant="success" onClick={handleClick} disabled={error.length > 0}>
+        <button className="btn-primary" onClick={handleClick} disabled={error.length > 0}>
           Save
-        </Button>
-      </Form>
+        </button>
+      </div>
     </div>
   );
 }

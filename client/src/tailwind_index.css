@@ -76,7 +76,7 @@
   }
   
   .slider-track {
-    @apply absolute rounded-sm h-1 bg-base-100 z-10 w-full;
+    @apply absolute rounded-sm h-1 bg-neutral z-10 w-full opacity-50;
   }
 
   .slider-range {
