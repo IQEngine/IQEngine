@@ -1,1 +1,1 @@
-export const sigmfSchema = import("../,,/../../../../client/src/Components/Validator/sigmf-schema.json");
+export const sigmfSchema = import("../../../../client/src/Components/Validator/sigmf-schema.json");
