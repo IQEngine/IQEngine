@@ -166,7 +166,7 @@ export const AnnotationList = ({ updateSpectrogram }) => {
                   onBlur={updateAnnotation}
                 />
               </div>
-              <div>{startFrequency.unit} - </div>
+              <div className="flex items-center">{startFrequency.unit} - </div>
               <div>
                 <AutoSizeInput
                   label={`Annotation ${i} - Frequency End`}
@@ -177,7 +177,7 @@ export const AnnotationList = ({ updateSpectrogram }) => {
                   onBlur={updateAnnotation}
                 />
               </div>
-              <div>{endFrequency.unit}</div>
+              <div className="flex items-center">{endFrequency.unit}</div>
             </div>
           ),
           bandwidthHz: bandwidthHz.freq + bandwidthHz.unit,
@@ -199,7 +199,7 @@ export const AnnotationList = ({ updateSpectrogram }) => {
                   onBlur={updateAnnotation}
                 />
               </div>
-              <div> - </div>
+              <div className="flex items-center"> - </div>
               <div>
                 <AutoSizeInput
                   label={`Annotation ${i} - End Time`}

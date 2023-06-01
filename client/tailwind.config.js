@@ -11,5 +11,22 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  daisyui: {
+    themes: [
+      {
+        mytheme: {
+          primary: '#4CE091',
+          secondary: '#136f63',
+          accent: '#84cae7',
+          neutral: '#2A2933',
+          'base-100': '#05041C',
+          info: '#386BE0',
+          success: '#149964',
+          warning: '#A07E0D',
+          error: '#F9666B',
+        },
+      },
+    ],
+  },
+  plugins: [require('daisyui')],
 };

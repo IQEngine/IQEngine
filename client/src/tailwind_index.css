@@ -54,4 +54,44 @@
   .btn-primary {
     @apply bg-iqengine-secondary hover:bg-iqengine-secondary hover:bg-opacity-50 text-white py-2 px-3 rounded;
   }
+
+  .slider {
+    @apply relative w-48;
+  }
+
+  .slider-container {
+    @apply h-8 flex items-center justify-center;
+  }
+
+  .slider-left-value {
+    @apply absolute text-lg mt-1 left-px;
+  }
+
+  .slider-right-value {
+    @apply absolute text-lg mb-10 mt-1 right-px;
+  }
+  
+  .slider-track {
+    @apply absolute rounded-sm h-1 bg-base-100 z-10 w-full;
+  }
+
+  .slider-range {
+    @apply absolute rounded-sm h-1 bg-primary z-20 w-full;
+  }
+
+  .thumb {
+    @apply pointer-events-none absolute h-0 w-48 outline-none appearance-none;
+  }
+
+  .thumb::-webkit-slider-thumb{
+    @apply bg-accent cursor-pointer h-4 w-4 mt-1 pointer-events-auto relative rounded-lg appearance-none;
+  }
+
+  .thumb::-moz-range-thumb{
+    @apply bg-accent cursor-pointer h-4 w-4 mt-1 pointer-events-auto relative rounded-lg appearance-none;
+  }
+
+  .label-text{
+    @apply font-bold text-center;
+  }
 }

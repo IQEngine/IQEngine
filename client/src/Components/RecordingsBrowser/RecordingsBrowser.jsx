@@ -4,7 +4,6 @@
 
 import React, { useEffect, useState } from 'react';
 import Directory from './Directory';
-import Spinner from 'react-bootstrap/Spinner';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import {
@@ -176,13 +175,21 @@ export default function RecordingsBrowser() {
   }
 
   return (
-    <div className="container-fluid" style={{ width: '90%', marginTop: '30px' }}>
+    <div className="container-fluid">
       {load ? (
         <center>
-          <Spinner animation="border" variant="light" style={{ width: '25em', height: '25em', margin: '10em 0 0 0' }} />
+          <svg
+            className="animate-spin ml-1 mr-3 h-2/5 w-2/5 text-white"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1"></circle>
+            <circle className="percent fifty stroke-current text-primary" cx="12" cy="12" r="10" pathLength="100" />
+          </svg>
         </center>
       ) : (
-        <table className="table">
+        <table className="table w-full">
           <thead>
             <tr style={{ textAlign: 'center' }}>
               <th>Spectrogram Thumbnail</th>

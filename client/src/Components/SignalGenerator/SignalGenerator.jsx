@@ -2,7 +2,6 @@
 // Licensed under the MIT License
 
 import React, { useEffect, useState } from 'react';
-import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { Container, Row, Col } from 'react-bootstrap';
 import { vscodeDark } from '@uiw/codemirror-theme-vscode';
@@ -314,14 +313,14 @@ print('NumPy Version:', numpy.version.version)
                 theme={vscodeDark}
               />
               <br></br>
-              <Button
+              <button
                 className="mb-3"
                 variant="secondary"
                 disabled={state.buttonDisabled}
                 onClick={onSubmitPythonSnippet}
               >
                 {state.buttonText}
-              </Button>
+              </button>
               <br></br>
               <InputGroup>
                 <Form.Check

@@ -519,7 +519,7 @@ export const SpectrogramPage = (props) => {
             Annotations
           </summary>
           <div className="outline outline-1 outline-iqengine-primary p-2">
-            <AnnotationList meta={meta} totalIQSamples={blob.totalIQSamples} updateSpectrogram={updateSpectrogram} />
+            <AnnotationList updateSpectrogram={updateSpectrogram} />
           </div>
         </details>
 

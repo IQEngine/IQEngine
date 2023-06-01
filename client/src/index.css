@@ -189,3 +189,12 @@ div.datatypetext {
 .input-number {
   max-width:60px;
 }
+
+.percent {
+  stroke-dasharray: 100;
+  stroke-dashoffset: calc(100 - var(--val));
+}
+
+.fifty {
+  --val: 50;
+}
