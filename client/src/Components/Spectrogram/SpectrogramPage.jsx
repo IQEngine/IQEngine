@@ -552,6 +552,7 @@ export const SpectrogramPage = (props) => {
             <div>
               <textarea
                 rows="20"
+                className="bg-neutral text-base-100"
                 style={{ width: '100%' }}
                 onChange={handleMetaAnnotation}
                 value={JSON.stringify(meta, null, 4)}

@@ -236,7 +236,7 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
 
       <div className="mb-3 flex">
         <div className="dropdown dropdown-hover">
-          <label tabIndex={0} className="btn-primary m-1 bg-primary">
+          <label tabIndex={0} className="btn-primary m-1">
             Example Filter Taps
           </label>
           <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
@@ -266,7 +266,7 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
 
       <div className="mb-3 flex">
         <div className="dropdown dropdown-hover">
-          <label tabIndex={0} className="btn-primary m-1 bg-primary">
+          <label tabIndex={0} className="btn-primary m-1">
             Window
           </label>
           <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
@@ -309,14 +309,14 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
           <span className="label-text text-base">Python Snippet</span>
         </label>
         <textarea
-          className="bg-base-100"
+          className="bg-neutral text-base-100 p-1"
           rows="6"
           cols="28"
           wrap="off"
           onChange={onChangePythonSnippet}
           value={state.pythonSnippet}
         />
-        <button className="btn-primary bg-primary" onClick={onSubmitPythonSnippet}>
+        <button className="btn-primary" onClick={onSubmitPythonSnippet}>
           Run Python
         </button>
       </div>

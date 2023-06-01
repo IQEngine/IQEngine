@@ -3,8 +3,6 @@
 // Licensed under the MIT License
 
 import React, { useState, useEffect } from 'react';
-import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button';
 import { configQuery } from '../../api/config/queries';
 import { useAppDispatch, useAppSelector } from '@/Store/hooks';
 import { setMetaAnnotations } from '@/Store/Reducers/FetchMetaReducer';
@@ -119,41 +117,43 @@ export const DetectorPane = (props) => {
   };
 
   return (
-    <Form className="detectForm" controlid="detectFormId" onSubmit={handleSubmit}>
-      <Form.Label>Detector:</Form.Label>
-      <select value={selectedDetector} onChange={handleChangeDetector}>
-        <option disabled value="default">
-          Select a Detector
-        </option>
-        {detectorList.map((detectorName, index) => (
-          <option key={index} value={detectorName}>
-            {detectorName}
+    <div className="detectForm" id="detectFormId" onSubmit={handleSubmit}>
+      <label className="label">
+        Detector:
+        <select className="rounded bg-neutral text-base-100" value={selectedDetector} onChange={handleChangeDetector}>
+          <option disabled value="default">
+            Select a Detector
           </option>
-        ))}
-      </select>
+          {detectorList.map((detectorName, index) => (
+            <option key={index} value={detectorName}>
+              {detectorName}
+            </option>
+          ))}
+        </select>
+      </label>
       {Object.keys(detectorParams).length > 0 && (
         <>
-          <Form.Label>Params:</Form.Label>
+          <label className="label">Params:</label>
           <br></br>{' '}
-          <Form.Group className="mb-3">
+          <div className="mb-3">
             {Object.keys(detectorParams).map((key, index) => (
-              <Form.Label key={index}>
+              <label className="label" key={index}>
                 {detectorParams[key]['title']} - {detectorParams[key]['type']}
-                <Form.Control
+                <input
                   type="text"
                   name={key}
                   value={detectorParams[key]['default']}
                   onChange={handleChange}
-                  className="form-control"
+                  className="h-10 text-base-100 pl-2"
                 />
-              </Form.Label>
+              </label>
             ))}
-          </Form.Group>
-          <Button type="submit" variant="primary">
+          </div>
+          <button type="submit" className="btn-primary">
             Run Detector
-          </Button>
+          </button>
         </>
       )}
-    </Form>
+    </div>
   );
 };

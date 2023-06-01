@@ -18,9 +18,13 @@
   h5 {
     @apply text-iqengine-primary;
   }
-
+  
   body {
-    @apply bg-iqengine-bg;
+    @apply text-iqengine-neutral;
+  }
+  
+  .label-text {
+    @apply !text-iqengine-neutral;
   }
 
   .flexOne {
