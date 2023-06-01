@@ -3,10 +3,13 @@
 // Licensed under the MIT License
 
 import { BlobServiceClient } from '@azure/storage-blob';
+import Ajv, {JSONSchemaType} from "ajv";
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { updateBlobTotalIQSamples } from './BlobReducer';
 import { dataTypeToBytesPerSample } from '@/Utils/selector';
 import { updateConnectionBlobClient } from './ConnectionReducer';
+import { sigmfSchema } from '@/Components/Validator/SigMFSchema';
+
 
 const initialState = { annotations: [], captures: [], global: {} };
 
@@ -40,6 +43,16 @@ export const fetchMeta = createAsyncThunk('fetchMata/fetchMeta', async (args: an
       updateBlobTotalIQSamples(dataFile.size / dataTypeToBytesPerSample(meta_json['global']['core:datatype']) / 2)
     );
     thunkAPI.dispatch(updateConnectionBlobClient('not null')); // even though we dont use the blobclient for local files, this triggers the initial fetch/render
+  }
+
+  const ajv = new Ajv()
+
+  const validate = ajv.compile(sigmfSchema)
+  if (validate(meta_json)) {
+    console.log("Metadata is valid.")
+  } else {
+    console.log("Metadata is invalid.")
+    console.log(validate.errors)
   }
   return meta_json;
 });
