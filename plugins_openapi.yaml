@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: IQEngine Plugins Open Interface API
   description: |
-    This API allows an RF Function to be called from IQEngine, and it is heavily based on the SigMF metadata standard.
+    The plugins API is a unified open interface for managing the processing of RF recordings and corresponding dataflow, with the goal of standardizing inputs and outputs to RF processing functions for easy of interoperability and to combat vendor lockin. The plugins API is planned to be converted to an OpenAPI spec once its further refined.  It will use JSON for the fields.
   version: 0.0.1
 paths:
   /:
@@ -81,6 +81,7 @@ paths:
               required:
                 - sample_rate
                 - center_freq
+                - data_type
               properties:
                 samples: # IQ samples but as an array of floats or ints, in form IQIQIQIQ...
                   example: [1, 2, 3, 4, 5, 6] # means [1+2j, 3+4j, 5+6j], can be ints or floats
@@ -102,11 +103,19 @@ paths:
                       type: integer
                     sample_count:
                       type: integer
-                # Always provide sample rate and center freq
+                # Always provide sample rate, center freq, data type
                 sample_rate:
                   type: number
                 center_freq:
                   type: number
+                # Initially for data_type we'll only support
+                # Complex signed 8-bit int "ci8_le"
+                # Complex signed 16-bit int "ci16_le"
+                # Complex signed 32-bit int "ci32_le"
+                # Complex 32-bit float "cf32_le"
+                # Complex 64-bit float "cf64_le"
+                data_type:
+                  type: string
                 # Custom params
                 additionalProperties:
                   anyOf:
