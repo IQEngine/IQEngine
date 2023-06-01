@@ -1,0 +1,34 @@
+{
+  "allOf": [
+    { "$ref": "./sigmf-schema.json" },
+    {
+      "properties": {
+        "annotations": {
+          "required": ["adsb:downlink_format", "adsb:message_type", "adsb:ICA_address", "adsb:binary"],
+          "properties": {
+            "adsb:downlink_format": {
+              "$id": "#/properties/annotations/properties/adsb%3Adownlink_format",
+              "description": "Indicates if an ADS-B signal is a Mode S Short (11) or a Mode S Extended (17) signal.",
+              "type": "integer"
+            },
+            "adsb:message_type": {
+              "$id": "#/properties/annotations/properties/adsb%3Amessage_type",
+              "description": "Indicates the type of data in a Mode S Extended signal. The message type code range is from 0 to 31. The type of messages are aircraft identification (1-4), surface position (5-8), airborne position with barometric (9-18), airborne velocities (19), airborne position with GNSS (20-22), testing (23), reserved (24-27, 30), Emergency/Airborne Collision Avoidance System (ACAS) status (28), trajectory change (29), and aircraft operational status (31). A signal with a Mode S Short downlink format does not contains a message and is represented by 0.",
+              "type": "integer"
+            },
+            "adsb:ICA_address": {
+              "$id": "#/properties/annotations/properties/adsb%3AICA_address",
+              "description": "Indicates the type of data in a Mode S Extended signal. The message type code range is from 0 to 31. The type of messages are aircraft identification (1-4), surface position (5-8), airborne position with barometric (9-18), airborne velocities (19), airborne position with GNSS (20-22), testing (23), reserved (24-27, 30), Emergency/Airborne Collision Avoidance System (ACAS) status (28), trajectory change (29), and aircraft operational status (31). A signal with a Mode S Short downlink format does not contains a message and is represented by 0.",
+              "type": "number"
+            },
+            "adsb:binary": {
+              "$id": "#/properties/annotations/properties/adsb%3Abinary",
+              "description": "The binary signal, either 56 bits (Mode S Short) or 112 bits (Mode S Extended).",
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  ]
+}
