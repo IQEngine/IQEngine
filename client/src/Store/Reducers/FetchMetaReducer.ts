@@ -3,13 +3,12 @@
 // Licensed under the MIT License
 
 import { BlobServiceClient } from '@azure/storage-blob';
-import Ajv, {JSONSchemaType} from "ajv";
+import Ajv from 'ajv';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { updateBlobTotalIQSamples } from './BlobReducer';
 import { dataTypeToBytesPerSample } from '@/Utils/selector';
 import { updateConnectionBlobClient } from './ConnectionReducer';
-import { sigmfSchema } from '@/Components/Validator/SigMFSchema';
-
+import sigmfSchema from '@/Components/Validator/sigmf-schema.json';
 
 const initialState = { annotations: [], captures: [], global: {} };
 
@@ -45,15 +44,20 @@ export const fetchMeta = createAsyncThunk('fetchMata/fetchMeta', async (args: an
     thunkAPI.dispatch(updateConnectionBlobClient('not null')); // even though we dont use the blobclient for local files, this triggers the initial fetch/render
   }
 
-  const ajv = new Ajv()
-
-  const validate = ajv.compile(sigmfSchema)
-  if (validate(meta_json)) {
-    console.log("Metadata is valid.")
-  } else {
-    console.log("Metadata is invalid.")
-    console.log(validate.errors)
+  const ajv = new Ajv({ strict: false });
+  try {
+    const validate = ajv.compile(sigmfSchema);
+    if (validate(meta_json)) {
+      console.log('Metadata is valid.');
+    } else {
+      console.error('Metadata is invalid.');
+      console.error(validate.errors);
+    }
+  } catch (err) {
+    console.error('Metadata is invalid.');
+    console.error(err);
   }
+
   return meta_json;
 });
 
