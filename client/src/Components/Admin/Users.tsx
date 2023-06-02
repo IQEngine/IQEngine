@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import Table from 'react-bootstrap/Table';
 import users from './users.json';
 
 const Users = () => {
@@ -8,7 +7,7 @@ const Users = () => {
   return (
     <>
       <h4>Users:</h4>
-      <Table striped bordered hover>
+      <table className="table table-zebra w-full">
         <thead>
           <tr>
             <th></th>
@@ -40,7 +39,7 @@ const Users = () => {
             </tr>
           ))}
         </tbody>
-      </Table>
+      </table>
     </>
   );
 };

@@ -1,18 +1,11 @@
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
 
-import React, { useEffect, useState } from 'react';
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
-import { Container, Row, Col } from 'react-bootstrap';
+import React, { useEffect, useState, useCallback } from 'react';
 import { vscodeDark } from '@uiw/codemirror-theme-vscode';
 import CodeMirror from '@uiw/react-codemirror';
 import { python } from '@codemirror/lang-python';
-import Tab from 'react-bootstrap/Tab';
-import Tabs from 'react-bootstrap/Tabs';
 import { examplesList } from './examples/exampleList';
-import Select from 'react-select';
-import InputGroup from 'react-bootstrap/InputGroup';
 
 export default function SignalGenerator(props) {
   const [state, setState] = useState({
@@ -59,7 +52,6 @@ plt.ylabel("Time [s]")
     errorLog: '<no errors>',
     buttonDisabled: true,
     buttonText: 'Python Initializing...',
-    currentTab: 'frequency',
     downloadChecked: false,
     currentExample: 0,
   });
@@ -77,7 +69,7 @@ pic_IObytes = io.BytesIO()
 plt.savefig(pic_IObytes, format='png', bbox_inches='tight')
 pic_IObytes.seek(0)
 freq_img = base64.b64encode(pic_IObytes.read()).decode() # the plot below will display whatever b64 is in img
-plt.clf() 
+plt.clf()
 `;
 
   const postTime = `
@@ -85,7 +77,7 @@ pic_IObytes = io.BytesIO()
 plt.savefig(pic_IObytes, format='png', bbox_inches='tight')
 pic_IObytes.seek(0)
 time_img = base64.b64encode(pic_IObytes.read()).decode() # the plot below will display whatever b64 is in img
-plt.clf() 
+plt.clf()
 `;
 
   const postIQ = `
@@ -93,7 +85,7 @@ pic_IObytes = io.BytesIO()
 plt.savefig(pic_IObytes, format='png', bbox_inches='tight')
 pic_IObytes.seek(0)
 iq_img = base64.b64encode(pic_IObytes.read()).decode() # the plot below will display whatever b64 is in img
-plt.clf() 
+plt.clf()
 `;
 
   const postSpectrogram = `
@@ -101,7 +93,7 @@ pic_IObytes = io.BytesIO()
 plt.savefig(pic_IObytes, format='png', bbox_inches='tight')
 pic_IObytes.seek(0)
 spectrogram_img = base64.b64encode(pic_IObytes.read()).decode() # the plot below will display whatever b64 is in img
-plt.clf() 
+plt.clf()
 `;
 
   const postCode = `
@@ -118,35 +110,38 @@ for varname in list(globals().keys()):
         globals()[varname] = None
 `;
 
-  const onChangePythonSnippet = React.useCallback(
+  const [currentSnippet, setCurrentSnippet] = useState(examplesList[0].value);
+  const [currentTab, setCurrentTab] = useState('frequency');
+
+  const onChangePythonSnippet = useCallback(
     (value, viewUpdate) => {
-      setState({ ...state, pythonSnippet: value });
+      setCurrentSnippet(value);
     },
     [state]
   );
 
-  const onChangeFreqPlotSnippet = React.useCallback(
+  const onChangeFreqPlotSnippet = useCallback(
     (value, viewUpdate) => {
       setState({ ...state, freqPlotSnippet: value });
     },
     [state]
   );
 
-  const onChangeTimePlotSnippet = React.useCallback(
+  const onChangeTimePlotSnippet = useCallback(
     (value, viewUpdate) => {
       setState({ ...state, timePlotSnippet: value });
     },
     [state]
   );
 
-  const onChangeIQPlotSnippet = React.useCallback(
+  const onChangeIQPlotSnippet = useCallback(
     (value, viewUpdate) => {
       setState({ ...state, iqPlotSnippet: value });
     },
     [state]
   );
 
-  const onChangeSpectrogramPlotSnippet = React.useCallback(
+  const onChangeSpectrogramPlotSnippet = useCallback(
     (value, viewUpdate) => {
       setState({ ...state, spectrogramPlotSnippet: value });
     },
@@ -258,12 +253,17 @@ print('NumPy Version:', numpy.version.version)
     }
   };
 
+  const onClickHandler = useCallback((evt) => {
+    const currentData = evt.currentTarget.dataset.value;
+    setCurrentTab(currentData);
+  });
+
   const onChangeDownloadChecked = () => {
     setState({ ...state, downloadChecked: !state.downloadChecked });
   };
 
-  const onChangeDropdown = (v) => {
-    setState({ ...state, pythonSnippet: v.value });
+  const onChangeDropdown = (evt) => {
+    setCurrentSnippet(evt.currentTarget.value);
   };
 
   // list of categories here https://react-select.com/styles#inner-components
@@ -290,64 +290,73 @@ print('NumPy Version:', numpy.version.version)
   };
 
   return (
-    <div style={{ marginTop: '30px' }}>
-      <Container>
-        <br></br>
-        <center>
-          <h2 style={{ color: '#00bc8c' }}>Python-Based Signal Generator</h2>
-        </center>
-        <Row>
-          <Col>
-            <Form>
-              <Select
-                defaultValue={examplesList[0]}
-                styles={dropdownStyle}
-                options={examplesList}
-                onChange={onChangeDropdown}
+    <div className="grid items-start justify-center">
+      <center>
+        <h2 className="text-primary">Python-Based Signal Generator</h2>
+      </center>
+      <div className="flex">
+        <div className="flex-1 mr-10">
+          <select className="select select-bordered w-full max-w-xs" onChange={onChangeDropdown}>
+            {examplesList.map((example) => (
+              <option key={example.label} value={example.value}>
+                {example.label}
+              </option>
+            ))}
+          </select>
+
+          <CodeMirror value={currentSnippet} height="700px" width="600px" extensions={[python()]} theme={vscodeDark} />
+          <button className="mb-3 btn btn-primary" disabled={state.buttonDisabled} onClick={onSubmitPythonSnippet}>
+            {state.buttonText}
+          </button>
+          <div className="mb-3">
+            <label className="label place-content-start">
+              <input
+                type="checkbox"
+                value={state.downloadChecked}
+                checked={state.downloadChecked}
+                onChange={() => onChangeDownloadChecked()}
               />
-              <CodeMirror
-                value={state.pythonSnippet}
-                height="700px"
-                width="600px"
-                extensions={[python()]}
-                onChange={onChangePythonSnippet}
-                theme={vscodeDark}
-              />
-              <br></br>
-              <Button
-                className="mb-3"
-                variant="secondary"
-                disabled={state.buttonDisabled}
-                onClick={onSubmitPythonSnippet}
-              >
-                {state.buttonText}
-              </Button>
-              <br></br>
-              <InputGroup>
-                <Form.Check
-                  type="checkbox"
-                  value={state.downloadChecked}
-                  checked={state.downloadChecked}
-                  onChange={() => onChangeDownloadChecked()}
-                />
-                <Form.Label> &nbsp; Download "x" as SigMF Recording</Form.Label>
-              </InputGroup>
-            </Form>
-            <br></br>
-            <div className="display-linebreak">
-              Error log: <br></br> {state.errorLog}
-            </div>
-          </Col>
-          <Col>
-            <Tabs
-              id="tabs"
-              activeKey={state.currentTab}
-              onSelect={(k) => {
-                setState({ ...state, currentTab: k });
-              }}
-              className="mb-3"
+              <span className="ml-2 label-text text-base">Download "x" as SigMF Recording</span>
+            </label>
+          </div>
+          <div className="display-linebreak">
+            Error log: <br></br> {state.errorLog}
+          </div>
+        </div>
+        <div className="flex-1">
+          <div className="tabs tabs-boxed">
+            <a
+              className={currentTab === 'frequency' ? 'tab tab-active' : 'tab tab-bordered'}
+              onClick={onClickHandler}
+              data-value="frequency"
             >
-              <Tab eventKey="frequency" title="Freq">
+              Freq
+            </a>
+            <a
+              className={currentTab === 'time' ? 'tab tab-active' : 'tab tab-bordered'}
+              onClick={onClickHandler}
+              data-value="time"
+            >
+              Time
+            </a>
+            <a
+              className={currentTab === 'iq' ? 'tab tab-active' : 'tab tab-bordered'}
+              onClick={onClickHandler}
+              data-value="iq"
+            >
+              IQ
+            </a>
+            <a
+              className={currentTab === 'spectrogram' ? 'tab tab-active' : 'tab tab-bordered'}
+              onClick={onClickHandler}
+              data-value="spectrogram"
+            >
+              Spectrogram
+            </a>
+          </div>
+          <div>
+            {currentTab === 'frequency' && (
+              <div>
                 <CodeMirror
                   value={state.freqPlotSnippet}
                   height="300px"
@@ -358,8 +367,10 @@ print('NumPy Version:', numpy.version.version)
                 />
                 <br></br>
                 <img src={state.b64ImageFreq} width="490px" alt="hit run to load" />
-              </Tab>
-              <Tab eventKey="time" title="Time">
+              </div>
+            )}
+            {currentTab === 'time' && (
+              <div>
                 <CodeMirror
                   value={state.timePlotSnippet}
                   height="300px"
@@ -370,8 +381,10 @@ print('NumPy Version:', numpy.version.version)
                 />
                 <br></br>
                 <img src={state.b64ImageTime} width="490px" alt="hit run to load" />
-              </Tab>
-              <Tab eventKey="iq" title="IQ">
+              </div>
+            )}
+            {currentTab === 'iq' && (
+              <div>
                 <CodeMirror
                   value={state.iqPlotSnippet}
                   height="300px"
@@ -382,8 +395,10 @@ print('NumPy Version:', numpy.version.version)
                 />
                 <br></br>
                 <img src={state.b64ImageIQ} width="490px" alt="hit run to load" />
-              </Tab>
-              <Tab eventKey="spectrogram" title="Spectrogram">
+              </div>
+            )}
+            {currentTab === 'spectrogram' && (
+              <div>
                 <CodeMirror
                   value={state.spectrogramPlotSnippet}
                   height="300px"
@@ -394,11 +409,11 @@ print('NumPy Version:', numpy.version.version)
                 />
                 <br></br>
                 <img src={state.b64ImageSpectrogram} width="490px" alt="hit run to load" />
-              </Tab>
-            </Tabs>
-          </Col>
-        </Row>
-      </Container>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

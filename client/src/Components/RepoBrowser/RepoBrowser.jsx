@@ -24,7 +24,7 @@ const RepoBrowser = () => {
   }, [config]);
 
   return (
-    <div className="homePage">
+    <div className="home-page">
       {tileObjInfo.map((item, i) => (
         <RepositoryTile key={i} item={item} />
       ))}

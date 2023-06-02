@@ -345,7 +345,7 @@ export const SpectrogramPage = (props) => {
 
   return (
     <div className="mt-3 mb-0 ml-0 mr-0 p-0">
-      <div className="flex flex-row">
+      <div className="flex flex-row w-full">
         <Sidebar
           updateMagnitudeMax={setMagnitudeMax}
           updateMagnitudeMin={setMagnitudeMin}
@@ -371,7 +371,7 @@ export const SpectrogramPage = (props) => {
                   setCurrentTab('spectrogram');
                 }}
                 className={` ${
-                  currentTab === 'spectrogram' ? 'bg-iqengine-primary text-black' : ''
+                  currentTab === 'spectrogram' ? 'bg-iqengine-primary !text-black' : ''
                 } inline-block px-3 py-0 outline  outline-iqengine-primary outline-1 text-lg text-iqengine-primary hover:text-green-900`}
               >
                 Spectrogram
@@ -384,7 +384,7 @@ export const SpectrogramPage = (props) => {
                   setCurrentTab('time');
                 }}
                 className={` ${
-                  currentTab === 'time' ? 'bg-iqengine-primary text-black' : ''
+                  currentTab === 'time' ? 'bg-iqengine-primary !text-black' : ''
                 } inline-block px-3 py-0 outline outline-iqengine-primary outline-1 text-lg text-iqengine-primary hover:text-green-900`}
               >
                 Time
@@ -397,7 +397,7 @@ export const SpectrogramPage = (props) => {
                   setCurrentTab('frequency');
                 }}
                 className={` ${
-                  currentTab === 'frequency' ? 'bg-iqengine-primary text-black' : ''
+                  currentTab === 'frequency' ? 'bg-iqengine-primary !text-black' : ''
                 } inline-block px-3 py-0 outline  outline-iqengine-primary outline-1 text-lg text-iqengine-primary hover:text-green-900`}
               >
                 Frequency
@@ -410,7 +410,7 @@ export const SpectrogramPage = (props) => {
                   setCurrentTab('iq');
                 }}
                 className={` ${
-                  currentTab === 'iq' ? 'bg-iqengine-primary text-black' : ''
+                  currentTab === 'iq' ? 'bg-iqengine-primary !text-black' : ''
                 } inline-block px-3 py-0 outline  outline-iqengine-primary outline-1 text-lg text-iqengine-primary hover:text-green-900`}
               >
                 IQ Plot
@@ -519,7 +519,7 @@ export const SpectrogramPage = (props) => {
             Annotations
           </summary>
           <div className="outline outline-1 outline-iqengine-primary p-2">
-            <AnnotationList meta={meta} totalIQSamples={blob.totalIQSamples} updateSpectrogram={updateSpectrogram} />
+            <AnnotationList updateSpectrogram={updateSpectrogram} />
           </div>
         </details>
 
@@ -530,7 +530,7 @@ export const SpectrogramPage = (props) => {
           <div className="outline outline-1 outline-iqengine-primary p-2">
             <div className="flex flex-row">
               <button
-                className="btn-primary text-right"
+                className="btn btn-primary text-right"
                 onClick={() => {
                   downloadInfo();
                 }}
@@ -539,7 +539,7 @@ export const SpectrogramPage = (props) => {
                 Download meta JSON
               </button>
               {/* TODO: Add in when PUT is working <button
-              className="btn-primary text-right ml-1"
+              className="btn btn-primary text-right ml-1"
               onClick={() => {
                 this.handleMeta();
                 this.saveMeta();
@@ -552,6 +552,7 @@ export const SpectrogramPage = (props) => {
             <div>
               <textarea
                 rows="20"
+                className="bg-neutral text-base-100"
                 style={{ width: '100%' }}
                 onChange={handleMetaAnnotation}
                 value={JSON.stringify(meta, null, 4)}

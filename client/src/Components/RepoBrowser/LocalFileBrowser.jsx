@@ -81,7 +81,7 @@ const LocalFileBrowser = () => {
 
   return (
     // <div className="container-fluid col-4">
-    <div className="flexOne repocard">
+    <div className="flex-one repocard">
       <div className="repocardheader">Browse Local Files</div>
       <div className="repocardbody">
         <center>

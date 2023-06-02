@@ -5,19 +5,12 @@
 import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
-import InputGroup from 'react-bootstrap/InputGroup';
-import DropdownButton from 'react-bootstrap/DropdownButton';
-import Dropdown from 'react-bootstrap/Dropdown';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
-import Toggle from 'react-toggle';
-import RangeSlider from 'react-bootstrap-range-slider';
-import 'react-bootstrap-range-slider/dist/react-bootstrap-range-slider.css';
 import { updateBlobTaps, resetBlobIQData } from '../../Store/Reducers/BlobReducer';
 import { useAppDispatch } from '@/Store/hooks';
 import { updateBlobPythonSnippet } from '@/Store/Reducers/BlobReducer';
+import DualRangeSlider from '@/Components/DualRangeSlider/DualRangeSlider';
 
 const SettingsPane = (props) => {
   const dispatch = useAppDispatch();
@@ -49,23 +42,22 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
   }, [props.magnitudeMin]);
 
   const onChangeWindowFunction = (event) => {
-    setState({ ...state, windowFunction: event });
+    const windowFunction = event.currentTarget.dataset.value;
+    setState({ ...state, windowFunction: windowFunction });
     dispatch(resetBlobIQData());
-    props.updateWindowChange(event);
+    props.updateWindowChange(windowFunction);
   };
 
-  const onChangeMagnitudeMax = (e) => {
-    setMagnitudeMax(parseInt(e.target.value));
-    props.updateMagnitudeMax(parseInt(e.target.value));
+  const onChangeMagnitudeMax = (max) => {
+    props.updateMagnitudeMax(parseInt(max));
   };
 
-  const onChangeMagnitudeMin = (e) => {
-    setMagnitudeMin(parseInt(e.target.value));
+  const onChangeMagnitudeMin = (min) => {
     // currently a min of 0 doesnt actually work so just set it to 1
-    if (e.target.value == 0) {
+    if (min == 0) {
       props.updateMagnitudeMin(1);
     } else {
-      props.updateMagnitudeMin(parseInt(e.target.value));
+      props.updateMagnitudeMin(parseInt(min));
     }
   };
 
@@ -115,7 +107,7 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
 
   const onClickPremadeTaps = (event) => {
     let taps = new Array(1).fill(1);
-    let taps_string = event;
+    let taps_string = event.currentTarget.dataset.value;
     if (taps_string[0] === '[' && taps_string.slice(-1) === ']') {
       taps = taps_string.slice(1, -1).split(',');
       taps = taps.map((x) => parseFloat(x));
@@ -138,122 +130,130 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
   };
 
   return (
-    <Form>
-      <Form.Group className="mb-3" controlId="formZoom">
-        <Form.Label className="text-center" style={{ width: '100%' }}>
-          Zoom Level
-        </Form.Label>
-        <RangeSlider
+    <div className="form-control">
+      <label className="mb-3" id="formZoom">
+        <span className="label-text text-base ">Zoom Level</span>
+        <input
+          type="range"
+          className="range range-xs range-primary"
           value={state.zoomLevel}
-          tooltip="on"
-          tooltipPlacement="top"
-          variant="secondary"
           min={1}
           max={10}
           step={1}
           onChange={onChangeZoomLevel}
         />
-      </Form.Group>
+      </label>
 
-      <Form.Group className="mb-3" controlId="toggle">
-        <Toggle id="toggle" defaultChecked={false} onChange={props.toggleCursors} />
-        <Form.Label style={{ marginLeft: '10px', marginBottom: '0px' }}> Toggle Cursors</Form.Label>
-      </Form.Group>
+      <label className="mb-3" id="toggle">
+        <span className="label-text text-base">Toggle Cursors</span>
+        <input
+          type="checkbox"
+          className="toggle checkbox checkbox-primary float-right"
+          onChange={props.toggleCursors}
+        />
+      </label>
 
-      <Form.Group className="mb-3" controlId="formMagMax">
-        <div className="text-center font-bold">Magnitude Color Mapping</div>
-        <InputGroup className="mb-3 mt-1">
-          <Form.Label className="pr-3">Max:</Form.Label>
-          <Form.Label className="text-xs">{magnitudeMin + 1}</Form.Label>
-          <RangeSlider
-            value={magnitudeMax}
-            tooltip="on"
-            tooltipPlacement="bottom"
-            variant="secondary"
-            min={magnitudeMin + 1}
-            max={255}
-            step={1}
-            onChange={onChangeMagnitudeMax}
-          />
-          <Form.Label className="text-xs">255</Form.Label>
-        </InputGroup>
+      <div className="mb-3" id="formMagMax">
+        <label>
+          <span className="label-text text-base">Magnitude Color Mapping</span>
+        </label>
 
-        <InputGroup>
-          <Form.Label className="pr-4">Min:</Form.Label>
-          <Form.Label className="text-xs">0</Form.Label>
-          <RangeSlider
-            value={magnitudeMin}
-            tooltip="on"
-            tooltipPlacement="top"
-            variant="secondary"
-            min={0}
-            max={magnitudeMax - 1}
-            step={1}
-            onChange={onChangeMagnitudeMin}
-          />
-          <Form.Label className="text-xs">{magnitudeMax - 1}</Form.Label>
-        </InputGroup>
-
+        <DualRangeSlider
+          min={0}
+          minValue={magnitudeMin}
+          max={255}
+          maxValue={magnitudeMax}
+          onChangeMin={onChangeMagnitudeMin}
+          onChangeMax={onChangeMagnitudeMax}
+        />
+      </div>
+      <div>
         {/* When you press this button it will make autoscale run during the next call to selectFft, then it will turn itself off */}
-        <Button
-          className="mb-3"
-          variant="secondary"
+        <button
+          className="mb-3 btn btn-primary"
           onClick={props.handleAutoScale}
           style={{ width: '100%', marginTop: '5px' }}
         >
           Autoscale Max/Min
-        </Button>
-      </Form.Group>
+        </button>
+      </div>
 
-      <Form.Group className="mb-3" controlId="formFFT">
-        <Form.Label>
-          FFT Size
-          <a
-            style={{ textDecoration: 'none', color: 'white', marginLeft: '5px' }}
-            target="_blank"
-            rel="noreferrer"
-            href="https://pysdr.org/content/frequency_domain.html#fft-sizing"
-          >
-            <HelpOutlineOutlinedIcon />
-          </a>
-        </Form.Label>
-        <InputGroup className="mb-3">
-          <Form.Control type="text" defaultValue={state.size} onChange={onChangeFftsize} size="sm" />
-          <Button variant="secondary" onClick={onSubmitFftsize}>
+      <div className="mb-3" id="formFFT">
+        <label className="label">
+          <span className="label-text text-base">
+            FFT Size
+            <a
+              style={{ textDecoration: 'none', color: 'white', marginLeft: '5px' }}
+              target="_blank"
+              rel="noreferrer"
+              href="https://pysdr.org/content/frequency_domain.html#fft-sizing"
+            >
+              <HelpOutlineOutlinedIcon />
+            </a>
+          </span>
+        </label>
+        <div className="mb-3 flex">
+          <input
+            type="text"
+            className="h-12 w-40 rounded-l text-base-100 ml-1 pl-2"
+            defaultValue={state.size}
+            onChange={onChangeFftsize}
+            size="sm"
+          />
+          <button className="btn btn-primary rounded-none rounded-r" onClick={onSubmitFftsize}>
             <FontAwesomeIcon icon={faArrowRight} />
-          </Button>
-        </InputGroup>
-      </Form.Group>
+          </button>
+        </div>
+      </div>
 
-      <Form.Group className="mb-3" controlId="formTaps">
-        <Form.Label style={{ display: 'flex' }}>
-          FIR Filter Taps<br></br>
-          <a
-            style={{ textDecoration: 'none', color: 'white', marginLeft: '5px' }}
-            target="_blank"
-            rel="noreferrer"
-            href="https://pysdr.org/content/filters.html"
-          >
-            <HelpOutlineOutlinedIcon />
-          </a>
-        </Form.Label>
-        <InputGroup className="mb-3">
-          <Form.Control type="text" defaultValue={state.taps} onChange={onChangeTaps} size="sm" />
-          <Button variant="secondary" onClick={onSubmitTaps}>
+      <div className="mb-3" id="formTaps">
+        <label className="label">
+          <span className="label-text text-base">
+            FIR Filter Taps
+            <a
+              style={{ textDecoration: 'none', color: 'white', marginLeft: '5px' }}
+              target="_blank"
+              rel="noreferrer"
+              href="https://pysdr.org/content/filters.html"
+            >
+              <HelpOutlineOutlinedIcon />
+            </a>
+          </span>
+        </label>
+        <div className="mb-3 flex">
+          <input
+            type="text"
+            className="h-12 w-40 rounded-l text-base-100 ml-1 pl-2"
+            defaultValue={state.taps}
+            onChange={onChangeTaps}
+            size="sm"
+          />
+          <button className="btn btn-primary rounded-none rounded-r" onClick={onSubmitTaps}>
             <FontAwesomeIcon icon={faArrowRight} />
-          </Button>
-        </InputGroup>
-      </Form.Group>
+          </button>
+        </div>
+      </div>
 
-      <div style={{ display: 'flex' }}>
-        <DropdownButton variant="secondary" title="Example Filter Taps" className="mb-3" onSelect={onClickPremadeTaps}>
-          <Dropdown.Item eventKey="[0.021019600765633,0.05574786251380393,0.04504671465435009,-0.012858837474581268,-0.042883835223827396,0.013822126400016621,0.05882808073316635,-0.014316809227248763,-0.10299625870988743,0.015410773935742991,0.31701869995313076,0.48460819626209206,0.31701869995313076,0.015410773935742991,-0.10299625870988743,-0.014316809227248763,0.05882808073316635,0.013822126400016621,-0.042883835223827396,-0.012858837474581268,0.04504671465435009,0.05574786251380393,0.021019600765633]">
-            Low Pass Filter, Keep Center 50%
-          </Dropdown.Item>
-          <Dropdown.Item eventKey="[0.016149208122345958,0.0315506154302014,0.044989927419396177,0.05039076977222029,0.036274497853720514,0.007612901271369674,-0.02948294665811137,-0.053019565543615366,-0.048888438402198676,-0.004134055886676617,0.07118987013413654,0.15929327646574953,0.22747019061450077,0.2546143327815347,0.22747019061450077,0.15929327646574953,0.07118987013413654,-0.004134055886676617,-0.048888438402198676,-0.053019565543615366,-0.02948294665811137,0.007612901271369674,0.036274497853720514,0.05039076977222029,0.044989927419396177,0.0315506154302014,0.016149208122345958]">
-            Low Pass Filter, Keep Center 25%
-          </Dropdown.Item>
-        </DropdownButton>
+      <div className="mb-3 flex">
+        <div className="dropdown dropdown-hover">
+          <label tabIndex={0} className="btn btn-primary m-1">
+            Example Filter Taps
+          </label>
+          <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
+            <li
+              data-value="[0.021019600765633,0.05574786251380393,0.04504671465435009,-0.012858837474581268,-0.042883835223827396,0.013822126400016621,0.05882808073316635,-0.014316809227248763,-0.10299625870988743,0.015410773935742991,0.31701869995313076,0.48460819626209206,0.31701869995313076,0.015410773935742991,-0.10299625870988743,-0.014316809227248763,0.05882808073316635,0.013822126400016621,-0.042883835223827396,-0.012858837474581268,0.04504671465435009,0.05574786251380393,0.021019600765633]"
+              onClick={onClickPremadeTaps}
+            >
+              <a>Low Pass Filter, Keep Center 50%</a>
+            </li>
+            <li
+              data-value="[0.016149208122345958,0.0315506154302014,0.044989927419396177,0.05039076977222029,0.036274497853720514,0.007612901271369674,-0.02948294665811137,-0.053019565543615366,-0.048888438402198676,-0.004134055886676617,0.07118987013413654,0.15929327646574953,0.22747019061450077,0.2546143327815347,0.22747019061450077,0.15929327646574953,0.07118987013413654,-0.004134055886676617,-0.048888438402198676,-0.053019565543615366,-0.02948294665811137,0.007612901271369674,0.036274497853720514,0.05039076977222029,0.044989927419396177,0.0315506154302014,0.016149208122345958]"
+              onClick={onClickPremadeTaps}
+            >
+              <a>Low Pass Filter, Keep Center 25%</a>
+            </li>
+          </ul>
+        </div>
         <a
           style={{ textDecoration: 'none', color: 'white', margin: '5px 0 0 5px' }}
           target="_blank"
@@ -264,30 +264,29 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
         </a>
       </div>
 
-      <Form.Label style={{ display: 'flex' }}>
-        <DropdownButton
-          title="Window"
-          variant="secondary"
-          className="mb-0"
-          id="dropdown-menu-align-right"
-          onSelect={onChangeWindowFunction}
-        >
-          <Dropdown.Item active={state.windowFunction === 'hamming'} eventKey="hamming">
-            Hamming
-          </Dropdown.Item>
-          <Dropdown.Item active={state.windowFunction === 'rectangle'} eventKey="rectangle">
-            Rectangle
-          </Dropdown.Item>
-          <Dropdown.Item active={state.windowFunction === 'hanning'} eventKey="hanning">
-            Hanning
-          </Dropdown.Item>
-          <Dropdown.Item active={state.windowFunction === 'barlett'} eventKey="barlett">
-            Barlett
-          </Dropdown.Item>
-          <Dropdown.Item active={state.windowFunction === 'blackman'} eventKey="blackman">
-            Blackman
-          </Dropdown.Item>
-        </DropdownButton>
+      <div className="mb-3 flex">
+        <div className="dropdown dropdown-hover">
+          <label tabIndex={0} className="btn btn-primary m-1">
+            Window
+          </label>
+          <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
+            <li data-value="hamming" onClick={onChangeWindowFunction}>
+              {state.windowFunction === 'hamming' ? <a className="bg-primary">Hamming</a> : <a>Hamming</a>}
+            </li>
+            <li active={state.windowFunction === 'rectangle'} data-value="rectangle" onClick={onChangeWindowFunction}>
+              {state.windowFunction === 'rectangle' ? <a className="bg-primary">Rectangle</a> : <a>Rectangle</a>}
+            </li>
+            <li active={state.windowFunction === 'hanning'} data-value="hanning" onClick={onChangeWindowFunction}>
+              {state.windowFunction === 'hanning' ? <a className="bg-primary">Hanning</a> : <a>Hanning</a>}
+            </li>
+            <li active={state.windowFunction === 'barlett'} data-value="barlett" onClick={onChangeWindowFunction}>
+              {state.windowFunction === 'barlett' ? <a className="bg-primary">Barlett</a> : <a>Barlett</a>}
+            </li>
+            <li active={state.windowFunction === 'blackman'} data-value="blackman" onClick={onChangeWindowFunction}>
+              {state.windowFunction === 'blackman' ? <a className="bg-primary">Blackman</a> : <a>Blackman</a>}
+            </li>
+          </ul>
+        </div>
         <a
           style={{ textDecoration: 'none', color: 'white', margin: '5px 0 0 5px' }}
           target="_blank"
@@ -296,25 +295,32 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
         >
           <HelpOutlineOutlinedIcon />
         </a>
-      </Form.Label>
+      </div>
 
-      <Form.Group className="mt-3" controlId="toggleFreq">
-        <Toggle id="toggle" defaultChecked={false} onChange={props.toggleIncludeRfFreq} />
-        <Form.Label style={{ marginLeft: '10px' }}> Display RF Freq</Form.Label>
-      </Form.Group>
+      <div className="mb-3" id="toggleFreq">
+        <label className="label">
+          <span className="label-text text-base">Display RF Freq</span>
+          <input type="checkbox" className="toggle checkbox checkbox-primary" onChange={props.toggleIncludeRfFreq} />
+        </label>
+      </div>
 
-      <Form.Group className="mb-3" controlId="formPythonSnippet">
-        <Form.Label style={{ display: 'flex' }}>
-          Python Snippet<br></br>
-        </Form.Label>
-        <textarea rows="6" cols="28" wrap="off" onChange={onChangePythonSnippet} value={state.pythonSnippet} />
-        <br></br>
-        <Button variant="secondary" style={{ float: 'right' }} onClick={onSubmitPythonSnippet}>
+      <div className="mb-3" id="formPythonSnippet">
+        <label className="label">
+          <span className="label-text text-base">Python Snippet</span>
+        </label>
+        <textarea
+          className="bg-neutral text-base-100 p-1"
+          rows="6"
+          cols="28"
+          wrap="off"
+          onChange={onChangePythonSnippet}
+          value={state.pythonSnippet}
+        />
+        <button className="btn btn-primary" onClick={onSubmitPythonSnippet}>
           Run Python
-        </Button>
-        <br></br>
-      </Form.Group>
-    </Form>
+        </button>
+      </div>
+    </div>
   );
 };
 

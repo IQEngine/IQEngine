@@ -13,7 +13,7 @@ const SiggenTile = (props) => {
   };
 
   return (
-    <div className="flexOne repocard">
+    <div className="flex-one repocard">
       <div className="repocardheader" style={{ display: 'flex', justifyContent: 'space-between' }}>
         Signal Generator
       </div>

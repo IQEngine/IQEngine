@@ -12,7 +12,7 @@ import {
   ValidatorType,
 } from '@rjsf/utils';
 
-import { sigmfSchema } from '../SigMFSchema';
+import sigmfSchema from '@/Components/Validator/sigmf-schema.json';
 import { sigmfFormData } from '../FormData';
 import Header, { LiveSettings } from './Header';
 import DemoFrame from './DemoFrame';

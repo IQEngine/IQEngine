@@ -38,7 +38,7 @@ const AzureBlobBrowser = () => {
   };
 
   return (
-    <div className="flexOne repocard">
+    <div className="flex-one repocard">
       <div className="repocardheader">Browse Your Azure Blob Storage</div>
       <div className="repocardbody">
         <form className="m-3 mt-0">

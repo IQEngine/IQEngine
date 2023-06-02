@@ -66,7 +66,7 @@ const RepositoryTile = (props) => {
   };
 
   return (
-    <div className="flexOne repocard">
+    <div className="flex-one repocard">
       <div className="repocardheader" style={{ display: 'flex', justifyContent: 'space-between' }}>
         {<div style={{ marginTop: 'auto' }}>{name}</div>} {writeableBool}
       </div>
