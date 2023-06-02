@@ -266,7 +266,7 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
 
       <div className="mb-3 flex">
         <div className="dropdown dropdown-hover">
-          <label tabIndex={0} className="btn-primary m-1">
+          <label tabIndex={0} className="btn btn-primary m-1">
             Window
           </label>
           <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
