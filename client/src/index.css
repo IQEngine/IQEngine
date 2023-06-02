@@ -20,20 +20,21 @@ div.datatypetext {
   white-space: pre-wrap;
 }
 
-.homePage {
+.home-page {
   display: flex;
   flex-flow: row wrap;
   margin: 0% 5%;
   justify-content: space-around;
 }
 
-.no-spin::-webkit-inner-spin-button, .no-spin::-webkit-outer-spin-button {
-  -webkit-appearance: none !important;
+.no-spin::-webkit-inner-spin-button,
+.no-spin::-webkit-outer-spin-button {
+  appearance: none !important;
   margin: 0 !important;
 }
 
 .no-spin {
-    -moz-appearance:textfield !important;
+  appearance: textfield !important;
 }
 
 .hide {
@@ -50,7 +51,7 @@ div.datatypetext {
 }
 
 .input-number {
-  max-width:60px;
+  max-width: 60px;
 }
 
 .percent {

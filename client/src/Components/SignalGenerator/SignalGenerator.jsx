@@ -69,7 +69,7 @@ pic_IObytes = io.BytesIO()
 plt.savefig(pic_IObytes, format='png', bbox_inches='tight')
 pic_IObytes.seek(0)
 freq_img = base64.b64encode(pic_IObytes.read()).decode() # the plot below will display whatever b64 is in img
-plt.clf() 
+plt.clf()
 `;
 
   const postTime = `
@@ -77,7 +77,7 @@ pic_IObytes = io.BytesIO()
 plt.savefig(pic_IObytes, format='png', bbox_inches='tight')
 pic_IObytes.seek(0)
 time_img = base64.b64encode(pic_IObytes.read()).decode() # the plot below will display whatever b64 is in img
-plt.clf() 
+plt.clf()
 `;
 
   const postIQ = `
@@ -85,7 +85,7 @@ pic_IObytes = io.BytesIO()
 plt.savefig(pic_IObytes, format='png', bbox_inches='tight')
 pic_IObytes.seek(0)
 iq_img = base64.b64encode(pic_IObytes.read()).decode() # the plot below will display whatever b64 is in img
-plt.clf() 
+plt.clf()
 `;
 
   const postSpectrogram = `
@@ -93,7 +93,7 @@ pic_IObytes = io.BytesIO()
 plt.savefig(pic_IObytes, format='png', bbox_inches='tight')
 pic_IObytes.seek(0)
 spectrogram_img = base64.b64encode(pic_IObytes.read()).decode() # the plot below will display whatever b64 is in img
-plt.clf() 
+plt.clf()
 `;
 
   const postCode = `

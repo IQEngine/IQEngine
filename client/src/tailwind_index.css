@@ -18,16 +18,16 @@
   h5 {
     @apply text-iqengine-primary;
   }
-  
+
   body {
     @apply text-iqengine-neutral;
   }
-  
+
   .label-text {
-    @apply !text-iqengine-neutral;
+    @apply !text-iqengine-neutral font-bold text-center;
   }
 
-  .flexOne {
+  .flex-one {
     @apply w-64 m-8 flex-auto;
   }
 
@@ -74,7 +74,7 @@
   .slider-right-value {
     @apply absolute text-lg mb-10 mt-1 right-px;
   }
-  
+
   .slider-track {
     @apply absolute rounded-sm h-1 bg-neutral z-10 w-full opacity-50;
   }
@@ -87,15 +87,11 @@
     @apply pointer-events-none absolute h-0 w-48 outline-none appearance-none;
   }
 
-  .thumb::-webkit-slider-thumb{
+  .thumb::-webkit-slider-thumb {
     @apply bg-accent cursor-pointer h-4 w-4 mt-1 pointer-events-auto relative rounded-lg appearance-none;
   }
 
-  .thumb::-moz-range-thumb{
+  .thumb::-moz-range-thumb {
     @apply bg-accent cursor-pointer h-4 w-4 mt-1 pointer-events-auto relative rounded-lg appearance-none;
-  }
-
-  .label-text{
-    @apply font-bold text-center;
   }
 }
