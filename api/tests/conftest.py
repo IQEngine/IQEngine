@@ -1,12 +1,22 @@
+# vim: tabstop=4 shiftwidth=4 expandtab
+
+import os
+
+import database.database as db
 import pytest
-from flask import Flask
-from api.api import create_app
+from fastapi.testclient import TestClient
+from main import app
+
 
 @pytest.fixture
-def app():
-    app = create_app()
-    yield app
+def client():
+    return TestClient(app)
 
-@pytest.fixture()
-def client(app):
-    return app.test_client()
+
+@pytest.fixture(autouse=True)
+def database():
+    os.environ["RFDX_FF_INMEMDB"] = "1"
+    yield
+    # Ensure db is recreated
+    # for each test
+    db._db = None

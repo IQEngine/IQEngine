@@ -18,7 +18,6 @@ COPY api/requirements.txt ./
 RUN pip install --no-cache-dir -r ./requirements.txt
 COPY api ./
 COPY .en[v] ./
-COPY --from=build-step /app/build ./build
-ENV FLASK_ENV production
+COPY --from=build-step /app/build ./iqengine
 EXPOSE 3000
-CMD ["gunicorn", "-b", ":3000", "api:create_app()"]
+CMD ["uvicorn", "--host", "0.0.0.0", "--port", "3000", "main:app"]

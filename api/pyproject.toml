@@ -1,0 +1,8 @@
+[tool.pyright]
+reportMissingImports = false
+
+[tool.flake8]
+max-line-length = 120
+
+[tool.roof]
+line-length = 120
