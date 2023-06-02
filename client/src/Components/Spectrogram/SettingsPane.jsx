@@ -192,10 +192,10 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
             </a>
           </span>
         </label>
-        <div className="mb-3">
+        <div className="mb-3 flex">
           <input
             type="text"
-            className="h-12 rounded-l text-base-100 ml-1 pl-2"
+            className="h-12 w-40 rounded-l text-base-100 ml-1 pl-2"
             defaultValue={state.size}
             onChange={onChangeFftsize}
             size="sm"
@@ -220,10 +220,10 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
             </a>
           </span>
         </label>
-        <div className="mb-3">
+        <div className="mb-3 flex">
           <input
             type="text"
-            className="h-12 rounded-l text-base-100 ml-1 pl-2"
+            className="h-12 w-40 rounded-l text-base-100 ml-1 pl-2"
             defaultValue={state.taps}
             onChange={onChangeTaps}
             size="sm"
