@@ -50,7 +50,7 @@ export default function InfoPane(props) {
     <div>
       <div key={'InfoPane'}>
         {Object.entries(metaGlobal).map(([key, value]) => (
-          <div className="mb-3" controlId="formBasicEmail" key={key}>
+          <div className="mb-3" key={key}>
             <label className="label-text text-base">
               {titleCase(key.replace('core:', '').replace(':', ' ').replace('_', ' ').replace('hw', 'Hardware'))}
             </label>
@@ -66,7 +66,7 @@ export default function InfoPane(props) {
             </div>
           </div>
         ))}
-        <button className="btn-primary" onClick={handleClick} disabled={error.length > 0}>
+        <button className="btn btn-primary" onClick={handleClick} disabled={error.length > 0}>
           Save
         </button>
       </div>

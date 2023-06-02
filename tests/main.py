@@ -42,7 +42,7 @@ try:
     link.click()
     time.sleep(5)
     driver.find_element("id", 'formMagMax')
-    toggle = driver.find_element("class name", 'react-toggle')
+    toggle = driver.find_element("class name", 'toggle')
     toggle.click()
     time.sleep(1)
     time_tab = driver.find_element("id", 'tabs-tab-time')

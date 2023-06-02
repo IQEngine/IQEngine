@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Table, Input, Select } from 'react-daisyui';
 
 export interface DataColumn {
   title: string;
@@ -137,7 +136,7 @@ export const DataTable = ({ dataColumns, dataRows }: TableProps) => {
         <div className="flex flex-row">
           <button
             aria-label="previous page"
-            className="btn-primary"
+            className="btn btn-primary"
             onClick={() => setCurrentPage((page) => Math.max(page - 1, 1))}
             disabled={currentPage === 1}
           >
@@ -145,7 +144,7 @@ export const DataTable = ({ dataColumns, dataRows }: TableProps) => {
           </button>
           <button
             aria-label="next page"
-            className="btn-primary"
+            className="btn btn-primary"
             onClick={() => setCurrentPage((page) => Math.min(page + 1, maxPage))}
             disabled={currentPage === maxPage}
           >
