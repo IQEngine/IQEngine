@@ -3,7 +3,8 @@ import { Temporal } from '@js-temporal/polyfill';
 export function calculateDate(start: string, count: number, sampleRate: number) {
   try {
     const startDate = Temporal.Instant.from(start);
-    const date = startDate.add({ microseconds: (count / sampleRate) * 1e6 }); // getTime() returns milliseconds
+    const dateInNanoseconds = Number(((count / sampleRate) * 1e9).toFixed(0));
+    const date = startDate.add({ nanoseconds: dateInNanoseconds });
     return date.toString();
   } catch {
     return null;
@@ -14,8 +15,8 @@ export function calculateSampleCount(start: string, current: string, sampleRate:
   try {
     const startDate = Temporal.Instant.from(start);
     const currentDate = Temporal.Instant.from(current);
-    const time = Number(currentDate.epochMicroseconds - startDate.epochMicroseconds);
-    return (time * sampleRate) / 1e6;
+    const time = Number(currentDate.epochNanoseconds - startDate.epochNanoseconds);
+    return (time * sampleRate) / 1e9;
   } catch {
     return null;
   }
