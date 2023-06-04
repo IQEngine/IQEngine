@@ -107,7 +107,7 @@ export const DataTable = ({ dataColumns, dataRows }: TableProps) => {
           />
         </div>
       </div>
-      <table className="w-full" aria-label="data table">
+      <table className="w-full text-left" aria-label="data table">
         <thead>
           <tr>
             {dataColumns?.map((column) => (
