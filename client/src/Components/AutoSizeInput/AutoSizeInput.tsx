@@ -23,7 +23,7 @@ export const AutoSizeInput = ({
   }, [parent]);
 
   useEffect(() => {
-    setWidth(span.current.offsetWidth);
+    setWidth(span.current.offsetWidth + 3);
   }, [content]);
 
   const changeHandler = useCallback((evt) => {

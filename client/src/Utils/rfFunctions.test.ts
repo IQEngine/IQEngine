@@ -11,9 +11,10 @@ import {
 describe('Calculate date', () => {
   // Arrange
   test.each`
-    startDate                     | count | sampleRate | expected
-    ${'2021-01-01T00:00:00.000Z'} | ${1}  | ${1}       | ${'2021-01-01T00:00:01Z'}
-    ${'invalid date'}             | ${1}  | ${1}       | ${null}
+    startDate                     | count     | sampleRate  | expected
+    ${'2021-01-01T00:00:00.000Z'} | ${1}      | ${1}        | ${'2021-01-01T00:00:01Z'}
+    ${'invalid date'}             | ${1}      | ${1}        | ${null}
+    ${'2021-10-19T18:02:12Z'}     | ${904328} | ${40000000} | ${'2021-10-19T18:02:12.0226082Z'}
   `('should calculate date correctly', ({ startDate, count, sampleRate, expected }) => {
     // Act
     const result = calculateDate(startDate, count, sampleRate);
@@ -26,10 +27,11 @@ describe('Calculate date', () => {
 describe('Calculate sample count', () => {
   // Arrange
   test.each`
-    startDate                     | currentDate                   | sampleRate | expected
-    ${'2021-01-01T00:00:00.000Z'} | ${'2021-01-01T00:00:01.000Z'} | ${1}       | ${1}
-    ${'invalid date'}             | ${'2021-01-01T00:00:01.000Z'} | ${2}       | ${null}
-    ${'2021-01-01T00:00:00.000Z'} | ${'invalid date'}             | ${2}       | ${null}
+    startDate                         | currentDate                       | sampleRate  | expected
+    ${'2021-01-01T00:00:00.000Z'}     | ${'2021-01-01T00:00:01.000Z'}     | ${1}        | ${1}
+    ${'invalid date'}                 | ${'2021-01-01T00:00:01.000Z'}     | ${2}        | ${null}
+    ${'2021-01-01T00:00:00.000Z'}     | ${'invalid date'}                 | ${2}        | ${null}
+    ${'2021-10-19T18:02:12.0226082Z'} | ${'2021-10-19T18:02:12.0227143Z'} | ${40000000} | ${4244}
   `('should calculate date correctly', ({ startDate, currentDate, sampleRate, expected }) => {
     // Act
     const result = calculateSampleCount(startDate, currentDate, sampleRate);
