@@ -23,11 +23,11 @@ export default function RecordingsBrowser() {
   }, [metadatas.data]);
 
   return (
-    <div className="container md:mx-auto flex">
+    <div className="container md:mx-auto flex justify-center">
       {!metadatas.isFetched ? (
-        <div className="justify-center">
+        <div>
           <svg
-            className="animate-spin ml-1 mr-3 h-2/5 w-2/5 text-white"
+            className="animate-spin ml-1 mr-3 w-96 text-white"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -39,7 +39,7 @@ export default function RecordingsBrowser() {
       ) : (
         <div className="md:px-8 xl:px-10">
           <div className="overflow-x-auto">
-            <table className="w-full border-collapse table-fixed">
+            <table className="w-full table-fixed">
               <thead>
                 <tr className="focus:outline-none h-12 border-b-2 border-accent ">
                   <th className="s:w-1/5 w-70">Spectrogram Thumbnail</th>
