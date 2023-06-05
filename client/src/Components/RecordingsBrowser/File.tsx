@@ -46,7 +46,7 @@ export default function FileRow({ item }: FileRowProps) {
   }
 
   return (
-    <tr className="hover:bg-info/10 text-center py-2 h-32 border-y-2 border-white/40">
+    <tr className="hover:bg-info/10 text-center py-2 h-32">
       {/* If we are looking at a recording from blob storage */}
       {
         <>

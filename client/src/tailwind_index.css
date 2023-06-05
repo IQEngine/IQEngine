@@ -23,6 +23,10 @@
     @apply text-iqengine-neutral;
   }
 
+  td {
+    @apply border-b border-neutral/25;
+  }
+
   .label-text {
     @apply !text-iqengine-neutral font-bold text-center;
   }
