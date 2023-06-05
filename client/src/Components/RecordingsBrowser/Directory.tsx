@@ -40,8 +40,8 @@ function Directory({ directory, setExpanded, isExpanded }: DirectoryProps) {
   };
   return (
     <>
-      <tr onClick={handleLocalToggle} className="hover:bg-info/40 hover:cursor-pointer focus:outline-none h-12 ">
-        <td colSpan={8}>
+      <tr onClick={handleLocalToggle} className="hover:bg-info/40 hover:cursor-pointer focus:outline-none h-12">
+        <td className="text-l" colSpan={8}>
           {isExpanded ? <StyledOpenFolderIcon /> : <StyledFolderIcon />}
           {directory.name}
         </td>

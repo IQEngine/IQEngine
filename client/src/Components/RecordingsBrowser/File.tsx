@@ -2,8 +2,7 @@
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
 
-import React, { useState } from 'react';
-import { Modal, ModalHeader, ModalBody } from 'reactstrap';
+import React, { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/Store/hooks';
 
@@ -13,12 +12,16 @@ interface FileRowProps {
   item: SigMFMetadata;
 }
 export default function FileRow({ item }: FileRowProps) {
-  const [modal, setModal] = useState(false);
   const spectogramLink = `/spectrogram/${item.getOrigin().type}/${item.getOrigin().account}/${
     item.getOrigin().container
   }/${encodeURIComponent(item.getFilePath())}`;
+  const modal = useRef(null);
   const toggle = () => {
-    setModal(!modal);
+    if (modal.current.className === 'modal w-full h-full') {
+      modal.current.className = 'modal modal-open w-full h-full';
+    } else {
+      modal.current.className = 'modal w-full h-full';
+    }
   };
   const annotationsData = item.annotations?.map((item, index) => {
     const deepItemCopy = JSON.parse(JSON.stringify(item));
@@ -29,7 +32,7 @@ export default function FileRow({ item }: FileRowProps) {
     delete deepItemCopy['core:description'];
 
     return (
-      <tr key={index}>
+      <tr key={index} className="h-12">
         <td>{item['core:sample_start']}</td>
         <td>{item['core:sample_count']}</td>
         <td>{item['core:freq_lower_edge'] / 1e6}</td>
@@ -92,24 +95,29 @@ export default function FileRow({ item }: FileRowProps) {
           >
             {item.annotations?.length ?? 0}
           </button>
-          <Modal isOpen={modal} toggle={toggle} size="lg">
-            <ModalHeader toggle={toggle}>{item.getFileName()}</ModalHeader>
-            <ModalBody>
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>Sample Start</th>
-                    <th>Sample Count</th>
-                    <th>Frequency Min [MHz]</th>
-                    <th>Frequency Max [MHz]</th>
-                    <th>Description</th>
-                    <th>Other</th>
-                  </tr>
-                </thead>
-                <tbody>{annotationsData}</tbody>
-              </table>
-            </ModalBody>
-          </Modal>
+          <dialog ref={modal} className="modal w-full h-full">
+            <form method="dialog" className="modal-box  max-w-full">
+              <h3 className="font-bold text-lg text-primary">{item.getFileName()}</h3>
+              <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 text-primary" onClick={toggle}>
+                ✕
+              </button>
+              <div className="grid justify-items-stretch">
+                <table className="text-neutral">
+                  <thead className="text-primary border-b-2 h-12 border-accent">
+                    <tr>
+                      <th>Sample Start</th>
+                      <th>Sample Count</th>
+                      <th>Frequency Min [MHz]</th>
+                      <th>Frequency Max [MHz]</th>
+                      <th>Description</th>
+                      <th>Other</th>
+                    </tr>
+                  </thead>
+                  <tbody>{annotationsData}</tbody>
+                </table>
+              </div>
+            </form>
+          </dialog>
           <br></br>({item.captures?.length ?? 0} Capture{item.captures?.length > 1 && 's'})
         </div>
       </td>
