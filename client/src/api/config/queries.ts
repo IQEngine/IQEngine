@@ -43,7 +43,7 @@ type Config = {
 export const configQuery = () =>
   useQuery(['config'], fetchConfig, {
     onSuccess: (data) => {
-      data.connectionInfo.settings.forEach((setting) => {
+      data.connectionInfo?.settings?.forEach((setting) => {
         const dataSource: DataSource = {
           type: CLIENT_TYPE_BLOB,
           name: setting.name,

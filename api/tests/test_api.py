@@ -36,13 +36,13 @@ valid_metadata = {
 
 def test_api_get_config(client):
     os.environ["DETECTOR_ENDPOINT"] = "http://localhost:5000"
-    os.environ["CONNECTION_INFO"] = "connection_info"
+    os.environ["CONNECTION_INFO"] = "{}"
     os.environ["GOOGLE_ANALYTICS_KEY"] = "google_analytics_key"
     response = client.get("/api/config")
     assert response.status_code == 200
     assert response.json() == {
         "detectorEndpoint": "http://localhost:5000",
-        "connectionInfo": "connection_info",
+        "connectionInfo": {},
         "googleAnalyticsKey": "google_analytics_key",
     }
 
