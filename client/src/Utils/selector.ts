@@ -18,13 +18,13 @@ function getStandardDeviation(array: Array<any>) {
 const average = (array: Array<any>) => array.reduce((a, b) => a + b) / array.length;
 
 function calcFftOfTile(
-  samples: any,
-  fftSize: any,
-  numFftsPerTile: any,
-  windowFunction: any,
-  magnitude_min: any,
-  magnitude_max: any,
-  autoscale: any,
+  samples: Float32Array,
+  fftSize: number,
+  numFftsPerTile: number,
+  windowFunction: string,
+  magnitude_min: number,
+  magnitude_max: number,
+  autoscale: boolean,
   currentFftMax: any,
   currentFftMin: any
 ) {
@@ -70,10 +70,13 @@ function calcFftOfTile(
     const f = new FFT(fftSize);
     const out = f.createComplexArray(); // creates an empty array the length of fft.size*2
     f.transform(out, samples_slice); // assumes input (2nd arg) is in form IQIQIQIQ and twice the length of fft.size
+
+    // convert to magnitude
     let magnitudes = new Array(out.length / 2);
     for (let j = 0; j < out.length / 2; j++) {
       magnitudes[j] = Math.sqrt(Math.pow(out[j * 2], 2) + Math.pow(out[j * 2 + 1], 2)); // take magnitude
     }
+
     fftshift(magnitudes); // in-place
 
     magnitudes = magnitudes.map((x) => 10.0 * Math.log10(x)); // convert to dB
@@ -151,6 +154,7 @@ export interface SelectFftReturn {
   currentFftMax: number;
   currentFftMin: number;
   missingTiles: Array<number>;
+  fftData: Record<number, Uint8ClampedArray>;
 }
 
 // lowerTile and upperTile are in fractions of a tile
@@ -166,7 +170,8 @@ export const selectFft = (
   currentFftMin: any,
   autoscale = false,
   zoomLevel: any,
-  iqData: Record<number, Float32Array>
+  iqData: Record<number, Float32Array>,
+  fftData: Record<number, Uint8ClampedArray>
 ): SelectFftReturn | null => {
   if (!meta || !iqData) {
     return;
@@ -179,32 +184,34 @@ export const selectFft = (
   let tempCurrentFftMin = currentFftMin;
 
   // Go through each of the tiles and compute the FFT and save in window.fftData
-  const tiles = range(Math.floor(lowerTile), Math.floor(upperTile) + 1);
+  const tiles = range(Math.floor(lowerTile), Math.floor(upperTile));
   let autoMaxs = [];
   let autoMins = [];
-  let fftData: Record<number, Uint8ClampedArray> = {};
   for (let tile of tiles) {
-    if (iqData[tile] !== undefined) {
-      let samples = iqData[tile.toString()];
-      const { newFftData, autoMax, autoMin, newCurrentFftMax, newCurrentFftMin } = calcFftOfTile(
-        samples,
-        fftSize,
-        numFftsPerTile,
-        windowFunction,
-        magnitude_min,
-        magnitude_max,
-        autoscale,
-        tempCurrentFftMax,
-        tempCurrentFftMin
-      );
-      tempCurrentFftMax = newCurrentFftMax;
-      tempCurrentFftMin = newCurrentFftMin;
-      autoMaxs.push(autoMax);
-      autoMins.push(autoMin);
-      fftData[tile] = newFftData;
-    } else {
-      console.debug('Dont have iqData of tile', tile, 'yet');
+    if (!!fftData[tile]) {
+      continue;
     }
+    if (!iqData[tile]) {
+      console.debug('Dont have iqData of tile', tile, 'yet');
+      continue;
+    }
+    let samples = iqData[tile.toString()];
+    const { newFftData, autoMax, autoMin, newCurrentFftMax, newCurrentFftMin } = calcFftOfTile(
+      samples,
+      fftSize,
+      numFftsPerTile,
+      windowFunction,
+      magnitude_min,
+      magnitude_max,
+      autoscale,
+      tempCurrentFftMax,
+      tempCurrentFftMin
+    );
+    tempCurrentFftMax = newCurrentFftMax;
+    tempCurrentFftMin = newCurrentFftMin;
+    autoMaxs.push(autoMax);
+    autoMins.push(autoMin);
+    fftData[tile] = newFftData;
   }
   const missingTiles = [];
   // Concatenate the full tiles
@@ -289,6 +296,7 @@ export const selectFft = (
     currentFftMax: tempCurrentFftMax,
     currentFftMin: tempCurrentFftMin,
     missingTiles: missingTiles,
+    fftData: fftData,
   };
   return selectFftReturn;
 };

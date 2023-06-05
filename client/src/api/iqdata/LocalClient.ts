@@ -5,7 +5,7 @@ import { IQDataClient } from './IQDataClient';
 import { IQDataSlice } from '../Models';
 
 export class LocalClient implements IQDataClient {
-  getIQDataSlices(meta: SigMFMetadata, indexes: number[], tileSize: number): Promise<Record<number, IQDataSlice>> {
+  getIQDataSlices(meta: SigMFMetadata, indexes: number[], tileSize: number): Promise<IQDataSlice[]> {
     throw new Error('Method not implemented.');
   }
   getIQDataSlice(meta: SigMFMetadata, index: number): Promise<IQDataSlice> {

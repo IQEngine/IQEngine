@@ -18,10 +18,10 @@ import { ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 import AnnotationList from '@/Components/Annotation/AnnotationList';
 import { SpectrogramContext } from './SpectrogramContext';
 import { useParams } from 'react-router-dom';
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { getMeta } from '@/api/metadata/Queries';
 import { SigMFMetadata } from '@/Utils/sigmfMetadata';
-import { getIQDataSliceRange } from '@/api/iqdata/Queries';
+import { getIQDataSlices } from '@/api/iqdata/Queries';
 import { IQDataSlice } from '@/api/Models';
 import { useInterval } from 'usehooks-ts';
 
@@ -51,6 +51,8 @@ export const SpectrogramPage = () => {
     });
     renderImage();
   };
+  const imgRef = useRef<HTMLImageElement>(null);
+  const imgRef2 = useRef<HTMLImageElement>(null);
 
   // FFT Properties
   const [fftSize, setFFTSize] = useState(1024);
@@ -79,11 +81,20 @@ export const SpectrogramPage = () => {
   const [plotHeight, setPlotHeight] = useState(0);
   const [missingTiles, setMissingTiles] = useState([]);
   const metaQuery = getMeta(type, account, container, filePath);
-  const iqSlices = getIQDataSliceRange(metaQuery.data, lowerTile, upperTile + 1, handleNewSlice);
+  const tiles = range(Math.floor(lowerTile), Math.floor(upperTile));
+  const [fftData, setfftData] = useState<Record<number, Uint8ClampedArray>>({});
+  // const iqSlices = getIQDataSliceRange(metaQuery.data, lowerTile, upperTile + 1, handleNewSlice);
+  const iqffts = getIQDataSlices(
+    metaQuery.data,
+    tiles,
+    handleNewSlice,
+    TILE_SIZE_IN_IQ_SAMPLES,
+    !!metaQuery.data && tiles.length > 0
+  );
   const [meta, setMeta] = useState<SigMFMetadata>(metaQuery.data);
   const [fetchMinimap, setFetchMinimap] = useState(false);
-  const iqData = () =>
-    iqSlices
+  const iqData = useMemo(() => {
+    return iqffts
       .map((slice) => slice.data)
       .filter((data) => data !== null)
       .reduce((acc, data) => {
@@ -93,10 +104,27 @@ export const SpectrogramPage = () => {
         acc[data.index] = data.iqArray;
         return acc;
       }, {});
+  }, [
+    iqffts.reduce((acc, item) => {
+      if (item.data) {
+        return [acc, item.data.index].join(',');
+      } else {
+        return acc;
+      }
+    }, '') ?? '',
+    fftSize,
+    magnitudeMax,
+    magnitudeMin,
+    fftWindow,
+    zoomLevel,
+    lowerTile,
+    upperTile,
+    missingTiles,
+  ]);
 
-  const renderImage = async () => {
+  const fftReturned = useMemo(() => {
     if (!meta || lowerTile < 0 || upperTile < 0) {
-      return;
+      return null;
     }
 
     // Update the image (eventually this should get moved somewhere else)
@@ -112,25 +140,30 @@ export const SpectrogramPage = () => {
       currentFftMin,
       autoscale,
       zoomLevel,
-      iqData()
+      iqData,
+      fftData
     );
-    if (ret) {
-      // Draw the spectrogram
-      // TODO: QUERY memoaise this fnction and save the rf data so we do not need to keep doing this
-      // I think this can be done on the query itself.
-      createImageBitmap(ret.imageData).then((ret) => {
-        setImage(ret);
-      });
-      if (autoscale && ret.autoMax) {
-        console.debug('New max/min:', ret.autoMax, ret.autoMin);
-        setAutoscale(false); // toggles it off so this only will happen once
-        setMagnitudeMax(ret.autoMax);
-        setMagnitudeMin(ret.autoMin);
-      }
-      setCurrentFftMax(ret.currentFftMax);
-      setCurrentFftMin(ret.currentFftMin);
-      setMissingTiles(ret.missingTiles);
+    setfftData(ret.fftData);
+    return ret;
+  }, [iqData, fftSize, magnitudeMax, magnitudeMin, fftWindow, zoomLevel, lowerTile, upperTile]);
+
+  const renderImage = async () => {
+    console.log('Rendering image');
+    if (!fftReturned) {
+      return;
     }
+    createImageBitmap(fftReturned.imageData).then((imageBitmap) => {
+      setImage(imageBitmap);
+    });
+    if (autoscale && fftReturned.autoMax) {
+      console.debug('New max/min:', fftReturned.autoMax, fftReturned.autoMin);
+      setAutoscale(false); // toggles it off so this only will happen once
+      setMagnitudeMax(fftReturned.autoMax);
+      setMagnitudeMin(fftReturned.autoMin);
+    }
+    setCurrentFftMax(fftReturned.currentFftMax);
+    setCurrentFftMin(fftReturned.currentFftMin);
+    setMissingTiles(fftReturned.missingTiles);
     setFetchMinimap(true);
   };
 
@@ -141,9 +174,9 @@ export const SpectrogramPage = () => {
     }
   }, zoomLevel * 100);
 
-  useEffect(() => {
-    renderImage();
-  }, [fftSize, fftWindow, magnitudeMax, magnitudeMin, autoscale, zoomLevel, lowerTile, upperTile, downloadedTiles]);
+  // useEffect(() => {
+  //   renderImage();
+  // }, [fftSize, fftWindow, magnitudeMax, magnitudeMin, autoscale, zoomLevel, lowerTile, upperTile, downloadedTiles]);
 
   const fetchAndRender = (handleTop) => {
     if (!meta) {
@@ -190,7 +223,7 @@ export const SpectrogramPage = () => {
   };
 
   useEffect(() => {
-    console.debug('iqData', iqData());
+    console.debug('iqData', iqData);
     renderImage();
   }, [downloadedTiles]);
 
@@ -257,8 +290,8 @@ export const SpectrogramPage = () => {
     let currentSamples = new Float32Array(bufferLen);
     let counter = 0;
     for (let tile of tiles) {
-      if (iqData()[tile] !== undefined) {
-        currentSamples.set(iqData()[tile], counter);
+      if (iqData[tile] !== undefined) {
+        currentSamples.set(iqData[tile], counter);
       } else {
         console.debug('Dont have iqData of tile', tile, 'yet');
       }
@@ -514,6 +547,8 @@ export const SpectrogramPage = () => {
           </details>
         </div>
       </div>
+      <img ref={imgRef} />
+      <img ref={imgRef2} />
     </SpectrogramContext.Provider>
   );
 };
