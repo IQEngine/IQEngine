@@ -1,10 +1,10 @@
-import { LocalClient } from './LocalClient';
+import { CLIENT_TYPE_API, CLIENT_TYPE_LOCAL, CLIENT_TYPE_BLOB } from '../Models';
 import { ApiClient } from './ApiClient';
 import { BlobClient } from './BlobClient';
-import { DataSourceClient } from './DataSourceClient';
-import { CLIENT_TYPE_API, CLIENT_TYPE_LOCAL, CLIENT_TYPE_BLOB } from '../Models';
+import { LocalClient } from './LocalClient';
+import { IQDataClient } from './IQDataClient';
 
-export const DataSourceClientFactory = (type: string): DataSourceClient => {
+export const IQDataClientFactory = (type: string): IQDataClient => {
   switch (type) {
     case CLIENT_TYPE_API:
       return new ApiClient();

@@ -1,22 +1,26 @@
-import { SigMFMetadata } from '@/Utils/sigmfStructure';
-import { DataSourceClient, DataSource } from './DataSourceClient';
+import { SigMFMetadata } from '@/Utils/sigmfMetadata';
+import { DataSourceClient } from './DataSourceClient';
+import { DataSource } from '../Models';
+import store from '@/Store/store';
+import { getDataSourceFromConnection } from '../utils/AzureBlob';
 
 export class BlobClient implements DataSourceClient {
-  get_datasource_meta(dataSource: string): Promise<SigMFMetadata> {
-    throw new Error('Method not implemented.');
-  }
-  update_meta(dataSource: string, filePath: string, meta: object): Promise<SigMFMetadata> {
-    throw new Error('Method not implemented.');
-  }
   list(): Promise<DataSource[]> {
-    throw new Error('Not implemented');
+    const connection = store.getState().connection;
+    if (!connection) {
+      return Promise.reject('No connection found');
+    }
+    return Promise.resolve(Object.values(connection.dataSources));
   }
-  get(dataSource: string): Promise<DataSource> {
-    throw new Error('Not implemented');
+
+  get(account: string, container: string): Promise<DataSource> {
+    const dataSource = getDataSourceFromConnection(account, container);
+    if (!dataSource) {
+      return Promise.reject('No connection found');
+    }
+    return Promise.resolve(dataSource);
   }
-  get_meta(dataSource: string, filePath: string): Promise<SigMFMetadata> {
-    throw new Error('Not implemented');
-  }
+
   features() {
     return {
       update_meta: false,

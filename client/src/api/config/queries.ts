@@ -1,5 +1,8 @@
 import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
+import store from '@/Store/store';
+import { CLIENT_TYPE_BLOB, DataSource } from '@/api/Models';
+import { upsertDataSource } from '@/Store/Reducers/ConnectionReducer';
 
 const fetchConfig = async () => {
   const response = await axios.get<Config>('/api/config').catch((error) => {
@@ -20,10 +23,37 @@ const fetchConfig = async () => {
   return response.data;
 };
 
+interface ConnectionInfo {
+  settings: Array<{
+    name: string;
+    containerName: string;
+    accountName: string;
+    sasToken: string;
+    imageURL: string;
+    description: string;
+  }>;
+}
+
 type Config = {
   detectorEndpoint: string;
-  connectionInfo: object;
+  connectionInfo: ConnectionInfo;
   googleAnalyticsKey: string;
 };
 
-export const configQuery = () => useQuery(['config'], fetchConfig);
+export const configQuery = () =>
+  useQuery(['config'], fetchConfig, {
+    onSuccess: (data) => {
+      data.connectionInfo.settings.forEach((setting) => {
+        const dataSource: DataSource = {
+          type: CLIENT_TYPE_BLOB,
+          name: setting.name,
+          description: setting.description,
+          imageURL: setting.imageURL,
+          account: setting.accountName,
+          container: setting.containerName,
+          sasToken: setting.sasToken,
+        };
+        store.dispatch({ type: upsertDataSource.type, payload: dataSource });
+      });
+    },
+  });

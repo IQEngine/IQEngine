@@ -1,22 +1,16 @@
 import axios from 'axios';
-import { DataSource, DataSourceClient } from './DataSourceClient';
-import { SigMFMetadata } from '@/Utils/sigmfStructure';
+import { DataSourceClient } from './DataSourceClient';
+import { DataSource } from '../Models';
+import { SigMFMetadata } from '@/Utils/sigmfMetadata';
 
 export class ApiClient implements DataSourceClient {
-  list(): Promise<DataSource[]> {
-    return axios.get('/api/datasources');
+  async list(): Promise<DataSource[]> {
+    const response = await axios.get('/api/datasources');
+    return response.data;
   }
-  get(dataSource: string): Promise<DataSource> {
-    return axios.get(`/api/datasources/${dataSource}`);
-  }
-  get_meta(dataSource: string, filePath: string): Promise<SigMFMetadata> {
-    return axios.get(`/api/datasources/${dataSource}/${filePath}/meta`);
-  }
-  get_datasource_meta(dataSource: string): Promise<SigMFMetadata> {
-    return axios.get(`/api/datasources/${dataSource}/meta`);
-  }
-  update_meta(dataSource: string, filePath: string, meta: object): Promise<SigMFMetadata> {
-    return axios.put(`/api/datasources/${dataSource}/${filePath}/meta`, meta);
+  async get(account: string, container: string): Promise<DataSource> {
+    const response = await axios.get(`/api/datasources/${account}/${container}`);
+    return response.data;
   }
   features() {
     return {
