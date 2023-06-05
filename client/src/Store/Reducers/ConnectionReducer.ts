@@ -1,7 +1,8 @@
 // Copyright (c) 2022 Microsoft Corporation
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
-import { createSlice } from '@reduxjs/toolkit';
+import { DataSource } from '@/api/Models';
+import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   accountName: '',
@@ -11,12 +12,17 @@ const initialState = {
   metafilehandle: '',
   datafilehandle: '',
   blobClient: null,
+  dataSources: {} as Record<string, DataSource>,
 };
 
 export const connectionSlicer = createSlice({
   name: 'connection',
   initialState,
   reducers: {
+    upsertDataSource: (state, action: PayloadAction<DataSource>) => {
+      const dataSourceKey = `${action.payload.account}/${action.payload.container}`;
+      state.dataSources[dataSourceKey] = action.payload;
+    },
     updateConnectionAccountName: (state, action) => {
       state.accountName = action.payload;
     },
@@ -51,6 +57,7 @@ export const connectionSlicer = createSlice({
 });
 
 export const {
+  upsertDataSource,
   updateConnectionAccountName,
   updateConnectionContainerName,
   updateConnectionRecording,
