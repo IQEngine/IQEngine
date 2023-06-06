@@ -8,7 +8,11 @@ const fetchConfig = async () => {
   const response = await axios.get<Config>('/api/config').catch((error) => {
     console.log(error);
     return {
-      data: {} as Config,
+      data: {
+        connectionInfo: JSON.parse(import.meta.env.VITE_CONNECTION_INFO),
+        detectorEndpoint: import.meta.env.VITE_DETECTOR_ENDPOINT,
+        googleAnalyticsKey: import.meta.env.VITE_GOOGLE_ANALYTICS_KEY,
+      } as Config,
     };
   });
   if (!response.data.connectionInfo) {
