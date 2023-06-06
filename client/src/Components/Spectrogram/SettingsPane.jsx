@@ -44,7 +44,6 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
   const onChangeWindowFunction = (event) => {
     const windowFunction = event.currentTarget.dataset.value;
     setState({ ...state, windowFunction: windowFunction });
-    dispatch(resetBlobIQData());
     props.updateWindowChange(windowFunction);
   };
 
