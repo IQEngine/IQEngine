@@ -42,7 +42,7 @@ export const DetectorPane = (props) => {
     setSelectedDetector(e.target.value);
     setDetectorParams({}); // in case something goes wrong
     // Fetch the custom params for this detector
-    fetch(detectorEndpoint + e.target.value, { method: 'GET' })
+    fetch(config.data.detectorEndpoint + e.target.value, { method: 'GET' })
       .then(function (response) {
         if (response.status === 404) {
           return {};
@@ -89,7 +89,7 @@ export const DetectorPane = (props) => {
     }
     console.log(body);
 
-    fetch(detectorEndpoint + selectedDetector, {
+    fetch(config.data.detectorEndpoint + selectedDetector, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
