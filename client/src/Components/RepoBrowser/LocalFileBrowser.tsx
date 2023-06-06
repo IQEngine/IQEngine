@@ -63,7 +63,7 @@ const LocalFileBrowser = () => {
     <div className="repocard">
       <h2 className="repocardheader grid content-center justify-center">Browse Local Files</h2>
       <div className="card-body grid justify-items-center">
-        <div className="grid justify-items-center">
+        <div className="grid justify-items-center mt-10">
           {directoryPickerAvailable && (
             <>
               <button className="btn btn-primary opacity-75" onClick={openDir}>

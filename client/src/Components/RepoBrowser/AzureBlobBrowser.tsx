@@ -44,7 +44,7 @@ const AzureBlobBrowser = () => {
     <div className="repocard">
       <h2 className="repocardheader grid content-center justify-center">Browse Your Azure Blob Storage</h2>
       <div className="card-body">
-        <form className="m-3 mt-0">
+        <form className="m-3 mt-8">
           <label>Storage Account Name:</label>
           <input
             className="mb-3 w-full rounded mt-1 h-8 p-1 bg-accent text-black"
