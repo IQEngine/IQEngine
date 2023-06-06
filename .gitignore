@@ -38,3 +38,4 @@ api/build
 **/.mypy_cache/
 **/.ruff_cache/
 *.venv/
+tiling/spectrogram.pmtiles
