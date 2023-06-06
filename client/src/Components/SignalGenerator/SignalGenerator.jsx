@@ -9,7 +9,6 @@ import { examplesList } from './examples/exampleList';
 
 export default function SignalGenerator(props) {
   const [state, setState] = useState({
-    pythonSnippet: examplesList[0].value,
     freqPlotSnippet: `\
 X = 10*np.log10(np.abs(np.fft.fftshift(np.fft.fft(x)))**2)
 f = np.linspace(-0.5, 0.5, len(X))
@@ -175,7 +174,7 @@ print('NumPy Version:', numpy.version.version)
     if (state.pyodide) {
       state.pyodide
         .runPythonAsync(
-          state.pythonSnippet +
+          currentSnippet +
             prePlot +
             state.freqPlotSnippet +
             postFreq +
