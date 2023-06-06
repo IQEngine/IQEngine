@@ -22,6 +22,7 @@ export class SettingsPaneProps {
   toggleIncludeRfFreq: any;
   handleAutoScale: any;
   toggleCursors: any;
+  updateZoomLevel: any;
 }
 
 const SettingsPane = (props: SettingsPaneProps) => {
@@ -128,7 +129,7 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
   const onChangeZoomLevel = (e) => {
     setState({ ...state, zoomLevel: e.target.value });
     // TODO: QUERY Update zoom level
-    // props.updateZoomLevel(e.target.value);
+    props.updateZoomLevel(e.target.value);
   };
 
   return (
