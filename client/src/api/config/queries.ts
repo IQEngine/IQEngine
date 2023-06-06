@@ -5,26 +5,34 @@ import { CLIENT_TYPE_BLOB, DataSource } from '@/api/Models';
 import { upsertDataSource } from '@/Store/Reducers/ConnectionReducer';
 
 const fetchConfig = async () => {
-  const response = await axios.get<Config>('/api/config').catch((error) => {
-    console.log(error);
+  try {
+    const response = await axios.get<Config>('/api/config').catch((error) => {
+      console.log(error);
+      return {
+        data: {
+          connectionInfo: JSON.parse(import.meta.env.VITE_CONNECTION_INFO),
+          detectorEndpoint: import.meta.env.VITE_DETECTOR_ENDPOINT,
+          googleAnalyticsKey: import.meta.env.VITE_GOOGLE_ANALYTICS_KEY,
+        } as Config,
+      };
+    });
+    if (!response.data.connectionInfo) {
+      response.data.connectionInfo = JSON.parse(import.meta.env.VITE_CONNECTION_INFO);
+    }
+    if (!response.data.detectorEndpoint) {
+      response.data.detectorEndpoint = import.meta.env.VITE_DETECTOR_ENDPOINT;
+    }
+    if (!response.data.googleAnalyticsKey) {
+      response.data.googleAnalyticsKey = import.meta.env.VITE_GOOGLE_ANALYTICS_KEY;
+    }
+    return response.data;
+  } catch (error) {
     return {
-      data: {
-        connectionInfo: JSON.parse(import.meta.env.VITE_CONNECTION_INFO),
-        detectorEndpoint: import.meta.env.VITE_DETECTOR_ENDPOINT,
-        googleAnalyticsKey: import.meta.env.VITE_GOOGLE_ANALYTICS_KEY,
-      } as Config,
-    };
-  });
-  if (!response.data.connectionInfo) {
-    response.data.connectionInfo = JSON.parse(import.meta.env.VITE_CONNECTION_INFO);
+      connectionInfo: JSON.parse(import.meta.env.VITE_CONNECTION_INFO),
+      detectorEndpoint: import.meta.env.VITE_DETECTOR_ENDPOINT,
+      googleAnalyticsKey: import.meta.env.VITE_GOOGLE_ANALYTICS_KEY,
+    } as Config;
   }
-  if (!response.data.detectorEndpoint) {
-    response.data.detectorEndpoint = import.meta.env.VITE_DETECTOR_ENDPOINT;
-  }
-  if (!response.data.googleAnalyticsKey) {
-    response.data.googleAnalyticsKey = import.meta.env.VITE_GOOGLE_ANALYTICS_KEY;
-  }
-  return response.data;
 };
 
 interface ConnectionInfo {
