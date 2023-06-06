@@ -9,7 +9,6 @@ import { examplesList } from './examples/exampleList';
 
 export default function SignalGenerator(props) {
   const [state, setState] = useState({
-    pythonSnippet: examplesList[0].value,
     freqPlotSnippet: `\
 X = 10*np.log10(np.abs(np.fft.fftshift(np.fft.fft(x)))**2)
 f = np.linspace(-0.5, 0.5, len(X))
@@ -113,13 +112,6 @@ for varname in list(globals().keys()):
   const [currentSnippet, setCurrentSnippet] = useState(examplesList[0].value);
   const [currentTab, setCurrentTab] = useState('frequency');
 
-  const onChangePythonSnippet = useCallback(
-    (value, viewUpdate) => {
-      setCurrentSnippet(value);
-    },
-    [state]
-  );
-
   const onChangeFreqPlotSnippet = useCallback(
     (value, viewUpdate) => {
       setState({ ...state, freqPlotSnippet: value });
@@ -175,7 +167,7 @@ print('NumPy Version:', numpy.version.version)
     if (state.pyodide) {
       state.pyodide
         .runPythonAsync(
-          state.pythonSnippet +
+          currentSnippet +
             prePlot +
             state.freqPlotSnippet +
             postFreq +
@@ -292,11 +284,11 @@ print('NumPy Version:', numpy.version.version)
   return (
     <div className="grid items-start justify-center">
       <center>
-        <h2 className="text-primary">Python-Based Signal Generator</h2>
+        <p className="text-iqengine-primary text-2xl mb-3">Python-Based Signal Generator</p>
       </center>
       <div className="flex">
         <div className="flex-1 mr-10">
-          <select className="select select-bordered w-full max-w-xs" onChange={onChangeDropdown}>
+          <select className="select select-bordered w-full max-w-xs text-base" onChange={onChangeDropdown}>
             {examplesList.map((example) => (
               <option key={example.label} value={example.value}>
                 {example.label}
@@ -316,7 +308,7 @@ print('NumPy Version:', numpy.version.version)
                 checked={state.downloadChecked}
                 onChange={() => onChangeDownloadChecked()}
               />
-              <span className="ml-2 label-text text-base">Download "x" as SigMF Recording</span>
+              <span className="ml-2 text-base">Download "x" as SigMF Recording</span>
             </label>
           </div>
           <div className="display-linebreak">
@@ -326,28 +318,44 @@ print('NumPy Version:', numpy.version.version)
         <div className="flex-1">
           <div className="tabs tabs-boxed">
             <a
-              className={currentTab === 'frequency' ? 'tab tab-active' : 'tab tab-bordered'}
+              className={
+                currentTab === 'frequency'
+                  ? 'tab tab-active text-base text-iqengine-bg font-bold'
+                  : 'tab tab-bordered text-base text-iqengine-primary hover:bg-iqengine-secondary'
+              }
               onClick={onClickHandler}
               data-value="frequency"
             >
               Freq
             </a>
             <a
-              className={currentTab === 'time' ? 'tab tab-active' : 'tab tab-bordered'}
+              className={
+                currentTab === 'time'
+                  ? 'tab tab-active text-base text-iqengine-bg font-bold'
+                  : 'tab tab-bordered text-base text-iqengine-primary hover:bg-iqengine-secondary'
+              }
               onClick={onClickHandler}
               data-value="time"
             >
               Time
             </a>
             <a
-              className={currentTab === 'iq' ? 'tab tab-active' : 'tab tab-bordered'}
+              className={
+                currentTab === 'iq'
+                  ? 'tab tab-active text-base text-iqengine-bg font-bold'
+                  : 'tab tab-bordered text-base text-iqengine-primary hover:bg-iqengine-secondary'
+              }
               onClick={onClickHandler}
               data-value="iq"
             >
               IQ
             </a>
             <a
-              className={currentTab === 'spectrogram' ? 'tab tab-active' : 'tab tab-bordered'}
+              className={
+                currentTab === 'spectrogram'
+                  ? 'tab tab-active text-base text-iqengine-bg font-bold'
+                  : 'tab tab-bordered text-base text-iqengine-primary hover:bg-iqengine-secondary'
+              }
               onClick={onClickHandler}
               data-value="spectrogram"
             >
