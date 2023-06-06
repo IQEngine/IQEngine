@@ -112,13 +112,6 @@ for varname in list(globals().keys()):
   const [currentSnippet, setCurrentSnippet] = useState(examplesList[0].value);
   const [currentTab, setCurrentTab] = useState('frequency');
 
-  const onChangePythonSnippet = useCallback(
-    (value, viewUpdate) => {
-      setCurrentSnippet(value);
-    },
-    [state]
-  );
-
   const onChangeFreqPlotSnippet = useCallback(
     (value, viewUpdate) => {
       setState({ ...state, freqPlotSnippet: value });
