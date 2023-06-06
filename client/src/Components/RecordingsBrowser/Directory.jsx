@@ -27,7 +27,7 @@ const Directory = ({ item, setCurrentFolder, currentFolder }) => {
     return (
       <>
         {item.name !== 'root' && (
-          <tr>
+          <tr className="border-iqengine-secondary border-2">
             <td></td>
             <td className="align-middle">
               <p

@@ -189,7 +189,7 @@ export default function RecordingsBrowser() {
           </svg>
         </center>
       ) : (
-        <table className="table w-full">
+        <table className="table w-fit">
           <thead>
             <tr style={{ textAlign: 'center' }}>
               <th>Spectrogram Thumbnail</th>

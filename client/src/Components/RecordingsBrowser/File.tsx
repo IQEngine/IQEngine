@@ -61,7 +61,7 @@ export default function FileRow({ item }) {
     delete deepItemCopy['core:description'];
 
     return (
-      <tr key={index}>
+      <tr key={index} className="border-iqengine-secondary border-2">
         <td>{item['core:sample_start']}</td>
         <td>{item['core:sample_count']}</td>
         <td>{item['core:freq_lower_edge'] / 1e6}</td>
@@ -78,7 +78,7 @@ export default function FileRow({ item }) {
   }
 
   return (
-    <tr style={{ textAlign: 'center' }}>
+    <tr style={{ textAlign: 'center' }} className="border-iqengine-secondary border-2">
       {/* If we are looking at a recording from blob storage */}
       {!item.dataFileHandle ? (
         <>
