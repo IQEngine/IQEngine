@@ -119,7 +119,11 @@ export const DetectorPane = (props) => {
     <div className="detectForm" id="detectFormId" onSubmit={handleSubmit}>
       <label className="label">
         Detector:
-        <select className="rounded bg-neutral text-base-100" value={selectedDetector} onChange={handleChangeDetector}>
+        <select
+          className="rounded bg-base-content text-base-100"
+          value={selectedDetector}
+          onChange={handleChangeDetector}
+        >
           <option disabled value="default">
             Select a Detector
           </option>

@@ -11,10 +11,10 @@ const Sidebar = (props) => {
   return (
     <div className="flex flex-col w-64 ml-3">
       <details open>
-        <summary className="pl-2 bg-iqengine-primary outline outline-1 outline-iqengine-primary text-lg text-black hover:bg-green-800">
+        <summary className="pl-2 bg-primary outline outline-1 outline-primary text-lg text-black hover:bg-green-800">
           Settings
         </summary>
-        <div className="outline outline-1 outline-iqengine-primary p-2">
+        <div className="outline outline-1 outline-primary p-2">
           <SettingsPane
             updateMagnitudeMax={props.updateMagnitudeMax}
             updateMagnitudeMin={props.updateMagnitudeMin}
@@ -32,19 +32,19 @@ const Sidebar = (props) => {
       </details>
 
       <details>
-        <summary className="pl-2 mt-2 bg-iqengine-primary outline outline-1 outline-iqengine-primary text-lg text-black hover:bg-green-800">
+        <summary className="pl-2 mt-2 bg-primary outline outline-1 outline-primary text-lg text-black hover:bg-green-800">
           Detector
         </summary>
-        <div className="outline outline-1 outline-iqengine-primary p-2">
+        <div className="outline outline-1 outline-primary p-2">
           <DetectorPane cursorsEnabled={props.cursorsEnabled} handleProcessTime={props.handleProcessTime} />
         </div>
       </details>
 
       <details>
-        <summary className="pl-2 mt-2 bg-iqengine-primary outline outline-1 outline-iqengine-primary text-lg text-black hover:bg-green-800">
+        <summary className="pl-2 mt-2 bg-primary outline outline-1 outline-primary text-lg text-black hover:bg-green-800">
           Global Properties
         </summary>
-        <div className="outline outline-1 outline-iqengine-primary p-2">
+        <div className="outline outline-1 outline-primary p-2">
           <InfoPane />
         </div>
       </details>

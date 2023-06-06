@@ -78,7 +78,7 @@ export const DataTable = ({ dataColumns, dataRows }: TableProps) => {
         <div className="flex flex-row items-center">
           <span className="mr-2">Show</span>
           <select
-            className={`bg-iqengine-bg`}
+            className={`bg-base-100`}
             aria-label="page size"
             value={pageSize}
             onChange={(e) => {
@@ -96,7 +96,7 @@ export const DataTable = ({ dataColumns, dataRows }: TableProps) => {
         </div>
         <div>
           <input
-            className={`bg-iqengine-bg input no-spin`}
+            className={`bg-base-100 input no-spin`}
             aria-label="filter"
             value={filterInput}
             onChange={(e) => {

@@ -60,28 +60,20 @@ const LocalFileBrowser = () => {
   };
 
   return (
-    // <div className="container-fluid col-4">
-    <div className="flex-one repocard">
-      <div className="repocardheader">Browse Local Files</div>
-      <div className="repocardbody">
-        <center>
+    <div className="repocard">
+      <h2 className="repocardheader grid content-center justify-center">Browse Local Files</h2>
+      <div className="card-body grid justify-items-center">
+        <div className="grid justify-items-center">
           {directoryPickerAvailable && (
             <>
-              <button
-                className="p-2 m-3 rounded-lg outline outline-1 outline-iqengine-primary hover:bg-iqengine-tertiary hover:text-black"
-                onClick={openDir}
-              >
+              <button className="btn btn-primary opacity-75" onClick={openDir}>
                 Open Local Directory
               </button>
-              <br />
               OR
             </>
           )}
           <br />
-          <button
-            className="p-2 m-3 rounded-lg outline outline-1 outline-iqengine-primary hover:bg-iqengine-tertiary hover:text-black"
-            onClick={openFile}
-          >
+          <button className="btn btn-primary opacity-75" onClick={openFile}>
             Select 1 .sigmf-meta
             <br />
             and 1 .sigmf-data
@@ -89,7 +81,7 @@ const LocalFileBrowser = () => {
           <div className="text-gray-500 mb-3">
             Note: FFTs and visualizations are done client-side (the data won't be uploaded anywhere)
           </div>
-        </center>
+        </div>
       </div>
     </div>
   );

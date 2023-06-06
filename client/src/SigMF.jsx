@@ -50,7 +50,7 @@ const exampleMeta = `
 export const SigMF = () => {
   return (
     <div className="mx-32">
-      <h1 className="text-iqengine-primary text-center">What is SigMF?</h1>
+      <h1 className="text-primary text-center">What is SigMF?</h1>
       <div className="columns-2">
         <p className="text-justify text-lg">
           The Signal Metadata Format (SigMF) specifies a way to describe sets of recorded digital signals with metadata
@@ -89,7 +89,7 @@ export const SigMF = () => {
       </div>
 
       {/* SigMF Summary */}
-      <h1 className="text-iqengine-primary text-center mt-16">SigMF in 5 Minutes</h1>
+      <h1 className="text-primary text-center mt-16">SigMF in 5 Minutes</h1>
       <p className="text-lg">
         The SigMF{' '}
         <a href="https://github.com/sigmf/SigMF/blob/sigmf-v1.x/sigmf-spec.md" target="_blank">

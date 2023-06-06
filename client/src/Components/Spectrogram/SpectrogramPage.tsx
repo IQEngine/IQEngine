@@ -340,7 +340,7 @@ export const SpectrogramPage = () => {
             updateZoomLevel={setZoomLevel}
           />
           <div className="flex flex-col">
-            <ul className="flex space-x-2 border-b border-iqengine-primary w-full sm:pl-12 lg:pl-32" id="tabsbar">
+            <ul className="flex space-x-2 border-b border-primary w-full sm:pl-12 lg:pl-32" id="tabsbar">
               <li>
                 <button
                   onClick={() => {
@@ -348,8 +348,8 @@ export const SpectrogramPage = () => {
                     setCurrentTab('spectrogram');
                   }}
                   className={` ${
-                    currentTab === 'spectrogram' ? 'bg-iqengine-primary !text-black' : ''
-                  } inline-block px-3 py-0 outline  outline-iqengine-primary outline-1 text-lg text-iqengine-primary hover:text-green-900`}
+                    currentTab === 'spectrogram' ? 'bg-primary !text-black' : ''
+                  } inline-block px-3 py-0 outline  outline-primary outline-1 text-lg text-primary hover:text-green-900`}
                 >
                   Spectrogram
                 </button>
@@ -361,8 +361,8 @@ export const SpectrogramPage = () => {
                     setCurrentTab('time');
                   }}
                   className={` ${
-                    currentTab === 'time' ? 'bg-iqengine-primary !text-black' : ''
-                  } inline-block px-3 py-0 outline outline-iqengine-primary outline-1 text-lg text-iqengine-primary hover:text-green-900`}
+                    currentTab === 'time' ? 'bg-primary !text-black' : ''
+                  } inline-block px-3 py-0 outline outline-primary outline-1 text-lg text-primary hover:text-green-900`}
                 >
                   Time
                 </button>
@@ -374,8 +374,8 @@ export const SpectrogramPage = () => {
                     setCurrentTab('frequency');
                   }}
                   className={` ${
-                    currentTab === 'frequency' ? 'bg-iqengine-primary !text-black' : ''
-                  } inline-block px-3 py-0 outline  outline-iqengine-primary outline-1 text-lg text-iqengine-primary hover:text-green-900`}
+                    currentTab === 'frequency' ? 'bg-primary !text-black' : ''
+                  } inline-block px-3 py-0 outline  outline-primary outline-1 text-lg text-primary hover:text-green-900`}
                 >
                   Frequency
                 </button>
@@ -387,8 +387,8 @@ export const SpectrogramPage = () => {
                     setCurrentTab('iq');
                   }}
                   className={` ${
-                    currentTab === 'iq' ? 'bg-iqengine-primary !text-black' : ''
-                  } inline-block px-3 py-0 outline  outline-iqengine-primary outline-1 text-lg text-iqengine-primary hover:text-green-900`}
+                    currentTab === 'iq' ? 'bg-primary !text-black' : ''
+                  } inline-block px-3 py-0 outline  outline-primary outline-1 text-lg text-primary hover:text-green-900`}
                 >
                   IQ Plot
                 </button>
@@ -493,19 +493,19 @@ export const SpectrogramPage = () => {
 
         <div className="mt-3 mb-0 px-2 py-0" style={{ margin: '5px' }}>
           <details>
-            <summary className="pl-2 mt-2 bg-iqengine-primary outline outline-1 outline-iqengine-primary text-lg text-black hover:bg-green-800">
+            <summary className="pl-2 mt-2 bg-primary outline outline-1 outline-primary text-lg text-black hover:bg-green-800">
               Annotations
             </summary>
-            <div className="outline outline-1 outline-iqengine-primary p-2">
+            <div className="outline outline-1 outline-primary p-2">
               <AnnotationList meta={meta} setHandleTop={setHandleTop} spectrogramHeight={spectrogramHeight} />
             </div>
           </details>
 
           <details>
-            <summary className="pl-2 mt-2 bg-iqengine-primary outline outline-1 outline-iqengine-primary text-lg text-black hover:bg-green-800">
+            <summary className="pl-2 mt-2 bg-primary outline outline-1 outline-primary text-lg text-black hover:bg-green-800">
               Metadata
             </summary>
-            <div className="outline outline-1 outline-iqengine-primary p-2">
+            <div className="outline outline-1 outline-primary p-2">
               <div className="flex flex-row">
                 <button
                   className="btn btn-primary text-right"
@@ -530,7 +530,7 @@ export const SpectrogramPage = () => {
               <div>
                 <textarea
                   rows={20}
-                  className="bg-neutral text-base-100"
+                  className="bg-base-content text-base-100"
                   style={{ width: '100%' }}
                   value={JSON.stringify(
                     {

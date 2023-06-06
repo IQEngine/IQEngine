@@ -309,7 +309,7 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
           <span className="label-text text-base">Python Snippet</span>
         </label>
         <textarea
-          className="bg-neutral text-base-100 p-1"
+          className="bg-base-content text-base-100 p-1"
           rows={6}
           cols={28}
           wrap="off"

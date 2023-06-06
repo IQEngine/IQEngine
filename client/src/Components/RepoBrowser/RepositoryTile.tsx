@@ -49,24 +49,22 @@ const RepositoryTile = (props) => {
   };
 
   return (
-    <div className="flex-one repocard">
-      <div className="repocardheader" style={{ display: 'flex', justifyContent: 'space-between' }}>
+    <div className="repocard">
+      <h2 className="repocardheader flex content-center justify-center">
         {<div style={{ marginTop: 'auto' }}>{name}</div>} {writeableBool}
-      </div>
+      </h2>
+      <figure>{imageURL && <img src={imageURL} className="rounded-xl pt-2 pl-2 pr-2 w-72 h-44"></img>}</figure>
       <div className="repocardbody">
-        <center>
-          {imageURL && <img src={imageURL} className="w-48 rounded-xl"></img>}
-          <div className="mb-2 mt-3">{description}</div>
-          <div className="mb-3" style={{ color: 'grey' }}>
-            SAS Token Expiration: {expires}
+        <div className="mb-2 h-20 overflow-hidden hover:overflow-auto">{description}</div>
+        <div className="mb-3" style={{ color: 'grey' }}>
+          SAS Token Expiration: {expires}
+        </div>
+        {isError && <div style={{ color: 'red' }}>This SAS token is expired</div>}
+        {isWarning && (
+          <div style={{ color: 'yellow' }}>
+            This token will expire {dayDifference === 0 ? 'today' : 'in ' + dayDifference + ' days'}
           </div>
-          {isError && <div style={{ color: 'red' }}>This SAS token is expired</div>}
-          {isWarning && (
-            <div style={{ color: 'yellow' }}>
-              This token will expire {dayDifference === 0 ? 'today' : 'in ' + dayDifference + ' days'}
-            </div>
-          )}
-        </center>
+        )}
       </div>
       <button className="repocardbutton" disabled={isDisabled} id={name.replaceAll(' ', '')} onClick={handleOnClick}>
         Browse

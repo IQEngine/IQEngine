@@ -41,34 +41,34 @@ const AzureBlobBrowser = () => {
   };
 
   return (
-    <div className="flex-one repocard">
-      <div className="repocardheader">Browse Your Azure Blob Storage</div>
-      <div className="repocardbody">
+    <div className="repocard">
+      <h2 className="repocardheader grid content-center justify-center">Browse Your Azure Blob Storage</h2>
+      <div className="card-body">
         <form className="m-3 mt-0">
           <label>Storage Account Name:</label>
           <input
-            className="mb-3 w-full rounded mt-1 h-8 p-1 bg-iqengine-tertiary text-black"
+            className="mb-3 w-full rounded mt-1 h-8 p-1 bg-accent text-black"
             type="text"
             defaultValue={account}
             onChange={onAccountNameChange}
           />
           <label>Container Name:</label>
           <input
-            className="mb-3 w-full rounded mt-1 h-8 p-1 bg-iqengine-tertiary text-black"
+            className="mb-3 w-full rounded mt-1 h-8 p-1 bg-accent text-black"
             type="text"
             defaultValue={container}
             onChange={onContainerNameChange}
           />
           <label>SAS Token for Container:</label>
           <input
-            className="w-full rounded mt-1 h-8 p-1 bg-iqengine-tertiary text-black"
+            className="w-full rounded mt-1 h-8 p-1 bg-accent text-black"
             type="password"
             defaultValue={sasToken}
             onChange={onSasTokenChange}
           />
         </form>
       </div>
-      <button className="repocardbutton" onClick={onSubmit}>
+      <button className="repocardbutton " onClick={onSubmit}>
         Browse
       </button>
     </div>

@@ -7,7 +7,7 @@ import React from 'react';
 export const About = () => {
   return (
     <div>
-      <div className="bg-iqengine-tertiary bg-opacity-10">
+      <div className="bg-accent bg-opacity-10">
         <h1 className="text-center p-4">Great For...</h1>
         <div className="columns-2 pl-48 pr-24 pb-4">
           <ul className="text-lg">
@@ -39,7 +39,7 @@ export const About = () => {
         </ul>
       </div>
 
-      <div className="bg-iqengine-tertiary bg-opacity-10 pt-1" style={{ width: 'auto', paddingBottom: '15px' }}>
+      <div className="bg-accent bg-opacity-10 pt-1" style={{ width: 'auto', paddingBottom: '15px' }}>
         <h1 className="text-center">Leadership Teams</h1>
         <div className="grid grid-cols-3 gap-4 justify-items-center px-32 py-3 text-lg">
           <div>

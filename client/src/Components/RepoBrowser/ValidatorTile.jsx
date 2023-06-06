@@ -13,22 +13,18 @@ const ValidatorTile = (props) => {
   };
 
   return (
-    <div className="flex-one repocard">
-      <div className="repocardheader" style={{ display: 'flex', justifyContent: 'space-between' }}>
-        SigMF Meta Validator
-      </div>
+    <div className="repocard">
+      <div className="repocardheader grid content-center justify-center">SigMF Meta Validator</div>
       <div className="repocardbody">
-        <center>
+        <div className="grid content-center justify-center">
           <img
             className="my-4"
             src="/validator.png"
             width="200px"
             alt="DALLE prompt - thumbs up with radio waves in the theme of dr suess solid dark background"
           ></img>
-          Validate your .sigmf-meta file using an interactive JSON schema validator
-          <br></br>
-          <br></br>
-        </center>
+        </div>
+        <div className="text-center">Validate your .sigmf-meta file using an interactive JSON schema validator</div>
       </div>
       <button className="repocardbutton" onClick={handleOnClick}>
         Validator

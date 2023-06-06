@@ -38,17 +38,18 @@ export default function RecordingsBrowser() {
         </div>
       ) : (
         <div className="md:px-8 xl:px-10">
-          <div className="overflow-x-auto">
-            <table className="w-full table-fixed">
+          <div className="flex justify-items-stretch">
+            <table>
               <thead>
-                <tr className="focus:outline-none h-12 border-b-2 border-accent ">
-                  <th className="s:w-1/5 w-70">Spectrogram Thumbnail</th>
-                  <th className="w-64">Recording Name</th>
-                  <th className="w-16">Length in Samples</th>
-                  <th>
-                    Data Type{' '}
+                <tr>
+                  <th className="text-start">Spectrogram Thumbnail</th>
+                  <th className="text-start">Recording Name</th>
+                  <th className="text-start">Length in Samples</th>
+                  <th className="text-start">
+                    Length in Seconds Data Type
                     <a
-                      style={{ textDecoration: 'none', color: 'white', margin: '5px 0 0 5px' }}
+                      style={{ textDecoration: 'none', color: 'white' }}
+                      className="mr-2"
                       target="_blank"
                       rel="noreferrer"
                       href="https://pysdr.org/content/iq_files.html#binary-files"
@@ -56,10 +57,10 @@ export default function RecordingsBrowser() {
                       <InfoOutlinedIcon></InfoOutlinedIcon>
                     </a>
                   </th>
-                  <th>Frequency</th>
-                  <th className="w-20">Sample Rate</th>
-                  <th>Number of Annotations</th>
-                  <th style={{ width: '10%' }}>Author</th>
+                  <th className="text-start">Frequency</th>
+                  <th className="text-start">Sample Rate</th>
+                  <th className="text-start">Number of Annotations</th>
+                  <th className="text-start">Author</th>
                 </tr>
               </thead>
               <tbody>

@@ -90,7 +90,7 @@ export default function FileRow({ item }: FileRowProps) {
       <td className="align-middle">
         <div>
           <button
-            className="mb-2 rounded border-2 border-iqengine-secondary p-1 hover:bg-iqengine-secondary hover:text-black"
+            className="mb-2 rounded border-2 border-secondary p-1 hover:bg-secondary hover:text-black"
             onClick={toggle}
           >
             {item.annotations?.length ?? 0}
@@ -102,7 +102,7 @@ export default function FileRow({ item }: FileRowProps) {
                 ✕
               </button>
               <div className="grid justify-items-stretch">
-                <table className="text-neutral">
+                <table className="text-base-content">
                   <thead className="text-primary border-b-2 h-12 border-accent">
                     <tr>
                       <th>Sample Start</th>
