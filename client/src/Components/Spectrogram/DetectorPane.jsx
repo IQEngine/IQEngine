@@ -149,7 +149,7 @@ export const DetectorPane = (props) => {
               </label>
             ))}
           </div>
-          <button type="submit" className="btn-primary">
+          <button type="submit" className="btn-primary" onClick={handleSubmit}>
             Run Detector
           </button>
         </>
