@@ -137,22 +137,23 @@ export const DetectorPane = (props) => {
       {Object.keys(detectorParams).length > 0 && (
         <>
           <label className="label">Params:</label>
-          <br></br>{' '}
           <div className="mb-3">
             {Object.keys(detectorParams).map((key, index) => (
-              <label className="label" key={index}>
-                {detectorParams[key]['title']} - {detectorParams[key]['type']}
+              <>
+                <label className="label" key={index}>
+                  {detectorParams[key]['title']}
+                </label>
                 <input
-                  type="text"
+                  type={detectorParams[key]['type']}
                   name={key}
                   value={detectorParams[key]['default']}
                   onChange={handleChange}
-                  className="h-10 text-base-100 pl-2"
+                  className="h-8 rounded text-base-100 ml-1 pl-2"
                 />
-              </label>
+              </>
             ))}
           </div>
-          <button type="submit" className="btn-primary">
+          <button type="submit" className="btn btn-primary" onClick={handleSubmit}>
             Run Detector
           </button>
         </>
