@@ -57,7 +57,8 @@ export const DataTable = ({ dataColumns, dataRows }: TableProps) => {
   }, [dataRows, filterInput]);
 
   useEffect(() => {
-    setMaxPage(Math.ceil(filteredData.length / pageSize));
+    const max = Math.ceil(filteredData.length / pageSize) === 0 ? 1 : Math.ceil(filteredData.length / pageSize);
+    setMaxPage(max);
   }, [filteredData, pageSize]);
 
   useEffect(() => {
@@ -138,7 +139,7 @@ export const DataTable = ({ dataColumns, dataRows }: TableProps) => {
             aria-label="previous page"
             className="btn btn-primary"
             onClick={() => setCurrentPage((page) => Math.max(page - 1, 1))}
-            disabled={currentPage === 1}
+            disabled={currentPage <= 1}
           >
             Prev
           </button>
@@ -146,7 +147,7 @@ export const DataTable = ({ dataColumns, dataRows }: TableProps) => {
             aria-label="next page"
             className="btn btn-primary"
             onClick={() => setCurrentPage((page) => Math.min(page + 1, maxPage))}
-            disabled={currentPage === maxPage}
+            disabled={currentPage >= maxPage}
           >
             Next
           </button>
