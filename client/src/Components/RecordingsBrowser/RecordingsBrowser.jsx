@@ -27,7 +27,7 @@ function GroupByFolder(files, root) {
     children: [],
   };
 
-  files.map((file) => {
+  files?.map((file) => {
     const relativeKey = file.name.substr(root.length);
     let currentFolder = fileTree;
     const folders = relativeKey.split('/');
@@ -129,7 +129,7 @@ export default function RecordingsBrowser() {
     toggleLoader(recording.loading);
   }, [recording.loading]);
 
-  const gfiles = data.map((data) => data.name);
+  const gfiles = data?.map((data) => data.name);
   let dataTree = [];
   let currentDataTree = [];
 
