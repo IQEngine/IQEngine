@@ -38,13 +38,13 @@ export default function FileRow({ item }) {
     connection_copy.datafilehandle = item.dataFileHandle;
     connection_copy.recording = item.name.replace('.sigmf-meta', '');
     connection_copy.blobClient = item.dataClient;
-    for (let i = 0; i < MAX_SIMULTANEOUS_FETCHES; i++) {
+    for (let i = 0; i < 4; i++) {
       dispatch(
         fetchMoreData({
           tile: i,
           connection: connection_copy,
           blob: blob,
-          dataType: item.dataType,
+          dataType: item.coreDataType,
           offset: i * TILE_SIZE_IN_IQ_SAMPLES, // in IQ samples
           count: TILE_SIZE_IN_IQ_SAMPLES, // in IQ samples
           pyodide: null,

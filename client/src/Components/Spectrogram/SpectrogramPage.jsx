@@ -207,6 +207,9 @@ export const SpectrogramPage = (props) => {
   }, [meta]);
 
   useEffect(() => {
+    if (lowerTile < 0 || upperTile < 0) {
+      return;
+    }
     let currenlowerTile = lowerTile;
     let currentUpperTile = upperTile;
     if (currenlowerTile === -1 || currentUpperTile === -1 || isNaN(currenlowerTile) || isNaN(currentUpperTile)) {

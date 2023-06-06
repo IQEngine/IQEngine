@@ -92,7 +92,7 @@ export function convertToFloat32(buffer, dataType) {
   } else if (dataType === 'cf64_le') {
     return Float32Array.from(new Float64Array(buffer));
   } else {
-    console.error('unsupported dataType');
+    console.error('unsupported dataType', dataType);
     return new Int16Array(buffer);
   }
 }
