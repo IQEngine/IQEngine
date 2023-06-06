@@ -23,19 +23,17 @@ export default function RecordingsBrowser() {
   }, [metadatas.data]);
 
   return (
-    <div className="container md:mx-auto flex justify-center">
+    <div className="flex justify-center">
       {!metadatas.isFetched ? (
-        <div>
-          <svg
-            className="animate-spin ml-1 mr-3 w-96 text-white"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1"></circle>
-            <circle className="percent fifty stroke-current text-primary" cx="12" cy="12" r="10" pathLength="100" />
-          </svg>
-        </div>
+        <svg
+          className="animate-spin ml-1 mr-3 w-96 text-white"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1"></circle>
+          <circle className="percent fifty stroke-current text-primary" cx="12" cy="12" r="10" pathLength="100" />
+        </svg>
       ) : (
         <div className="md:px-8 xl:px-10">
           <div className="flex justify-items-stretch">
@@ -46,7 +44,7 @@ export default function RecordingsBrowser() {
                   <th className="text-start">Recording Name</th>
                   <th className="text-start">Length in Samples</th>
                   <th className="text-start">
-                    Length in Seconds Data Type
+                    Data Type
                     <a
                       style={{ textDecoration: 'none', color: 'white' }}
                       className="mr-2"

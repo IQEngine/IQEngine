@@ -78,7 +78,7 @@ const LocalFileBrowser = () => {
             <br />
             and 1 .sigmf-data
           </button>
-          <div className="text-gray-500 mb-3">
+          <div className="text-secondary mb-3">
             Note: FFTs and visualizations are done client-side (the data won't be uploaded anywhere)
           </div>
         </div>

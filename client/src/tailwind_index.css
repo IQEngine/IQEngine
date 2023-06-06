@@ -40,15 +40,15 @@
   }
 
   .repocardheader {
-    @apply bg-primary rounded-t-xl opacity-75 pl-2 pb-1 h-12 text-base-100 text-lg;
+    @apply bg-primary rounded-t-xl opacity-75 pl-2 pb-1 h-8 text-base-100 text-lg font-bold;
   }
 
   .repocardbody {
-    @apply card-body pt-2 pl-6 pr-6 pb-0 bg-opacity-60 mt-3;
+    @apply card-body px-3 bg-opacity-60;
   }
 
   .repocardbutton {
-    @apply bg-primary opacity-75 w-full h-9 uppercase text-sm text-base-100 hover:bg-accent hover:opacity-100 !rounded-b-xl rounded-t-none !border-none;
+    @apply bg-primary opacity-75 w-full h-6 text-base-100 hover:bg-accent hover:opacity-100 !rounded-b-xl rounded-t-none !border-none;
   }
 
   .leadership-card-header {
@@ -57,10 +57,6 @@
 
   .leadership-card-body {
     @apply w-56 bg-neutral rounded-b-xl p-2 text-center;
-  }
-
-  .btn-primary {
-    @apply bg-secondary hover:bg-secondary hover:bg-opacity-50 text-white py-2 px-3 rounded;
   }
 
   .slider {
