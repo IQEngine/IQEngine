@@ -183,19 +183,19 @@ export const SpectrogramPage = (props) => {
     if (meta) {
       renderImage(lowerTile, upperTile);
     }
-  }, [zoomLevel, autoscale, fftSize, blob.iqData, lowerTile, upperTile]);
+  }, [zoomLevel, autoscale, blob.iqData, lowerTile, upperTile]);
 
   useEffect(() => {
     if (meta) {
       dispatch(resetBlobFFTData());
       renderImage(lowerTile, upperTile);
     }
-  }, [magnitudeMax, magnitudeMin]);
+  }, [magnitudeMax, magnitudeMin, fftSize, fftWindow]);
 
-  // Things that should trigger a fetch and render when changed
+  // Refetch IQ and rerender
   useEffect(() => {
     fetchAndRender(handleTop);
-  }, [blob.taps, fftWindow, plotHeight, zoomLevel, blob.pythonSnippet]);
+  }, [blob.taps, plotHeight, zoomLevel, blob.pythonSnippet]);
 
   useEffect(() => {
     if (meta && meta.global && !meta.global['core:sample_rate']) {
