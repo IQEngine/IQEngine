@@ -74,7 +74,7 @@ const ScrollBar = (props: ScrollBarProps) => {
       });
       setTicks(t);
     }
-  }, [spectrogramHeight, fftSizeScrollbar, zoomLevel]);
+  }, [spectrogramHeight, fftSizeScrollbar, zoomLevel, iqSlices.data]);
 
   // This only runs once, once all the minimap fetches have occurred
   useEffect(() => {

@@ -231,6 +231,7 @@ export const SpectrogramPage = () => {
     );
     setLowerTile(Math.floor(calculatedTiles.lowerTile));
     setUpperTile(Math.ceil(calculatedTiles.upperTile));
+    setHandleTop(handleTop);
   };
 
   const windowResized = () => {
@@ -276,6 +277,11 @@ export const SpectrogramPage = () => {
       fetchAndRender(handleTop);
     }
   }, [meta, zoomLevel]);
+
+  // run windowResized once when page loads
+  useEffect(() => {
+    windowResized();
+  }, []);
 
   const downloadInfo = () => {
     const fileData = JSON.stringify(meta, null, 4);
