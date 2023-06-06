@@ -34,7 +34,12 @@ async function handleDirectoryEntry(handle, out, dir) {
           // FIXME: there might be a bug here when there are multiple files of the same name in diff directories...
           if (val.name === file.name.replace('sigmf-meta', 'sigmf-data')) {
             const json_string = await readFileAsync(file); // grab the metafile text
-            out.push(parseMeta(json_string, 'local/', dir + file.name, entry, val));
+            try {
+              const parsed_meta = parseMeta(json_string, 'local/', dir + file.name, entry, val);
+              out.push(parsed_meta);
+            } catch (e) {
+              console.warn('Failing parsed meta', e);
+            }
           }
         }
       }

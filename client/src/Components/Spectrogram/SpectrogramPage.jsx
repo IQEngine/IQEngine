@@ -183,19 +183,19 @@ export const SpectrogramPage = (props) => {
     if (meta) {
       renderImage(lowerTile, upperTile);
     }
-  }, [zoomLevel, autoscale, fftSize, blob.iqData, lowerTile, upperTile]);
+  }, [zoomLevel, autoscale, blob.iqData, lowerTile, upperTile]);
 
   useEffect(() => {
     if (meta) {
       dispatch(resetBlobFFTData());
       renderImage(lowerTile, upperTile);
     }
-  }, [magnitudeMax, magnitudeMin]);
+  }, [magnitudeMax, magnitudeMin, fftSize, fftWindow]);
 
-  // Things that should trigger a fetch and render when changed
+  // Refetch IQ and rerender
   useEffect(() => {
     fetchAndRender(handleTop);
-  }, [blob.taps, fftWindow, plotHeight, zoomLevel, blob.pythonSnippet]);
+  }, [blob.taps, plotHeight, zoomLevel, blob.pythonSnippet]);
 
   useEffect(() => {
     if (meta && meta.global && !meta.global['core:sample_rate']) {
@@ -207,9 +207,10 @@ export const SpectrogramPage = (props) => {
   }, [meta]);
 
   useEffect(() => {
+    if (!meta) return;
     let currenlowerTile = lowerTile;
     let currentUpperTile = upperTile;
-    if (currenlowerTile === -1 || currentUpperTile === -1 || isNaN(currenlowerTile) || isNaN(currentUpperTile)) {
+    if (currenlowerTile < 0 || currentUpperTile < 0 || isNaN(currenlowerTile) || isNaN(currentUpperTile)) {
       const calculated = calculateTileNumbers(0, blob.totalIQSamples, fftSize, spectrogramHeight, zoomLevel);
       currenlowerTile = calculated.lowerTile;
       currentUpperTile = calculated.upperTile;
@@ -231,29 +232,33 @@ export const SpectrogramPage = (props) => {
         continue;
       }
     }
-    if (minimapFetch && meta.global['core:datatype']) {
-      const fftSizeScrollbar = 1024; // for minimap only. there's so much overhead with blob downloading that this might as well be a high value...
-      const skipNFfts = Math.floor(blob.totalIQSamples / 100e3); // sets the decimation rate (manually tweaked)
-      setSkipNFfts(skipNFfts);
-      console.log('skipNFfts:', skipNFfts);
-      const numFfts = Math.floor(blob.totalIQSamples / fftSizeScrollbar / (skipNFfts + 1));
-      for (let i = 0; i < numFfts; i++) {
-        dispatch(
-          fetchMinimap({
-            blob: blob,
-            dataType: meta.global['core:datatype'],
-            connection: connection,
-            tile: 'minimap' + i.toString(),
-            offset: i * fftSizeScrollbar * (skipNFfts + 1), // in IQ samples
-            count: fftSizeScrollbar, // in IQ samples
-          })
-        );
-      }
-      setMinimapFetch(false);
-      setMinimapNumFetches(numFfts);
-    }
     setLowerTile(currenlowerTile);
     setUpperTile(currentUpperTile);
+  }, [meta]);
+
+  useEffect(() => {
+    if (!meta || !meta.global || !meta.global['core:datatype'] || !minimapFetch) {
+      return;
+    }
+    const fftSizeScrollbar = 1024; // for minimap only. there's so much overhead with blob downloading that this might as well be a high value...
+    const skipNFfts = Math.floor(blob.totalIQSamples / 100e3); // sets the decimation rate (manually tweaked)
+    setSkipNFfts(skipNFfts);
+    console.log('skipNFfts:', skipNFfts);
+    const numFfts = Math.floor(blob.totalIQSamples / fftSizeScrollbar / (skipNFfts + 1));
+    for (let i = 0; i < numFfts; i++) {
+      dispatch(
+        fetchMinimap({
+          blob: blob,
+          dataType: meta.global['core:datatype'],
+          connection: connection,
+          tile: 'minimap' + i.toString(),
+          offset: i * fftSizeScrollbar * (skipNFfts + 1), // in IQ samples
+          count: fftSizeScrollbar, // in IQ samples
+        })
+      );
+    }
+    setMinimapFetch(false);
+    setMinimapNumFetches(numFfts);
   }, [meta]);
 
   useEffect(() => {
