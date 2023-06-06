@@ -56,9 +56,8 @@ const LocalFileBrowser = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // Around 6/6/22 this got screwed up, so disabling it for now
-  //const directoryPickerAvailable = typeof window.showDirectoryPicker !== 'undefined'; // not all browsers support it yet
-  const directoryPickerAvailable = false;
+  const directoryPickerAvailable = typeof window.showDirectoryPicker !== 'undefined'; // not all browsers support it yet
+
 
   const openFile = async () => {
     dispatch(clearRecordingsList());

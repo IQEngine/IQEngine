@@ -207,13 +207,16 @@ export const SpectrogramPage = (props) => {
   }, [meta]);
 
   useEffect(() => {
-    if (!meta) return;
+    if (!meta || !blob.totalIQSamples) return;
     let currenlowerTile = lowerTile;
     let currentUpperTile = upperTile;
     if (currenlowerTile < 0 || currentUpperTile < 0 || isNaN(currenlowerTile) || isNaN(currentUpperTile)) {
       const calculated = calculateTileNumbers(0, blob.totalIQSamples, fftSize, spectrogramHeight, zoomLevel);
       currenlowerTile = calculated.lowerTile;
       currentUpperTile = calculated.upperTile;
+    }
+    if (currenlowerTile === lowerTile && currentUpperTile === upperTile) {
+      return;
     }
     const tiles = range(Math.floor(currenlowerTile), Math.ceil(currentUpperTile));
     for (let tile of tiles) {
@@ -234,7 +237,7 @@ export const SpectrogramPage = (props) => {
     }
     setLowerTile(currenlowerTile);
     setUpperTile(currentUpperTile);
-  }, [meta]);
+  }, [meta, blob.totalIQSamples]);
 
   useEffect(() => {
     if (!meta || !meta.global || !meta.global['core:datatype'] || !minimapFetch) {
