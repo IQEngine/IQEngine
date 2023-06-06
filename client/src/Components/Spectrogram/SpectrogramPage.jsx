@@ -240,6 +240,7 @@ export const SpectrogramPage = (props) => {
     if (!meta || !meta.global || !meta.global['core:datatype'] || !minimapFetch) {
       return;
     }
+    windowResized();
     const fftSizeScrollbar = 1024; // for minimap only. there's so much overhead with blob downloading that this might as well be a high value...
     const skipNFfts = Math.floor(blob.totalIQSamples / 100e3); // sets the decimation rate (manually tweaked)
     setSkipNFfts(skipNFfts);
