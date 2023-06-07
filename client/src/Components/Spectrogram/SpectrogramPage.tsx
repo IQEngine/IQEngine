@@ -371,6 +371,8 @@ export const SpectrogramPage = () => {
             setZoomLevel={setZoomLevel}
             setPythonSnippet={setPythonSnippet}
             pythonSnippet={pythonSnippet}
+            meta={meta}
+            setMeta={setMeta}
           />
           <div className="flex flex-col">
             <ul className="flex space-x-2 border-b border-primary w-full sm:pl-12 lg:pl-32" id="tabsbar">

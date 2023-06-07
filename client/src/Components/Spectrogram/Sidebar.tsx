@@ -6,6 +6,7 @@ import React from 'react';
 import SettingsPane from './SettingsPane';
 import { DetectorPane } from './DetectorPane';
 import InfoPane from './InfoPane';
+import { SigMFMetadata } from '@/Utils/sigmfMetadata';
 
 export interface SidebarProps {
   updateMagnitudeMax: (magnitudeMax: number) => void;
@@ -27,6 +28,8 @@ export interface SidebarProps {
   windowFunction: string;
   pythonSnippet: string;
   setPythonSnippet: (pythonSnippet: string) => void;
+  meta: SigMFMetadata;
+  setMeta: (meta: SigMFMetadata) => void;
 }
 
 const Sidebar = (props) => {
@@ -64,7 +67,12 @@ const Sidebar = (props) => {
           Detector
         </summary>
         <div className="outline outline-1 outline-primary p-2">
-          <DetectorPane cursorsEnabled={props.cursorsEnabled} handleProcessTime={props.handleProcessTime} />
+          <DetectorPane
+            cursorsEnabled={props.cursorsEnabled}
+            handleProcessTime={props.handleProcessTime}
+            meta={props.meta}
+            setMeta={props.setMeta}
+          />
         </div>
       </details>
 

@@ -5,10 +5,17 @@
 import React, { useState, useEffect } from 'react';
 import { configQuery } from '../../api/config/queries';
 import { useAppDispatch } from '@/Store/hooks';
+import { Annotation, SigMFMetadata } from '@/Utils/sigmfMetadata';
+import { matchPath } from 'react-router-dom';
 
-export const DetectorPane = (props) => {
-  let { cursorsEnabled, handleProcessTime } = props;
+export interface DetectorPaneProps {
+  cursorsEnabled: boolean;
+  handleProcessTime: () => { trimmedSamples: number[]; startSampleOffset: number };
+  meta: SigMFMetadata;
+  setMeta: (meta: SigMFMetadata) => void;
+}
 
+export const DetectorPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }: DetectorPaneProps) => {
   const [detectorList, setDetectorList] = useState([]);
   const [selectedDetector, setSelectedDetector] = useState('default');
   const [detectorParams, setDetectorParams] = useState({});
@@ -64,8 +71,8 @@ export const DetectorPane = (props) => {
     // this does the tile calc and gets the right samples in currentSamples
     const { trimmedSamples, startSampleOffset } = handleProcessTime();
 
-    const sampleRate = props.meta['global']['core:sample_rate'];
-    const freq = props.meta['captures'][0]['core:frequency'];
+    const sampleRate = meta['global']['core:sample_rate'];
+    const freq = meta['captures'][0]['core:frequency'];
 
     // We can only send normal Arrays over JSON for some reason, so convert it
     const newSamps = Array.from(trimmedSamples);
@@ -104,8 +111,12 @@ export const DetectorPane = (props) => {
         for (let i = 0; i < data.annotations.length; i++) {
           data.annotations[i]['core:sample_start'] += startSampleOffset;
         }
-        // TODO: QUERY fix on how to update meta
-        // dispatch(setMetaAnnotations(data.annotations)); // update the annotations stored in meta state in SpectrogramPage
+        let newAnnotations = data.annotations.map((annotation) => Object.assign(new Annotation(), annotation));
+        console.log(newAnnotations);
+        meta['annotations'].push(...newAnnotations);
+        meta['annotations'] = meta['annotations'].flat();
+        let newMeta = Object.assign(new SigMFMetadata(), meta);
+        setMeta(newMeta);
       });
   };
 
