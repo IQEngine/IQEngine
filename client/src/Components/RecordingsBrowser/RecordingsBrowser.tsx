@@ -23,7 +23,7 @@ export default function RecordingsBrowser() {
   }, [metadata_collection.data]);
 
   return (
-    <div className="flex justify-center">
+    <div className="flex justify-stretch">
       {!metadata_collection.isFetched ? (
         <svg
           className="animate-spin ml-1 mr-3 w-96 text-white"
