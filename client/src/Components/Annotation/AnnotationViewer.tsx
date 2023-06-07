@@ -16,6 +16,7 @@ interface AnnotationViewerProps {
   lowerTile: number;
   upperTile: number;
   zoomLevel: number;
+  setMeta: (meta: SigMFMetadata) => void;
 }
 
 const AnnotationViewer = ({
@@ -25,9 +26,8 @@ const AnnotationViewer = ({
   lowerTile,
   zoomLevel,
   upperTile,
+  setMeta,
 }: AnnotationViewerProps) => {
-  const queryClient = useQueryClient();
-
   function onDragEnd(e) {
     const x = e.target.x(); // coords of the corner box
     const y = e.target.y();
@@ -39,6 +39,8 @@ const AnnotationViewer = ({
     const start_sample_index = lowerTile * TILE_SIZE_IN_IQ_SAMPLES;
     const lower_freq = meta.captures[0]['core:frequency'] - meta.global['core:sample_rate'] / 2;
     const f = annotations[annot_indx]['index'];
+    console.log('Starting changes to meta');
+    console.log(meta.annotations[f]);
     meta.annotations[f]['core:sample_start'] = annotations[annot_indx].y1 * fftSize * zoomLevel + start_sample_index;
     meta.annotations[f]['core:sample_count'] =
       (annotations[annot_indx].y2 - annotations[annot_indx].y1) * fftSize * zoomLevel;
@@ -46,22 +48,11 @@ const AnnotationViewer = ({
       (annotations[annot_indx].x1 / fftSize) * meta.global['core:sample_rate'] + lower_freq;
     meta.annotations[f]['core:freq_upper_edge'] =
       (annotations[annot_indx].x2 / fftSize) * meta.global['core:sample_rate'] + lower_freq;
-    updateMeta(queryClient, meta);
-
-    // Now update the actual meta.annotations
-    // const f = annotations[annot_indx]['index']; // remember there are 2 different indexes- the ones on the screen and the meta.annotations
-    // const updatedAnnotations = [...meta.annotations];
-    // const updatedAnnotation = { ...updatedAnnotations[f] };
-    // const start_sample_index = lowerTile * TILE_SIZE_IN_IQ_SAMPLES;
-    // updatedAnnotation['core:sample_start'] = annotations[annot_indx].y1 * fftSize * zoomLevel + start_sample_index;
-    // updatedAnnotation['core:sample_count'] =
-    //   (annotations[annot_indx].y2 - annotations[annot_indx].y1) * fftSize * zoomLevel;
-    // const lower_freq = meta.captures[0]['core:frequency'] - meta.global['core:sample_rate'] / 2;
-    // updatedAnnotation['core:freq_lower_edge'] =
-    //   (annotations[annot_indx].x1 / fftSize) * meta.global['core:sample_rate'] + lower_freq;
-    // updatedAnnotation['core:freq_upper_edge'] =
-    //   (annotations[annot_indx].x2 / fftSize) * meta.global['core:sample_rate'] + lower_freq;
-    // setMetaAnnotation(updatedAnnotation, index);
+    console.log('Finish changes to meta');
+    console.log(meta);
+    console.log(meta.annotations[f]);
+    let new_meta = Object.assign(new SigMFMetadata(), meta);
+    setMeta(new_meta);
   }
 
   const annotations = meta?.annotations.map((annotation, index) => {
@@ -116,18 +107,8 @@ const AnnotationViewer = ({
         'core:description': annotations[annot_indx]['description'],
       })
     );
-    updateMeta(queryClient, meta);
-    // const f = updatedAnnotations.length - 1;
-
-    // updatedAnnotations[f]['core:sample_start'] = updatedAnnotations[f]['core:sample_count'] =
-    //   (annotations[annot_indx].y2 - annotations[annot_indx].y1) * fftSize * zoomLevel;
-
-    // updatedAnnotations[f]['core:freq_lower_edge'] =
-    //   (annotations[annot_indx].x1 / fftSize) * meta.global['core:sample_rate'] + lower_freq;
-    // updatedAnnotations[f]['core:freq_upper_edge'] =
-    //   (annotations[annot_indx].x2 / fftSize) * meta.global['core:sample_rate'] + lower_freq;
-    // updatedAnnotations[f]['core:description'] = annotations[annot_indx]['description'];
-    // setMetaAnnotations(updatedAnnotations);
+    let new_meta = Object.assign(new SigMFMetadata(), meta);
+    setMeta(new_meta);
   };
 
   // Ability to update annotation labels
@@ -166,8 +147,8 @@ const AnnotationViewer = ({
         annotations[textarea.id]['description'] = textarea.value; // update the local version first
         // Now update the actual meta info
         meta.annotations[annotations[textarea.id]['index']]['core:description'] = textarea.value;
-        updateMeta(queryClient, meta);
-        //setMetaAnnotations(meta.annotations);
+        let new_meta = Object.assign(new SigMFMetadata(), meta);
+        setMeta(new_meta);
         document.body.removeChild(textarea);
         document.body.removeChild(textarea2);
       }

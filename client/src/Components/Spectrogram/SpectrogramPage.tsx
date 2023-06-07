@@ -117,6 +117,8 @@ export const SpectrogramPage = () => {
         if (!data) {
           return acc;
         }
+        // TODO: Add back data transformation once we find out how to pass through the performance provblems it is getting now.
+        // let dataTransformed = applyProcessing(data.iqArray, taps, pythonSnippet, pyodide);
         acc[data.index] = data.iqArray;
         return acc;
       }, {});
@@ -137,28 +139,10 @@ export const SpectrogramPage = () => {
     upperTile,
     missingTiles,
     downloadedTiles,
+    pyodide,
+    pythonSnippet,
+    taps,
   ]);
-
-  // useEffect(() => {
-  //   console.debug('[IQDATAProcessed] IQ Data changed', iqData);
-  //   if (iqData) {
-  //     if (pyodide && false) {
-  //       const applyPostProcessing = async () => {
-  //         console.debug('Applying post processing', iqData);
-  //         let result = {};
-  //         for (let i in iqData) {
-  //           let iqData = iqData[i];
-  //           iqData = await applyProcessing(iqData, taps, pythonSnippet, pyodide);
-  //           result[i] = iqData;
-  //         }
-  //         setIqData(result);
-  //       };
-  //       applyPostProcessing();
-  //     } else {
-  //       setIqData(iqData);
-  //     }
-  //   }
-  // }, [pyodide, pythonSnippet]);
 
   const fftReturned = useMemo(() => {
     if (!meta || lowerTile < 0 || upperTile < 0) {
@@ -211,7 +195,6 @@ export const SpectrogramPage = () => {
   }, [fftSize, magnitudeMax, magnitudeMin, fftWindow]);
 
   useEffect(() => {
-    console.debug('Change in ffts', fftReturned);
     renderImage();
   }, [fftReturned]);
 
@@ -293,6 +276,7 @@ export const SpectrogramPage = () => {
 
   useEffect(() => {
     if (meta) {
+      console.log('Meta data loaded, fetching and rendering tiles', meta);
       fetchAndRender(handleTop);
     }
   }, [meta, zoomLevel]);
@@ -468,6 +452,7 @@ export const SpectrogramPage = () => {
                         lowerTile={lowerTile}
                         upperTile={upperTile}
                         zoomLevel={zoomLevel}
+                        setMeta={setMeta}
                       />
                       {cursorsEnabled && (
                         <TimeSelector

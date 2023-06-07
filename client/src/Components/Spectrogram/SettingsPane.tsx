@@ -124,7 +124,7 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
     let taps_string = event.currentTarget.dataset.value;
     updateTaps(taps_string);
     setState({ ...state, taps: taps_string });
-    let taps = JSON.parse(event.currentTarget.dataset.value)
+    let taps = JSON.parse(event.currentTarget.dataset.value);
     props.setTaps(taps);
   };
 
@@ -208,63 +208,67 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
           </button>
         </div>
       </div>
+      {/* TODO: Reenable this when we found out how to avoid the performance problems. */}
+      {false && (
+        <>
+          <div className="mb-3" id="formTaps">
+            <label className="label">
+              <span className="label-text text-base">
+                FIR Filter Taps
+                <a
+                  style={{ textDecoration: 'none', color: 'white', marginLeft: '5px' }}
+                  target="_blank"
+                  rel="noreferrer"
+                  href="https://pysdr.org/content/filters.html"
+                >
+                  <HelpOutlineOutlinedIcon />
+                </a>
+              </span>
+            </label>
+            <div className="mb-3 flex">
+              <input
+                type="text"
+                className="h-12 w-40 rounded-l text-base-100 ml-1 pl-2"
+                defaultValue={state.taps}
+                onChange={onChangeTaps}
+              />
+              <button className="btn btn-primary rounded-none rounded-r" onClick={onSubmitTaps}>
+                <FontAwesomeIcon icon={faArrowRight} />
+              </button>
+            </div>
+          </div>
 
-      <div className="mb-3" id="formTaps">
-        <label className="label">
-          <span className="label-text text-base">
-            FIR Filter Taps
+          <div className="mb-3 flex">
+            <div className="dropdown dropdown-hover">
+              <label tabIndex={0} className="btn btn-primary m-1">
+                Example Filter Taps
+              </label>
+              <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
+                <li
+                  data-value="[0.021019600765633,0.05574786251380393,0.04504671465435009,-0.012858837474581268,-0.042883835223827396,0.013822126400016621,0.05882808073316635,-0.014316809227248763,-0.10299625870988743,0.015410773935742991,0.31701869995313076,0.48460819626209206,0.31701869995313076,0.015410773935742991,-0.10299625870988743,-0.014316809227248763,0.05882808073316635,0.013822126400016621,-0.042883835223827396,-0.012858837474581268,0.04504671465435009,0.05574786251380393,0.021019600765633]"
+                  onClick={onClickPremadeTaps}
+                >
+                  <a>Low Pass Filter, Keep Center 50%</a>
+                </li>
+                <li
+                  data-value="[0.016149208122345958,0.0315506154302014,0.044989927419396177,0.05039076977222029,0.036274497853720514,0.007612901271369674,-0.02948294665811137,-0.053019565543615366,-0.048888438402198676,-0.004134055886676617,0.07118987013413654,0.15929327646574953,0.22747019061450077,0.2546143327815347,0.22747019061450077,0.15929327646574953,0.07118987013413654,-0.004134055886676617,-0.048888438402198676,-0.053019565543615366,-0.02948294665811137,0.007612901271369674,0.036274497853720514,0.05039076977222029,0.044989927419396177,0.0315506154302014,0.016149208122345958]"
+                  onClick={onClickPremadeTaps}
+                >
+                  <a>Low Pass Filter, Keep Center 25%</a>
+                </li>
+              </ul>
+            </div>
             <a
-              style={{ textDecoration: 'none', color: 'white', marginLeft: '5px' }}
+              style={{ textDecoration: 'none', color: 'white', margin: '5px 0 0 5px' }}
               target="_blank"
               rel="noreferrer"
-              href="https://pysdr.org/content/filters.html"
+              href="http://t-filter.engineerjs.com/" //DevSkim: ignore DS137138
             >
-              <HelpOutlineOutlinedIcon />
+              <InfoOutlinedIcon></InfoOutlinedIcon>
             </a>
-          </span>
-        </label>
-        <div className="mb-3 flex">
-          <input
-            type="text"
-            className="h-12 w-40 rounded-l text-base-100 ml-1 pl-2"
-            defaultValue={state.taps}
-            onChange={onChangeTaps}
-          />
-          <button className="btn btn-primary rounded-none rounded-r" onClick={onSubmitTaps}>
-            <FontAwesomeIcon icon={faArrowRight} />
-          </button>
-        </div>
-      </div>
-
-      <div className="mb-3 flex">
-        <div className="dropdown dropdown-hover">
-          <label tabIndex={0} className="btn btn-primary m-1">
-            Example Filter Taps
-          </label>
-          <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
-            <li
-              data-value="[0.021019600765633,0.05574786251380393,0.04504671465435009,-0.012858837474581268,-0.042883835223827396,0.013822126400016621,0.05882808073316635,-0.014316809227248763,-0.10299625870988743,0.015410773935742991,0.31701869995313076,0.48460819626209206,0.31701869995313076,0.015410773935742991,-0.10299625870988743,-0.014316809227248763,0.05882808073316635,0.013822126400016621,-0.042883835223827396,-0.012858837474581268,0.04504671465435009,0.05574786251380393,0.021019600765633]"
-              onClick={onClickPremadeTaps}
-            >
-              <a>Low Pass Filter, Keep Center 50%</a>
-            </li>
-            <li
-              data-value="[0.016149208122345958,0.0315506154302014,0.044989927419396177,0.05039076977222029,0.036274497853720514,0.007612901271369674,-0.02948294665811137,-0.053019565543615366,-0.048888438402198676,-0.004134055886676617,0.07118987013413654,0.15929327646574953,0.22747019061450077,0.2546143327815347,0.22747019061450077,0.15929327646574953,0.07118987013413654,-0.004134055886676617,-0.048888438402198676,-0.053019565543615366,-0.02948294665811137,0.007612901271369674,0.036274497853720514,0.05039076977222029,0.044989927419396177,0.0315506154302014,0.016149208122345958]"
-              onClick={onClickPremadeTaps}
-            >
-              <a>Low Pass Filter, Keep Center 25%</a>
-            </li>
-          </ul>
-        </div>
-        <a
-          style={{ textDecoration: 'none', color: 'white', margin: '5px 0 0 5px' }}
-          target="_blank"
-          rel="noreferrer"
-          href="http://t-filter.engineerjs.com/" //DevSkim: ignore DS137138
-        >
-          <InfoOutlinedIcon></InfoOutlinedIcon>
-        </a>
-      </div>
+          </div>
+        </>
+      )}
 
       <div className="mb-3 flex">
         <div className="dropdown dropdown-hover">
@@ -305,23 +309,25 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
           <input type="checkbox" className="toggle checkbox checkbox-primary" onChange={props.toggleIncludeRfFreq} />
         </label>
       </div>
-
-      <div className="mb-3" id="formPythonSnippet">
-        <label className="label">
-          <span className="label-text text-base">Python Snippet</span>
-        </label>
-        <textarea
-          className="bg-base-content text-base-100 p-1"
-          rows={6}
-          cols={28}
-          wrap="off"
-          onChange={onChangePythonSnippet}
-          value={state.pythonSnippet}
-        />
-        <button className="btn btn-primary" onClick={onSubmitPythonSnippet}>
-          Run Python
-        </button>
-      </div>
+      {/* TODO: Reenable this when we found out how to avoid the performance problems. */}
+      {false && (
+        <div className="mb-3" id="formPythonSnippet">
+          <label className="label">
+            <span className="label-text text-base">Python Snippet</span>
+          </label>
+          <textarea
+            className="bg-base-content text-base-100 p-1"
+            rows={6}
+            cols={28}
+            wrap="off"
+            onChange={onChangePythonSnippet}
+            value={state.pythonSnippet}
+          />
+          <button className="btn btn-primary" onClick={onSubmitPythonSnippet}>
+            Run Python
+          </button>
+        </div>
+      )}
     </div>
   );
 };
