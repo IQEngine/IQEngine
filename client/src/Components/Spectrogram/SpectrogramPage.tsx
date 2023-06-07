@@ -550,7 +550,7 @@ export const SpectrogramPage = () => {
             <div className="outline outline-1 outline-primary p-2">
               <div className="flex flex-row">
                 <button
-                  className="btn btn-primary text-right"
+                  className="btn btn-primary btn-sm mb-1 text-right"
                   onClick={() => {
                     downloadInfo();
                   }}
@@ -559,7 +559,7 @@ export const SpectrogramPage = () => {
                   Download meta JSON
                 </button>
                 {/* TODO: Add in when PUT is working <button
-              className="btn btn-primary text-right ml-1"
+              className="btn btn-primary btn-sm text-right ml-1"
               onClick={() => {
                 this.handleMeta();
                 this.saveMeta();

@@ -297,7 +297,11 @@ print('NumPy Version:', numpy.version.version)
           </select>
 
           <CodeMirror value={currentSnippet} height="700px" width="600px" extensions={[python()]} theme={vscodeDark} />
-          <button className="mb-3 btn btn-primary" disabled={state.buttonDisabled} onClick={onSubmitPythonSnippet}>
+          <button
+            className="mb-3 btn btn-primary btn-sm"
+            disabled={state.buttonDisabled}
+            onClick={onSubmitPythonSnippet}
+          >
             {state.buttonText}
           </button>
           <div className="mb-3">

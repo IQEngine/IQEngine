@@ -164,7 +164,7 @@ export const DetectorPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta 
               </>
             ))}
           </div>
-          <button type="submit" className="btn btn-primary" onClick={handleSubmit}>
+          <button type="submit" className="btn btn-primary btn-sm" onClick={handleSubmit}>
             Run Detector
           </button>
         </>
