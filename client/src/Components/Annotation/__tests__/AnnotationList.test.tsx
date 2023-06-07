@@ -8,7 +8,7 @@ import metadataJson from './AnnotationList.test.meta.json';
 import { SigMFMetadata } from '@/Utils/sigmfMetadata';
 
 describe('Annotation list component', () => {
-  beforeEach(() => {
+  test('Columns display correctly', async () => {
     //Arrange
     //Javascript keeps modifying the metadata object, so we have to make a copy of it
     const meta = Object.assign(new SigMFMetadata(), JSON.parse(JSON.stringify(metadataJson)));
@@ -17,9 +17,64 @@ describe('Annotation list component', () => {
     render(
       <AnnotationList meta={meta} setHandleTop={() => {}} spectrogramHeight={200} setMeta={() => {}}></AnnotationList>
     );
+
+    // Assert column are in document
+    expect(await screen.queryByText('Time Range')).toBeInTheDocument();
+    expect(await screen.queryByText('Annotation')).toBeInTheDocument();
+    expect(await screen.queryByText('Frequency Range')).toBeInTheDocument();
+    expect(await screen.queryByText('BW')).toBeInTheDocument();
+    expect(await screen.queryByText('Label')).toBeInTheDocument();
+    expect(await screen.queryByText('Duration')).toBeInTheDocument();
+    expect(await screen.queryByText('Actions')).toBeInTheDocument();
+  });
+
+  test.each`
+    input                         | column
+    ${'invalid date'}             | ${'Time Range'}
+    ${'2022-03-17T16:43:30.0025'} | ${'Time Range'}
+  `('Hide column and value when invalid', async ({ input }) => {
+    // Arrange
+    const meta = Object.assign(new SigMFMetadata(), JSON.parse(JSON.stringify(metadataJson)));
+    meta.captures[0]['core:datetime'] = input;
+
+    // Act
+    render(
+      <AnnotationList meta={meta} setHandleTop={() => {}} spectrogramHeight={200} setMeta={() => {}}></AnnotationList>
+    );
+
+    // Assert column not in document
+    expect(await screen.queryByText('Time Range')).not.toBeInTheDocument();
+
+    // Assert values not in document
+    expect(await screen.queryByText('Time Range')).not.toBeInTheDocument();
+    expect(await screen.queryByText(input)).not.toBeInTheDocument();
+
+    // Assert columns are in document
+    expect(await screen.queryByText('Annotation')).toBeInTheDocument();
+    expect(await screen.queryByText('Frequency Range')).toBeInTheDocument();
+    expect(await screen.queryByText('BW')).toBeInTheDocument();
+    expect(await screen.queryByText('Label')).toBeInTheDocument();
+    expect(await screen.queryByText('Duration')).toBeInTheDocument();
+    expect(await screen.queryByText('Actions')).toBeInTheDocument();
+
+    // Assert values are in document
+    expect(await screen.findByText('883.275')).toBeInTheDocument();
+    expect(await screen.findByText('884.625')).toBeInTheDocument();
+    expect(await screen.findByText('1.35MHz')).toBeInTheDocument();
+    expect(await screen.findByText('LTE')).toBeInTheDocument();
+    expect(await screen.findByText('5ms')).toBeInTheDocument();
   });
 
   test('Display correct data on initial view', async () => {
+    //Arrange
+    //Javascript keeps modifying the metadata object, so we have to make a copy of it
+    const meta = Object.assign(new SigMFMetadata(), JSON.parse(JSON.stringify(metadataJson)));
+
+    // Act
+    render(
+      <AnnotationList meta={meta} setHandleTop={() => {}} spectrogramHeight={200} setMeta={() => {}}></AnnotationList>
+    );
+
     // Assert
     expect(await screen.findByText('883.275')).toBeInTheDocument();
     expect(await screen.findByText('884.625')).toBeInTheDocument();
@@ -43,6 +98,15 @@ describe('Annotation list component', () => {
     ${'2022-03-17T16:45:30.0000Z'} | ${'Annotation 0 - End Time'}        | ${'textbox'}    | ${'Date must be before end of the file'}                              | ${9}
     ${'Invalid date'}              | ${'Annotation 0 - End Time'}        | ${'textbox'}    | ${'Invalid date'}                                                     | ${10}
   `('Annotation errors display correctly on tab escape', async ({ input, label, type, expected }) => {
+    //Arrange
+    //Javascript keeps modifying the metadata object, so we have to make a copy of it
+    const meta = Object.assign(new SigMFMetadata(), JSON.parse(JSON.stringify(metadataJson)));
+
+    // Act
+    render(
+      <AnnotationList meta={meta} setHandleTop={() => {}} spectrogramHeight={200} setMeta={() => {}}></AnnotationList>
+    );
+
     // Act
     const start = await screen.findByRole(type, { name: label });
 
@@ -68,6 +132,15 @@ describe('Annotation list component', () => {
     ${'2022-03-17T16:45:30.0000Z'} | ${'Annotation 0 - End Time'}        | ${'textbox'}    | ${'Date must be before end of the file'}                              | ${9}
     ${'Invalid date'}              | ${'Annotation 0 - End Time'}        | ${'textbox'}    | ${'Invalid date'}                                                     | ${10}
   `('Annotation errors display correctly on enter', async ({ input, label, type, expected }) => {
+    //Arrange
+    //Javascript keeps modifying the metadata object, so we have to make a copy of it
+    const meta = Object.assign(new SigMFMetadata(), JSON.parse(JSON.stringify(metadataJson)));
+
+    // Act
+    render(
+      <AnnotationList meta={meta} setHandleTop={() => {}} spectrogramHeight={200} setMeta={() => {}}></AnnotationList>
+    );
+
     // Act
     const start = await screen.findByRole(type, { name: label });
 
@@ -88,6 +161,15 @@ describe('Annotation list component', () => {
     ${'2022-03-17T16:43:30.002Z'} | ${'Annotation 0 - Start Time'}      | ${'textbox'}    | ${'2022-03-17T16:43:30.002Z'}
     ${'2022-03-17T16:45:30.003Z'} | ${'Annotation 0 - End Time'}        | ${'textbox'}    | ${'2022-03-17T16:45:30.003Z'}
   `('Annotation updates values correctly', async ({ input, label, type, expected }) => {
+    //Arrange
+    //Javascript keeps modifying the metadata object, so we have to make a copy of it
+    const meta = Object.assign(new SigMFMetadata(), JSON.parse(JSON.stringify(metadataJson)));
+
+    // Act
+    render(
+      <AnnotationList meta={meta} setHandleTop={() => {}} spectrogramHeight={200} setMeta={() => {}}></AnnotationList>
+    );
+
     // Act
     expect(await screen.queryByText(expected)).not.toBeInTheDocument();
 
