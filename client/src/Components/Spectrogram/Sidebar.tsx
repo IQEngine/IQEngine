@@ -7,6 +7,28 @@ import SettingsPane from './SettingsPane';
 import { DetectorPane } from './DetectorPane';
 import InfoPane from './InfoPane';
 
+export interface SidebarProps {
+  updateMagnitudeMax: (magnitudeMax: number) => void;
+  updateMagnitudeMin: (magnitudeMin: number) => void;
+  updateFftsize: (fftSize: number) => void;
+  updateWindowChange: (fftWindow: string) => void;
+  handleAutoScale: (autoscale: boolean) => void;
+  autoscale: boolean;
+  magnitudeMax: number;
+  magnitudeMin: number;
+  toggleCursors: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  toggleIncludeRfFreq: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  cursorsEnabled: boolean;
+  handleProcessTime: (processTime: number) => void;
+  zoomLevel: number;
+  taps: [];
+  setTaps: (taps: []) => void;
+  setZoomLevel: (zoomLevel: number) => void;
+  windowFunction: string;
+  pythonSnippet: string;
+  setPythonSnippet: (pythonSnippet: string) => void;
+}
+
 const Sidebar = (props) => {
   return (
     <div className="flex flex-col w-64 ml-3">
@@ -21,12 +43,18 @@ const Sidebar = (props) => {
             updateFftsize={props.updateFftsize}
             updateWindowChange={props.updateWindowChange}
             handleAutoScale={props.handleAutoScale}
-            autoscale={props.autoscale}
+            autoScale={props.autoscale}
             magnitudeMax={props.magnitudeMax}
             magnitudeMin={props.magnitudeMin}
             toggleCursors={props.toggleCursors}
             toggleIncludeRfFreq={props.toggleIncludeRfFreq}
             updateZoomLevel={props.updateZoomLevel}
+            zoomLevel={props.zoomLevel}
+            taps={props.taps}
+            setTaps={props.setTaps}
+            windowFunction={props.windowFunction}
+            pythonSnippet={props.pythonSnippet}
+            setPythonSnippet={props.setPythonSnippet}
           />
         </div>
       </details>

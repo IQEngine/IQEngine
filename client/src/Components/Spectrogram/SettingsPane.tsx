@@ -14,7 +14,6 @@ export class SettingsPaneProps {
   magnitudeMax: number;
   magnitudeMin: number;
   taps: Float32Array = Float32Array.from([1]);
-  // TODO: QUERY add type to he parameters
   updateWindowChange: any;
   updateMagnitudeMax: any;
   updateMagnitudeMin: any;
@@ -23,6 +22,12 @@ export class SettingsPaneProps {
   handleAutoScale: any;
   toggleCursors: any;
   updateZoomLevel: any;
+  autoScale: boolean;
+  windowFunction: string;
+  zoomLevel: number;
+  setTaps: (taps: number[]) => void;
+  pythonSnippet: string;
+  setPythonSnippet: (pythonSnippet: string) => void;
 }
 
 const SettingsPane = (props: SettingsPaneProps) => {
@@ -90,8 +95,7 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
   };
 
   const onSubmitPythonSnippet = () => {
-    // TODO: QUERY update the maind page python snippet
-    //dispatch(updateBlobPythonSnippet(state.pythonSnippet));
+    props.setPythonSnippet(state.pythonSnippet);
   };
 
   const onChangeTaps = (event) => {
@@ -102,11 +106,9 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
     if (taps_string[0] === '[' && taps_string.slice(-1) === ']') {
       let temp_taps = taps_string.slice(1, -1).split(',');
       let temp_number_taps = temp_taps.map((x) => parseFloat(x));
-      props.taps = Float32Array.from(temp_number_taps);
-      // TODO: QUERY Update the taps in the main component
-      // dispatch(updateBlobTaps(taps));
-      // We apply the taps when we download the IQ data, so we have to clear both
-      console.debug('valid taps, found', props.taps.length, 'taps');
+      let taps = Float32Array.from(temp_number_taps);
+      props.setTaps(temp_number_taps);
+      console.debug('valid taps, found', taps.length, 'taps');
     } else {
       console.warn('invalid taps');
     }
@@ -122,13 +124,12 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
     let taps_string = event.currentTarget.dataset.value;
     updateTaps(taps_string);
     setState({ ...state, taps: taps_string });
-    // TODO: QUERY Update taps
-    // dispatch(updateBlobTaps(taps));
+    let taps = JSON.parse(event.currentTarget.dataset.value)
+    props.setTaps(taps);
   };
 
   const onChangeZoomLevel = (e) => {
     setState({ ...state, zoomLevel: e.target.value });
-    // TODO: QUERY Update zoom level
     props.updateZoomLevel(e.target.value);
   };
 

@@ -20,12 +20,21 @@ interface ScrollBarProps {
   zoomLevel: number;
   handleTop: number;
   fetchEnabled: boolean;
+  fftSizeScrollbar: number;
 }
 
 const ScrollBar = (props: ScrollBarProps) => {
-  let { meta, spectrogramHeight, fetchAndRender, downloadedTiles, zoomLevel, handleTop, fetchEnabled } = props;
+  let {
+    meta,
+    spectrogramHeight,
+    fetchAndRender,
+    downloadedTiles,
+    zoomLevel,
+    handleTop,
+    fetchEnabled,
+    fftSizeScrollbar,
+  } = props;
 
-  const fftSizeScrollbar = 1024;
   const [dataRange, setDataRange] = useState([]);
   const [skipNFfts, setSkipNFfts] = useState(0);
 
@@ -38,6 +47,7 @@ const ScrollBar = (props: ScrollBarProps) => {
   const [scalingFactor, setScalingFactor] = useState(1);
 
   useEffect(() => {
+    console.debug('minimap meta changed', meta);
     if (meta) {
       // for minimap only. there's so much overhead with blob downloading that this might as well be a high value...
       const skipNFfts = Math.floor(meta.getTotalSamples() / 100e3); // sets the decimation rate (manually tweaked)
@@ -53,7 +63,7 @@ const ScrollBar = (props: ScrollBarProps) => {
 
   // Calc scroll handle height and new scaling factor
   useEffect(() => {
-    if (!meta || !iqSlices.data) return;
+    if (!meta) return;
     let x = (spectrogramHeight / (meta.getTotalSamples() / fftSizeScrollbar / zoomLevel)) * spectrogramHeight;
     if (x < MINIMUM_SCROLL_HANDLE_HEIGHT_PIXELS) x = MINIMUM_SCROLL_HANDLE_HEIGHT_PIXELS;
     setHandleHeightPixels(x);
@@ -74,7 +84,7 @@ const ScrollBar = (props: ScrollBarProps) => {
       });
       setTicks(t);
     }
-  }, [spectrogramHeight, fftSizeScrollbar, zoomLevel, iqSlices.data]);
+  }, [spectrogramHeight, fftSizeScrollbar, zoomLevel, iqSlices.data, meta]);
 
   // This only runs once, once all the minimap fetches have occurred
   useEffect(() => {

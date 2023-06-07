@@ -6,3 +6,8 @@ export const TILE_SIZE_IN_IQ_SAMPLES = 50 * 1024 * 4; // must lead to doing a po
 export const MINIMUM_SCROLL_HANDLE_HEIGHT_PIXELS = 10;
 export const MAX_SIMULTANEOUS_FETCHES = 48; // when you drag the scrollbar it can accumulate many real quick, this limits them
 export const DEFAULT_IQ_SLICE_SIZE = TILE_SIZE_IN_IQ_SAMPLES * 10; // 10 tiles
+export const INITIAL_PYTHON_SNIPPET = `import numpy as np
+import time
+start_t = time.time()
+x = x*1
+print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`;

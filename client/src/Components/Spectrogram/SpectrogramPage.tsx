@@ -12,7 +12,7 @@ import { selectFft, calculateTileNumbers, range } from '../../Utils/selector';
 import { AnnotationViewer } from '@/Components/Annotation/AnnotationViewer';
 import { RulerTop } from './RulerTop';
 import { RulerSide } from './RulerSide';
-import { TILE_SIZE_IN_IQ_SAMPLES } from '../../Utils/constants';
+import { INITIAL_PYTHON_SNIPPET, TILE_SIZE_IN_IQ_SAMPLES } from '../../Utils/constants';
 import TimeSelector from './TimeSelector';
 import { ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 import AnnotationList from '@/Components/Annotation/AnnotationList';
@@ -25,6 +25,7 @@ import { getIQDataSlices } from '@/api/iqdata/Queries';
 import { IQDataSlice } from '@/api/Models';
 import { useInterval } from 'usehooks-ts';
 import { python } from '@codemirror/lang-python';
+import { applyProcessing } from '@/Sources/FetchMoreDataSource';
 
 declare global {
   interface Window {
@@ -84,7 +85,10 @@ export const SpectrogramPage = () => {
   const tiles = range(Math.floor(lowerTile), Math.floor(upperTile));
   const [fftData, setfftData] = useState<Record<number, Uint8ClampedArray>>({});
   const [meta, setMeta] = useState<SigMFMetadata>(metaQuery.data);
+  const [taps, setTaps] = useState<number[]>([1]);
+  const [pythonSnippet, setPythonSnippet] = useState(INITIAL_PYTHON_SNIPPET);
   const [fetchMinimap, setFetchMinimap] = useState(false);
+  const [iqDataProcessed, setIqData] = useState<Record<number, Float32Array>>({});
   const iqffts = getIQDataSlices(
     metaQuery.data,
     tiles,
@@ -132,7 +136,29 @@ export const SpectrogramPage = () => {
     lowerTile,
     upperTile,
     missingTiles,
+    downloadedTiles,
   ]);
+
+  // useEffect(() => {
+  //   console.debug('[IQDATAProcessed] IQ Data changed', iqData);
+  //   if (iqData) {
+  //     if (pyodide && false) {
+  //       const applyPostProcessing = async () => {
+  //         console.debug('Applying post processing', iqData);
+  //         let result = {};
+  //         for (let i in iqData) {
+  //           let iqData = iqData[i];
+  //           iqData = await applyProcessing(iqData, taps, pythonSnippet, pyodide);
+  //           result[i] = iqData;
+  //         }
+  //         setIqData(result);
+  //       };
+  //       applyPostProcessing();
+  //     } else {
+  //       setIqData(iqData);
+  //     }
+  //   }
+  // }, [pyodide, pythonSnippet]);
 
   const fftReturned = useMemo(() => {
     if (!meta || lowerTile < 0 || upperTile < 0) {
@@ -177,14 +203,15 @@ export const SpectrogramPage = () => {
     lowerTile,
     upperTile,
     missingTiles.length,
+    fftData,
   ]);
 
   useEffect(() => {
     setfftData({});
-  }, [fftSize]);
+  }, [fftSize, magnitudeMax, magnitudeMin, fftWindow]);
 
   useEffect(() => {
-    console.log('FFT Returned', fftReturned);
+    console.debug('Change in ffts', fftReturned);
     renderImage();
   }, [fftReturned]);
 
@@ -208,15 +235,11 @@ export const SpectrogramPage = () => {
   };
 
   // useInterval(() => {
-  //   if ( > 0) {
-  //     console.debug('Missing tiles:', missingTiles);
+  //   if (missingTiles.length > 0) {
+  //     console.debug('Missing tiles:', missingTiles, fftData, tiles);
   //     renderImage();
   //   }
   // }, zoomLevel * 100);
-
-  // useEffect(() => {
-  //   renderImage();
-  // }, [fftSize, fftWindow, magnitudeMax, magnitudeMin, autoscale, zoomLevel, lowerTile, upperTile, downloadedTiles]);
 
   const fetchAndRender = (handleTop) => {
     if (!meta) {
@@ -231,10 +254,14 @@ export const SpectrogramPage = () => {
     );
     setLowerTile(Math.floor(calculatedTiles.lowerTile));
     setUpperTile(Math.ceil(calculatedTiles.upperTile));
+
     setHandleTop(handleTop);
   };
 
   const windowResized = () => {
+    if (!meta) {
+      return;
+    }
     // Calc the area to be filled by the spectrogram
     const windowHeight = window.innerHeight;
     const topRowHeight = document.getElementById('topRow').offsetHeight;
@@ -258,15 +285,7 @@ export const SpectrogramPage = () => {
     const newPlotHeight = newSpectrogramHeight - 100;
     setPlotWidth(newplotWidth);
     setPlotHeight(newPlotHeight);
-
-    // Trigger re-render, but not when the window first loads
-    //renderImage();
   };
-
-  // useEffect(() => {
-  //   console.debug('iqData', iqData);
-  //   renderImage();
-  // }, [downloadedTiles]);
 
   useEffect(() => {
     setMeta(metaQuery.data);
@@ -362,6 +381,12 @@ export const SpectrogramPage = () => {
             }}
             toggleIncludeRfFreq={toggleIncludeRfFreq}
             updateZoomLevel={setZoomLevel}
+            zoomLevel={zoomLevel}
+            taps={taps}
+            setTaps={setTaps}
+            setZoomLevel={setZoomLevel}
+            setPythonSnippet={setPythonSnippet}
+            pythonSnippet={pythonSnippet}
           />
           <div className="flex flex-col">
             <ul className="flex space-x-2 border-b border-primary w-full sm:pl-12 lg:pl-32" id="tabsbar">
@@ -475,6 +500,7 @@ export const SpectrogramPage = () => {
                         handleTop={handleTop}
                         meta={meta}
                         fetchEnabled={fetchMinimap}
+                        fftSizeScrollbar={fftSize}
                       />
                     </Stage>
                   </div>
