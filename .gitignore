@@ -12,6 +12,9 @@ node_modules
 
 # testing
 /coverage
+/test-results/
+/playwright-report/
+/playwright/.cache/
 
 # misc
 .DS_Store
@@ -38,3 +41,4 @@ api/build
 **/.mypy_cache/
 **/.ruff_cache/
 *.venv/
+tiling/spectrogram.pmtiles

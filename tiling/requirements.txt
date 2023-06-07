@@ -1,0 +1,4 @@
+pmtiles==3.1.1
+numpy
+scikit-image==0.21.0
+Pillow==9.5.0

@@ -1,4 +1,4 @@
-.PHONY: setup run-api run-react build-docker run-docker clean run-dev lint lint-corrections lint-no-corrections all test
+.PHONY: setup run-api run-react build-docker run-docker clean dev test lint lint-corrections lint-no-corrections all test
 
 setup:
 	@echo "Setting up project dependencies..."
@@ -6,8 +6,8 @@ setup:
 	@npm install --prefix ./client
 
 run-api:
-	@echo "Running Flask API on port 5000..."
-	@cd api && flask run
+	@echo "Running FastAPI on port 5000..."
+	@cd api && RFDX_FF_INMEMDB=1 && uvicorn --port 5000 main:app
 
 run-react:
 	@echo "Running React application on port 3000..."
@@ -27,11 +27,19 @@ clean:
 	@rm -rf client/node_modules
 	@rm -rf client/build
 
+dev: SHELL:=/bin/bash
 dev:
-	@echo "Running Flask API and React application for debugging..."
-	@cd api && flask run &
+	@echo "Confirm the FastAPI is running on port 5000 (press any key)..." && read -n1 -s
+	@echo "Running React application for debugging..."
 	@cd client && npm run start
 
+test: SHELL:=/bin/bash
+test:
+	@echo "Confirm the FastAPI is running on port 5000 (press any key)..." && read -n1 -s
+	@echo "Running Playwright frontend and end-to-end tests"
+	@npx playwright test
+	@echo "Running pytest api tests"
+	@cd api && pytest
 
 lint:
 	@echo "Do you want to lint to correct the files? [y/N] " && read ans && if [ $${ans:-'N'} = 'y' ]; then make lint-corrections; else make lint-no-corrections;fi
