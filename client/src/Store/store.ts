@@ -4,19 +4,13 @@
 
 import { configureStore } from '@reduxjs/toolkit';
 
-import blobReducer from './Reducers/BlobReducer';
 import connectionReducer from './Reducers/ConnectionReducer';
-import fetchMetaReducer from './Reducers/FetchMetaReducer';
-import minimapReducer from './Reducers/MinimapReducer';
-import recordingsListReducer from './Reducers/RecordingsListReducer';
+import localClientReducer from './Reducers/LocalClientReducer';
 
 const store = configureStore({
   reducer: {
-    blob: blobReducer,
     connection: connectionReducer,
-    meta: fetchMetaReducer,
-    minimap: minimapReducer,
-    recordingsList: recordingsListReducer,
+    localClient: localClientReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

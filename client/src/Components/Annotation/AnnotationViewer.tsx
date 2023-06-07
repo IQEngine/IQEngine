@@ -2,21 +2,32 @@
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
 
-import React, { Fragment } from 'react';
+import React, { Fragment, useCallback } from 'react';
 import { Layer, Rect, Text } from 'react-konva';
 import { TILE_SIZE_IN_IQ_SAMPLES } from '../../Utils/constants';
-import { useAppSelector, useAppDispatch } from '@/Store/hooks';
-import { setMetaAnnotation } from '@/Store/Reducers/FetchMetaReducer';
+import { Annotation, SigMFMetadata } from '@/Utils/sigmfMetadata';
+import { updateMeta } from '@/api/metadata/Queries';
+import { useQueryClient } from '@tanstack/react-query';
 
-const AnnotationViewer = (props) => {
-  const meta = useAppSelector((state) => state.meta);
-  const dispatch = useAppDispatch();
-  let { spectrogramWidthScale, annotations, fftSize, lowerTile, zoomLevel } = props;
+interface AnnotationViewerProps {
+  spectrogramWidthScale: number;
+  meta: SigMFMetadata;
+  fftSize: number;
+  lowerTile: number;
+  upperTile: number;
+  zoomLevel: number;
+  setMeta: (meta: SigMFMetadata) => void;
+}
 
-  // These two lines are a hack used to force a re-render when an annotation is updated, which for some reason wasnt updating
-  const [, updateState] = React.useState();
-  const forceUpdate = React.useCallback(() => updateState({}), []);
-
+const AnnotationViewer = ({
+  spectrogramWidthScale,
+  meta,
+  fftSize,
+  lowerTile,
+  zoomLevel,
+  upperTile,
+  setMeta,
+}: AnnotationViewerProps) => {
   function onDragEnd(e) {
     const x = e.target.x(); // coords of the corner box
     const y = e.target.y();
@@ -25,23 +36,41 @@ const AnnotationViewer = (props) => {
     const annot_pos_y = e.target.id().split('-')[2];
     annotations[annot_indx][annot_pos_x] = x / spectrogramWidthScale; // reverse the calcs done to generate the coords
     annotations[annot_indx][annot_pos_y] = y;
-    forceUpdate(); // TODO remove the forceupdate and do it the proper way (possibly using spread?)
-
-    // Now update the actual meta.annotations
-    const f = annotations[annot_indx]['index']; // remember there are 2 different indexes- the ones on the screen and the meta.annotations
-    const updatedAnnotations = [...meta.annotations];
-    const updatedAnnotation = { ...updatedAnnotations[f] };
     const start_sample_index = lowerTile * TILE_SIZE_IN_IQ_SAMPLES;
-    updatedAnnotation['core:sample_start'] = annotations[annot_indx].y1 * fftSize * zoomLevel + start_sample_index;
-    updatedAnnotation['core:sample_count'] =
-      (annotations[annot_indx].y2 - annotations[annot_indx].y1) * fftSize * zoomLevel;
     const lower_freq = meta.captures[0]['core:frequency'] - meta.global['core:sample_rate'] / 2;
-    updatedAnnotation['core:freq_lower_edge'] =
+    const f = annotations[annot_indx]['index'];
+    console.log('Starting changes to meta');
+    console.log(meta.annotations[f]);
+    meta.annotations[f]['core:sample_start'] = annotations[annot_indx].y1 * fftSize * zoomLevel + start_sample_index;
+    meta.annotations[f]['core:sample_count'] =
+      (annotations[annot_indx].y2 - annotations[annot_indx].y1) * fftSize * zoomLevel;
+    meta.annotations[f]['core:freq_lower_edge'] =
       (annotations[annot_indx].x1 / fftSize) * meta.global['core:sample_rate'] + lower_freq;
-    updatedAnnotation['core:freq_upper_edge'] =
+    meta.annotations[f]['core:freq_upper_edge'] =
       (annotations[annot_indx].x2 / fftSize) * meta.global['core:sample_rate'] + lower_freq;
-    dispatch(setMetaAnnotation({ annotation: updatedAnnotation, index: f }));
+    console.log('Finish changes to meta');
+    console.log(meta);
+    console.log(meta.annotations[f]);
+    let new_meta = Object.assign(new SigMFMetadata(), meta);
+    setMeta(new_meta);
   }
+
+  const annotations = meta?.annotations.map((annotation, index) => {
+    let position = annotation.getAnnotationPosition(
+      lowerTile,
+      upperTile,
+      meta.getCenterFrequency(),
+      meta.getSampleRate(),
+      fftSize,
+      zoomLevel
+    );
+    let result = {
+      ...position,
+      description: annotation.getDescription(),
+      index: index,
+    };
+    return result;
+  });
 
   // add cursor styling
   function onMouseOver() {
@@ -59,30 +88,31 @@ const AnnotationViewer = (props) => {
       y2: 400,
       description: 'Fill Me In',
       index: -1,
+      visible: true,
     });
-    forceUpdate(); // TODO remove the forceupdate and do it the proper way (possibly using spread?)
 
     // Add it to the meta.annotations as well. TODO: this is duplicate code
     let updatedAnnotations = [...meta.annotations];
     annotations[annotations.length - 1]['index'] = updatedAnnotations.length;
-    updatedAnnotations.push({});
-    const f = updatedAnnotations.length - 1;
-    const annot_indx = annotations.length - 1;
+
     let start_sample_index = lowerTile * TILE_SIZE_IN_IQ_SAMPLES;
-    updatedAnnotations[f]['core:sample_start'] = annotations[annot_indx].y1 * fftSize * zoomLevel + start_sample_index;
-    updatedAnnotations[f]['core:sample_count'] =
-      (annotations[annot_indx].y2 - annotations[annot_indx].y1) * fftSize * zoomLevel;
+    const annot_indx = annotations.length - 1;
     let lower_freq = meta.captures[0]['core:frequency'] - meta.global['core:sample_rate'] / 2;
-    updatedAnnotations[f]['core:freq_lower_edge'] =
-      (annotations[annot_indx].x1 / fftSize) * meta.global['core:sample_rate'] + lower_freq;
-    updatedAnnotations[f]['core:freq_upper_edge'] =
-      (annotations[annot_indx].x2 / fftSize) * meta.global['core:sample_rate'] + lower_freq;
-    updatedAnnotations[f]['core:description'] = annotations[annot_indx]['description'];
-    dispatch(setMetaAnnotations(updatedAnnotations));
+    meta.annotations.push(
+      Object.assign(new Annotation(), {
+        'core:sample_start': annotations[annot_indx].y1 * fftSize * zoomLevel + start_sample_index,
+        'core:sample_count': (annotations[annot_indx].y2 - annotations[annot_indx].y1) * fftSize * zoomLevel,
+        'core:freq_lower_edge': (annotations[annot_indx].x1 / fftSize) * meta.global['core:sample_rate'] + lower_freq,
+        'core:freq_upper_edge': (annotations[annot_indx].x2 / fftSize) * meta.global['core:sample_rate'] + lower_freq,
+        'core:description': annotations[annot_indx]['description'],
+      })
+    );
+    let new_meta = Object.assign(new SigMFMetadata(), meta);
+    setMeta(new_meta);
   };
 
   // Ability to update annotation labels
-  const handleTextClick = (e) => {
+  const handleTextClick = useCallback((e) => {
     // create textarea and style it
     var textarea = document.createElement('textarea');
     document.body.appendChild(textarea);
@@ -96,6 +126,7 @@ const AnnotationViewer = (props) => {
     textarea.rows = 1;
     textarea.id = e.target.id();
     textarea.focus();
+    textarea.classList.add('text-base-100');
 
     // Add a note about hitting enter to finish the edit
     var textarea2 = document.createElement('textarea');
@@ -109,22 +140,21 @@ const AnnotationViewer = (props) => {
     textarea2.rows = 1;
     textarea2.disabled = true;
     textarea2.style.resize = 'none';
-    textarea2.style.backgroundColor = 'black';
+    textarea2.classList.add('text-base-100');
 
     textarea.addEventListener('keydown', function (e) {
       if (e.key === 'Enter') {
-        console.log(textarea.value, textarea.id);
+        console.debug(textarea.value, textarea.id);
         annotations[textarea.id]['description'] = textarea.value; // update the local version first
         // Now update the actual meta info
-        let updatedAnnotations = [...meta.annotations];
-        updatedAnnotations[annotations[textarea.id]['index']]['core:description'] = textarea.value;
-        dispatch(setMetaAnnotations(updatedAnnotations));
+        meta.annotations[annotations[textarea.id]['index']]['core:description'] = textarea.value;
+        let new_meta = Object.assign(new SigMFMetadata(), meta);
+        setMeta(new_meta);
         document.body.removeChild(textarea);
         document.body.removeChild(textarea2);
-        forceUpdate(); // TODO remove the forceupdate and do it the proper way (possibly using spread?)
       }
     });
-  };
+  }, []);
 
   return (
     <Layer>
@@ -141,7 +171,7 @@ const AnnotationViewer = (props) => {
         key="newannotation"
       />
 
-      {annotations.map((annotation, index) => (
+      {annotations?.map((annotation, index) => (
         // for params of Rect see https://konvajs.org/api/Konva.Rect.html
         // for Text params see https://konvajs.org/api/Konva.Text.html
         // Note that index is for the list of annotations currently on the screen, not for meta.annotations which contains all
@@ -152,7 +182,7 @@ const AnnotationViewer = (props) => {
             y={annotation.y1}
             width={(annotation.x2 - annotation.x1) * spectrogramWidthScale}
             height={annotation.y2 - annotation.y1}
-            fillEnabled="false"
+            fillEnabled={true}
             stroke="black"
             strokeWidth={4}
             key={index}
@@ -163,7 +193,7 @@ const AnnotationViewer = (props) => {
             y={annotation.y1 - 4}
             width={8}
             height={8}
-            fillEnabled="true"
+            fillEnabled={true}
             fill="white"
             stroke="black"
             strokeWidth={1}
@@ -180,7 +210,7 @@ const AnnotationViewer = (props) => {
             y={annotation.y1 - 4}
             width={8}
             height={8}
-            fillEnabled="true"
+            fillEnabled={true}
             fill="white"
             stroke="black"
             strokeWidth={1}
@@ -197,7 +227,7 @@ const AnnotationViewer = (props) => {
             y={annotation.y2 - 4}
             width={8}
             height={8}
-            fillEnabled="true"
+            fillEnabled={true}
             fill="white"
             stroke="black"
             strokeWidth={1}
@@ -214,7 +244,7 @@ const AnnotationViewer = (props) => {
             y={annotation.y2 - 4}
             width={8}
             height={8}
-            fillEnabled="true"
+            fillEnabled={true}
             fill="white"
             stroke="black"
             strokeWidth={1}

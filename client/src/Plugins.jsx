@@ -8,7 +8,7 @@ export const Plugins = () => {
   return (
     <div>
       <div style={{ width: 'auto' }}>
-        <h1 className="text-iqengine-primary text-center">Plugins Concept</h1>
+        <h1 className="text-primary text-center">Plugins Concept</h1>
         <p className="text-center text-lg mx-56">
           Through an optional backend API, IQEngine will support various plugins (currently, only signal
           detection/classification is supported). IQEngine is still in its infancy and we are looking for people to help
@@ -30,7 +30,7 @@ export const Plugins = () => {
         <center>
           <img
             src="./plugins_concept.svg"
-            className="w-1/2 border-iqengine-tertiary border-1 shadow-md shadow-iqengine-tertiary mb-3"
+            className="w-1/2 border-accent border-1 shadow-md shadow-tertiary mb-3"
             alt="plugins concept"
           ></img>
         </center>

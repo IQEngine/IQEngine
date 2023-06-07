@@ -25,6 +25,22 @@ describe('Data table component', () => {
     }
   });
 
+  test('Previous and next button disabled when empty list', async () => {
+    // Arrange
+    const dataColumns: DataColumn[] = [];
+    const dataRows: DataRow[] = [];
+
+    // Act
+    render(<DataTable dataColumns={dataColumns} dataRows={dataRows.slice(0, 10)} />);
+
+    const previous = await screen.findByRole('button', { name: /previous page/i });
+    const next = await screen.findByRole('button', { name: /next page/i });
+
+    // Assert
+    expect(previous.hasAttribute('disabled')).toBeTruthy();
+    expect(next.hasAttribute('disabled')).toBeTruthy();
+  });
+
   test('Previous button disabled on initial view', async () => {
     // Act
     render(<DataTable dataColumns={dataColumns} dataRows={dataRows} />);

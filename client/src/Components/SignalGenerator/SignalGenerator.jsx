@@ -143,7 +143,7 @@ for varname in list(globals().keys()):
   useEffect(() => {
     if (!state.pyodide) {
       async function main() {
-        console.log('Initializing Pyodide');
+        console.debug('Initializing Pyodide');
         let pyodide = await window.loadPyodide();
         await pyodide.loadPackage('numpy');
         await pyodide.loadPackage('scipy');
@@ -162,7 +162,7 @@ print('NumPy Version:', numpy.version.version)
 
   const onSubmitPythonSnippet = () => {
     setState({ ...state, buttonDisabled: true, buttonText: 'Running' });
-    console.log('Running python snippet');
+    console.debug('Running python snippet');
     const startTime = performance.now();
     if (state.pyodide) {
       state.pyodide
@@ -195,7 +195,7 @@ print('NumPy Version:', numpy.version.version)
             b64ImageIQ: 'data:image/png;base64, ' + iqImgStr,
             b64ImageSpectrogram: 'data:image/png;base64, ' + spectrogramImgStr,
           }); // also clear errors
-          console.log('Call to runPythonAsync took', performance.now() - startTime, 'milliseconds');
+          console.debug('Call to runPythonAsync took', performance.now() - startTime, 'milliseconds');
 
           // Create/Download SigMF recording file if requested
           if (state.downloadChecked) {
@@ -240,7 +240,7 @@ print('NumPy Version:', numpy.version.version)
         })
         .catch((err) => {
           setState({ ...state, buttonDisabled: false, buttonText: 'Run', errorLog: String(err) });
-          console.log('Call to runPythonAsync took', performance.now() - startTime, 'milliseconds');
+          console.debug('Call to runPythonAsync took', performance.now() - startTime, 'milliseconds');
         });
     }
   };
@@ -297,7 +297,11 @@ print('NumPy Version:', numpy.version.version)
           </select>
 
           <CodeMirror value={currentSnippet} height="700px" width="600px" extensions={[python()]} theme={vscodeDark} />
-          <button className="mb-3 btn btn-primary" disabled={state.buttonDisabled} onClick={onSubmitPythonSnippet}>
+          <button
+            className="mb-3 btn btn-primary btn-sm"
+            disabled={state.buttonDisabled}
+            onClick={onSubmitPythonSnippet}
+          >
             {state.buttonText}
           </button>
           <div className="mb-3">

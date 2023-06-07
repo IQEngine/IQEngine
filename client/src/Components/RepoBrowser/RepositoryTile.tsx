@@ -5,27 +5,21 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import {
-  updateConnectionAccountName,
-  updateConnectionContainerName,
-  updateConnectionSasToken,
-} from '@/Store/Reducers/ConnectionReducer';
-
-import { fetchRecordingsList } from '@/Store/Reducers/RecordingsListReducer';
 import { useAppDispatch } from '@/Store/hooks';
+import { CLIENT_TYPE_BLOB } from '@/api/Models';
 
 const RepositoryTile = (props) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { item } = props;
 
-  const { name, accountName, containerName, imageURL, description, sasToken } = item;
+  const { name, account, container, imageURL, description, sasToken } = item;
   const [isDisabled, setIsDisabled] = useState(false);
   const [isWarning, setIsWarning] = useState(false);
   const [isError, setIsError] = useState(false);
-  const [dayDifference, setDayDifference] = useState();
+  const [dayDifference, setDayDifference] = useState<number>();
   const [expires, setExpires] = useState();
-  const [writeableBool, setWriteableBool] = useState();
+  const [writeableBool, setWriteableBool] = useState<any>();
 
   useEffect(() => {
     const tempExpires = sasToken.slice(sasToken.search('se')).split('&')[0].slice(3, 13); // YEAR-MONTH-DAY
@@ -50,40 +44,25 @@ const RepositoryTile = (props) => {
   }, [sasToken]);
 
   const handleOnClick = async () => {
-    dispatch(updateConnectionAccountName(accountName));
-    dispatch(updateConnectionContainerName(containerName));
-    dispatch(updateConnectionSasToken(sasToken));
-    dispatch(fetchRecordingsList({ accountName, containerName, sasToken }));
     // so we can fetch when someone is linked to a repo directly
-    navigate(
-      '/recordings/?accountName=' +
-        accountName +
-        '&containerName=' +
-        containerName +
-        '&sasToken=' +
-        encodeURIComponent(sasToken)
-    );
+    navigate(`/recordings/${CLIENT_TYPE_BLOB}/${account}/${container}/${encodeURIComponent(sasToken)}`);
   };
 
   return (
-    <div className="flex-one repocard">
-      <div className="repocardheader" style={{ display: 'flex', justifyContent: 'space-between' }}>
-        {<div style={{ marginTop: 'auto' }}>{name}</div>} {writeableBool}
-      </div>
+    <div className="repocard">
+      <h2 className="repocardheader flex content-center justify-center">
+        {<div className="text-neutral mr-2">{name}</div>} {writeableBool}
+      </h2>
+      <figure>{imageURL && <img src={imageURL} className="rounded-2xl mt-3 px-2 h-36"></img>}</figure>
       <div className="repocardbody">
-        <center>
-          {imageURL && <img src={imageURL} className="w-48 rounded-xl"></img>}
-          <div className="mb-2 mt-3">{description}</div>
-          <div className="mb-3" style={{ color: 'grey' }}>
-            SAS Token Expiration: {expires}
+        <div className="h-24 overflow-hidden hover:overflow-auto text-center">{description}</div>
+        <div className="text-secondary text-center">SAS Token Expiration: {expires}</div>
+        {isError && <div style={{ color: 'red' }}>This SAS token is expired</div>}
+        {isWarning && (
+          <div style={{ color: 'yellow' }}>
+            This token will expire {dayDifference === 0 ? 'today' : 'in ' + dayDifference + ' days'}
           </div>
-          {isError && <div style={{ color: 'red' }}>This SAS token is expired</div>}
-          {isWarning && (
-            <div style={{ color: 'yellow' }}>
-              This token will expire {dayDifference === 0 ? 'today' : 'in ' + dayDifference + ' days'}
-            </div>
-          )}
-        </center>
+        )}
       </div>
       <button className="repocardbutton" disabled={isDisabled} id={name.replaceAll(' ', '')} onClick={handleOnClick}>
         Browse

@@ -57,7 +57,8 @@ export const DataTable = ({ dataColumns, dataRows }: TableProps) => {
   }, [dataRows, filterInput]);
 
   useEffect(() => {
-    setMaxPage(Math.ceil(filteredData.length / pageSize));
+    const max = Math.ceil(filteredData.length / pageSize) === 0 ? 1 : Math.ceil(filteredData.length / pageSize);
+    setMaxPage(max);
   }, [filteredData, pageSize]);
 
   useEffect(() => {
@@ -78,7 +79,7 @@ export const DataTable = ({ dataColumns, dataRows }: TableProps) => {
         <div className="flex flex-row items-center">
           <span className="mr-2">Show</span>
           <select
-            className={`bg-iqengine-bg`}
+            className={`bg-base-100`}
             aria-label="page size"
             value={pageSize}
             onChange={(e) => {
@@ -96,7 +97,7 @@ export const DataTable = ({ dataColumns, dataRows }: TableProps) => {
         </div>
         <div>
           <input
-            className={`bg-iqengine-bg input no-spin`}
+            className={`bg-base-100 input no-spin`}
             aria-label="filter"
             value={filterInput}
             onChange={(e) => {
@@ -136,17 +137,17 @@ export const DataTable = ({ dataColumns, dataRows }: TableProps) => {
         <div className="flex flex-row">
           <button
             aria-label="previous page"
-            className="btn btn-primary"
+            className="btn btn-primary btn-sm"
             onClick={() => setCurrentPage((page) => Math.max(page - 1, 1))}
-            disabled={currentPage === 1}
+            disabled={currentPage <= 1}
           >
             Prev
           </button>
           <button
             aria-label="next page"
-            className="btn btn-primary"
+            className="btn btn-primary btn-sm"
             onClick={() => setCurrentPage((page) => Math.min(page + 1, maxPage))}
-            disabled={currentPage === maxPage}
+            disabled={currentPage >= maxPage}
           >
             Next
           </button>

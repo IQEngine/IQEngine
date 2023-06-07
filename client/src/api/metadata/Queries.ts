@@ -1,6 +1,6 @@
 import { SigMFMetadata } from '@/Utils/sigmfMetadata';
 import { MetadataClientFactory } from './MetadataClientFactory';
-import { QueryClient, useMutation, useQuery } from '@tanstack/react-query';
+import { QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 
 export const fetchMeta = async (type: string, account: string, container: string, filePath: string) => {
@@ -50,20 +50,24 @@ export const getMeta = (type: string, account: string, container: string, filePa
     fetchMeta(type, account, container, filePath)
   );
 
-export const updateMeta = (client: QueryClient, meta: SigMFMetadata) => {
+export const updateMeta = (meta: SigMFMetadata) => {
+  let client = useQueryClient();
+  console.log('updateMeta', meta);
   if (!meta.getOrigin()) {
     throw new Error('Meta is missing origin');
   }
   const { type, account, container, file_path: filePath } = meta.getOrigin();
-  useMutation({
-    mutationFn: () => updateDataSourceMeta(type, account, container, filePath, meta),
+  return useMutation({
+    mutationFn: (newMeta: SigMFMetadata) => updateDataSourceMeta(type, account, container, filePath, newMeta),
     onMutate: async () => {
+      console.log('onMutate');
       await client.cancelQueries(['datasource', type, account, container, filePath, 'meta']);
       const previousMeta = client.getQueryData(['datasource', type, account, container, filePath, 'meta']);
       client.setQueryData(['datasource', type, account, container, filePath, 'meta'], meta);
       return { previousMeta };
     },
-    onError: (err, newTodo, context) => {
+    onError: (err, newMeta, context) => {
+      console.log('onError', err);
       client.setQueryData(['datasource', type, account, container, filePath, 'meta'], context.previousMeta);
     },
   });

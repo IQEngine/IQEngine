@@ -4,19 +4,24 @@
 
 import React, { useState, useEffect } from 'react';
 import { configQuery } from '../../api/config/queries';
-import { useAppDispatch, useAppSelector } from '@/Store/hooks';
-import { setMetaAnnotations } from '@/Store/Reducers/FetchMetaReducer';
+import { useAppDispatch } from '@/Store/hooks';
+import { Annotation, SigMFMetadata } from '@/Utils/sigmfMetadata';
+import { matchPath } from 'react-router-dom';
 
-export const DetectorPane = (props) => {
-  let { cursorsEnabled, handleProcessTime } = props;
+export interface DetectorPaneProps {
+  cursorsEnabled: boolean;
+  handleProcessTime: () => { trimmedSamples: number[]; startSampleOffset: number };
+  meta: SigMFMetadata;
+  setMeta: (meta: SigMFMetadata) => void;
+}
 
+export const DetectorPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }: DetectorPaneProps) => {
   const [detectorList, setDetectorList] = useState([]);
   const [selectedDetector, setSelectedDetector] = useState('default');
   const [detectorParams, setDetectorParams] = useState({});
   const [value, setValue] = useState(0); // integer state used to force rerender
   const dispatch = useAppDispatch();
   const config = configQuery();
-  const meta = useAppSelector((state) => state.meta);
   useEffect(() => {
     if (!config.data || !config.data.detectorEndpoint) return;
     let detectorEndpoint = 'http://127.0.0.1:8000/detectors/';
@@ -29,13 +34,13 @@ export const DetectorPane = (props) => {
         return response.json();
       })
       .then(function (data) {
-        console.log('Detectors:', data);
+        console.debug('Detectors:', data);
         setDetectorList(data);
       })
       .catch((error) => {
-        console.log(error);
+        console.debug(error);
       });
-  }, [config.data.detectorEndpoint]);
+  }, [config?.data?.detectorEndpoint]);
 
   const handleChangeDetector = (e) => {
     if (!config.data || !config.data.detectorEndpoint) return;
@@ -50,7 +55,7 @@ export const DetectorPane = (props) => {
         return response.json();
       })
       .then(function (data) {
-        console.log('Detector Params:', data);
+        console.debug('Detector Params:', data);
         setDetectorParams(data);
       });
   };
@@ -87,7 +92,7 @@ export const DetectorPane = (props) => {
         body[key] = value['default'];
       }
     }
-    console.log(body);
+    console.debug(body);
 
     fetch(config.data.detectorEndpoint + selectedDetector, {
       method: 'POST',
@@ -101,12 +106,17 @@ export const DetectorPane = (props) => {
         return response.json();
       })
       .then(function (data) {
-        console.log('Detector Status:', data.status);
-        console.log('Results:', data.annotations);
+        console.debug('Detector Status:', data.status);
+        console.debug('Results:', data.annotations);
         for (let i = 0; i < data.annotations.length; i++) {
           data.annotations[i]['core:sample_start'] += startSampleOffset;
         }
-        dispatch(setMetaAnnotations(data.annotations)); // update the annotations stored in meta state in SpectrogramPage
+        let newAnnotations = data.annotations.map((annotation) => Object.assign(new Annotation(), annotation));
+        console.log(newAnnotations);
+        meta['annotations'].push(...newAnnotations);
+        meta['annotations'] = meta['annotations'].flat();
+        let newMeta = Object.assign(new SigMFMetadata(), meta);
+        setMeta(newMeta);
       });
   };
 
@@ -120,7 +130,11 @@ export const DetectorPane = (props) => {
     <div className="detectForm" id="detectFormId" onSubmit={handleSubmit}>
       <label className="label">
         Detector:
-        <select className="rounded bg-neutral text-base-100" value={selectedDetector} onChange={handleChangeDetector}>
+        <select
+          className="rounded bg-base-content text-base-100"
+          value={selectedDetector}
+          onChange={handleChangeDetector}
+        >
           <option disabled value="default">
             Select a Detector
           </option>
@@ -150,7 +164,7 @@ export const DetectorPane = (props) => {
               </>
             ))}
           </div>
-          <button type="submit" className="btn btn-primary" onClick={handleSubmit}>
+          <button type="submit" className="btn btn-primary btn-sm" onClick={handleSubmit}>
             Run Detector
           </button>
         </>

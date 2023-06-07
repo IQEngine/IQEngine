@@ -20,7 +20,7 @@ export const AutoSizeInput = ({
 
   useEffect(() => {
     setError(parent?.error);
-  }, [parent]);
+  }, [parent?.error]);
 
   useEffect(() => {
     setWidth(span.current.offsetWidth + 3);
@@ -59,7 +59,7 @@ export const AutoSizeInput = ({
           type={type ?? 'text'}
           title={content}
           value={content}
-          className={`bg-iqengine-bg input no-spin ${className}`}
+          className={`bg-base-100 input no-spin ${className}`}
           style={{ width }}
           autoFocus
           onChange={changeHandler}
