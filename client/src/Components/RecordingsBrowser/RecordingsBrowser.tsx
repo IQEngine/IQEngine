@@ -23,27 +23,29 @@ export default function RecordingsBrowser() {
   }, [metadata_collection.data]);
 
   return (
-    <div className="flex justify-stretch">
+    <div>
       {!metadata_collection.isFetched ? (
-        <svg
-          className="animate-spin ml-1 mr-3 w-96 text-white"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-        >
-          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1"></circle>
-          <circle className="percent fifty stroke-current text-primary" cx="12" cy="12" r="10" pathLength="100" />
-        </svg>
+        <div className="flex justify-center">
+          <svg
+            className="animate-spin ml-1 mr-3 w-96 text-white"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1"></circle>
+            <circle className="percent fifty stroke-current text-primary" cx="12" cy="12" r="10" pathLength="100" />
+          </svg>
+        </div>
       ) : (
         <div className="md:px-8 xl:px-10">
-          <div className="flex justify-items-stretch">
+          <div className="flex justify-items-stretch text-start">
             <table>
               <thead>
                 <tr>
-                  <th className="text-start">Spectrogram Thumbnail</th>
-                  <th className="text-start">Recording Name</th>
-                  <th className="text-start">Length in Samples</th>
-                  <th className="text-start">
+                  <th className="p-2">Spectrogram Thumbnail</th>
+                  <th className="p-2">Recording Name</th>
+                  <th className="p-2">Length in Samples</th>
+                  <th className="p-2">
                     Data Type
                     <a
                       style={{ textDecoration: 'none', color: 'white' }}
@@ -55,10 +57,10 @@ export default function RecordingsBrowser() {
                       <InfoOutlinedIcon></InfoOutlinedIcon>
                     </a>
                   </th>
-                  <th className="text-start">Frequency</th>
-                  <th className="text-start">Sample Rate</th>
-                  <th className="text-start">Number of Annotations</th>
-                  <th className="text-start">Author</th>
+                  <th className="p-2">Frequency</th>
+                  <th className="p-2">Sample Rate</th>
+                  <th className="p-2">Number of Annotations</th>
+                  <th className="p-2">Author</th>
                 </tr>
               </thead>
               <tbody>
