@@ -13,18 +13,18 @@ import { useQueryClient } from '@tanstack/react-query';
 export default function RecordingsBrowser() {
   const { type, account, container, sasToken } = useParams();
   const queryClient = useQueryClient();
-  const metadatas = getDataSourceMeta(queryClient, type, account, container);
+  const metadata_collection = getDataSourceMeta(queryClient, type, account, container);
   const [directoryNode, setDirectoryNode] = useState<DirectoryNode>(null);
   useEffect(() => {
-    if (metadatas.data && metadatas.data.length > 0) {
-      const dataRoot = groupDataByDirectories(metadatas.data);
+    if (metadata_collection.data && metadata_collection.data.length > 0) {
+      const dataRoot = groupDataByDirectories(metadata_collection.data);
       setDirectoryNode(dataRoot);
     }
-  }, [metadatas.data]);
+  }, [metadata_collection.data]);
 
   return (
     <div className="flex justify-center">
-      {!metadatas.isFetched ? (
+      {!metadata_collection.isFetched ? (
         <svg
           className="animate-spin ml-1 mr-3 w-96 text-white"
           xmlns="http://www.w3.org/2000/svg"
