@@ -51,7 +51,7 @@ const RepositoryTile = (props) => {
   return (
     <div className="repocard">
       <h2 className="repocardheader flex content-center justify-center">
-        {<h2 className="text-neutral mr-2">{name}</h2>} {writeableBool}
+        {<div className="text-neutral mr-2">{name}</div>} {writeableBool}
       </h2>
       <figure>{imageURL && <img src={imageURL} className="rounded-2xl mt-3 px-2 h-36"></img>}</figure>
       <div className="repocardbody">

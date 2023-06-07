@@ -20,7 +20,7 @@ export const AutoSizeInput = ({
 
   useEffect(() => {
     setError(parent?.error);
-  }, [parent]);
+  }, [parent?.error]);
 
   useEffect(() => {
     setWidth(span.current.offsetWidth + 3);

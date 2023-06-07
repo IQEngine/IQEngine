@@ -10,20 +10,40 @@ import {
   validateFrequency,
   validateDate,
 } from '@/Utils/rfFunctions';
-import { useAppSelector, useAppDispatch } from '@/Store/hooks';
 import AutoSizeInput from '@/Components/AutoSizeInput/AutoSizeInput';
-import { SigMFMetadata } from '@/Utils/sigmfMetadata';
+import { Annotation, SigMFMetadata } from '@/Utils/sigmfMetadata';
 
 interface AnnotationListProps {
   meta: SigMFMetadata;
   setHandleTop: any;
   spectrogramHeight: number;
+  setMeta: (meta: SigMFMetadata) => void;
 }
 
-export const AnnotationList = ({ meta, setHandleTop, spectrogramHeight }: AnnotationListProps) => {
+export const AnnotationList = ({ meta, setHandleTop, spectrogramHeight, setMeta }: AnnotationListProps) => {
   const [parents, setParents] = useState([]);
   const [data, setData] = useState([]);
-  const dispatch = useAppDispatch();
+  const originalColumns = [
+    { title: 'Annotation', dataIndex: 'annotation' },
+    { title: 'Frequency Range', dataIndex: 'frequencyRange' },
+    { title: 'BW', dataIndex: 'bandwidthHz' },
+    { title: 'Label', dataIndex: 'label' },
+    { title: 'Time Range', dataIndex: 'timeRange' },
+    { title: 'Duration', dataIndex: 'duration' },
+    { title: 'Actions', dataIndex: 'actions' },
+  ];
+  const [columns, setColumns] = useState(originalColumns);
+
+  const calculateColumns = useCallback(() => {
+    if (data.length > 0) {
+      const newColumns = originalColumns.filter((column) => {
+        if (data.find((row) => row[column.dataIndex] !== undefined)) {
+          return column;
+        }
+      });
+      setColumns(newColumns);
+    }
+  }, [columns, data]);
 
   const getActions = useCallback(
     (startSampleCount) => {
@@ -78,11 +98,11 @@ export const AnnotationList = ({ meta, setHandleTop, spectrogramHeight }: Annota
 
       let updatedAnnotation = { ...parent.annotation };
       updatedAnnotation[parent.name] = newAnnotationValue ? newAnnotationValue : updatedAnnotation[parent.name];
+      meta.annotations[parent.index] = Object.assign(new Annotation(), updatedAnnotation);
 
       setData(calculateAnnotationsData());
-      // TODO: QUERY update annotations
-      // dispatch(setMetaAnnotation({ index: parent.index, annotation: updatedAnnotation }));
-      // updateSpectrogram();
+      let new_meta = Object.assign(new SigMFMetadata(), meta);
+      setMeta(new_meta);
     },
     [meta]
   );
@@ -196,7 +216,12 @@ export const AnnotationList = ({ meta, setHandleTop, spectrogramHeight }: Annota
               onBlur={updateAnnotation}
             />
           ),
-          timeRange: (
+          duration: duration.time + duration.unit,
+          actions: getActions(startSampleCount),
+        };
+
+        if (startTime && endTime) {
+          currentData['timeRange'] = (
             <div className="flex flex-row">
               <div>
                 <AutoSizeInput
@@ -216,10 +241,8 @@ export const AnnotationList = ({ meta, setHandleTop, spectrogramHeight }: Annota
                 />
               </div>
             </div>
-          ),
-          duration: duration.time + duration.unit,
-          actions: getActions(startSampleCount),
-        };
+          );
+        }
 
         data.push(currentData);
       }
@@ -233,20 +256,11 @@ export const AnnotationList = ({ meta, setHandleTop, spectrogramHeight }: Annota
     setData(calculateAnnotationsData());
   }, [calculateAnnotationsData]);
 
-  return (
-    <DataTable
-      dataColumns={[
-        { title: 'Annotation', dataIndex: 'annotation' },
-        { title: 'Frequency Range', dataIndex: 'frequencyRange' },
-        { title: 'BW', dataIndex: 'bandwidthHz' },
-        { title: 'Label', dataIndex: 'label' },
-        { title: 'Time Range', dataIndex: 'timeRange' },
-        { title: 'Duration', dataIndex: 'duration' },
-        { title: 'Actions', dataIndex: 'actions' },
-      ]}
-      dataRows={data}
-    />
-  );
+  useEffect(() => {
+    calculateColumns();
+  }, [data]);
+
+  return <DataTable dataColumns={columns} dataRows={data} />;
 };
 
 export default AnnotationList;

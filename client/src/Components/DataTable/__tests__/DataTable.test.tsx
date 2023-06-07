@@ -25,7 +25,7 @@ describe('Data table component', () => {
     }
   });
 
-  test('Previous and button disabled when empty list', async () => {
+  test('Previous and next button disabled when empty list', async () => {
     // Arrange
     const dataColumns: DataColumn[] = [];
     const dataRows: DataRow[] = [];

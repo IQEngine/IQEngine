@@ -5,43 +5,17 @@ import '@testing-library/jest-dom';
 import { AnnotationList } from '@/Components/Annotation/AnnotationList';
 import React from 'react';
 import metadataJson from './AnnotationList.test.meta.json';
-import { configureStore } from '@reduxjs/toolkit';
-import blobReducer from '@/Store/Reducers/BlobReducer';
-import fetchMetaReducer from '@/Store/Reducers/FetchMetaReducer';
-import { Provider } from 'react-redux';
+import { SigMFMetadata } from '@/Utils/sigmfMetadata';
 
 describe('Annotation list component', () => {
   beforeEach(() => {
     //Arrange
     //Javascript keeps modifying the metadata object, so we have to make a copy of it
-    const meta = JSON.parse(JSON.stringify(metadataJson));
-
-    const blob = {
-      size: 0,
-      totalIQSamples: 20000000,
-      currentMax: 0,
-      status: 'idle',
-      taps: null,
-      pythonSnippet: '',
-      numActiveFetches: 0,
-      iqData: {},
-      fftData: {},
-      sampleRate: 1,
-    };
-
-    const store = configureStore({
-      reducer: {
-        blob: blobReducer || (() => {}),
-        meta: fetchMetaReducer || (() => {}),
-      },
-      preloadedState: { blob, meta },
-    });
+    const meta = Object.assign(new SigMFMetadata(), JSON.parse(JSON.stringify(metadataJson)));
 
     // Act
     render(
-      <Provider store={store}>
-        <AnnotationList updateSpectrogram={() => {}}></AnnotationList>
-      </Provider>
+      <AnnotationList meta={meta} setHandleTop={() => {}} spectrogramHeight={200} setMeta={() => {}}></AnnotationList>
     );
   });
 

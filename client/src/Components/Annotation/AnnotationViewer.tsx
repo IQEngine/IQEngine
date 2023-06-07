@@ -2,7 +2,7 @@
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
 
-import React, { Fragment } from 'react';
+import React, { Fragment, useCallback } from 'react';
 import { Layer, Rect, Text } from 'react-konva';
 import { TILE_SIZE_IN_IQ_SAMPLES } from '../../Utils/constants';
 import { Annotation, SigMFMetadata } from '@/Utils/sigmfMetadata';
@@ -112,7 +112,7 @@ const AnnotationViewer = ({
   };
 
   // Ability to update annotation labels
-  const handleTextClick = (e) => {
+  const handleTextClick = useCallback((e) => {
     // create textarea and style it
     var textarea = document.createElement('textarea');
     document.body.appendChild(textarea);
@@ -126,6 +126,7 @@ const AnnotationViewer = ({
     textarea.rows = 1;
     textarea.id = e.target.id();
     textarea.focus();
+    textarea.classList.add('text-base-100');
 
     // Add a note about hitting enter to finish the edit
     var textarea2 = document.createElement('textarea');
@@ -139,7 +140,7 @@ const AnnotationViewer = ({
     textarea2.rows = 1;
     textarea2.disabled = true;
     textarea2.style.resize = 'none';
-    textarea2.style.backgroundColor = 'black';
+    textarea2.classList.add('text-base-100');
 
     textarea.addEventListener('keydown', function (e) {
       if (e.key === 'Enter') {
@@ -153,7 +154,7 @@ const AnnotationViewer = ({
         document.body.removeChild(textarea2);
       }
     });
-  };
+  }, []);
 
   return (
     <Layer>

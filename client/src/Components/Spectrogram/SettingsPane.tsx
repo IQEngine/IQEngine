@@ -279,16 +279,16 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
             <li data-value="hamming" onClick={onChangeWindowFunction}>
               {state.windowFunction === 'hamming' ? <a className="bg-primary">Hamming</a> : <a>Hamming</a>}
             </li>
-            <li active={state.windowFunction === 'rectangle'} data-value="rectangle" onClick={onChangeWindowFunction}>
+            <li data-value="rectangle" onClick={onChangeWindowFunction}>
               {state.windowFunction === 'rectangle' ? <a className="bg-primary">Rectangle</a> : <a>Rectangle</a>}
             </li>
-            <li active={state.windowFunction === 'hanning'} data-value="hanning" onClick={onChangeWindowFunction}>
+            <li data-value="hanning" onClick={onChangeWindowFunction}>
               {state.windowFunction === 'hanning' ? <a className="bg-primary">Hanning</a> : <a>Hanning</a>}
             </li>
-            <li active={state.windowFunction === 'barlett'} data-value="barlett" onClick={onChangeWindowFunction}>
+            <li data-value="barlett" onClick={onChangeWindowFunction}>
               {state.windowFunction === 'barlett' ? <a className="bg-primary">Barlett</a> : <a>Barlett</a>}
             </li>
-            <li active={state.windowFunction === 'blackman'} data-value="blackman" onClick={onChangeWindowFunction}>
+            <li data-value="blackman" onClick={onChangeWindowFunction}>
               {state.windowFunction === 'blackman' ? <a className="bg-primary">Blackman</a> : <a>Blackman</a>}
             </li>
           </ul>

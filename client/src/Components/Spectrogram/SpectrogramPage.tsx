@@ -532,7 +532,12 @@ export const SpectrogramPage = () => {
               Annotations
             </summary>
             <div className="outline outline-1 outline-primary p-2">
-              <AnnotationList meta={meta} setHandleTop={setHandleTop} spectrogramHeight={spectrogramHeight} />
+              <AnnotationList
+                meta={meta}
+                setHandleTop={setHandleTop}
+                spectrogramHeight={spectrogramHeight}
+                setMeta={setMeta}
+              />
             </div>
           </details>
 
