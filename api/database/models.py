@@ -9,6 +9,7 @@ class DataSource(BaseModel):
 
 
 class DataSourceReference(BaseModel):
+    type: str
     account: str
     container: str
     file_path: str
