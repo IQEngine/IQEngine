@@ -27,4 +27,5 @@ jobs:
       - name: Run Playwright tests
         run: |
           npm install
+          npx playwright install
           npx playwright test --config playwright-pr.config.ts --reporter list
