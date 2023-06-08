@@ -2,7 +2,6 @@
 module.exports = {
   content: ['./src/**/*.{js,jsx,ts,tsx}'],
   daisyui: {
-    styled: false, // don't use daisyui's built-in styles, explicit > implicit
     themes: [
       {
         mytheme: {
