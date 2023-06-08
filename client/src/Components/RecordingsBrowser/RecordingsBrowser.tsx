@@ -39,7 +39,7 @@ export default function RecordingsBrowser() {
       ) : (
         <div className="md:px-8 xl:px-10">
           <div className="flex justify-items-stretch text-start">
-            <table>
+            <table className="w-full">
               <thead>
                 <tr>
                   <th className="p-2">Spectrogram Thumbnail</th>

@@ -9,11 +9,11 @@ export const fetchMeta = async (type: string, account: string, container: string
   return response;
 };
 
-const fetchDataSourceMeta = async (quertClient: QueryClient, type: string, account: string, container: string) => {
+const fetchDataSourceMeta = async (queryClient: QueryClient, type: string, account: string, container: string) => {
   const client = MetadataClientFactory(type);
   const response = await client.getDataSourceMeta(account, container);
   for (const meta of response) {
-    quertClient.setQueryData(['datasource', type, account, container, meta.getOrigin().file_path, 'meta'], meta);
+    queryClient.setQueryData(['datasource', type, account, container, meta.getOrigin().file_path, 'meta'], meta);
   }
   return response;
 };

@@ -36,7 +36,7 @@ const Sidebar = (props) => {
   return (
     <div className="flex flex-col w-64 ml-3">
       <details open>
-        <summary className="pl-2 bg-primary outline outline-1 outline-primary text-lg text-black hover:bg-green-800">
+        <summary className="pl-2 bg-primary outline outline-1 outline-primary text-lg text-base-100 hover:bg-green-800">
           Settings
         </summary>
         <div className="outline outline-1 outline-primary p-2">
@@ -63,7 +63,7 @@ const Sidebar = (props) => {
       </details>
 
       <details>
-        <summary className="pl-2 mt-2 bg-primary outline outline-1 outline-primary text-lg text-black hover:bg-green-800">
+        <summary className="pl-2 mt-2 bg-primary outline outline-1 outline-primary text-lg text-base-100 hover:bg-green-800">
           Detector
         </summary>
         <div className="outline outline-1 outline-primary p-2">
@@ -77,7 +77,7 @@ const Sidebar = (props) => {
       </details>
 
       <details>
-        <summary className="pl-2 mt-2 bg-primary outline outline-1 outline-primary text-lg text-black hover:bg-green-800">
+        <summary className="pl-2 mt-2 bg-primary outline outline-1 outline-primary text-lg text-base-100 hover:bg-green-800">
           Global Properties
         </summary>
         <div className="outline outline-1 outline-primary p-2">

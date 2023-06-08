@@ -50,11 +50,12 @@ const RepositoryTile = (props) => {
 
   return (
     <div className="repocard">
-      <h2 className="repocardheader flex content-center justify-center">
-        {<div className="text-neutral mr-2">{name}</div>} {writeableBool}
+      <h2 className="repocardheader">
+        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 whitespace-nowrap">{name}</div>
+        <div className="absolute right-0 translate-x-1 -translate-y-2">{writeableBool}</div>
       </h2>
-      <figure>{imageURL && <img src={imageURL} className="rounded-2xl mt-3 px-2 h-36"></img>}</figure>
       <div className="repocardbody">
+        <figure>{imageURL && <img src={imageURL} className="rounded-2xl px-2 h-36"></img>}</figure>
         <div className="h-24 overflow-hidden hover:overflow-auto text-center">{description}</div>
         <div className="text-secondary text-center">SAS Token Expiration: {expires}</div>
         {isError && <div style={{ color: 'red' }}>This SAS token is expired</div>}

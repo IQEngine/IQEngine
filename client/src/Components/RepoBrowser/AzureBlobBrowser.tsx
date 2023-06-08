@@ -47,21 +47,21 @@ const AzureBlobBrowser = () => {
         <form className="m-3 mt-8">
           <label>Storage Account Name:</label>
           <input
-            className="mb-3 w-full rounded mt-1 h-8 p-1 bg-accent text-black"
+            className="mb-3 w-full rounded mt-1 h-8 p-1 bg-accent text-base-100"
             type="text"
             defaultValue={account}
             onChange={onAccountNameChange}
           />
           <label>Container Name:</label>
           <input
-            className="mb-3 w-full rounded mt-1 h-8 p-1 bg-accent text-black"
+            className="mb-3 w-full rounded mt-1 h-8 p-1 bg-accent text-base-100"
             type="text"
             defaultValue={container}
             onChange={onContainerNameChange}
           />
           <label>SAS Token for Container:</label>
           <input
-            className="w-full rounded mt-1 h-8 p-1 bg-accent text-black"
+            className="w-full rounded mt-1 h-8 p-1 bg-accent text-base-100"
             type="password"
             defaultValue={sasToken}
             onChange={onSasTokenChange}
