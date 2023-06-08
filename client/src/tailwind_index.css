@@ -42,7 +42,7 @@
   }
 
   .repocard {
-    @apply card rounded-xl w-72 m-3 bg-neutral shadow-primary shadow-md;
+    @apply card rounded-xl w-72 m-3 bg-neutral bg-opacity-50 shadow-primary shadow-md;
   }
 
   .repocardheader {
@@ -50,7 +50,7 @@
   }
 
   .repocardbody {
-    @apply card-body px-3 pt-3 bg-opacity-60;
+    @apply card-body px-3 pt-3;
   }
 
   .repocardbutton {
