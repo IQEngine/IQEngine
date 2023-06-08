@@ -4,8 +4,12 @@ import RepoBrowser from '@/Components/RepoBrowser/RepoBrowser';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 
-describe("Test RepoBrowser", () => {
+import { configureStore } from '@reduxjs/toolkit';
+import { BrowserRouter as Router } from 'react-router-dom';
+import connectionReducer from '@/Store/Reducers/ConnectionReducer';
+import { Provider } from 'react-redux';
 
+describe('Test RepoBrowser', () => {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
@@ -13,6 +17,22 @@ describe("Test RepoBrowser", () => {
       },
     },
   });
+
+  const store = configureStore({
+    reducer: {
+      connection: connectionReducer,
+      // other reducers go here
+    },
+  });
+
+  const AllProviders = ({ children }) => (
+    <Provider store={store}>
+      <QueryClientProvider client={queryClient}>
+        <Router>{children}</Router>
+      </QueryClientProvider>
+    </Provider>
+  );
+
   const wrapper = ({ children }) => <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
   beforeAll(() => {
     import.meta.env.VITE_DETECTOR_ENDPOINT = 'http://127.0.0.1:8000/detectors/';
@@ -30,6 +50,6 @@ describe("Test RepoBrowser", () => {
   });
 
   test('Basic Rendering', async () => {
-    render(<RepoBrowser></RepoBrowser>);
+    render(<RepoBrowser></RepoBrowser>, { wrapper: AllProviders });
   });
 });
