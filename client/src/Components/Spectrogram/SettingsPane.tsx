@@ -152,7 +152,7 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
         <span className="label-text text-base">Toggle Cursors</span>
         <input
           type="checkbox"
-          className="toggle checkbox checkbox-primary float-right"
+          className="toggle toggle-primary float-right"
           onChange={props.toggleCursors}
         />
       </label>
@@ -302,7 +302,7 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
       <div className="mb-3" id="toggleFreq">
         <label className="label">
           <span className="label-text text-base">Display RF Freq</span>
-          <input type="checkbox" className="toggle checkbox checkbox-primary" onChange={props.toggleIncludeRfFreq} />
+          <input type="checkbox" className="toggle toggle-primary" onChange={props.toggleIncludeRfFreq} />
         </label>
       </div>
       {/* TODO: Reenable this when we found out how to avoid the performance problems. */}
