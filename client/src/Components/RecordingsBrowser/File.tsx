@@ -98,7 +98,7 @@ export default function FileRow({ item }: FileRowProps) {
           <dialog ref={modal} className="modal w-full h-full">
             <form method="dialog" className="modal-box  max-w-full">
               <h3 className="font-bold text-lg text-primary">{item.getFileName()}</h3>
-              <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 text-primary" onClick={toggle}>
+              <button className="absolute right-2 top-2 text-primary" onClick={toggle}>
                 ✕
               </button>
               <div className="grid justify-items-stretch">

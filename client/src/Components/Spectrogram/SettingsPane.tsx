@@ -173,11 +173,7 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
       </div>
       <div>
         {/* When you press this button it will make autoscale run during the next call to selectFft, then it will turn itself off */}
-        <button
-          className="mb-3 btn btn-primary btn-sm"
-          onClick={props.handleAutoScale}
-          style={{ width: '100%', marginTop: '5px' }}
-        >
+        <button className="mb-3" onClick={props.handleAutoScale} style={{ width: '100%', marginTop: '5px' }}>
           Autoscale Max/Min
         </button>
       </div>
@@ -203,7 +199,7 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
             defaultValue={state.size}
             onChange={onChangeFftsize}
           />
-          <button className="btn btn-primary btn-sm rounded-none rounded-r" onClick={onSubmitFftsize}>
+          <button className="rounded-none rounded-r" onClick={onSubmitFftsize}>
             <FontAwesomeIcon icon={faArrowRight} />
           </button>
         </div>
@@ -232,7 +228,7 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
                 defaultValue={state.taps}
                 onChange={onChangeTaps}
               />
-              <button className="btn btn-primary btn-sm rounded-none rounded-r" onClick={onSubmitTaps}>
+              <button className="rounded-none rounded-r" onClick={onSubmitTaps}>
                 <FontAwesomeIcon icon={faArrowRight} />
               </button>
             </div>
@@ -240,7 +236,7 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
 
           <div className="mb-3 flex">
             <div className="dropdown dropdown-hover">
-              <label tabIndex={0} className="btn btn-primary btn-sm m-1">
+              <label tabIndex={0} className="m-1">
                 Example Filter Taps
               </label>
               <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
@@ -272,7 +268,7 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
 
       <div className="mb-3 flex">
         <div className="dropdown dropdown-hover">
-          <label tabIndex={0} className="btn btn-primary btn-sm m-1">
+          <label tabIndex={0} className="m-1">
             Window
           </label>
           <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
@@ -323,9 +319,7 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
             onChange={onChangePythonSnippet}
             value={state.pythonSnippet}
           />
-          <button className="btn btn-primary btn-sm" onClick={onSubmitPythonSnippet}>
-            Run Python
-          </button>
+          <button onClick={onSubmitPythonSnippet}>Run Python</button>
         </div>
       )}
     </div>

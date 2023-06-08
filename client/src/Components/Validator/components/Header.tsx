@@ -14,7 +14,7 @@ const HeaderButton: React.FC<
   } & React.ButtonHTMLAttributes<HTMLButtonElement>
 > = ({ title, onClick, children, ...buttonProps }) => {
   return (
-    <button type="button" className="btn btn-default" title={title} onClick={onClick} {...buttonProps}>
+    <button title={title} onClick={onClick} {...buttonProps}>
       {children}
     </button>
   );

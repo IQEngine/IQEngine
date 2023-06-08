@@ -2,6 +2,7 @@
 module.exports = {
   content: ['./src/**/*.{js,jsx,ts,tsx}'],
   daisyui: {
+    styled: false, // don't use daisyui's built-in styles, explicit > implicit
     themes: [
       {
         mytheme: {
@@ -11,10 +12,6 @@ module.exports = {
           neutral: '#0f172a',
           'base-100': '#05041C',
           'base-content': '#f4f4f5',
-          info: '#386BE0',
-          success: '#149964',
-          warning: '#A07E0D',
-          error: '#F9666B',
         },
       },
     ],

@@ -14,18 +14,14 @@ export default function CopyLink({ shareURL, onShare }: CopyLinkProps) {
   }
 
   if (!shareURL) {
-    return (
-      <button className="btn btn-default" type="button" onClick={onShare}>
-        Share
-      </button>
-    );
+    return <button onClick={onShare}>Share</button>;
   }
 
   return (
     <div className="input-group">
       <input type="text" ref={input} className="form-control" defaultValue={shareURL} />
       <span className="input-group-btn">
-        <button className="btn btn-default" type="button" onClick={onCopyClick}>
+        <button onClick={onCopyClick}>
           <i className="glyphicon glyphicon-copy" />
         </button>
       </span>

@@ -38,9 +38,7 @@ class ErrorBoundary extends Component<Props, State> {
         <div className="alert alert-danger">
           <p>The following error was encountered:</p>
           <pre>{error.message}</pre>
-          <button className="btn" onClick={this.resetErrorBoundary}>
-            Refresh Form
-          </button>
+          <button onClick={this.resetErrorBoundary}>Refresh Form</button>
         </div>
       );
     }

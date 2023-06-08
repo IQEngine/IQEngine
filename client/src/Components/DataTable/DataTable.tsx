@@ -137,7 +137,6 @@ export const DataTable = ({ dataColumns, dataRows }: TableProps) => {
         <div className="flex flex-row">
           <button
             aria-label="previous page"
-            className="btn btn-primary btn-sm"
             onClick={() => setCurrentPage((page) => Math.max(page - 1, 1))}
             disabled={currentPage <= 1}
           >
@@ -145,7 +144,6 @@ export const DataTable = ({ dataColumns, dataRows }: TableProps) => {
           </button>
           <button
             aria-label="next page"
-            className="btn btn-primary btn-sm"
             onClick={() => setCurrentPage((page) => Math.min(page + 1, maxPage))}
             disabled={currentPage >= maxPage}
           >
