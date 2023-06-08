@@ -50,7 +50,7 @@
   }
 
   .repocardbody {
-    @apply card-body px-3 bg-opacity-60;
+    @apply card-body px-3 pt-3 bg-opacity-60;
   }
 
   .repocardbutton {
