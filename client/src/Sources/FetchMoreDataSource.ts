@@ -28,12 +28,12 @@ export function convolve(array, taps) {
   return output;
 }
 
-async function callPyodide(pyodide, pythonSnippet, samples) {
-  console.log('Running Python Snippet');
+function callPyodide(pyodide, pythonSnippet, samples) {
+  console.debug('Running Python Snippet');
 
   // if for some reason it's still not initialized, return samples without modification
   if (!pyodide) {
-    console.log('Pyodide isnt initialized yet');
+    console.debug('Pyodide isnt initialized yet');
     return samples;
   }
 
@@ -45,19 +45,19 @@ async function callPyodide(pyodide, pythonSnippet, samples) {
   pythonSnippet = 'import numpy as np\nx = np.asarray(x)\n' + pythonSnippet + '\nx = x.tolist()';
 
   // TODO: print python errors to console somehow, look at https://pyodide.org/en/stable/usage/api/python-api/code.html#pyodide.code.eval_code
-  await pyodide.runPythonAsync(pythonSnippet, { globals: myNamespace });
+  pyodide.runPython(pythonSnippet, { globals: myNamespace });
 
   samples = myNamespace.toJs().get('x'); // pull out python variable x
 
   return samples;
 }
 
-export async function applyProcessing(samples, taps, pythonSnippet, pyodide) {
-  if (taps.length !== 1) {
+export function applyProcessing(samples, taps, pythonSnippet, pyodide) {
+  if (taps && taps.length !== 1) {
     samples = convolve(samples, taps); // we apply the taps here and not in the FFT calcs so transients dont hurt us as much
   }
-  if (pythonSnippet !== '') {
-    samples = await callPyodide(pyodide, pythonSnippet, samples);
+  if (pyodide && pythonSnippet) {
+    samples = callPyodide(pyodide, pythonSnippet, samples);
   }
   return samples;
 }
@@ -92,8 +92,8 @@ export function convertToFloat32(buffer, dataType) {
   } else if (dataType === 'cf64_le') {
     return Float32Array.from(new Float64Array(buffer));
   } else {
-    console.error('unsupported dataType', dataType);
-    return new Int16Array(buffer);
+    console.error('unsupported dataType');
+    return new Float32Array(buffer);
   }
 }
 

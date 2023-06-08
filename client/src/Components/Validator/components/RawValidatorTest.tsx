@@ -32,15 +32,11 @@ export default function RawValidatorTest({ validator, schema, formData }: RawVal
         with Ajv instead.
       </details>
       <div style={{ marginBottom: '10px' }}>
-        <button className="btn btn-default" type="button" onClick={handleRawClick}>
-          Raw Validate
-        </button>
+        <button onClick={handleRawClick}>Raw Validate</button>
         {rawValidation && (
           <>
             <span> </span>
-            <button className="btn btn-default" type="button" onClick={handleClearClick}>
-              Clear
-            </button>
+            <button onClick={handleClearClick}>Clear</button>
           </>
         )}
       </div>

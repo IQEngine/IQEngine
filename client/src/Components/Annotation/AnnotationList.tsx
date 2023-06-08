@@ -10,26 +10,50 @@ import {
   validateFrequency,
   validateDate,
 } from '@/Utils/rfFunctions';
-import { useAppSelector, useAppDispatch } from '@/Store/hooks';
 import AutoSizeInput from '@/Components/AutoSizeInput/AutoSizeInput';
-import { setMetaAnnotation } from '@/Store/Reducers/FetchMetaReducer';
+import { Annotation, SigMFMetadata } from '@/Utils/sigmfMetadata';
 
-export const AnnotationList = ({ updateSpectrogram }) => {
+interface AnnotationListProps {
+  meta: SigMFMetadata;
+  setHandleTop: any;
+  spectrogramHeight: number;
+  setMeta: (meta: SigMFMetadata) => void;
+}
+
+export const AnnotationList = ({ meta, setHandleTop, spectrogramHeight, setMeta }: AnnotationListProps) => {
   const [parents, setParents] = useState([]);
   const [data, setData] = useState([]);
+  const originalColumns = [
+    { title: 'Annotation', dataIndex: 'annotation' },
+    { title: 'Frequency Range', dataIndex: 'frequencyRange' },
+    { title: 'BW', dataIndex: 'bandwidthHz' },
+    { title: 'Label', dataIndex: 'label' },
+    { title: 'Time Range', dataIndex: 'timeRange' },
+    { title: 'Duration', dataIndex: 'duration' },
+    { title: 'Actions', dataIndex: 'actions' },
+  ];
+  const [columns, setColumns] = useState(originalColumns);
 
-  const meta = useAppSelector((state) => state.meta);
-  const blob = useAppSelector((state) => state.blob);
-  const dispatch = useAppDispatch();
+  const calculateColumns = useCallback(() => {
+    if (data.length > 0) {
+      const newColumns = originalColumns.filter((column) => {
+        if (data.find((row) => row[column.dataIndex] !== undefined)) {
+          return column;
+        }
+      });
+      setColumns(newColumns);
+    }
+  }, [columns, data]);
 
   const getActions = useCallback(
     (startSampleCount) => {
       return (
         <div>
           <button
-            className="btn-primary"
             onClick={() => {
-              updateSpectrogram(startSampleCount);
+              const fractionIntoFile = startSampleCount / meta.getLengthInIQSamples();
+              const handleTop = fractionIntoFile * spectrogramHeight;
+              setHandleTop(handleTop);
             }}
           >
             <ArrowRightIcon className="h-4 w-4" />
@@ -37,24 +61,25 @@ export const AnnotationList = ({ updateSpectrogram }) => {
         </div>
       );
     },
-    [updateSpectrogram]
+    [meta, spectrogramHeight, setHandleTop]
   );
 
   const updateAnnotation = useCallback(
     (value, parent) => {
+      if (!meta) return;
       let newAnnotationValue = value;
 
       // Get the min and max frequencies
-      const minFreq = meta.captures[0]['core:frequency'] - meta.global['core:sample_rate'] / 2;
-      const maxFreq = meta.captures[0]['core:frequency'] + meta.global['core:sample_rate'] / 2;
+      const minFreq = meta.getCenterFrequency() - meta.getSampleRate() / 2;
+      const maxFreq = meta.getCenterFrequency() + meta.getSampleRate() / 2;
 
       // Get sample rate and sample start
-      const sampleRate = Number(meta.global['core:sample_rate']);
+      const sampleRate = Number(meta.getSampleRate());
       const sampleStart = Number(parent.annotation['core:sample_start']);
 
       // Get the start and end dates
       const startDate = meta.captures[0]['core:datetime'];
-      const endDate = calculateDate(meta.captures[0]['core:datetime'], blob.totalIQSamples, sampleRate);
+      const endDate = calculateDate(meta.captures[0]['core:datetime'], meta.getTotalSamples(), sampleRate);
 
       if (parent.name == 'core:freq_lower_edge') {
         newAnnotationValue = getOriginalFrequency(value, parent.object.unit);
@@ -72,12 +97,13 @@ export const AnnotationList = ({ updateSpectrogram }) => {
 
       let updatedAnnotation = { ...parent.annotation };
       updatedAnnotation[parent.name] = newAnnotationValue ? newAnnotationValue : updatedAnnotation[parent.name];
+      meta.annotations[parent.index] = Object.assign(new Annotation(), updatedAnnotation);
 
       setData(calculateAnnotationsData());
-      dispatch(setMetaAnnotation({ index: parent.index, annotation: updatedAnnotation }));
-      updateSpectrogram();
+      let new_meta = Object.assign(new SigMFMetadata(), meta);
+      setMeta(new_meta);
     },
-    [meta, blob]
+    [meta]
   );
 
   const calculateAnnotationsData = useCallback(() => {
@@ -189,7 +215,12 @@ export const AnnotationList = ({ updateSpectrogram }) => {
               onBlur={updateAnnotation}
             />
           ),
-          timeRange: (
+          duration: duration.time + duration.unit,
+          actions: getActions(startSampleCount),
+        };
+
+        if (startTime && endTime) {
+          currentData['timeRange'] = (
             <div className="flex flex-row">
               <div>
                 <AutoSizeInput
@@ -209,10 +240,8 @@ export const AnnotationList = ({ updateSpectrogram }) => {
                 />
               </div>
             </div>
-          ),
-          duration: duration.time + duration.unit,
-          actions: getActions(startSampleCount),
-        };
+          );
+        }
 
         data.push(currentData);
       }
@@ -226,20 +255,11 @@ export const AnnotationList = ({ updateSpectrogram }) => {
     setData(calculateAnnotationsData());
   }, [calculateAnnotationsData]);
 
-  return (
-    <DataTable
-      dataColumns={[
-        { title: 'Annotation', dataIndex: 'annotation' },
-        { title: 'Frequency Range', dataIndex: 'frequencyRange' },
-        { title: 'BW', dataIndex: 'bandwidthHz' },
-        { title: 'Label', dataIndex: 'label' },
-        { title: 'Time Range', dataIndex: 'timeRange' },
-        { title: 'Duration', dataIndex: 'duration' },
-        { title: 'Actions', dataIndex: 'actions' },
-      ]}
-      dataRows={data}
-    />
-  );
+  useEffect(() => {
+    calculateColumns();
+  }, [data]);
+
+  return <DataTable dataColumns={columns} dataRows={data} />;
 };
 
 export default AnnotationList;

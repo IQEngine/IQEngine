@@ -3,28 +3,38 @@
 @tailwind utilities;
 
 @layer base {
+  button {
+    @apply rounded-lg bg-primary text-base-100 px-2 py-1 hover:bg-accent
+    transition-all hover:shadow-lg hover:shadow-accent/40 focus:opacity-[0.85]
+    focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none;
+  }
+
   a {
-    @apply text-iqengine-primary;
+    @apply text-primary;
   }
 
   h1 {
-    @apply text-iqengine-primary text-2xl my-4 font-bold;
+    @apply text-primary text-2xl my-4 font-bold;
   }
 
   h2 {
-    @apply text-iqengine-primary text-lg;
+    @apply text-primary text-lg;
   }
 
   h5 {
-    @apply text-iqengine-primary;
+    @apply text-primary;
   }
 
   body {
-    @apply text-iqengine-neutral;
+    @apply text-base-content;
+  }
+
+  td {
+    @apply border-b border-base-content/25;
   }
 
   .label-text {
-    @apply !text-iqengine-neutral font-bold text-center;
+    @apply !text-base-content font-bold text-center;
   }
 
   .flex-one {
@@ -32,31 +42,27 @@
   }
 
   .repocard {
-    @apply rounded-2xl h-fit border-0 border-iqengine-primary shadow-md shadow-iqengine-primary rounded-t-xl;
+    @apply card rounded-xl w-72 m-3 bg-neutral bg-opacity-50 shadow-primary shadow-md;
   }
 
   .repocardheader {
-    @apply bg-iqengine-primary rounded-t-2xl opacity-75 pl-2 pb-1 text-iqengine-bg text-lg font-bold;
+    @apply bg-primary rounded-t-xl opacity-75 pl-2 pb-1 h-8 text-base-100 text-lg font-bold text-center;
   }
 
   .repocardbody {
-    @apply bg-iqengine-bg p-1 bg-opacity-60 mt-3;
+    @apply card-body px-3 pt-3;
   }
 
   .repocardbutton {
-    @apply bg-iqengine-primary opacity-75 w-full h-8 text-iqengine-bg hover:bg-iqengine-tertiary hover:opacity-100 font-bold rounded-b-2xl rounded-t-none border-0;
+    @apply bg-primary opacity-75 text-lg py-0 text-base-100 hover:bg-accent hover:opacity-100 rounded-t-none !border-none;
   }
 
   .leadership-card-header {
-    @apply w-56 rounded-t-xl p-2 font-extrabold text-center bg-iqengine-primary text-iqengine-bg;
+    @apply w-56 rounded-t-xl p-2 text-center bg-primary text-base-100 font-bold;
   }
 
   .leadership-card-body {
-    @apply w-56 bg-iqengine-bg rounded-b-xl p-2 text-center;
-  }
-
-  .btn-primary {
-    @apply bg-iqengine-secondary hover:bg-iqengine-secondary hover:bg-opacity-50 text-white py-2 px-3 rounded;
+    @apply w-56 bg-base-100 rounded-b-xl p-2 text-center;
   }
 
   .slider {
@@ -76,7 +82,7 @@
   }
 
   .slider-track {
-    @apply absolute rounded-sm h-1 bg-neutral z-10 w-full opacity-50;
+    @apply absolute rounded-sm h-1 bg-base-content z-10 w-full opacity-50;
   }
 
   .slider-range {

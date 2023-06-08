@@ -7,7 +7,7 @@ import { upsertDataSource } from '@/Store/Reducers/ConnectionReducer';
 const fetchConfig = async () => {
   try {
     const response = await axios.get<Config>('/api/config').catch((error) => {
-      console.log(error);
+      console.log('axios config not found, using env vars instead');
       return {
         data: {
           connectionInfo: JSON.parse(import.meta.env.VITE_CONNECTION_INFO),

@@ -13,23 +13,20 @@ const SiggenTile = (props) => {
   };
 
   return (
-    <div className="flex-one repocard">
-      <div className="repocardheader" style={{ display: 'flex', justifyContent: 'space-between' }}>
-        Signal Generator
-      </div>
+    <div className="repocard">
+      <div className="repocardheader">Signal Generator</div>
       <div className="repocardbody">
-        <center>
+        <div className="grid content-center justify-center">
           <img
-            className="my-4 rounded-xl"
+            className="my-4 rounded-xl justify-center"
             src="/siggen.png"
             width="200px"
             alt="DALLE prompt - signal generator in the style of dr. seuss with a control panel"
           ></img>
-          Generate your own signals in Python, with examples!
-          <br /> <br />
-          Save as a SigMF recording!
-          <br /> <br />
-        </center>
+        </div>
+        <div className="text-center">Generate your own signals in Python, with examples!</div>
+        <div className="text-center"> Save as a SigMF recording!</div>
+        <br /> <br />
       </div>
       <button className="repocardbutton" onClick={handleOnClick}>
         Siggen

@@ -2,8 +2,9 @@ import { SigMFMetadata } from '@/Utils/sigmfMetadata';
 import { useQueries, useQuery } from '@tanstack/react-query';
 import { IQDataClientFactory } from './IQDataClientFactory';
 import { range } from '@/Utils/selector';
-import { IQDataSlice } from '../Models';
+import { DEFAULT_FFT_PARAMETERS, FFTParams, IQDataSlice } from '../Models';
 import { TILE_SIZE_IN_IQ_SAMPLES } from '@/Utils/constants';
+import { useCallback } from 'react';
 
 export const getIQDataSlice = (
   meta: SigMFMetadata,

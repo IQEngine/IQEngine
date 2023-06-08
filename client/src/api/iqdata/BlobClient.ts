@@ -26,6 +26,6 @@ export class BlobClient implements IQDataClient {
     const blobBody = await (await download.blobBody).arrayBuffer();
     const iqArray = convertToFloat32(blobBody, meta.getDataType());
     console.log(`getIQDataSlice ${file_path} ${index} took:`, performance.now() - startTime, 'ms');
-    return Promise.resolve({ index, iqArray });
+    return { index, iqArray };
   }
 }
