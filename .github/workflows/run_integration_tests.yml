@@ -1,7 +1,7 @@
 name: Run frontend integration tests
 
 on:
-  pull_request:
+  push:
     # only runs on PRs that target main
     # branches:
     #   - main
