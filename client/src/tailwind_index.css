@@ -46,7 +46,7 @@
   }
 
   .repocardheader {
-    @apply bg-primary rounded-t-xl opacity-75 pl-2 pb-1 h-8 text-base-100 text-lg font-bold;
+    @apply bg-primary rounded-t-xl opacity-75 pl-2 pb-1 h-8 text-base-100 text-lg font-bold text-center;
   }
 
   .repocardbody {

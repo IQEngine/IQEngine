@@ -14,7 +14,7 @@ const ValidatorTile = (props) => {
 
   return (
     <div className="repocard">
-      <div className="repocardheader grid content-center justify-center">SigMF Meta Validator</div>
+      <div className="repocardheader">SigMF Meta Validator</div>
       <div className="repocardbody">
         <div className="grid content-center justify-center">
           <img
