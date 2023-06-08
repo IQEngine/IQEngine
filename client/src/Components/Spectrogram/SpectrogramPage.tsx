@@ -377,56 +377,56 @@ export const SpectrogramPage = () => {
           <div className="flex flex-col">
             <ul className="flex space-x-2 border-b border-primary w-full sm:pl-12 lg:pl-32" id="tabsbar">
               <li>
-                <button
+                <div
                   onClick={() => {
                     handleProcessTime();
                     setCurrentTab('spectrogram');
                   }}
                   className={` ${
-                    currentTab === 'spectrogram' ? 'bg-primary !text-black' : ''
-                  } inline-block px-3 py-0 outline  outline-primary outline-1 text-lg text-primary hover:text-green-900`}
+                    currentTab === 'spectrogram' ? 'bg-primary !text-base-100' : ''
+                  } inline-block px-3 py-0 outline  outline-primary outline-1 text-lg text-primary hover:text-accent hover:shadow-lg hover:shadow-accent`}
                 >
                   Spectrogram
-                </button>
+                </div>
               </li>
               <li>
-                <button
+                <div
                   onClick={() => {
                     handleProcessTime();
                     setCurrentTab('time');
                   }}
                   className={` ${
-                    currentTab === 'time' ? 'bg-primary !text-black' : ''
-                  } inline-block px-3 py-0 outline outline-primary outline-1 text-lg text-primary hover:text-green-900`}
+                    currentTab === 'time' ? 'bg-primary !text-base-100' : ''
+                  } inline-block px-3 py-0 outline outline-primary outline-1 text-lg text-primary hover:text-accent hover:shadow-lg hover:shadow-accent`}
                 >
                   Time
-                </button>
+                </div>
               </li>
               <li>
-                <button
+                <div
                   onClick={() => {
                     handleProcessTime();
                     setCurrentTab('frequency');
                   }}
                   className={` ${
-                    currentTab === 'frequency' ? 'bg-primary !text-black' : ''
-                  } inline-block px-3 py-0 outline  outline-primary outline-1 text-lg text-primary hover:text-green-900`}
+                    currentTab === 'frequency' ? 'bg-primary !text-base-100' : ''
+                  } inline-block px-3 py-0 outline  outline-primary outline-1 text-lg text-primary hover:text-accent hover:shadow-lg hover:shadow-accent`}
                 >
                   Frequency
-                </button>
+                </div>
               </li>
               <li>
-                <button
+                <div
                   onClick={() => {
                     handleProcessTime();
                     setCurrentTab('iq');
                   }}
                   className={` ${
-                    currentTab === 'iq' ? 'bg-primary !text-black' : ''
-                  } inline-block px-3 py-0 outline  outline-primary outline-1 text-lg text-primary hover:text-green-900`}
+                    currentTab === 'iq' ? 'bg-primary !text-base-100' : ''
+                  } inline-block px-3 py-0 outline  outline-primary outline-1 text-lg text-primary hover:text-accent hover:shadow-lg hover:shadow-accent`}
                 >
                   IQ Plot
-                </button>
+                </div>
               </li>
             </ul>
             <div className="p-0 ml-0 mr-0 mb-0 mt-2">
@@ -530,7 +530,7 @@ export const SpectrogramPage = () => {
 
         <div className="mt-3 mb-0 px-2 py-0" style={{ margin: '5px' }}>
           <details>
-            <summary className="pl-2 mt-2 bg-primary outline outline-1 outline-primary text-lg text-black hover:bg-green-800">
+            <summary className="pl-2 mt-2 bg-primary outline outline-1 outline-primary text-lg text-base-100 hover:bg-green-800">
               Annotations
             </summary>
             <div className="outline outline-1 outline-primary p-2">
@@ -544,13 +544,13 @@ export const SpectrogramPage = () => {
           </details>
 
           <details>
-            <summary className="pl-2 mt-2 bg-primary outline outline-1 outline-primary text-lg text-black hover:bg-green-800">
+            <summary className="pl-2 mt-2 bg-primary outline outline-1 outline-primary text-lg text-base-100 hover:bg-green-800">
               Metadata
             </summary>
             <div className="outline outline-1 outline-primary p-2">
               <div className="flex flex-row">
                 <button
-                  className="btn btn-primary btn-sm mb-1 text-right"
+                  className="mb-1 text-right"
                   onClick={() => {
                     downloadInfo();
                   }}
@@ -559,7 +559,7 @@ export const SpectrogramPage = () => {
                   Download meta JSON
                 </button>
                 {/* TODO: Add in when PUT is working <button
-              className="btn btn-primary btn-sm text-right ml-1"
+              className="text-right ml-1"
               onClick={() => {
                 this.handleMeta();
                 this.saveMeta();

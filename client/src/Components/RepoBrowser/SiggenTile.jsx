@@ -14,7 +14,7 @@ const SiggenTile = (props) => {
 
   return (
     <div className="repocard">
-      <div className="repocardheader grid content-center justify-center">Signal Generator</div>
+      <div className="repocardheader">Signal Generator</div>
       <div className="repocardbody">
         <div className="grid content-center justify-center">
           <img

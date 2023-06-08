@@ -61,24 +61,21 @@ const LocalFileBrowser = () => {
 
   return (
     <div className="repocard">
-      <h2 className="repocardheader grid content-center justify-center">Browse Local Files</h2>
-      <div className="card-body grid justify-items-center">
-        <div className="grid justify-items-center mt-10">
+      <h2 className="repocardheader">Browse Local Files</h2>
+      <div className="repocardbody">
+        <div className="grid justify-items-center mt-12 space-y-4">
           {directoryPickerAvailable && (
             <>
-              <button className="btn btn-primary opacity-75" onClick={openDir}>
-                Open Local Directory
-              </button>
-              OR
+              <button onClick={openDir}>Open Local Directory</button>
+              <p>OR</p>
             </>
           )}
-          <br />
-          <button className="btn btn-primary opacity-75" onClick={openFile}>
+          <button onClick={openFile}>
             Select 1 .sigmf-meta
             <br />
             and 1 .sigmf-data
           </button>
-          <div className="text-secondary mb-3">
+          <div className="text-secondary text-center">
             Note: FFTs and visualizations are done client-side (the data won't be uploaded anywhere)
           </div>
         </div>

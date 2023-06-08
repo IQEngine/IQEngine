@@ -50,7 +50,6 @@ export const AnnotationList = ({ meta, setHandleTop, spectrogramHeight, setMeta 
       return (
         <div>
           <button
-            className="btn btn-primary btn-sm"
             onClick={() => {
               const fractionIntoFile = startSampleCount / meta.getLengthInIQSamples();
               const handleTop = fractionIntoFile * spectrogramHeight;

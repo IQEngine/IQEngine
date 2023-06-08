@@ -3,6 +3,12 @@
 @tailwind utilities;
 
 @layer base {
+  button {
+    @apply rounded-lg bg-primary text-base-100 px-2 py-1 hover:bg-accent
+    transition-all hover:shadow-lg hover:shadow-accent/40 focus:opacity-[0.85]
+    focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none;
+  }
+
   a {
     @apply text-primary;
   }
@@ -36,27 +42,27 @@
   }
 
   .repocard {
-    @apply card w-72 m-2 bg-neutral shadow-primary shadow-md;
+    @apply card rounded-xl w-72 m-3 bg-neutral bg-opacity-50 shadow-primary shadow-md;
   }
 
   .repocardheader {
-    @apply bg-primary rounded-t-xl opacity-75 pl-2 pb-1 h-8 text-base-100 text-lg font-bold;
+    @apply bg-primary rounded-t-xl opacity-75 pl-2 pb-1 h-8 text-base-100 text-lg font-bold text-center;
   }
 
   .repocardbody {
-    @apply card-body px-3 bg-opacity-60;
+    @apply card-body px-3 pt-3;
   }
 
   .repocardbutton {
-    @apply bg-primary opacity-75 w-full h-6 text-base-100 hover:bg-accent hover:opacity-100 !rounded-b-xl rounded-t-none !border-none;
+    @apply bg-primary opacity-75 text-lg py-0 text-base-100 hover:bg-accent hover:opacity-100 rounded-t-none !border-none;
   }
 
   .leadership-card-header {
-    @apply w-56 rounded-t-xl p-2 font-extrabold text-center bg-primary text-base-content;
+    @apply w-56 rounded-t-xl p-2 text-center bg-primary text-base-100 font-bold;
   }
 
   .leadership-card-body {
-    @apply w-56 bg-neutral rounded-b-xl p-2 text-center;
+    @apply w-56 bg-base-100 rounded-b-xl p-2 text-center;
   }
 
   .slider {
