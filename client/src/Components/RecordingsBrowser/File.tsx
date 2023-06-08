@@ -90,7 +90,7 @@ export default function FileRow({ item }: FileRowProps) {
       <td className="align-middle">
         <div>
           <button
-            className="mb-2 rounded border-2 border-secondary p-1 hover:bg-secondary hover:text-black"
+            className="mb-2 rounded border-2 border-secondary p-1 hover:bg-secondary hover:text-base-100"
             onClick={toggle}
           >
             {item.annotations?.length ?? 0}
