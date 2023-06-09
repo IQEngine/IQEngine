@@ -1,4 +1,4 @@
-name: Run frontend integration tests
+name: Run Playwright frontend integration tests
 
 on:
   push:
@@ -17,8 +17,8 @@ on:
 #       - completed
 
 jobs:
-  integration:
-    name: RunIntegrationTests
+  playwright:
+    name: RunPlaywrightTests
     runs-on: ubuntu-latest
 
     steps:
@@ -27,5 +27,5 @@ jobs:
       - name: Run Playwright tests
         run: |
           npm install
-          npx playwright install
+          npx playwright install --with-deps
           npx playwright test --config playwright-pr.config.ts --reporter list
