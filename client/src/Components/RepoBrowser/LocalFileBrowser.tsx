@@ -38,7 +38,6 @@ const LocalFileBrowser = () => {
   const openFile = async () => {
     const files = await fileOpen({
       multiple: true,
-      extensions: ['.sigmf-meta', '.sigmf-data'],
     });
     let fileWithoutExtrension = files[0].webkitRelativePath.replace('.sigmf-meta', '').replace('.sigmf-data', '');
     setFilePath(fileWithoutExtrension);
