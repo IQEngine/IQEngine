@@ -1,20 +1,12 @@
 name: Run Playwright frontend integration tests
 
 on:
-  push:
-    # only runs on PRs that target main
-    # branches:
-    #   - main
-    # paths:
-    #   - client/**
+  workflow_run:
+    workflows: ["Deploy To PR"]
+    branches: [main]
+    types:
+      - completed
   workflow_dispatch:
-
-# on:
-#   workflow_run:
-#     workflows: ["Deploy To PR"]
-#     branches: [main]
-#     types:
-#       - completed
 
 jobs:
   playwright:
