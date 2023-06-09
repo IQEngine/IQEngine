@@ -81,11 +81,7 @@ export const Actions = ({
               value={currentAnnotation}
             ></textarea>
           </div>
-          <button
-            aria-label={'Annotation ' + index + ' Modal Update Button'}
-            className="btn btn-primary btn-sm"
-            onClick={onUpdateHandler}
-          >
+          <button aria-label={'Annotation ' + index + ' Modal Update Button'} onClick={onUpdateHandler}>
             Update
           </button>
         </form>
