@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { upsertDataSource } from '@/Store/Reducers/ConnectionReducer';
 import { useAppDispatch } from '@/Store/hooks';
 import { CLIENT_TYPE_BLOB, DataSource } from '@/api/Models';
+import toast from 'react-hot-toast';
 
 const AzureBlobBrowser = () => {
   const dispatch = useAppDispatch();
@@ -28,6 +29,38 @@ const AzureBlobBrowser = () => {
 
   const onSubmit = async (event) => {
     event.preventDefault();
+    if (account === '' || container === '' || sasToken === '') {
+      toast('Please fill in all blob fields', {
+        duration: 5000,
+        position: 'top-center',
+        icon: '😖',
+        className: 'bg-red-100 font-bold',
+      });
+      return;
+    }
+    // This code has been extracted from the way that validation of sas token it si done now on RepoBrowser.tsx
+    const tempExpires = sasToken.slice(sasToken.search('se')).split('&')[0].slice(3, 13); // YEAR-MONTH-DAY
+    if (tempExpires.length !== 10) {
+      toast('SAS token invalid', {
+        icon: '😖',
+        className: 'bg-red-100 font-bold',
+      });
+      return;
+    }
+    const todayDate = new Date();
+    const todayFormattedDate = todayDate.toISOString().substring(0, 10);
+    const tempDayDifference = Math.abs((Date.parse(todayFormattedDate) - Date.parse(tempExpires)) / 86400000);
+    if (todayFormattedDate > tempExpires) {
+      toast('SAS Token has expired', {
+        icon: '😖',
+        className: 'bg-red-100 font-bold',
+      });
+      return;
+    } else if (tempDayDifference < 7) {
+      toast('Warning this is close to expiration', {
+        icon: '⚠️',
+      });
+    }
     var dataSource = {
       name: account + '/' + container,
       type: 'blob',
