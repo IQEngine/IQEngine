@@ -1,8 +1,9 @@
+---
 name: Run Playwright frontend integration tests
 
 on:
   workflow_run:
-    workflows: ["Deploy To PR"]
+    workflows: ['Deploy To PR']
     branches: [main]
     types:
       - completed
@@ -29,4 +30,4 @@ jobs:
 
       - name: Run Playwright tests
         run: |
-          npx playwright test --config playwright-pr.config.ts 
+          npx playwright test --config playwright-pr.config.ts
