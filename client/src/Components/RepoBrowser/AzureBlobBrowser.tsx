@@ -30,7 +30,7 @@ const AzureBlobBrowser = () => {
   const onSubmit = async (event) => {
     event.preventDefault();
     if (account === '' || container === '' || sasToken === '') {
-      toast('Please fill in all blob fields', {
+      toast('Please fill in all blob storage account credential fields.', {
         duration: 5000,
         position: 'top-center',
         icon: '😖',
@@ -57,7 +57,7 @@ const AzureBlobBrowser = () => {
       });
       return;
     } else if (tempDayDifference < 7) {
-      toast('Warning this is close to expiration', {
+      toast('Warning: the SAS token is within 7 days of expiration.', {
         icon: '⚠️',
       });
     }
