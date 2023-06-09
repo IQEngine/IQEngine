@@ -6,19 +6,17 @@ export interface MetaViewerProps {
 }
 
 export const MetaViewer = ( { meta }  : MetaViewerProps) => {
-    return ( 
+    return (
         <div className="border border-primary ml-3 mt-2">
             <div className="flex mt-3 mb-3 stats shadow">
             <div className="stat place-items-center">
                 <div className="stat-title">data type</div>
                 <div className="stat-value">{meta.getDataType()}</div>
             </div>
-            
             <div className="stat place-items-center">
                 <div className="stat-title">offset</div>
                 <div className="stat-value">{meta.getOffset()}</div>
             </div>
-            
             <div className="stat place-items-center">
                 <div className="stat-title">sample rate</div>
                 <div className="stat-value">{meta.getSampleRate()}</div>
