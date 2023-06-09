@@ -28,9 +28,7 @@ export class LocalClient implements MetadataClient {
     }
 
     if (!metadata.global['traceability:sample_length']) {
-      console.log(dataFile);
       metadata.global['traceability:sample_length'] = Math.round(dataFile.size / 2 / metadata.getBytesPerSample());
-      console.log('sample_length', metadata.global['traceability:sample_length']);
     }
     metadata.annotations = metadata.annotations.map((annotation) => Object.assign(new Annotation(), annotation));
     metadata.captures = metadata.captures.map((capture) => Object.assign(new CaptureSegment(), capture));
