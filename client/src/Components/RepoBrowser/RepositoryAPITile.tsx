@@ -15,7 +15,20 @@ const RepositoryAPITile = (props) => {
 
   const { type, name, account, container, imageURL, description } = item;
   const [isDisabled, setIsDisabled] = useState(false);
-  const [writeableBool, setWriteableBool] = useState<any>();
+  const [writeableBool, setWriteableBool] = useState<any>(true);
+
+  useEffect(() => {
+    const writeable = true; // boolean
+    if (writeable) {
+      setWriteableBool(<div className="mr-2 mt-2 text-xs">R/W</div>);
+    } else {
+      setWriteableBool(
+        <div className="mr-2 mt-2 text-xs inline">
+          R<div className="inline text-gray-400">/W</div>
+        </div>
+      );
+    }
+  }, [type]);
 
   const handleOnClick = async () => {
     // so we can fetch when someone is linked to a repo directly
