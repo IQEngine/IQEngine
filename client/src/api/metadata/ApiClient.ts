@@ -7,10 +7,10 @@ export class ApiClient implements MetadataClient {
     const response = await axios.get(`/api/datasources/${account}/${container}/${filePath}`);
     let responseMetaData: SigMFMetadata | null = null;
     responseMetaData = Object.assign(new SigMFMetadata(), response.data);
-    responseMetaData.annotations = responseMetaData.annotations.map((annotation) =>
+    responseMetaData.annotations = responseMetaData.annotations?.map((annotation) =>
       Object.assign(new Annotation(), annotation)
     );
-    responseMetaData.captures = responseMetaData.captures.map((capture) =>
+    responseMetaData.captures = responseMetaData.captures?.map((capture) =>
       Object.assign(new CaptureSegment(), capture)
     );
     return responseMetaData;
@@ -21,8 +21,8 @@ export class ApiClient implements MetadataClient {
     let objectFromJson = response.data;
     let responseMetaData: SigMFMetadata[] = objectFromJson.map((meta) => {
       let newMeta = Object.assign(new SigMFMetadata(), meta);
-      newMeta.annotations = newMeta.annotations.map((annotation) => Object.assign(new Annotation(), annotation));
-      newMeta.captures = newMeta.captures.map((capture) => Object.assign(new CaptureSegment(), capture));
+      newMeta.annotations = newMeta.annotations?.map((annotation) => Object.assign(new Annotation(), annotation));
+      newMeta.captures = newMeta.captures?.map((capture) => Object.assign(new CaptureSegment(), capture));
       return newMeta;
     });
     return responseMetaData;
@@ -31,10 +31,10 @@ export class ApiClient implements MetadataClient {
     const response = await axios.put(`/api/datasources/${account}/${container}/${filePath}`, meta);
     let responseMetaData: SigMFMetadata | null = null;
     responseMetaData = Object.assign(new SigMFMetadata(), response.data);
-    responseMetaData.annotations = responseMetaData.annotations.map((annotation) =>
+    responseMetaData.annotations = responseMetaData.annotations?.map((annotation) =>
       Object.assign(new Annotation(), annotation)
     );
-    responseMetaData.captures = responseMetaData.captures.map((capture) =>
+    responseMetaData.captures = responseMetaData.captures?.map((capture) =>
       Object.assign(new CaptureSegment(), capture)
     );
     return responseMetaData;

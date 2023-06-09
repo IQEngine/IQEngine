@@ -62,6 +62,45 @@ describe('ApiClient Metadata Tests', () => {
     expect(result).toEqual(testMetadata);
   });
 
+  test('getMeta should return metadata and work with no annotations or captures', async ({ expect }) => {
+    let expectedMeta = {
+      global: {
+        'core:datatype': 'cf32_le',
+        'core:sample_rate': 480000,
+        'core:version': '0.0.2',
+        'core:sha512':
+          'bb2f1f9222b172373e81d333a11a866d56611308fd481c7f9c2462e50fec62da1bddd93a94cd9b3e00dcaa6ba4ffe4546022aa50385bc582fc8dd7426740b564',
+        'core:description': '',
+        'core:author': 'Marc',
+        'core:recorder': 'GNU Radio 3.8.2',
+        'core:license': 'https://creativecommons.org/licenses/by/4.0/',
+        'traceability:revision': 1,
+        'traceability:origin': {
+          type: 'API',
+          account: 'gnuradio',
+          container: 'iqengine',
+          file_path: 'bluetooth',
+        },
+      },
+      captures: [],
+      annotations: [],
+    };
+
+    let metaJson = JSON.stringify(expectedMeta);
+    let testMetadata: SigMFMetadata | null = null;
+    testMetadata = Object.assign(new SigMFMetadata(), expectedMeta);
+    testMetadata.annotations = testMetadata.annotations.map((annotation) =>
+      Object.assign(new Annotation(), annotation)
+    );
+    testMetadata.captures = testMetadata.captures.map((capture) => Object.assign(new CaptureSegment(), capture));
+
+    nock('http://localhost:3000').get(`/api/datasources/${account}/${container}/${filePath}`).reply(200, metaJson);
+
+    const client = new ApiClient();
+    const result = await client.getMeta(account, container, filePath);
+    expect(result).toEqual(testMetadata);
+  });
+
   test('getDataSourceMeta should return an array of metadata', async ({ expect }) => {
     let expectedMeta = [
       {
