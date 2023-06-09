@@ -7,33 +7,58 @@ import numpy as np
 import io
 import skimage.measure
 from PIL import Image
+import os
 
-fft_size = 8192
-#        layer 0   1  2  3  4
-decimations = [16, 8, 4, 2, 1]
-max_layer = 4 # inclusive
+filename = '/mnt/c/Users/marclichtman/Downloads/ism_band_24.sigmf-data'
+dtype = np.int16 # np.float32
+fft_size = 16384
+initial_decimation = 4 # this should represent the most zoomed in level you want to achieve
+#        layer  0  1   2  3  4  5
+decimations = [-1, -1, 8, 4, 2, 1]
+max_layer = 5 # inclusive
+min_layer = 2 # 0 is the first allowable layer, max zoomed out, its just 1 tile
 
-# Read in samples from binary IQ file
-filename = '/home/marc/fm_wide_20MHz_3.sigmf-data'
-samples = np.fromfile(filename, dtype=np.float32) # CHANGE THIS TO MATCH YOUR FILE, e.g. np.int16 or np.int8
-samples = samples[::2] + 1j*samples[1::2]
+spectrogram_decim_list = ()
+file_split = 100 # to be able to process huge files without having the whole thing in memory
+if dtype == np.int16:
+    block_len = os.path.getsize(filename) / 2 / file_split # needs to be item size so fromfile() works properly
+elif dtype == np.float32:
+    block_len = os.path.getsize(filename) / 4 / file_split
+else:
+    print("invalid datatype")
+    exit()
+block_len = int(np.floor(block_len))
+if block_len % 2 == 1: # IQIQIQIQ
+    block_len -= 1
 
-# Calc spectrogram
-num_rows = len(samples) // fft_size
-spectrogram = np.zeros((num_rows, fft_size))
-for i in range(num_rows):
-    spectrogram[i,:] = 10*np.log10(np.abs(np.fft.fftshift(np.fft.fft(samples[i*fft_size:(i+1)*fft_size])))**2)
+for i in range(file_split):
+    print(str(i/file_split * 100) + '%')
+    # Read in samples from binary IQ file
+    samples = np.fromfile(filename, dtype=dtype, count=block_len, offset=block_len*i) / 32000
+    samples = samples[::2] + 1j*samples[1::2]
 
-# Scale to uint8 (0-255)
-spectrogram -= (np.min(spectrogram) + 20)
-spectrogram /= np.max(spectrogram)
-spectrogram *= 255
-spectrogram = np.uint8(spectrogram)
+    # Calc spectrogram
+    num_rows = len(samples) // fft_size
+    spectrogram = np.zeros((num_rows, fft_size))
+    for i in range(num_rows):
+        spectrogram[i,:] = 10*np.log10(np.abs(np.fft.fftshift(np.fft.fft(samples[i*fft_size:(i+1)*fft_size])))**2)
+
+    # Scale to uint8 (0-255)
+    spectrogram -= (np.min(spectrogram) + 20)
+    spectrogram /= np.max(spectrogram)
+    spectrogram *= 255
+    spectrogram = np.uint8(spectrogram)
+
+    # Decimate using initial decimation
+    spectrogram_decim = skimage.measure.block_reduce(spectrogram, (initial_decimation, initial_decimation), np.max)
+    spectrogram_decim_list = spectrogram_decim_list + (spectrogram_decim, )
+
+spectrogram = np.concatenate(spectrogram_decim_list, axis=0)
 
 with open("spectrogram.pmtiles", "wb") as f:
     writer = Writer(f)
 
-    for layer in range(max_layer + 1):
+    for layer in range(min_layer, max_layer + 1):
         print("starting layer", layer)
         x_len = spectrogram.shape[1] // 2**layer
         y_len = spectrogram.shape[0] // 2**layer
@@ -51,7 +76,7 @@ with open("spectrogram.pmtiles", "wb") as f:
         {
             "tile_type": TileType.PNG,
             "tile_compression": Compression.NONE,
-            "min_zoom": 0,
+            "min_zoom": min_layer,
             "max_zoom": max_layer,
             "min_lon_e7": int(-90e7),
             "min_lat_e7": int(-90e7), 
