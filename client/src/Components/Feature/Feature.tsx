@@ -1,0 +1,19 @@
+import React, { ReactNode } from 'react';
+import { useFeatureFlags } from '../FeatureFlagsContext/FeatureFlagsContext';
+
+interface Props {
+  flag: string;
+  children: ReactNode;
+}
+
+const Feature: React.FC<Props> = ({ flag, children }) => {
+  const { featureFlags } = useFeatureFlags();
+
+  if (!featureFlags) {
+    return <div>Feature flags not loaded yet</div>;
+  }
+
+  return featureFlags[flag] ? <>{children}</> : null;
+};
+
+export default Feature;

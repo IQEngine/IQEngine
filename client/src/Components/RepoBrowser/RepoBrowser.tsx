@@ -16,6 +16,7 @@ import { useAppDispatch } from '@/Store/hooks';
 import { upsertDataSource } from '@/Store/Reducers/ConnectionReducer';
 import { CLIENT_TYPE_BLOB, DataSource } from '@/api/Models';
 import { useQueryClient } from '@tanstack/react-query';
+import Feature from '../Feature/Feature';
 
 const RepoBrowser = () => {
   let [dataAvailable, setDataAvailable] = useState(false);
@@ -59,7 +60,9 @@ const RepoBrowser = () => {
       {blobDataSources.data?.map((item, i) => (
         <RepositoryTile key={i} item={item} />
       ))}
-      <LocalFileBrowser />
+      <Feature flag="useAPIDatasources">
+        <LocalFileBrowser />
+      </Feature>
       <AzureBlobBrowser />
       <SiggenTile />
       <ValidatorTile />
