@@ -10,6 +10,12 @@ import { configQuery } from './api/config/queries';
 
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
+const initialFlags = {
+  newFeature: false,
+  betaFeature: false,
+  experimentalFeature: false,
+};
+
 export const App = () => {
   // Set up google analytics (if enabled) to only share the page path (does not include names of local files)
   // ;
@@ -32,7 +38,7 @@ export const App = () => {
   }, [config]);
 
   return (
-    <FeatureFlagsProvider flags={config.data.featureFlags}>
+    <FeatureFlagsProvider flags={initialFlags}>
       <ThemeSelector>
         <div>
           <div className="container flex mb-40" id="topRow">

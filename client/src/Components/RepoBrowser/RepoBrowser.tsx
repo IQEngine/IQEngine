@@ -60,7 +60,7 @@ const RepoBrowser = () => {
       {blobDataSources.data?.map((item, i) => (
         <RepositoryTile key={i} item={item} />
       ))}
-      <Feature flag="useAPIDatasources">
+      <Feature flag="newFeature">
         <LocalFileBrowser />
       </Feature>
       <AzureBlobBrowser />
