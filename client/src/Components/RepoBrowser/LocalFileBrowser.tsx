@@ -2,7 +2,7 @@
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 
@@ -16,46 +16,45 @@ const LocalFileBrowser = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [container, setContainer] = useState<string>(null);
-  const [enabled, setEnabled] = useState(false);
-  const [filePath, setFilePath] = useState('');
-  const dataSourceQuery = getDataSource(CLIENT_TYPE_LOCAL, 'local', container, enabled);
+  const [filePath, setFilePath] = useState<string>(null);
+  const dataSourceQuery = getDataSource(CLIENT_TYPE_LOCAL, 'local', container, !!container || !!filePath);
 
   useEffect(() => {
-    if (dataSourceQuery.data) {
-      if (filePath !== '') {
-        const spectogramLink = `/spectrogram/${CLIENT_TYPE_LOCAL}/${dataSourceQuery.data.account}/${
-          dataSourceQuery.data.container
-        }/${encodeURIComponent(filePath)}`;
+    console.debug('dataSourceQuery', dataSourceQuery.data, 'container', container, 'filePath', filePath);
+    if (dataSourceQuery.data && dataSourceQuery.data.container === container) {
+      if (filePath) {
+        const spectogramLink = `/spectrogram/${CLIENT_TYPE_LOCAL}/local/single_file/${encodeURIComponent(filePath)}`;
         navigate(spectogramLink);
       } else {
         navigate(`/recordings/${CLIENT_TYPE_LOCAL}/${dataSourceQuery.data.account}/${dataSourceQuery.data.container}`);
       }
     }
-  }, [dataSourceQuery.data]);
+  }, [dataSourceQuery.data, container, filePath]);
 
   const directoryPickerAvailable = supported; // not all browsers support it yet
 
   const openFile = async () => {
+    console.log('opening local file');
     const files = await fileOpen({
       multiple: true,
     });
-    let fileWithoutExtrension = files[0].webkitRelativePath.replace('.sigmf-meta', '').replace('.sigmf-data', '');
-    setFilePath(fileWithoutExtrension);
+    console.log('files', files);
+    let fileWithoutExtrension = files[0].name.replace('.sigmf-meta', '').replace('.sigmf-data', '');
     dispatch(setLocalClient(files));
-    setEnabled(true);
+    setFilePath(fileWithoutExtrension);
   };
 
   const openDir = async () => {
+    console.log('opening local directory');
     const dirHandle = (await directoryOpen({
       recursive: true,
     })) as FileWithDirectoryAndFileHandle[];
     if (dirHandle.length === 0) {
       return;
     }
-    let container = dirHandle[0].webkitRelativePath.split('/')[0];
-    setContainer(container);
+    let containerPath = dirHandle[0].webkitRelativePath.split('/')[0];
     dispatch(setLocalClient(dirHandle));
-    setEnabled(true);
+    setContainer(containerPath);
   };
 
   return (

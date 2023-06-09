@@ -21,7 +21,9 @@ export class LocalClient implements MetadataClient {
         type: 'local',
         account: account,
         container: container,
-        file_path: file.webkitRelativePath.replace('.sigmf-meta', ''),
+        file_path: !file.webkitRelativePath
+          ? file.name.replace('.sigmf-meta', '')
+          : file.webkitRelativePath.replace('.sigmf-meta', ''),
       };
     }
 
@@ -70,14 +72,14 @@ export class LocalClient implements MetadataClient {
       Promise.reject('No local directory found');
     }
     let metadataFile: FileWithDirectoryAndFileHandle | undefined = localDirectory.find((file) => {
-      return file.webkitRelativePath === filePath + '.sigmf-meta';
+      return file.webkitRelativePath === filePath + '.sigmf-meta' || file.name === filePath + '.sigmf-meta';
     });
     console.log('metadataFile', metadataFile);
     if (!metadataFile) {
       return Promise.reject('No file found');
     }
     const dataFile = localDirectory.find((file) => {
-      return file.webkitRelativePath === filePath + '.sigmf-data';
+      return file.webkitRelativePath === filePath + '.sigmf-data' || file.name === filePath + '.sigmf-data';
     });
     if (!dataFile) {
       return Promise.reject('No file found');
