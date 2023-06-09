@@ -11,7 +11,7 @@ import { configQuery } from './api/config/queries';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 const initialFlags = {
-  newFeature: false,
+  newFeature: true,
   betaFeature: false,
   experimentalFeature: false,
 };
@@ -23,7 +23,7 @@ export const App = () => {
   const config = configQuery();
   useEffect(() => {
     if (!config.data) return;
-    console.log('Feature flags:', config.data.featureFlags);
+
     const analytics_key = config.data.googleAnalyticsKey;
     if (analytics_key) {
       ReactGA.initialize(analytics_key);
