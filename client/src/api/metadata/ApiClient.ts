@@ -21,12 +21,8 @@ export class ApiClient implements MetadataClient {
     let objectFromJson = response.data;
     let responseMetaData: SigMFMetadata[] = objectFromJson.map((meta) => {
       let newMeta = Object.assign(new SigMFMetadata(), meta);
-      if (newMeta.annotations) {
-        newMeta.annotations = newMeta.annotations.map((annotation) => Object.assign(new Annotation(), annotation));
-      }
-      if (newMeta.captures) {
-        newMeta.captures = newMeta.captures.map((capture) => Object.assign(new CaptureSegment(), capture));
-      }
+      newMeta.annotations = newMeta.annotations.map((annotation) => Object.assign(new Annotation(), annotation));
+      newMeta.captures = newMeta.captures.map((capture) => Object.assign(new CaptureSegment(), capture));
       return newMeta;
     });
     return responseMetaData;
