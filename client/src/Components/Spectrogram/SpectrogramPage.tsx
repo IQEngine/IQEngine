@@ -526,13 +526,7 @@ export const SpectrogramPage = () => {
                 )}
               </div>
             </div>
-            <MetaViewer
-              datatype={meta?.global["core:datatype"]}
-              offset={meta?.global["core:offset"]}
-              sample_rate={meta?.global["core:sample_rate"]}
-              version={meta?.global["core:version"]}
-              description={meta?.global["core:description"]}
-            />
+            <MetaViewer meta={meta}/>
           </div>
         </div>
         <div className="mt-3 mb-0 px-2 py-0" style={{ margin: '5px' }}>

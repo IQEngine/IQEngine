@@ -1,42 +1,36 @@
 import React from 'react'
+import { SigMFMetadata } from '@/Utils/sigmfMetadata';
 
 export interface MetaViewerProps {
-    "datatype": string;
-    "version": string;
-    "offset": number;
-    "sample_rate": number;
-    "description": string;
+    meta: SigMFMetadata;
 }
 
-export const MetaViewer: React.FC<MetaViewerProps> = (meta: MetaViewerProps) => {
-    const truncateDescription = (desc: string) => {
-        return desc.length > 50 ? desc.substring(0, 50) + "..." : desc;
-    }
+export const MetaViewer = ( { meta }  : MetaViewerProps) => {
     return ( 
         <div className="border border-primary ml-3 mt-2">
             <div className="flex mt-3 mb-3 stats shadow">
             <div className="stat place-items-center">
                 <div className="stat-title">data type</div>
-                <div className="stat-value">{meta.datatype}</div>
+                <div className="stat-value">{meta.getDataType()}</div>
             </div>
             
             <div className="stat place-items-center">
                 <div className="stat-title">offset</div>
-                <div className="stat-value">{meta.offset}</div>
+                <div className="stat-value">{meta.getOffset()}</div>
             </div>
             
             <div className="stat place-items-center">
                 <div className="stat-title">sample rate</div>
-                <div className="stat-value">{meta.sample_rate}</div>
+                <div className="stat-value">{meta.getSampleRate()}</div>
             </div>
             <div className="stat place-items-center">
                 <div className="stat-title">version</div>
-                <div className="stat-value">{meta.version}</div>
+                <div className="stat-value">{meta.getVersion()}</div>
             </div>
             <div className="stat place-items-center">
                 <div className="stat-title">description</div>
-                <div className="tooltip" data-tip={meta.description}>
-                    <div className="stat-desc text-white">{truncateDescription(meta.description)}</div>
+                <div className="tooltip" data-tip={meta.getDescription()}>
+                    <div className="stat-desc text-white">{meta.getShortDescription()}</div>
                 </div>
             </div>
             </div>

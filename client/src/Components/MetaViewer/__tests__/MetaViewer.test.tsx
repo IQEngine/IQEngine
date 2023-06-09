@@ -3,31 +3,26 @@ import '@testing-library/jest-dom';
 import { describe, expect, test } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
+import { SigMFMetadata } from '@/Utils/sigmfMetadata';
 import { MetaViewer, MetaViewerProps } from '../MetaViewer';
 
 describe('MetaViewer list component', () => {
+    const meta = Object.assign(new SigMFMetadata(), JSON.parse(JSON.stringify({
+        global: {
+            'core:datatype': 'datatype test',
+            'core:version': 'version test',
+            'core:offset': 0,
+            'core:sample_rate': 1,
+            'core:description': 'lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
 
-    let meta: MetaViewerProps = {
-        "datatype": "datatype test",
-        "version": "version test",
-        "offset": 0,
-        "sample_rate": 1,
-        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed id elit vel nisi gravida condimentum. Suspendisse euismod tempor nunc pharetra lacinia. Suspendisse mauris justo, efficitur vel commodo non, semper ac dolor. Etiam vitae venenatis felis. Sed urna augue, dictum a ante eu, hendrerit dictum elit. Vestibulum a fringilla quam. Nam lacinia lorem vitae porttitor congue. "
-    };
-
+        }
+    })));
     test('Renders correctly', async () => {
-        render(<MetaViewer {...meta} />);
+        render(<MetaViewer meta={meta} />);
         expect(await screen.findByText('datatype test')).toBeInTheDocument();
         expect(await screen.findByText('version test')).toBeInTheDocument();
         expect(await screen.findByText('0')).toBeInTheDocument();
         expect(await screen.findByText('1')).toBeInTheDocument();
-        expect(await screen.findByText('Lorem ipsum dolor sit amet, consectetur adipiscing...')).toBeInTheDocument();
-    });
-
-    test('Renders untruncated description if < 50 characters', async () => {
-        meta.description = 'short description';
-
-        render(<MetaViewer {...meta} />);        
-        expect(await screen.findByText('short description')).toBeInTheDocument();
+        expect(await screen.findByText('lorem ipsum dolor sit amet, consectetur adipiscing elit, sed...')).toBeInTheDocument();
     });
 });
