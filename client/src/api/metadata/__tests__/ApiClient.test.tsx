@@ -50,10 +50,10 @@ describe('ApiClient Metadata Tests', () => {
     let metaJson = JSON.stringify(expectedMeta);
     let testMetadata: SigMFMetadata | null = null;
     testMetadata = Object.assign(new SigMFMetadata(), expectedMeta);
-    testMetadata.annotations = testMetadata.annotations.map((annotation) =>
+    testMetadata.annotations = testMetadata.annotations?.map((annotation) =>
       Object.assign(new Annotation(), annotation)
     );
-    testMetadata.captures = testMetadata.captures.map((capture) => Object.assign(new CaptureSegment(), capture));
+    testMetadata.captures = testMetadata.captures?.map((capture) => Object.assign(new CaptureSegment(), capture));
 
     nock('http://localhost:3000').get(`/api/datasources/${account}/${container}/${filePath}`).reply(200, metaJson);
 
@@ -89,10 +89,10 @@ describe('ApiClient Metadata Tests', () => {
     let metaJson = JSON.stringify(expectedMeta);
     let testMetadata: SigMFMetadata | null = null;
     testMetadata = Object.assign(new SigMFMetadata(), expectedMeta);
-    testMetadata.annotations = testMetadata.annotations.map((annotation) =>
+    testMetadata.annotations = testMetadata.annotations?.map((annotation) =>
       Object.assign(new Annotation(), annotation)
     );
-    testMetadata.captures = testMetadata.captures.map((capture) => Object.assign(new CaptureSegment(), capture));
+    testMetadata.captures = testMetadata.captures?.map((capture) => Object.assign(new CaptureSegment(), capture));
 
     nock('http://localhost:3000').get(`/api/datasources/${account}/${container}/${filePath}`).reply(200, metaJson);
 
@@ -179,12 +179,8 @@ describe('ApiClient Metadata Tests', () => {
 
     let testMetadata: SigMFMetadata[] = expectedMeta.map((meta) => {
       let newMeta = Object.assign(new SigMFMetadata(), meta);
-      if (newMeta.annotations) {
-        newMeta.annotations = newMeta.annotations.map((annotation) => Object.assign(new Annotation(), annotation));
-      }
-      if (newMeta.captures) {
-        newMeta.captures = newMeta.captures.map((capture) => Object.assign(new CaptureSegment(), capture));
-      }
+      newMeta.annotations = newMeta.annotations?.map((annotation) => Object.assign(new Annotation(), annotation));
+      newMeta.captures = newMeta.captures?.map((capture) => Object.assign(new CaptureSegment(), capture));
       return newMeta;
     });
 
@@ -272,13 +268,15 @@ describe('ApiClient Metadata Tests', () => {
 
     let newMetaData: SigMFMetadata | null = null;
     newMetaData = Object.assign(new SigMFMetadata(), newMeta);
-    newMetaData.annotations = newMetaData.annotations.map((annotation) => Object.assign(new Annotation(), annotation));
-    newMetaData.captures = newMetaData.captures.map((capture) => Object.assign(new CaptureSegment(), capture));
+    newMetaData.annotations = newMetaData.annotations?.map((annotation) => Object.assign(new Annotation(), annotation));
+    newMetaData.captures = newMetaData.captures?.map((capture) => Object.assign(new CaptureSegment(), capture));
 
     let testMetaData: SigMFMetadata | null = null;
     testMetaData = Object.assign(new SigMFMetadata(), newMeta);
-    testMetaData.annotations = newMetaData.annotations.map((annotation) => Object.assign(new Annotation(), annotation));
-    testMetaData.captures = newMetaData.captures.map((capture) => Object.assign(new CaptureSegment(), capture));
+    testMetaData.annotations = newMetaData.annotations?.map((annotation) =>
+      Object.assign(new Annotation(), annotation)
+    );
+    testMetaData.captures = newMetaData.captures?.map((capture) => Object.assign(new CaptureSegment(), capture));
 
     nock('http://localhost:3000')
       .put(`/api/datasources/${account}/${container}/${filePath}`, newMeta)
