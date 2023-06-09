@@ -8,6 +8,7 @@ import ThemeSelector from './Components/Styles/ThemeSelector';
 import { configQuery } from './api/config/queries';
 
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { Toaster } from 'react-hot-toast';
 
 export const App = () => {
   // Set up google analytics (if enabled) to only share the page path (does not include names of local files)
@@ -31,6 +32,7 @@ export const App = () => {
 
   return (
     <ThemeSelector>
+      <Toaster />
       <div>
         <div className="container flex mb-40" id="topRow">
           <a href="/" className="absolute mt-4 pt-2 top-0 left-1/2 transform -translate-x-1/2">
