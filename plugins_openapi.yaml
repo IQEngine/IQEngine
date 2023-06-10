@@ -38,26 +38,39 @@ paths:
           content:
             application/json:
               schema:
-                # This object is essentially just a json schema that is at most 1 layer deep
-                # e.g.:
-                # {'param1': {'title': 'Param1', 'default': 1,       'type': 'integer'},
-                #  'param2': {'title': 'Param2', 'default': 'test2', 'type': 'string'},
-                #  'param3': {'title': 'Param3', 'default': 5.67,    'type': 'number'}}
                 type: object
-                minProperties: 1
-                maxProperties: 100
-                additionalProperties:
-                  type: object
-                  properties:
-                    title:
-                      type: string
-                    type:
-                      anyOf:
-                        # For now this is all we'll support
-                        - type: string
-                        - type: number # (float)
-                        - type: integer
-                        - type: boolean
+                required:
+                  - custom_params
+                properties:
+                  max_inputs: # max sets of IQ as input
+                    type: integer
+                    default: 1 # note that default documents behavior when a field is absent
+                    minimum: 0 # a siggen/tx wouldn't have IQ on the input side, only custom params
+                  max_outputs: # max sets of IQ as output
+                    type: integer
+                    default: 1
+                    minimum: 0
+                  custom_params:
+                    # This object is essentially just a json schema that is at most 1 layer deep
+                    # e.g.:
+                    # {'param1': {'title': 'Param1', 'default': 1,       'type': 'integer'},
+                    #  'param2': {'title': 'Param2', 'default': 'test2', 'type': 'string'},
+                    #  'param3': {'title': 'Param3', 'default': 5.67,    'type': 'number'}}
+                    type: object
+                    minProperties: 1
+                    maxProperties: 100
+                    additionalProperties:
+                      type: object
+                      properties:
+                        title:
+                          type: string
+                        type:
+                          anyOf:
+                            # For now this is all we'll support
+                            - type: string
+                            - type: number # (float)
+                            - type: integer
+                            - type: boolean
     post:
       summary: Run the RF Function, using the provided IQ samples and params
       parameters:
@@ -83,26 +96,10 @@ paths:
                 - center_freq
                 - data_type
               properties:
-                samples: # IQ samples but as an array of floats or ints, in form IQIQIQIQ...
-                  example: [1, 2, 3, 4, 5, 6] # means [1+2j, 3+4j, 5+6j], can be ints or floats
-                  type: array
-                  items:
-                    anyOf:
-                      - type: number
-                      - type: integer
+                samples:
+                  $ref: '#/components/schemas/samples'
                 samples_pointer:
-                  type: object
-                  properties:
-                    accountName:
-                      type: string
-                    containerName:
-                      type: string
-                    filepath:
-                      type: string
-                    sample_start:
-                      type: integer
-                    sample_count:
-                      type: integer
+                  $ref: '#/components/schemas/samples_pointer'
                 # Always provide sample rate, center freq, data type
                 sample_rate:
                   type: number
@@ -136,6 +133,14 @@ paths:
                 # The following is taken from SigMF's annotations schema (currently a subset of it)
                 type: object
                 properties:
+                  samples:
+                    $ref: '#/components/schemas/samples'
+                  samples_pointer:
+                    $ref: '#/components/schemas/samples_pointer'
+                  sample_rate: # in case sample rate changed
+                    type: number
+                  center_freq: #  in case center freq changed
+                    type: number
                   annotations:
                     description: See https://github.com/sigmf/SigMF/blob/sigmf-v1.x/sigmf-spec.md#annotations-array
                     type: array
@@ -182,3 +187,32 @@ paths:
                             format: uuid
                             type: string
                       additionalProperties: true
+
+# A way to specify properties that are reused, or simply too large to have look good within parameters/responses objects
+components:
+  schemas:
+    samples:
+      type: array # list of IQ samples, most functions will just have 1
+      items:
+        # IQ samples but as an array of floats or ints, in form IQIQIQIQ...
+        example: [1, 2, 3, 4, 5, 6] # means [1+2j, 3+4j, 5+6j], can be ints or floats
+        type: array
+        items:
+          anyOf:
+            - type: number
+            - type: integer
+    samples_pointer:
+      type: array # list of IQ samples, most functions will just have 1
+      items:
+        type: object # a pointer to IQ samples in cloud storage
+        properties:
+          accountName:
+            type: string
+          containerName:
+            type: string
+          file_path:
+            type: string
+          sample_start:
+            type: integer
+          sample_count:
+            type: integer
