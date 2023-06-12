@@ -1,64 +1,30 @@
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
 
-import React, { useEffect, useRef, useState } from 'react';
-import Ajv from 'ajv';
-import sigmfSchema from '@/Components/Validator/sigmf-schema.json';
+import React, { useState } from 'react';
 import { vscodeDark } from '@uiw/codemirror-theme-vscode';
-
-import { json } from '@codemirror/lang-json';
 import CodeMirror from '@uiw/react-codemirror';
+import { INITIAL_METADATA_SNIPPET } from '@/Utils/constants';
+import { metadataValidator } from '@/Utils/validators';
 
-export default function Validator() {
-  const [metadata, setMetadata] = useState(`{
-    "global": {
-        "core:datatype": "cf32_le",
-        "core:sample_rate": 1000000,
-        "core:hw": "PlutoSDR with 915 MHz whip antenna",
-        "core:author": "Art Vandelay",
-        "core:version": "1.0.0"
-    },
-    "captures": [
-        {
-            "core:sample_start": 0,
-            "core:frequency": 915000000
-        }
-    ],
-    "annotations": []
-}`);
+export const Validator = () => {
+  const [metadata, setMetadata] = useState(INITIAL_METADATA_SNIPPET);
   const [errors, setErrors] = useState([]);
-  const ajv = new Ajv({ strict: false, allErrors: true });
 
   const onChangeHandler = (metadataValue) => {
-    try {
-      setMetadata(metadataValue);
-      const metadataJSON = JSON.parse(metadataValue);
-
-      const validate = ajv.compile(sigmfSchema);
-      const valid = validate(metadataJSON);
-
-      if (valid) {
-        setErrors([]);
-      } else {
-        setErrors(validate.errors);
-      }
-    } catch (e) {
-      if (e instanceof SyntaxError) {
-        setErrors([{ message: 'Syntax Error: ' + e.message }]);
-      } else {
-        setErrors([{ message: 'Error' + e.message }]);
-      }
-    }
+    const metadata = metadataValidator(metadataValue);
+    setMetadata(metadata.metadata);
+    setErrors(metadata.errors);
   };
 
   return (
     <div>
       <div className="flex justify-center">
         <CodeMirror
+        aria-label= 'Validator Code Editor'
           value={metadata}
           height="500px"
           width="700px"
-          extensions={[json()]}
           onChange={onChangeHandler}
           theme={vscodeDark}
           readOnly={false}
@@ -72,7 +38,7 @@ export default function Validator() {
             </h2>
           </div>
           <div className="flex justify-center text-error">
-            <ul style={{ width: '700px' }}>
+            <ul aria-label='Validator Errors' style={{ width: '700px' }}>
               {errors.map((error, i) => (
                 <li key={'error ' + { i }}>
                   <svg
@@ -97,3 +63,5 @@ export default function Validator() {
     </div>
   );
 }
+
+export default Validator;
