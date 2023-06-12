@@ -23,7 +23,7 @@ describe('Validate metadata', () => {
     expect(result.metadata).toBe(meta);
     expect(result.errors).toStrictEqual([]);
   });
-  
+
   test('Invalid json contains syntax error', () => {
     // Arrange && Act
     const result = metadataValidator('{,');
