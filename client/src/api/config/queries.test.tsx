@@ -19,11 +19,13 @@ describe('Config contains information from environment', () => {
     import.meta.env.VITE_DETECTOR_ENDPOINT = 'http://127.0.0.1:8000/detectors/';
     import.meta.env.VITE_CONNECTION_INFO = '{}';
     import.meta.env.VITE_GOOGLE_ANALYTICS_KEY = 'UA-TEST-KEY-1';
+    import.meta.env.VITE_FEATURE_FLAGS = '{}';
   });
   afterAll(() => {
     delete import.meta.env.VITE_DETECTOR_ENDPOINT;
     delete import.meta.env.VITE_CONNECTION_INFO;
     delete import.meta.env.VITE_GOOGLE_ANALYTICS_KEY;
+    delete import.meta.env.VITE_FEATURE_FLAGS;
   });
 
   beforeEach(() => {
@@ -42,6 +44,7 @@ describe('Config contains information from environment', () => {
       expect(result.current.data.detectorEndpoint).toBe('http://127.0.0.1:8000/detectors/');
       expect(result.current.data.connectionInfo).toMatchObject({});
       expect(result.current.data.googleAnalyticsKey).toBe('UA-TEST-KEY-1');
+      expect(result.current.data.featureFlags).toMatchObject({});
     });
   });
 
@@ -57,6 +60,7 @@ describe('Config contains information from environment', () => {
       expect(result.current.data.detectorEndpoint).toBe('http://127.0.0.1:8000/detectors/');
       expect(result.current.data.connectionInfo).toMatchObject({});
       expect(result.current.data.googleAnalyticsKey).toBe('UA-TEST-KEY-1');
+      expect(result.current.data.featureFlags).toMatchObject({});
     });
   });
 
@@ -68,6 +72,7 @@ describe('Config contains information from environment', () => {
         detectorEndpoint: 'http://some-detector-endpoint',
         connectionInfo: { some: 'connection-info' },
         googleAnalyticsKey: 'UA-SOME_KEY-1',
+        featureFlags: { someFeature: true },
       });
     // Act
     const { result } = renderHook(() => configQuery(), { wrapper });
@@ -77,6 +82,7 @@ describe('Config contains information from environment', () => {
       expect(result.current.data.detectorEndpoint).toBe('http://some-detector-endpoint');
       expect(result.current.data.connectionInfo).toMatchObject({ some: 'connection-info' });
       expect(result.current.data.googleAnalyticsKey).toBe('UA-SOME_KEY-1');
+      expect(result.current.data.featureFlags).toMatchObject({});
     });
   });
 });
