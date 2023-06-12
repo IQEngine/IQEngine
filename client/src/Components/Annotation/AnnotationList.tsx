@@ -1,5 +1,5 @@
 import DataTable from '@/Components/DataTable/DataTable';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import {
   calculateDate,
@@ -12,6 +12,7 @@ import {
 } from '@/Utils/rfFunctions';
 import AutoSizeInput from '@/Components/AutoSizeInput/AutoSizeInput';
 import { Annotation, SigMFMetadata } from '@/Utils/sigmfMetadata';
+import Actions from './Actions';
 
 interface AnnotationListProps {
   meta: SigMFMetadata;
@@ -23,6 +24,15 @@ interface AnnotationListProps {
 export const AnnotationList = ({ meta, setHandleTop, spectrogramHeight, setMeta }: AnnotationListProps) => {
   const [parents, setParents] = useState([]);
   const [data, setData] = useState([]);
+  const modal = useRef(null);
+  const toggle = () => {
+    if (modal.current.className === 'modal w-full h-full') {
+      modal.current.className = 'modal modal-open w-full h-full';
+    } else {
+      modal.current.className = 'modal w-full h-full';
+    }
+  };
+
   const originalColumns = [
     { title: 'Annotation', dataIndex: 'annotation' },
     { title: 'Frequency Range', dataIndex: 'frequencyRange' },
@@ -44,25 +54,6 @@ export const AnnotationList = ({ meta, setHandleTop, spectrogramHeight, setMeta 
       setColumns(newColumns);
     }
   }, [columns, data]);
-
-  const getActions = useCallback(
-    (startSampleCount) => {
-      return (
-        <div>
-          <button
-            onClick={() => {
-              const fractionIntoFile = startSampleCount / meta.getLengthInIQSamples();
-              const handleTop = fractionIntoFile * spectrogramHeight;
-              setHandleTop(handleTop);
-            }}
-          >
-            <ArrowRightIcon className="h-4 w-4" />
-          </button>
-        </div>
-      );
-    },
-    [meta, spectrogramHeight, setHandleTop]
-  );
 
   const updateAnnotation = useCallback(
     (value, parent) => {
@@ -216,7 +207,17 @@ export const AnnotationList = ({ meta, setHandleTop, spectrogramHeight, setMeta 
             />
           ),
           duration: duration.time + duration.unit,
-          actions: getActions(startSampleCount),
+          actions: (
+            <Actions
+              startSampleCount={startSampleCount}
+              spectrogramHeight={spectrogramHeight}
+              index={i}
+              annotation={annotation}
+              meta={meta}
+              setHandleTop={setHandleTop}
+              setMeta={setMeta}
+            />
+          ),
         };
 
         if (startTime && endTime) {

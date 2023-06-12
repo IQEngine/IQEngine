@@ -16,6 +16,7 @@ import { INITIAL_PYTHON_SNIPPET, TILE_SIZE_IN_IQ_SAMPLES } from '../../Utils/con
 import TimeSelector from './TimeSelector';
 import { ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 import AnnotationList from '@/Components/Annotation/AnnotationList';
+import { MetaViewer } from '@/Components/MetaViewer/MetaViewer';
 import { SpectrogramContext } from './SpectrogramContext';
 import { useParams } from 'react-router-dom';
 import React, { useState, useEffect, useMemo, useRef } from 'react';
@@ -82,7 +83,7 @@ export const SpectrogramPage = () => {
   const [plotHeight, setPlotHeight] = useState(0);
   const [missingTiles, setMissingTiles] = useState([]);
   const metaQuery = getMeta(type, account, container, filePath);
-  const tiles = range(Math.floor(lowerTile), Math.floor(upperTile));
+  const tiles = range(Math.floor(lowerTile), Math.ceil(upperTile));
   const [fftData, setfftData] = useState<Record<number, Uint8ClampedArray>>({});
   const [meta, setMeta] = useState<SigMFMetadata>(metaQuery.data);
   const [taps, setTaps] = useState<number[]>([1]);
@@ -235,9 +236,8 @@ export const SpectrogramPage = () => {
       spectrogramHeight,
       zoomLevel
     );
-    setLowerTile(Math.floor(calculatedTiles.lowerTile));
-    setUpperTile(Math.ceil(calculatedTiles.upperTile));
-
+    setLowerTile(calculatedTiles.lowerTile);
+    setUpperTile(calculatedTiles.upperTile);
     setHandleTop(handleTop);
   };
 
@@ -525,9 +525,9 @@ export const SpectrogramPage = () => {
                 )}
               </div>
             </div>
+            <MetaViewer meta={meta}/>
           </div>
         </div>
-
         <div className="mt-3 mb-0 px-2 py-0" style={{ margin: '5px' }}>
           <details>
             <summary className="pl-2 mt-2 bg-primary outline outline-1 outline-primary text-lg text-base-100 hover:bg-green-800">
@@ -572,8 +572,7 @@ export const SpectrogramPage = () => {
               <div>
                 <textarea
                   rows={20}
-                  className="bg-base-content text-base-100"
-                  style={{ width: '100%' }}
+                  className="textarea w-full bg-base-100 text-base-content overflow-hidden hover:overflow-scroll"
                   readOnly={true}
                   value={JSON.stringify(
                     {

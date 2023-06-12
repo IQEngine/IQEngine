@@ -50,7 +50,7 @@ export const getIQDataSliceRange = (
       queries: [],
     });
   }
-  const indexes = range(start, end);
+  const indexes = range(Math.floor(start), Math.ceil(end));
   return getIQDataSlices(meta, indexes, handleNewSlice, tileSize, enabled);
 };
 
