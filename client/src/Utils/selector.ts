@@ -183,7 +183,7 @@ export const selectFft = (
   let tempCurrentFftMin = currentFftMin;
 
   // Go through each of the tiles and compute the FFT and save in window.fftData
-  const tiles = range(Math.floor(lowerTile), Math.floor(upperTile));
+  const tiles = range(Math.floor(lowerTile), Math.ceil(upperTile));
   let autoMaxs = [];
   let autoMins = [];
   for (let tile of tiles) {
@@ -252,7 +252,6 @@ export const selectFft = (
     trimmedFftData = zoomedFftData;
   }
 
-  console.debug('num_final_ffts:', num_final_ffts);
 
   // Render Image
   const imageData = new ImageData(trimmedFftData, fftSize, num_final_ffts);
