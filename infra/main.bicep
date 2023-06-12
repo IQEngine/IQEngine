@@ -4,6 +4,9 @@ param containerImage string = 'iqengine/iqengine:pre'
 param containerPort int = 3000
 param registry string = 'ghcr.io'
 param applicationName string = 'iqengine'
+param subscriptionUnique string = uniqueString(subscription().subscriptionId)
+param subiqueSubRes string = uniqueString(resourceGroup().id, subscriptionUnique)
+
 
 module law 'law.bicep' = {
     name: 'log-analytics-workspace'

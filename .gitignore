@@ -44,3 +44,4 @@ api/build
 tiling/spectrogram.pmtiles
 
 **/infra/*.json
+!**/infra/iqengine.json
