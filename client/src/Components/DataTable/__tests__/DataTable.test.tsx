@@ -21,7 +21,9 @@ describe('Data table component', () => {
     expect(table.querySelectorAll('tr').length).toBe(11);
 
     for (const row of dataRows.slice(0, 10)) {
-      assertValues(row);
+      for (const key in row) {
+        expect(screen.getAllByText(row[key])[0]).toBeInTheDocument();
+      }
     }
   });
 
@@ -66,7 +68,9 @@ describe('Data table component', () => {
     expect(table.querySelectorAll('tr').length).toBe(11);
 
     for (const row of dataRows.slice(10, 20)) {
-      assertValues(row);
+      for (const key in row) {
+        expect(screen.getAllByText(row[key])[0]).toBeInTheDocument();
+      }
     }
   });
 
@@ -99,7 +103,9 @@ describe('Data table component', () => {
     // Head plus one element
     expect(table.querySelectorAll('tr').length).toBe(2);
 
-    assertValues(dataRows[0]);
+    for (const key in dataRows[0]) {
+      expect(screen.getAllByText(dataRows[0][key])[0]).toBeInTheDocument();
+    }
   });
 });
 
@@ -117,14 +123,8 @@ test('Selecting 50 returns 50', async () => {
   expect(table.querySelectorAll('tr').length).toBe(51);
 
   for (const row of dataRows.slice(0, 50)) {
-    assertValues(row);
-  }
-});
-
-const assertValues = (dataRow: DataRow) => {
-  {
-    for (const key in dataRow) {
-      expect(screen.getAllByText(dataRow[key])[0]).toBeInTheDocument();
+    for (const key in row) {
+      expect(screen.getAllByText(row[key])[0]).toBeInTheDocument();
     }
   }
-};
+});
