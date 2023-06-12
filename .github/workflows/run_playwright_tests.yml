@@ -3,7 +3,7 @@ name: Run Playwright frontend integration tests
 
 on:
   workflow_run:
-    workflows: ['Deploy To PR']
+    workflows: ['Deploy To Staging']
     branches: [main]
     types:
       - completed
