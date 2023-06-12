@@ -196,13 +196,13 @@ describe('Annotation list component', () => {
     );
 
     // Act
-    // Act
     expect(await screen.queryByText(expected)).not.toBeInTheDocument();
 
     const start = await screen.findByRole(type, { name: label });
     await userEvent.clear(start);
     await userEvent.type(start, input);
     await userEvent.tab();
+    
     // Assert
     const textarea = await screen.findByLabelText('Annotation 0 Modal Text Area');
     expect(textarea.innerHTML).toContain(expected);
