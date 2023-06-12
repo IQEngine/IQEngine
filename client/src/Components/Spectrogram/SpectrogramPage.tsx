@@ -83,7 +83,7 @@ export const SpectrogramPage = () => {
   const [plotHeight, setPlotHeight] = useState(0);
   const [missingTiles, setMissingTiles] = useState([]);
   const metaQuery = getMeta(type, account, container, filePath);
-  const tiles = range(Math.floor(lowerTile), Math.floor(upperTile));
+  const tiles = range(Math.floor(lowerTile), Math.ceil(upperTile));
   const [fftData, setfftData] = useState<Record<number, Uint8ClampedArray>>({});
   const [meta, setMeta] = useState<SigMFMetadata>(metaQuery.data);
   const [taps, setTaps] = useState<number[]>([1]);
@@ -236,9 +236,8 @@ export const SpectrogramPage = () => {
       spectrogramHeight,
       zoomLevel
     );
-    setLowerTile(Math.floor(calculatedTiles.lowerTile));
-    setUpperTile(Math.ceil(calculatedTiles.upperTile));
-
+    setLowerTile(calculatedTiles.lowerTile);
+    setUpperTile(calculatedTiles.upperTile);
     setHandleTop(handleTop);
   };
 
