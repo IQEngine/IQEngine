@@ -3,14 +3,13 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { AnnotationList } from '@/Components/Annotation/AnnotationList';
-import React from 'react';
+import React, { useState } from 'react';
 import metadataJson from './AnnotationList.test.meta.json';
 import { SigMFMetadata } from '@/Utils/sigmfMetadata';
 
 describe('Annotation list component', () => {
   test('Columns display correctly', async () => {
     //Arrange
-    //Javascript keeps modifying the metadata object, so we have to make a copy of it
     const meta = Object.assign(new SigMFMetadata(), JSON.parse(JSON.stringify(metadataJson)));
 
     // Act
@@ -67,10 +66,8 @@ describe('Annotation list component', () => {
 
   test('Display correct data on initial view', async () => {
     //Arrange
-    //Javascript keeps modifying the metadata object, so we have to make a copy of it
     const meta = Object.assign(new SigMFMetadata(), JSON.parse(JSON.stringify(metadataJson)));
 
-    // Act
     render(
       <AnnotationList meta={meta} setHandleTop={() => {}} spectrogramHeight={200} setMeta={() => {}}></AnnotationList>
     );
@@ -99,10 +96,8 @@ describe('Annotation list component', () => {
     ${'Invalid date'}              | ${'Annotation 0 - End Time'}        | ${'textbox'}    | ${'Invalid date'}                                                     | ${10}
   `('Annotation errors display correctly on tab escape', async ({ input, label, type, expected }) => {
     //Arrange
-    //Javascript keeps modifying the metadata object, so we have to make a copy of it
     const meta = Object.assign(new SigMFMetadata(), JSON.parse(JSON.stringify(metadataJson)));
 
-    // Act
     render(
       <AnnotationList meta={meta} setHandleTop={() => {}} spectrogramHeight={200} setMeta={() => {}}></AnnotationList>
     );
@@ -133,10 +128,8 @@ describe('Annotation list component', () => {
     ${'Invalid date'}              | ${'Annotation 0 - End Time'}        | ${'textbox'}    | ${'Invalid date'}                                                     | ${10}
   `('Annotation errors display correctly on enter', async ({ input, label, type, expected }) => {
     //Arrange
-    //Javascript keeps modifying the metadata object, so we have to make a copy of it
     const meta = Object.assign(new SigMFMetadata(), JSON.parse(JSON.stringify(metadataJson)));
 
-    // Act
     render(
       <AnnotationList meta={meta} setHandleTop={() => {}} spectrogramHeight={200} setMeta={() => {}}></AnnotationList>
     );
@@ -162,10 +155,8 @@ describe('Annotation list component', () => {
     ${'2022-03-17T16:45:30.003Z'} | ${'Annotation 0 - End Time'}        | ${'textbox'}    | ${'2022-03-17T16:45:30.003Z'}
   `('Annotation updates values correctly', async ({ input, label, type, expected }) => {
     //Arrange
-    //Javascript keeps modifying the metadata object, so we have to make a copy of it
     const meta = Object.assign(new SigMFMetadata(), JSON.parse(JSON.stringify(metadataJson)));
 
-    // Act
     render(
       <AnnotationList meta={meta} setHandleTop={() => {}} spectrogramHeight={200} setMeta={() => {}}></AnnotationList>
     );
@@ -180,5 +171,40 @@ describe('Annotation list component', () => {
 
     // Assert
     expect((await screen.findAllByText(expected))[0]).toBeInTheDocument();
+  });
+
+  test.each`
+    input                         | key                       | value                | label                               | type            | expected
+    ${'883'}                      | ${'core:freq_lower_edge'} | ${883000000}         | ${'Annotation 0 - Frequency Start'} | ${'spinbutton'} | ${883000000}
+    ${'885'}                      | ${'core:freq_upper_edge'} | ${885000000}         | ${'Annotation 0 - Frequency End'}   | ${'spinbutton'} | ${885000000}
+    ${'New Description'}          | ${'core:description'}     | ${'New Description'} | ${'Annotation 0 - Label'}           | ${'textbox'}    | ${'New Description'}
+    ${'2022-03-17T16:43:30.002Z'} | ${'core:sample_start'}    | ${10001}             | ${'Annotation 0 - Start Time'}      | ${'textbox'}    | ${10001}
+    ${'2022-03-17T16:45:30.003Z'} | ${'core:sample_count'}    | ${10002}             | ${'Annotation 0 - End Time'}        | ${'textbox'}    | ${10002}
+  `('Annotation updates action value correctly on alteration', async ({ input, key, value, label, type, expected }) => {
+    //Arrange
+    const meta = Object.assign(new SigMFMetadata(), JSON.parse(JSON.stringify(metadataJson)));
+
+    render(
+      <AnnotationList
+        meta={meta}
+        setHandleTop={() => {}}
+        spectrogramHeight={200}
+        setMeta={() => {
+          meta.annotations[0][key] = value;
+        }}
+      ></AnnotationList>
+    );
+
+    // Act
+    // Act
+    expect(await screen.queryByText(expected)).not.toBeInTheDocument();
+
+    const start = await screen.findByRole(type, { name: label });
+    await userEvent.clear(start);
+    await userEvent.type(start, input);
+    await userEvent.tab();
+    // Assert
+    const textarea = await screen.findByLabelText('Annotation 0 Modal Text Area');
+    expect(textarea.innerHTML).toContain(expected);
   });
 });

@@ -7,7 +7,6 @@ interface ActionsProps {
   startSampleCount: number;
   spectrogramHeight: number;
   index: number;
-  annotation: Annotation;
   setHandleTop: (handleTop: number) => void;
   setMeta: (meta: SigMFMetadata) => void;
 }
@@ -17,12 +16,11 @@ export const Actions = ({
   startSampleCount,
   spectrogramHeight,
   index,
-  annotation,
   setHandleTop,
   setMeta,
 }: ActionsProps) => {
   const modal = useRef(null);
-  const [currentAnnotation, setCurrentAnnotation] = useState(JSON.stringify(annotation, undefined, 4));
+  const [currentAnnotation, setCurrentAnnotation] = useState(JSON.stringify(meta.annotations[index], undefined, 4));
 
   const toggle = () => {
     if (modal.current.className === 'modal w-full h-full') {
@@ -31,6 +29,10 @@ export const Actions = ({
       modal.current.className = 'modal w-full h-full';
     }
   };
+
+  useEffect(() => {
+    setCurrentAnnotation(JSON.stringify(meta.annotations[index], undefined, 4));
+  }, [meta]);
 
   const onChangeHandler = (e) => {
     setCurrentAnnotation(e.target.value);
