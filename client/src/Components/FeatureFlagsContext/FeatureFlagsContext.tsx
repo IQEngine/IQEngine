@@ -6,6 +6,7 @@ interface Flags {
 
 interface ContextProps {
   featureFlags: Flags;
+  getFeatureFlag: (flag: string) => boolean;
   setFeatureFlags: React.Dispatch<React.SetStateAction<Flags>>;
 }
 
@@ -18,9 +19,16 @@ interface Props {
 
 export const FeatureFlagsProvider = ({ children, flags }: Props) => {
   const [featureFlags, setFeatureFlags] = useState<Flags>(flags);
-
+  const getFeatureFlag = (flag: string) => {
+    if (!featureFlags || !(flag in featureFlags)) {
+      return true;
+    }
+    return featureFlags[flag];
+  };
   return (
-    <FeatureFlagsContext.Provider value={{ featureFlags, setFeatureFlags }}>{children}</FeatureFlagsContext.Provider>
+    <FeatureFlagsContext.Provider value={{ featureFlags, setFeatureFlags, getFeatureFlag }}>
+      {children}
+    </FeatureFlagsContext.Provider>
   );
 };
 

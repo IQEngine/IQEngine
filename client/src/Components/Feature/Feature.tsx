@@ -7,13 +7,9 @@ interface FeatureProps {
 }
 
 const Feature = ({ flag, children }: FeatureProps) => {
-  const { featureFlags } = useFeatureFlags();
+  const { getFeatureFlag } = useFeatureFlags();
 
-  if (!featureFlags) {
-    return null;
-  }
-
-  return featureFlags[flag] ? <>{children}</> : null;
+  return getFeatureFlag(flag) ? <>{children}</> : null;
 };
 
 export default Feature;
