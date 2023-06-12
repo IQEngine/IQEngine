@@ -23,11 +23,11 @@ jobs:
           node-version: 18
 
       - name: Install dependencies
-        run: npm ci
+        run: cd ${{ vars.GITHUB_WORKSPACE }}/__tests__ && npm ci
 
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
+        run: cd ${{ vars.GITHUB_WORKSPACE }}/__tests__ && npx playwright install --with-deps
 
       - name: Run Playwright tests
         run: |
-          npx playwright test --config playwright-pr.config.ts
+          cd ${{ vars.GITHUB_WORKSPACE }}/__tests__ && npx playwright test --config playwright-pr.config.ts
