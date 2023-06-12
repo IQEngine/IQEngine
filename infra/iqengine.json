@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.17.1.54307",
-      "templateHash": "18332343184975459915"
+      "templateHash": "12518665118416508164"
     }
   },
   "parameters": {
@@ -28,6 +28,10 @@
     "applicationName": {
       "type": "string",
       "defaultValue": "iqengine"
+    },
+    "uniqueSuffix": {
+      "type": "string",
+      "defaultValue": "[substring(resourceGroup().id, 0, 5)]"
     }
   },
   "resources": [
@@ -45,7 +49,7 @@
             "value": "[parameters('location')]"
           },
           "name": {
-            "value": "[format('law-{0}', parameters('applicationName'))]"
+            "value": "[format('law-{0}-{1}', parameters('applicationName'), parameters('uniqueSuffix'))]"
           }
         },
         "template": {
@@ -110,7 +114,7 @@
             "value": "[parameters('location')]"
           },
           "name": {
-            "value": "[format('mongodb-{0}', parameters('applicationName'))]"
+            "value": "[format('mongodb-{0}-{1}', parameters('applicationName'), parameters('uniqueSuffix'))]"
           }
         },
         "template": {
@@ -195,7 +199,7 @@
         "mode": "Incremental",
         "parameters": {
           "name": {
-            "value": "[parameters('applicationName')]"
+            "value": "[format('appenv-{0}-{1}', parameters('applicationName'), parameters('uniqueSuffix'))]"
           },
           "location": {
             "value": "[parameters('location')]"
@@ -272,7 +276,7 @@
         "mode": "Incremental",
         "parameters": {
           "name": {
-            "value": "[parameters('applicationName')]"
+            "value": "[format('{0}-{1}', parameters('applicationName'), parameters('uniqueSuffix'))]"
           },
           "location": {
             "value": "[parameters('location')]"

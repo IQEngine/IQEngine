@@ -15,7 +15,7 @@ _<p align="center"><a href="https://www.iqengine.org">www.iqengine.org</a></p>_
 * Interactively learn about different Fourier and wavelet transforms and filters by applying them to interesting signals
 * Organize and search through millions of RF recordings via metadata queries
 
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FIQEngine%2FIQEngine%2Fmain%2Finfra%2Fmain.bicep)
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FNepomuceno%2FIQEngine%2Fdeploy_to_azure%2Finfra%2Fiqengine.json)
 
 Try IQEngine now using the canonical instance at [www.iqengine.org](http://iqengine.org/) hosted by [GNU Radio](https://www.gnuradio.org/) and connected to the official [SigMF](https://github.com/gnuradio/SigMF) examples repository.  You can use the same site to open local RF recordings, the processing is all done client-side.
 
