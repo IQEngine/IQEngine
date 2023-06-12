@@ -58,9 +58,13 @@ const RepositoryTile = (props) => {
         <figure>{imageURL && <img src={imageURL} className="rounded-2xl px-2 h-36"></img>}</figure>
         <div className="h-24 overflow-hidden hover:overflow-auto text-center">{description}</div>
         <div className="text-secondary text-center">SAS Token Expiration: {expires}</div>
-        {isError && <div style={{ color: 'red' }}>This SAS token is expired</div>}
+        {isError && (
+          <div className="text-center" style={{ color: 'red' }}>
+            This SAS token is expired
+          </div>
+        )}
         {isWarning && (
-          <div style={{ color: 'yellow' }}>
+          <div className="text-center" style={{ color: 'yellow' }}>
             This token will expire {dayDifference === 0 ? 'today' : 'in ' + dayDifference + ' days'}
           </div>
         )}
