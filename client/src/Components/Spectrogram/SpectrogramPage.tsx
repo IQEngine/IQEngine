@@ -572,8 +572,7 @@ export const SpectrogramPage = () => {
               <div>
                 <textarea
                   rows={20}
-                  className="bg-base-content text-base-100"
-                  style={{ width: '100%' }}
+                  className="textarea w-full bg-base-100 text-base-content overflow-hidden hover:overflow-scroll"
                   readOnly={true}
                   value={JSON.stringify(
                     {
