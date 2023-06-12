@@ -81,6 +81,7 @@ def test_api_post_meta(client):
     metadata = Metadata.parse_obj(response.json())
     assert metadata.globalMetadata.traceability_revision == 0
     assert metadata.globalMetadata.traceability_origin == {
+        "type": "api",
         "account": test_datasource["account"],
         "container": test_datasource["container"],
         "file_path": "file_path",
