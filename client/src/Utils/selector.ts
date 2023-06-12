@@ -148,7 +148,6 @@ function calcFftOfTile(
 
 export interface SelectFftReturn {
   imageData: any;
-  annotations: Array<any>;
   autoMax: number;
   autoMin: number;
   currentFftMax: number;
@@ -258,39 +257,8 @@ export const selectFft = (
   // Render Image
   const imageData = new ImageData(trimmedFftData, fftSize, num_final_ffts);
 
-  // Annotation portion
-  let annotations_list = [];
-  let sampleRate = meta.getSampleRate();
-  for (let i = 0; i < meta.annotations.length; i++) {
-    let freq_lower_edge = meta.annotations[i]['core:freq_lower_edge'];
-    let freq_upper_edge = meta.annotations[i]['core:freq_upper_edge'];
-    let sample_start = meta.annotations[i]['core:sample_start'];
-    let sample_count = meta.annotations[i]['core:sample_count'];
-    let description = meta.annotations[i]['core:description'];
-
-    // Calc the sample index of the first FFT being displayed
-    let start_sample_index = lowerTile * TILE_SIZE_IN_IQ_SAMPLES;
-    let samples_in_window = (upperTile - lowerTile) * TILE_SIZE_IN_IQ_SAMPLES;
-    let stop_sample_index = start_sample_index + samples_in_window;
-    let center_frequency = meta.getCenterFrequency();
-    let lower_freq = center_frequency - sampleRate / 2;
-    if (
-      (sample_start >= start_sample_index && sample_start < stop_sample_index) ||
-      (sample_start + sample_count >= start_sample_index && sample_start < stop_sample_index)
-    ) {
-      annotations_list.push({
-        x1: ((freq_lower_edge - lower_freq) / sampleRate) * fftSize, // left side. units are in fractions of an FFT size, e.g. 0-1024
-        x2: ((freq_upper_edge - lower_freq) / sampleRate) * fftSize, // right side
-        y1: (sample_start - start_sample_index) / fftSize / zoomLevel, // top
-        y2: (sample_start - start_sample_index + sample_count) / fftSize / zoomLevel, // bottom
-        description: description,
-        index: i, // so we can keep track of which annotation it was in the full list
-      });
-    }
-  }
   let selectFftReturn = {
     imageData: imageData,
-    annotations: annotations_list,
     autoMax: autoMaxs.length ? average(autoMaxs) : 255,
     autoMin: autoMins.length ? average(autoMins) : 0,
     currentFftMax: tempCurrentFftMax,
