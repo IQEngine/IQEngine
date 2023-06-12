@@ -1,12 +1,12 @@
 import React, { ReactNode } from 'react';
 import { useFeatureFlags } from '../FeatureFlagsContext/FeatureFlagsContext';
 
-interface Props {
+interface FeatureProps {
   flag: string;
   children: ReactNode;
 }
 
-const Feature: React.FC<Props> = ({ flag, children }) => {
+const Feature = ({ flag, children }: FeatureProps) => {
   const { featureFlags } = useFeatureFlags();
 
   if (!featureFlags) {

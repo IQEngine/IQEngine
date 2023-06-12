@@ -16,7 +16,7 @@ interface Props {
   flags: Flags;
 }
 
-export const FeatureFlagsProvider: React.FC<Props> = ({ children, flags }) => {
+export const FeatureFlagsProvider = ({ children, flags }: Props) => {
   const [featureFlags, setFeatureFlags] = useState<Flags>(flags);
 
   return (
