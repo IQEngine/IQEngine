@@ -35,7 +35,7 @@ dev:
 test: SHELL:=/bin/bash
 test:
 	@echo "Running Playwright frontend and end-to-end tests"
-	@cd __tests__ && npx playwright test
+	@cd e2e && npx playwright test
 	@echo "Running pytest api tests"
 	@cd api && pytest
 
@@ -43,7 +43,7 @@ test-pw: SHELL:=/bin/bash
 test-pw:
 	@echo "Confirm the FastAPI is running on port 5000 (press any key)..." && read -n1 -s
 	@echo "Running Playwright frontend and end-to-end tests"
-	@npx playwright test
+	@cd e2e && npx playwright test
 
 lint:
 	@echo "Do you want to lint to correct the files? [y/N] " && read ans && if [ $${ans:-'N'} = 'y' ]; then make lint-corrections; else make lint-no-corrections;fi
