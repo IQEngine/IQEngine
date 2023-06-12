@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.17.1.54307",
-      "templateHash": "12518665118416508164"
+      "templateHash": "10118917763092221620"
     }
   },
   "parameters": {
@@ -31,7 +31,7 @@
     },
     "uniqueSuffix": {
       "type": "string",
-      "defaultValue": "[substring(resourceGroup().id, 0, 5)]"
+      "defaultValue": "[substring(uniqueString(resourceGroup().id), 0, 5)]"
     }
   },
   "resources": [
@@ -261,9 +261,7 @@
           }
         }
       },
-      "dependsOn": [
-        "[resourceId('Microsoft.Resources/deployments', 'log-analytics-workspace')]"
-      ]
+      "dependsOn": ["[resourceId('Microsoft.Resources/deployments', 'log-analytics-workspace')]"]
     },
     {
       "type": "Microsoft.Resources/deployments",

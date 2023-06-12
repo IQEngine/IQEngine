@@ -3,7 +3,7 @@ param containerImage string = 'iqengine/iqengine:pre'
 param containerPort int = 3000
 param registry string = 'ghcr.io'
 param applicationName string = 'iqengine'
-param uniqueSuffix string = substring((resourceGroup().id), 0, 5)
+param uniqueSuffix string = substring(uniqueString((resourceGroup().id)), 0, 5)
 
 
 module law 'law.bicep' = {
