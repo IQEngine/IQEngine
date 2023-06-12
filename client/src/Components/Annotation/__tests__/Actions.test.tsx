@@ -6,7 +6,6 @@ import { Actions } from '@/Components/Annotation/Actions';
 import React from 'react';
 import metadataJson from './AnnotationList.test.meta.json';
 import { SigMFMetadata } from '@/Utils/sigmfMetadata';
-import { current } from '@reduxjs/toolkit';
 
 describe('Annotation list component', () => {
   test('Annotations modal is not visible on initial render', async () => {
@@ -16,7 +15,6 @@ describe('Annotation list component', () => {
       <Actions
         meta={meta}
         index={0}
-        annotation={meta.annotations[0]}
         spectrogramHeight={200}
         startSampleCount={10}
         setHandleTop={() => {}}
@@ -39,7 +37,6 @@ describe('Annotation list component', () => {
       <Actions
         meta={meta}
         index={0}
-        annotation={meta.annotations[0]}
         spectrogramHeight={200}
         startSampleCount={10}
         setHandleTop={() => {}}
@@ -65,7 +62,6 @@ describe('Annotation list component', () => {
       <Actions
         meta={meta}
         index={0}
-        annotation={meta.annotations[0]}
         spectrogramHeight={200}
         startSampleCount={10}
         setHandleTop={() => {}}
@@ -90,7 +86,6 @@ describe('Annotation list component', () => {
       <Actions
         meta={meta}
         index={0}
-        annotation={meta.annotations[0]}
         spectrogramHeight={200}
         startSampleCount={10}
         setHandleTop={() => {}}
@@ -118,7 +113,6 @@ describe('Annotation list component', () => {
       <Actions
         meta={meta}
         index={0}
-        annotation={meta.annotations[0]}
         spectrogramHeight={200}
         startSampleCount={10}
         setHandleTop={() => {}}
@@ -146,7 +140,6 @@ describe('Annotation list component', () => {
       <Actions
         meta={meta}
         index={0}
-        annotation={meta.annotations[0]}
         spectrogramHeight={200}
         startSampleCount={10}
         setHandleTop={() => {}}

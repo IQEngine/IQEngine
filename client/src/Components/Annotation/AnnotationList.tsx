@@ -212,7 +212,6 @@ export const AnnotationList = ({ meta, setHandleTop, spectrogramHeight, setMeta 
               startSampleCount={startSampleCount}
               spectrogramHeight={spectrogramHeight}
               index={i}
-              annotation={annotation}
               meta={meta}
               setHandleTop={setHandleTop}
               setMeta={setMeta}
