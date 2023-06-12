@@ -235,8 +235,8 @@ export const SpectrogramPage = () => {
       spectrogramHeight,
       zoomLevel
     );
-    setLowerTile(Math.floor(calculatedTiles.lowerTile));
-    setUpperTile(Math.ceil(calculatedTiles.upperTile));
+    setLowerTile(calculatedTiles.lowerTile);
+    setUpperTile(calculatedTiles.upperTile);
 
     setHandleTop(handleTop);
   };
