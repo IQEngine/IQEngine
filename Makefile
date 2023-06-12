@@ -35,7 +35,7 @@ dev:
 test: SHELL:=/bin/bash
 test:
 	@echo "Running Playwright frontend and end-to-end tests"
-	@npx playwright test
+	@cd __tests__ && npx playwright test
 	@echo "Running pytest api tests"
 	@cd api && pytest
 
