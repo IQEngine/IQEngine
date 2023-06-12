@@ -10,7 +10,7 @@ const Feature = ({ flag, children }: FeatureProps) => {
   const { featureFlags } = useFeatureFlags();
 
   if (!featureFlags) {
-    return <div>Feature flags not loaded yet</div>;
+    return null;
   }
 
   return featureFlags[flag] ? <>{children}</> : null;

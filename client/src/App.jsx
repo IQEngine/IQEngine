@@ -89,7 +89,7 @@ export const App = () => {
           rel="noreferrer"
           href="https://dashboard.mailerlite.com/forms/299501/77960409531811734/share"
         >
-          <Feature flag="useIQEngineAdverts">
+          <Feature flag="useIQEngineOutReach">
             <h2 className="text-center py-2">
               Sign up for a once-a-month email update on IQEngine, such as new features, demos, and more!
             </h2>
