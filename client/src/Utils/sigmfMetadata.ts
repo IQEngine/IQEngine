@@ -42,6 +42,14 @@ export class SigMFMetadata {
     return dataTypeToBytesPerSample(this.global['core:datatype']) ?? 1;
   }
 
+  getVersion() {
+    return this.global['core:version'];
+  }
+
+  getOffset() {
+    return this.global['core:offset'] ?? 0;
+  }
+
   getOrigin() {
     return this.global['traceability:origin'];
   }
@@ -117,7 +125,7 @@ export class SigMFMetadata {
     return this.getFullFilePath() + '.sigmf-meta';
   }
   getDataType() {
-    return this.global['core:datatype'];
+    return this.global['core:datatype'] ?? '';
   }
   getDataTypeDescription() {
     return this.global['core:datatype']

@@ -1,4 +1,7 @@
 To run FastAPI functions locally for testing:
+
+First edit your .env file to include `VITE_DETECTOR_ENDPOINT=http://localhost:8000/detectors/`
+
 ```
 sudo apt install uvicorn ffmpeg libsm6 libxext6 -y
 cd detectors
