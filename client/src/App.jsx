@@ -38,7 +38,7 @@ export const App = () => {
   }, [config]);
 
   return (
-    <FeatureFlagsProvider flags={initialFlags}>
+    <FeatureFlagsProvider flags={config.data.featureFlags}>
       <ThemeSelector>
         <div>
           <div className="container flex mb-40" id="topRow">
