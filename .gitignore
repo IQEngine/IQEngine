@@ -42,3 +42,5 @@ api/build
 **/.ruff_cache/
 *.venv/
 tiling/spectrogram.pmtiles
+
+**/infra/*.json
