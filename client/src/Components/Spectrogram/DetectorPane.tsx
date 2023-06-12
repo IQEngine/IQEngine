@@ -113,8 +113,13 @@ export const DetectorPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta 
         }
         let newAnnotations = data.annotations.map((annotation) => Object.assign(new Annotation(), annotation));
         console.log(newAnnotations);
-        meta['annotations'].push(...newAnnotations);
-        meta['annotations'] = meta['annotations'].flat();
+        // for now replace the existing annotations
+        if (true) {
+          meta['annotations'] = newAnnotations;
+        } else {
+          meta['annotations'].push(...newAnnotations);
+          meta['annotations'] = meta['annotations'].flat();
+        }
         let newMeta = Object.assign(new SigMFMetadata(), meta);
         setMeta(newMeta);
       });
@@ -164,9 +169,7 @@ export const DetectorPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta 
               </>
             ))}
           </div>
-          <button type="submit" onClick={handleSubmit}>
-            Run Detector
-          </button>
+          <button onClick={handleSubmit}>Run Detector</button>
         </>
       )}
     </div>
