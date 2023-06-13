@@ -1,4 +1,4 @@
-.PHONY: setup run-api run-react build-docker run-docker clean dev test lint lint-corrections lint-no-corrections all test
+.PHONY: setup run-api run-react build-docker run-docker clean dev test lint lint-corrections lint-no-corrections all test test-pw build-infra deploy-infra
 
 setup:
 	@echo "Setting up project dependencies..."
@@ -20,6 +20,15 @@ build-docker:
 run-docker:
 	@echo "Running IQEngine Docker container..."
 	@docker run -p 5000:5000 -p 3000:3000 iqengine
+
+build-infra:
+	@echo "Building infrastructure..."
+	@bicep build $(shell git rev-parse --show-toplevel)/infra/main.bicep --outfile $(shell git rev-parse --show-toplevel)/infra/iqengine.json
+
+deploy-infra:
+	@echo "Deploying infrastructure..."
+	@az group create --name iqengine --location uksouth
+	@az deployment group create --resource-group iqengine --template-file $(shell git rev-parse --show-toplevel)/infra/iqengine.json
 
 clean:
 	@echo "Cleaning up..."
