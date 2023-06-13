@@ -38,11 +38,13 @@ describe('Test RepoBrowser', () => {
     import.meta.env.VITE_DETECTOR_ENDPOINT = 'http://127.0.0.1:8000/detectors/';
     import.meta.env.VITE_CONNECTION_INFO = '{}';
     import.meta.env.VITE_GOOGLE_ANALYTICS_KEY = 'UA-TEST-KEY-1';
+    import.meta.env.VITE_FEATURE_FLAGS = { useAPIDatasources: true };
   });
   afterAll(() => {
     delete import.meta.env.VITE_DETECTOR_ENDPOINT;
     delete import.meta.env.VITE_CONNECTION_INFO;
     delete import.meta.env.VITE_GOOGLE_ANALYTICS_KEY;
+    delete import.meta.env.VITE_FEATURE_FLAGS;
   });
 
   beforeEach(() => {
