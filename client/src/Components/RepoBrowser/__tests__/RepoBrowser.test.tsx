@@ -51,5 +51,10 @@ describe('Test RepoBrowser', () => {
 
   test('Basic Rendering', async () => {
     render(<RepoBrowser></RepoBrowser>, { wrapper: AllProviders });
+    expect(await screen.getByText('Browse Your Azure Blob Storage')).exist;
   });
 });
+
+// test for rendering api datasources
+
+// test for rendering azure blob storage
