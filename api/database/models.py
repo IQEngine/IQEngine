@@ -2,10 +2,12 @@ from pydantic import BaseModel, Extra, Field
 
 
 class DataSource(BaseModel):
+    type: str
     name: str
     account: str
     container: str
     description: str
+    imageURL: str | None
 
 
 class DataSourceReference(BaseModel):

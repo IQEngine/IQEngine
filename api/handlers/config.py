@@ -15,7 +15,7 @@ def get_config():
     if connection_info:
         connection_info = json.loads(connection_info)
     detector_endpoint = os.getenv("DETECTOR_ENDPOINT", None)
-    if detector_endpoint[-1] != '/':
+    if detector_endpoint and detector_endpoint[-1] != '/':
         detector_endpoint += '/'
     return {
         "detectorEndpoint": detector_endpoint,
