@@ -102,6 +102,20 @@ To fix 99% of linting warnings automatically, try running:
 docker run -d -v $(git rev-parse --show-toplevel):/tmp/lint ghcr.io/oxsecurity/megalinter:v6
 ```
 
+Feature Flag usage.
+
+Feature flags are set up across the application. To use a feature flag add it to the environment .env and then use it to wrap UI elements as illustrated below, or use the getFeatureFlag(flagname) method to programmatically get a feature flag value.
+
+Each component needs to import the Feature component.
+
+```HTML
+      <Feature flag="useIQEngineOutReach">
+        <h2 className="text-center py-2">
+          Sign up for a once-a-month email update on IQEngine, such as new features, demos, and more!
+        </h2>
+      </Feature>
+```
+
 ## Project Configuration
 
 To configure the project, you need to set specific environment variables. The currently supported environment variables are as follows:
@@ -170,20 +184,3 @@ The following roadmap highlights the past, current, and future work items across
 <p align="center"><img width=250 src="client/public/microsoft-logo.svg" /></p>
 
 <p align="center"><a href="https://www.qoherent.ai/"><img width=250 src="client/public/clogo-black.png" /></a></p>
-
-
-## Miscellaneous Tips
-
-Feature Flag usage.
-
-Feature flags are set up across the application. To use a feature flag add it to the environment .env and then use it to wrap UI elements as illustrated below, or use the getFeatureFlag(<flag>) method to programmatically get a feature flag value.
-
-Each component needs to import the Feature component.
-
-```HTML
-      <Feature flag="useIQEngineOutReach">
-        <h2 className="text-center py-2">
-          Sign up for a once-a-month email update on IQEngine, such as new features, demos, and more!
-        </h2>
-      </Feature>
-```
