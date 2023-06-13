@@ -1,15 +1,16 @@
 param location string = resourceGroup().location
-
 param containerImage string = 'iqengine/iqengine:pre'
 param containerPort int = 3000
 param registry string = 'ghcr.io'
 param applicationName string = 'iqengine'
+param uniqueSuffix string = substring(uniqueString((resourceGroup().id)), 0, 5)
+
 
 module law 'law.bicep' = {
     name: 'log-analytics-workspace'
     params: {
       location: location
-      name: 'law-${applicationName}'
+      name: 'law-${applicationName}-${uniqueSuffix}'
     }
 }
 
@@ -17,14 +18,14 @@ module mondodb 'mongodb.bicep' = {
   name: 'mongodb'
   params: {
     location: location
-    name: 'mongodb-${applicationName}'
+    name: 'mongodb-${applicationName}-${uniqueSuffix}'
   }
 }
 
 module containerAppEnvironment 'environment.bicep' = {
   name: 'container-app-environment'
   params: {
-    name: applicationName
+    name: 'appenv-${applicationName}-${uniqueSuffix}'
     location: location
     lawClientId:law.outputs.clientId
     lawClientSecret: law.outputs.clientSecret
@@ -34,7 +35,7 @@ module containerAppEnvironment 'environment.bicep' = {
 module containerApp 'containerapp.bicep' = {
   name: 'container-app'
   params: {
-    name: applicationName
+    name: '${applicationName}-${uniqueSuffix}'
     location: location
     containerAppEnvironmentId: containerAppEnvironment.outputs.id
     containerImage: containerImage

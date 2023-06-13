@@ -3,7 +3,7 @@ name: Run Playwright frontend integration tests
 
 on:
   workflow_run:
-    workflows: ['Deploy To PR']
+    workflows: ['Deploy To Staging']
     branches: [main]
     types:
       - completed
@@ -23,11 +23,11 @@ jobs:
           node-version: 18
 
       - name: Install dependencies
-        run: npm ci
+        run: cd "$GITHUB_WORKSPACE/e2e" && npm ci
 
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
+        run: cd "$GITHUB_WORKSPACE/e2e" && npx playwright install --with-deps
 
       - name: Run Playwright tests
         run: |
-          npx playwright test --config playwright-pr.config.ts
+          cd "$GITHUB_WORKSPACE/e2e" && npx playwright test --config playwright-pr.config.ts

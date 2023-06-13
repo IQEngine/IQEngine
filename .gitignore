@@ -12,9 +12,9 @@ node_modules
 
 # testing
 /coverage
-/test-results/
-/playwright-report/
-/playwright/.cache/
+**/test-results/
+**/playwright-report/
+**/playwright/.cache/
 
 # misc
 .DS_Store
@@ -42,3 +42,6 @@ api/build
 **/.ruff_cache/
 *.venv/
 tiling/spectrogram.pmtiles
+
+**/infra/*.json
+!**/infra/iqengine.json

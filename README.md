@@ -15,6 +15,8 @@ _<p align="center"><a href="https://www.iqengine.org">www.iqengine.org</a></p>_
 * Interactively learn about different Fourier and wavelet transforms and filters by applying them to interesting signals
 * Organize and search through millions of RF recordings via metadata queries
 
+
+
 Try IQEngine now using the canonical instance at [www.iqengine.org](http://iqengine.org/) hosted by [GNU Radio](https://www.gnuradio.org/) and connected to the official [SigMF](https://github.com/gnuradio/SigMF) examples repository.  You can use the same site to open local RF recordings, the processing is all done client-side.
 
 IQEngine is rapidly evolving, so [sign up](https://dashboard.mailerlite.com/forms/299501/77960409531811734/share) for a once-a-month email update, including new features, demos, and more!  There is also an IQEngine [Discord](https://discord.gg/k7C8kp3b76) chat channel if you want to get involved in the development.  You may also contact Marc at iqengine@vt.edu for questions/comments/suggestions.
@@ -29,6 +31,12 @@ It currently only supports Python snippets, where the samples out must be the sa
 <p align="center">
   <img width=450 src="client/public/plugins_concept.svg" />
 </p>
+
+## Create your own instance
+Click the button below to deploy your own instance of IQEngine.
+You will need an Azure account, but you can get a free one [here](https://azure.microsoft.com/en-us/free/).  The deployment will take about 5 minutes.
+
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FIQEngine%2FIQEngine%2Fmain%2Finfra%2Fiqengine.json)
 
 ## Local Installation
 
@@ -100,6 +108,20 @@ To fix 99% of linting warnings automatically, try running:
 
 ```bash
 docker run -d -v $(git rev-parse --show-toplevel):/tmp/lint ghcr.io/oxsecurity/megalinter:v6
+```
+
+Feature Flag usage.
+
+Feature flags are set up across the application. To use a feature flag add it to the environment .env and then use it to wrap UI elements as illustrated below, or use the getFeatureFlag(flagname) method to programmatically get a feature flag value.
+
+Each component needs to import the Feature component.
+
+```HTML
+      <Feature flag="useIQEngineOutReach">
+        <h2 className="text-center py-2">
+          Sign up for a once-a-month email update on IQEngine, such as new features, demos, and more!
+        </h2>
+      </Feature>
 ```
 
 ## Project Configuration
