@@ -279,7 +279,7 @@ export const SpectrogramPage = () => {
       console.log('Meta data loaded, fetching and rendering tiles', meta);
       fetchAndRender(handleTop);
     }
-  }, [meta, zoomLevel]);
+  }, [meta, zoomLevel, handleTop]);
 
   // run windowResized once when page loads
   useEffect(() => {
