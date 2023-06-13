@@ -29,6 +29,7 @@ import RepoBrowser from './Components/RepoBrowser/RepoBrowser';
 import RecordingsBrowser from './Components/RecordingsBrowser/RecordingsBrowser';
 import SpectrogramPage from './Components/Spectrogram/SpectrogramPage';
 import { CLIENT_TYPE_BLOB } from './api/Models';
+import { FeatureFlagsProvider } from './Components/FeatureFlagsContext/FeatureFlagsContext';
 
 // @ts-ignore
 const queryClient = new QueryClient();
@@ -42,29 +43,31 @@ const root = createRoot(container);
 root.render(
   <QueryClientProvider client={queryClient}>
     <Provider store={store}>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<App />}>
-            <Route path="about" element={<About />} />
-            <Route path="sigmf" element={<SigMF />} />
-            <Route path="siggen" element={<SignalGenerator />} />
-            <Route path="plugins" element={<Plugins />} />
-            <Route path="validator" element={<Validator />} />
-            <Route
-              path="/openapi"
-              element={
-                <div className="bg-white">
-                  <SwaggerUI url="https://raw.githubusercontent.com/IQEngine/IQEngine/main/detectors/openapi.yaml" />
-                </div>
-              }
-            />
-            <Route path="/" element={<RepoBrowser />} />
-            <Route path="recordings/" element={<RecordingsBrowser />} />
-            <Route path="recordings/:type/:account/:container/:sasToken?" element={<RecordingsBrowser />} />
-            <Route path="spectrogram/:type/:account/:container/:filePath/:sasToken?" element={<SpectrogramPage />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
+      <FeatureFlagsProvider flags={null}>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<App />}>
+              <Route path="about" element={<About />} />
+              <Route path="sigmf" element={<SigMF />} />
+              <Route path="siggen" element={<SignalGenerator />} />
+              <Route path="plugins" element={<Plugins />} />
+              <Route path="validator" element={<Validator />} />
+              <Route
+                path="/openapi"
+                element={
+                  <div className="bg-white">
+                    <SwaggerUI url="https://raw.githubusercontent.com/IQEngine/IQEngine/main/detectors/openapi.yaml" />
+                  </div>
+                }
+              />
+              <Route path="/" element={<RepoBrowser />} />
+              <Route path="recordings/" element={<RecordingsBrowser />} />
+              <Route path="recordings/:type/:account/:container/:sasToken?" element={<RecordingsBrowser />} />
+              <Route path="spectrogram/:type/:account/:container/:filePath/:sasToken?" element={<SpectrogramPage />} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </FeatureFlagsProvider>
     </Provider>
   </QueryClientProvider>
 );
