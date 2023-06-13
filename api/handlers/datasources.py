@@ -43,6 +43,7 @@ def get_datasources(
         result.append(datasource)
     return result
 
+
 @router.get(
     "/api/datasources/{account}/{container}/image")
 def get_generated_image():
@@ -56,4 +57,3 @@ def get_generated_image():
     image_data.seek(0)
 
     return StreamingResponse(image_data, media_type="image/png")
-
