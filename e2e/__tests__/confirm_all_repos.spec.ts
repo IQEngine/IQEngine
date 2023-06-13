@@ -22,6 +22,6 @@ test('Confirm all repos display', async ({ page }) => {
   await page.getByRole('link', { name: 'IQEngine', exact: true }).click();
 
   // Azure blob
-  // await page.getByRole('button', { name: 'Browse' }).nth(3).click();
-  // await page.getByRole('link', { name: 'IQEngine', exact: true }).click();
+  await page.getByRole('button', { name: 'Browse' }).nth(3).click();
+  //await page.getByRole('link', { name: 'IQEngine', exact: true }).click(); // wasnt working for marc
 });

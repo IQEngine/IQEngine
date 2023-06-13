@@ -22,6 +22,10 @@ export class LocalClient implements DataSourceClient {
   }
 
   get(account: string, container: string): Promise<DataSource> {
+    const localDirectory: FileWithDirectoryAndFileHandle[] = store.getState().localClient.files;
+    if (!localDirectory) {
+      return Promise.reject('No local directory found');
+    }
     return Promise.resolve({
       name: container,
       account: account,

@@ -6,28 +6,6 @@ import { IQDataSlice } from '../Models';
 import { convertToFloat32 } from '@/Sources/FetchMoreDataSource';
 
 export class LocalClient implements IQDataClient {
-  async getMetaFromFile(
-    file: FileWithDirectoryAndFileHandle,
-    dataFile: FileWithDirectoryAndFileHandle,
-    account: string,
-    container: string
-  ) {
-    const fileContent = await file.text();
-    let metadata = Object.assign(new SigMFMetadata(), JSON.parse(fileContent)) as SigMFMetadata;
-    metadata.dataFileHandle = dataFile;
-    metadata.metadataFileHandle = file;
-    const origin: TraceabilityOrigin = metadata['traceability:origin'];
-    if (!origin) {
-      metadata['traceability:origin'] = {
-        type: 'local',
-        account: account,
-        container: container,
-        filePath: file.webkitRelativePath,
-      };
-    }
-    return metadata;
-  }
-
   getIQDataSlices(meta: SigMFMetadata, indexes: number[], tileSize: number): Promise<IQDataSlice[]> {
     return Promise.all(indexes.map((index) => this.getIQDataSlice(meta, index, tileSize)));
   }
@@ -38,8 +16,9 @@ export class LocalClient implements IQDataClient {
       Promise.reject('No local directory found');
     }
     const filePath = meta.getOrigin().file_path;
+    console.log('getIQDataSlice', filePath, index);
     const dataFile = localDirectory.find((file) => {
-      return file.webkitRelativePath === filePath + '.sigmf-data';
+      return file.webkitRelativePath === filePath + '.sigmf-data' || file.name === filePath + '.sigmf-data';
     });
     if (!dataFile) {
       return Promise.reject('No data file found');
