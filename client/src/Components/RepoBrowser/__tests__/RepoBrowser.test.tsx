@@ -8,6 +8,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import { BrowserRouter as Router } from 'react-router-dom';
 import connectionReducer from '@/Store/Reducers/ConnectionReducer';
 import { Provider } from 'react-redux';
+import { FeatureFlagsProvider } from '@/Components/FeatureFlagsContext/FeatureFlagsContext';
 
 describe('Test RepoBrowser', () => {
   const queryClient = new QueryClient({
@@ -28,7 +29,9 @@ describe('Test RepoBrowser', () => {
   const AllProviders = ({ children }) => (
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
-        <Router>{children}</Router>
+        <FeatureFlagsProvider flags={null}>
+          <Router>{children}</Router>
+        </FeatureFlagsProvider>
       </QueryClientProvider>
     </Provider>
   );
