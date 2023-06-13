@@ -186,6 +186,14 @@ const ScrollBar = (props: ScrollBarProps) => {
     fetchAndRender(newY);
   };
 
+  const handleWheel = (e) => {
+    e.evt.preventDefault();
+    let scrollDirection = -e.evt.wheelDeltaY / Math.abs(e.evt.wheelDeltaY);
+    let scrollAmount = scrollDirection * 12;
+    let newY = Math.min(spectrogramHeight - handleHeightPixels, Math.max(0, handleTop + scrollAmount));
+    fetchAndRender(newY);
+  }
+
   const handleDragMove = (e) => {
     let newY = e.target.y();
     if (newY <= 0) {
@@ -203,7 +211,7 @@ const ScrollBar = (props: ScrollBarProps) => {
   if (!minimapImg) {
     return (
       <>
-        <Layer>
+        <Layer onWheel={handleWheel}>
           <Rect
             x={0}
             y={0}
@@ -229,7 +237,7 @@ const ScrollBar = (props: ScrollBarProps) => {
 
   return (
     <>
-      <Layer>
+      <Layer onWheel={handleWheel}>
         <Image image={minimapImg} x={0} y={0} width={scrollbarWidth} height={spectrogramHeight} />
         {/* This rect is invisible */}
         <Rect
@@ -243,7 +251,7 @@ const ScrollBar = (props: ScrollBarProps) => {
           onClick={handleClick}
         ></Rect>
       </Layer>
-      <Layer>
+      <Layer onWheel={handleWheel}>
         <Rect
           x={0}
           y={handleTop}
