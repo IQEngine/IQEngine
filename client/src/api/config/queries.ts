@@ -35,7 +35,7 @@ const fetchConfig = async () => {
       connectionInfo: JSON.parse(import.meta.env.VITE_CONNECTION_INFO),
       detectorEndpoint: import.meta.env.VITE_DETECTOR_ENDPOINT,
       googleAnalyticsKey: import.meta.env.VITE_GOOGLE_ANALYTICS_KEY,
-      featureFlags: JSON.parse(import.meta.env.VITE_FEATURE_FLAGS),
+      featureFlags: {}, // optional env var, may not exist in .env file
     } as Config;
   }
 };
