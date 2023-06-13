@@ -16,6 +16,7 @@ itsdangerous==2.1.2
 Jinja2==3.1.2
 MarkupSafe==2.1.2
 packaging==23.1
+pillow==9.5.0
 pluggy==1.0.0
 pydantic==1.10.8
 pymongo==4.3.3
