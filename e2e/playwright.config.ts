@@ -21,6 +21,22 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
 
+  /* Start the API Server */
+  webServer: [
+    {
+      command: 'cd .. && . .venv/bin/activate && make run-api',
+      url: 'http://127.0.0.1:5000/api/status',
+      reuseExistingServer: !process.env.CI,
+      timeout : 3 * 1000
+    },
+    {
+      command: 'cd .. && make dev',
+      url: 'http://127.0.0.1:3000',
+      reuseExistingServer: !process.env.CI,
+      timeout : 3 * 1000
+    }
+  ],
+
   /* Configure projects for major browsers */
   projects: [
     {
