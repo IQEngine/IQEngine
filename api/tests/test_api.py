@@ -6,10 +6,12 @@ import os
 from database.models import Metadata
 
 test_datasource = {
+    "type": "api",
     "name": "name",
     "account": "account",
     "container": "container",
     "description": "description",
+    "imageURL": "imageURL"
 }
 
 test_datasource_id = f'{test_datasource["account"]}_{test_datasource["container"]}'
