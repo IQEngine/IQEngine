@@ -16,6 +16,7 @@ import { INITIAL_PYTHON_SNIPPET, TILE_SIZE_IN_IQ_SAMPLES } from '../../Utils/con
 import TimeSelector from './TimeSelector';
 import { ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 import AnnotationList from '@/Components/Annotation/AnnotationList';
+import { GlobalProperties } from '@/Components/GlobalProperties/GlobalProperties';
 import { MetaViewer } from '@/Components/MetaViewer/MetaViewer';
 import { SpectrogramContext } from './SpectrogramContext';
 import { useParams } from 'react-router-dom';
@@ -538,6 +539,18 @@ export const SpectrogramPage = () => {
                 meta={meta}
                 setHandleTop={setHandleTop}
                 spectrogramHeight={spectrogramHeight}
+                setMeta={setMeta}
+              />
+            </div>
+          </details>
+
+          <details>
+            <summary className="pl-2 mt-2 bg-primary outline outline-1 outline-primary text-lg text-base-100 hover:bg-green-800">
+              Global Properties
+            </summary>
+            <div className="outline outline-1 outline-primary p-2">
+              <GlobalProperties
+                meta={meta}
                 setMeta={setMeta}
               />
             </div>

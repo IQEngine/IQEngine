@@ -44,7 +44,7 @@ div.datatypetext {
   white-space: pre;
 }
 
-.input {
+.input-autosize {
   min-width: 1px;
   padding: 0;
   max-width: 250px;
