@@ -78,18 +78,22 @@ export const DetectorPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta 
     const newSamps = Array.from(trimmedSamples);
 
     let body = {
-      samples: newSamps,
-      sample_rate: sampleRate,
-      center_freq: freq,
+      data_input: [{
+        samples: newSamps,
+        sample_rate: sampleRate,
+        center_freq: freq,
+        data_type: "iq/cf32_le"
+      }],
+      custom_params: {},
     };
     // Add custom params
     for (const [key, value] of Object.entries(detectorParams)) {
       if (value['type'] === 'integer') {
-        body[key] = parseInt(value['default']); // remember, we updated default with whatever the user enters
+        body["custom_params"][key] = parseInt(value['default']); // remember, we updated default with whatever the user enters
       } else if (value['type'] === 'number') {
-        body[key] = parseFloat(value['default']);
+        body["custom_params"][key] = parseFloat(value['default']);
       } else {
-        body[key] = value['default'];
+        body["custom_params"][key] = value['default'];
       }
     }
     console.debug(body);
@@ -107,21 +111,26 @@ export const DetectorPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta 
       })
       .then(function (data) {
         console.debug('Detector Status:', data.status);
-        console.debug('Results:', data.annotations);
-        for (let i = 0; i < data.annotations.length; i++) {
-          data.annotations[i]['core:sample_start'] += startSampleOffset;
+        //console.debug('data:', data);
+        if (data.data_output.length > 0){
+          console.log(data.data_output);
         }
-        let newAnnotations = data.annotations.map((annotation) => Object.assign(new Annotation(), annotation));
-        console.log(newAnnotations);
-        // for now replace the existing annotations
-        if (true) {
-          meta['annotations'] = newAnnotations;
-        } else {
-          meta['annotations'].push(...newAnnotations);
-          meta['annotations'] = meta['annotations'].flat();
+        if (data.annotations){
+          for (let i = 0; i < data.annotations.length; i++) {
+            data.annotations[i]['core:sample_start'] += startSampleOffset;
+          }
+          let newAnnotations = data.annotations.map((annotation) => Object.assign(new Annotation(), annotation));
+          console.log(newAnnotations);
+          // for now replace the existing annotations
+          if (true) {
+            meta['annotations'] = newAnnotations;
+          } else {
+            meta['annotations'].push(...newAnnotations);
+            meta['annotations'] = meta['annotations'].flat();
+          }
+          let newMeta = Object.assign(new SigMFMetadata(), meta);
+          setMeta(newMeta);
         }
-        let newMeta = Object.assign(new SigMFMetadata(), meta);
-        setMeta(newMeta);
       });
   };
 
@@ -152,11 +161,10 @@ export const DetectorPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta 
       </label>
       {Object.keys(detectorParams).length > 0 && (
         <>
-          <label className="label">Params:</label>
           <div className="mb-3">
             {Object.keys(detectorParams).map((key, index) => (
-              <>
-                <label className="label" key={index}>
+              <div key={index + 100000}>
+                <label className="label pb-0">
                   {detectorParams[key]['title']}
                 </label>
                 <input
@@ -165,8 +173,9 @@ export const DetectorPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta 
                   value={detectorParams[key]['default']}
                   onChange={handleChange}
                   className="h-8 rounded text-base-100 ml-1 pl-2"
+                  
                 />
-              </>
+              </div>
             ))}
           </div>
           <button onClick={handleSubmit}>Run Detector</button>

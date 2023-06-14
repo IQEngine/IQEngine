@@ -65,32 +65,45 @@ async def detect(info : fastapi.Request, detectorname):
     #except Exception as e:
     #    print("POST body failed schema validation, error:", e)
 
-    samples = function_input.pop("samples") # Assumed to be real or floats in IQIQIQIQ (cant send complex over JSON)
-    print(function_input)
-
-    if not samples:
-        return {
-        "status" : "FAILED",
-        "annotations" : []
-    }
-    samples = np.asarray(samples)
-    if samples.size % 2 == 1:
-        return {"status" : "FAILED - number of samples was not an even number", "annotations": []}
-    samples = samples[::2] + 1j*samples[1::2]
-    samples = samples.astype(np.complex64)
-
-    DetectorInstance = Detector(**function_input) # a way to provide params as a single dict
-    annotations = DetectorInstance.detect(samples)
-    logging.info(annotations)
-
-    # Validate with our schema
     try:
-        validate(instance=function_input, schema=schema["paths"]["/detectors/{detectorname}"]['post']['responses']['200']['content']['application/json']['schema'])
-    except Exception as e:
-        print("Detector's return annotations failed schema validation, error:", e)
+        data_input_len = len(function_input.get("data_input", []))
+        print(type(function_input.get("data_input", None)))
+        if not isinstance(function_input.get("data_input", None), list):
+            return {"status" : "FAILED - data_input wasnt a list", "annotations": []}
+        print("data_input length:", data_input_len)
+        if data_input_len < 1:
+            return {"status" : "FAILED - no data_input", "annotations": []}
+
+        # Extract samples
+        samples = function_input["data_input"][0]["samples"] # Assumed to be real or floats in IQIQIQIQ (cant send complex over JSON)
+        sample_rate = function_input["data_input"][0]["sample_rate"]
+        center_freq = function_input["data_input"][0]["center_freq"]
+        samples = np.asarray(samples)
+        if samples.size % 2 == 1:
+            return {"status" : "FAILED - number of samples was not an even number", "annotations": []}
+        samples = samples[::2] + 1j*samples[1::2]
+        samples = samples.astype(np.complex64)
+
+        custom_params = function_input.get("custom_params", {})
+        custom_params["sample_rate"] = sample_rate
+        custom_params["center_freq"] = center_freq
+
+        DetectorInstance = Detector(**custom_params) # a way to provide params as a single dict
+        annotations = DetectorInstance.detect(samples)
+        logging.info(annotations)
+
+    except:
+        return {"status" : "FAILED - unknown error in detector_api", "annotations": []}
+
+    ## Validate with our schema
+    #try:
+    #    validate(instance=function_input, schema=schema["paths"]["/detectors/{detectorname}"]['post']['responses']['200']['content']['application/json']['schema'])
+    #except Exception as e:
+    #    print("Detector's return annotations failed schema validation, error:", e)
 
     return {
         "status" : "SUCCESS",
+        "data_output" : [],
         "annotations" : annotations
     }
 
