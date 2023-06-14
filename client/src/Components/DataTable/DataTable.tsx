@@ -97,7 +97,7 @@ export const DataTable = ({ dataColumns, dataRows }: TableProps) => {
         </div>
         <div>
           <input
-            className={`bg-base-100 input no-spin`}
+            className={`bg-base-100 input input-autosize no-spin`}
             aria-label="filter"
             value={filterInput}
             onChange={(e) => {

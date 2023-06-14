@@ -59,7 +59,7 @@ export const AutoSizeInput = ({
           type={type ?? 'text'}
           title={content}
           value={content}
-          className={`bg-base-100 input no-spin ${className}`}
+          className={`bg-base-100 input input-autosize no-spin ${className}`}
           style={{ width }}
           autoFocus
           onChange={changeHandler}
