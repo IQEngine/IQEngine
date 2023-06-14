@@ -107,7 +107,3 @@ describe('Test RepoBrowser', () => {
 
 
 });
-
-// test for rendering api datasources
-
-// test for rendering azure blob storage
