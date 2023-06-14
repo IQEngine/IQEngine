@@ -28,7 +28,6 @@ const TimeSelector = (props) => {
   useEffect(() => {
     handleTimeSelectionStart(startTileNum);
     handleTimeSelectionEnd(endTileNum);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // dont put dep here
 
   // Sample-start bar
