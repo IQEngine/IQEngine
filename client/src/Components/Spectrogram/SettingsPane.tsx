@@ -136,7 +136,7 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
     setState({ ...state, zoomLevel: e.target.value });
     props.updateZoomLevel(e.target.value);
   };
-  
+
   const onToggleCursors = (e) => {
     setState({ ...state, saveButtonEnabled: !state.saveButtonEnabled});
     props.toggleCursors(e);

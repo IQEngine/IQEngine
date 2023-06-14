@@ -49,10 +49,10 @@ const TimeSelector = (props) => {
     e.target.x(0); // keep line in the same x location
     return (newY / spectrogramHeight) * tileDiff + lowerTile;
   };
-  
+
   const updateTimeSelection = (e) => {
-	handleTimeSelectionStart(Math.min(startTileNum, endTileNum));
-	handleTimeSelectionEnd(Math.max(startTileNum, endTileNum));
+    handleTimeSelectionStart(Math.min(startTileNum, endTileNum));
+    handleTimeSelectionEnd(Math.max(startTileNum, endTileNum));
   }
 
   return (
