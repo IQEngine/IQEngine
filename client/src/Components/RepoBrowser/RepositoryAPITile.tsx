@@ -45,7 +45,7 @@ const RepositoryAPITile = (props) => {
         <figure>{imageURL && <img src={imageURL} className="rounded-2xl px-2 h-36"></img>}</figure>
         <div className="h-24 overflow-hidden hover:overflow-auto text-center">{description}</div>
       </div>
-      <button className="repocardbutton" disabled={isDisabled} id={name.replaceAll(' ', '')} onClick={handleOnClick}>
+      <button className="repocardbutton" aria-label={name} disabled={isDisabled} id={name.replaceAll(' ', '')} onClick={handleOnClick}>
         Browse
       </button>
     </div>
