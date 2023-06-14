@@ -6,7 +6,7 @@ class DataSource(BaseModel):
     name: str
     account: str
     container: str
-    description: str
+    description: str | None
     imageURL: str | None
 
 
