@@ -23,10 +23,7 @@ describe('Test RepoBrowser', () => {
   });
 
   const store = configureStore({
-    reducer: {
-      connection: connectionReducer,
-      // other reducers go here
-    },
+    reducer: { },
   });
 
   const AllProviders = ({ children }) => (
@@ -39,7 +36,6 @@ describe('Test RepoBrowser', () => {
     </Provider>
   );
 
-  const wrapper = ({ children }) => <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
   beforeAll(() => {
     import.meta.env.VITE_DETECTOR_ENDPOINT = 'http://127.0.0.1:8000/detectors/';
     import.meta.env.VITE_CONNECTION_INFO = '{}';
@@ -104,6 +100,4 @@ describe('Test RepoBrowser', () => {
     expect(await screen.findByRole('button', { name: 'api-test-name2' })).toBeInTheDocument();
     expect(await screen.findByText('API Test Description 2')).toBeInTheDocument();
   });
-
-
 });
