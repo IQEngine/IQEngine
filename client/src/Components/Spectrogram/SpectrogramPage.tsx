@@ -276,7 +276,7 @@ export const SpectrogramPage = () => {
 
   useEffect(() => {
     if (meta) {
-      console.log('Meta data loaded, fetching and rendering tiles', meta);
+      console.log('fetching and rendering tiles', meta);
       fetchAndRender(handleTop);
     }
   }, [meta, zoomLevel]);
@@ -525,7 +525,7 @@ export const SpectrogramPage = () => {
                 )}
               </div>
             </div>
-            <MetaViewer meta={meta}/>
+            <MetaViewer meta={meta} />
           </div>
         </div>
         <div className="mt-3 mb-0 px-2 py-0" style={{ margin: '5px' }}>
