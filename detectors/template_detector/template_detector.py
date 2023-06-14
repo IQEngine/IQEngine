@@ -33,7 +33,11 @@ class Detector:
         an['core:sample_count'] = 4
         an["core:description"] = "Unknown"
         annotations.append(an)
-        return annotations
+        return {
+            "status" : "SUCCESS",
+            "data_output" : [],
+            "annotations" : annotations
+        }
 
 if __name__ == "__main__":
     # Example of how to test your detector locally

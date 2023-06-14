@@ -89,8 +89,9 @@ async def detect(info : fastapi.Request, detectorname):
         custom_params["center_freq"] = center_freq
 
         DetectorInstance = Detector(**custom_params) # a way to provide params as a single dict
-        annotations = DetectorInstance.detect(samples)
-        logging.info(annotations)
+
+        results = DetectorInstance.detect(samples)
+        logging.info(results)
 
     except:
         return {"status" : "FAILED - unknown error in detector_api", "annotations": []}
@@ -101,11 +102,7 @@ async def detect(info : fastapi.Request, detectorname):
     #except Exception as e:
     #    print("Detector's return annotations failed schema validation, error:", e)
 
-    return {
-        "status" : "SUCCESS",
-        "data_output" : [],
-        "annotations" : annotations
-    }
+    return results
 
 # When running as an azure function this is used
 if os.getenv('ON_AZURE'):

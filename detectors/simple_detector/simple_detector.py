@@ -67,7 +67,12 @@ class Detector:
             an['core:sample_count'] = int(h * fft_size)
             an["core:description"] = "Unknown"
             annotations.append(an)
-        return annotations
+
+        return {
+            "status" : "SUCCESS",
+            "data_output" : [],
+            "annotations" : annotations
+        }
 
 if __name__ == "__main__":
     # Example of how to test your detector locally
