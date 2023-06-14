@@ -9,8 +9,10 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import { useAppDispatch } from '@/Store/hooks';
 import DualRangeSlider from '@/Components/DualRangeSlider/DualRangeSlider';
+import { SigMFMetadata } from '@/Utils/sigmfMetadata';
 
 export class SettingsPaneProps {
+  meta: SigMFMetadata;
   magnitudeMax: number;
   magnitudeMin: number;
   taps: Float32Array = Float32Array.from([1]);
@@ -28,6 +30,7 @@ export class SettingsPaneProps {
   setTaps: (taps: number[]) => void;
   pythonSnippet: string;
   setPythonSnippet: (pythonSnippet: string) => void;
+  handleProcessTime: () => { trimmedSamples: number[]; startSampleOffset: number };
 }
 
 const SettingsPane = (props: SettingsPaneProps) => {
@@ -46,6 +49,7 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
 
     windowFunction: 'hamming',
     zoomLevel: 1,
+    saveButtonEnabled: false,
   });
 
   let [magnitudeMax, setMagnitudeMax] = useState(props.magnitudeMax);
@@ -132,6 +136,43 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
     setState({ ...state, zoomLevel: e.target.value });
     props.updateZoomLevel(e.target.value);
   };
+  
+  const onToggleCursors = (e) => {
+    setState({ ...state, saveButtonEnabled: !state.saveButtonEnabled});
+    props.toggleCursors(e);
+  }
+
+  const onPressSaveButton = (e) => {
+    const { trimmedSamples, _ } = props.handleProcessTime();
+
+    console.log(props.meta);
+
+    var blob = new Blob([trimmedSamples], { type: 'octet/stream' });
+    var meta = {
+        "global": props.meta.global,
+        "captures": props.meta.captures,
+        "annotations": []
+    }
+
+    meta.global["traceability:sample_length"] = trimmedSamples.length;
+    delete meta.global["traceability:origin"];
+
+    var blobUrl = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    document.body.appendChild(a);
+    a.style = 'display: none';
+
+    a.href = blobUrl;
+    a.download = 'trimmedSamples.sigmf-data';
+    a.click();
+
+    a.href ="data:text/plain;charset=utf-8," + encodeURIComponent(JSON.stringify(meta, null, 2));
+    a.download = "trimmedSamples.sigmf-meta";
+    a.click();
+
+    window.URL.revokeObjectURL(blobUrl);
+    document.body.removeChild(a);
+  }
 
   return (
     <div className="form-control">
@@ -153,9 +194,13 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
         <input
           type="checkbox"
           className="toggle toggle-primary float-right"
-          onChange={props.toggleCursors}
+          onChange={onToggleCursors}
         />
       </label>
+
+      <button className="mb-3" onClick={onPressSaveButton} style={{ width: '100%', marginTop: '5px' }} disabled={!state.saveButtonEnabled}>
+        Save Selection
+      </button>
 
       <div className="mb-3" id="formMagMax">
         <label>
