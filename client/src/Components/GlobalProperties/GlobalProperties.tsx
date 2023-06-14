@@ -11,7 +11,7 @@ export const  GlobalProperties = ({ meta, setMeta }) => {
   if(!meta) return <></>
 
   const globalMeta = meta.global ?? {};
-  
+
   const titleCase = (str: string) : string => {
     str = str.replace('core:', '').replace(':', ' ').replace('_', ' ').replace('hw', 'Hardware');
     let strArr: string[] = str.toLowerCase().split(' ');
@@ -29,12 +29,12 @@ export const  GlobalProperties = ({ meta, setMeta }) => {
   }
 
   const renderFormInput = (key: string, value: any) : ReactElement<P> => {
-    if(key.indexOf('core:description') !== -1 || 
+    if(key.indexOf('core:description') !== -1 ||
       (typeof value === "object" && value !== null) )
       return (
         <textarea
           name={key}
-          placeholder={value} 
+          placeholder={value}
           className="textarea pl-4 pr-4 textarea-bordered textarea-success textarea-lg w-full"
           data-testid={key}
           defaultValue={stringifyObject(key, value)}
@@ -44,8 +44,8 @@ export const  GlobalProperties = ({ meta, setMeta }) => {
     return (
       <input
           name={key}
-          type="text" 
-          placeholder={value} 
+          type="text"
+          placeholder={value}
           className="input input-bordered input-success w-full"
           data-testid={key}
           defaultValue={stringifyObject(key, value)}
