@@ -49,6 +49,11 @@ const TimeSelector = (props) => {
     e.target.x(0); // keep line in the same x location
     return (newY / spectrogramHeight) * tileDiff + lowerTile;
   };
+  
+  const updateTimeSelection = (e) => {
+	handleTimeSelectionStart(Math.min(startTileNum, endTileNum));
+	handleTimeSelectionEnd(Math.max(startTileNum, endTileNum));
+  }
 
   return (
     <>
@@ -69,7 +74,7 @@ const TimeSelector = (props) => {
             height={0}
             draggable={true}
             onDragMove={handleDragMoveStart}
-            onDragEnd={() => handleTimeSelectionStart(startTileNum)}
+            onDragEnd={updateTimeSelection}
             strokeEnabled={true}
             strokeWidth={5}
             stroke="white"
@@ -81,7 +86,7 @@ const TimeSelector = (props) => {
             height={0}
             draggable={true}
             onDragMove={handleDragMoveEnd}
-            onDragEnd={() => handleTimeSelectionEnd(endTileNum)}
+            onDragEnd={updateTimeSelection}
             strokeEnabled={true}
             strokeWidth={5}
             stroke="white"
