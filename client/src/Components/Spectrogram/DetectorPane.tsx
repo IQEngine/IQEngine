@@ -78,22 +78,24 @@ export const DetectorPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta 
     const newSamps = Array.from(trimmedSamples);
 
     let body = {
-      data_input: [{
-        samples: newSamps,
-        sample_rate: sampleRate,
-        center_freq: freq,
-        data_type: "iq/cf32_le"
-      }],
+      data_input: [
+        {
+          samples: newSamps,
+          sample_rate: sampleRate,
+          center_freq: freq,
+          data_type: 'iq/cf32_le',
+        },
+      ],
       custom_params: {},
     };
     // Add custom params
     for (const [key, value] of Object.entries(detectorParams)) {
       if (value['type'] === 'integer') {
-        body["custom_params"][key] = parseInt(value['default']); // remember, we updated default with whatever the user enters
+        body['custom_params'][key] = parseInt(value['default']); // remember, we updated default with whatever the user enters
       } else if (value['type'] === 'number') {
-        body["custom_params"][key] = parseFloat(value['default']);
+        body['custom_params'][key] = parseFloat(value['default']);
       } else {
-        body["custom_params"][key] = value['default'];
+        body['custom_params'][key] = value['default'];
       }
     }
     console.debug(body);
@@ -112,10 +114,10 @@ export const DetectorPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta 
       .then(function (data) {
         console.debug('Detector Status:', data.status);
         //console.debug('data:', data);
-        if (data.data_output.length > 0){
+        if (data.data_output.length > 0) {
           console.log(data.data_output);
         }
-        if (data.annotations){
+        if (data.annotations) {
           for (let i = 0; i < data.annotations.length; i++) {
             data.annotations[i]['core:sample_start'] += startSampleOffset;
           }
@@ -164,16 +166,13 @@ export const DetectorPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta 
           <div className="mb-3">
             {Object.keys(detectorParams).map((key, index) => (
               <div key={index + 100000}>
-                <label className="label pb-0">
-                  {detectorParams[key]['title']}
-                </label>
+                <label className="label pb-0">{detectorParams[key]['title']}</label>
                 <input
                   type={detectorParams[key]['type']}
                   name={key}
                   value={detectorParams[key]['default']}
                   onChange={handleChange}
                   className="h-8 rounded text-base-100 ml-1 pl-2"
-                  
                 />
               </div>
             ))}
