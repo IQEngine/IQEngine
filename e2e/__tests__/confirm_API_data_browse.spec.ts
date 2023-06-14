@@ -13,6 +13,10 @@ test('API Datasource Browsing', async ({ page }) => {
     description: "test description",
     imageURL: "https://i.etsystatic.com/20456772/r/il/a94e13/3604976065/il_1588xN.3604976065_dzyi.jpg"
   };
+
+  // TODO: Either clean the DB each time, check for pre-existing or
+  // tolerate a 409 (since each browser tested will run this against the
+  // same DB instance at present)
   await apiClient.create(dataSource);
   
   await page.goto('/');
