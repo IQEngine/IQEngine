@@ -50,7 +50,7 @@ export const SpectrogramPage = () => {
   const { type, account, container, filePath, sasToken } = useParams();
 
   const handleNewSlice = (newSlice: IQDataSlice) => {
-    console.log('newSlice', newSlice);
+    console.debug('fetched slice', newSlice);
   };
   const imgRef = useRef<HTMLImageElement>(null);
   const imgRef2 = useRef<HTMLImageElement>(null);
@@ -113,7 +113,6 @@ export const SpectrogramPage = () => {
   }, []);
 
   useEffect(() => {
-    console.log('fetch Changed');
     let data = iqQuery
       .map((slice) => slice.data)
       .filter((data) => data !== null)
@@ -146,7 +145,7 @@ export const SpectrogramPage = () => {
   }, [pythonSnippet, taps, pyodide]);
 
   useEffect(() => {
-    console.log('IQ Raw Changed');
+    console.debug('IQ Raw Changed');
     let data = Object.keys(iqRaw).reduce((acc, index) => {
       let iqArray = iqRaw[index];
       if (!iqArray || !!iqData[index]) {
@@ -284,7 +283,7 @@ export const SpectrogramPage = () => {
 
   useEffect(() => {
     if (meta) {
-      console.log('Meta data loaded, fetching and rendering tiles', meta);
+      console.debug('Meta data loaded, fetching and rendering tiles', meta);
       fetchAndRender(handleTop);
     }
   }, [meta, zoomLevel, handleTop]);
