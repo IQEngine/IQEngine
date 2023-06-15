@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ArrowRightIcon, ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
 import { Annotation, SigMFMetadata } from '@/Utils/sigmfMetadata';
-import { annotationsValidator } from '@/Utils/validators';
+import { metadataValidator } from '@/Utils/validators';
 
 interface ActionsProps {
   meta: SigMFMetadata;
@@ -38,7 +38,7 @@ export const Actions = ({
 
   useEffect(() => {
     const annotationsString =`{"annotations":[${currentAnnotation}]}`;
-    const validateAnnotations = annotationsValidator(annotationsString);
+    const validateAnnotations = metadataValidator(annotationsString, '/annotations');
     setErrors(validateAnnotations?.errors);
   }, [currentAnnotation]);
 

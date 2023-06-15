@@ -1,5 +1,5 @@
 import { INITIAL_ANNOTATIONS_SNIPPET, INITIAL_METADATA_SNIPPET } from '../constants';
-import { annotationsValidator, metadataValidator } from '../validators';
+import { metadataValidator } from '../validators';
 import metadataJson from './validators.test.meta.json';
 import annotationsJson from './validators.test.annotations.json';
 
@@ -94,10 +94,10 @@ describe('Validate metadata', () => {
 describe('Validate annotations', () => {
   test('Initial annotations snippet contains no errors', () => {
     // Arrange && Act
-    const result = annotationsValidator(INITIAL_ANNOTATIONS_SNIPPET);
+    const result = metadataValidator(INITIAL_ANNOTATIONS_SNIPPET, '/annotations');
 
     // Assert
-    expect(result.annotations).toBe(INITIAL_ANNOTATIONS_SNIPPET);
+    expect(result.metadata).toBe(INITIAL_ANNOTATIONS_SNIPPET);
     expect(result.errors).toStrictEqual([]);
   });
 
@@ -106,10 +106,10 @@ describe('Validate annotations', () => {
     const annotations = JSON.stringify(annotationsJson);
 
     // Act
-    const result = annotationsValidator(annotations);
+    const result = metadataValidator(annotations, '/annotations');
 
     // Assert
-    expect(result.annotations).toBe(annotations);
+    expect(result.metadata).toBe(annotations);
     expect(result.errors).toStrictEqual([]);
   });
 
@@ -124,10 +124,10 @@ describe('Validate annotations', () => {
     const annotations = JSON.stringify(annJson);
 
     // Act
-    const result = annotationsValidator(annotations);
+    const result = metadataValidator(annotations, '/annotations');
 
     // Assert
-    expect(result.annotations).toBe(annotations);
+    expect(result.metadata).toBe(annotations);
     expect(result.errors[0].message).toBe(expectedError.message);
     expect(result.errors[0].instancePath).toBe(expectedError.instancePath);
   });

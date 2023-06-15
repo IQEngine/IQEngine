@@ -1,30 +1,21 @@
 import Ajv from 'ajv';
 import sigmfSchema from '@/Utils/sigmf-schema.json';
-import sigmfAnnotationsSchema from '@/Utils/sigmf-annotations-schema.json';
-import { json } from 'react-router-dom';
 
 interface MetadataValidator {
   metadata: string;
   errors: any[];
 }
 
-interface AnnotationsValidator {
-  annotations: string;
-  errors: any[];
-}
-
-export function metadataValidator(metadataValue: string) {
-  const metadataValidator = { metadata: metadataValue, errors: [] } as MetadataValidator;
+export function metadataValidator(metadataValue: string, path: string = null) {
+  let metadataValidator = { metadata: metadataValue, errors: [] } as MetadataValidator;
   metadataValidator.metadata = metadataValue;
+  metadataValidator = validator(metadataValue, sigmfSchema, metadataValidator);
 
-  return validator(metadataValue, sigmfSchema, metadataValidator);
-}
+  if (path) {
+    metadataValidator.errors = metadataValidator.errors.filter(error => error?.instancePath?.startsWith(path));
+  }
 
-export function annotationsValidator(annotationsValue: string) {
-  const annotationValidator = { annotations: annotationsValue, errors: [] } as AnnotationsValidator;
-  annotationValidator.annotations = annotationsValue;
-
-  return validator(annotationsValue, sigmfAnnotationsSchema, annotationValidator);
+  return metadataValidator;
 }
 
 export function validator(value: string, schema: any, validator: any){
