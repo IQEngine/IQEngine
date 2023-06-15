@@ -8,46 +8,46 @@ import { useAppDispatch } from '@/Store/hooks';
 import { Annotation, SigMFMetadata } from '@/Utils/sigmfMetadata';
 import { matchPath } from 'react-router-dom';
 
-export interface DetectorPaneProps {
+export interface PluginsPaneProps {
   cursorsEnabled: boolean;
   handleProcessTime: () => { trimmedSamples: number[]; startSampleOffset: number };
   meta: SigMFMetadata;
   setMeta: (meta: SigMFMetadata) => void;
 }
 
-export const DetectorPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }: DetectorPaneProps) => {
-  const [detectorList, setDetectorList] = useState([]);
-  const [selectedDetector, setSelectedDetector] = useState('default');
-  const [detectorParams, setDetectorParams] = useState({});
+export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }: PluginsPaneProps) => {
+  const [pluginsList, setPluginsList] = useState([]);
+  const [selectedPlugin, setSelectedPlugin] = useState('default');
+  const [pluginParams, setPluginParams] = useState({});
   const [value, setValue] = useState(0); // integer state used to force rerender
   const dispatch = useAppDispatch();
   const config = configQuery();
   useEffect(() => {
-    if (!config.data || !config.data.detectorEndpoint) return;
-    let detectorEndpoint = 'http://127.0.0.1:8000/detectors/';
+    if (!config.data || !config.data.pluginsEndpoint) return;
+    let pluginsEndpoint = 'http://127.0.0.1:8000/plugins/';
     // In local mode, CONNECTION_INFO isn't defined
-    if (config.data.detectorEndpoint) {
-      detectorEndpoint = config.data.detectorEndpoint;
+    if (config.data.pluginsEndpoint) {
+      pluginsEndpoint = config.data.pluginsEndpoint;
     }
-    fetch(detectorEndpoint, { method: 'GET' })
+    fetch(pluginsEndpoint, { method: 'GET' })
       .then(function (response) {
         return response.json();
       })
       .then(function (data) {
-        console.debug('Detectors:', data);
-        setDetectorList(data);
+        console.debug('Plugins:', data);
+        setPluginsList(data);
       })
       .catch((error) => {
         console.debug(error);
       });
-  }, [config?.data?.detectorEndpoint]);
+  }, [config?.data?.pluginsEndpoint]);
 
-  const handleChangeDetector = (e) => {
-    if (!config.data || !config.data.detectorEndpoint) return;
-    setSelectedDetector(e.target.value);
-    setDetectorParams({}); // in case something goes wrong
-    // Fetch the custom params for this detector
-    fetch(config.data.detectorEndpoint + e.target.value, { method: 'GET' })
+  const handleChangePlugin = (e) => {
+    if (!config.data || !config.data.pluginsEndpoint) return;
+    setSelectedPlugin(e.target.value);
+    setPluginParams({}); // in case something goes wrong
+    // Fetch the custom params for this plugin
+    fetch(config.data.pluginsEndpoint + e.target.value, { method: 'GET' })
       .then(function (response) {
         if (response.status === 404) {
           return {};
@@ -55,8 +55,8 @@ export const DetectorPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta 
         return response.json();
       })
       .then(function (data) {
-        console.debug('Detector Params:', data);
-        setDetectorParams(data);
+        console.debug('Plugin Params:', data);
+        setPluginParams(data);
       });
   };
 
@@ -64,7 +64,7 @@ export const DetectorPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta 
     e.preventDefault();
 
     if (!cursorsEnabled) {
-      alert('First enable cursors and choose a region of time to run the detector on');
+      alert('First enable cursors and choose a region of time to run the plugin on');
       return;
     }
 
@@ -89,7 +89,7 @@ export const DetectorPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta 
       custom_params: {},
     };
     // Add custom params
-    for (const [key, value] of Object.entries(detectorParams)) {
+    for (const [key, value] of Object.entries(pluginParams)) {
       if (value['type'] === 'integer') {
         body['custom_params'][key] = parseInt(value['default']); // remember, we updated default with whatever the user enters
       } else if (value['type'] === 'number') {
@@ -100,7 +100,7 @@ export const DetectorPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta 
     }
     console.debug(body);
 
-    fetch(config.data.detectorEndpoint + selectedDetector, {
+    fetch(config.data.pluginsEndpoint + selectedPlugin, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -112,7 +112,7 @@ export const DetectorPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta 
         return response.json();
       })
       .then(function (data) {
-        console.debug('Detector Status:', data.status);
+        console.debug('Plugin Status:', data.status);
         //console.debug('data:', data);
         if (data.data_output.length > 0) {
           console.log(data.data_output);
@@ -137,47 +137,43 @@ export const DetectorPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta 
   };
 
   const handleChange = (e) => {
-    detectorParams[e.target.name]['default'] = e.target.value; // the schema uses default so we'll just replace it with the new value
-    setDetectorParams(detectorParams);
+    pluginParams[e.target.name]['default'] = e.target.value; // the schema uses default so we'll just replace it with the new value
+    setPluginParams(pluginParams);
     setValue((value) => value + 1); // update state to force render
   };
 
   return (
-    <div className="detectForm" id="detectFormId" onSubmit={handleSubmit}>
+    <div className="pluginForm" id="pluginFormId" onSubmit={handleSubmit}>
       <label className="label">
-        Detector:
-        <select
-          className="rounded bg-base-content text-base-100"
-          value={selectedDetector}
-          onChange={handleChangeDetector}
-        >
+        Plugin:
+        <select className="rounded bg-base-content text-base-100" value={selectedPlugin} onChange={handleChangePlugin}>
           <option disabled value="default">
-            Select a Detector
+            Select a Plugin
           </option>
-          {detectorList.map((detectorName, index) => (
-            <option key={index} value={detectorName}>
-              {detectorName}
+          {pluginsList.map((pluginName, index) => (
+            <option key={index} value={pluginName}>
+              {pluginName}
             </option>
           ))}
         </select>
       </label>
-      {Object.keys(detectorParams).length > 0 && (
+      {Object.keys(pluginParams).length > 0 && (
         <>
           <div className="mb-3">
-            {Object.keys(detectorParams).map((key, index) => (
+            {Object.keys(pluginParams).map((key, index) => (
               <div key={index + 100000}>
-                <label className="label pb-0">{detectorParams[key]['title']}</label>
+                <label className="label pb-0">{pluginParams[key]['title']}</label>
                 <input
-                  type={detectorParams[key]['type']}
+                  type={pluginParams[key]['type']}
                   name={key}
-                  value={detectorParams[key]['default']}
+                  value={pluginParams[key]['default']}
                   onChange={handleChange}
                   className="h-8 rounded text-base-100 ml-1 pl-2"
                 />
               </div>
             ))}
           </div>
-          <button onClick={handleSubmit}>Run Detector</button>
+          <button onClick={handleSubmit}>Run Plugin</button>
         </>
       )}
     </div>

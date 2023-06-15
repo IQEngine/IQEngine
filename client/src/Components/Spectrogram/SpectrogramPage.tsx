@@ -334,7 +334,7 @@ export const SpectrogramPage = () => {
     setCurrentSamples(trimmedSamples);
 
     const startSampleOffset = timeSelectionStart * TILE_SIZE_IN_IQ_SAMPLES; // in IQ samples
-    return { trimmedSamples: trimmedSamples, startSampleOffset: startSampleOffset }; // only used by detector
+    return { trimmedSamples: trimmedSamples, startSampleOffset: startSampleOffset }; // only used by plugins
   };
 
   return (

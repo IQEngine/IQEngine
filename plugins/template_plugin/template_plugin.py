@@ -6,7 +6,7 @@ import json
 from pydantic.dataclasses import dataclass
 
 @dataclass
-class Detector:
+class Plugin:
     sample_rate: int = 0
     center_freq: int = 0
     # Your custom params are below, call them whatever you want
@@ -14,7 +14,7 @@ class Detector:
     param2: str = 'test2'
     param3: float = 5.67
 
-    def detect(self, samples):
+    def run(self, samples):
         print(samples[0:10])
         print(self.sample_rate)
         print(self.center_freq)
@@ -22,9 +22,9 @@ class Detector:
         print(self.param2)
         print(self.param3)
 
-        # Your detection (and optionally, classification) code here
+        # Your Plugin (and optionally, classification) code here
         
-        # For the return, make a list, then for each detected emission, add one of these dicts to the list:   
+        # When making a detector, for the return, make a list, then for each detected emission, add one of these dicts to the list:   
         annotations = []
         an = {}
         an['core:freq_lower_edge'] = 1 # Hz
@@ -40,7 +40,7 @@ class Detector:
         }
 
 if __name__ == "__main__":
-    # Example of how to test your detector locally
+    # Example of how to test your plugin locally
     fname = "C:\\Users\\marclichtman\\Downloads\\synthetic"
     with open(fname + '.sigmf-meta', 'r') as f:
         meta_data = json.load(f)
@@ -48,6 +48,6 @@ if __name__ == "__main__":
     center_freq = meta_data["captures"][0]['core:frequency']
     samples = np.fromfile(fname + '.sigmf-data', dtype=np.complex64)
     params = {'sample_rate': sample_rate, 'center_freq': center_freq, 'param1': 1, 'param2': 'test2', 'param3': 5.67}
-    detector = Detector(**params)
-    annotations = detector.detect(samples)
+    plugin = Plugin(**params)
+    annotations = plugin.run(samples)
     print(annotations)

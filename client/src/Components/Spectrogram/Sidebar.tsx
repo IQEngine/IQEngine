@@ -4,7 +4,7 @@
 
 import React from 'react';
 import SettingsPane from './SettingsPane';
-import { DetectorPane } from './DetectorPane';
+import { PluginsPane } from './PluginsPane';
 import InfoPane from './InfoPane';
 import { SigMFMetadata } from '@/Utils/sigmfMetadata';
 
@@ -64,10 +64,10 @@ const Sidebar = (props) => {
 
       <details>
         <summary className="pl-2 mt-2 bg-primary outline outline-1 outline-primary text-lg text-base-100 hover:bg-green-800">
-          Detector
+          Plugins
         </summary>
         <div className="outline outline-1 outline-primary p-2">
-          <DetectorPane
+          <PluginsPane
             cursorsEnabled={props.cursorsEnabled}
             handleProcessTime={props.handleProcessTime}
             meta={props.meta}

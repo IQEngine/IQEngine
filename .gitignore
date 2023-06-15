@@ -28,7 +28,6 @@ yarn-debug.log*
 yarn-error.log*
 
 .env
-detectors/markos_detector/__pycache__/markos_detector.cpython-310.pyc
 tests/geckodriver.log
 geckodriver.log
 

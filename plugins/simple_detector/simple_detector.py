@@ -7,7 +7,7 @@ from pydantic.dataclasses import dataclass
 import cv2
 
 @dataclass
-class Detector:
+class Plugin:
     sample_rate: int = 0
     center_freq: int = 0
 
@@ -15,7 +15,7 @@ class Detector:
     threshold_dB: float = 40.0
 
 
-    def detect(self, samples):
+    def run(self, samples):
         #print(samples[0:10])
         #print(self.sample_rate)
         #print(self.center_freq)
@@ -84,6 +84,6 @@ if __name__ == "__main__":
     samples = np.fromfile(fname + '.sigmf-data', dtype=np.complex64)
     #print(samples[0:10])
     params = {'sample_rate': sample_rate, 'center_freq': center_freq, 'threshold_dB': 40}
-    detector = Detector(**params)
-    annotations = detector.detect(samples)
+    detector = Plugin(**params)
+    annotations = detector.run(samples)
     print(annotations)

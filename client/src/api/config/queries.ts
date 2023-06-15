@@ -11,7 +11,7 @@ const fetchConfig = async () => {
       return {
         data: {
           connectionInfo: JSON.parse(import.meta.env.VITE_CONNECTION_INFO),
-          detectorEndpoint: import.meta.env.VITE_DETECTOR_ENDPOINT,
+          pluginsEndpoint: import.meta.env.VITE_PLUGINS_ENDPOINT,
           googleAnalyticsKey: import.meta.env.VITE_GOOGLE_ANALYTICS_KEY,
         } as Config,
       };
@@ -19,8 +19,8 @@ const fetchConfig = async () => {
     if (!response.data.connectionInfo) {
       response.data.connectionInfo = JSON.parse(import.meta.env.VITE_CONNECTION_INFO);
     }
-    if (!response.data.detectorEndpoint) {
-      response.data.detectorEndpoint = import.meta.env.VITE_DETECTOR_ENDPOINT;
+    if (!response.data.pluginsEndpoint) {
+      response.data.pluginsEndpoint = import.meta.env.VITE_PLUGINS_ENDPOINT;
     }
     if (!response.data.googleAnalyticsKey) {
       response.data.googleAnalyticsKey = import.meta.env.VITE_GOOGLE_ANALYTICS_KEY;
@@ -29,7 +29,7 @@ const fetchConfig = async () => {
   } catch (error) {
     return {
       connectionInfo: JSON.parse(import.meta.env.VITE_CONNECTION_INFO),
-      detectorEndpoint: import.meta.env.VITE_DETECTOR_ENDPOINT,
+      pluginsEndpoint: import.meta.env.VITE_PLUGINS_ENDPOINT,
       googleAnalyticsKey: import.meta.env.VITE_GOOGLE_ANALYTICS_KEY,
     } as Config;
   }
@@ -47,7 +47,7 @@ interface ConnectionInfo {
 }
 
 type Config = {
-  detectorEndpoint: string;
+  pluginsEndpoint: string;
   connectionInfo: ConnectionInfo;
   googleAnalyticsKey: string;
 };

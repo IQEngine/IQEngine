@@ -20,9 +20,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/detectors")
-async def get_detector_list():
-    # This just looks at the list of dirs to figure out the detectors available, each dir is assumed to be 1 detector
+@app.get("/plugins")
+async def get_plugins_list():
+    # This just looks at the list of dirs to figure out the plugins available, each dir is assumed to be 1 plugin
     dirs = []
     for file in os.listdir('.'):
         d = os.path.join('.', file)
@@ -32,36 +32,36 @@ async def get_detector_list():
     dirs.remove('azure_functions')
     return(dirs)
 
-@app.get("/detectors/{detectorname}")
-async def get_detect(detectorname: str):
+@app.get("/plugins/{plugin_name}")
+async def get_plugin(plugin_name: str):
     try:
-        print('detectorname:', detectorname)
-        Detector = getattr(__import__(detectorname + '.' + detectorname, fromlist=["Detector"]), "Detector")
-        schema = copy.deepcopy(Detector.__pydantic_model__.schema()['properties'])
-        del Detector
+        print('plugin_name:', plugin_name)
+        Plugin = getattr(__import__(plugin_name + '.' + plugin_name, fromlist=["Plugin"]), "Plugin")
+        schema = copy.deepcopy(Plugin.__pydantic_model__.schema()['properties'])
+        del Plugin
         # Remove the standard params
         del schema['sample_rate']
         del schema['center_freq']
         print(schema)
         return(schema)
     except AttributeError:
-        raise fastapi.HTTPException(status_code=404, detail="Detector schema could not be generated")
+        raise fastapi.HTTPException(status_code=404, detail="Plugin schema could not be generated")
     except KeyError as err:
         print(err)
 
-@app.post("/detectors/{detectorname}")
-async def detect(info : fastapi.Request, detectorname):
+@app.post("/plugins/{plugin_name}")
+async def run(info : fastapi.Request, plugin_name):
     try:
-        Detector = getattr(__import__(detectorname + '.' + detectorname, fromlist=["Detector"]), "Detector")
-        logging.info("loaded detector")
+        Plugin = getattr(__import__(plugin_name + '.' + plugin_name, fromlist=["Plugin"]), "Plugin")
+        logging.info("loaded plugin")
     except ModuleNotFoundError as e:
-        return {"status" : "FAILED - detector does not exist", "annotations": []}
+        return {"status" : "FAILED - plugin does not exist", "annotations": []}
 
     function_input = await info.json()
 
     # Validate with our schema TOOK TOO LONG
     #try:
-    #    validate(instance=function_input, schema=schema["paths"]["/detectors/{detectorname}"]['post']['requestBody']['content']['application/json']['schema'])
+    #    validate(instance=function_input, schema=schema["paths"]["/plugins/{plugin_name}"]['post']['requestBody']['content']['application/json']['schema'])
     #except Exception as e:
     #    print("POST body failed schema validation, error:", e)
 
@@ -88,19 +88,19 @@ async def detect(info : fastapi.Request, detectorname):
         custom_params["sample_rate"] = sample_rate
         custom_params["center_freq"] = center_freq
 
-        DetectorInstance = Detector(**custom_params) # a way to provide params as a single dict
+        PluginInstance = Plugin(**custom_params) # a way to provide params as a single dict
 
-        results = DetectorInstance.detect(samples)
+        results = PluginInstance.run(samples) # all python plugins should have a run method that takes in the samples
         logging.info(results)
 
     except:
-        return {"status" : "FAILED - unknown error in detector_api", "annotations": []}
+        return {"status" : "FAILED - unknown error in plugins_api", "annotations": []}
 
     ## Validate with our schema
     #try:
-    #    validate(instance=function_input, schema=schema["paths"]["/detectors/{detectorname}"]['post']['responses']['200']['content']['application/json']['schema'])
+    #    validate(instance=function_input, schema=schema["paths"]["/plugins/{pluginname}"]['post']['responses']['200']['content']['application/json']['schema'])
     #except Exception as e:
-    #    print("Detector's return annotations failed schema validation, error:", e)
+    #    print("Plugin's return annotations failed schema validation, error:", e)
 
     return results
 

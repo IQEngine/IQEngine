@@ -13,9 +13,9 @@ run-react:
 	@echo "Running React application on port 3000..."
 	@cd client && npm run start
 
-run-detector:
-	@echo "Running detector backend on port 8000..."
-	@cd detectors && uvicorn detector_api:app --reload
+run-plugins:
+	@echo "Running plugins backend on port 8000..."
+	@cd plugins && uvicorn plugins_api:app --reload
 
 build-docker:
 	@echo "Building Docker image for IQEngine..."
