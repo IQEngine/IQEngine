@@ -88,7 +88,7 @@ export const SpectrogramPage = () => {
   const [pythonSnippet, setPythonSnippet] = useState(INITIAL_PYTHON_SNIPPET);
   const [fetchMinimap, setFetchMinimap] = useState(false);
   const [iqData, setIQData] = useState<Record<number, Float32Array>>({});
-  const [iqRaw, setIQRaw] = useState<Record<number, Float32Array>>([]);
+  const [iqRaw, setIQRaw] = useState<Record<number, Float32Array>>({});
   const [fftImage, setFFTImage] = useState<SelectFftReturn>(null);
   const { downloadedTiles } = useCurrentCachedIQDataSlice(meta, TILE_SIZE_IN_IQ_SAMPLES);
 
