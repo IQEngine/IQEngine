@@ -112,6 +112,13 @@ for varname in list(globals().keys()):
   const [currentSnippet, setCurrentSnippet] = useState(examplesList[0].value);
   const [currentTab, setCurrentTab] = useState('frequency');
 
+  const onChangePythonSnippet = useCallback(
+    (value, viewUpdate) => {
+      setCurrentSnippet(value);
+    },
+    [state]
+  );
+
   const onChangeFreqPlotSnippet = useCallback(
     (value, viewUpdate) => {
       setState({ ...state, freqPlotSnippet: value });
@@ -296,7 +303,14 @@ print('NumPy Version:', numpy.version.version)
             ))}
           </select>
 
-          <CodeMirror value={currentSnippet} height="700px" width="600px" extensions={[python()]} theme={vscodeDark} />
+          <CodeMirror
+            value={currentSnippet}
+            onChange={onChangePythonSnippet}
+            height="700px"
+            width="600px"
+            extensions={[python()]}
+            theme={vscodeDark}
+          />
           <button className="mb-3" disabled={state.buttonDisabled} onClick={onSubmitPythonSnippet}>
             {state.buttonText}
           </button>
