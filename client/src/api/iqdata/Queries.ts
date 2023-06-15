@@ -1,10 +1,11 @@
 import { SigMFMetadata } from '@/Utils/sigmfMetadata';
-import { useQueries, useQuery } from '@tanstack/react-query';
+import { useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
 import { IQDataClientFactory } from './IQDataClientFactory';
 import { range } from '@/Utils/selector';
 import { DEFAULT_FFT_PARAMETERS, FFTParams, IQDataSlice } from '../Models';
 import { TILE_SIZE_IN_IQ_SAMPLES } from '@/Utils/constants';
 import { useCallback } from 'react';
+import { applyProcessing } from '@/Sources/FetchMoreDataSource';
 
 export const getIQDataSlice = (
   meta: SigMFMetadata,
@@ -79,7 +80,6 @@ export const getIQDataFullIndexes = (
 export const getIQDataSlices = (
   meta: SigMFMetadata,
   indexes: number[],
-  handleNewSlice: (slice: IQDataSlice) => void = null,
   tileSize: number = TILE_SIZE_IN_IQ_SAMPLES,
   enabled = true
 ) => {
@@ -97,12 +97,31 @@ export const getIQDataSlices = (
         queryFn: () => client.getIQDataSlice(meta, index, tileSize),
         enabled: enabled && !!meta && index >= 0,
         staleTime: Infinity,
-        onSuccess(data: IQDataSlice) {
-          if (handleNewSlice) {
-            handleNewSlice(data);
-          }
-        },
       };
     }),
   });
+};
+
+export const useCurrentCachedIQDataSlice = (meta: SigMFMetadata, tileSize: number = TILE_SIZE_IN_IQ_SAMPLES) => {
+  if (!meta) {
+    return {
+      downloadedTiles: [],
+    };
+  }
+  const queryClient = useQueryClient();
+  const { type, account, container, file_path: filePath } = meta.getOrigin();
+  const downloadedTiles = queryClient
+    .getQueriesData(['datasource', type, account, container, filePath, 'iq'])
+    .map((slice) => {
+      let queryData = slice[0][slice[0].length - 1] as { tileSize: number; index: number };
+      if (queryData && queryData.tileSize === tileSize) {
+        return queryData.index;
+      } else {
+        return null;
+      }
+    })
+    .filter((tile) => tile !== null);
+  return {
+    downloadedTiles: downloadedTiles,
+  };
 };
