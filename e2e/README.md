@@ -14,7 +14,6 @@ sudo apt-get install libflite1
 ## Run
 
 The simples way to run the tests is just to do:
-
 ```
 cd e2e
 npx playwright test
