@@ -120,7 +120,6 @@ export const useCurrentCachedIQDataSlice = (meta: SigMFMetadata, tileSize: numbe
     .getQueriesData(['datasource', type, account, container, filePath, 'iq'])
     .map((slice) => {
       let queryData = slice[0][slice[0].length - 1] as { tileSize: number; index: number };
-      console.log('content', slice[1]);
       if (queryData && queryData.tileSize === tileSize) {
         return queryData.index;
       } else {
