@@ -9,16 +9,11 @@ interface MetadataValidator {
 export function metadataValidator(metadataValue: string, path: string = null) {
   let metadataValidator = { metadata: metadataValue, errors: [] } as MetadataValidator;
   metadataValidator.metadata = metadataValue;
-  metadataValidator = validator(metadataValue, sigmfSchema, metadataValidator);
 
-  if (path) {
-    metadataValidator.errors = metadataValidator.errors.filter(error => error?.instancePath?.startsWith(path));
-  }
-
-  return metadataValidator;
+  return  validator(metadataValue, sigmfSchema, metadataValidator, path);
 }
 
-export function validator(value: string, schema: any, validator: any){
+export function validator(value: string, schema: any, validator: any, path: string = null){
   const ajv = new Ajv({ strict: false, allErrors: true });
   try {
     const jsonValue = JSON.parse(value);
@@ -30,6 +25,9 @@ export function validator(value: string, schema: any, validator: any){
       validator.errors = [];
     } else {
       validator.errors = validate.errors;
+      if (path) {
+        validator.errors = validator.errors.filter(error => error?.instancePath?.startsWith(path));
+      }
     }
   } catch (e) {
     if (e instanceof SyntaxError) {
@@ -38,5 +36,6 @@ export function validator(value: string, schema: any, validator: any){
       validator.errors = [{ message: 'Error' + e.message }];
     }
   }
+
   return validator;
 }
