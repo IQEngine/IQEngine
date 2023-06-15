@@ -112,8 +112,8 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
         return response.json();
       })
       .then(function (data) {
-        console.debug('Plugin Status:', data.status);
-        //console.debug('data:', data);
+        console.log('Plugin Status:', data.status);
+        console.log('data:', data);
         if (data.data_output.length > 0) {
           console.log(data.data_output);
         }

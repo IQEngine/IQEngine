@@ -30,6 +30,7 @@ async def get_plugins_list():
             dirs.append(file)
     dirs.remove('__pycache__')
     dirs.remove('azure_functions')
+    dirs.remove('template_plugin')
     return(dirs)
 
 @app.get("/plugins/{plugin_name}")
@@ -67,7 +68,6 @@ async def run(info : fastapi.Request, plugin_name):
 
     try:
         data_input_len = len(function_input.get("data_input", []))
-        print(type(function_input.get("data_input", None)))
         if not isinstance(function_input.get("data_input", None), list):
             return {"status" : "FAILED - data_input wasnt a list", "annotations": []}
         print("data_input length:", data_input_len)
