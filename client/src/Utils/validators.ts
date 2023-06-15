@@ -16,7 +16,7 @@ interface AnnotationsValidator {
 export function metadataValidator(metadataValue: string) {
   const metadataValidator = { metadata: metadataValue, errors: [] } as MetadataValidator;
   metadataValidator.metadata = metadataValue;
-    
+
   return validator(metadataValue, sigmfSchema, metadataValidator);
 }
 
