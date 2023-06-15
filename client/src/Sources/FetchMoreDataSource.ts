@@ -2,6 +2,8 @@
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
 
+import { INITIAL_PYTHON_SNIPPET } from '@/Utils/constants';
+
 export function convolve(array, taps) {
   // make sure its an odd number of taps
   if (taps.length % 2 !== 1) taps.push(0);
@@ -56,7 +58,7 @@ export function applyProcessing(samples, taps, pythonSnippet, pyodide) {
   if (taps && taps.length !== 1) {
     samples = convolve(samples, taps); // we apply the taps here and not in the FFT calcs so transients dont hurt us as much
   }
-  if (pyodide && pythonSnippet) {
+  if (pyodide && pythonSnippet && pythonSnippet.length > 0 && pythonSnippet != INITIAL_PYTHON_SNIPPET) {
     samples = callPyodide(pyodide, pythonSnippet, samples);
   }
   return samples;
