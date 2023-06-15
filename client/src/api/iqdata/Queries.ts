@@ -80,7 +80,6 @@ export const getIQDataFullIndexes = (
 export const getIQDataSlices = (
   meta: SigMFMetadata,
   indexes: number[],
-  handleNewSlice: (slice: IQDataSlice) => void = null,
   tileSize: number = TILE_SIZE_IN_IQ_SAMPLES,
   enabled = true
 ) => {
@@ -98,11 +97,6 @@ export const getIQDataSlices = (
         queryFn: () => client.getIQDataSlice(meta, index, tileSize),
         enabled: enabled && !!meta && index >= 0,
         staleTime: Infinity,
-        onSuccess(data: IQDataSlice) {
-          if (handleNewSlice) {
-            handleNewSlice(data);
-          }
-        },
       };
     }),
   });

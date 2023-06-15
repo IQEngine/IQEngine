@@ -48,10 +48,6 @@ export const SpectrogramPage = () => {
   const rulerTopHeight = 30;
   const marginTop = 30;
   const { type, account, container, filePath, sasToken } = useParams();
-
-  const handleNewSlice = (newSlice: IQDataSlice) => {
-    console.debug('fetched slice', newSlice);
-  };
   const imgRef = useRef<HTMLImageElement>(null);
   const imgRef2 = useRef<HTMLImageElement>(null);
 
@@ -95,7 +91,6 @@ export const SpectrogramPage = () => {
   const iqQuery = getIQDataSlices(
     metaQuery.data,
     tiles,
-    handleNewSlice,
     TILE_SIZE_IN_IQ_SAMPLES,
     !!metaQuery.data && tiles.length > 0
   );
