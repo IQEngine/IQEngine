@@ -5,6 +5,7 @@ import { range } from '@/Utils/selector';
 import { DEFAULT_FFT_PARAMETERS, FFTParams, IQDataSlice } from '../Models';
 import { TILE_SIZE_IN_IQ_SAMPLES } from '@/Utils/constants';
 import { useCallback } from 'react';
+import { applyProcessing } from '@/Sources/FetchMoreDataSource';
 
 export const getIQDataSlice = (
   meta: SigMFMetadata,
@@ -102,6 +103,47 @@ export const getIQDataSlices = (
             handleNewSlice(data);
           }
         },
+      };
+    }),
+  });
+};
+
+export const getIQDataSlicesTransformed = (
+  meta: SigMFMetadata,
+  indexes: number[],
+  handleNewSlice: (slice: IQDataSlice) => void = null,
+  taps,
+  pythonSnippet,
+  pyodide,
+  tileSize: number = TILE_SIZE_IN_IQ_SAMPLES,
+  enabled = true
+) => {
+  if (!meta || !indexes || indexes.length === 0) {
+    return useQueries({
+      queries: [],
+    });
+  }
+  const { type, account, container, file_path } = meta?.getOrigin();
+  const client = IQDataClientFactory(type);
+  return useQueries({
+    queries: indexes.map((index) => {
+      return {
+        queryKey: ['datasource', type, account, container, file_path, 'iq', { index: index, tileSize: tileSize }],
+        queryFn: () => client.getIQDataSlice(meta, index, tileSize),
+        enabled: enabled && !!meta && index >= 0,
+        staleTime: Infinity,
+        onSuccess(data: IQDataSlice) {
+          if (handleNewSlice) {
+            handleNewSlice(data);
+          }
+        },
+        select: useCallback(
+          (data: IQDataSlice) => {
+            data.iqArray = applyProcessing(data.iqArray, taps, pythonSnippet, pyodide);
+            return data;
+          },
+          [pythonSnippet, pyodide]
+        ),
       };
     }),
   });

@@ -23,7 +23,7 @@ import { useParams } from 'react-router-dom';
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { getMeta } from '@/api/metadata/Queries';
 import { SigMFMetadata } from '@/Utils/sigmfMetadata';
-import { getIQDataSlices } from '@/api/iqdata/Queries';
+import { getIQDataSlices, getIQDataSlicesTransformed } from '@/api/iqdata/Queries';
 import { IQDataSlice } from '@/api/Models';
 import { useInterval } from 'usehooks-ts';
 import { python } from '@codemirror/lang-python';
@@ -90,8 +90,9 @@ export const SpectrogramPage = () => {
   const [taps, setTaps] = useState<number[]>([1]);
   const [pythonSnippet, setPythonSnippet] = useState(INITIAL_PYTHON_SNIPPET);
   const [fetchMinimap, setFetchMinimap] = useState(false);
-  const [iqDataProcessed, setIqData] = useState<Record<number, Float32Array>>({});
-  const iqffts = getIQDataSlices(
+  const [iqData, setIQData] = useState<Record<number, Float32Array>>({});
+  const [iqRaw, setIQRaw] = useState<Record<number, Float32Array>>([]);
+  const iqQuery = getIQDataSlices(
     metaQuery.data,
     tiles,
     handleNewSlice,
@@ -110,41 +111,53 @@ export const SpectrogramPage = () => {
       window.removeEventListener('resize', windowResized);
     };
   }, []);
-
-  const iqData = useMemo(() => {
-    return iqffts
+  useEffect(() => {
+    console.log('fetch Changed');
+    let data = iqQuery
       .map((slice) => slice.data)
       .filter((data) => data !== null)
       .reduce((acc, data) => {
-        if (!data) {
+        if (!data || !!iqRaw[data.index]) {
           return acc;
         }
-        // TODO: Add back data transformation once we find out how to pass through the performance provblems it is getting now.
-        // let dataTransformed = applyProcessing(data.iqArray, taps, pythonSnippet, pyodide);
         acc[data.index] = data.iqArray;
         return acc;
       }, {});
-  }, [
-    iqffts.reduce((acc, item) => {
-      if (item.data) {
-        return [acc, item.data.index].join(',');
-      } else {
+    console.debug('Setting IQ Data', data);
+    setIQRaw((oldData) => {
+      return { ...oldData, ...data };
+    });
+  }, [iqQuery.reduce((previous, current) => previous + current.dataUpdatedAt, '')]);
+
+  useEffect(() => {
+    let data = Object.keys(iqRaw).reduce((acc, index) => {
+      let iqArray = iqRaw[index];
+      if (!iqArray) {
         return acc;
       }
-    }, '') ?? '',
-    fftSize,
-    magnitudeMax,
-    magnitudeMin,
-    fftWindow,
-    zoomLevel,
-    lowerTile,
-    upperTile,
-    missingTiles,
-    downloadedTiles,
-    pyodide,
-    pythonSnippet,
-    taps,
-  ]);
+      let iqArrayTransformed = applyProcessing(iqArray, taps, pythonSnippet, pyodide);
+      acc[index] = iqArrayTransformed;
+      return acc;
+    }, {});
+    setIQData(data);
+  }, [pythonSnippet, taps, pyodide]);
+
+  useEffect(() => {
+    console.log('IQ Raw Changed');
+    let data = Object.keys(iqRaw).reduce((acc, index) => {
+      let iqArray = iqRaw[index];
+      if (!iqArray || !!iqData[index]) {
+        return acc;
+      }
+      let iqArrayTransformed = applyProcessing(iqArray, taps, pythonSnippet, pyodide);
+      acc[index] = iqArrayTransformed;
+      return acc;
+    }, {});
+    console.debug('Setting IQ Data', data);
+    setIQData((oldData) => {
+      return { ...oldData, ...data };
+    });
+  }, [iqRaw]);
 
   const fftReturned = useMemo(() => {
     if (!meta || lowerTile < 0 || upperTile < 0) {
@@ -180,7 +193,6 @@ export const SpectrogramPage = () => {
     );
     return { ret, fftData };
   }, [
-    downloadedTiles.length,
     fftSize,
     magnitudeMax,
     magnitudeMin,
@@ -190,6 +202,7 @@ export const SpectrogramPage = () => {
     upperTile,
     missingTiles.length,
     fftData,
+    iqData,
   ]);
 
   useEffect(() => {
@@ -218,13 +231,6 @@ export const SpectrogramPage = () => {
     setMissingTiles(fftReturned.ret.missingTiles);
     setFetchMinimap(true);
   };
-
-  // useInterval(() => {
-  //   if (missingTiles.length > 0) {
-  //     console.debug('Missing tiles:', missingTiles, fftData, tiles);
-  //     renderImage();
-  //   }
-  // }, zoomLevel * 100);
 
   const fetchAndRender = (handleTop) => {
     if (!meta) {
@@ -526,7 +532,7 @@ export const SpectrogramPage = () => {
                 )}
               </div>
             </div>
-            <MetaViewer meta={meta}/>
+            <MetaViewer meta={meta} />
           </div>
         </div>
         <div className="mt-3 mb-0 px-2 py-0" style={{ margin: '5px' }}>
@@ -549,10 +555,7 @@ export const SpectrogramPage = () => {
               Global Properties
             </summary>
             <div className="outline outline-1 outline-primary p-2">
-              <GlobalProperties
-                meta={meta}
-                setMeta={setMeta}
-              />
+              <GlobalProperties meta={meta} setMeta={setMeta} />
             </div>
           </details>
 
