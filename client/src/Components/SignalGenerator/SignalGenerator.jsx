@@ -289,12 +289,12 @@ print('NumPy Version:', numpy.version.version)
   };
 
   return (
-    <div className="grid items-start justify-center">
+    <div>
       <center>
-        <p className="text-iqengine-primary text-2xl mb-3">Python-Based Signal Generator</p>
+        <p className="text-primary text-2xl mb-3">Python-Based Signal Generator</p>
       </center>
-      <div className="flex">
-        <div className="flex-1 mr-10">
+      <div className="grid grid-cols-2 gap-8 h-full mx-8">
+        <div className="">
           <select className="select select-bordered w-full max-w-xs text-base" onChange={onChangeDropdown}>
             {examplesList.map((example) => (
               <option key={example.label} value={example.value}>
@@ -307,7 +307,7 @@ print('NumPy Version:', numpy.version.version)
             value={currentSnippet}
             onChange={onChangePythonSnippet}
             height="700px"
-            width="600px"
+            width="auto"
             extensions={[python()]}
             theme={vscodeDark}
           />
@@ -325,17 +325,18 @@ print('NumPy Version:', numpy.version.version)
               <span className="ml-2 text-base">Download "x" as SigMF Recording</span>
             </label>
           </div>
-          <div className="display-linebreak">
+          <div className="w-fit">
             Error log: <br></br> {state.errorLog}
           </div>
         </div>
-        <div className="flex-1">
+
+        <div className="">
           <div className="tabs tabs-boxed">
             <a
               className={
                 currentTab === 'frequency'
-                  ? 'tab tab-active text-base text-iqengine-bg font-bold'
-                  : 'tab tab-bordered text-base text-iqengine-primary hover:bg-iqengine-secondary'
+                  ? 'tab tab-active text-base text-bg font-bold'
+                  : 'tab tab-bordered text-base text-primary hover:bg-secondary'
               }
               onClick={onClickHandler}
               data-value="frequency"
@@ -345,8 +346,8 @@ print('NumPy Version:', numpy.version.version)
             <a
               className={
                 currentTab === 'time'
-                  ? 'tab tab-active text-base text-iqengine-bg font-bold'
-                  : 'tab tab-bordered text-base text-iqengine-primary hover:bg-iqengine-secondary'
+                  ? 'tab tab-active text-base text-bg font-bold'
+                  : 'tab tab-bordered text-base text-primary hover:bg-secondary'
               }
               onClick={onClickHandler}
               data-value="time"
@@ -356,8 +357,8 @@ print('NumPy Version:', numpy.version.version)
             <a
               className={
                 currentTab === 'iq'
-                  ? 'tab tab-active text-base text-iqengine-bg font-bold'
-                  : 'tab tab-bordered text-base text-iqengine-primary hover:bg-iqengine-secondary'
+                  ? 'tab tab-active text-base text-bg font-bold'
+                  : 'tab tab-bordered text-base text-primary hover:bg-secondary'
               }
               onClick={onClickHandler}
               data-value="iq"
@@ -367,8 +368,8 @@ print('NumPy Version:', numpy.version.version)
             <a
               className={
                 currentTab === 'spectrogram'
-                  ? 'tab tab-active text-base text-iqengine-bg font-bold'
-                  : 'tab tab-bordered text-base text-iqengine-primary hover:bg-iqengine-secondary'
+                  ? 'tab tab-active text-base text-bg font-bold'
+                  : 'tab tab-bordered text-base text-primary hover:bg-secondary'
               }
               onClick={onClickHandler}
               data-value="spectrogram"
@@ -382,7 +383,7 @@ print('NumPy Version:', numpy.version.version)
                 <CodeMirror
                   value={state.freqPlotSnippet}
                   height="300px"
-                  width="490px"
+                  width="auto"
                   extensions={[python()]}
                   onChange={onChangeFreqPlotSnippet}
                   theme={vscodeDark}
@@ -396,7 +397,7 @@ print('NumPy Version:', numpy.version.version)
                 <CodeMirror
                   value={state.timePlotSnippet}
                   height="300px"
-                  width="490px"
+                  width="auto"
                   extensions={[python()]}
                   onChange={onChangeTimePlotSnippet}
                   theme={vscodeDark}
@@ -410,7 +411,7 @@ print('NumPy Version:', numpy.version.version)
                 <CodeMirror
                   value={state.iqPlotSnippet}
                   height="300px"
-                  width="490px"
+                  width="auto"
                   extensions={[python()]}
                   onChange={onChangeIQPlotSnippet}
                   theme={vscodeDark}
@@ -424,7 +425,7 @@ print('NumPy Version:', numpy.version.version)
                 <CodeMirror
                   value={state.spectrogramPlotSnippet}
                   height="300px"
-                  width="490px"
+                  width="auto"
                   extensions={[python()]}
                   onChange={onChangeSpectrogramPlotSnippet}
                   theme={vscodeDark}
