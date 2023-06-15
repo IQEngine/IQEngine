@@ -1,6 +1,7 @@
-import { INITIAL_METADATA_SNIPPET } from '../constants';
+import { INITIAL_ANNOTATIONS_SNIPPET, INITIAL_METADATA_SNIPPET } from '../constants';
 import { metadataValidator } from '../validators';
 import metadataJson from './validators.test.meta.json';
+import annotationsJson from './validators.test.annotations.json';
 
 describe('Validate metadata', () => {
   test('Initial metadata snippet contains no errors', () => {
@@ -85,6 +86,48 @@ describe('Validate metadata', () => {
 
     // Assert
     expect(result.metadata).toBe(meta);
+    expect(result.errors[0].message).toBe(expectedError.message);
+    expect(result.errors[0].instancePath).toBe(expectedError.instancePath);
+  });
+});
+
+describe('Validate annotations', () => {
+  test('Initial annotations snippet contains no errors', () => {
+    // Arrange && Act
+    const result = metadataValidator(INITIAL_ANNOTATIONS_SNIPPET, '/annotations');
+
+    // Assert
+    expect(result.metadata).toBe(INITIAL_ANNOTATIONS_SNIPPET);
+    expect(result.errors).toStrictEqual([]);
+  });
+
+  test('Valid annotations snippet contains no errors', () => {
+    // Arrange
+    const annotations = JSON.stringify(annotationsJson);
+
+    // Act
+    const result = metadataValidator(annotations, '/annotations');
+
+    // Assert
+    expect(result.metadata).toBe(annotations);
+    expect(result.errors).toStrictEqual([]);
+  });
+
+  test.each`
+    removedKey             | expectedError
+    ${'core:sample_start'} | ${{ message: "must have required property 'core:sample_start'", instancePath: '/annotations/0' }}
+    ${'core:sample_count'} | ${{ message: "must have required property 'core:sample_count'", instancePath: '/annotations/0' }}
+  `('Missing required annotations fields contains errors', ({ removedKey, expectedError }) => {
+    // Arrange
+    const annJson = JSON.parse(JSON.stringify(annotationsJson));
+    delete annJson.annotations[0][removedKey];
+    const annotations = JSON.stringify(annJson);
+
+    // Act
+    const result = metadataValidator(annotations, '/annotations');
+
+    // Assert
+    expect(result.metadata).toBe(annotations);
     expect(result.errors[0].message).toBe(expectedError.message);
     expect(result.errors[0].instancePath).toBe(expectedError.instancePath);
   });

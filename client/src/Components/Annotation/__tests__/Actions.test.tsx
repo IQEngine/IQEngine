@@ -132,7 +132,7 @@ describe('Annotation list component', () => {
     expect(modal).not.toHaveClass('modal-open');
   });
 
-  test('Annotations modal closes when json not valid', async () => {
+  test('Annotations modal does not close, displays errors and update is disabled when json not valid', async () => {
     //Arrange
     const meta = Object.assign(new SigMFMetadata(), JSON.parse(JSON.stringify(metadataJson)));
 
@@ -161,5 +161,45 @@ describe('Annotation list component', () => {
     // Assert
     const modal = await screen.findByLabelText('Annotation 0 Modal');
     expect(modal).toHaveClass('modal-open');
+    expect(updateButton).toBeDisabled();
+    expect(screen.getByText('Syntax Error: Unexpected token o in JSON at position 17')).toBeInTheDocument();
+  });
+
+  test('Annotations modal displays errors when schema not valid', async () => {
+    //Arrange
+    const meta = Object.assign(new SigMFMetadata(), JSON.parse(JSON.stringify(metadataJson)));
+    const annotation = {...meta.annotations[0]};
+    delete annotation['core:sample_start'];
+    delete annotation['core:sample_count'];
+
+    render(
+      <Actions
+        meta={meta}
+        index={0}
+        spectrogramHeight={200}
+        startSampleCount={10}
+        setHandleTop={() => {}}
+        setMeta={() => {}}
+      ></Actions>
+    );
+
+    // Act
+    const openButton = await screen.findByLabelText('Annotation 0 Modal Open Button');
+    await userEvent.click(openButton);
+
+    const textarea = await screen.findByLabelText('Annotation 0 Modal Text Area');
+    await userEvent.clear(textarea);
+    var json = JSON.stringify(annotation);
+    await userEvent.paste(json);
+
+    const updateButton = await screen.findByLabelText('Annotation 0 Modal Update Button');
+    await userEvent.click(updateButton);
+
+    // Assert
+    const modal = await screen.findByLabelText('Annotation 0 Modal');
+    expect(modal).toHaveClass('modal-open');
+    expect(updateButton).toBeDisabled();
+    expect(screen.getByText("must have required property 'core:sample_start' inside /annotations/0")).toBeInTheDocument();
+    expect(screen.getByText("must have required property 'core:sample_count' inside /annotations/0")).toBeInTheDocument();
   });
 });
