@@ -1,32 +1,51 @@
 import Ajv from 'ajv';
 import sigmfSchema from '@/Utils/sigmf-schema.json';
+import sigmfAnnotationsSchema from '@/Utils/sigmf-annotations-schema.json';
+import { json } from 'react-router-dom';
 
 interface MetadataValidator {
   metadata: string;
   errors: any[];
 }
 
-export function metadataValidator(metadataValue: string) {
-  const ajv = new Ajv({ strict: false, allErrors: true });
-  const metadataValidator = { metadata: metadataValue, errors: [] } as MetadataValidator;
-  try {
-    metadataValidator.metadata = metadataValue;
-    const metadataJSON = JSON.parse(metadataValue);
+interface AnnotationsValidator {
+  annotations: string;
+  errors: any[];
+}
 
-    const validate = ajv.compile(sigmfSchema);
-    const valid = validate(metadataJSON);
+export function metadataValidator(metadataValue: string) {
+  const metadataValidator = { metadata: metadataValue, errors: [] } as MetadataValidator;
+  metadataValidator.metadata = metadataValue;
+    
+  return validator(metadataValue, sigmfSchema, metadataValidator);
+}
+
+export function annotationsValidator(annotationsValue: string) {
+  const annotationValidator = { annotations: annotationsValue, errors: [] } as AnnotationsValidator;
+  annotationValidator.annotations = annotationsValue;
+
+  return validator(annotationsValue, sigmfAnnotationsSchema, annotationValidator);
+}
+
+export function validator(value: string, schema: any, validator: any){
+  const ajv = new Ajv({ strict: false, allErrors: true });
+  try {
+    const jsonValue = JSON.parse(value);
+
+    const validate = ajv.compile(schema);
+    const valid = validate(jsonValue);
 
     if (valid) {
-      metadataValidator.errors = [];
+      validator.errors = [];
     } else {
-      metadataValidator.errors = validate.errors;
+      validator.errors = validate.errors;
     }
   } catch (e) {
     if (e instanceof SyntaxError) {
-      metadataValidator.errors = [{ message: 'Syntax Error: ' + e.message }];
+      validator.errors = [{ message: 'Syntax Error: ' + e.message }];
     } else {
-      metadataValidator.errors = [{ message: 'Error' + e.message }];
+      validator.errors = [{ message: 'Error' + e.message }];
     }
   }
-  return metadataValidator;
+  return validator;
 }

@@ -2,6 +2,7 @@ import { BlobClient } from '@azure/storage-blob';
 import { dataTypeToBytesPerSample } from './selector';
 import { FileWithDirectoryAndFileHandle } from 'browser-fs-access';
 import { TILE_SIZE_IN_IQ_SAMPLES } from './constants';
+import { metadataValidator } from './validators';
 export class SigMFMetadata {
   global: {
     'antenna:gain'?: number;
@@ -163,6 +164,15 @@ export class SigMFMetadata {
       }
     }
     return 0;
+  }
+
+  metadataValidation() {
+    var metadataString = JSON.stringify({
+      global: this.global,
+      captures: this.captures,
+      annotations: this.annotations,
+    });
+    return metadataValidator(metadataString);
   }
 }
 

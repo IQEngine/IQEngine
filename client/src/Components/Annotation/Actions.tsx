@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ArrowRightIcon, ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
 import { Annotation, SigMFMetadata } from '@/Utils/sigmfMetadata';
+import { annotationsValidator } from '@/Utils/validators';
 
 interface ActionsProps {
   meta: SigMFMetadata;
@@ -21,6 +22,7 @@ export const Actions = ({
 }: ActionsProps) => {
   const modal = useRef(null);
   const [currentAnnotation, setCurrentAnnotation] = useState(JSON.stringify(meta.annotations[index], undefined, 4));
+  const [errors, setErrors] = useState([]);
 
   const toggle = () => {
     if (modal.current.className === 'modal w-full h-full') {
@@ -33,6 +35,12 @@ export const Actions = ({
   useEffect(() => {
     setCurrentAnnotation(JSON.stringify(meta.annotations[index], undefined, 4));
   }, [meta]);
+
+  useEffect(() => {
+    const annotationsString =`{"annotations":[${currentAnnotation}]}`;
+    const validateAnnotations = annotationsValidator(annotationsString);
+    setErrors(validateAnnotations?.errors);
+  }, [currentAnnotation]);
 
   const onChangeHandler = (e) => {
     setCurrentAnnotation(e.target.value);
@@ -83,7 +91,29 @@ export const Actions = ({
               value={currentAnnotation}
             ></textarea>
           </div>
-          <button aria-label={'Annotation ' + index + ' Modal Update Button'} onClick={onUpdateHandler}>
+          <div className="flex justify-center text-error">
+            <ul aria-label='Validator Errors' style={{ width: '700px' }}>
+              {errors.map((error, i) => (
+                <li key={'error ' + { i }}>
+                  <svg
+                    className="w-4 h-4 mr-1.5 text-error flex-shrink-0 inline-block"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                      clip-rule="evenodd"
+                    ></path>
+                  </svg>
+                  {error.message} {error.instancePath ? ' inside ' + error.instancePath : ''}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <button aria-label={'Annotation ' + index + ' Modal Update Button'} onClick={onUpdateHandler}
+          disabled={errors?.length > 0 }>
             Update
           </button>
         </form>
