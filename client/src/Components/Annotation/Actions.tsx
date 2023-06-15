@@ -11,14 +11,7 @@ interface ActionsProps {
   setMeta: (meta: SigMFMetadata) => void;
 }
 
-export const Actions = ({
-  meta,
-  startSampleCount,
-  spectrogramHeight,
-  index,
-  setHandleTop,
-  setMeta,
-}: ActionsProps) => {
+export const Actions = ({ meta, startSampleCount, spectrogramHeight, index, setHandleTop, setMeta }: ActionsProps) => {
   const modal = useRef(null);
   const [currentAnnotation, setCurrentAnnotation] = useState(JSON.stringify(meta.annotations[index], undefined, 4));
 

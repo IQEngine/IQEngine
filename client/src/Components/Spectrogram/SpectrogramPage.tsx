@@ -526,7 +526,7 @@ export const SpectrogramPage = () => {
                 )}
               </div>
             </div>
-            <MetaViewer meta={meta}/>
+            <MetaViewer meta={meta} />
           </div>
         </div>
         <div className="mt-3 mb-0 px-2 py-0" style={{ margin: '5px' }}>
@@ -549,10 +549,7 @@ export const SpectrogramPage = () => {
               Global Properties
             </summary>
             <div className="outline outline-1 outline-primary p-2">
-              <GlobalProperties
-                meta={meta}
-                setMeta={setMeta}
-              />
+              <GlobalProperties meta={meta} setMeta={setMeta} />
             </div>
           </details>
 

@@ -252,7 +252,6 @@ export const selectFft = (
     trimmedFftData = zoomedFftData;
   }
 
-
   // Render Image
   const imageData = new ImageData(trimmedFftData, fftSize, num_final_ffts);
 

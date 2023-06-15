@@ -150,11 +150,7 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
 
       <label className="mb-3" id="toggle">
         <span className="label-text text-base">Toggle Cursors</span>
-        <input
-          type="checkbox"
-          className="toggle toggle-primary float-right"
-          onChange={props.toggleCursors}
-        />
+        <input type="checkbox" className="toggle toggle-primary float-right" onChange={props.toggleCursors} />
       </label>
 
       <div className="mb-3" id="formMagMax">

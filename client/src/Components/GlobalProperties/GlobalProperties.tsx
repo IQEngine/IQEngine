@@ -7,30 +7,29 @@ export interface GlobalPropertiesProps {
   setMeta: (meta: SigMFMetadata) => void;
 }
 
-export const  GlobalProperties = ({ meta, setMeta }) => {
-  if(!meta) return <></>
+export const GlobalProperties = ({ meta, setMeta }) => {
+  if (!meta) return <></>;
 
   const globalMeta = meta.global ?? {};
 
-  const titleCase = (str: string) : string => {
+  const titleCase = (str: string): string => {
     str = str.replace('core:', '').replace(':', ' ').replace('_', ' ').replace('hw', 'Hardware');
     let strArr: string[] = str.toLowerCase().split(' ');
     for (var i = 0; i < strArr.length; i++) {
       strArr[i] = strArr[i].charAt(0).toUpperCase() + strArr[i].slice(1);
     }
     return strArr.join(' ');
-  }
+  };
 
-  const stringifyObject = (key: string, value: any) : string => {
-    if(typeof value === "object" && value !== null) {
+  const stringifyObject = (key: string, value: any): string => {
+    if (typeof value === 'object' && value !== null) {
       return JSON.stringify(value, undefined, 4);
     }
-    return value
-  }
+    return value;
+  };
 
-  const renderFormInput = (key: string, value: any) : ReactElement<P> => {
-    if(key.indexOf('core:description') !== -1 ||
-      (typeof value === "object" && value !== null) )
+  const renderFormInput = (key: string, value: any): ReactElement<P> => {
+    if (key.indexOf('core:description') !== -1 || (typeof value === 'object' && value !== null))
       return (
         <textarea
           name={key}
@@ -40,29 +39,31 @@ export const  GlobalProperties = ({ meta, setMeta }) => {
           defaultValue={stringifyObject(key, value)}
           onChange={(event) => handleChange(event, key)}
         />
-      )
+      );
     return (
       <input
-          name={key}
-          type="text"
-          placeholder={value}
-          className="input input-bordered input-success w-full"
-          data-testid={key}
-          defaultValue={stringifyObject(key, value)}
-          onChange={(event) => handleChange(event, key)}
-        />
-    )
-  }
-  const handleChange = (e, key: string) : null => {
+        name={key}
+        type="text"
+        placeholder={value}
+        className="input input-bordered input-success w-full"
+        data-testid={key}
+        defaultValue={stringifyObject(key, value)}
+        onChange={(event) => handleChange(event, key)}
+      />
+    );
+  };
+  const handleChange = (e, key: string): null => {
     const { value } = e.target;
-    setMeta(Object.assign(new SigMFMetadata(), {
-      ...meta,
-      global: {
-        ...globalMeta,
-        [key]: value
-      }
-    }));
-  }
+    setMeta(
+      Object.assign(new SigMFMetadata(), {
+        ...meta,
+        global: {
+          ...globalMeta,
+          [key]: value,
+        },
+      })
+    );
+  };
 
   return (
     <div className="pr-4">
@@ -84,6 +85,6 @@ export const  GlobalProperties = ({ meta, setMeta }) => {
       )}
     </div>
   );
-}
+};
 
 export default GlobalProperties;

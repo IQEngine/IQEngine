@@ -21,7 +21,7 @@ export const Validator = () => {
     <div>
       <div className="flex justify-center">
         <CodeMirror
-        aria-label= 'Validator Code Editor'
+          aria-label="Validator Code Editor"
           value={metadata}
           height="500px"
           width="700px"
@@ -38,7 +38,7 @@ export const Validator = () => {
             </h2>
           </div>
           <div className="flex justify-center text-error">
-            <ul aria-label='Validator Errors' style={{ width: '700px' }}>
+            <ul aria-label="Validator Errors" style={{ width: '700px' }}>
               {errors.map((error, i) => (
                 <li key={'error ' + { i }}>
                   <svg
@@ -62,6 +62,6 @@ export const Validator = () => {
       )}
     </div>
   );
-}
+};
 
 export default Validator;

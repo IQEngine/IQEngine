@@ -26,4 +26,4 @@ export const INITIAL_METADATA_SNIPPET = `{
         }
     ],
     "annotations": []
-}`
+}`;

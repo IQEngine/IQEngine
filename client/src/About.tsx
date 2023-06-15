@@ -28,12 +28,16 @@ export const About = () => {
         <ul className="text-lg">
           <li className="list-group-item">- Analyze one RF recording</li>
           <li className="list-group-item">- Organize and query millions of RF recordings</li>
-          <li className="list-group-item">- Evaluate signal detection/classification algorithms on a variety of recordings</li>
+          <li className="list-group-item">
+            - Evaluate signal detection/classification algorithms on a variety of recordings
+          </li>
         </ul>
         <ul className="text-lg">
           <li className="list-group-item">- Share your RF recordings or non-realtime RF functions with the world</li>
           <li className="list-group-item">- Learn DSP basics (e.g., FFTs, filtering, wavelets)</li>
-          <li className="list-group-item">- Share RF recordings/datasets within your team or organization using a local instance of IQEngine</li>
+          <li className="list-group-item">
+            - Share RF recordings/datasets within your team or organization using a local instance of IQEngine
+          </li>
         </ul>
       </div>
 
