@@ -1,4 +1,4 @@
-POST http://127.0.0.1:8000/detectors/markos_detector HTTP/1.1
+POST http://127.0.0.1:8000/plugins/markos_detector HTTP/1.1
 content-type: application/json
 
 {

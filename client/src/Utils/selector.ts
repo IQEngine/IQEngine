@@ -17,7 +17,7 @@ function getStandardDeviation(array: Array<any>) {
 
 const average = (array: Array<any>) => array.reduce((a, b) => a + b) / array.length;
 
-function calcFftOfTile(
+export function calcFftOfTile(
   samples: Float32Array,
   fftSize: number,
   numFftsPerTile: number,
@@ -251,7 +251,6 @@ export const selectFft = (
     }
     trimmedFftData = zoomedFftData;
   }
-
 
   // Render Image
   const imageData = new ImageData(trimmedFftData, fftSize, num_final_ffts);

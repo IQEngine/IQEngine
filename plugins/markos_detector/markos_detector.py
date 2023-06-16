@@ -12,7 +12,7 @@ import json
 from pydantic.dataclasses import dataclass
 
 @dataclass
-class Detector:
+class Plugin:
     sample_rate: int = 0
     center_freq: int = 0
     # Your custom params are below, call them whatever you want
@@ -21,7 +21,7 @@ class Detector:
     time_margin_seconds: float = 0.001
     min_bw: float = 10e3
 
-    def detect(self, samples):
+    def run(self, samples):
         noise_params = get_noise_floor(samples, self.sample_rate, n_floor_window_bins=self.time_window_size)
         start_time = time.time()
         anots = highlight_energy(samples=samples,
@@ -44,7 +44,11 @@ class Detector:
         if False:
             plot_spectrogram(samples, sample_rate, rects)
 
-        return anots
+        return {
+            "status" : "SUCCESS",
+            "data_output" : [],
+            "annotations" : anots
+        }
 
 def get_noise_floor(samps, sample_rate, fft_size=1024, n_floor_window_bins=10, n_random_spots=5):
     # this function does an fft of size {fft_size} at {n_random_spots} different locations
@@ -185,13 +189,3 @@ def highlight_energy(samples, samp_rate, fft_size, window_size, noise_power, pwr
         cv.imwrite('thresh_cont.png', backtorgb)
     return annotations
 
-
-if __name__ == "__main__":
-    fname = "C:\\Users\\marclichtman\\Downloads\\synthetic"
-    with open(fname + '.sigmf-meta', 'r') as f:
-        meta_data = json.load(f)
-    sample_rate = meta_data["global"]["core:sample_rate"]
-    center_freq = meta_data["captures"][0]['core:frequency']
-    samples = np.fromfile(fname + '.sigmf-data', dtype=np.complex64)
-    annotations = detect(samples, sample_rate, center_freq, time_window_size=10, power_threshold_db=20, time_margin_seconds=0.001, min_bw=10e3)
-    print(annotations)

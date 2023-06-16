@@ -132,7 +132,7 @@ To configure the project, you need to set specific environment variables. The cu
 
 * `VITE_GOOGLE_ANALYTICS_KEY` or `GOOGLE_ANALYTICS_KEY`: This variable holds the key for Google Analytics. If you don't intend to use Google Analytics, you can leave this variable empty.
 
-* `VITE_DETECTOR_ENDPOINT` or `DETECTOR_ENDPOINT`: Use this variable to specify the endpoint for the detector API. If you don't plan to use the detector API, you can leave this variable empty.
+* `VITE_PLUGINS_ENDPOINT` or `PLUGINS_ENDPOINT`: Use this variable to specify the endpoint for the detector API. If you don't plan to use the detector API, you can leave this variable empty.
 
 * `METADATA_DB_CONNECTION_STRING`: This variable stores the connection string for the Metadata DB. If you don't want to utilize the Metadata DB, you can leave this variable empty. Please note that this variable is only used by the backend API.
 
