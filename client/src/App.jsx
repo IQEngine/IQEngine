@@ -2,6 +2,8 @@
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
 import React, { useEffect } from 'react';
+import { useFeatureFlags } from './Components/FeatureFlagsContext/FeatureFlagsContext';
+import Feature from './Components/Feature/Feature';
 import { useLocation, Outlet } from 'react-router-dom';
 import ReactGA from 'react-ga4';
 import ThemeSelector from './Components/Styles/ThemeSelector';
@@ -15,8 +17,10 @@ export const App = () => {
   // ;
   const location = useLocation();
   const config = configQuery();
+  const { setFeatureFlags } = useFeatureFlags();
   useEffect(() => {
     if (!config.data) return;
+
     const analytics_key = config.data.googleAnalyticsKey;
     if (analytics_key) {
       ReactGA.initialize(analytics_key);
@@ -28,6 +32,7 @@ export const App = () => {
         page_hash: location.hash,
       });
     }
+    setFeatureFlags(config.data.featureFlags);
   }, [config]);
 
   return (

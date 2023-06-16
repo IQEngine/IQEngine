@@ -75,15 +75,6 @@ const Sidebar = (props) => {
           />
         </div>
       </details>
-
-      <details>
-        <summary className="pl-2 mt-2 bg-primary outline outline-1 outline-primary text-lg text-base-100 hover:bg-green-800">
-          Global Properties
-        </summary>
-        <div className="outline outline-1 outline-primary p-2">
-          <InfoPane />
-        </div>
-      </details>
     </div>
   );
 };

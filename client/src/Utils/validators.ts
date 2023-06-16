@@ -6,27 +6,36 @@ interface MetadataValidator {
   errors: any[];
 }
 
-export function metadataValidator(metadataValue: string) {
-  const ajv = new Ajv({ strict: false, allErrors: true });
-  const metadataValidator = { metadata: metadataValue, errors: [] } as MetadataValidator;
-  try {
-    metadataValidator.metadata = metadataValue;
-    const metadataJSON = JSON.parse(metadataValue);
+export function metadataValidator(metadataValue: string, path: string = null) {
+  let metadataValidator = { metadata: metadataValue, errors: [] } as MetadataValidator;
+  metadataValidator.metadata = metadataValue;
 
-    const validate = ajv.compile(sigmfSchema);
-    const valid = validate(metadataJSON);
+  return  validator(metadataValue, sigmfSchema, metadataValidator, path);
+}
+
+export function validator(value: string, schema: any, validator: any, path: string = null){
+  const ajv = new Ajv({ strict: false, allErrors: true });
+  try {
+    const jsonValue = JSON.parse(value);
+
+    const validate = ajv.compile(schema);
+    const valid = validate(jsonValue);
 
     if (valid) {
-      metadataValidator.errors = [];
+      validator.errors = [];
     } else {
-      metadataValidator.errors = validate.errors;
+      validator.errors = validate.errors;
+      if (path) {
+        validator.errors = validator.errors.filter(error => error?.instancePath?.startsWith(path));
+      }
     }
   } catch (e) {
     if (e instanceof SyntaxError) {
-      metadataValidator.errors = [{ message: 'Syntax Error: ' + e.message }];
+      validator.errors = [{ message: 'Syntax Error: ' + e.message }];
     } else {
-      metadataValidator.errors = [{ message: 'Error' + e.message }];
+      validator.errors = [{ message: 'Error' + e.message }];
     }
   }
-  return metadataValidator;
+
+  return validator;
 }

@@ -6,6 +6,7 @@ export interface MetaViewerProps {
 }
 
 export const MetaViewer = ( { meta }  : MetaViewerProps) => {
+    if(!meta) return <></>
     return (
         <div className="border border-primary ml-3 mt-2">
             <div className="flex mt-3 mb-3 stats shadow">

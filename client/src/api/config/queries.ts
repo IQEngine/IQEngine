@@ -10,14 +10,15 @@ const fetchConfig = async () => {
       console.log('axios config not found, using env vars instead');
       return {
         data: {
-          connectionInfo: JSON.parse(import.meta.env.VITE_CONNECTION_INFO),
+          connectionInfo: JSON.parse(import.meta.env.VITE_CONNECTION_INFO ?? null),
           pluginsEndpoint: import.meta.env.VITE_PLUGINS_ENDPOINT,
           googleAnalyticsKey: import.meta.env.VITE_GOOGLE_ANALYTICS_KEY,
+          featureFlags: JSON.parse(import.meta.env.VITE_FEATURE_FLAGS ?? null),
         } as Config,
       };
     });
     if (!response.data.connectionInfo) {
-      response.data.connectionInfo = JSON.parse(import.meta.env.VITE_CONNECTION_INFO);
+      response.data.connectionInfo = JSON.parse(import.meta.env.VITE_CONNECTION_INFO ?? null);
     }
     if (!response.data.pluginsEndpoint) {
       response.data.pluginsEndpoint = import.meta.env.VITE_PLUGINS_ENDPOINT;
@@ -25,12 +26,16 @@ const fetchConfig = async () => {
     if (!response.data.googleAnalyticsKey) {
       response.data.googleAnalyticsKey = import.meta.env.VITE_GOOGLE_ANALYTICS_KEY;
     }
+    if (!response.data.featureFlags) {
+      response.data.featureFlags = JSON.parse(import.meta.env.VITE_FEATURE_FLAGS ?? null);
+    }
     return response.data;
   } catch (error) {
     return {
-      connectionInfo: JSON.parse(import.meta.env.VITE_CONNECTION_INFO),
+      connectionInfo: JSON.parse(import.meta.env.VITE_CONNECTION_INFO ?? null),
       pluginsEndpoint: import.meta.env.VITE_PLUGINS_ENDPOINT,
       googleAnalyticsKey: import.meta.env.VITE_GOOGLE_ANALYTICS_KEY,
+      featureFlags: JSON.parse(import.meta.env.VITE_FEATURE_FLAGS ?? null),
     } as Config;
   }
 };
@@ -50,6 +55,7 @@ type Config = {
   pluginsEndpoint: string;
   connectionInfo: ConnectionInfo;
   googleAnalyticsKey: string;
+  featureFlags: { [key: string]: boolean };
 };
 
 export const configQuery = () =>

@@ -8,7 +8,7 @@ import { TimePlot } from './TimePlot';
 import { FrequencyPlot } from './FrequencyPlot';
 import { IQPlot } from './IQPlot';
 import { Layer, Image, Stage } from 'react-konva';
-import { selectFft, calculateTileNumbers, range } from '../../Utils/selector';
+import { selectFft, calculateTileNumbers, range, SelectFftReturn } from '../../Utils/selector';
 import { AnnotationViewer } from '@/Components/Annotation/AnnotationViewer';
 import { RulerTop } from './RulerTop';
 import { RulerSide } from './RulerSide';
@@ -16,17 +16,19 @@ import { INITIAL_PYTHON_SNIPPET, TILE_SIZE_IN_IQ_SAMPLES } from '../../Utils/con
 import TimeSelector from './TimeSelector';
 import { ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 import AnnotationList from '@/Components/Annotation/AnnotationList';
+import { GlobalProperties } from '@/Components/GlobalProperties/GlobalProperties';
 import { MetaViewer } from '@/Components/MetaViewer/MetaViewer';
 import { SpectrogramContext } from './SpectrogramContext';
 import { useParams } from 'react-router-dom';
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { getMeta } from '@/api/metadata/Queries';
 import { SigMFMetadata } from '@/Utils/sigmfMetadata';
-import { getIQDataSlices } from '@/api/iqdata/Queries';
+import { getIQDataSlices, getIQDataSlicesTransformed, useCurrentCachedIQDataSlice } from '@/api/iqdata/Queries';
 import { IQDataSlice } from '@/api/Models';
 import { useInterval } from 'usehooks-ts';
 import { python } from '@codemirror/lang-python';
 import { applyProcessing } from '@/Sources/FetchMoreDataSource';
+import { useQueryClient } from '@tanstack/react-query';
 
 declare global {
   interface Window {
@@ -46,13 +48,6 @@ export const SpectrogramPage = () => {
   const rulerTopHeight = 30;
   const marginTop = 30;
   const { type, account, container, filePath, sasToken } = useParams();
-
-  const handleNewSlice = (newSlice: IQDataSlice) => {
-    setDownloadedTiles((oldTiles) => {
-      oldTiles.push(newSlice.index);
-      return oldTiles;
-    });
-  };
   const imgRef = useRef<HTMLImageElement>(null);
   const imgRef2 = useRef<HTMLImageElement>(null);
 
@@ -77,23 +72,25 @@ export const SpectrogramPage = () => {
   const [pyodide, setPyodide] = useState(null);
   const [handleTop, setHandleTop] = useState(0);
   const [zoomLevel, setZoomLevel] = useState(1);
-  const [downloadedTiles, setDownloadedTiles] = useState([]);
   const [includeRfFreq, setIncludeRfFreq] = useState(false);
   const [plotWidth, setPlotWidth] = useState(0);
   const [plotHeight, setPlotHeight] = useState(0);
   const [missingTiles, setMissingTiles] = useState([]);
   const metaQuery = getMeta(type, account, container, filePath);
   const tiles = range(Math.floor(lowerTile), Math.ceil(upperTile));
-  const [fftData, setfftData] = useState<Record<number, Uint8ClampedArray>>({});
+  const [fftData, setFFTData] = useState<Record<number, Uint8ClampedArray>>({});
   const [meta, setMeta] = useState<SigMFMetadata>(metaQuery.data);
   const [taps, setTaps] = useState<number[]>([1]);
   const [pythonSnippet, setPythonSnippet] = useState(INITIAL_PYTHON_SNIPPET);
   const [fetchMinimap, setFetchMinimap] = useState(false);
-  const [iqDataProcessed, setIqData] = useState<Record<number, Float32Array>>({});
-  const iqffts = getIQDataSlices(
+  const [iqData, setIQData] = useState<Record<number, Float32Array>>({});
+  const [iqRaw, setIQRaw] = useState<Record<number, Float32Array>>({});
+  const [fftImage, setFFTImage] = useState<SelectFftReturn>(null);
+  const { downloadedTiles } = useCurrentCachedIQDataSlice(meta, TILE_SIZE_IN_IQ_SAMPLES);
+
+  const iqQuery = getIQDataSlices(
     metaQuery.data,
     tiles,
-    handleNewSlice,
     TILE_SIZE_IN_IQ_SAMPLES,
     !!metaQuery.data && tiles.length > 0
   );
@@ -110,59 +107,85 @@ export const SpectrogramPage = () => {
     };
   }, []);
 
-  const iqData = useMemo(() => {
-    return iqffts
+  useEffect(() => {
+    let data = iqQuery
       .map((slice) => slice.data)
       .filter((data) => data !== null)
       .reduce((acc, data) => {
-        if (!data) {
+        if (!data || !!iqRaw[data.index]) {
           return acc;
         }
-        // TODO: Add back data transformation once we find out how to pass through the performance provblems it is getting now.
-        // let dataTransformed = applyProcessing(data.iqArray, taps, pythonSnippet, pyodide);
         acc[data.index] = data.iqArray;
         return acc;
       }, {});
-  }, [
-    iqffts.reduce((acc, item) => {
-      if (item.data) {
-        return [acc, item.data.index].join(',');
-      } else {
+    setIQRaw((oldData) => {
+      return { ...oldData, ...data };
+    });
+  }, [iqQuery.reduce((previous, current) => previous + current.dataUpdatedAt, '')]);
+
+  useEffect(() => {
+    (async () => {
+      let data = Object.keys(iqRaw).reduce((acc, index) => {
+        let iqArray = iqRaw[index];
+        if (!iqArray) {
+          return acc;
+        }
+        let iqArrayTransformed = applyProcessing(iqArray, taps, pythonSnippet, pyodide);
+        acc[index] = iqArrayTransformed;
+        return acc;
+      }, {});
+      setFFTData({});
+      setIQData(data);
+    })();
+  }, [pythonSnippet, taps, pyodide]);
+
+  useEffect(() => {
+    console.debug('IQ Raw Changed');
+    let data = Object.keys(iqRaw).reduce((acc, index) => {
+      let iqArray = iqRaw[index];
+      if (!iqArray || !!iqData[index]) {
         return acc;
       }
-    }, '') ?? '',
-    fftSize,
-    magnitudeMax,
-    magnitudeMin,
-    fftWindow,
-    zoomLevel,
-    lowerTile,
-    upperTile,
-    missingTiles,
-    downloadedTiles,
-    pyodide,
-    pythonSnippet,
-    taps,
-  ]);
+      let iqArrayTransformed = applyProcessing(iqArray, taps, pythonSnippet, pyodide);
+      acc[index] = iqArrayTransformed;
+      return acc;
+    }, {});
+    console.debug('Setting IQ Data', data);
+    setIQData((oldData) => {
+      return { ...oldData, ...data };
+    });
+  }, [iqRaw]);
 
-  const fftReturned = useMemo(() => {
+  useEffect(() => {
     if (!meta || lowerTile < 0 || upperTile < 0) {
-      return null;
+      return;
     }
-    console.debug('Dependencies changed, recalculating FFT', {
-      iqData,
+    console.debug('FFT Changed');
+    const ret = selectFft(
+      lowerTile,
+      upperTile,
       fftSize,
       magnitudeMax,
       magnitudeMin,
-      fftWindow,
+      meta,
+      fftWindow, // dont want to conflict with the main window var
+      currentFftMax,
+      currentFftMin,
+      autoscale,
       zoomLevel,
-      lowerTile,
-      upperTile,
-      missingTiles,
-    });
+      iqData,
+      {}
+    );
+    setFFTData(ret?.fftData);
+    setFFTImage(ret);
+  }, [fftSize, magnitudeMax, magnitudeMin, fftWindow, zoomLevel]);
 
-    // Update the image (eventually this should get moved somewhere else)
-    let ret = selectFft(
+  useEffect(() => {
+    if (!meta || lowerTile < 0 || upperTile < 0) {
+      return;
+    }
+    console.debug('FFT Repositioned');
+    const ret = selectFft(
       lowerTile,
       upperTile,
       fftSize,
@@ -177,53 +200,32 @@ export const SpectrogramPage = () => {
       iqData,
       fftData
     );
-    return { ret, fftData };
-  }, [
-    downloadedTiles.length,
-    fftSize,
-    magnitudeMax,
-    magnitudeMin,
-    fftWindow,
-    zoomLevel,
-    lowerTile,
-    upperTile,
-    missingTiles.length,
-    fftData,
-  ]);
-
-  useEffect(() => {
-    setfftData({});
-  }, [fftSize, magnitudeMax, magnitudeMin, fftWindow]);
+    setFFTData(ret?.fftData);
+    setFFTImage(ret);
+  }, [lowerTile, upperTile, missingTiles.length, iqData]);
 
   useEffect(() => {
     renderImage();
-  }, [fftReturned]);
+  }, [fftImage]);
 
   const renderImage = async () => {
-    if (!fftReturned) {
+    if (!fftImage) {
       return;
     }
-    createImageBitmap(fftReturned.ret.imageData).then((imageBitmap) => {
+    createImageBitmap(fftImage.imageData).then((imageBitmap) => {
       setImage(imageBitmap);
     });
-    if (autoscale && fftReturned.ret.autoMax) {
-      console.debug('New max/min:', fftReturned.ret.autoMax, fftReturned.ret.autoMin);
+    if (autoscale && fftImage.autoMax) {
+      console.debug('New max/min:', fftImage.autoMax, fftImage.autoMin);
       setAutoscale(false); // toggles it off so this only will happen once
-      setMagnitudeMax(fftReturned.ret.autoMax);
-      setMagnitudeMin(fftReturned.ret.autoMin);
+      setMagnitudeMax(fftImage.autoMax);
+      setMagnitudeMin(fftImage.autoMin);
     }
-    setCurrentFftMax(fftReturned.ret.currentFftMax);
-    setCurrentFftMin(fftReturned.ret.currentFftMin);
-    setMissingTiles(fftReturned.ret.missingTiles);
+    setCurrentFftMax(fftImage.currentFftMax);
+    setCurrentFftMin(fftImage.currentFftMin);
+    setMissingTiles(fftImage.missingTiles);
     setFetchMinimap(true);
   };
-
-  // useInterval(() => {
-  //   if (missingTiles.length > 0) {
-  //     console.debug('Missing tiles:', missingTiles, fftData, tiles);
-  //     renderImage();
-  //   }
-  // }, zoomLevel * 100);
 
   const fetchAndRender = (handleTop) => {
     if (!meta) {
@@ -279,7 +281,7 @@ export const SpectrogramPage = () => {
       console.log('fetching and rendering tiles', meta);
       fetchAndRender(handleTop);
     }
-  }, [meta, zoomLevel]);
+  }, [meta, zoomLevel, handleTop]);
 
   // run windowResized once when page loads
   useEffect(() => {
@@ -540,6 +542,15 @@ export const SpectrogramPage = () => {
                 spectrogramHeight={spectrogramHeight}
                 setMeta={setMeta}
               />
+            </div>
+          </details>
+
+          <details>
+            <summary className="pl-2 mt-2 bg-primary outline outline-1 outline-primary text-lg text-base-100 hover:bg-green-800">
+              Global Properties
+            </summary>
+            <div className="outline outline-1 outline-primary p-2">
+              <GlobalProperties meta={meta} setMeta={setMeta} />
             </div>
           </details>
 
