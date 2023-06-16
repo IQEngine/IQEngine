@@ -23,7 +23,7 @@ import { useParams } from 'react-router-dom';
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { getMeta } from '@/api/metadata/Queries';
 import { SigMFMetadata } from '@/Utils/sigmfMetadata';
-import { getIQDataSlices, getIQDataSlicesTransformed, useCurrentCachedIQDataSlice } from '@/api/iqdata/Queries';
+import { getIQDataSlices, useCurrentCachedIQDataSlice } from '@/api/iqdata/Queries';
 import { IQDataSlice } from '@/api/Models';
 import { useInterval } from 'usehooks-ts';
 import { python } from '@codemirror/lang-python';
@@ -88,12 +88,7 @@ export const SpectrogramPage = () => {
   const [fftImage, setFFTImage] = useState<SelectFftReturn>(null);
   const { downloadedTiles } = useCurrentCachedIQDataSlice(meta, TILE_SIZE_IN_IQ_SAMPLES);
 
-  const iqQuery = getIQDataSlices(
-    metaQuery.data,
-    tiles,
-    TILE_SIZE_IN_IQ_SAMPLES,
-    !!metaQuery.data && tiles.length > 0
-  );
+  const iqQuery = getIQDataSlices(metaQuery.data, tiles, TILE_SIZE_IN_IQ_SAMPLES, !!metaQuery.data && tiles.length > 0);
 
   useEffect(() => {
     window.addEventListener('resize', windowResized);
