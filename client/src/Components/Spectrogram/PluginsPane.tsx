@@ -6,7 +6,11 @@ import React, { useState, useEffect } from 'react';
 import { configQuery } from '../../api/config/queries';
 import { useAppDispatch } from '@/Store/hooks';
 import { Annotation, SigMFMetadata } from '@/Utils/sigmfMetadata';
-import { matchPath } from 'react-router-dom';
+import { TimePlot } from './TimePlot';
+import { FrequencyPlot } from './FrequencyPlot';
+import { IQPlot } from './IQPlot';
+import { Layer, Image, Stage } from 'react-konva';
+import { calcFftOfTile } from '../../Utils/selector';
 
 export interface PluginsPaneProps {
   cursorsEnabled: boolean;
@@ -19,6 +23,9 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
   const [pluginsList, setPluginsList] = useState([]);
   const [selectedPlugin, setSelectedPlugin] = useState('default');
   const [pluginParams, setPluginParams] = useState({});
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalSamples, setModalSamples] = useState([]);
+  const [modalSpectrogram, setmodalSpectrogram] = useState(null);
   const [value, setValue] = useState(0); // integer state used to force rerender
   const dispatch = useAppDispatch();
   const config = configQuery();
@@ -114,8 +121,37 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
       .then(function (data) {
         console.log('Plugin Status:', data.status);
         console.log('data:', data);
-        if (data.data_output.length > 0) {
-          console.log(data.data_output);
+        if (data.data_output && data.data_output.length > 0) {
+          // just show the first output for now, 99% of plugins will have 0 or 1 IQ output anyway
+          const samples = data.data_output[0]['samples'];
+          //const sample_rate = data.data_output[0]['sample_rate']; // Hz
+          //const center_freq = data.data_output[0]['center_freq']; // Hz
+          //const data_type = data.data_output[0]['data_type']; // assumes iq/cf32_le
+          setModalSamples(samples);
+
+          // create spectrogram out of all samples
+          const fftSize = 1024;
+          const numFfts = Math.floor(samples.length / 2 / fftSize);
+          const magnitudeMin = 50;
+          const magnitudeMax = 220;
+          const samples_typed = Float32Array.from(samples);
+          const ret = calcFftOfTile(
+            samples_typed,
+            fftSize,
+            numFfts,
+            'hamming',
+            magnitudeMin,
+            magnitudeMax,
+            false, // autoscale
+            -99999, // fftmin (updates during function)
+            99999 // fftmax (updates during function)
+          );
+          const imageData = new ImageData(ret['newFftData'], fftSize, numFfts);
+          createImageBitmap(imageData).then((imageBitmap) => {
+            setmodalSpectrogram(imageBitmap);
+          });
+
+          setModalOpen(true);
         }
         if (data.annotations) {
           for (let i = 0; i < data.annotations.length; i++) {
@@ -175,6 +211,32 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
           </div>
           <button onClick={handleSubmit}>Run Plugin</button>
         </>
+      )}
+
+      {modalOpen && (
+        <dialog className="modal modal-open w-fit h-full">
+          <form method="dialog" className="modal-box max-w-full">
+            <h3 className="font-bold text-2xl mb-3 text-primary text-center">IQ Output from Plugin</h3>
+            <button
+              className="absolute right-2 top-2 text-secondary font-bold"
+              onClick={() => {
+                setModalOpen(false);
+              }}
+            >
+              ✕
+            </button>
+            <div className="grid justify-items-stretch">
+              <Stage width={800} height={600}>
+                <Layer>
+                  <Image image={modalSpectrogram} x={0} y={0} width={800} height={600} />
+                </Layer>
+              </Stage>
+              <TimePlot currentSamples={modalSamples} cursorsEnabled={true} plotWidth={800} plotHeight={400} />
+              <FrequencyPlot currentSamples={modalSamples} cursorsEnabled={true} plotWidth={800} plotHeight={400} />
+              <IQPlot currentSamples={modalSamples} cursorsEnabled={true} plotWidth={800} plotHeight={400} />
+            </div>
+          </form>
+        </dialog>
       )}
     </div>
   );

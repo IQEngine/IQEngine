@@ -93,8 +93,8 @@ async def run(info : fastapi.Request, plugin_name):
         results = PluginInstance.run(samples) # all python plugins should have a run method that takes in the samples
         logging.info(results)
 
-    except:
-        return {"status" : "FAILED - unknown error in plugins_api", "annotations": []}
+    except Exception as e:
+        return {"status" : "FAILED - unknown error in plugins_api:" + str(e), "annotations": []}
 
     ## Validate with our schema
     #try:
