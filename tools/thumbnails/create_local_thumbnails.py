@@ -55,7 +55,7 @@ def spectro_maker(directory, basename):
     for i in range(num_rows):
         spectrogram[i, :] = np.log10(
             np.abs(
-                np.fft.fftshift(np.fft.fft(samples[i * fftSize : (i + 1) * fftSize]))
+                np.fft.fftshift(np.fft.fft(samples[i * fftSize: (i + 1) * fftSize]))
             )
             ** 2
         )
