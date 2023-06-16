@@ -1,8 +1,8 @@
 import { SigMFMetadata } from '@/Utils/sigmfMetadata';
 import { DataSourceClient } from './DataSourceClient';
-import { DataSource } from '../Models';
+import { DataSource } from '@/api/Models';
 import store from '@/Store/store';
-import { getDataSourceFromConnection } from '../utils/AzureBlob';
+import { getDataSourceFromConnection } from '@/api/utils/AzureBlob';
 
 export class BlobClient implements DataSourceClient {
   list(): Promise<DataSource[]> {
@@ -22,7 +22,7 @@ export class BlobClient implements DataSourceClient {
   }
 
   create(dataSource: DataSource): Promise<DataSource> {
-    return Promise.reject("Not implemented");
+    return Promise.reject('Not implemented');
   }
 
   features() {

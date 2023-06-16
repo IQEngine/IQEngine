@@ -1,7 +1,6 @@
 import { MetadataClient } from './MetadataClient';
-import { DataSource } from '../Models';
 import { Annotation, CaptureSegment, SigMFMetadata, TraceabilityOrigin } from '@/Utils/sigmfMetadata';
-import store from '../../Store/store';
+import store from '@/Store/store';
 import { FileWithDirectoryAndFileHandle } from 'browser-fs-access';
 
 export class LocalClient implements MetadataClient {

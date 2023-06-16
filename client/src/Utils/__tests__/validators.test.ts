@@ -1,5 +1,5 @@
-import { INITIAL_ANNOTATIONS_SNIPPET, INITIAL_METADATA_SNIPPET } from '../constants';
-import { metadataValidator } from '../validators';
+import { INITIAL_ANNOTATIONS_SNIPPET, INITIAL_METADATA_SNIPPET } from '@/Utils/constants';
+import { metadataValidator } from '@/Utils/validators';
 import metadataJson from './validators.test.meta.json';
 import annotationsJson from './validators.test.annotations.json';
 

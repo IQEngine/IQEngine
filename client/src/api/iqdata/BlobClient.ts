@@ -1,9 +1,9 @@
 import { IQDataClient } from './IQDataClient';
 import { convertToFloat32 } from '@/Sources/FetchMoreDataSource';
-import { getBlobClient } from '../utils/AzureBlob';
+import { getBlobClient } from '@/api/utils/AzureBlob';
 import { SigMFMetadata } from '@/Utils/sigmfMetadata';
 import { TILE_SIZE_IN_IQ_SAMPLES } from '@/Utils/constants';
-import { IQDataSlice } from '../Models';
+import { IQDataSlice } from '@/api/Models';
 
 export class BlobClient implements IQDataClient {
   getIQDataSlices(meta: SigMFMetadata, indexes: number[], tileSize: number): Promise<IQDataSlice[]> {

@@ -10,14 +10,14 @@ import RepositoryTile from './RepositoryTile';
 import RepositoryAPITile from './RepositoryAPITile';
 import SiggenTile from './SiggenTile';
 import ValidatorTile from './ValidatorTile';
-import { configQuery } from '../../api/config/queries';
-import { preFetchDataSourcesMeta } from '../../api/metadata/Queries';
-import { getDataSources } from '../../api/datasource/Queries';
+import { configQuery } from '@/api/config/queries';
+import { preFetchDataSourcesMeta } from '@/api/metadata/Queries';
+import { getDataSources } from '@/api/datasource/Queries';
 import { useAppDispatch } from '@/Store/hooks';
 import { upsertDataSource } from '@/Store/Reducers/ConnectionReducer';
 import { CLIENT_TYPE_API, CLIENT_TYPE_BLOB, DataSource } from '@/api/Models';
 import { useQueryClient } from '@tanstack/react-query';
-import Feature from '../Feature/Feature';
+import Feature from '@/Components/Feature/Feature';
 
 const RepoBrowser = () => {
   let [dataAvailable, setDataAvailable] = useState(false);

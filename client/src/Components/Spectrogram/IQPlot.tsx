@@ -4,7 +4,7 @@
 
 import Plot from 'react-plotly.js';
 import React, { useEffect, useState } from 'react';
-import { template } from '../../Utils/plotlyTemplate';
+import { template } from '@/Utils/plotlyTemplate';
 
 export const IQPlot = (props) => {
   let { currentSamples, plotWidth, plotHeight } = props;

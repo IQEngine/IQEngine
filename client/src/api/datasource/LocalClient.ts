@@ -1,7 +1,7 @@
 import { DataSourceClient } from './DataSourceClient';
-import { DataSource } from '../Models';
+import { DataSource } from '@/api/Models';
 import { SigMFMetadata, TraceabilityOrigin } from '@/Utils/sigmfMetadata';
-import store from '../../Store/store';
+import store from '@/Store/store';
 import { FileWithDirectoryAndFileHandle } from 'browser-fs-access';
 
 export class LocalClient implements DataSourceClient {
@@ -35,7 +35,7 @@ export class LocalClient implements DataSourceClient {
   }
 
   create(dataSource: DataSource): Promise<DataSource> {
-    return Promise.reject("Not implemented");
+    return Promise.reject('Not implemented');
   }
 
   features() {

@@ -4,7 +4,7 @@
 
 import React, { Fragment, useCallback } from 'react';
 import { Layer, Rect, Text } from 'react-konva';
-import { TILE_SIZE_IN_IQ_SAMPLES } from '../../Utils/constants';
+import { TILE_SIZE_IN_IQ_SAMPLES } from '@/Utils/constants';
 import { Annotation, SigMFMetadata } from '@/Utils/sigmfMetadata';
 import { updateMeta } from '@/api/metadata/Queries';
 import { useQueryClient } from '@tanstack/react-query';
