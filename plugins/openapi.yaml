@@ -21,12 +21,12 @@ paths:
                 minItems: 1
                 maxItems: 100
                 uniqueItems: true
-  /detectors/{detectorname}:
+  /detectors/{pluginname}:
     get:
       summary: Gets the detector's custom params in the form of a JSON schema that is only 1 layer deep.
       parameters:
         - in: path
-          name: detectorname
+          name: pluginname
           schema:
             type: string
           required: true
@@ -63,7 +63,7 @@ paths:
       summary: Run the detector, using the provided IQ samples and params.
       parameters:
         - in: path
-          name: detectorname
+          name: pluginname
           schema:
             type: string
           required: true

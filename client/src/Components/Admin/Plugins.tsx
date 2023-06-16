@@ -1,7 +1,7 @@
 import React from 'react';
 
-const Detectors = () => {
+const Plugins = () => {
   return <h1></h1>;
 };
 
-export default Detectors;
+export default Plugins;
