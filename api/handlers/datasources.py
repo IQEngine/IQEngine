@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pymongo.collection import Collection
 from fastapi.responses import StreamingResponse
 from PIL import Image, ImageDraw
+from .cipher import decrypt
 
 router = APIRouter()
 
@@ -60,21 +61,11 @@ def get_datasource(
             "container": container,
         }
     )
+
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
+    
+    if "core.windows.net" in datasource.imageURL:
+        datasource.imageURL = datasource.imageURL + "?" + decrypt(datasource.sasToken)
     return datasource
 
-
-@router.get(
-    "/api/datasources/{account}/{container}/image")
-def get_generated_image():
-    # Generate the image as place holder
-    image = Image.new("RGB", (200, 200), (255, 255, 255))
-    draw = ImageDraw.Draw(image)
-    draw.rectangle((50, 50, 150, 150), fill=(0, 0, 0))
-
-    image_data = io.BytesIO()
-    image.save(image_data, format="PNG")
-    image_data.seek(0)
-
-    return StreamingResponse(image_data, media_type="image/png")

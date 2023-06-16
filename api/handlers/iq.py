@@ -89,14 +89,6 @@ async def get_iq_data_slices(
         #ToDo: validate iq_data against blob size to ensure we don't try to read past the end of the blob
         
         data_list = []
-        # for loop solution. Syncronous calls to blob storage are slow 
-        # for index in iq_data.indexes:
-        #     offsetBytes = index * iq_data.tile_size * iq_data.bytes_per_sample * 2
-        #     countBytes = iq_data.tile_size * iq_data.bytes_per_sample * 2
-        #     download_stream = blob_client.download_blob(offsetBytes, countBytes)
-        #     data = io.BytesIO(download_stream.readall())
-        #     encoded_data = base64.b64encode(data.getvalue()).decode("utf-8")
-        #     data_list.append({"index": index, "data" : encoded_data})
 
         # asyncio solution. Much faster
         tasks = [download_blob(blob_client, index, iq_data.tile_size, iq_data.bytes_per_sample, blob_size) for index in iq_data.indexes]
