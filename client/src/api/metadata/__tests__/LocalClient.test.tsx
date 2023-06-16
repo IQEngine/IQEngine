@@ -1,8 +1,5 @@
 import { test, describe } from 'vitest';
-import nock from 'nock';
-import { ApiClient } from '../ApiClient';
-import { SigMFMetadata, Annotation, CaptureSegment } from '@/Utils/sigmfMetadata';
-import { LocalClient } from '../LocalClient';
+import { LocalClient } from '@/api/metadata/LocalClient';
 import store from '@/Store/store';
 import { setLocalClient } from '@/Store/Reducers/LocalClientReducer';
 import { FileWithDirectoryAndFileHandle } from 'browser-fs-access';

@@ -1,4 +1,4 @@
-import { CLIENT_TYPE_API, CLIENT_TYPE_LOCAL, CLIENT_TYPE_BLOB } from '../Models';
+import { CLIENT_TYPE_API, CLIENT_TYPE_LOCAL, CLIENT_TYPE_BLOB } from '@/api/Models';
 import { ApiClient } from './ApiClient';
 import { BlobClient } from './BlobClient';
 import { LocalClient } from './LocalClient';

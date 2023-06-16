@@ -4,7 +4,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Layer, Rect } from 'react-konva';
-
+import { useEffectOnce } from 'usehooks-ts';
 const TimeSelector = (props) => {
   const {
     spectrogramHeight,
@@ -25,11 +25,10 @@ const TimeSelector = (props) => {
   }, [props.spectrogramWidth]);
 
   // Run once at beginning to set value in SpectrogramPage
-  useEffect(() => {
+  useEffectOnce(() => {
     handleTimeSelectionStart(startTileNum);
     handleTimeSelectionEnd(endTileNum);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // dont put dep here
+  });
 
   // Sample-start bar
   const handleDragMoveStart = (e) => {

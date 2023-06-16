@@ -5,8 +5,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Layer, Rect, Image } from 'react-konva';
 import { fftshift } from 'fftshift';
-import { colMap } from '../../Utils/colormap';
-import { MINIMUM_SCROLL_HANDLE_HEIGHT_PIXELS, TILE_SIZE_IN_IQ_SAMPLES } from '../../Utils/constants';
+import { colMap } from '@/Utils/colormap';
+import { MINIMUM_SCROLL_HANDLE_HEIGHT_PIXELS, TILE_SIZE_IN_IQ_SAMPLES } from '@/Utils/constants';
 import { FFT } from '@/Utils/fft';
 import { SigMFMetadata } from '@/Utils/sigmfMetadata';
 import { getIQDataFullIndexes } from '@/api/iqdata/Queries';
