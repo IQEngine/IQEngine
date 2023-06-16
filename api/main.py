@@ -50,7 +50,7 @@ class LogConfig(BaseModel):
 dictConfig(LogConfig().dict())
 logger = logging.getLogger("api")
 
-app = FastAPI(debug=True)
+app = FastAPI()
 app.include_router(datasources_router)
 app.include_router(metadata_router)
 app.include_router(status_router)
