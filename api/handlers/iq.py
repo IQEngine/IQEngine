@@ -1,5 +1,4 @@
 import database.database
-from cryptography.fernet import Fernet
 from database.models import DataSource
 from pymongo.collection import Collection
 from azure.storage.blob import BlobClient
@@ -10,9 +9,8 @@ from pydantic import BaseModel
 import logging
 import asyncio
 from asyncio import to_thread
-
+from .cipher import decrypt
 import io
-import os
 import base64
 
 router = APIRouter()
@@ -21,13 +19,6 @@ class IQData(BaseModel):
     indexes: List[int]
     tile_size: int
     bytes_per_sample: int
-
-def decrypt(sas_token: str):
-    key = os.getenv("DB_ENCRYPTION_KEY", None)
-    if not key: return None
-    cipher_suite = Fernet(key)
-    plain_text = cipher_suite.decrypt(sas_token)
-    return plain_text.decode("utf-8")
 
 
 def get_sas_token(account: str, container: str, datasources_collection: Collection[DataSource] = Depends(database.database.datasources_collection)):
