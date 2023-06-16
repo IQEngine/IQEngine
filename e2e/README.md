@@ -36,7 +36,7 @@ Integration testing is implemented using a couple of tools. For the api, pytest 
 
 There is also a VSCode extension available which can run tests from within the editor. See [https://playwright.dev/docs/getting-started-vscode] for details.
 
-*NB: Seems like a bug but the extension will choose the alphabetically-sorted first config it finds. You may need to set the default 
+*NB: Seems like a bug but the extension will choose the alphabetically-sorted first config it finds. You may need to set the default
 config file to use when running this way*
 
 

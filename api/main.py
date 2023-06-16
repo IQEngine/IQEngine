@@ -1,5 +1,4 @@
 # vim: tabstop=4 shiftwidth=4 expandtab
-
 import os
 import logging
 from logging.config import dictConfig
@@ -19,6 +18,7 @@ if not os.path.exists("iqengine"):
     os.makedirs("iqengine")
 
 from pydantic import BaseModel
+
 
 class LogConfig(BaseModel):
     """Logging configuration to be set for the server"""
@@ -48,10 +48,11 @@ class LogConfig(BaseModel):
         LOGGER_NAME: {"handlers": ["default"], "level": LOG_LEVEL},
     }
 
+
 dictConfig(LogConfig().dict())
 logger = logging.getLogger("api")
 
-app = FastAPI(debug = True)
+app = FastAPI(debug=True)
 app.include_router(datasources_router)
 app.include_router(metadata_router)
 app.include_router(status_router)

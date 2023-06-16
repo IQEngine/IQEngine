@@ -23,7 +23,7 @@ describe('Test RepoBrowser', () => {
   });
 
   const store = configureStore({
-    reducer: { },
+    reducer: {},
   });
 
   const AllProviders = ({ children }) => (
@@ -66,11 +66,11 @@ describe('Test RepoBrowser', () => {
         account: 'api-test-account',
         container: 'api-test-container',
         description: 'API Test Description',
-      }
+      },
     ];
     nock('http://localhost:3000').get('/api/datasources').reply(200, data);
-    
-    render(<RepoBrowser/>, { wrapper: AllProviders });
+
+    render(<RepoBrowser />, { wrapper: AllProviders });
     expect(await screen.findByRole('button', { name: 'api-test-name' })).toBeInTheDocument();
     expect(await screen.findByText('API Test Description')).toBeInTheDocument();
   });
@@ -90,11 +90,11 @@ describe('Test RepoBrowser', () => {
         account: 'api-test-account2',
         container: 'api-test-container2',
         description: 'API Test Description 2',
-      }
+      },
     ];
     nock('http://localhost:3000').get('/api/datasources').reply(200, data);
-    
-    render(<RepoBrowser/>, { wrapper: AllProviders });
+
+    render(<RepoBrowser />, { wrapper: AllProviders });
     expect(await screen.findByRole('button', { name: 'api-test-name' })).toBeInTheDocument();
     expect(await screen.findByText('API Test Description')).toBeInTheDocument();
     expect(await screen.findByRole('button', { name: 'api-test-name2' })).toBeInTheDocument();
