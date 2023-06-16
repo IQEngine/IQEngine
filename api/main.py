@@ -9,14 +9,13 @@ from handlers.config import router as config_router
 from handlers.datasources import router as datasources_router
 from handlers.metadata import router as metadata_router
 from handlers.status import router as status_router
+from pydantic import BaseModel
 
 load_dotenv()
 
 # check if the iqengine directory exists and create it if not
 if not os.path.exists("iqengine"):
     os.makedirs("iqengine")
-
-from pydantic import BaseModel
 
 
 class LogConfig(BaseModel):
