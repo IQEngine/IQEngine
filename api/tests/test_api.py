@@ -43,7 +43,7 @@ def test_api_get_config(client):
     response = client.get("/api/config")
     assert response.status_code == 200
     assert response.json() == {
-        "pluginsEndpoint": "http://localhost:5000/", # it should add the trailing "/"
+        "pluginsEndpoint": "http://localhost:5000/",  # it should add the trailing "/"
         "connectionInfo": {},
         "googleAnalyticsKey": "google_analytics_key",
     }
