@@ -45,6 +45,27 @@ def get_datasources(
 
 
 @router.get(
+        "/api/datasources/{account}/{container}/datasource", 
+        response_model=DataSource)
+def get_datasource(
+    account: str,
+    container: str,
+    datasources_collection: Collection[DataSource] = Depends(
+        database.database.datasources_collection
+    ),
+):
+    datasource = datasources_collection.find_one(
+        {
+            "account": account,
+            "container": container,
+        }
+    )
+    if not datasource:
+        raise HTTPException(status_code=404, detail="Datasource not found")
+    return datasource
+
+
+@router.get(
     "/api/datasources/{account}/{container}/image")
 def get_generated_image():
     # Generate the image as place holder

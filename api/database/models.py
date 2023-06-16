@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Extra, Field
+from pydantic import BaseModel, SecretStr, Extra, Field
 
 
 class DataSource(BaseModel):
@@ -8,7 +8,7 @@ class DataSource(BaseModel):
     container: str
     description: str | None
     imageURL: str | None
-
+    sasToken: SecretStr | None
 
 class DataSourceReference(BaseModel):
     type: str
