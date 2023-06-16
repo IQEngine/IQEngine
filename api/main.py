@@ -1,4 +1,3 @@
-# vim: tabstop=4 shiftwidth=4 expandtab
 import os
 import logging
 from logging.config import dictConfig
