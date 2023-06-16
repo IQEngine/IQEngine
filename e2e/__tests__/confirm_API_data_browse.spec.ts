@@ -10,7 +10,7 @@ test('API Datasource Browsing', async ({ page, request }) => {
     imageURL: 'https://i.etsystatic.com/20456772/r/il/a94e13/3604976065/il_1588xN.3604976065_dzyi.jpg',
   };
 
-  const response = await request.post('/api/datasources', { data: dataSource }); // Returns between 200 and 201 depending on local or staging environment
+  const response = await request.post('/api/datasources', { data: dataSource });
 
   await page.goto('/');
   const elements = await page.locator('[id="TestAPIDataSource"]'); // After first run there will be more than one element by this name
