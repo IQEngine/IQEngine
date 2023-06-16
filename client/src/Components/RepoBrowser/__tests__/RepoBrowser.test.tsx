@@ -1,41 +1,13 @@
 import { describe, expect, test } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import RepoBrowser from '@/Components/RepoBrowser/RepoBrowser';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import nock from 'nock';
 import '@testing-library/jest-dom';
-
-import { configureStore } from '@reduxjs/toolkit';
-import { BrowserRouter as Router } from 'react-router-dom';
-import connectionReducer from '@/Store/Reducers/ConnectionReducer';
-import { Provider } from 'react-redux';
-import { FeatureFlagsProvider } from '@/Components/FeatureFlagsContext/FeatureFlagsContext';
 import { DataSource } from '@/api/Models';
+import { AllProviders, queryClient } from './setupTests';
 
 describe('Test RepoBrowser', () => {
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        staleTime: Infinity,
-      },
-    },
-  });
-
-  const store = configureStore({
-    reducer: {},
-  });
-
-  const AllProviders = ({ children }) => (
-    <Provider store={store}>
-      <QueryClientProvider client={queryClient}>
-        <FeatureFlagsProvider flags={null}>
-          <Router>{children}</Router>
-        </FeatureFlagsProvider>
-      </QueryClientProvider>
-    </Provider>
-  );
-
   beforeAll(() => {
     import.meta.env.VITE_DETECTOR_ENDPOINT = 'http://127.0.0.1:8000/detectors/';
     import.meta.env.VITE_CONNECTION_INFO = '{}';
