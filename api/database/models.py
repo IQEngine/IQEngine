@@ -2,13 +2,16 @@ from pydantic import BaseModel, Extra, Field
 
 
 class DataSource(BaseModel):
+    type: str
     name: str
     account: str
     container: str
-    description: str
+    description: str | None
+    imageURL: str | None
 
 
 class DataSourceReference(BaseModel):
+    type: str
     account: str
     container: str
     file_path: str

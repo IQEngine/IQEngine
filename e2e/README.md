@@ -13,23 +13,37 @@ sudo apt-get install libflite1
 
 ## Run
 
-First, run an instance of the site locally, e.g. with `make dev` which will run it on <http://localhost:3000>
+The simples way to run the tests is just to do:
+
+```bash
+cd e2e
+npx playwright test
+# Or DEBUG=pw:webserver npx playwright test to debug server startup
+```
+
+This will start up the necessary API and application servers to run an end-to-end test on all configured browsers. If a server is already
+running the tests will try and re-use that rather than start a new one.
+
+See (Playwright Test Cli)(https://playwright.dev/docs/test-cli) for full details of command line arguments.
+
+If you need more fine-grained control the project Makefile has targets to help you with that e.g.
+
+```bash
+make run-api  # Start the API Server
+make dev      # Start the app server
+```
 
 Integration testing is implemented using a couple of tools. For the api, pytest is the tool. For the frontend, the tool is [Playwright](https://playwright.dev/docs/intro).
 
-There are several ways to run the tests:
+There is also a VSCode extension available which can run tests from within the editor. See [Getting Started VSCode](https://playwright.dev/docs/getting-started-vscode) for details.
 
-1. ```npx playwright test (with optional pattern)```
-2. ```make test``` (runs playwright and pytest unit tests)
-3. ```make test-pw```  (runs only the playwright tests)
-4. In VSCode, the Playwright extension has run script features as well as several others.
+*NB: Seems like a bug but the extension will choose the alphabetically-sorted first config it finds. You may need to set the default
+config file to use when running this way*
 
-If you're using #1, the (pattern) is the usual - a substring, filename pattern and so on.
-
-If you're using VSCode, here's a little more on the [extension](https://marketplace.visualstudio.com/items?itemName=ms-playwright.playwright):
-
+```html
 <p align="center">
   <img width=500 src="../client/public/vscode-pw-test-runner.png" />
 </p>
+```
 
 The highlighted controls trigger running a script, a collection of scripts, debugging of scripts, and so on.

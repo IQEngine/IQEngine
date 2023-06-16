@@ -21,6 +21,10 @@ export class BlobClient implements DataSourceClient {
     return Promise.resolve(dataSource);
   }
 
+  create(dataSource: DataSource): Promise<DataSource> {
+    return Promise.reject("Not implemented");
+  }
+
   features() {
     return {
       update_meta: false,

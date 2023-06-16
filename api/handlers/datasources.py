@@ -1,7 +1,10 @@
+import io
 import database.database
 from database.models import DataSource
 from fastapi import APIRouter, Depends, HTTPException
 from pymongo.collection import Collection
+from fastapi.responses import StreamingResponse
+from PIL import Image, ImageDraw
 
 router = APIRouter()
 
@@ -39,3 +42,18 @@ def get_datasources(
     for datasource in datasources:
         result.append(datasource)
     return result
+
+
+@router.get(
+    "/api/datasources/{account}/{container}/image")
+def get_generated_image():
+    # Generate the image as place holder
+    image = Image.new("RGB", (200, 200), (255, 255, 255))
+    draw = ImageDraw.Draw(image)
+    draw.rectangle((50, 50, 150, 150), fill=(0, 0, 0))
+
+    image_data = io.BytesIO()
+    image.save(image_data, format="PNG")
+    image_data.seek(0)
+
+    return StreamingResponse(image_data, media_type="image/png")

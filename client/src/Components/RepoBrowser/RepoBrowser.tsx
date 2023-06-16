@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 import LocalFileBrowser from './LocalFileBrowser';
 import AzureBlobBrowser from './AzureBlobBrowser';
 import RepositoryTile from './RepositoryTile';
+import RepositoryAPITile from './RepositoryAPITile';
 import SiggenTile from './SiggenTile';
 import ValidatorTile from './ValidatorTile';
 import { configQuery } from '../../api/config/queries';
@@ -14,13 +15,14 @@ import { preFetchDataSourcesMeta } from '../../api/metadata/Queries';
 import { getDataSources } from '../../api/datasource/Queries';
 import { useAppDispatch } from '@/Store/hooks';
 import { upsertDataSource } from '@/Store/Reducers/ConnectionReducer';
-import { CLIENT_TYPE_BLOB, DataSource } from '@/api/Models';
+import { CLIENT_TYPE_API, CLIENT_TYPE_BLOB, DataSource } from '@/api/Models';
 import { useQueryClient } from '@tanstack/react-query';
 import Feature from '../Feature/Feature';
 
 const RepoBrowser = () => {
   let [dataAvailable, setDataAvailable] = useState(false);
   const config = configQuery();
+  const apiDataSources = getDataSources(CLIENT_TYPE_API);
   const blobDataSources = getDataSources(CLIENT_TYPE_BLOB, dataAvailable);
   const queryClient = useQueryClient();
   const dispatch = useAppDispatch();
@@ -60,6 +62,11 @@ const RepoBrowser = () => {
       {blobDataSources.data?.map((item, i) => (
         <RepositoryTile key={i} item={item} />
       ))}
+      <Feature flag="useAPIDatasources">
+        {apiDataSources.data?.map((item, i) => (
+          <RepositoryAPITile key={i} item={item} />
+        ))}
+      </Feature>
       <LocalFileBrowser />
       <AzureBlobBrowser />
       <SiggenTile />

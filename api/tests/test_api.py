@@ -6,10 +6,12 @@ import os
 from database.models import Metadata
 
 test_datasource = {
+    "type": "api",
     "name": "name",
     "account": "account",
     "container": "container",
     "description": "description",
+    "imageURL": "imageURL"
 }
 
 test_datasource_id = f'{test_datasource["account"]}_{test_datasource["container"]}'
@@ -41,7 +43,7 @@ def test_api_get_config(client):
     response = client.get("/api/config")
     assert response.status_code == 200
     assert response.json() == {
-        "pluginsEndpoint": "http://localhost:5000/", # it should add the trailing "/"
+        "pluginsEndpoint": "http://localhost:5000/",  # it should add the trailing "/"
         "connectionInfo": {},
         "googleAnalyticsKey": "google_analytics_key",
     }
@@ -81,6 +83,7 @@ def test_api_post_meta(client):
     metadata = Metadata.parse_obj(response.json())
     assert metadata.globalMetadata.traceability_revision == 0
     assert metadata.globalMetadata.traceability_origin == {
+        "type": "api",
         "account": test_datasource["account"],
         "container": test_datasource["container"],
         "file_path": "file_path",

@@ -15,7 +15,7 @@ def get_config():
     if connection_info:
         connection_info = json.loads(connection_info)
     plugins_endpoint = os.getenv("PLUGINS_ENDPOINT", None)
-    if plugins_endpoint[-1] != '/':
+    if plugins_endpoint and plugins_endpoint[-1] != '/':
         plugins_endpoint += '/'
     return {
         "pluginsEndpoint": plugins_endpoint,

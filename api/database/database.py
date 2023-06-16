@@ -39,7 +39,7 @@ def datasources_collection():
 
 
 def metadata_collection():
-    collection: Collection[Metadata] = db().metadatas
+    collection: Collection[Metadata] = db().metadata
     return collection
 
 
