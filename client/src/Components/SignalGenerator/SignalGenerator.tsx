@@ -322,7 +322,7 @@ print('NumPy Version:', numpy.version.version)
                 checked={state.downloadChecked}
                 onChange={() => onChangeDownloadChecked()}
               />
-              <span className="ml-2 text-base">Download "x" as SigMF Recording</span>
+              <span className="ml-2 text-base">Download "x" as a SigMF Recording</span>
             </label>
           </div>
           <div className="w-fit">
