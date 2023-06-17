@@ -17,6 +17,9 @@ jobs:
       pull-requests: write
       packages: write
     runs-on: ubuntu-latest
+    environment:
+      name: 'Staging'
+      url: https://staging.iqengine.org
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v2
