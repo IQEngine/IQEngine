@@ -9,19 +9,12 @@ import 'swagger-ui-react/swagger-ui.css';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Provider } from 'react-redux';
-// @ts-ignore
-import store from './Store/store';
-// @ts-ignore
-import { About } from './About';
-// @ts-ignore
-import { SigMF } from './SigMF';
-// @ts-ignore
-import SignalGenerator from './Components/SignalGenerator/SignalGenerator';
-// @ts-ignore
-import { Plugins } from './Plugins';
-// @ts-ignore
+import store from '@/Store/store';
+import { About } from '@/pages/About';
+import { SigMF } from '@/pages/SigMF';
+import { Plugins } from '@/pages/Plugins';
+import SignalGenerator from './pages/signalGenerator/SignalGenerator';
 import Validator from './Components/Validator/Validator';
-// @ts-ignore
 import { App } from './App';
 import { createRoot } from 'react-dom/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
