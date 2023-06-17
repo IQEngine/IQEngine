@@ -291,7 +291,7 @@ print('NumPy Version:', numpy.version.version)
   return (
     <div>
       <center>
-        <p className="text-primary text-2xl mb-3">Python Based Signal Generator</p>
+        <p className="text-primary text-2xl mb-3">Python-Based Signal Generator</p>
       </center>
       <div className="grid grid-cols-2 gap-8 h-full mx-8">
         <div className="">
