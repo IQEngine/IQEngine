@@ -122,10 +122,8 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
 
   const onClickPremadeTaps = (event) => {
     let taps_string = event.currentTarget.dataset.value;
+    setState({ ...state, taps: taps_string }); // TODO: WHY ISNT THIS WORKING!?
     updateTaps(taps_string);
-    setState({ ...state, taps: taps_string });
-    let taps = JSON.parse(event.currentTarget.dataset.value);
-    props.setTaps(taps);
   };
 
   const onChangeZoomLevel = (e) => {
@@ -169,12 +167,12 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
       </div>
       <div>
         {/* When you press this button it will make autoscale run during the next call to selectFft, then it will turn itself off */}
-        <button className="mb-3" onClick={props.handleAutoScale} style={{ width: '100%', marginTop: '5px' }}>
+        <button className="mb-3 w-full mt-2" onClick={props.handleAutoScale}>
           Autoscale Max/Min
         </button>
       </div>
 
-      <div className="mb-3" id="formFFT">
+      <div id="formFFT">
         <label className="label">
           <span className="label-text text-base">
             FFT Size
@@ -230,9 +228,9 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
 
         <div className="mb-3 flex">
           <div className="dropdown dropdown-hover">
-            <label tabIndex={0} className="m-1">
+            <button tabIndex={0} className="m-1 px-7 w-full">
               Example Filter Taps
-            </label>
+            </button>
             <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
               <li
                 data-value="[0.021019600765633,0.05574786251380393,0.04504671465435009,-0.012858837474581268,-0.042883835223827396,0.013822126400016621,0.05882808073316635,-0.014316809227248763,-0.10299625870988743,0.015410773935742991,0.31701869995313076,0.48460819626209206,0.31701869995313076,0.015410773935742991,-0.10299625870988743,-0.014316809227248763,0.05882808073316635,0.013822126400016621,-0.042883835223827396,-0.012858837474581268,0.04504671465435009,0.05574786251380393,0.021019600765633]"
@@ -249,7 +247,7 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
             </ul>
           </div>
           <a
-            style={{ textDecoration: 'none', color: 'white', margin: '5px 0 0 5px' }}
+            className="ml-3 mt-1"
             target="_blank"
             rel="noreferrer"
             href="http://t-filter.engineerjs.com/" //DevSkim: ignore DS137138
@@ -259,11 +257,11 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
         </div>
       </>
 
-      <div className="mb-3 flex">
+      <div className="mb-3">
         <div className="dropdown dropdown-hover">
-          <label tabIndex={0} className="m-1">
+          <button tabIndex={0} className="m-1 px-16 w-full">
             Window
-          </label>
+          </button>
           <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
             <li data-value="hamming" onClick={onChangeWindowFunction}>
               {state.windowFunction === 'hamming' ? <a className="bg-primary">Hamming</a> : <a>Hamming</a>}
@@ -283,7 +281,7 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
           </ul>
         </div>
         <a
-          style={{ textDecoration: 'none', color: 'white', margin: '5px 0 0 5px' }}
+          className="ml-4"
           target="_blank"
           rel="noreferrer"
           href="https://pysdr.org/content/frequency_domain.html#windowing"
@@ -292,7 +290,7 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
         </a>
       </div>
 
-      <div className="mb-3" id="toggleFreq">
+      <div id="toggleFreq">
         <label className="label">
           <span className="label-text text-base">Display RF Freq</span>
           <input type="checkbox" className="toggle toggle-primary" onChange={props.toggleIncludeRfFreq} />
