@@ -3,70 +3,28 @@
 // Licensed under the MIT License
 
 import React from 'react';
-import SwaggerUI from 'swagger-ui-react';
 import 'swagger-ui-react/swagger-ui.css';
 // @ts-ignore
 import reportWebVitals from './reportWebVitals';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { RouterProvider } from 'react-router-dom';
 import { Provider } from 'react-redux';
-// @ts-ignore
-import store from './Store/store';
-// @ts-ignore
-import { About } from './About';
-// @ts-ignore
-import { SigMF } from './SigMF';
-// @ts-ignore
-import SignalGenerator from './Components/SignalGenerator/SignalGenerator';
-// @ts-ignore
-import { Plugins } from './Plugins';
-// @ts-ignore
-import Validator from './Components/Validator/Validator';
-// @ts-ignore
-import { App } from './App';
+import store from '@/Store/store';
 import { createRoot } from 'react-dom/client';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import RepoBrowser from './Components/RepoBrowser/RepoBrowser';
-import RecordingsBrowser from './Components/RecordingsBrowser/RecordingsBrowser';
-import SpectrogramPage from './Components/Spectrogram/SpectrogramPage';
-import { CLIENT_TYPE_BLOB } from './api/Models';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { FeatureFlagsProvider } from './Components/FeatureFlagsContext/FeatureFlagsContext';
+import { useIQEngineQueryClient } from '@/hooks/useIQEngineQueryClient';
+import { useIQEngineRouter } from '@/hooks/useIQEngineRouter';
 
-// @ts-ignore
-const queryClient = new QueryClient();
-queryClient.setQueryDefaults(['config'], { staleTime: 1000 * 60 * 60 * 24 });
-queryClient.setQueryDefaults(['datasource', CLIENT_TYPE_BLOB], { staleTime: 1000 * 60 });
-var new_version: boolean = false;
-// Select which version to run based on an environment variable
 const container = document.getElementById('root');
 if (!container) throw new Error('No root element found');
 const root = createRoot(container);
+const { queryClient } = useIQEngineQueryClient();
+const { router } = useIQEngineRouter();
 root.render(
   <QueryClientProvider client={queryClient}>
     <Provider store={store}>
       <FeatureFlagsProvider flags={null}>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<App />}>
-              <Route path="about" element={<About />} />
-              <Route path="sigmf" element={<SigMF />} />
-              <Route path="siggen" element={<SignalGenerator />} />
-              <Route path="plugins" element={<Plugins />} />
-              <Route path="validator" element={<Validator />} />
-              <Route
-                path="/openapi"
-                element={
-                  <div className="bg-white">
-                    <SwaggerUI url="https://raw.githubusercontent.com/IQEngine/IQEngine/main/detectors/openapi.yaml" />
-                  </div>
-                }
-              />
-              <Route path="/" element={<RepoBrowser />} />
-              <Route path="recordings/" element={<RecordingsBrowser />} />
-              <Route path="recordings/:type/:account/:container/:sasToken?" element={<RecordingsBrowser />} />
-              <Route path="spectrogram/:type/:account/:container/:filePath/:sasToken?" element={<SpectrogramPage />} />
-            </Route>
-          </Routes>
-        </BrowserRouter>
+        <RouterProvider router={router} />
       </FeatureFlagsProvider>
     </Provider>
   </QueryClientProvider>

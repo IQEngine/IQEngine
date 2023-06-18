@@ -5,7 +5,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { vscodeDark } from '@uiw/codemirror-theme-vscode';
 import CodeMirror from '@uiw/react-codemirror';
 import { python } from '@codemirror/lang-python';
-import { examplesList } from './examples/exampleList';
+import { examplesList } from '@/pages/signalGenerator/examples/exampleList';
 
 export default function SignalGenerator(props) {
   const [state, setState] = useState({

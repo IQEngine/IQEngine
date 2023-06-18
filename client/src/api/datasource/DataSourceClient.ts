@@ -1,5 +1,5 @@
 import { SigMFMetadata } from '@/Utils/sigmfMetadata';
-import { DataSource } from '../Models';
+import { DataSource } from '@/api/Models';
 
 export interface DataSourceClient {
   list(): Promise<DataSource[]>;
