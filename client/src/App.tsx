@@ -3,7 +3,6 @@
 // Licensed under the MIT License
 import React, { useEffect } from 'react';
 import { useFeatureFlags } from './Components/FeatureFlagsContext/FeatureFlagsContext';
-import Feature from './Components/Feature/Feature';
 import { useLocation, Outlet } from 'react-router-dom';
 import ReactGA from 'react-ga4';
 import ThemeSelector from './Components/Styles/ThemeSelector';
@@ -13,8 +12,6 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'react-hot-toast';
 
 export const App = () => {
-  // Set up google analytics (if enabled) to only share the page path (does not include names of local files)
-  // ;
   const location = useLocation();
   const config = configQuery();
   const { setFeatureFlags } = useFeatureFlags();
@@ -25,6 +22,7 @@ export const App = () => {
     if (analytics_key) {
       ReactGA.initialize(analytics_key);
     }
+    // Set up google analytics (if enabled) to only share the page path (does not include names of local files)
     if (analytics_key) {
       window.gtag('event', 'page_view', {
         page_path: location.pathname + location.search + location.hash, // Note- we make sure to not include local file names in the urls, so they wont get sent to google analytics
