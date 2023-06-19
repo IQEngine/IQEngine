@@ -81,7 +81,7 @@ export class BlobClient implements MetadataClient {
     return recordings.filter((recording) => recording !== null) as SigMFMetadata[];
   }
 
-  async updateMeta(account: string, container: string, filePath: string, meta: SigMFMetadata): Promise<SigMFMetadata> {
+  async updateMeta(account: string, container: string, filePath: string, meta: SigMFMetadata): Promise<any> {
     // Currently update meta doesnt even try to update the blob so we are just going to return here
     return meta;
 
@@ -95,7 +95,7 @@ export class BlobClient implements MetadataClient {
 
   features() {
     return {
-      update_meta: false,
+      canUpdateMeta: false,
     };
   }
 }
