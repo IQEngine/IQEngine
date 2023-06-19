@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 
-const DualRangeSlider = ({ min, minValue, max, maxValue, setMin, setMax }) => {
+const DualRangeSlider = ({ min, minValue, max, maxValue, setMin, setMax, unit }) => {
   const range = useRef(null);
   const getPercent = useCallback((value) => Math.round(((value - min) / (max - min)) * 100), [min, max]);
 
@@ -49,10 +49,10 @@ const DualRangeSlider = ({ min, minValue, max, maxValue, setMin, setMax }) => {
       />
 
       <div className="slider">
-        <div className="slider-left-value">{minValue.toFixed(1) + ' dB'}</div>
+        <div className="slider-left-value">{minValue.toFixed(1) + ' ' + unit}</div>
         <div className="slider-track" />
         <div ref={range} className="slider-range" />
-        <div className="slider-right-value">{maxValue.toFixed(1) + ' dB'}</div>
+        <div className="slider-right-value">{maxValue.toFixed(1) + ' ' + unit}</div>
       </div>
     </div>
   );

@@ -185,6 +185,7 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
           maxValue={props.magnitudeMax}
           setMin={props.updateMagnitudeMin}
           setMax={props.updateMagnitudeMax}
+          unit="dB"
         />
       </div>
       <div>
