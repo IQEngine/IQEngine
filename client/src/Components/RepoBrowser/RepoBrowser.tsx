@@ -63,7 +63,7 @@ const RepoBrowser = () => {
         <RepositoryTile key={i} item={item} />
       ))}
       <Feature flag="useAPIDatasources">
-        {apiDataSources.data?.map((item, i) => (
+        {apiDataSources?.data?.map((item, i) => (
           <RepositoryAPITile key={i} item={item} />
         ))}
       </Feature>
