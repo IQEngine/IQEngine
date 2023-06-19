@@ -70,7 +70,7 @@ export const App = () => {
           </div>
           <div className="navbar-center">
             <Link to="/" onClick={() => {}}>
-              <img src="/IQEngine.svg" alt="IQEngine" />
+              <img className="sm:w-40 lg:w-auto" src="/IQEngine.svg" alt="IQEngine" />
             </Link>
           </div>
           <div className="navbar-end">
