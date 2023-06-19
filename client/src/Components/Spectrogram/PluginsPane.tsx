@@ -132,8 +132,8 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
           // create spectrogram out of all samples
           const fftSize = 1024;
           const numFfts = Math.floor(samples.length / 2 / fftSize);
-          const magnitudeMin = 50;
-          const magnitudeMax = 220;
+          const magnitudeMin = -40;
+          const magnitudeMax = -10;
           const samples_typed = Float32Array.from(samples);
           const ret = calcFftOfTile(
             samples_typed,
@@ -142,9 +142,7 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
             'hamming',
             magnitudeMin,
             magnitudeMax,
-            false, // autoscale
-            -99999, // fftmin (updates during function)
-            99999 // fftmax (updates during function)
+            false // autoscale
           );
           const imageData = new ImageData(ret['newFftData'], fftSize, numFfts);
           createImageBitmap(imageData).then((imageBitmap) => {
