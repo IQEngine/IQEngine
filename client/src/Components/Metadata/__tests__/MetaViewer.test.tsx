@@ -4,7 +4,7 @@ import { describe, expect, test } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
 import { SigMFMetadata } from '@/Utils/sigmfMetadata';
-import { MetaViewer, MetaViewerProps } from '@/Components/MetaViewer/MetaViewer';
+import { MetaViewer, MetaViewerProps } from '@/Components/Metadata/MetaViewer';
 
 describe('MetaViewer list component', () => {
   const meta = Object.assign(

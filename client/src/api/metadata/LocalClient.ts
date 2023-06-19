@@ -58,7 +58,7 @@ export class LocalClient implements MetadataClient {
     return result;
   }
 
-  updateMeta(account: string, container: string, filePath: string, meta: object): Promise<SigMFMetadata> {
+  updateMeta(account: string, container: string, filePath: string, meta: object): Promise<any> {
     // We do not save the metadata to the file system
     return Promise.resolve(meta as SigMFMetadata);
   }
@@ -86,7 +86,7 @@ export class LocalClient implements MetadataClient {
 
   features() {
     return {
-      update_meta: false,
+      canUpdateMeta: false,
     };
   }
 }
