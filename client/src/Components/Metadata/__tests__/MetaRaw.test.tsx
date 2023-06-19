@@ -6,6 +6,9 @@ import { render, screen } from '@testing-library/react';
 import { Annotation, CaptureSegment, SigMFMetadata } from '@/Utils/sigmfMetadata';
 import { MetaRaw } from '@/Components/Metadata/MetaRaw';
 import { AllProviders } from '@/mocks/setupTests';
+import userEvent from '@testing-library/user-event';
+import { Toaster } from 'react-hot-toast';
+import nock from 'nock';
 
 describe('MetaRaw ', () => {
   const meta: SigMFMetadata = Object.assign(new SigMFMetadata(), {
@@ -60,5 +63,43 @@ describe('MetaRaw ', () => {
     meta.global['traceability:origin'].type = 'local';
     render(<MetaRaw meta={meta} />, { wrapper: AllProviders });
     expect(screen.queryByRole('button', { name: 'Save Metadata Button' })).not.toBeInTheDocument();
+  });
+
+  test('Displays save successful message when successful update', async () => {
+    meta.global['traceability:origin'].type = 'api';
+
+    nock('http://localhost:3000').put(`/api/datasources/gnuradio/iqengine/bluetooth`).reply(204);
+
+    render(
+      <>
+        <Toaster />
+        <MetaRaw meta={meta} />
+      </>,
+      { wrapper: AllProviders }
+    );
+
+    const saveButton = screen.getByRole('button', { name: 'Save Metadata Button' });
+    await userEvent.click(saveButton);
+
+    expect(await screen.findByText('Successfully updated metadata')).toBeInTheDocument();
+  });
+
+  test('Displays save unsuccessful message when error on update', async () => {
+    meta.global['traceability:origin'].type = 'api';
+
+    nock('http://localhost:3000').put(`/api/datasources/gnuradio/iqengine/bluetooth`).reply(404);
+
+    render(
+      <>
+        <Toaster />
+        <MetaRaw meta={meta} />
+      </>,
+      { wrapper: AllProviders }
+    );
+
+    const saveButton = screen.getByRole('button', { name: 'Save Metadata Button' });
+    await userEvent.click(saveButton);
+
+    expect(await screen.findByText('Something went wrong updating metadata')).toBeInTheDocument();
   });
 });
