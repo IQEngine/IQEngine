@@ -69,19 +69,6 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
     props.updateWindowChange(windowFunction);
   };
 
-  const onChangeMagnitudeMax = (max) => {
-    props.updateMagnitudeMax(parseInt(max));
-  };
-
-  const onChangeMagnitudeMin = (min) => {
-    // currently a min of 0 doesnt actually work so just set it to 1
-    if (min == 0) {
-      props.updateMagnitudeMin(1);
-    } else {
-      props.updateMagnitudeMin(parseInt(min));
-    }
-  };
-
   const onChangeFftsize = (event) => {
     setState({ ...state, size: parseInt(event.target.value) });
   };
@@ -203,12 +190,12 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
         </label>
 
         <DualRangeSlider
-          min={0}
+          min={-100.0}
           minValue={magnitudeMin}
-          max={255}
+          max={50.0}
           maxValue={magnitudeMax}
-          onChangeMin={onChangeMagnitudeMin}
-          onChangeMax={onChangeMagnitudeMax}
+          updateMagnitudeMin={props.updateMagnitudeMin}
+          updateMagnitudeMax={props.updateMagnitudeMax}
         />
       </div>
       <div>

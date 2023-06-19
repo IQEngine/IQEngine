@@ -53,8 +53,8 @@ export const SpectrogramPage = () => {
 
   // FFT Properties
   const [fftSize, setFFTSize] = useState(1024);
-  const [magnitudeMax, setMagnitudeMax] = useState(240);
-  const [magnitudeMin, setMagnitudeMin] = useState(80);
+  const [magnitudeMax, setMagnitudeMax] = useState(-10.0);
+  const [magnitudeMin, setMagnitudeMin] = useState(-40.0);
   const [fftWindow, setFFTWindow] = useState('hamming');
   const [autoscale, setAutoscale] = useState(false);
   const [image, setImage] = useState(null);
@@ -66,8 +66,6 @@ export const SpectrogramPage = () => {
   const [timeSelectionStart, setTimeSelectionStart] = useState(0);
   const [timeSelectionEnd, setTimeSelectionEnd] = useState(10);
   const [cursorsEnabled, setCursorsEnabled] = useState(false);
-  const [currentFftMax, setCurrentFftMax] = useState(-999999);
-  const [currentFftMin, setCurrentFftMin] = useState(999999);
   const [currentTab, setCurrentTab] = useState('spectrogram');
   const [pyodide, setPyodide] = useState(null);
   const [handleTop, setHandleTop] = useState(0);
@@ -164,8 +162,6 @@ export const SpectrogramPage = () => {
       magnitudeMin,
       meta,
       fftWindow, // dont want to conflict with the main window var
-      currentFftMax,
-      currentFftMin,
       autoscale,
       zoomLevel,
       iqData,
@@ -188,8 +184,6 @@ export const SpectrogramPage = () => {
       magnitudeMin,
       meta,
       fftWindow, // dont want to conflict with the main window var
-      currentFftMax,
-      currentFftMin,
       autoscale,
       zoomLevel,
       iqData,
@@ -216,8 +210,6 @@ export const SpectrogramPage = () => {
       setMagnitudeMax(fftImage.autoMax);
       setMagnitudeMin(fftImage.autoMin);
     }
-    setCurrentFftMax(fftImage.currentFftMax);
-    setCurrentFftMin(fftImage.currentFftMin);
     setMissingTiles(fftImage.missingTiles);
     setFetchMinimap(true);
   };
@@ -485,6 +477,8 @@ export const SpectrogramPage = () => {
                         meta={meta}
                         fetchEnabled={fetchMinimap}
                         fftSizeScrollbar={fftSize}
+                        setMagnitudeMax={setMagnitudeMax}
+                        setMagnitudeMin={setMagnitudeMin}
                       />
                     </Stage>
                   </div>
