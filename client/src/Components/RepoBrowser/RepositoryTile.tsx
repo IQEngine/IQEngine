@@ -51,30 +51,42 @@ export const RepositoryTile = (props) => {
   return (
     <div className="card w-96 bg-neutral text-neutral-content shadow-xl mb-3">
       <figure>
-        <img onClick={handleOnClick} className="object-cover h-48 w-96" src={imageURL ?? "/external_source.png"} alt="Shoes" />
+        <img
+          onClick={handleOnClick}
+          className="object-cover h-48 w-96"
+          src={imageURL ?? '/external_source.png'}
+          alt="Shoes"
+        />
       </figure>
-        <div className="card-body">
-          <h2 className="card-title text-2xl">{name}</h2>
-          <p>{description}</p>
-          {!isError && !isWarning && (
-            <div className="alert alert-info">
-              <span>SAS Token Expiration: {expires}</span>
-            </div>
-          )}
-          {isError && (
-            <div className="alert alert-error">
+      <div className="card-body">
+        <h2 className="card-title text-2xl">{name}</h2>
+        <p>{description}</p>
+        {!isError && !isWarning && (
+          <div className="alert alert-info">
+            <span>SAS Token Expiration: {expires}</span>
+          </div>
+        )}
+        {isError && (
+          <div className="alert alert-error">
             <span>SAS Token is expired!</span>
           </div>
-          )}
-          {isWarning && (
-            <div className="alert alert-warning">
-              <span>This token will expire {dayDifference === 0 ? 'today' : 'in ' + dayDifference + ' days'}</span>
-            </div>
-          )}
-          <div className="card-actions mt-2 justify-end">
-            <button className="btn btn-primary w-full" >browse</button>
+        )}
+        {isWarning && (
+          <div className="alert alert-warning">
+            <span>This token will expire {dayDifference === 0 ? 'today' : 'in ' + dayDifference + ' days'}</span>
           </div>
+        )}
+        <div className="card-actions mt-2 justify-end">
+          <button
+            className="btn btn-primary w-full"
+            disabled={isDisabled}
+            id={name.replaceAll(' ', '')}
+            onClick={handleOnClick}
+          >
+            browse
+          </button>
         </div>
+      </div>
     </div>
   );
 };
