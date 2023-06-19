@@ -58,9 +58,9 @@ const RepoBrowser = () => {
   }, [blobDataSources.data]);
 
   return (
-    <div className="py-10">
+    <div className="py-3">
       <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-        <div className="grid grid-cols-3 gap-10">
+        <div className="grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-10 justify-items-center">
           {blobDataSources.data?.map((item, i) => (
             <RepositoryTile key={i} item={item} />
           ))}

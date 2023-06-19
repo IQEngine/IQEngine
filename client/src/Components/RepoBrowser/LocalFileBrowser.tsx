@@ -58,19 +58,27 @@ const LocalFileBrowser = () => {
   };
 
   return (
-    <div className="card w-96 bg-neutral text-neutral-content shadow-xl mb-3">
-      <figure><img className="object-cover h-48 w-96" src="/local_file.jpeg" alt="Shoes" /></figure>
-        <div className="card-body">
-          <h2 className="card-title text-2xl">Local File Browser</h2>
-          <p>Choose from opening a local directory OR from a local SigMF metadata & raw IQ file</p>
-          <span className="label-text-alt">Note: FFTs and visualizations are performed client-side </span>
-          <div className="card-actions mt-2 justify-end">
-            {directoryPickerAvailable && (
-              <button className="btn btn-primary" onClick={openDir}>local folder</button>
-            )}
-            <button className="btn btn-ghost" onClick={openFile}>local files</button>
-          </div>
+    <div className="repocard">
+      <figure>
+        <img className="repoimage" src="/local_file.jpeg" alt="Local file browser tile" />
+      </figure>
+      <div className="repocardbody">
+        <h2>Local File Browser</h2>
+        <div>Choose from opening a local directory OR from a local SigMF metadata & raw IQ file</div>
+        <span className="text-secondary">
+          Note: FFTs and visualizations are performed client-side (the data won't be uploaded anywhere)
+        </span>
+        <div className="card-actions mt-2 justify-center">
+          {directoryPickerAvailable && (
+            <button className="btn btn-primary opacity-75" onClick={openDir}>
+              local folder
+            </button>
+          )}
+          <button className="btn btn-primary opacity-75" onClick={openFile}>
+            local files
+          </button>
         </div>
+      </div>
     </div>
   );
 };
