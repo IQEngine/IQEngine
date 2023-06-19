@@ -74,36 +74,20 @@ const AzureBlobBrowser = () => {
   };
 
   return (
-    <div className="repocard">
-      <h2 className="repocardheader grid content-center justify-center">Browse Your Azure Blob Storage</h2>
-      <div className="card-body">
-        <form className="m-3 mt-8">
-          <label>Storage Account Name:</label>
-          <input
-            className="mb-3 w-full rounded mt-1 h-8 p-1 bg-accent text-base-100"
-            type="text"
-            defaultValue={account}
-            onChange={onAccountNameChange}
-          />
-          <label>Container Name:</label>
-          <input
-            className="mb-3 w-full rounded mt-1 h-8 p-1 bg-accent text-base-100"
-            type="text"
-            defaultValue={container}
-            onChange={onContainerNameChange}
-          />
-          <label>SAS Token for Container:</label>
-          <input
-            className="w-full rounded mt-1 h-8 p-1 bg-accent text-base-100"
-            type="password"
-            defaultValue={sasToken}
-            onChange={onSasTokenChange}
-          />
-        </form>
-      </div>
-      <button className="repocardbutton " onClick={onSubmit}>
-        Browse
-      </button>
+    <div className="card w-96 bg-neutral text-neutral-content shadow-xl mb-3">
+      <figure><img className="object-cover h-48 w-96" src="/azure_blob.png" alt="Shoes" /></figure>
+        <div className="card-body">
+          <h2 className="card-title text-2xl">Azure Blob Storage</h2>
+          <form>
+            <input type="text" placeholder="Storage Account Name" defaultValue={account} onChange={onAccountNameChange} className="mt-2 input input-bordered input-success w-full max-w-xs" />
+            <input type="text" placeholder="Container Name" defaultValue={container} onChange={onContainerNameChange} className="mt-2 input input-bordered input-success w-full max-w-xs" />
+            <input type="password" placeholder="SAS Token" defaultValue={sasToken} onChange={onSasTokenChange} className="mt-2 input input-bordered input-success w-full max-w-xs" />
+          </form>
+          <span className="label-text-alt">Note: FFTs and visualizations are performed client-side </span>
+          <div className="card-actions mt-2 justify-end">
+            <button onClick={onSubmit} className="btn btn-primary w-full" >browse</button>
+          </div>
+        </div>
     </div>
   );
 };
