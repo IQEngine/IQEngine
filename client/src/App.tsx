@@ -38,10 +38,11 @@ export const App = () => {
       <Toaster />
       <div>
         <div className="container flex mb-40" id="topRow">
-          <a href="/" className="absolute mt-4 pt-2 top-0 left-1/2 transform -translate-x-1/2">
-            <img src="/IQEngine.svg" alt="IQEngine" />
-          </a>
-
+          <Link to="/" onClick={() => {}}>
+            <div className="absolute mt-4 pt-2 top-0 left-1/2 transform -translate-x-1/2">
+              <img src="/IQEngine.svg" alt="IQEngine" />
+            </div>
+          </Link>
           <div className="absolute right-0 py-2 mr-2">
             <ul className="flex-row flex mb-4 mt-0 space-x-5 text-sm font-medium">
               <li>
