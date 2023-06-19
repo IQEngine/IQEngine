@@ -148,14 +148,10 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
     console.log(props.meta);
 
     var blob = new Blob([trimmedSamples], { type: 'octet/stream' });
-    var meta = {
-      global: props.meta.global,
-      captures: props.meta.captures,
-      annotations: [],
-    };
 
-    meta.global['traceability:sample_length'] = trimmedSamples.length;
-    delete meta.global['traceability:origin'];
+    // Grab metadata and remove the parts that shouldn't be included in the metafile
+    let metaClone = JSON.parse(JSON.stringify(props.meta));
+    delete metaClone['dataClient'];
 
     var blobUrl = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -166,7 +162,7 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
     a.download = 'trimmedSamples.sigmf-data';
     a.click();
 
-    a.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent(JSON.stringify(meta, null, 2));
+    a.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent(JSON.stringify(metaClone, null, 2));
     a.download = 'trimmedSamples.sigmf-meta';
     a.click();
 
