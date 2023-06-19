@@ -17,12 +17,15 @@ const SiggenTile = (props) => {
       <div className="repocardheader">Signal Generator</div>
       <div className="repocardbody">
         <div className="grid content-center justify-center">
-          <img
-            className="my-4 rounded-xl justify-center"
-            src="/siggen.png"
-            width="200px"
-            alt="DALLE prompt - signal generator in the style of dr. seuss with a control panel"
-          ></img>
+          <button className="m-0 p-0">
+            <img
+              className="rounded-xl justify-center"
+              src="/siggen.png"
+              width="200px"
+              alt="DALLE prompt - signal generator in the style of dr. seuss with a control panel"
+              onClick={handleOnClick}
+            ></img>
+          </button>
         </div>
         <div className="text-center">Generate your own signals in Python, with examples!</div>
         <div className="text-center"> Save as a SigMF recording!</div>
