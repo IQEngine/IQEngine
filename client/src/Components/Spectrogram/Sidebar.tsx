@@ -41,6 +41,7 @@ const Sidebar = (props) => {
         </summary>
         <div className="outline outline-1 outline-primary p-2">
           <SettingsPane
+            meta={props.meta}
             updateMagnitudeMax={props.updateMagnitudeMax}
             updateMagnitudeMin={props.updateMagnitudeMin}
             updateFftsize={props.updateFftsize}
@@ -58,6 +59,7 @@ const Sidebar = (props) => {
             windowFunction={props.windowFunction}
             pythonSnippet={props.pythonSnippet}
             setPythonSnippet={props.setPythonSnippet}
+            handleProcessTime={props.handleProcessTime}
           />
         </div>
       </details>
