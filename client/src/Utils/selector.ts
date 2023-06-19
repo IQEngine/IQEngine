@@ -24,17 +24,13 @@ export function calcFftOfTile(
   windowFunction: string,
   magnitude_min: number,
   magnitude_max: number,
-  autoscale: boolean,
-  currentFftMax: any,
-  currentFftMin: any
+  autoscale: boolean
 ) {
   let startTime = performance.now();
   let newFftData = new Uint8ClampedArray(fftSize * numFftsPerTile * 4); // 4 because RGBA
   let startOfs = 0;
   let autoMin;
   let autoMax;
-  let tempCurrentFftMax = currentFftMax;
-  let tempCurrentFftMin = currentFftMin;
 
   // loop through each row
   for (let i = 0; i < numFftsPerTile; i++) {
@@ -68,8 +64,10 @@ export function calcFftOfTile(
     }
 
     const f = new FFT(fftSize);
-    const out = f.createComplexArray(); // creates an empty array the length of fft.size*2
+    let out = f.createComplexArray(); // creates an empty array the length of fft.size*2
     f.transform(out, samples_slice); // assumes input (2nd arg) is in form IQIQIQIQ and twice the length of fft.size
+
+    out = out.map((x) => x / fftSize); // divide by fftsize
 
     // convert to magnitude
     let magnitudes = new Array(out.length / 2);
@@ -78,22 +76,8 @@ export function calcFftOfTile(
     }
 
     fftshift(magnitudes); // in-place
-
     magnitudes = magnitudes.map((x) => 10.0 * Math.log10(x)); // convert to dB
     magnitudes = magnitudes.map((x) => (isFinite(x) ? x : 0)); // get rid of -infinity which happens when the input is all 0s
-
-    const tempFftMax = Math.max(...magnitudes);
-    if (tempFftMax > tempCurrentFftMax) tempCurrentFftMax = tempFftMax;
-    const tempFftMin = Math.min(...magnitudes);
-    if (tempFftMin < tempCurrentFftMin) tempCurrentFftMin = tempFftMin;
-
-    // convert to 0 - 255
-    magnitudes = magnitudes.map((x) => x - tempCurrentFftMin); // lowest value is now 0
-    magnitudes = magnitudes.map((x) => x / (tempCurrentFftMax - tempCurrentFftMin)); // highest value is now 1
-    magnitudes = magnitudes.map((x) => x * 255); // now from 0 to 255
-
-    // To leave some margin to go above max and below min, scale it to 50 to 200 for now
-    magnitudes = magnitudes.map((x) => x * 0.588 + 50); // 0.588 is (200-50)/255
 
     // When you click the button this code will run once, then it will turn itself off until you click it again
     if (autoscale) {
@@ -114,11 +98,10 @@ export function calcFftOfTile(
       autoMin = Math.round(autoMin * 1000) / 1000;
     }
 
-    // apply magnitude min and max
-    magnitudes = magnitudes.map((x) => x / ((magnitude_max - magnitude_min) / 255));
+    // apply magnitude min and max (which are in dB, same units as magnitudes prior to this point) and convert to 0-255
+    const dbPer1 = 255 / (magnitude_max - magnitude_min);
     magnitudes = magnitudes.map((x) => x - magnitude_min);
-
-    // Clip from 0 to 255 and convert to ints
+    magnitudes = magnitudes.map((x) => x * dbPer1);
     magnitudes = magnitudes.map((x) => (x > 255 ? 255 : x)); // clip above 255
     magnitudes = magnitudes.map((x) => (x < 0 ? 0 : x)); // clip below 0
     let ipBuf8 = Uint8ClampedArray.from(magnitudes); // anything over 255 or below 0 at this point will become a random number, hence clipping above
@@ -141,8 +124,6 @@ export function calcFftOfTile(
     newFftData: newFftData,
     autoMax: autoMax,
     autoMin: autoMin,
-    newCurrentFftMax: tempCurrentFftMax,
-    newCurrentFftMin: tempCurrentFftMin,
   };
 }
 
@@ -150,8 +131,6 @@ export interface SelectFftReturn {
   imageData: any;
   autoMax: number;
   autoMin: number;
-  currentFftMax: number;
-  currentFftMin: number;
   missingTiles: Array<number>;
   fftData: Record<number, Uint8ClampedArray>;
 }
@@ -165,8 +144,6 @@ export const selectFft = (
   magnitudeMin: number,
   meta: SigMFMetadata,
   windowFunction: any,
-  currentFftMax: any,
-  currentFftMin: any,
   autoscale = false,
   zoomLevel: any,
   iqData: Record<number, Float32Array>,
@@ -179,8 +156,6 @@ export const selectFft = (
   const numFftsPerTile = TILE_SIZE_IN_IQ_SAMPLES / fftSize;
   let magnitude_max = magnitudeMax;
   let magnitude_min = magnitudeMin;
-  let tempCurrentFftMax = currentFftMax;
-  let tempCurrentFftMin = currentFftMin;
 
   // Go through each of the tiles and compute the FFT and save in window.fftData
   const tiles = range(Math.floor(lowerTile), Math.ceil(upperTile));
@@ -195,19 +170,15 @@ export const selectFft = (
       continue;
     }
     let samples = iqData[tile.toString()];
-    const { newFftData, autoMax, autoMin, newCurrentFftMax, newCurrentFftMin } = calcFftOfTile(
+    const { newFftData, autoMax, autoMin } = calcFftOfTile(
       samples,
       fftSize,
       numFftsPerTile,
       windowFunction,
       magnitude_min,
       magnitude_max,
-      autoscale,
-      tempCurrentFftMax,
-      tempCurrentFftMin
+      autoscale
     );
-    tempCurrentFftMax = newCurrentFftMax;
-    tempCurrentFftMin = newCurrentFftMin;
     autoMaxs.push(autoMax);
     autoMins.push(autoMin);
     fftData[tile] = newFftData;
@@ -259,8 +230,6 @@ export const selectFft = (
     imageData: imageData,
     autoMax: autoMaxs.length ? average(autoMaxs) : 255,
     autoMin: autoMins.length ? average(autoMins) : 0,
-    currentFftMax: tempCurrentFftMax,
-    currentFftMin: tempCurrentFftMin,
     missingTiles: missingTiles,
     fftData: fftData,
   };
