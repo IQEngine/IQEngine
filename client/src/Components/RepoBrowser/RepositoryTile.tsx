@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '@/Store/hooks';
 import { CLIENT_TYPE_BLOB } from '@/api/Models';
 
-const RepositoryTile = (props) => {
+export const RepositoryTile = (props) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { item } = props;
@@ -49,35 +49,44 @@ const RepositoryTile = (props) => {
   };
 
   return (
-    <div className="repocard">
-      <h2 className="repocardheader">
-        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 whitespace-nowrap">{name}</div>
-        <div className="absolute right-0 translate-x-1 -translate-y-2">{writeableBool}</div>
-      </h2>
-      <div className="repocardbody">
-        <figure>
-          {imageURL && (
-            <button className="m-0 p-0 bg-transparent">
-              <img src={imageURL} className="rounded-2xl h-36" onClick={handleOnClick}></img>
-            </button>
-          )}
-        </figure>
-        <div className="h-24 overflow-hidden hover:overflow-auto text-center">{description}</div>
-        <div className="text-secondary text-center">SAS Token Expiration: {expires}</div>
+    <div className="card w-96 bg-neutral text-neutral-content shadow-xl mb-3">
+      <figure>
+        <img
+          onClick={handleOnClick}
+          className="object-cover h-48 w-96"
+          src={imageURL ?? '/external_source.png'}
+          alt="Shoes"
+        />
+      </figure>
+      <div className="card-body">
+        <h2 className="card-title text-2xl">{name}</h2>
+        <p>{description}</p>
+        {!isError && !isWarning && (
+          <div className="alert alert-info">
+            <span>SAS Token Expiration: {expires}</span>
+          </div>
+        )}
         {isError && (
-          <div className="text-center" style={{ color: 'red' }}>
-            This SAS token is expired
+          <div className="alert alert-error">
+            <span>SAS Token is expired!</span>
           </div>
         )}
         {isWarning && (
-          <div className="text-center" style={{ color: 'yellow' }}>
-            This token will expire {dayDifference === 0 ? 'today' : 'in ' + dayDifference + ' days'}
+          <div className="alert alert-warning">
+            <span>This token will expire {dayDifference === 0 ? 'today' : 'in ' + dayDifference + ' days'}</span>
           </div>
         )}
+        <div className="card-actions mt-2 justify-end">
+          <button
+            className="btn btn-primary w-full"
+            disabled={isDisabled}
+            id={name.replaceAll(' ', '')}
+            onClick={handleOnClick}
+          >
+            browse
+          </button>
+        </div>
       </div>
-      <button className="repocardbutton" disabled={isDisabled} id={name.replaceAll(' ', '')} onClick={handleOnClick}>
-        Browse
-      </button>
     </div>
   );
 };
