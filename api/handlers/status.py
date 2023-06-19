@@ -17,5 +17,4 @@ def get_status(
         datasources_collection.database.command("ping")
     except ServerSelectionTimeoutError:
         return "No Database Connection Available"
-    
     return "OK"

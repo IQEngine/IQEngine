@@ -82,6 +82,7 @@ app.include_router(config_router)
 
 app.mount("/", SPAStaticFiles(directory="iqengine", html=True), name="iqengine")
 
+
 @app.exception_handler(ServerSelectionTimeoutError)
 async def database_exception_handler(request: Request, exc: ServerSelectionTimeoutError):
     return JSONResponse(
