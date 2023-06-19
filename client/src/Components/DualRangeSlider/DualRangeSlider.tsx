@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 
-const DualRangeSlider = ({ min, minValue, max, maxValue, updateMagnitudeMin, updateMagnitudeMax }) => {
+const DualRangeSlider = ({ min, minValue, max, setValue, setMin, setMax }) => {
   const range = useRef(null);
   const getPercent = useCallback((value) => Math.round(((value - min) / (max - min)) * 100), [min, max]);
 
