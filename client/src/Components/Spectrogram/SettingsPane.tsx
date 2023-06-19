@@ -52,17 +52,6 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
     saveButtonEnabled: false,
   });
 
-  let [magnitudeMax, setMagnitudeMax] = useState(props.magnitudeMax);
-  let [magnitudeMin, setMagnitudeMin] = useState(props.magnitudeMin);
-
-  useEffect(() => {
-    setMagnitudeMax(props.magnitudeMax);
-  }, [props.magnitudeMax]);
-
-  useEffect(() => {
-    setMagnitudeMin(props.magnitudeMin);
-  }, [props.magnitudeMin]);
-
   const onChangeWindowFunction = (event) => {
     const windowFunction = event.currentTarget.dataset.value;
     setState({ ...state, windowFunction: windowFunction });
@@ -191,9 +180,9 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
 
         <DualRangeSlider
           min={-100.0}
-          minValue={magnitudeMin}
+          minValue={props.magnitudeMin}
           max={50.0}
-          maxValue={magnitudeMax}
+          maxValue={props.magnitudeMax}
           updateMagnitudeMin={props.updateMagnitudeMin}
           updateMagnitudeMax={props.updateMagnitudeMax}
         />

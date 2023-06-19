@@ -53,8 +53,8 @@ export const SpectrogramPage = () => {
 
   // FFT Properties
   const [fftSize, setFFTSize] = useState(1024);
-  const [magnitudeMax, setMagnitudeMax] = useState(-10.0);
-  const [magnitudeMin, setMagnitudeMin] = useState(-40.0);
+  const [magnitudeMax, setMagnitudeMax] = useState(-10.0); // in dB
+  const [magnitudeMin, setMagnitudeMin] = useState(-40.0); // in dB
   const [fftWindow, setFFTWindow] = useState('hamming');
   const [autoscale, setAutoscale] = useState(false);
   const [image, setImage] = useState(null);
