@@ -58,19 +58,23 @@ const RepoBrowser = () => {
   }, [blobDataSources.data]);
 
   return (
-    <div className="home-page">
-      {blobDataSources.data?.map((item, i) => (
-        <RepositoryTile key={i} item={item} />
-      ))}
-      <Feature flag="useAPIDatasources">
-        {apiDataSources.data?.map((item, i) => (
-          <RepositoryAPITile key={i} item={item} />
-        ))}
-      </Feature>
-      <LocalFileBrowser />
-      <AzureBlobBrowser />
-      <SiggenTile />
-      <ValidatorTile />
+    <div className="py-10">
+      <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+        <div className="grid grid-cols-3 gap-10">
+          {blobDataSources.data?.map((item, i) => (
+            <RepositoryTile key={i} item={item} />
+          ))}
+          <Feature flag="useAPIDatasources">
+            {apiDataSources.data?.map((item, i) => (
+              <RepositoryAPITile key={i} item={item} />
+            ))}
+          </Feature>
+          <LocalFileBrowser />
+          <AzureBlobBrowser />
+          <SiggenTile />
+          <ValidatorTile />
+        </div>
+      </div>
     </div>
   );
 };
