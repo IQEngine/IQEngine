@@ -65,11 +65,11 @@ export function applyProcessing(samples, taps, pythonSnippet, pyodide) {
 }
 
 export function convertToFloat32(buffer, dataType) {
-  if (dataType === 'ci8_le' || dataType === 'ci8') {
+  if (dataType === 'ci8_le' || dataType === 'ci8' || dataType === 'i8') {
     let samples = Float32Array.from(new Int8Array(buffer));
     for (let i = 0; i < samples.length; i++) samples[i] = samples[i] / 255.0;
     return samples;
-  } else if (dataType === 'cu8_le' || dataType === 'cu8') {
+  } else if (dataType === 'cu8_le' || dataType === 'cu8' || dataType === 'u8') {
     let samples = Float32Array.from(new Uint8Array(buffer));
     for (let i = 0; i < samples.length; i++) samples[i] = (samples[i] - 255.0) / 255.0;
     return samples;
@@ -95,7 +95,7 @@ export function convertToFloat32(buffer, dataType) {
     return Float32Array.from(new Float64Array(buffer));
   } else {
     console.error('unsupported dataType');
-    return new Float32Array(buffer);
+    //return new Float32Array(buffer);
   }
 }
 
