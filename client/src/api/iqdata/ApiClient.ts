@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { IQDataClient } from './IQDataClient';
 import { SigMFMetadata } from '@/Utils/sigmfMetadata';
-import { IQDataSlice } from '../Models';
+import { IQDataSlice } from '@/api/Models';
 import { convertToFloat32 } from '@/Sources/FetchMoreDataSource';
 
 export class ApiClient implements IQDataClient {

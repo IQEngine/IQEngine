@@ -15,20 +15,6 @@ const RepositoryAPITile = (props) => {
 
   const { type, name, account, container, imageURL, description } = item;
   const [isDisabled, setIsDisabled] = useState(false);
-  const [writeableBool, setWriteableBool] = useState<any>(true);
-
-  useEffect(() => {
-    const writeable = true; // boolean
-    if (writeable) {
-      setWriteableBool(<div className="mr-2 mt-2 text-xs">R/W</div>);
-    } else {
-      setWriteableBool(
-        <div className="mr-2 mt-2 text-xs inline">
-          R<div className="inline text-gray-400">/W</div>
-        </div>
-      );
-    }
-  }, [type]);
 
   const handleOnClick = async () => {
     // so we can fetch when someone is linked to a repo directly
@@ -36,18 +22,25 @@ const RepositoryAPITile = (props) => {
   };
 
   return (
-    <div className="repocard">
-      <h2 className="repocardheader">
-        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 whitespace-nowrap">{name}</div>
-        <div className="absolute right-0 translate-x-1 -translate-y-2">{writeableBool}</div>
-      </h2>
-      <div className="repocardbody">
-        <figure>{imageURL && <img src={imageURL} className="rounded-2xl px-2 h-36"></img>}</figure>
-        <div className="h-24 overflow-hidden hover:overflow-auto text-center">{description}</div>
+    <div className="card w-96 bg-neutral text-neutral-content shadow-xl mb-3">
+      <figure>
+        <img onClick={handleOnClick} className="object-cover h-48 w-96" src={imageURL ?? '/api.png'} alt="Shoes" />
+      </figure>
+      <div className="card-body">
+        <h2 className="card-title text-2xl">{name}</h2>
+        <p>{description}</p>
+        <div className="card-actions mt-2 justify-end">
+          <button
+            id={name.replaceAll(' ', '')}
+            disabled={isDisabled}
+            onClick={handleOnClick}
+            className="btn btn-primary w-full"
+            aria-label={name}
+          >
+            browse
+          </button>
+        </div>
       </div>
-      <button className="repocardbutton" aria-label={name} disabled={isDisabled} id={name.replaceAll(' ', '')} onClick={handleOnClick}>
-        Browse
-      </button>
     </div>
   );
 };

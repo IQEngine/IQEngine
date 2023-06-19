@@ -1,5 +1,5 @@
 import { SigMFMetadata } from '@/Utils/sigmfMetadata';
-import { IQDataSlice } from '../Models';
+import { IQDataSlice } from '@/api/Models';
 
 export interface IQDataClient {
   getIQDataSlice(meta: SigMFMetadata, index: number, tileSize: number): Promise<IQDataSlice>;

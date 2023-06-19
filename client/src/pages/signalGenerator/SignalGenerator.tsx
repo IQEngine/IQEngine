@@ -5,7 +5,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { vscodeDark } from '@uiw/codemirror-theme-vscode';
 import CodeMirror from '@uiw/react-codemirror';
 import { python } from '@codemirror/lang-python';
-import { examplesList } from './examples/exampleList';
+import { examplesList } from '@/pages/signalGenerator/examples/exampleList';
 
 export default function SignalGenerator(props) {
   const [state, setState] = useState({
@@ -291,7 +291,7 @@ print('NumPy Version:', numpy.version.version)
   return (
     <div>
       <center>
-        <p className="text-primary text-2xl mb-3">Python Based Signal Generator</p>
+        <p className="text-primary text-2xl mb-3">Python-Based Signal Generator</p>
       </center>
       <div className="grid grid-cols-2 gap-8 h-full mx-8">
         <div className="">
@@ -322,7 +322,7 @@ print('NumPy Version:', numpy.version.version)
                 checked={state.downloadChecked}
                 onChange={() => onChangeDownloadChecked()}
               />
-              <span className="ml-2 text-base">Download "x" as SigMF Recording</span>
+              <span className="ml-2 text-base">Download "x" as a SigMF Recording</span>
             </label>
           </div>
           <div className="w-fit">

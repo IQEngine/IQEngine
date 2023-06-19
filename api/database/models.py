@@ -3,6 +3,7 @@ from pydantic import BaseModel, SecretStr, Extra, Field
 
 class DataSource(BaseModel):
     type: str
+    type: str
     name: str
     account: str
     container: str

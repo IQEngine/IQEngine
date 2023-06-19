@@ -5,12 +5,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'api/**'
-      - 'client/**'
-      - 'Dockerfile'
-      - '.dockerignore'
-      - '.github/workflows/docker-release.yml'
   workflow_dispatch:
 
 permissions:
@@ -23,6 +17,9 @@ jobs:
       pull-requests: write
       packages: write
     runs-on: ubuntu-latest
+    environment:
+      name: 'Staging'
+      url: https://staging.iqengine.org
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v2
@@ -75,3 +72,15 @@ jobs:
           VITE_GOOGLE_ANALYTICS_KEY: '${{ secrets.VITE_GOOGLE_ANALYTICS_KEY }}'
           VITE_PLUGINS_ENDPOINT: '${{ secrets.VITE_PLUGINS_ENDPOINT }}'
           NODE_ENV: production
+
+      - name: Log in with Azure with Service Principal
+        uses: azure/login@v1
+        with:
+          creds: '${{ secrets.AZURE_CREDENTIALS }}'
+          
+      - name: Build and deploy Container App
+        uses: azure/container-apps-deploy-action@v1
+        with:
+          containerAppName: ${{ secrets.AZURE_CONTAINER_APP_NAME }}
+          resourceGroup: ${{ secrets.AZURE_RESOURCEGROUP }}
+          imageToDeploy: ghcr.io/${{ steps.set_variables.outputs.repository }}:${{ steps.set_variables.outputs.sha }}

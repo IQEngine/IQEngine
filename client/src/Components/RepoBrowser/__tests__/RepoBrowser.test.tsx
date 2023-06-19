@@ -1,41 +1,14 @@
 import { describe, expect, test } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import RepoBrowser from '@/Components/RepoBrowser/RepoBrowser';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { RepositoryTile } from '@/Components/RepoBrowser/RepositoryTile';
 import React from 'react';
 import nock from 'nock';
 import '@testing-library/jest-dom';
-
-import { configureStore } from '@reduxjs/toolkit';
-import { BrowserRouter as Router } from 'react-router-dom';
-import connectionReducer from '@/Store/Reducers/ConnectionReducer';
-import { Provider } from 'react-redux';
-import { FeatureFlagsProvider } from '@/Components/FeatureFlagsContext/FeatureFlagsContext';
 import { DataSource } from '@/api/Models';
+import { AllProviders, queryClient } from './setupTests';
 
 describe('Test RepoBrowser', () => {
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        staleTime: Infinity,
-      },
-    },
-  });
-
-  const store = configureStore({
-    reducer: { },
-  });
-
-  const AllProviders = ({ children }) => (
-    <Provider store={store}>
-      <QueryClientProvider client={queryClient}>
-        <FeatureFlagsProvider flags={null}>
-          <Router>{children}</Router>
-        </FeatureFlagsProvider>
-      </QueryClientProvider>
-    </Provider>
-  );
-
   beforeAll(() => {
     import.meta.env.VITE_DETECTOR_ENDPOINT = 'http://127.0.0.1:8000/detectors/';
     import.meta.env.VITE_CONNECTION_INFO = '{}';
@@ -55,7 +28,7 @@ describe('Test RepoBrowser', () => {
 
   test('Basic Rendering', async () => {
     render(<RepoBrowser></RepoBrowser>, { wrapper: AllProviders });
-    expect(screen.getByText('Browse Your Azure Blob Storage')).exist;
+    expect(screen.getByText('Azure Blob Storage')).exist;
   });
 
   test('Display Repository API Tile', async () => {
@@ -66,11 +39,11 @@ describe('Test RepoBrowser', () => {
         account: 'api-test-account',
         container: 'api-test-container',
         description: 'API Test Description',
-      }
+      },
     ];
     nock('http://localhost:3000').get('/api/datasources').reply(200, data);
-    
-    render(<RepoBrowser/>, { wrapper: AllProviders });
+
+    render(<RepoBrowser />, { wrapper: AllProviders });
     expect(await screen.findByRole('button', { name: 'api-test-name' })).toBeInTheDocument();
     expect(await screen.findByText('API Test Description')).toBeInTheDocument();
   });
@@ -90,14 +63,29 @@ describe('Test RepoBrowser', () => {
         account: 'api-test-account2',
         container: 'api-test-container2',
         description: 'API Test Description 2',
-      }
+      },
     ];
     nock('http://localhost:3000').get('/api/datasources').reply(200, data);
-    
-    render(<RepoBrowser/>, { wrapper: AllProviders });
+
+    render(<RepoBrowser />, { wrapper: AllProviders });
     expect(await screen.findByRole('button', { name: 'api-test-name' })).toBeInTheDocument();
     expect(await screen.findByText('API Test Description')).toBeInTheDocument();
     expect(await screen.findByRole('button', { name: 'api-test-name2' })).toBeInTheDocument();
     expect(await screen.findByText('API Test Description 2')).toBeInTheDocument();
+  });
+});
+
+describe('Test RepositoryTile', () => {
+  test('displays warning if SAS token has expired', async () => {
+    const data: DataSource = {
+      type: 'test-type',
+      name: 'test-name',
+      account: 'test-account',
+      container: 'test-container',
+      description: 'test description',
+      sasToken: 'sp=rl&st=2022-12-24T03:00:57Z&se=2023-01-24T11:00:57Z&sv=2021-06-08',
+    };
+    render(<RepositoryTile item={data} />, { wrapper: AllProviders });
+    expect(await screen.findByText('SAS Token is expired!')).toBeInTheDocument();
   });
 });

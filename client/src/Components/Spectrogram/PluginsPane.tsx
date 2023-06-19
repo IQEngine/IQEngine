@@ -3,14 +3,14 @@
 // Licensed under the MIT License
 
 import React, { useState, useEffect } from 'react';
-import { configQuery } from '../../api/config/queries';
+import { configQuery } from '@/api/config/queries';
 import { useAppDispatch } from '@/Store/hooks';
 import { Annotation, SigMFMetadata } from '@/Utils/sigmfMetadata';
 import { TimePlot } from './TimePlot';
 import { FrequencyPlot } from './FrequencyPlot';
 import { IQPlot } from './IQPlot';
 import { Layer, Image, Stage } from 'react-konva';
-import { calcFftOfTile } from '../../Utils/selector';
+import { calcFftOfTile } from '@/Utils/selector';
 
 export interface PluginsPaneProps {
   cursorsEnabled: boolean;

@@ -1,4 +1,4 @@
-import { SigMFMetadata } from '../sigmfMetadata';
+import { SigMFMetadata } from '@/Utils/sigmfMetadata';
 
 const sampleSigmfMetadata: SigMFMetadata = Object.assign(new SigMFMetadata(), {
   global: {

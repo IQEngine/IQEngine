@@ -1,7 +1,7 @@
 import { Annotation, CaptureSegment, SigMFMetadata } from '@/Utils/sigmfMetadata';
 import { BlobServiceClient, ContainerClient } from '@azure/storage-blob';
 import { MetadataClient } from './MetadataClient';
-import { getContainerClient } from '../utils/AzureBlob';
+import { getContainerClient } from '@/api/utils/AzureBlob';
 
 function readBlobAsText(blob: Blob): Promise<string> {
   return new Promise<string>((resolve, reject) => {

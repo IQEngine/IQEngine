@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { DataSourceClient } from './DataSourceClient';
-import { DataSource } from '../Models';
-import { SigMFMetadata } from '@/Utils/sigmfMetadata';
+import { DataSource } from '@/api/Models';
 
 export class ApiClient implements DataSourceClient {
   async list(): Promise<DataSource[]> {
@@ -27,7 +26,6 @@ export class ApiClient implements DataSourceClient {
     return response.data;
   }
   async create(dataSource: DataSource): Promise<DataSource> {
-    // TODO: Why doesn't this get routed correctly when called from the test
     const response = await axios.post('/api/datasources', dataSource);
     if (response.status !== 201) {
       throw new Error(`Failed to create datasource: ${response.status}`);

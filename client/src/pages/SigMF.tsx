@@ -119,7 +119,7 @@ export const SigMF = () => {
         <br></br>
         <br></br>
         The .sigmf-meta file containing JSON is made up of three parts:
-        <ul class="list-disc px-16 my-4">
+        <ul className="list-disc px-16 my-4">
           <li>
             <b>global</b> - Contains datatype, SigMF version, sample_rate, description, and other optional fields such
             as the hardware used to make the recording. The datatype string indicates float (f), signed int (i),
@@ -168,7 +168,7 @@ export const SigMF = () => {
         <br></br>
         In addition to saving your RF recordings using the SigMF standard, you can use SigMF within your software, using
         one of four ways:
-        <ul class="list-decimal px-16 my-4">
+        <ul className="list-decimal px-16 my-4">
           <li>
             Within Python, using the official SigMF Python package{' '}
             <a href="https://github.com/sigmf/sigmf-python">sigmf</a> available from pip:{' '}

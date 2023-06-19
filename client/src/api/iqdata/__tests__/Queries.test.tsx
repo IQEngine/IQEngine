@@ -1,6 +1,6 @@
 import { SigMFMetadata } from '@/Utils/sigmfMetadata';
 import { test, describe } from 'vitest';
-import { useCurrentCachedIQDataSlice } from '../Queries';
+import { useCurrentCachedIQDataSlice } from '@/api/iqdata/Queries';
 import { renderHook } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';

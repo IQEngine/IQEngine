@@ -4,7 +4,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Layer, Rect } from 'react-konva';
-
+import { useEffectOnce } from 'usehooks-ts';
 const TimeSelector = (props) => {
   const {
     spectrogramHeight,
@@ -25,10 +25,9 @@ const TimeSelector = (props) => {
   }, [props.spectrogramWidth]);
 
   // Run once at beginning to set value in SpectrogramPage
-  useEffect(() => {
+  useEffectOnce(() => {
     handleTimeSelectionStart(startTileNum);
     handleTimeSelectionEnd(endTileNum);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // dont put dep here
 
   // Sample-start bar
@@ -50,6 +49,11 @@ const TimeSelector = (props) => {
     return (newY / spectrogramHeight) * tileDiff + lowerTile;
   };
 
+  const updateTimeSelection = (e) => {
+    handleTimeSelectionStart(Math.min(startTileNum, endTileNum));
+    handleTimeSelectionEnd(Math.max(startTileNum, endTileNum));
+  };
+
   return (
     <>
       <Layer>
@@ -69,7 +73,7 @@ const TimeSelector = (props) => {
             height={0}
             draggable={true}
             onDragMove={handleDragMoveStart}
-            onDragEnd={() => handleTimeSelectionStart(startTileNum)}
+            onDragEnd={updateTimeSelection}
             strokeEnabled={true}
             strokeWidth={5}
             stroke="white"
@@ -81,7 +85,7 @@ const TimeSelector = (props) => {
             height={0}
             draggable={true}
             onDragMove={handleDragMoveEnd}
-            onDragEnd={() => handleTimeSelectionEnd(endTileNum)}
+            onDragEnd={updateTimeSelection}
             strokeEnabled={true}
             strokeWidth={5}
             stroke="white"

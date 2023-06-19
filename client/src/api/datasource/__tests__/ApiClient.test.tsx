@@ -1,7 +1,7 @@
 import { test, describe } from 'vitest';
 import nock from 'nock';
-import { ApiClient } from '../ApiClient';
-import { DataSource } from '../../Models';
+import { ApiClient } from '@/api/datasource/ApiClient';
+import { DataSource } from '@/api/Models';
 
 describe('ApiClient Metadata Tests', () => {
   test('list should return a list of data sources', async ({ expect }) => {

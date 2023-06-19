@@ -1,5 +1,4 @@
-# vim: tabstop=4 shiftwidth=4 expandtab
-
+import logging
 import os
 import logging
 from logging.config import dictConfig
@@ -12,6 +11,8 @@ from handlers.datasources import router as datasources_router
 from handlers.metadata import router as metadata_router
 from handlers.status import router as status_router
 from handlers.iq import router as iq_router
+from pydantic import BaseModel
+from starlette.exceptions import HTTPException
 
 load_dotenv()
 
@@ -19,7 +20,27 @@ load_dotenv()
 if not os.path.exists("iqengine"):
     os.makedirs("iqengine")
 
-from pydantic import BaseModel
+
+class SPAStaticFiles(StaticFiles):
+    """
+    This class is used to serve the static files for the SPA.
+    It will return the index.html file for any path that is not found.
+    """
+
+    async def get_response(self, path: str, scope):
+        print("parsing static files", path)
+        try:
+            response = await super().get_response(path, scope)
+        except HTTPException as e:
+            print("HTTP Exception", e)
+            response = await super().get_response("index.html", scope)
+        except Exception as e:
+            print("Exception", e)
+            response = await super().get_response("index.html", scope)
+        if response.status_code == 404:
+            response = await super().get_response("index.html", scope)
+        return response
+
 
 class LogConfig(BaseModel):
     """Logging configuration to be set for the server"""
@@ -52,13 +73,14 @@ class LogConfig(BaseModel):
 dictConfig(LogConfig().dict())
 logger = logging.getLogger("api")
 
-app = FastAPI(debug = True)
+app = FastAPI()
 app.include_router(iq_router)
 app.include_router(datasources_router)
 app.include_router(metadata_router)
 app.include_router(status_router)
 app.include_router(config_router)
-app.mount("/", StaticFiles(directory="iqengine", html=True), name="iqengine")
+
+app.mount("/", SPAStaticFiles(directory="iqengine", html=True), name="iqengine")
 
 if __name__ == "__main__":
     print("Cannot be run standalone. Do 'uvicorn main:app' instead")

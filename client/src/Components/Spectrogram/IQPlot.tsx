@@ -4,23 +4,26 @@
 
 import Plot from 'react-plotly.js';
 import React, { useEffect, useState } from 'react';
-import { template } from '../../Utils/plotlyTemplate';
+import { template } from '@/Utils/plotlyTemplate';
 
-export const TimePlot = (props) => {
+export const IQPlot = (props) => {
   let { currentSamples, plotWidth, plotHeight } = props;
   const [I, setI] = useState();
   const [Q, setQ] = useState();
 
   useEffect(() => {
     if (currentSamples && currentSamples.length > 0) {
+      // For now just show the first 1000 IQ samples, else it's too busy
+      const tempCurrentSamples = currentSamples.slice(0, 2000);
+
       setI(
-        currentSamples.filter((element, index) => {
+        tempCurrentSamples.filter((element, index) => {
           return index % 2 === 0;
         })
       );
 
       setQ(
-        currentSamples.filter((element, index) => {
+        tempCurrentSamples.filter((element, index) => {
           return index % 2 === 1;
         })
       );
@@ -40,29 +43,22 @@ export const TimePlot = (props) => {
       <Plot
         data={[
           {
-            y: I,
-            type: 'scatter',
-            name: 'I',
-          },
-          {
+            x: I,
             y: Q,
             type: 'scatter',
-            name: 'Q',
+            mode: 'markers',
           },
         ]}
         layout={{
           width: plotWidth,
           height: plotHeight,
           dragmode: 'pan',
-          showlegend: true,
           template: template,
           xaxis: {
-            title: 'Time',
-            rangeslider: { range: [0, 1000] },
+            title: 'I',
           },
           yaxis: {
-            title: 'Samples',
-            fixedrange: true,
+            title: 'Q',
           },
         }}
         config={{
