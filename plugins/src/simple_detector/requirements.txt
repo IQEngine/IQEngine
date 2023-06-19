@@ -1,0 +1,4 @@
+numpy
+fastapi
+opencv-python
+cv2
