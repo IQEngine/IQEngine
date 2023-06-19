@@ -7,7 +7,7 @@ import { useLocation, Outlet } from 'react-router-dom';
 import ReactGA from 'react-ga4';
 import ThemeSelector from './Components/Styles/ThemeSelector';
 import { configQuery } from './api/config/queries';
-
+import { Link } from 'react-router-dom';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'react-hot-toast';
 
@@ -45,19 +45,19 @@ export const App = () => {
           <div className="absolute right-0 py-2 mr-2">
             <ul className="flex-row flex mb-4 mt-0 space-x-5 text-sm font-medium">
               <li>
-                <a href="/about" className="text-lg ">
-                  About
-                </a>
+                <Link to="/about" onClick={() => {}}>
+                  <div className="text-lg">About</div>
+                </Link>
               </li>
               <li>
-                <a href="/sigmf" className="text-lg">
-                  SigMF
-                </a>
+                <Link to="/sigmf" onClick={() => {}}>
+                  <div className="text-lg">SigMF</div>
+                </Link>
               </li>
               <li>
-                <a href="/plugins" className="text-lg ">
-                  Plugins
-                </a>
+                <Link to="/plugins" onClick={() => {}}>
+                  <div className="text-lg">Plugins</div>
+                </Link>
               </li>
               <li>
                 <a href="https://discord.gg/k7C8kp3b76" target="_blank" rel="noreferrer" className="text-lg">
