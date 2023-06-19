@@ -13,15 +13,17 @@ const SiggenTile = (props) => {
   };
 
   return (
-    <div className="card w-96 bg-neutral text-neutral-content shadow-xl mb-3">
-      <figure><img onClick={handleOnClick} className="object-cover h-48 w-96" src="/siggen.png" alt="Shoes" /></figure>
-        <div className="card-body">
-          <h2 className="card-title text-2xl">SigGen</h2>
-          <p>Generate your own signals in Python, with examples! and save as a SigMF recording</p>
-          <div className="card-actions mt-2 justify-end">
-            <button onClick={handleOnClick} className="btn btn-primary w-full" >browse</button>
-          </div>
-        </div>
+    <div className="repocard">
+      <figure>
+        <img onClick={handleOnClick} className="repoimage" src="/siggen.png" alt="Siggen tile" />
+      </figure>
+      <div className="repocardbody">
+        <h2>Signal Generator</h2>
+        Generate your own signals in Python, with examples! Save as a SigMF recording
+      </div>
+      <button onClick={handleOnClick} className="repocardbutton">
+        Browse
+      </button>
     </div>
   );
 };

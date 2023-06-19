@@ -42,19 +42,19 @@
   }
 
   .repocard {
-    @apply card rounded-xl w-72 m-3 bg-neutral bg-opacity-50 shadow-primary shadow-md;
+    @apply card rounded-xl w-72 m-3 bg-neutral bg-opacity-50 outline-secondary outline-1 outline;
   }
 
-  .repocardheader {
-    @apply bg-primary rounded-t-xl opacity-75 pl-2 pb-1 h-8 text-base-100 text-lg font-bold text-center;
+  .repoimage {
+    @apply h-48 rounded-lg mt-3;
   }
 
   .repocardbody {
-    @apply card-body px-3 pt-3;
+    @apply card-body p-3;
   }
 
   .repocardbutton {
-    @apply bg-primary opacity-75 text-lg py-0 text-base-100 hover:bg-accent hover:opacity-100 rounded-t-none !border-none;
+    @apply bg-primary opacity-75 text-lg text-base-100 hover:bg-accent hover:opacity-100 rounded-t-none !border-none text-center;
   }
 
   .leadership-card-header {
