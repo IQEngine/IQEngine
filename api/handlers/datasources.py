@@ -3,8 +3,6 @@ import database.database
 from database.models import DataSource
 from fastapi import APIRouter, Depends, HTTPException
 from pymongo.collection import Collection
-from fastapi.responses import StreamingResponse
-from PIL import Image, ImageDraw
 from .cipher import decrypt
 
 router = APIRouter()
