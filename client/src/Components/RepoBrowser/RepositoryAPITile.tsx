@@ -30,7 +30,13 @@ const RepositoryAPITile = (props) => {
         </div>
       </h2>
       <div className="repocardbody">
-        <figure>{imageURL && <img src={imageURL} className="rounded-2xl px-2 h-36"></img>}</figure>
+        <figure>
+          {imageURL && (
+            <button className="m-0 p-0 bg-transparent">
+              <img src={imageURL} className="rounded-2xl h-36" onClick={handleOnClick}></img>
+            </button>
+          )}
+        </figure>
         <div className="h-24 overflow-hidden hover:overflow-auto text-center">{description}</div>
       </div>
       <button
