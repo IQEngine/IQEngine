@@ -11,6 +11,7 @@ import { FrequencyPlot } from './FrequencyPlot';
 import { IQPlot } from './IQPlot';
 import { Layer, Image, Stage } from 'react-konva';
 import { calcFftOfTile } from '@/Utils/selector';
+import { convertFloat32ArrayToBase64, convertBase64ToFloat32Array } from '@/Utils/rfFunctions';
 
 export interface PluginsPaneProps {
   cursorsEnabled: boolean;
@@ -81,8 +82,8 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
     const sampleRate = meta['global']['core:sample_rate'];
     const freq = meta['captures'][0]['core:frequency'];
 
-    // We can only send normal Arrays over JSON for some reason, so convert it
-    const newSamps = Array.from(trimmedSamples);
+    const newSamps = convertFloat32ArrayToBase64(trimmedSamples);
+    console.log(newSamps);
 
     let body = {
       data_input: [
@@ -123,7 +124,8 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
         console.log('data:', data);
         if (data.data_output && data.data_output.length > 0) {
           // just show the first output for now, 99% of plugins will have 0 or 1 IQ output anyway
-          const samples = data.data_output[0]['samples'];
+          const samples_base64 = data.data_output[0]['samples'];
+          const samples = convertBase64ToFloat32Array(samples_base64);
           //const sample_rate = data.data_output[0]['sample_rate']; // Hz
           //const center_freq = data.data_output[0]['center_freq']; // Hz
           //const data_type = data.data_output[0]['data_type']; // assumes iq/cf32_le
