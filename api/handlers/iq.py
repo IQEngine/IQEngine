@@ -1,17 +1,18 @@
+import io
+import base64
+import logging
+import asyncio
 import database.database
 from database.models import DataSource
 from pymongo.collection import Collection
 from azure.storage.blob import BlobClient
 from fastapi import HTTPException, Depends, APIRouter
-from fastapi.responses import StreamingResponse
 from typing import List
 from pydantic import BaseModel
-import logging
-import asyncio
+
 from asyncio import to_thread
 from .cipher import decrypt
-import io
-import base64
+
 
 router = APIRouter()
 
@@ -26,8 +27,12 @@ def get_sas_token(account: str, container: str, datasources_collection: Collecti
     datasource = datasources_collection.find_one({"account": account, "container": container})
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
-    decrypted_sas_token = decrypt(datasource["sasToken"])
-    if not decrypted_sas_token: return ""
+    
+    if "sasToken" in datasource:
+        decrypted_sas_token = decrypt(datasource["sasToken"])
+    else:
+        return None
+    if not decrypted_sas_token: return None
     return decrypted_sas_token
 
 
@@ -44,9 +49,8 @@ def get_iq(
     try:
         if not sasToken:
             raise HTTPException(status_code=400, detail="Invalid SAS token")
-        
-        blob_client = BlobClient.from_blob_url(f"https://{account}.blob.core.windows.net/{container}/{filepath}.sigmf-data", credential=sasToken)
 
+        blob_client = BlobClient.from_blob_url(f"https://{account}.blob.core.windows.net/{container}/{filepath}.sigmf-data", credential=sasToken)
 
         download_stream = blob_client.download_blob(offsetBytes, countBytes)
         data = io.BytesIO(download_stream.readall())
@@ -55,6 +59,7 @@ def get_iq(
 
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
 
 async def download_blob(blob_client, index, tile_size, bytes_per_sample, blob_size):
     offsetBytes = index * tile_size * bytes_per_sample * 2
