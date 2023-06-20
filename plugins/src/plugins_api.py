@@ -4,6 +4,7 @@ import numpy as np
 from fastapi.middleware.cors import CORSMiddleware
 import os
 import copy
+import base64
 
 app = fastapi.FastAPI()
 
@@ -64,15 +65,10 @@ async def run(info : fastapi.Request, plugin_name):
             return {"status" : "FAILED - no data_input", "annotations": []}
 
         # Extract samples
-        samples = function_input["data_input"][0]["samples"] # Assumed to be real or floats in IQIQIQIQ
+        samples_b64 = function_input["data_input"][0]["samples"] # provided as base64 string of float32 array
+        samples = np.frombuffer(base64.decodebytes(samples_b64.encode()), dtype=np.complex64)
         sample_rate = function_input["data_input"][0]["sample_rate"]
         center_freq = function_input["data_input"][0]["center_freq"]
-        samples = np.asarray(samples)
-        if samples.size % 2 == 1:
-            return {"status" : "FAILED - number of samples was not an even number", "annotations": []}
-        samples = samples[::2] + 1j*samples[1::2]
-        samples = samples.astype(np.complex64)
-
         custom_params = function_input.get("custom_params", {})
         custom_params["sample_rate"] = sample_rate
         custom_params["center_freq"] = center_freq

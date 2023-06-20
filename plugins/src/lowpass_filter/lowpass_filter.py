@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 
 import numpy as np
+import base64
 from pydantic.dataclasses import dataclass
 from scipy import signal
 
@@ -22,8 +23,7 @@ class Plugin:
                           fs=self.sample_rate,
                           pass_zero=True).astype(np.complex64)
         samples = np.convolve(samples, h, 'valid')
-        samples_list = samples.view(dtype=np.float32).tolist() # convert to I,Q,I,Q for JSON sake
-        samples_obj = {"samples": samples_list,
+        samples_obj = {"samples": base64.b64encode(samples),
                        "sample_rate": self.sample_rate,
                        "center_freq": self.center_freq,
                        "data_type": "iq/cf32_le"}
