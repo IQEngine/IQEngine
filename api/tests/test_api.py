@@ -172,6 +172,7 @@ def test_api_get_datasource(client):
     assert response.status_code == 200
     assert len(response.json()) > 1
 
+
 def test_api_filename_url_encoded(client):
     client.post("/api/datasources", json=test_datasource).json()
     response = client.post(

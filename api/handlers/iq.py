@@ -16,23 +16,26 @@ from .cipher import decrypt
 
 router = APIRouter()
 
+
 class IQData(BaseModel):
     indexes: List[int]
     tile_size: int
     bytes_per_sample: int
 
 
-def get_sas_token(account: str, container: str, datasources_collection: Collection[DataSource] = Depends(database.database.datasources_collection)):
+def get_sas_token(account: str, container: str, 
+                  datasources_collection: Collection[DataSource] = Depends(database.database.datasources_collection)):
 
     datasource = datasources_collection.find_one({"account": account, "container": container})
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
-    
+
     if "sasToken" in datasource:
         decrypted_sas_token = decrypt(datasource["sasToken"])
     else:
         return None
-    if not decrypted_sas_token: return None
+    if not decrypted_sas_token:
+        return None
     return decrypted_sas_token
 
 
@@ -50,7 +53,8 @@ def get_iq(
         if not sasToken:
             raise HTTPException(status_code=400, detail="Invalid SAS token")
 
-        blob_client = BlobClient.from_blob_url(f"https://{account}.blob.core.windows.net/{container}/{filepath}.sigmf-data", credential=sasToken)
+        blob_client = BlobClient.from_blob_url(f"https://{account}.blob.core.windows.net/{container}/{filepath}.sigmf-data",
+                                               credential=sasToken)
 
         download_stream = blob_client.download_blob(offsetBytes, countBytes)
         data = io.BytesIO(download_stream.readall())
@@ -87,7 +91,8 @@ async def get_iq_data_slices(
         if not sasToken:
             raise HTTPException(status_code=400, detail="Invalid SAS token")
 
-        blob_client = BlobClient.from_blob_url(f"https://{account}.blob.core.windows.net/{container}/{filepath}.sigmf-data", credential=sasToken)
+        blob_client = BlobClient.from_blob_url(f"https://{account}.blob.core.windows.net/{container}/{filepath}.sigmf-data",
+                                               credential=sasToken)
         blob_properties = blob_client.get_blob_properties()
         blob_size = blob_properties.size
 

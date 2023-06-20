@@ -1,4 +1,3 @@
-import logging
 import os
 import logging
 from logging.config import dictConfig
@@ -71,6 +70,7 @@ class LogConfig(BaseModel):
     loggers = {
         LOGGER_NAME: {"handlers": ["default"], "level": LOG_LEVEL},
     }
+
 
 dictConfig(LogConfig().dict())
 logger = logging.getLogger("api")

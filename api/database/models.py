@@ -10,6 +10,7 @@ class DataSource(BaseModel):
     imageURL: str | None
     sasToken: str | None
 
+
 class DataSourceReference(BaseModel):
     type: str
     account: str

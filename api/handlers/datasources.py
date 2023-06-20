@@ -1,9 +1,8 @@
-import io
 import database.database
 from database.models import DataSource
 from fastapi import APIRouter, Depends, HTTPException
 from pymongo.collection import Collection
-from .cipher import decrypt,encrypt
+from .cipher import decrypt, encrypt
 
 router = APIRouter()
 
@@ -26,10 +25,10 @@ def create_datasource(
         }
     ):
         raise HTTPException(status_code=409, detail="Datasource Already Exists")
-    
+
     if datasource.sasToken:
         datasource.sasToken = encrypt(datasource.sasToken)
-        
+
     datasources.insert_one(datasource.dict(by_alias=True, exclude_unset=True))
     return datasource
 
@@ -48,7 +47,7 @@ def get_datasources(
 
 
 @router.get(
-        "/api/datasources/{account}/{container}/datasource", 
+        "/api/datasources/{account}/{container}/datasource",
         response_model=DataSource)
 def get_datasource(
     account: str,
@@ -66,9 +65,8 @@ def get_datasource(
 
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
-    
+
     if "imageURL" in datasource and "sasToken" in datasource and "core.windows.net" in datasource["imageURL"]:
         datasource["imageURL"] = datasource["imageURL"] + "?" + decrypt(datasource["sasToken"])
 
     return datasource
-
