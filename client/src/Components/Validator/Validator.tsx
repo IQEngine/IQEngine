@@ -4,7 +4,6 @@
 import React, { useState } from 'react';
 import { vscodeDark } from '@uiw/codemirror-theme-vscode';
 import CodeMirror from '@uiw/react-codemirror';
-import { json } from '@codemirror/lang-json';
 import { INITIAL_METADATA_SNIPPET } from '@/Utils/constants';
 import { metadataValidator } from '@/Utils/validators';
 import { langs } from '@uiw/codemirror-extensions-langs';

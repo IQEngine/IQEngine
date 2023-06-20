@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 import { vi } from 'vitest';
 import { vscodeDark } from '@uiw/codemirror-theme-vscode';
 import CodeMirror from '@uiw/react-codemirror';
-import { json } from '@codemirror/lang-json';
+import { langs } from '@uiw/codemirror-extensions-langs';
 
 export interface MetaRawProps {
   meta: SigMFMetadata;
@@ -82,7 +82,7 @@ export const MetaRaw = ({ meta }: MetaRawProps) => {
           height="500px"
           theme={vscodeDark}
           readOnly={true}
-          extensions={[json()]}
+          extensions={[langs.json()]}
         />
       </div>
     </div>
