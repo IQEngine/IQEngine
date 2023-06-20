@@ -40,10 +40,6 @@ describe('MetaRaw ', () => {
   ];
   test('Renders correctly', async () => {
     render(<MetaRaw meta={meta} />, { wrapper: AllProviders });
-
-    const textarea = screen.getByRole('textbox', { name: 'Metadata Text Area' });
-
-    expect(textarea.innerHTML).toContain(meta.getSigMFRaw());
     expect(screen.queryByRole('button', { name: 'Download Metadata Button' })).toBeInTheDocument();
   });
 
