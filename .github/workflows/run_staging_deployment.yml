@@ -2,19 +2,19 @@
 name: Deploy To Staging
 
 on:
-  workflow_run:
-    workflows: ['Create pre-release and push Docker image']
-    branches: [main]
-    types:
-      - completed
+  push:
+    branches:
+      - main
   workflow_dispatch:
-
 
 permissions:
   contents: read
 
 jobs:
-  create_new_release:
+  create_pre_release:
+    uses: ./.github/workflows/docker-pre-release.yml
+
+  run_staging_deployment:
     if: github.repository == 'IQEngine/IQEngine'
     permissions:
       contents: write
@@ -24,16 +24,18 @@ jobs:
     environment:
       name: 'Staging'
       url: https://staging.iqengine.org
+    env:
+      repository: ${{needs.create_pre_release.outputs.repository}}
+      sha: ${{needs.create_pre_release.outputs.sha}}
     steps:
       - name: Log in with Azure with Service Principal
         uses: azure/login@v1
         with:
           creds: '${{ secrets.AZURE_CREDENTIALS }}'
-          
+
       - name: Build and deploy Container App
         uses: azure/container-apps-deploy-action@v1
         with:
           containerAppName: ${{ secrets.AZURE_CONTAINER_APP_NAME }}
           resourceGroup: ${{ secrets.AZURE_RESOURCEGROUP }}
-          imageToDeploy: ghcr.io/${{ steps.set_variables.outputs.repository }}:${{ steps.set_variables.outputs.sha }}
-
+          imageToDeploy: ghcr.io/${{ env.repository }}:${{ env.sha}}
