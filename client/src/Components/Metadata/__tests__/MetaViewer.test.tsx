@@ -27,7 +27,7 @@ describe('MetaViewer list component', () => {
     expect(await screen.findByText('datatype test')).toBeInTheDocument();
     expect(await screen.findByText('version test')).toBeInTheDocument();
     expect(await screen.findByText('0')).toBeInTheDocument();
-    expect(await screen.findByText('1')).toBeInTheDocument();
+    expect(await screen.findByText('1 Hz')).toBeInTheDocument();
     expect(
       await screen.findByText('lorem ipsum dolor sit amet, consectetur adipiscing elit, sed...')
     ).toBeInTheDocument();
