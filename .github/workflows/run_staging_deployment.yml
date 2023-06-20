@@ -1,11 +1,14 @@
 ---
-name: Create pre-release and push Docker image
+name: Deploy To Staging
 
 on:
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows: ['Create pre-release and push Docker image']
+    branches: [main]
+    types:
+      - completed
   workflow_dispatch:
+
 
 permissions:
   contents: read
