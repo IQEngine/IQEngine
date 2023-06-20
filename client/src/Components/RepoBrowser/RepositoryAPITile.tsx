@@ -21,6 +21,8 @@ const RepositoryAPITile = (props) => {
     navigate(`/recordings/${CLIENT_TYPE_API}/${account}/${container}`);
   };
 
+  // TODO: COPY STYLE BELOW FROM THE OTHER REPOSITORY TILE
+
   return (
     <div className="card w-96 bg-neutral text-neutral-content shadow-xl mb-3">
       <figure>

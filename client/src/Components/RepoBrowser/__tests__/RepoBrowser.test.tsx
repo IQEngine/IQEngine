@@ -6,7 +6,7 @@ import React from 'react';
 import nock from 'nock';
 import '@testing-library/jest-dom';
 import { DataSource } from '@/api/Models';
-import { AllProviders, queryClient } from './setupTests';
+import { AllProviders, queryClient } from '@/mocks/setupTests';
 
 describe('Test RepoBrowser', () => {
   beforeAll(() => {

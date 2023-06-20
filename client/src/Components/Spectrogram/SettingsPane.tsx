@@ -52,34 +52,10 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
     saveButtonEnabled: false,
   });
 
-  let [magnitudeMax, setMagnitudeMax] = useState(props.magnitudeMax);
-  let [magnitudeMin, setMagnitudeMin] = useState(props.magnitudeMin);
-
-  useEffect(() => {
-    setMagnitudeMax(props.magnitudeMax);
-  }, [props.magnitudeMax]);
-
-  useEffect(() => {
-    setMagnitudeMin(props.magnitudeMin);
-  }, [props.magnitudeMin]);
-
   const onChangeWindowFunction = (event) => {
     const windowFunction = event.currentTarget.dataset.value;
     setState({ ...state, windowFunction: windowFunction });
     props.updateWindowChange(windowFunction);
-  };
-
-  const onChangeMagnitudeMax = (max) => {
-    props.updateMagnitudeMax(parseInt(max));
-  };
-
-  const onChangeMagnitudeMin = (min) => {
-    // currently a min of 0 doesnt actually work so just set it to 1
-    if (min == 0) {
-      props.updateMagnitudeMin(1);
-    } else {
-      props.updateMagnitudeMin(parseInt(min));
-    }
   };
 
   const onChangeFftsize = (event) => {
@@ -203,19 +179,22 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
         </label>
 
         <DualRangeSlider
-          min={0}
-          minValue={magnitudeMin}
-          max={255}
-          maxValue={magnitudeMax}
-          onChangeMin={onChangeMagnitudeMin}
-          onChangeMax={onChangeMagnitudeMax}
+          min={-100.0}
+          minValue={props.magnitudeMin}
+          max={50.0}
+          maxValue={props.magnitudeMax}
+          setMin={props.updateMagnitudeMin}
+          setMax={props.updateMagnitudeMax}
+          unit="dB"
         />
       </div>
       <div>
         {/* When you press this button it will make autoscale run during the next call to selectFft, then it will turn itself off */}
+        {/*  Disable auto scale button until the functionality gets fixed
         <button className="mb-3 w-full mt-2" onClick={props.handleAutoScale}>
           Autoscale Max/Min
         </button>
+        */}
       </div>
 
       <div id="formFFT">

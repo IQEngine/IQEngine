@@ -50,7 +50,7 @@ export const getMeta = (type: string, account: string, container: string, filePa
     fetchMeta(type, account, container, filePath)
   );
 
-export const updateMeta = (meta: SigMFMetadata) => {
+export const useUpdateMeta = (meta: SigMFMetadata) => {
   let client = useQueryClient();
   console.log('updateMeta', meta);
   if (!meta.getOrigin()) {
@@ -77,4 +77,9 @@ export const preFetchDataSourcesMeta = (client: QueryClient, type: string, accou
   client.prefetchQuery(['datasource', type, account, container, 'meta'], () =>
     fetchDataSourceMeta(client, type, account, container)
   );
+};
+
+export const useGetMetadataFeatures = (type: string) => {
+  const client = MetadataClientFactory(type);
+  return client.features();
 };

@@ -6,9 +6,7 @@ Install Playwright with the following, tested to work on Ubuntu 22:
 
 ```bash
 npm install playwright
-npx playwright install
-sudo apt-get install libflite1
-(probably more installs needed to get all browsers in the list working)
+npx playwright install-deps
 ```
 
 ## Run
@@ -24,7 +22,7 @@ npx playwright test
 This will start up the necessary API and application servers to run an end-to-end test on all configured browsers. If a server is already
 running the tests will try and re-use that rather than start a new one.
 
-See (Playwright Test Cli)(https://playwright.dev/docs/test-cli) for full details of command line arguments.
+See (Playwright Test Cli)(<https://playwright.dev/docs/test-cli>) for full details of command line arguments.
 
 If you need more fine-grained control the project Makefile has targets to help you with that e.g.
 

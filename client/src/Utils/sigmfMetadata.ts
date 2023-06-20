@@ -166,13 +166,20 @@ export class SigMFMetadata {
     return 0;
   }
 
+  getSigMFRaw() {
+    return JSON.stringify(
+      {
+        global: this.global ?? {},
+        captures: this.captures ?? [],
+        annotations: this.annotations ?? [],
+      },
+      null,
+      4
+    );
+  }
+
   metadataValidation() {
-    var metadataString = JSON.stringify({
-      global: this.global,
-      captures: this.captures,
-      annotations: this.annotations,
-    });
-    return metadataValidator(metadataString);
+    return metadataValidator(this.getSigMFRaw());
   }
 }
 

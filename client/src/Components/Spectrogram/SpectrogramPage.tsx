@@ -14,10 +14,10 @@ import { RulerTop } from './RulerTop';
 import { RulerSide } from './RulerSide';
 import { INITIAL_PYTHON_SNIPPET, TILE_SIZE_IN_IQ_SAMPLES } from '@/Utils/constants';
 import TimeSelector from './TimeSelector';
-import { ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 import AnnotationList from '@/Components/Annotation/AnnotationList';
 import { GlobalProperties } from '@/Components/GlobalProperties/GlobalProperties';
-import { MetaViewer } from '@/Components/MetaViewer/MetaViewer';
+import { MetaViewer } from '@/Components/Metadata/MetaViewer';
+import { MetaRaw } from '@/Components/Metadata/MetaRaw';
 import { SpectrogramContext } from './SpectrogramContext';
 import { useParams } from 'react-router-dom';
 import React, { useState, useEffect, useMemo, useRef } from 'react';
@@ -29,6 +29,7 @@ import { useInterval } from 'usehooks-ts';
 import { python } from '@codemirror/lang-python';
 import { applyProcessing } from '@/Sources/FetchMoreDataSource';
 import { useQueryClient } from '@tanstack/react-query';
+import { useGetMetadataFeatures } from '@/api/metadata/Queries';
 
 declare global {
   interface Window {
@@ -53,8 +54,8 @@ export const SpectrogramPage = () => {
 
   // FFT Properties
   const [fftSize, setFFTSize] = useState(1024);
-  const [magnitudeMax, setMagnitudeMax] = useState(240);
-  const [magnitudeMin, setMagnitudeMin] = useState(80);
+  const [magnitudeMax, setMagnitudeMax] = useState(-10.0); // in dB
+  const [magnitudeMin, setMagnitudeMin] = useState(-40.0); // in dB
   const [fftWindow, setFFTWindow] = useState('hamming');
   const [autoscale, setAutoscale] = useState(false);
   const [image, setImage] = useState(null);
@@ -66,8 +67,6 @@ export const SpectrogramPage = () => {
   const [timeSelectionStart, setTimeSelectionStart] = useState(0);
   const [timeSelectionEnd, setTimeSelectionEnd] = useState(10);
   const [cursorsEnabled, setCursorsEnabled] = useState(false);
-  const [currentFftMax, setCurrentFftMax] = useState(-999999);
-  const [currentFftMin, setCurrentFftMin] = useState(999999);
   const [currentTab, setCurrentTab] = useState('spectrogram');
   const [pyodide, setPyodide] = useState(null);
   const [handleTop, setHandleTop] = useState(0);
@@ -87,7 +86,6 @@ export const SpectrogramPage = () => {
   const [iqRaw, setIQRaw] = useState<Record<number, Float32Array>>({});
   const [fftImage, setFFTImage] = useState<SelectFftReturn>(null);
   const { downloadedTiles } = useCurrentCachedIQDataSlice(meta, TILE_SIZE_IN_IQ_SAMPLES);
-
   const iqQuery = getIQDataSlices(metaQuery.data, tiles, TILE_SIZE_IN_IQ_SAMPLES, !!metaQuery.data && tiles.length > 0);
 
   useEffect(() => {
@@ -164,8 +162,6 @@ export const SpectrogramPage = () => {
       magnitudeMin,
       meta,
       fftWindow, // dont want to conflict with the main window var
-      currentFftMax,
-      currentFftMin,
       autoscale,
       zoomLevel,
       iqData,
@@ -188,8 +184,6 @@ export const SpectrogramPage = () => {
       magnitudeMin,
       meta,
       fftWindow, // dont want to conflict with the main window var
-      currentFftMax,
-      currentFftMin,
       autoscale,
       zoomLevel,
       iqData,
@@ -216,8 +210,6 @@ export const SpectrogramPage = () => {
       setMagnitudeMax(fftImage.autoMax);
       setMagnitudeMin(fftImage.autoMin);
     }
-    setCurrentFftMax(fftImage.currentFftMax);
-    setCurrentFftMin(fftImage.currentFftMin);
     setMissingTiles(fftImage.missingTiles);
     setFetchMinimap(true);
   };
@@ -282,21 +274,6 @@ export const SpectrogramPage = () => {
   useEffect(() => {
     windowResized();
   }, []);
-
-  const downloadInfo = () => {
-    const fileData = JSON.stringify(meta, null, 4);
-    const blob = new Blob([fileData], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.download = 'spectrogram-meta-data-modified.sigmf-meta';
-    link.href = url;
-    document.body.appendChild(link);
-    link.click();
-    setTimeout(function () {
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    }, 0);
-  };
 
   const toggleIncludeRfFreq = () => {
     setIncludeRfFreq(!includeRfFreq);
@@ -485,6 +462,8 @@ export const SpectrogramPage = () => {
                         meta={meta}
                         fetchEnabled={fetchMinimap}
                         fftSizeScrollbar={fftSize}
+                        setMagnitudeMax={setMagnitudeMax}
+                        setMagnitudeMin={setMagnitudeMin}
                       />
                     </Stage>
                   </div>
@@ -551,46 +530,10 @@ export const SpectrogramPage = () => {
 
           <details>
             <summary className="pl-2 mt-2 bg-primary outline outline-1 outline-primary text-lg text-base-100 hover:bg-green-800">
-              Metadata
+              Raw Metadata
             </summary>
             <div className="outline outline-1 outline-primary p-2">
-              <div className="flex flex-row">
-                <button
-                  className="mb-1 text-right"
-                  onClick={() => {
-                    downloadInfo();
-                  }}
-                >
-                  <ArrowDownTrayIcon className="inline-block mr-2 h-6 w-6" />
-                  Download meta JSON
-                </button>
-                {/* TODO: Add in when PUT is working <button
-              className="text-right ml-1"
-              onClick={() => {
-                this.handleMeta();
-                this.saveMeta();
-              }}
-            >
-              <DocumentCheckIcon className="inline-block mr-2 h-6 w-6" />
-              Save latest
-            </button>*/}
-              </div>
-              <div>
-                <textarea
-                  rows={20}
-                  className="textarea w-full bg-base-100 text-base-content overflow-hidden hover:overflow-scroll"
-                  readOnly={true}
-                  value={JSON.stringify(
-                    {
-                      global: meta?.global ?? {},
-                      captures: meta?.captures ?? [],
-                      annotations: meta?.annotations ?? [],
-                    },
-                    null,
-                    4
-                  )}
-                />
-              </div>
+              <MetaRaw meta={meta} />
             </div>
           </details>
         </div>
