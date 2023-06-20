@@ -6,6 +6,8 @@ import {
   getSeconds,
   validateDate,
   validateFrequency,
+  convertFloat32ArrayToBase64,
+  convertBase64ToFloat32Array,
 } from '@/Utils/rfFunctions';
 
 describe('Calculate date', () => {
@@ -155,5 +157,22 @@ describe('Validate date', () => {
 
     // Assert
     expect(result).toEqual(expected);
+  });
+});
+
+describe('Convert float32array to base64 and back', () => {
+  test('should convert float32array to base 64 correctly', () => {
+    // Arrange
+    const input = new Float32Array([...Array(1000000).keys()]);
+
+    // Act
+    const result = convertFloat32ArrayToBase64(input);
+    const expected = convertBase64ToFloat32Array(result);
+
+    // Assert, check a few random ones
+    expect(input[0]).toEqual(expected[0]);
+    expect(input[123]).toEqual(expected[123]);
+    expect(input[7777]).toEqual(expected[7777]);
+    expect(input[987654]).toEqual(expected[987654]);
   });
 });

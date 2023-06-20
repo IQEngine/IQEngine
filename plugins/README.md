@@ -23,7 +23,7 @@ Plugins written in other languages will have to implement the full API.
 To get a feel for how simple it is to write a Python based plugin, check out the /src/lowpass_filter/low_passfilter.py
 code that implements a low-pass filter plugin in a couple dozen lines of Python, no additional boilerplate needed!
 
-## To run FastAPI functions locally for testing:
+## To run FastAPI functions locally for testing
 
 First edit your .env file to include `VITE_PLUGINS_ENDPOINT=http://localhost:8000/plugins/`
 

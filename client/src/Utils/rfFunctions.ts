@@ -103,3 +103,16 @@ export function validateDate(current: string, start: string, end: string) {
     return 'Invalid date';
   }
 }
+
+export function convertFloat32ArrayToBase64(float32Array: Float32Array) {
+  return btoa(new Uint8Array(float32Array.buffer).reduce((data, byte) => data + String.fromCharCode(byte), ''));
+}
+
+// TODO: could probably be made faster, without a for loop
+export function convertBase64ToFloat32Array(base64String: string): Float32Array {
+  const blob = atob(base64String);
+  const arrayBuffer = new ArrayBuffer(blob.length);
+  const dataView = new DataView(arrayBuffer);
+  for (let i = 0; i < blob.length; i++) dataView.setUint8(i, blob.charCodeAt(i));
+  return new Float32Array(arrayBuffer);
+}
