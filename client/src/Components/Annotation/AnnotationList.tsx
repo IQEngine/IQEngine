@@ -260,7 +260,6 @@ export const AnnotationList = ({ meta, setHandleTop, spectrogramHeight, setMeta 
 
   useEffect(() => {
     setData(calculateAnnotationsData());
-    console.log('meta update');
   }, [calculateAnnotationsData]);
 
   useEffect(() => {
