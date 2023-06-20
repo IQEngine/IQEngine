@@ -64,7 +64,7 @@ async def run(info : fastapi.Request, plugin_name):
             return {"status" : "FAILED - no data_input", "annotations": []}
 
         # Extract samples
-        samples = function_input["data_input"][0]["samples"] # Assumed to be real or floats in IQIQIQIQ (cant send complex over JSON)
+        samples = function_input["data_input"][0]["samples"] # Assumed to be real or floats in IQIQIQIQ
         sample_rate = function_input["data_input"][0]["sample_rate"]
         center_freq = function_input["data_input"][0]["center_freq"]
         samples = np.asarray(samples)
