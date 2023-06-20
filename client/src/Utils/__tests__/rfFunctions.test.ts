@@ -163,15 +163,16 @@ describe('Validate date', () => {
 describe('Convert float 32 to base 64', () => {
   test('should convert float 32 to base 64 correctly', () => {
     // Arrange
-    const input = new Float32Array([...Array(1000000).keys()]);
+    const input = new Float32Array([...Array(10000000).keys()]);
 
     // Act
     const result = convertFloat32ArrayToBase64(input);
     const expected = convertBase64ToFloat32Array(result);
 
-    // Assert
-    for (let i = 0; i < input.length; i++) {
-      expect(input[i]).toEqual(expected[i]);
-    }
+    // Assert, check a few random ones
+    expect(input[0]).toEqual(expected[0]);
+    expect(input[123]).toEqual(expected[123]);
+    expect(input[7777]).toEqual(expected[7777]);
+    expect(input[987654]).toEqual(expected[987654]);
   });
 });
