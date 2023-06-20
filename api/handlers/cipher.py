@@ -12,7 +12,7 @@ def get_key():
 
 def decrypt(sas_token: str):
     key = get_key()
-    if not key: 
+    if not key:
         return None
     cipher_suite = Fernet(key)
     plain_text = cipher_suite.decrypt(sas_token)
@@ -21,7 +21,7 @@ def decrypt(sas_token: str):
 
 def encrypt(sas_token: str):
     key = get_key()
-    if not key: 
+    if not key:
         return None
     cipher_suite = Fernet(key)
     cipher_text = cipher_suite.encrypt(sas_token.encode("utf-8"))

@@ -20,7 +20,9 @@ def test_get_iq(client):
         MockBlobClient.from_blob_url.return_value = mock_blob_client
 
         response = client.get(
-            f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path/iqslice?offsetBytes=0&countBytes=10')
+            f'/api/datasources/'
+            f'{test_datasource["account"]}/{test_datasource["container"]}'
+            f'/file_path/iqslice?offsetBytes=0&countBytes=10')
 
         assert response.status_code == 200
         assert response.json() == {"data": base64.b64encode(testBytes).decode()}
