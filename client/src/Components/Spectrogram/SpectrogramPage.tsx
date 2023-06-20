@@ -311,6 +311,18 @@ export const SpectrogramPage = () => {
     return { trimmedSamples: trimmedSamples, startSampleOffset: startSampleOffset }; // only used by plugins
   };
 
+  const handleWheel = (e) => {
+    e.evt.preventDefault();
+    let scrollDirection = -e.evt.wheelDeltaY / Math.abs(e.evt.wheelDeltaY);
+    let scrollAmount = scrollDirection * 2;
+    let presentingSize = (spectrogramHeight / (meta.getTotalSamples() / fftSize / zoomLevel)) * spectrogramHeight;
+    let maxValue = spectrogramHeight - presentingSize;
+    // make sure we don't scroll past the beginning or end
+    let newY = handleTop + scrollAmount;
+    newY = newY < 0 ? 0 : newY > maxValue ? maxValue : newY;
+    fetchAndRender(newY);
+  };
+
   return (
     <SpectrogramContext.Provider
       value={{
@@ -418,7 +430,7 @@ export const SpectrogramPage = () => {
 
                   <div className="flex flex-row">
                     <Stage width={spectrogramWidth} height={spectrogramHeight}>
-                      <Layer>
+                      <Layer onWheel={handleWheel}>
                         <Image image={image} x={0} y={0} width={spectrogramWidth} height={spectrogramHeight} />
                       </Layer>
                       <AnnotationViewer
