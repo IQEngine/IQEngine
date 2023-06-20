@@ -4,6 +4,7 @@
 import React, { useState } from 'react';
 import { vscodeDark } from '@uiw/codemirror-theme-vscode';
 import CodeMirror from '@uiw/react-codemirror';
+import { json } from '@codemirror/lang-json';
 import { INITIAL_METADATA_SNIPPET } from '@/Utils/constants';
 import { metadataValidator } from '@/Utils/validators';
 
@@ -21,13 +22,14 @@ export const Validator = () => {
     <div>
       <div className="flex justify-center">
         <CodeMirror
-        aria-label= 'Validator Code Editor'
+          aria-label="Validator Code Editor"
           value={metadata}
           height="500px"
           width="700px"
           onChange={onChangeHandler}
           theme={vscodeDark}
           readOnly={false}
+          extensions={[json()]}
         />
       </div>
       {errors.length > 0 && (
@@ -38,9 +40,9 @@ export const Validator = () => {
             </h2>
           </div>
           <div className="flex justify-center text-error">
-            <ul aria-label='Validator Errors' style={{ width: '700px' }}>
+            <ul aria-label="Validator Errors" style={{ width: '700px' }}>
               {errors.map((error, i) => (
-                <li key={'error ' + i }>
+                <li key={'error ' + i}>
                   <svg
                     className="w-4 h-4 mr-1.5 text-error flex-shrink-0 inline-block"
                     fill="currentColor"
@@ -62,6 +64,6 @@ export const Validator = () => {
       )}
     </div>
   );
-}
+};
 
 export default Validator;
