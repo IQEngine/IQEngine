@@ -50,12 +50,11 @@ paths:
                     type: integer
                     default: 1
                     minimum: 0
-                  custom_params:
-                    # This object is essentially just a json schema that is at most 1 layer deep
-                    # e.g.:
-                    # {'param1': {'title': 'Param1', 'default': 1,       'type': 'integer'},
-                    #  'param2': {'title': 'Param2', 'default': 'test2', 'type': 'string'},
-                    #  'param3': {'title': 'Param3', 'default': 5.67,    'type': 'number'}}
+                  custom_params: # This object is essentially just a json schema that is at most 1 layer deep
+                                 # e.g.:
+                                 # {'param1': {'title': 'Param1', 'default': 1,       'type': 'integer'},
+                                 #  'param2': {'title': 'Param2', 'default': 'test2', 'type': 'string'},
+                                 #  'param3': {'title': 'Param3', 'default': 5.67,    'type': 'number'}}
                     type: object
                     minProperties: 1
                     maxProperties: 100
@@ -91,28 +90,18 @@ paths:
               oneOf:
                 - required: [samples]
                 - required: [samples_pointer]
-              required:
-                - sample_rate
-                - center_freq
-                - data_type
               properties:
                 samples:
-                  $ref: '#/components/schemas/samples'
+                  $ref: '#/components/schemas/samples_b64'
                 samples_pointer:
-                  $ref: '#/components/schemas/samples_pointer'
+                  $ref: '#/components/schemas/samples_cloud'
                 # Always provide sample rate, center freq, data type
+                data_type: # uses MIME types, plus custom types we are adding for IQ, based on SigMF
+                  $ref: '#/components/schemas/data_type'
                 sample_rate:
                   type: number
                 center_freq:
                   type: number
-                # Initially for data_type we'll only support
-                # Complex signed 8-bit int "ci8_le"
-                # Complex signed 16-bit int "ci16_le"
-                # Complex signed 32-bit int "ci32_le"
-                # Complex 32-bit float "cf32_le"
-                # Complex 64-bit float "cf64_le"
-                data_type:
-                  type: string
                 # Custom params
                 additionalProperties:
                   anyOf:
@@ -134,85 +123,122 @@ paths:
                 type: object
                 properties:
                   samples:
-                    $ref: '#/components/schemas/samples'
+                    type: array # list of IQ samples, most functions will just have 1
+                    items:
+                      $ref: '#/components/schemas/samples_b64'
                   samples_pointer:
-                    $ref: '#/components/schemas/samples_pointer'
-                  sample_rate: # in case sample rate changed
-                    type: number
-                  center_freq: #  in case center freq changed
-                    type: number
+                    type: array # list of IQ samples, most functions will just have 1
+                    items:
+                      $ref: '#/components/schemas/samples_cloud'
                   annotations:
                     description: See https://github.com/sigmf/SigMF/blob/sigmf-v1.x/sigmf-spec.md#annotations-array
                     type: array
-                    additionalProperties: true
                     items:
-                      type: object
-                      required:
-                        - core:sample_start
-                        - core:sample_count
-                      properties:
-                        core:comment:
-                            default: ""
-                            description: A human-readable comment
-                            type: string
-                        core:freq_lower_edge:
-                            description: The frequency (Hz) of the lower edge of the feature described by this annotation.
-                            type: number
-                            minimum: -1.7976931348623157E+308
-                            maximum: 1.7976931348623157E+308
-                        core:freq_upper_edge:
-                            description: The frequency (Hz) of the upper edge of the feature described by this annotation.
-                            type: number
-                            minimum: -1.7976931348623157E+308
-                            maximum: 1.7976931348623157E+308
-                        core:generator:
-                            description: Human-readable name of the entity that created this annotation.
-                            type: string
-                        core:label:
-                            description: A short form human/machine-readable label for the annotation. CAN BE USED TO LABEL CLASSIFIER OUTPUT
-                            type: string
-                        core:sample_count:
-                            description: The number of samples that this Segment applies to.
-                            type: integer
-                            minimum: 0
-                            maximum: 18446744073709551615
-                        core:sample_start:
-                            default: 0
-                            description: The sample index at which this Segment takes effect
-                            minimum: 0
-                            maximum: 18446744073709551615
-                            type: integer
-                        core:uuid:
-                            description: RFC-4122 unique identifier.
-                            format: uuid
-                            type: string
-                      additionalProperties: true
+                      $ref: '#/components/schemas/annotation'
+
 
 # A way to specify properties that are reused, or simply too large to have look good within parameters/responses objects
 components:
   schemas:
-    samples:
-      type: array # list of IQ samples, most functions will just have 1
-      items:
-        # IQ samples but as an array of floats or ints, in form IQIQIQIQ...
-        example: [1, 2, 3, 4, 5, 6] # means [1+2j, 3+4j, 5+6j], can be ints or floats
-        type: array
-        items:
-          anyOf:
-            - type: number
-            - type: integer
-    samples_pointer:
-      type: array # list of IQ samples, most functions will just have 1
-      items:
-        type: object # a pointer to IQ samples in cloud storage
-        properties:
-          accountName:
+    samples_b64: # samples directly within the JSON request/response
+      type: object
+      required:
+        - samples
+        - data_type
+      properties:
+        samples:
+          # IQ samples, as a base64 encoded string, MIME type will indicate the datatype of the underlying bytes
+          type: string
+          format: byte # base64-encoded characters
+        data_type: # uses MIME types, plus custom types we are adding for IQ, based on SigMF
+          $ref: '#/components/schemas/data_type'
+        sample_rate: # in case sample rate changed
+          type: number
+          default: 1
+        center_freq: # in case center freq changed
+          type: number
+          default: 0
+
+    samples_cloud: # a pointer to IQ samples in cloud storage
+      type: object
+      required:
+        - accountName
+        - containerName
+        - file_path
+        - data_type
+      properties:
+        accountName:
+          type: string
+        containerName:
+          type: string
+        file_path:
+          type: string
+        sas_token:
+          type: string
+        sample_start:
+          type: integer
+          default: 0
+        sample_count: # default is to grab all of the samples in the file
+          type: integer
+        data_type:
+          $ref: '#/components/schemas/data_type'
+        sample_rate:
+          type: number
+          default: 1
+        center_freq:
+          type: number
+          default: 0
+
+    data_type:
+      type: string
+      enum:
+        - iq/ci8_le  # from SigMF
+        - iq/ci16_le # from SigMF
+        - iq/cf32_le # from SigMF
+        - image/png
+        - audio/wav
+        - application/octet-stream # eg application/octet-stream
+        - text/plain # e.g. for representing an ASCII message or speech to text output
+
+    annotation:
+      type: object
+      required:
+        - core:sample_start
+        - core:sample_count
+      properties:
+        core:comment:
+            default: ""
+            description: A human-readable comment
             type: string
-          containerName:
+        core:freq_lower_edge:
+            description: The frequency (Hz) of the lower edge of the feature described by this annotation.
+            type: number
+            minimum: -1.7976931348623157E+308
+            maximum: 1.7976931348623157E+308
+        core:freq_upper_edge:
+            description: The frequency (Hz) of the upper edge of the feature described by this annotation.
+            type: number
+            minimum: -1.7976931348623157E+308
+            maximum: 1.7976931348623157E+308
+        core:generator:
+            description: Human-readable name of the entity that created this annotation.
             type: string
-          file_path:
+        core:label:
+            description: A short form human/machine-readable label for the annotation. CAN BE USED TO LABEL CLASSIFIER OUTPUT
             type: string
-          sample_start:
+        core:sample_count:
+            description: The number of samples that this Segment applies to.
             type: integer
-          sample_count:
+            minimum: 0
+            maximum: 18446744073709551615
+        core:sample_start:
+            default: 0
+            description: The sample index at which this Segment takes effect
+            minimum: 0
+            maximum: 18446744073709551615
             type: integer
+        core:uuid:
+            description: RFC-4122 unique identifier.
+            format: uuid
+            type: string
+      additionalProperties: true
