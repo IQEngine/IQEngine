@@ -13,6 +13,10 @@ permissions:
 jobs:
   create_pre_release:
     uses: ./.github/workflows/docker-pre-release.yml
+    permissions:
+      contents: write
+      pull-requests: write
+      packages: write
 
   run_staging_deployment:
     if: github.repository == 'IQEngine/IQEngine'
