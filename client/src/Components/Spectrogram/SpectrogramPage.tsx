@@ -24,12 +24,7 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { getMeta } from '@/api/metadata/Queries';
 import { SigMFMetadata } from '@/Utils/sigmfMetadata';
 import { getIQDataSlices, useCurrentCachedIQDataSlice } from '@/api/iqdata/Queries';
-import { IQDataSlice } from '@/api/Models';
-import { useInterval } from 'usehooks-ts';
-import { python } from '@codemirror/lang-python';
 import { applyProcessing } from '@/Sources/FetchMoreDataSource';
-import { useQueryClient } from '@tanstack/react-query';
-import { useGetMetadataFeatures } from '@/api/metadata/Queries';
 
 declare global {
   interface Window {
