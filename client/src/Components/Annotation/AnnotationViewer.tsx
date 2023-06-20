@@ -6,8 +6,6 @@ import React, { Fragment, useCallback } from 'react';
 import { Layer, Rect, Text } from 'react-konva';
 import { TILE_SIZE_IN_IQ_SAMPLES } from '@/Utils/constants';
 import { Annotation, SigMFMetadata } from '@/Utils/sigmfMetadata';
-import { updateMeta } from '@/api/metadata/Queries';
-import { useQueryClient } from '@tanstack/react-query';
 
 interface AnnotationViewerProps {
   spectrogramWidthScale: number;
@@ -55,22 +53,23 @@ const AnnotationViewer = ({
     setMeta(new_meta);
   }
 
-  const annotations = meta?.annotations.map((annotation, index) => {
-    let position = annotation.getAnnotationPosition(
-      lowerTile,
-      upperTile,
-      meta.getCenterFrequency(),
-      meta.getSampleRate(),
-      fftSize,
-      zoomLevel
-    );
-    let result = {
-      ...position,
-      description: annotation.getDescription(),
-      index: index,
-    };
-    return result;
-  });
+  const annotations =
+    meta?.annotations.map((annotation, index) => {
+      let position = annotation.getAnnotationPosition(
+        lowerTile,
+        upperTile,
+        meta.getCenterFrequency(),
+        meta.getSampleRate(),
+        fftSize,
+        zoomLevel
+      );
+      let result = {
+        ...position,
+        description: annotation.getDescription(),
+        index: index,
+      };
+      return result;
+    }) ?? [];
 
   // add cursor styling
   function onMouseOver() {
