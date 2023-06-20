@@ -93,9 +93,9 @@ paths:
                 - required: [samples]
                 - required: [samples_pointer]
               properties:
-                samples:
+                samples_b64:
                   $ref: '#/components/schemas/samples_b64'
-                samples_pointer:
+                samples_cloud:
                   $ref: '#/components/schemas/samples_cloud'
                 # Always provide sample rate, center freq, data type
                 data_type: # uses MIME types, plus custom types we are adding for IQ, based on SigMF
@@ -124,11 +124,11 @@ paths:
                 # The following is taken from SigMF's annotations schema (currently a subset of it)
                 type: object
                 properties:
-                  samples:
+                  samples_b64:
                     type: array # list of IQ samples, most functions will just have 1
                     items:
                       $ref: '#/components/schemas/samples_b64'
-                  samples_pointer:
+                  samples_cloud:
                     type: array # list of IQ samples, most functions will just have 1
                     items:
                       $ref: '#/components/schemas/samples_cloud'
