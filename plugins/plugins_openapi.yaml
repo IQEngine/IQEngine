@@ -2,7 +2,9 @@ openapi: 3.0.0
 info:
   title: IQEngine Plugins Open Interface API
   description: |
-    The plugins API is a unified open interface for managing the processing of RF recordings and corresponding dataflow, with the goal of standardizing inputs and outputs to RF processing functions for easy of interoperability and to combat vendor lockin. The plugins API is planned to be converted to an OpenAPI spec once its further refined.  It will use JSON for the fields.
+    The plugins API is a unified open interface for managing the processing of RF recordings and corresponding dataflow,
+    with the goal of standardizing inputs and outputs to RF processing functions for easy of interoperability and to combat vendor lockin.
+    The plugins API is planned to be converted to an OpenAPI spec once its further refined.  It will use JSON for the fields.
   version: 0.0.1
 paths:
   /:
