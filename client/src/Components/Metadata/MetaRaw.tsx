@@ -81,7 +81,7 @@ export const MetaRaw = ({ meta }: MetaRawProps) => {
           value={meta?.getSigMFRaw()}
           height="500px"
           theme={vscodeDark}
-          readOnly={true}
+          readOnly={!canUpdateMeta}
           extensions={[langs.json()]}
         />
       </div>
