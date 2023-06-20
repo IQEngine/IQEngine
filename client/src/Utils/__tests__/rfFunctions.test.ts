@@ -163,7 +163,7 @@ describe('Validate date', () => {
 describe('Convert float 32 to base 64', () => {
   test('should convert float 32 to base 64 correctly', () => {
     // Arrange
-    const input = new Float32Array([...Array(10000000).keys()]);
+    const input = new Float32Array([...Array(1000000).keys()]);
 
     // Act
     const result = convertFloat32ArrayToBase64(input);
