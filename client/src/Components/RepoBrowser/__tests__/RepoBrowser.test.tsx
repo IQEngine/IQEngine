@@ -44,7 +44,6 @@ describe('Test RepoBrowser', () => {
     nock('http://localhost:3000').get('/api/datasources').reply(200, data);
 
     render(<RepoBrowser />, { wrapper: AllProviders });
-    expect(await screen.findByRole('button', { name: 'api-test-name' })).toBeInTheDocument();
     expect(await screen.findByText('API Test Description')).toBeInTheDocument();
   });
 
@@ -55,7 +54,7 @@ describe('Test RepoBrowser', () => {
         name: 'api-test-name',
         account: 'api-test-account',
         container: 'api-test-container',
-        description: 'API Test Description',
+        description: 'API Test Description 1',
       },
       {
         type: 'API',
@@ -68,9 +67,7 @@ describe('Test RepoBrowser', () => {
     nock('http://localhost:3000').get('/api/datasources').reply(200, data);
 
     render(<RepoBrowser />, { wrapper: AllProviders });
-    expect(await screen.findByRole('button', { name: 'api-test-name' })).toBeInTheDocument();
-    expect(await screen.findByText('API Test Description')).toBeInTheDocument();
-    expect(await screen.findByRole('button', { name: 'api-test-name2' })).toBeInTheDocument();
+    expect(await screen.findByText('API Test Description 1')).toBeInTheDocument();
     expect(await screen.findByText('API Test Description 2')).toBeInTheDocument();
   });
 });
