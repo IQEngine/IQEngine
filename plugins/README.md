@@ -29,7 +29,7 @@ First edit your .env file to include `VITE_PLUGINS_ENDPOINT=http://localhost:800
 
 ```
 sudo apt install uvicorn ffmpeg libsm6 libxext6 -y
-cd plugins
+cd plugins/src
 sudo pip install -r requirements.txt
 uvicorn plugins_api:app --reload
 ```

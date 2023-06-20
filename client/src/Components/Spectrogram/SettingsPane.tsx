@@ -190,9 +190,11 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
       </div>
       <div>
         {/* When you press this button it will make autoscale run during the next call to selectFft, then it will turn itself off */}
+        {/*  Disable auto scale button until the functionality gets fixed
         <button className="mb-3 w-full mt-2" onClick={props.handleAutoScale}>
           Autoscale Max/Min
         </button>
+        */}
       </div>
 
       <div id="formFFT">

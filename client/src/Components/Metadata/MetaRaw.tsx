@@ -4,6 +4,9 @@ import { SigMFMetadata } from '@/Utils/sigmfMetadata';
 import { useGetMetadataFeatures, useUpdateMeta } from '@/api/metadata/Queries';
 import toast from 'react-hot-toast';
 import { vi } from 'vitest';
+import { vscodeDark } from '@uiw/codemirror-theme-vscode';
+import CodeMirror from '@uiw/react-codemirror';
+import { langs } from '@uiw/codemirror-extensions-langs';
 
 export interface MetaRawProps {
   meta: SigMFMetadata;
@@ -73,13 +76,13 @@ export const MetaRaw = ({ meta }: MetaRawProps) => {
           </button>
         )}
       </div>
-      <div>
-        <textarea
-          rows={20}
-          className="textarea w-full bg-base-100 text-base-content overflow-hidden hover:overflow-scroll"
-          readOnly={true}
+      <div className="">
+        <CodeMirror
           value={meta?.getSigMFRaw()}
-          aria-label="Metadata Text Area"
+          height="500px"
+          theme={vscodeDark}
+          readOnly={!canUpdateMeta}
+          extensions={[langs.json()]}
         />
       </div>
     </div>

@@ -76,7 +76,7 @@ const AzureBlobBrowser = () => {
   return (
     <div className="repocard">
       <figure>
-        <img className="repoimage" src="/azure_blob.png" alt="Azure blob explorer tile" />
+        <img className="repoimage" width="150px" src="/storage-blob.svg" alt="Azure blob explorer tile" />
       </figure>
       <div className="repocardbody">
         <h2>Azure Blob Storage</h2>
