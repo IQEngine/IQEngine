@@ -20,6 +20,7 @@ jobs:
 
   run_staging_deployment:
     if: github.repository == 'IQEngine/IQEngine'
+    needs: create_pre_release
     permissions:
       contents: write
       pull-requests: write
