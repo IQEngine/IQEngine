@@ -1,0 +1,7 @@
+numpy
+scipy
+fastapi
+jsonschema
+PyYAML
+pre-commit
+uvicorn

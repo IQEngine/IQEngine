@@ -15,7 +15,7 @@ export default function parseMeta(
   try {
     obj = JSON.parse(json_string); // string to JSON
   } catch (e) {
-    console.log('Error parsing meta file:', fName);
+    console.debug('Error parsing meta file:', fName);
     return null;
   }
   const emailName = obj['global']['core:author'] ?? '';
@@ -51,6 +51,7 @@ export default function parseMeta(
       .replace('32', '32 bits')
       .replace('64', '64 bits')
       .replace('_le', ''),
+    coreDataType: obj['global']['core:datatype'],
     frequency: (obj['captures'][0]['core:frequency'] ?? 1e6) / 1e6, // in MHz
     annotations: obj['annotations'],
     numberOfAnnotation: obj['annotations'].length,

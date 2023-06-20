@@ -1,0 +1,33 @@
+---
+name: Run Playwright frontend integration tests
+
+on:
+  workflow_run:
+    workflows: ['Deploy To Staging']
+    branches: [main]
+    types:
+      - completed
+  workflow_dispatch:
+
+jobs:
+  playwright:
+    name: RunPlaywrightTests
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: cd "$GITHUB_WORKSPACE/e2e" && npm ci
+
+      - name: Install Playwright Browsers
+        run: cd "$GITHUB_WORKSPACE/e2e" && npx playwright install --with-deps
+
+      - name: Run Playwright tests
+        run: |
+          cd "$GITHUB_WORKSPACE/e2e" && npx playwright test --config playwright-pr.config.ts

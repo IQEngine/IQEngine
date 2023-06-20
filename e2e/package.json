@@ -1,0 +1,16 @@
+{
+  "name": "hmg-iqengine",
+  "version": "1.0.0",
+  "description": "<p align=\"center\">   <img width=250 src=\"client/public/IQEngine_Black.svg\" /> </p>",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.35.0"
+  }
+}

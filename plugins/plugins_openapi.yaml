@@ -52,11 +52,11 @@ paths:
                     type: integer
                     default: 1
                     minimum: 0
-                  custom_params: # This object is essentially just a json schema that is at most 1 layer deep
-                                 # e.g.:
-                                 # {'param1': {'title': 'Param1', 'default': 1,       'type': 'integer'},
-                                 #  'param2': {'title': 'Param2', 'default': 'test2', 'type': 'string'},
-                                 #  'param3': {'title': 'Param3', 'default': 5.67,    'type': 'number'}}
+                  custom_params:  # This object is essentially just a json schema that is at most 1 layer deep
+                                  # e.g.:
+                                  # {'param1': {'title': 'Param1', 'default': 1,       'type': 'integer'},
+                                  #  'param2': {'title': 'Param2', 'default': 'test2', 'type': 'string'},
+                                  #  'param3': {'title': 'Param3', 'default': 5.67,    'type': 'number'}}
                     type: object
                     minProperties: 1
                     maxProperties: 100
@@ -209,38 +209,38 @@ components:
         - core:sample_count
       properties:
         core:comment:
-            default: ""
-            description: A human-readable comment
-            type: string
+          default: ""
+          description: A human-readable comment
+          type: string
         core:freq_lower_edge:
-            description: The frequency (Hz) of the lower edge of the feature described by this annotation.
-            type: number
-            minimum: -1.7976931348623157E+308
-            maximum: 1.7976931348623157E+308
+          description: The frequency (Hz) of the lower edge of the feature described by this annotation.
+          type: number
+          minimum: -1.7976931348623157E+308
+          maximum: 1.7976931348623157E+308
         core:freq_upper_edge:
-            description: The frequency (Hz) of the upper edge of the feature described by this annotation.
-            type: number
-            minimum: -1.7976931348623157E+308
-            maximum: 1.7976931348623157E+308
+          description: The frequency (Hz) of the upper edge of the feature described by this annotation.
+          type: number
+          minimum: -1.7976931348623157E+308
+          maximum: 1.7976931348623157E+308
         core:generator:
-            description: Human-readable name of the entity that created this annotation.
-            type: string
+          description: Human-readable name of the entity that created this annotation.
+          type: string
         core:label:
-            description: A short form human/machine-readable label for the annotation. CAN BE USED TO LABEL CLASSIFIER OUTPUT
-            type: string
+          description: A short form human/machine-readable label for the annotation. CAN BE USED TO LABEL CLASSIFIER OUTPUT
+          type: string
         core:sample_count:
-            description: The number of samples that this Segment applies to.
-            type: integer
-            minimum: 0
-            maximum: 18446744073709551615
+          description: The number of samples that this Segment applies to.
+          type: integer
+          minimum: 0
+          maximum: 18446744073709551615
         core:sample_start:
-            default: 0
-            description: The sample index at which this Segment takes effect
-            minimum: 0
-            maximum: 18446744073709551615
-            type: integer
+          default: 0
+          description: The sample index at which this Segment takes effect
+          minimum: 0
+          maximum: 18446744073709551615
+          type: integer
         core:uuid:
-            description: RFC-4122 unique identifier.
-            format: uuid
-            type: string
+          description: RFC-4122 unique identifier.
+          format: uuid
+          type: string
       additionalProperties: true

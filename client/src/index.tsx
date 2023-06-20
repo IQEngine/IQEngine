@@ -3,94 +3,31 @@
 // Licensed under the MIT License
 
 import React from 'react';
-// import { RedocStandalone } from 'redoc';
-// import { redocTheme } from './Utils/redocTheme';
+import 'swagger-ui-react/swagger-ui.css';
 // @ts-ignore
 import reportWebVitals from './reportWebVitals';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { RouterProvider } from 'react-router-dom';
 import { Provider } from 'react-redux';
-// @ts-ignore
-import store from './Store/store';
-import Layout from './pages/Layout';
-import Admin from './pages/Admin';
-import Query from './pages/Query';
-import Upload from './pages/Upload';
-import Home from './pages/Home';
-import Visualization from './pages/Visualization';
-// @ts-ignore
-import { About } from './About';
-// @ts-ignore
-import { SigMF } from './SigMF';
-// @ts-ignore
-import SignalGenerator from './Components/SignalGenerator/SignalGenerator';
-// @ts-ignore
-import { Plugins } from './Plugins';
-// @ts-ignore
-import Validator from './Components/Validator/Validator';
-// @ts-ignore
-import RepoBrowserContainer from './Containers/RepoBrowserContainer';
-// @ts-ignore
-import SpectrogramContainer from './Containers/SpectrogramContainer';
-// @ts-ignore
-import RecordingsListContainer from './Containers/RecordingsListContainer';
-// @ts-ignore
-import { App } from './App';
+import store from '@/Store/store';
 import { createRoot } from 'react-dom/client';
-// @ts-ignore
+import { QueryClientProvider } from '@tanstack/react-query';
+import { FeatureFlagsProvider } from './Components/FeatureFlagsContext/FeatureFlagsContext';
+import { useIQEngineQueryClient } from '@/hooks/useIQEngineQueryClient';
+import { useIQEngineRouter } from '@/hooks/useIQEngineRouter';
 
-var new_version: boolean = false;
-// Select wich version to run based on an environment variable
-if (import.meta.env.VITE_IQENGINE_APP_VERSION === 'v2') {
-  new_version = true;
-} else {
-  new_version = false;
-}
 const container = document.getElementById('root');
 if (!container) throw new Error('No root element found');
 const root = createRoot(container);
+const { queryClient } = useIQEngineQueryClient();
+const { router } = useIQEngineRouter();
 root.render(
-  <Provider store={store}>
-    <BrowserRouter>
-      <Routes>
-        {new_version ? (
-          <Route path="/" element={<Layout />}>
-            <Route path="/" element={<Home />} />
-            <Route path="admin" element={<Admin />} />
-            <Route path="query" element={<Query />} />
-            <Route path="upload" element={<Upload />} />
-            <Route path="visualization" element={<Visualization />} />
-          </Route>
-        ) : (
-          <Route path="/" element={<App />}>
-            <Route path="about" element={<About />} />
-            <Route path="sigmf" element={<SigMF />} />
-            <Route path="siggen" element={<SignalGenerator />} />
-            <Route path="plugins" element={<Plugins />} />
-            <Route path="validator" element={<Validator />} />
-
-            {
-              // Remove redoc until we can get it to work with the new version of React
-              /* <Route
-              path="/openapi"
-              element={
-                <RedocStandalone
-                  options={{
-                    theme: redocTheme,
-                    hideDownloadButton: true,
-                  }}
-                  specUrl="https://raw.githubusercontent.com/IQEngine/IQEngine/main/detectors/openapi.yaml"
-                />
-              }
-            /> */
-            }
-            <Route path="/" element={<RepoBrowserContainer />} />
-            <Route path="recordings/spectrogram/:recording" element={<SpectrogramContainer />} />
-            <Route path="recordings/:accountName?/:containerName?/:sasToken?" element={<RecordingsListContainer />} />
-          </Route>
-        )}
-      </Routes>
-    </BrowserRouter>
-  </Provider>
+  <QueryClientProvider client={queryClient}>
+    <Provider store={store}>
+      <FeatureFlagsProvider flags={null}>
+        <RouterProvider router={router} />
+      </FeatureFlagsProvider>
+    </Provider>
+  </QueryClientProvider>
 );
 
 // If you want to start measuring performance in your app, pass a function

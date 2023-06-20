@@ -1,15 +1,80 @@
 {
-  // Use IntelliSense to learn about possible attributes.
-  // Hover to view descriptions of existing attributes.
-  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
     {
-      "type": "msedge",
+      "name": "[LOADER] run pytest",
+      "type": "python",
       "request": "launch",
-      "name": "Launch Edge against localhost",
-      "url": "http://localhost:3001",
-      "webRoot": "${workspaceFolder}"
+      "module": "pytest",
+      "cwd": "${workspaceFolder}/tools/metadata_loader"
+    },
+    {
+      "name": "[LOADER] datasource list",
+      "type": "python",
+      "request": "launch",
+      "program": "${file}",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "args": ["datasource", "list"]
+    },
+    {
+      "name": "[LOADER] datasource create",
+      "type": "python",
+      "request": "launch",
+      "program": "${file}",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "args": [
+        "datasource",
+        "create",
+        "-name",
+        "golive",
+        "-accountName",
+        "golivemisc",
+        "-containerName",
+        "sigmf-metadata",
+        "-description",
+        "my sigmf metadata"
+      ]
+    },
+    {
+      "name": "[LOADER] metadata addfolder",
+      "type": "python",
+      "request": "launch",
+      "program": "${file}",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "args": ["metadata", "addfolder", "-accountName", "golivemisc", "-containerName", "sigmf-metadata"]
+    },
+    {
+      "name": "[LOADER] metadata list",
+      "type": "python",
+      "request": "launch",
+      "program": "${file}",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "args": ["metadata", "list", "-accountName", "golivemisc", "-containerName", "sigmf-metadata"]
+    },
+    {
+        "name": "[API]: FastAPI",
+        "type": "python",
+        "request": "launch",
+        "cwd": "${workspaceFolder}/api",
+        "module": "uvicorn",
+        "args": [
+            "main:app",
+            "--reload"
+        ],
+        "jinja": true,
+        "justMyCode": true
+    },
+    {
+      //Run 'npm run start' in client folder via integrated terminal before launching this configuration
+      "name": "[CLIENT]: Web Launcher Chrome",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}/client"
     }
   ]
 }

@@ -1,6 +1,4 @@
-import React, { useState } from 'react';
-import Button from '@/Components/Button/Button';
-import { Table, Input, Select } from 'react-daisyui';
+import React, { useCallback, useEffect, useState } from 'react';
 
 export interface DataColumn {
   title: string;
@@ -20,25 +18,69 @@ export const DataTable = ({ dataColumns, dataRows }: TableProps) => {
   const [filterInput, setFilterInput] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [maxPage, setMaxPage] = useState(1);
+  const [firstIndex, setFirstIndex] = useState(0);
+  const [lastIndex, setLastIndex] = useState(0);
+  const [currentPageData, setCurrentPageData] = useState(dataRows);
+  const [filteredData, setFilteredData] = useState(dataRows);
 
   // Define a custom filtering function
-  const filteredData = dataRows.filter((row) =>
-    Object.values(row).some((value) => String(value).toLowerCase().includes(filterInput.toLowerCase()))
+  const filterRecursive = useCallback(
+    (obj, filterInput) => {
+      for (const key in obj) {
+        const value = obj[key];
+
+        if (typeof value === 'object' && value !== null) {
+          if (Array.isArray(value)) {
+            for (const item of value) {
+              if (filterRecursive(item, filterInput)) {
+                return true;
+              }
+            }
+          } else {
+            if (filterRecursive(value, filterInput)) {
+              return true;
+            }
+          }
+        } else if (String(value).toLowerCase().includes(filterInput.toLowerCase())) {
+          return true;
+        }
+      }
+
+      return false;
+    },
+    [filterInput]
   );
 
-  // Calculate pagination variables
-  const maxPage = Math.ceil(filteredData.length / pageSize);
-  const firstIndex = (currentPage - 1) * pageSize;
-  const lastIndex = firstIndex + pageSize;
-  const currentPageData = filteredData.slice(firstIndex, lastIndex);
+  useEffect(() => {
+    setFilteredData(dataRows.filter((row) => filterRecursive(row, filterInput)));
+  }, [dataRows, filterInput]);
+
+  useEffect(() => {
+    const max = Math.ceil(filteredData.length / pageSize) === 0 ? 1 : Math.ceil(filteredData.length / pageSize);
+    setMaxPage(max);
+  }, [filteredData, pageSize]);
+
+  useEffect(() => {
+    setFirstIndex((currentPage - 1) * pageSize);
+  }, [currentPage, pageSize]);
+
+  useEffect(() => {
+    setLastIndex(firstIndex + pageSize);
+  }, [firstIndex, pageSize]);
+
+  useEffect(() => {
+    setCurrentPageData(filteredData.slice(firstIndex, lastIndex));
+  }, [filteredData, firstIndex, lastIndex]);
 
   return (
     <div>
       <div className="mb-4 flex flex-row justify-between items-center">
         <div className="flex flex-row items-center">
           <span className="mr-2">Show</span>
-          <Select
-            data-testid="pagesize"
+          <select
+            className={`bg-base-100`}
+            aria-label="page size"
             value={pageSize}
             onChange={(e) => {
               setPageSize(Number(e.target.value));
@@ -50,23 +92,23 @@ export const DataTable = ({ dataColumns, dataRows }: TableProps) => {
                 {size}
               </option>
             ))}
-          </Select>
+          </select>
           <span className="ml-2">entries</span>
         </div>
         <div>
-          <Input
+          <input
+            className={`bg-base-100 input input-autosize no-spin`}
+            aria-label="filter"
             value={filterInput}
             onChange={(e) => {
               setFilterInput(e.target.value);
               setCurrentPage(1);
             }}
-            name="search"
             placeholder={`Search ${dataRows.length} records...`}
           />
         </div>
       </div>
-
-      <Table>
+      <table className="w-full text-left" aria-label="data table">
         <thead>
           <tr>
             {dataColumns?.map((column) => (
@@ -83,7 +125,7 @@ export const DataTable = ({ dataColumns, dataRows }: TableProps) => {
             </tr>
           ))}
         </tbody>
-      </Table>
+      </table>
       <div className="mt-4 flex flex-row justify-between items-center">
         <div>
           Page{' '}
@@ -93,15 +135,20 @@ export const DataTable = ({ dataColumns, dataRows }: TableProps) => {
           ({filteredData.length} records)
         </div>
         <div className="flex flex-row">
-          <Button onClick={() => setCurrentPage((page) => Math.max(page - 1, 1))} disabled={currentPage === 1}>
+          <button
+            aria-label="previous page"
+            onClick={() => setCurrentPage((page) => Math.max(page - 1, 1))}
+            disabled={currentPage <= 1}
+          >
             Prev
-          </Button>
-          <Button
+          </button>
+          <button
+            aria-label="next page"
             onClick={() => setCurrentPage((page) => Math.min(page + 1, maxPage))}
-            disabled={currentPage === maxPage}
+            disabled={currentPage >= maxPage}
           >
             Next
-          </Button>
+          </button>
         </div>
       </div>
     </div>

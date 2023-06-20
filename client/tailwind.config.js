@@ -2,14 +2,27 @@
 module.exports = {
   content: ['./src/**/*.{js,jsx,ts,tsx}'],
   theme: {
-    extend: {
-      colors: {
-        'iqengine-primary': '#4CE091', // emerald
-        'iqengine-secondary': '#136f63', // pine green (darkish green)
-        'iqengine-tertiary': '#84cae7', // sky blue
-        'iqengine-bg': '#05041C', // very dark blue
-      },
+    screens: {
+      sm: '375px',
+      md: '912px',
+      lg: '1180px',
+      xl: '1280px',
+      '2xl': '1536px',
     },
   },
-  plugins: [],
+  daisyui: {
+    themes: [
+      {
+        mytheme: {
+          primary: '#4CE091',
+          secondary: '#136f63',
+          accent: '#84cae7',
+          neutral: '#0f172a',
+          'base-100': '#05041C',
+          'base-content': '#f4f4f5',
+        },
+      },
+    ],
+  },
+  plugins: [require('daisyui')],
 };
