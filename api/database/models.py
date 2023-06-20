@@ -1,4 +1,4 @@
-from pydantic import BaseModel, SecretStr, Extra, Field
+from pydantic import BaseModel, Extra, Field
 
 
 class DataSource(BaseModel):
