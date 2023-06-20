@@ -510,12 +510,14 @@ export const SpectrogramPage = () => {
               Annotations
             </summary>
             <div className="outline outline-1 outline-primary p-2">
-              <AnnotationList
-                meta={meta}
-                setHandleTop={setHandleTop}
-                spectrogramHeight={spectrogramHeight}
-                setMeta={setMeta}
-              />
+              {meta && (
+                <AnnotationList
+                  meta={meta}
+                  setHandleTop={setHandleTop}
+                  spectrogramHeight={spectrogramHeight}
+                  setMeta={setMeta}
+                />
+              )}
             </div>
           </details>
 
@@ -532,9 +534,7 @@ export const SpectrogramPage = () => {
             <summary className="pl-2 mt-2 bg-primary outline outline-1 outline-primary text-lg text-base-100 hover:bg-green-800">
               Raw Metadata
             </summary>
-            <div className="outline outline-1 outline-primary p-2">
-              <MetaRaw meta={meta} />
-            </div>
+            <div className="outline outline-1 outline-primary p-2">{meta && <MetaRaw meta={meta} />}</div>
           </details>
         </div>
       </div>

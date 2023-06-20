@@ -1,6 +1,5 @@
 import DataTable from '@/Components/DataTable/DataTable';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import {
   calculateDate,
   calculateSampleCount,
@@ -49,7 +48,8 @@ export const AnnotationList = ({ meta, setHandleTop, spectrogramHeight, setMeta 
 
   const updateAnnotation = useCallback(
     (value, parent) => {
-      if (!meta) return;
+      if (!meta?.annotations) return;
+
       let newAnnotationValue = value;
 
       // Get the min and max frequencies
@@ -97,7 +97,7 @@ export const AnnotationList = ({ meta, setHandleTop, spectrogramHeight, setMeta 
     const startCapture = meta?.captures[0];
     const currentParents = parents;
 
-    if (!meta && !meta.annotations) return;
+    if (!meta?.annotations) return;
 
     for (let i = 0; i < meta.annotations?.length; i++) {
       const annotation = meta.annotations[i];
