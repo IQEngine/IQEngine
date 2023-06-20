@@ -55,7 +55,7 @@ describe('ApiClient Metadata Tests', () => {
     );
     testMetadata.captures = testMetadata.captures?.map((capture) => Object.assign(new CaptureSegment(), capture));
 
-    nock('http://localhost:3000').get(`/api/datasources/${account}/${container}/${filePath}`).reply(200, metaJson);
+    nock('http://localhost:3000').get(`/api/datasources/${account}/${container}/${filePath}/meta`).reply(200, metaJson);
 
     const client = new ApiClient();
     const result = await client.getMeta(account, container, filePath);
@@ -94,7 +94,7 @@ describe('ApiClient Metadata Tests', () => {
     );
     testMetadata.captures = testMetadata.captures?.map((capture) => Object.assign(new CaptureSegment(), capture));
 
-    nock('http://localhost:3000').get(`/api/datasources/${account}/${container}/${filePath}`).reply(200, metaJson);
+    nock('http://localhost:3000').get(`/api/datasources/${account}/${container}/${filePath}/meta`).reply(200, metaJson);
 
     const client = new ApiClient();
     const result = await client.getMeta(account, container, filePath);
@@ -241,7 +241,7 @@ describe('ApiClient Metadata Tests', () => {
     );
     testMetaData.captures = newMetaData.captures?.map((capture) => Object.assign(new CaptureSegment(), capture));
 
-    nock('http://localhost:3000').put(`/api/datasources/${account}/${container}/${filePath}`, newMeta).reply(204);
+    nock('http://localhost:3000').put(`/api/datasources/${account}/${container}/${filePath}/meta`, newMeta).reply(204);
 
     const client = new ApiClient();
     const result = await client.updateMeta(account, container, filePath, newMetaData);
@@ -303,7 +303,9 @@ describe('ApiClient Metadata Tests', () => {
     );
     testMetaData.captures = newMetaData.captures?.map((capture) => Object.assign(new CaptureSegment(), capture));
 
-    nock('http://localhost:3000').put(`/api/datasources/${account}/${container}/${filePath}`, newMeta).reply(response);
+    nock('http://localhost:3000')
+      .put(`/api/datasources/${account}/${container}/${filePath}/meta`, newMeta)
+      .reply(response);
 
     const client = new ApiClient();
     await expect(client.updateMeta(account, container, filePath, newMetaData)).rejects.toEqual(
