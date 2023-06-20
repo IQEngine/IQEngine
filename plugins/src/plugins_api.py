@@ -4,11 +4,6 @@ import numpy as np
 from fastapi.middleware.cors import CORSMiddleware
 import os
 import copy
-from jsonschema import validate
-import yaml
-
-with open('openapi.yaml', 'r') as file:
-    schema = yaml.safe_load(file)
 
 app = fastapi.FastAPI()
 
@@ -60,12 +55,6 @@ async def run(info : fastapi.Request, plugin_name):
 
     function_input = await info.json()
 
-    # Validate with our schema TOOK TOO LONG
-    #try:
-    #    validate(instance=function_input, schema=schema["paths"]["/plugins/{plugin_name}"]['post']['requestBody']['content']['application/json']['schema'])
-    #except Exception as e:
-    #    print("POST body failed schema validation, error:", e)
-
     try:
         data_input_len = len(function_input.get("data_input", []))
         if not isinstance(function_input.get("data_input", None), list):
@@ -95,12 +84,6 @@ async def run(info : fastapi.Request, plugin_name):
 
     except Exception as e:
         return {"status" : "FAILED - unknown error in plugins_api:" + str(e), "annotations": []}
-
-    ## Validate with our schema
-    #try:
-    #    validate(instance=function_input, schema=schema["paths"]["/plugins/{pluginname}"]['post']['responses']['200']['content']['application/json']['schema'])
-    #except Exception as e:
-    #    print("Plugin's return annotations failed schema validation, error:", e)
 
     return results
 

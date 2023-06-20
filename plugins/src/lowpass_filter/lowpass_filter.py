@@ -20,9 +20,8 @@ class Plugin:
                           cutoff=self.cutoff,
                           width=self.width,
                           fs=self.sample_rate,
-                          pass_zero=True)
+                          pass_zero=True).astype(np.complex64)
         samples = np.convolve(samples, h, 'valid')
-        samples = samples.astype(np.complex64)
         samples_list = samples.view(dtype=np.float32).tolist() # convert to I,Q,I,Q for JSON sake
         samples_obj = {"samples": samples_list, 
                        "sample_rate": self.sample_rate,
