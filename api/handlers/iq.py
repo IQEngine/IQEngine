@@ -54,8 +54,9 @@ def get_iq(
         if not sasToken:
             raise HTTPException(status_code=400, detail="Invalid SAS token")
 
-        blob_client = BlobClient.from_blob_url(f"https://{account}.blob.core.windows.net/{container}/{filepath}.sigmf-data",
-                                               credential=sasToken)
+        blob_client = BlobClient.from_blob_url(f"https://{account}.blob.core.windows.net/"
+                                                f"{container}/{filepath}.sigmf-data",
+                                                credential=sasToken)
 
         download_stream = blob_client.download_blob(offsetBytes, countBytes)
         data = io.BytesIO(download_stream.readall())
@@ -98,13 +99,11 @@ async def get_iq_data_slices(
         blob_properties = blob_client.get_blob_properties()
         blob_size = blob_properties.size
 
-        #ToDo: validate iq_data against blob size to ensure we don't try to read past the end of the blob
-
         data_list = []
 
         # asyncio solution. Much faster
         tasks = [download_blob(blob_client, index, iq_data.tile_size,
-                               iq_data.bytes_per_sample, blob_size) for index in iq_data.indexes]
+                                iq_data.bytes_per_sample, blob_size) for index in iq_data.indexes]
         data_list = await asyncio.gather(*tasks)
 
         return data_list
