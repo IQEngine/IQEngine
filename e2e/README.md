@@ -6,10 +6,7 @@ Install Playwright with the following, tested to work on Ubuntu 22:
 
 ```bash
 npm install playwright
-npx playwright install
-sudo apt-get install libflite1
 npx playwright install-deps
-(probably more installs needed to get all browsers in the list working)
 ```
 
 ## Run
