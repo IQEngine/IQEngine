@@ -27,16 +27,22 @@ export class ApiClient implements MetadataClient {
     });
     return responseMetaData;
   }
+
   async updateMeta(account: string, container: string, filePath: string, meta: SigMFMetadata): Promise<SigMFMetadata> {
-    const response = await axios.put(`/api/datasources/${account}/${container}/${filePath}`, meta);
-    let responseMetaData: SigMFMetadata | null = null;
-    responseMetaData = Object.assign(new SigMFMetadata(), response.data);
-    responseMetaData.annotations = responseMetaData.annotations?.map((annotation) =>
-      Object.assign(new Annotation(), annotation)
-    );
-    responseMetaData.captures = responseMetaData.captures?.map((capture) =>
-      Object.assign(new CaptureSegment(), capture)
-    );
-    return responseMetaData;
+    return await axios
+      .put(`/api/datasources/${account}/${container}/${filePath}`, meta)
+      .then((response) => {
+        return Promise.resolve(meta as SigMFMetadata);
+      })
+      .catch((error) => {
+        console.error(error);
+        throw new Error('Failed to update metadata.');
+      });
+  }
+
+  features() {
+    return {
+      canUpdateMeta: true,
+    };
   }
 }

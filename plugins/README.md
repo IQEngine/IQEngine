@@ -1,10 +1,35 @@
-To run FastAPI functions locally for testing:
+# Plugins
+
+Through a separate backend API, IQEngine supports various plugins, which act as RF functions you can run on sets of IQ samples.
+This plugins take in IQ samples, and output either IQ samples or another format, such as bytes, audio, SigMF annotations, etc.
+While it is expected that most plugins will take in 1 set of IQ samples, it is possible to provide a set of IQ samples, such as for TDOA or MIMO processing.
+Some example plugins we expect to support (using the same plugins API for all) include:
+
+- Signal detectors
+- Signal and modulation classifiers
+- Modems (demodulation, decoding, etc)
+- Filters
+- Channel emulators
+- Radar
+- TDOA
+- DOA
+- MIMO processing
+- Signal generators (the one case that wont take in IQ)
+
+Plugins written in Python can make use of the existing Python plugin server in the /src directory and authors can start from the template plugin.
+We expect to create a C++ version of this server and template plugin soon.
+Plugins written in other languages will have to implement the full API.
+
+To get a feel for how simple it is to write a Python based plugin, check out the /src/lowpass_filter/low_passfilter.py
+code that implements a low-pass filter plugin in a couple dozen lines of Python, no additional boilerplate needed!
+
+## To run FastAPI functions locally for testing:
 
 First edit your .env file to include `VITE_PLUGINS_ENDPOINT=http://localhost:8000/plugins/`
 
 ```
 sudo apt install uvicorn ffmpeg libsm6 libxext6 -y
-cd plugins
+cd plugins/src
 sudo pip install -r requirements.txt
 uvicorn plugins_api:app --reload
 ```

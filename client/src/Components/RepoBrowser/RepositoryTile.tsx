@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '@/Store/hooks';
 import { CLIENT_TYPE_BLOB } from '@/api/Models';
 
-const RepositoryTile = (props) => {
+export const RepositoryTile = (props) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { item } = props;
@@ -50,28 +50,26 @@ const RepositoryTile = (props) => {
 
   return (
     <div className="repocard">
-      <h2 className="repocardheader">
-        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 whitespace-nowrap">{name}</div>
-        <div className="absolute right-0 translate-x-1 -translate-y-2">{writeableBool}</div>
-      </h2>
+      <figure>
+        <img onClick={handleOnClick} className="repoimage" src={imageURL ?? '/external_source.png'} alt={name} />
+      </figure>
       <div className="repocardbody">
-        <figure>
-          {imageURL && (
-            <button className="m-0 p-0 bg-transparent">
-              <img src={imageURL} className="rounded-2xl h-36" onClick={handleOnClick}></img>
-            </button>
-          )}
-        </figure>
-        <div className="h-24 overflow-hidden hover:overflow-auto text-center">{description}</div>
-        <div className="text-secondary text-center">SAS Token Expiration: {expires}</div>
+        <h2>{name}</h2>
+        <div className="text-primary absolute right-1 translate-x-1">{writeableBool}</div>
+        <p>{description}</p>
+        {!isError && !isWarning && (
+          <div className="text-secondary">
+            <span>SAS Token Expiration: {expires}</span>
+          </div>
+        )}
         {isError && (
-          <div className="text-center" style={{ color: 'red' }}>
-            This SAS token is expired
+          <div className="text-red-600">
+            <span>SAS Token is expired!</span>
           </div>
         )}
         {isWarning && (
-          <div className="text-center" style={{ color: 'yellow' }}>
-            This token will expire {dayDifference === 0 ? 'today' : 'in ' + dayDifference + ' days'}
+          <div className="text-yellow-400">
+            <span>This token will expire {dayDifference === 0 ? 'today' : 'in ' + dayDifference + ' days'}</span>
           </div>
         )}
       </div>

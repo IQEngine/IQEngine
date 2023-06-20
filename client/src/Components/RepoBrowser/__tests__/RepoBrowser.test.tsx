@@ -1,11 +1,12 @@
 import { describe, expect, test } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import RepoBrowser from '@/Components/RepoBrowser/RepoBrowser';
+import { RepositoryTile } from '@/Components/RepoBrowser/RepositoryTile';
 import React from 'react';
 import nock from 'nock';
 import '@testing-library/jest-dom';
 import { DataSource } from '@/api/Models';
-import { AllProviders, queryClient } from './setupTests';
+import { AllProviders, queryClient } from '@/mocks/setupTests';
 
 describe('Test RepoBrowser', () => {
   beforeAll(() => {
@@ -27,7 +28,7 @@ describe('Test RepoBrowser', () => {
 
   test('Basic Rendering', async () => {
     render(<RepoBrowser></RepoBrowser>, { wrapper: AllProviders });
-    expect(screen.getByText('Browse Your Azure Blob Storage')).exist;
+    expect(screen.getByText('Azure Blob Storage')).exist;
   });
 
   test('Display Repository API Tile', async () => {
@@ -71,5 +72,20 @@ describe('Test RepoBrowser', () => {
     expect(await screen.findByText('API Test Description')).toBeInTheDocument();
     expect(await screen.findByRole('button', { name: 'api-test-name2' })).toBeInTheDocument();
     expect(await screen.findByText('API Test Description 2')).toBeInTheDocument();
+  });
+});
+
+describe('Test RepositoryTile', () => {
+  test('displays warning if SAS token has expired', async () => {
+    const data: DataSource = {
+      type: 'test-type',
+      name: 'test-name',
+      account: 'test-account',
+      container: 'test-container',
+      description: 'test description',
+      sasToken: 'sp=rl&st=2022-12-24T03:00:57Z&se=2023-01-24T11:00:57Z&sv=2021-06-08',
+    }
+    render(<RepositoryTile item={data}/>, { wrapper: AllProviders });
+    expect(await screen.findByText('SAS Token is expired!')).toBeInTheDocument();
   });
 });

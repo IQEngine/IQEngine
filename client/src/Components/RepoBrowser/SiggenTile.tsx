@@ -14,25 +14,15 @@ const SiggenTile = (props) => {
 
   return (
     <div className="repocard">
-      <div className="repocardheader">Signal Generator</div>
+      <figure>
+        <img onClick={handleOnClick} className="repoimage" src="/siggen.png" alt="Siggen tile" />
+      </figure>
       <div className="repocardbody">
-        <div className="grid content-center justify-center">
-          <button className="m-0 p-0">
-            <img
-              className="rounded-xl justify-center"
-              src="/siggen.png"
-              width="200px"
-              alt="DALLE prompt - signal generator in the style of dr. seuss with a control panel"
-              onClick={handleOnClick}
-            ></img>
-          </button>
-        </div>
-        <div className="text-center">Generate your own signals in Python, with examples!</div>
-        <div className="text-center"> Save as a SigMF recording!</div>
-        <br /> <br />
+        <h2>Signal Generator</h2>
+        Generate your own signals in Python, with examples! Save as a SigMF recording
       </div>
-      <button className="repocardbutton" onClick={handleOnClick}>
-        Siggen
+      <button onClick={handleOnClick} className="repocardbutton">
+        Browse
       </button>
     </div>
   );

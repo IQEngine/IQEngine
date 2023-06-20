@@ -4,3 +4,4 @@ fastapi
 jsonschema
 PyYAML
 pre-commit
+uvicorn

@@ -14,23 +14,15 @@ const ValidatorTile = (props) => {
 
   return (
     <div className="repocard">
-      <div className="repocardheader">SigMF Meta Validator</div>
+      <figure>
+        <img onClick={handleOnClick} className="repoimage" src="/validator.png" alt="Validator tile" />
+      </figure>
       <div className="repocardbody">
-        <div className="grid content-center justify-center">
-          <button className="m-0 p-0">
-            <img
-              className=""
-              src="/validator.png"
-              width="200px"
-              alt="DALLE prompt - thumbs up with radio waves in the theme of dr suess solid dark background"
-              onClick={handleOnClick}
-            ></img>
-          </button>
-        </div>
-        <div className="text-center">Validate your .sigmf-meta file using an interactive JSON schema validator</div>
+        <h2>SigMF Meta Validator</h2>
+        Validate your .sigmf-meta file using an interactive JSON schema validator
       </div>
       <button className="repocardbutton" onClick={handleOnClick}>
-        Validator
+        Browse
       </button>
     </div>
   );

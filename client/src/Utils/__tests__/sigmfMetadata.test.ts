@@ -1,4 +1,4 @@
-import { SigMFMetadata } from '@/Utils/sigmfMetadata';
+import { Annotation, SigMFMetadata } from '@/Utils/sigmfMetadata';
 
 const sampleSigmfMetadata: SigMFMetadata = Object.assign(new SigMFMetadata(), {
   global: {
@@ -121,5 +121,47 @@ describe('getShortDescription', () => {
   `('should return short description', ({ description, expected }) => {
     sampleSigmfMetadata.global['core:description'] = description;
     expect(sampleSigmfMetadata.getShortDescription()).toBe(expected);
+  });
+});
+
+describe('getSigMFRaw', () => {
+  test('should return sigmf raw', () => {
+    const expectedRaw = JSON.stringify(
+      {
+        global: sampleSigmfMetadata.global,
+        captures: [],
+        annotations: [],
+      },
+      null,
+      4
+    );
+    expect(sampleSigmfMetadata.getSigMFRaw()).toBe(expectedRaw);
+  });
+
+  test('should return sigmf raw with all values populated', () => {
+    sampleSigmfMetadata.annotations = [
+      Object.assign(new Annotation(), {
+        'core:sample_start': 0,
+        'core:sample_count': 100,
+        'core:description': 'test',
+      }),
+    ];
+
+    sampleSigmfMetadata.captures = [
+      Object.assign(new Annotation(), {
+        'core:sample_start': 0,
+      }),
+    ];
+
+    const expectedRaw = JSON.stringify(
+      {
+        global: sampleSigmfMetadata.global,
+        captures: sampleSigmfMetadata.captures,
+        annotations: sampleSigmfMetadata.annotations,
+      },
+      null,
+      4
+    );
+    expect(sampleSigmfMetadata.getSigMFRaw()).toBe(expectedRaw);
   });
 });

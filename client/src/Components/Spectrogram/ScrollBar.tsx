@@ -21,6 +21,8 @@ interface ScrollBarProps {
   handleTop: number;
   fetchEnabled: boolean;
   fftSizeScrollbar: number;
+  setMagnitudeMax: any;
+  setMagnitudeMin: any;
 }
 
 const ScrollBar = (props: ScrollBarProps) => {
@@ -111,8 +113,9 @@ const ScrollBar = (props: ScrollBarProps) => {
       const samples = iqData[sampleIndex];
       // Calc PSD
       const f = new FFT(fftSizeScrollbar);
-      const out = f.createComplexArray(); // creates an empty array the length of fft.size*2
+      let out = f.createComplexArray(); // creates an empty array the length of fft.size*2
       f.transform(out, samples); // assumes input (2nd arg) is in form IQIQIQIQ and twice the length of fft.size
+      out = out.map((x) => x / fftSizeScrollbar); // divide by fftsize
       let magnitudes = new Array(out.length / 2);
       for (let j = 0; j < out.length / 2; j++) {
         magnitudes[j] = Math.sqrt(Math.pow(out[j * 2], 2) + Math.pow(out[j * 2 + 1], 2)); // take magnitude
@@ -130,21 +133,19 @@ const ScrollBar = (props: ScrollBarProps) => {
     console.debug('min/max', minimumVal, maximumVal);
     for (let i = 0; i < dataRange.length; i++) {
       let magnitudes = magnitudesBuffer.slice(i * fftSizeScrollbar, (i + 1) * fftSizeScrollbar);
-      // convert to 0 - 255
-      magnitudes = magnitudes.map((x) => x - minimumVal); // lowest value is now 0
-      magnitudes = magnitudes.map((x) => x / (maximumVal - minimumVal)); // highest value is now 1
-      magnitudes = magnitudes.map((x) => x * 255); // now from 0 to 255
 
-      // apply magnitude min and max
-      const magnitudeMax = 240;
-      const magnitudeMin = 80;
-      magnitudes = magnitudes.map((x) => x / ((magnitudeMax - magnitudeMin) / 255));
-      magnitudes = magnitudes.map((x) => x - magnitudeMin);
-
-      // Clip from 0 to 255 and convert to ints
+      // apply magnitude min and max (which are in dB, same units as magnitudes prior to this point) and convert to 0-255
+      const magnitude_max = maximumVal - 0; // dB
+      props.setMagnitudeMax(magnitude_max);
+      const magnitude_min = minimumVal + 20; // dB
+      props.setMagnitudeMin(magnitude_min);
+      const dbPer1 = 255 / (magnitude_max - magnitude_min);
+      magnitudes = magnitudes.map((x) => x - magnitude_min);
+      magnitudes = magnitudes.map((x) => x * dbPer1);
       magnitudes = magnitudes.map((x) => (x > 255 ? 255 : x)); // clip above 255
       magnitudes = magnitudes.map((x) => (x < 0 ? 0 : x)); // clip below 0
-      let ipBuf8 = Uint8ClampedArray.from(magnitudes); // anything over 255 or below 0 at this point will become a random number
+      let ipBuf8 = Uint8ClampedArray.from(magnitudes); // anything over 255 or below 0 at this point will become a random number, hence clipping above
+
       let lineOffset = i * fftSizeScrollbar * 4;
       for (let sigVal, rgba, opIdx = 0, ipIdx = startOfs; ipIdx < fftSizeScrollbar + startOfs; opIdx += 4, ipIdx++) {
         sigVal = ipBuf8[ipIdx] || 0; // if input line too short add zeros
@@ -192,7 +193,7 @@ const ScrollBar = (props: ScrollBarProps) => {
     let scrollAmount = scrollDirection * 12;
     let newY = Math.min(spectrogramHeight - handleHeightPixels, Math.max(0, handleTop + scrollAmount));
     fetchAndRender(newY);
-  }
+  };
 
   const handleDragMove = (e) => {
     let newY = e.target.y();

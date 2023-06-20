@@ -75,33 +75,36 @@ const AzureBlobBrowser = () => {
 
   return (
     <div className="repocard">
-      <h2 className="repocardheader grid content-center justify-center">Browse Your Azure Blob Storage</h2>
-      <div className="card-body">
-        <form className="m-3 mt-8">
-          <label>Storage Account Name:</label>
+      <figure>
+        <img className="repoimage" width="150px" src="/storage-blob.svg" alt="Azure blob explorer tile" />
+      </figure>
+      <div className="repocardbody">
+        <h2>Azure Blob Storage</h2>
+        <form>
           <input
-            className="mb-3 w-full rounded mt-1 h-8 p-1 bg-accent text-base-100"
             type="text"
+            placeholder="Storage Account Name"
             defaultValue={account}
             onChange={onAccountNameChange}
+            className="input input-bordered input-success w-full max-w-xs"
           />
-          <label>Container Name:</label>
           <input
-            className="mb-3 w-full rounded mt-1 h-8 p-1 bg-accent text-base-100"
             type="text"
+            placeholder="Container Name"
             defaultValue={container}
             onChange={onContainerNameChange}
+            className="mt-2 input input-bordered input-success w-full max-w-xs"
           />
-          <label>SAS Token for Container:</label>
           <input
-            className="w-full rounded mt-1 h-8 p-1 bg-accent text-base-100"
             type="password"
+            placeholder="SAS Token"
             defaultValue={sasToken}
             onChange={onSasTokenChange}
+            className="mt-2 input input-bordered input-success w-full max-w-xs"
           />
         </form>
       </div>
-      <button className="repocardbutton " onClick={onSubmit}>
+      <button className="repocardbutton" onClick={onSubmit}>
         Browse
       </button>
     </div>
