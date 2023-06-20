@@ -7,6 +7,7 @@ import CodeMirror from '@uiw/react-codemirror';
 import { json } from '@codemirror/lang-json';
 import { INITIAL_METADATA_SNIPPET } from '@/Utils/constants';
 import { metadataValidator } from '@/Utils/validators';
+import { langs } from '@uiw/codemirror-extensions-langs';
 
 export const Validator = () => {
   const [metadata, setMetadata] = useState(INITIAL_METADATA_SNIPPET);
@@ -29,7 +30,7 @@ export const Validator = () => {
           onChange={onChangeHandler}
           theme={vscodeDark}
           readOnly={false}
-          extensions={[json()]}
+          extensions={[langs.json()]}
         />
       </div>
       {errors.length > 0 && (

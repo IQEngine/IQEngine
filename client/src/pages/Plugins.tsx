@@ -10,9 +10,7 @@ export const Plugins = () => {
       <div style={{ width: 'auto' }}>
         <h1 className="text-primary text-center">Plugins Concept</h1>
         <p className="text-center text-lg mx-56">
-          Through an optional backend API, IQEngine will support various plugins (currently, only signal
-          detection/classification is supported). IQEngine is still in its infancy and we are looking for people to help
-          develop the concept and create example plugins!
+          Through an optional backend API, IQEngine supports various plugins, such as:
         </p>
         <ul className="list-disc text-lg mx-72 my-4">
           <li>
