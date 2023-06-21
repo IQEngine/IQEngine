@@ -4,6 +4,7 @@ import { DataSource } from '@/api/Models';
 
 export class ApiClient implements DataSourceClient {
   async list(): Promise<DataSource[]> {
+    // TODO: Why doesn't this get routed correctly when called from the test
     const response = await axios.get('/api/datasources');
     if (response.status !== 200) {
       throw new Error(`Unexpected status code: ${response.status}`);
@@ -14,6 +15,7 @@ export class ApiClient implements DataSourceClient {
     return response.data;
   }
   async get(account: string, container: string): Promise<DataSource> {
+    // TODO: Why doesn't this get routed correctly when called from the test
     const response = await axios.get(`/api/datasources/${account}/${container}`);
     if (response.status !== 200) {
       throw new Error(`Unexpected status code: ${response.status}`);

@@ -64,7 +64,7 @@ describe('MetaRaw ', () => {
   test('Displays save successful message when successful update', async () => {
     meta.global['traceability:origin'].type = 'api';
 
-    nock('http://localhost:3000').put(`/api/datasources/gnuradio/iqengine/bluetooth`).reply(204);
+    nock('http://localhost:3000').put(`/api/datasources/gnuradio/iqengine/bluetooth/meta`).reply(204);
 
     render(
       <>
@@ -83,7 +83,7 @@ describe('MetaRaw ', () => {
   test('Displays save unsuccessful message when error on update', async () => {
     meta.global['traceability:origin'].type = 'api';
 
-    nock('http://localhost:3000').put(`/api/datasources/gnuradio/iqengine/bluetooth`).reply(404);
+    nock('http://localhost:3000').put(`/api/datasources/gnuradio/iqengine/bluetooth/meta`).reply(404);
 
     render(
       <>
