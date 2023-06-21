@@ -13,6 +13,12 @@ test('Confirm all repos display', async ({ page }) => {
   await page.locator('[id="NortheasternUniversity"]').click();
   await page.getByRole('img', { name: 'IQEngine', exact: true }).click();
 
+  await page.locator('[id="(API)GNURadioSigMFRepo"]').click();
+  await page.getByRole('img', { name: 'IQEngine', exact: true }).click();
+
+  await page.locator('[id="(API)Paulfotest"]').click();
+  await page.getByRole('img', { name: 'IQEngine', exact: true }).click();
+
   // signal generator
   await page.locator('[id="Siggen"]').click();
   await page.getByRole('img', { name: 'IQEngine', exact: true }).click();
