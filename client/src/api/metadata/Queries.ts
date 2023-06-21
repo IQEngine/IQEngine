@@ -1,7 +1,6 @@
 import { SigMFMetadata } from '@/Utils/sigmfMetadata';
 import { MetadataClientFactory } from './MetadataClientFactory';
 import { QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
 
 export const fetchMeta = async (type: string, account: string, container: string, filePath: string) => {
   const client = MetadataClientFactory(type);
@@ -42,12 +41,18 @@ export const getDataSourceMeta = (
     () => fetchDataSourceMeta(client, type, account, container),
     {
       enabled: enabled,
+      staleTime: Infinity,
     }
   );
 
 export const getMeta = (type: string, account: string, container: string, filePath: string, enabled = true) =>
-  useQuery(['datasource', type, account, container, filePath, 'meta'], () =>
-    fetchMeta(type, account, container, filePath)
+  useQuery(
+    ['datasource', type, account, container, filePath, 'meta'],
+    () => fetchMeta(type, account, container, filePath),
+    {
+      enabled: enabled,
+      staleTime: Infinity,
+    }
   );
 
 export const useUpdateMeta = (meta: SigMFMetadata) => {
