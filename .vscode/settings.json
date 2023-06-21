@@ -1,5 +1,4 @@
 {
-  "prettier.prettierPath": "./client/node_modules/prettier",
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true
@@ -31,7 +30,7 @@
   "python.testing.unittestEnabled": false,
   "python.testing.pytestEnabled": true,
   "[python]": {
-    "editor.defaultFormatter": "ms-python.black-formatter"
+    "editor.defaultFormatter": "ms-python.python"
   },
   "python.formatting.provider": "black"
 }

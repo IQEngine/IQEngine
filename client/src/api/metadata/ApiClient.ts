@@ -4,7 +4,7 @@ import { SigMFMetadata, Annotation, CaptureSegment } from '@/Utils/sigmfMetadata
 
 export class ApiClient implements MetadataClient {
   async getMeta(account: string, container: string, filePath: string): Promise<SigMFMetadata> {
-    const response = await axios.get(`/api/datasources/${account}/${container}/${filePath}`);
+    const response = await axios.get(`/api/datasources/${account}/${container}/${filePath}/meta`);
     let responseMetaData: SigMFMetadata | null = null;
     responseMetaData = Object.assign(new SigMFMetadata(), response.data);
     responseMetaData.annotations = responseMetaData.annotations?.map((annotation) =>
@@ -30,7 +30,7 @@ export class ApiClient implements MetadataClient {
 
   async updateMeta(account: string, container: string, filePath: string, meta: SigMFMetadata): Promise<SigMFMetadata> {
     return await axios
-      .put(`/api/datasources/${account}/${container}/${filePath}`, meta)
+      .put(`/api/datasources/${account}/${container}/${filePath}/meta`, meta)
       .then((response) => {
         return Promise.resolve(meta as SigMFMetadata);
       })

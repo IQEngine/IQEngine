@@ -2,10 +2,8 @@
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
 
-export const TILE_SIZE_IN_IQ_SAMPLES = 50 * 1024 * 4; // must lead to doing a power of 2 FFT, and we *4 for datatypes with 4 bytes per sample
+export const TILE_SIZE_IN_IQ_SAMPLES = Math.pow(2, 17); // should always be a power of 2
 export const MINIMUM_SCROLL_HANDLE_HEIGHT_PIXELS = 10;
-export const MAX_SIMULTANEOUS_FETCHES = 48; // when you drag the scrollbar it can accumulate many real quick, this limits them
-export const DEFAULT_IQ_SLICE_SIZE = TILE_SIZE_IN_IQ_SAMPLES * 10; // 10 tiles
 export const INITIAL_PYTHON_SNIPPET = `import numpy as np
 import time
 start_t = time.time()
@@ -26,7 +24,7 @@ export const INITIAL_METADATA_SNIPPET = `{
         }
     ],
     "annotations": []
-}`
+}`;
 export const INITIAL_ANNOTATIONS_SNIPPET = `{
     "annotations": [{
         "core:sample_start": 100000,
@@ -35,4 +33,4 @@ export const INITIAL_ANNOTATIONS_SNIPPET = `{
         "core:freq_upper_edge": 884625000,
         "core:description": "LTE"
     }]
-}`
+}`;
