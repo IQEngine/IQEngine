@@ -10,6 +10,7 @@ import { configQuery } from './api/config/queries';
 import { Link } from 'react-router-dom';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'react-hot-toast';
+import Feature from '@/Components/Feature/Feature';
 
 export const App = () => {
   const [width, setWidth] = React.useState(window.innerWidth);
@@ -73,6 +74,7 @@ export const App = () => {
                     <div className="text-lg">Plugins</div>
                   </Link>
                 </li>
+                <Feature flag="useIQEngineOutReach">
                 <li>
                   <a href="https://discord.gg/k7C8kp3b76" target="_blank" rel="noreferrer" className="text-lg">
                     <div className="flex">
@@ -81,6 +83,7 @@ export const App = () => {
                     </div>
                   </a>
                 </li>
+                </Feature>
                 <li>
                   <a href="https://github.com/iqengine/iqengine" target="_blank" rel="noreferrer" className="text-lg ">
                     <div className="flex">
@@ -100,10 +103,11 @@ export const App = () => {
             target="_blank"
             rel="noreferrer"
             href="https://dashboard.mailerlite.com/forms/299501/77960409531811734/share"
-          >
+          ><Feature flag="useIQEngineOutReach">
             <h2 className="text-center py-2">
               Sign up for a once-a-month email update on IQEngine, such as new features, demos, and more!
             </h2>
+            </Feature>
           </a>
         </div>
         <ReactQueryDevtools initialIsOpen={false} />
@@ -203,9 +207,11 @@ export const App = () => {
             rel="noreferrer"
             href="https://dashboard.mailerlite.com/forms/299501/77960409531811734/share"
           >
+          <Feature flag="useIQEngineOutReach">
             <h2 className="text-center py-2">
               Sign up for a once-a-month email update on IQEngine, such as new features, demos, and more!
             </h2>
+            </Feature>
           </a>
         </div>
         <ReactQueryDevtools initialIsOpen={false} />
