@@ -3,7 +3,6 @@ import { ArrowDownTrayIcon, DocumentCheckIcon } from '@heroicons/react/24/outlin
 import { SigMFMetadata } from '@/Utils/sigmfMetadata';
 import { useGetMetadataFeatures, useUpdateMeta } from '@/api/metadata/Queries';
 import toast from 'react-hot-toast';
-import { vi } from 'vitest';
 import { vscodeDark } from '@uiw/codemirror-theme-vscode';
 import CodeMirror from '@uiw/react-codemirror';
 import { langs } from '@uiw/codemirror-extensions-langs';
@@ -13,8 +12,6 @@ export interface MetaRawProps {
 }
 
 export const MetaRaw = ({ meta }: MetaRawProps) => {
-  if (!meta) return <></>;
-
   const updateMeta = useUpdateMeta(meta);
   const { canUpdateMeta } = useGetMetadataFeatures(meta.getOrigin().type);
 

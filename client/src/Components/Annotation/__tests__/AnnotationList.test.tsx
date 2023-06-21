@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { AnnotationList } from '@/Components/Annotation/AnnotationList';
-import React, { useState } from 'react';
+import React from 'react';
 import metadataJson from './AnnotationList.test.meta.json';
 import { SigMFMetadata } from '@/Utils/sigmfMetadata';
 
@@ -25,6 +25,35 @@ describe('Annotation list component', () => {
     expect(await screen.queryByText('Label')).toBeInTheDocument();
     expect(await screen.queryByText('Duration')).toBeInTheDocument();
     expect(await screen.queryByText('Actions')).toBeInTheDocument();
+  });
+
+  test('Columns display correctly when no capture date time', async () => {
+    //Arrange
+    const meta = Object.assign(new SigMFMetadata(), JSON.parse(JSON.stringify(metadataJson)));
+    delete meta.captures[0]['core:datetime'];
+
+    // Act
+    render(
+      <AnnotationList meta={meta} setHandleTop={() => {}} spectrogramHeight={200} setMeta={() => {}}></AnnotationList>
+    );
+
+    // Assert column are in document
+    expect(await screen.queryByText('Time Range')).not.toBeInTheDocument();
+
+    // Assert columns are in document
+    expect(await screen.queryByText('Annotation')).toBeInTheDocument();
+    expect(await screen.queryByText('Frequency Range')).toBeInTheDocument();
+    expect(await screen.queryByText('BW')).toBeInTheDocument();
+    expect(await screen.queryByText('Label')).toBeInTheDocument();
+    expect(await screen.queryByText('Duration')).toBeInTheDocument();
+    expect(await screen.queryByText('Actions')).toBeInTheDocument();
+
+    // Assert values are in document
+    expect(await screen.findByText('883.275')).toBeInTheDocument();
+    expect(await screen.findByText('884.625')).toBeInTheDocument();
+    expect(await screen.findByText('1.35MHz')).toBeInTheDocument();
+    expect(await screen.findByText('LTE')).toBeInTheDocument();
+    expect(await screen.findByText('5ms')).toBeInTheDocument();
   });
 
   test.each`
