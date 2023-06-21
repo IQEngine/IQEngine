@@ -1,6 +1,9 @@
-.vscode
-.git
+.vscode/
+.git/
 .gitignore
-tests/
+e2e/
 **/node_modules/
 Dockerfile
+megalinter-reports/
+tools/
+.github/
