@@ -24,25 +24,23 @@ const RepositoryAPITile = (props) => {
   // TODO: COPY STYLE BELOW FROM THE OTHER REPOSITORY TILE
 
   return (
-    <div className="card w-96 bg-neutral text-neutral-content shadow-xl mb-3">
+    <div className="repocard">
       <figure>
-        <img onClick={handleOnClick} className="object-cover h-48 w-96" src={imageURL ?? '/api.png'} alt="Shoes" />
+        <img onClick={handleOnClick} className="repoimage" src={imageURL ?? '/api.png'} alt={name} />
       </figure>
-      <div className="card-body">
-        <h2 className="card-title text-2xl">{name}</h2>
+      <div className="repocardbody">
+        <h2>{name}</h2>
         <p>{description}</p>
-        <div className="card-actions mt-2 justify-end">
-          <button
-            id={name.replaceAll(' ', '')}
-            disabled={isDisabled}
-            onClick={handleOnClick}
-            className="btn btn-primary w-full"
-            aria-label={name}
-          >
-            browse
-          </button>
-        </div>
       </div>
+      <button
+        id={name.replaceAll(' ', '')}
+        disabled={isDisabled}
+        onClick={handleOnClick}
+        className="repocardbutton"
+        aria-label={name}
+      >
+        Browse
+      </button>
     </div>
   );
 };

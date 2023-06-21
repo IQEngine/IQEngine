@@ -2,14 +2,14 @@
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
-import { useAppDispatch } from '@/Store/hooks';
 import DualRangeSlider from '@/Components/DualRangeSlider/DualRangeSlider';
 import { SigMFMetadata } from '@/Utils/sigmfMetadata';
+import { TILE_SIZE_IN_IQ_SAMPLES } from '@/Utils/constants';
 
 export class SettingsPaneProps {
   meta: SigMFMetadata;
@@ -34,7 +34,7 @@ export class SettingsPaneProps {
 }
 
 const SettingsPane = (props: SettingsPaneProps) => {
-  const dispatch = useAppDispatch();
+  const fftSizes = [128, 256, 512, 1024, 2048, 4096, 16384, 65536, TILE_SIZE_IN_IQ_SAMPLES];
 
   const [state, setState] = useState({
     size: 1024,
@@ -59,15 +59,9 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
   };
 
   const onChangeFftsize = (event) => {
-    setState({ ...state, size: parseInt(event.target.value) });
-  };
-
-  const onSubmitFftsize = () => {
-    if (state.size >= 32 && Math.log2(state.size) % 1 === 0) {
-      props.updateFftsize(state.size);
-    } else {
-      alert('Size must be a power of 2 and at least 32');
-    }
+    const newSize = parseInt(event.target.text);
+    setState({ ...state, size: newSize });
+    props.updateFftsize(newSize);
   };
 
   const onChangePythonSnippet = (event) => {
@@ -211,16 +205,18 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
             </a>
           </span>
         </label>
-        <div className="mb-3 flex">
-          <input
-            type="text"
-            className="h-8 w-54 rounded-l bg-base-content text-base-100 ml-1 pl-2"
-            defaultValue={state.size}
-            onChange={onChangeFftsize}
-          />
-          <button className="rounded-none rounded-r" onClick={onSubmitFftsize}>
-            <FontAwesomeIcon icon={faArrowRight} />
+
+        <div className="dropdown dropdown-hover">
+          <button tabIndex={0} className="m-1 px-16 w-full">
+            FFT Size
           </button>
+          <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
+            {fftSizes.map((x) => (
+              <li data-value={String(x)} onClick={onChangeFftsize}>
+                {state.size === x ? <a className="bg-primary">{x}</a> : <a>{x}</a>}
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
       <>
