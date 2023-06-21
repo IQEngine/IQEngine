@@ -1,39 +1,7 @@
 # vim: tabstop=4 shiftwidth=4 expandtab
-
-
 import os
-
 from database.models import Metadata
-
-test_datasource = {
-    "type": "api",
-    "name": "name",
-    "account": "account",
-    "container": "container",
-    "description": "description",
-    "imageURL": "imageURL"
-}
-
-test_datasource_id = f'{test_datasource["account"]}_{test_datasource["container"]}'
-
-valid_metadata = {
-    "global": {
-        "core:datatype": "string",
-        "core:sample_rate": 1,
-        "core:version": "1.0.0",
-    },
-    "captures": [
-        {
-            "core:sample_start": 1,
-        }
-    ],
-    "annotations": [
-        {
-            "core:sample_start": 1,
-            "core:sample_count": 1,
-        }
-    ],
-}
+from tests.test_data import test_datasource, valid_metadata
 
 
 def test_api_get_config(client):
@@ -194,6 +162,15 @@ def test_api_get_datasources(client):
     response = client.get("/api/datasources")
     assert response.status_code == 200
     assert len(response.json()) == 1
+
+
+def test_api_get_datasource(client):
+    response = client.post("/api/datasources", json=test_datasource)
+    response = client.get(
+        f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/datasource'
+    )
+    assert response.status_code == 200
+    assert len(response.json()) > 1
 
 
 def test_api_filename_url_encoded(client):

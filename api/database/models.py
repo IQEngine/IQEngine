@@ -8,6 +8,7 @@ class DataSource(BaseModel):
     container: str
     description: str | None
     imageURL: str | None
+    sasToken: str | None
 
 
 class DataSourceReference(BaseModel):

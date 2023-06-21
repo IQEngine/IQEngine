@@ -1,5 +1,5 @@
-import logging
 import os
+import logging
 from logging.config import dictConfig
 
 from dotenv import load_dotenv
@@ -9,6 +9,7 @@ from handlers.config import router as config_router
 from handlers.datasources import router as datasources_router
 from handlers.metadata import router as metadata_router
 from handlers.status import router as status_router
+from handlers.iq import router as iq_router
 from pydantic import BaseModel
 from starlette.exceptions import HTTPException
 from starlette.responses import JSONResponse
@@ -75,6 +76,7 @@ dictConfig(LogConfig().dict())
 logger = logging.getLogger("api")
 
 app = FastAPI()
+app.include_router(iq_router)
 app.include_router(datasources_router)
 app.include_router(metadata_router)
 app.include_router(status_router)
