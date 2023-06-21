@@ -75,14 +75,14 @@ export const App = () => {
                   </Link>
                 </li>
                 <Feature flag="useIQEngineOutReach">
-                <li>
-                  <a href="https://discord.gg/k7C8kp3b76" target="_blank" rel="noreferrer" className="text-lg">
-                    <div className="flex">
-                      <img src="/discord.svg" className="w-6 pr-1" alt="Discord" />
-                      Discord
-                    </div>
-                  </a>
-                </li>
+                  <li>
+                    <a href="https://discord.gg/k7C8kp3b76" target="_blank" rel="noreferrer" className="text-lg">
+                      <div className="flex">
+                        <img src="/discord.svg" className="w-6 pr-1" alt="Discord" />
+                        Discord
+                      </div>
+                    </a>
+                  </li>
                 </Feature>
                 <li>
                   <a href="https://github.com/iqengine/iqengine" target="_blank" rel="noreferrer" className="text-lg ">
@@ -207,10 +207,10 @@ export const App = () => {
             rel="noreferrer"
             href="https://dashboard.mailerlite.com/forms/299501/77960409531811734/share"
           >
-          <Feature flag="useIQEngineOutReach">
-            <h2 className="text-center py-2">
-              Sign up for a once-a-month email update on IQEngine, such as new features, demos, and more!
-            </h2>
+            <Feature flag="useIQEngineOutReach">
+              <h2 className="text-center py-2">
+                Sign up for a once-a-month email update on IQEngine, such as new features, demos, and more!
+              </h2>
             </Feature>
           </a>
         </div>
