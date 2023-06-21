@@ -4,24 +4,25 @@ import { test, expect } from '@playwright/test';
 test('Confirm all repos display', async ({ page }) => {
   await page.goto('/');
 
-  await page.locator('#GNURadioSigMFRepo').click();
-  await page.getByRole('link', { name: 'IQEngine', exact: true }).click();
+  await page.locator('[id="GNURadioSigMFRepo"]').click();
+  await page.getByRole('img', { name: 'IQEngine', exact: true }).click();
 
   await page.locator('[id="DanielEstévez\\\'Recordings"]').click();
-  await page.getByRole('link', { name: 'IQEngine', exact: true }).click();
+  await page.getByRole('img', { name: 'IQEngine', exact: true }).click();
 
-  await page.locator('#NortheasternUniversity').click();
-  await page.getByRole('link', { name: 'IQEngine', exact: true }).click();
+  await page.locator('[id="NortheasternUniversity"]').click();
+  await page.getByRole('img', { name: 'IQEngine', exact: true }).click();
 
   // signal generator
-  await page.getByRole('button', { name: 'Siggen' }).click();
-  await page.getByRole('link', { name: 'IQEngine', exact: true }).click();
+  await page.locator('[id="Siggen"]').click();
+  await page.getByRole('img', { name: 'IQEngine', exact: true }).click();
 
   // sigmf validator page
-  await page.getByRole('button', { name: 'Validator' }).click();
-  await page.getByRole('link', { name: 'IQEngine', exact: true }).click();
+  await page.locator('[id="Validator"]').click();
+  await page.getByRole('img', { name: 'IQEngine', exact: true }).click();
 
   // Azure blob
-  await page.getByRole('button', { name: 'Browse' }).nth(3).click();
-  //await page.getByRole('link', { name: 'IQEngine', exact: true }).click(); // wasnt working for marc
+  await page.locator('[id="AzureBlob"]').click();
+  // doesn't currently change page as blob parameters required
+  //await page.getByRole('img', { name: 'IQEngine', exact: true }).click();
 });
