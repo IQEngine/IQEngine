@@ -11,6 +11,11 @@ describe('Test Feature flags', () => {
         expect(screen.getByText('Test')).toBeInTheDocument;
     })
 
+    test('Renders when null', async () => {
+        render(<Feature flag={null}>Test</Feature>, { wrapper: AllProviders });
+        expect(screen.getByText('Test')).toBeInTheDocument;
+    })
+
     test('Does not render when false', async () => {
         render(<Feature flag={"false"}>Test</Feature>, { wrapper: AllProviders });
         expect(screen.getByText('Test')).not.toBeInTheDocument;
