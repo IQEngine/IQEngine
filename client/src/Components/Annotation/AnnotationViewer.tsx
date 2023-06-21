@@ -6,8 +6,6 @@ import React, { Fragment, useCallback } from 'react';
 import { Layer, Rect, Text } from 'react-konva';
 import { TILE_SIZE_IN_IQ_SAMPLES } from '@/Utils/constants';
 import { Annotation, SigMFMetadata } from '@/Utils/sigmfMetadata';
-import { updateMeta } from '@/api/metadata/Queries';
-import { useQueryClient } from '@tanstack/react-query';
 
 interface AnnotationViewerProps {
   spectrogramWidthScale: number;
@@ -55,22 +53,23 @@ const AnnotationViewer = ({
     setMeta(new_meta);
   }
 
-  const annotations = meta?.annotations.map((annotation, index) => {
-    let position = annotation.getAnnotationPosition(
-      lowerTile,
-      upperTile,
-      meta.getCenterFrequency(),
-      meta.getSampleRate(),
-      fftSize,
-      zoomLevel
-    );
-    let result = {
-      ...position,
-      description: annotation.getDescription(),
-      index: index,
-    };
-    return result;
-  });
+  const annotations =
+    meta?.annotations.map((annotation, index) => {
+      let position = annotation.getAnnotationPosition(
+        lowerTile,
+        upperTile,
+        meta.getCenterFrequency(),
+        meta.getSampleRate(),
+        fftSize,
+        zoomLevel
+      );
+      let result = {
+        ...position,
+        description: annotation.getDescription(),
+        index: index,
+      };
+      return result;
+    }) ?? [];
 
   // add cursor styling
   function onMouseOver() {
@@ -80,7 +79,7 @@ const AnnotationViewer = ({
     document.body.style.cursor = 'default';
   }
 
-  const newAnnotationClick = (e) => {
+  const newAnnotationClick = useCallback(() => {
     annotations.push({
       x1: 200,
       x2: 400,
@@ -109,52 +108,55 @@ const AnnotationViewer = ({
     );
     let new_meta = Object.assign(new SigMFMetadata(), meta);
     setMeta(new_meta);
-  };
+  }, [annotations, meta, lowerTile, fftSize, zoomLevel, setMeta]);
 
   // Ability to update annotation labels
-  const handleTextClick = useCallback((e) => {
-    // create textarea and style it
-    var textarea = document.createElement('textarea');
-    document.body.appendChild(textarea);
+  const handleTextClick = useCallback(
+    (e) => {
+      // create textarea and style it
+      var textarea = document.createElement('textarea');
+      document.body.appendChild(textarea);
 
-    textarea.value = e.target.text();
-    textarea.style.position = 'absolute';
-    textarea.style.top = '300px'; // middle of screen
-    textarea.style.left = '500px'; // middle of screen
-    textarea.style.width = '400px';
-    textarea.style.fontSize = '25px';
-    textarea.rows = 1;
-    textarea.id = e.target.id();
-    textarea.focus();
-    textarea.classList.add('text-base-100');
+      textarea.value = e.target.text();
+      textarea.style.position = 'absolute';
+      textarea.style.top = '300px'; // middle of screen
+      textarea.style.left = '500px'; // middle of screen
+      textarea.style.width = '400px';
+      textarea.style.fontSize = '25px';
+      textarea.rows = 1;
+      textarea.id = e.target.id();
+      textarea.focus();
+      textarea.classList.add('text-base-100');
 
-    // Add a note about hitting enter to finish the edit
-    var textarea2 = document.createElement('textarea');
-    document.body.appendChild(textarea2);
-    textarea2.value = 'Hit Enter to Finish';
-    textarea2.style.position = 'absolute';
-    textarea2.style.top = '270px';
-    textarea2.style.left = '600px';
-    textarea2.style.width = '140px';
-    textarea2.style.height = '30px';
-    textarea2.rows = 1;
-    textarea2.disabled = true;
-    textarea2.style.resize = 'none';
-    textarea2.classList.add('text-base-100');
+      // Add a note about hitting enter to finish the edit
+      var textarea2 = document.createElement('textarea');
+      document.body.appendChild(textarea2);
+      textarea2.value = 'Hit Enter to Finish';
+      textarea2.style.position = 'absolute';
+      textarea2.style.top = '270px';
+      textarea2.style.left = '600px';
+      textarea2.style.width = '140px';
+      textarea2.style.height = '30px';
+      textarea2.rows = 1;
+      textarea2.disabled = true;
+      textarea2.style.resize = 'none';
+      textarea2.classList.add('text-base-100');
 
-    textarea.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter') {
-        console.debug(textarea.value, textarea.id);
-        annotations[textarea.id]['description'] = textarea.value; // update the local version first
-        // Now update the actual meta info
-        meta.annotations[annotations[textarea.id]['index']]['core:description'] = textarea.value;
-        let new_meta = Object.assign(new SigMFMetadata(), meta);
-        setMeta(new_meta);
-        document.body.removeChild(textarea);
-        document.body.removeChild(textarea2);
-      }
-    });
-  }, []);
+      textarea.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+          console.debug(textarea.value, textarea.id);
+          annotations[textarea.id]['description'] = textarea.value; // update the local version first
+          // Now update the actual meta info
+          meta.annotations[annotations[textarea.id]['index']]['core:description'] = textarea.value;
+          let new_meta = Object.assign(new SigMFMetadata(), meta);
+          setMeta(new_meta);
+          document.body.removeChild(textarea);
+          document.body.removeChild(textarea2);
+        }
+      });
+    },
+    [annotations, meta, setMeta]
+  );
 
   return (
     <Layer>

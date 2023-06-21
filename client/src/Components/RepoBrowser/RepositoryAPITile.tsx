@@ -26,13 +26,19 @@ const RepositoryAPITile = (props) => {
   return (
     <div className="repocard">
       <figure>
-        <img onClick={handleOnClick} className="repoimage" src={imageURL ?? '/external_source.png'} alt={name} />
+        <img onClick={handleOnClick} className="repoimage" src={imageURL ?? '/api.png'} alt={name} />
       </figure>
       <div className="repocardbody">
         <h2>{name}</h2>
         <p>{description}</p>
       </div>
-      <button className="repocardbutton" disabled={isDisabled} id={name.replaceAll(' ', '')} onClick={handleOnClick}>
+      <button
+        id={name.replaceAll(' ', '')}
+        disabled={isDisabled}
+        onClick={handleOnClick}
+        className="repocardbutton"
+        aria-label={name}
+      >
         Browse
       </button>
     </div>

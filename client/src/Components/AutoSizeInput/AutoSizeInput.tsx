@@ -24,7 +24,7 @@ export const AutoSizeInput = ({
 
   useEffect(() => {
     setWidth(span.current.offsetWidth + 3);
-  }, [span.current?.offsetWidth]);
+  }, [content, span.current?.offsetWidth]);
 
   const changeHandler = useCallback((evt) => {
     setContent(evt.target.value);

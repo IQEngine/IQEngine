@@ -24,12 +24,7 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { getMeta } from '@/api/metadata/Queries';
 import { SigMFMetadata } from '@/Utils/sigmfMetadata';
 import { getIQDataSlices, useCurrentCachedIQDataSlice } from '@/api/iqdata/Queries';
-import { IQDataSlice } from '@/api/Models';
-import { useInterval } from 'usehooks-ts';
-import { python } from '@codemirror/lang-python';
 import { applyProcessing } from '@/Sources/FetchMoreDataSource';
-import { useQueryClient } from '@tanstack/react-query';
-import { useGetMetadataFeatures } from '@/api/metadata/Queries';
 
 declare global {
   interface Window {
@@ -311,6 +306,18 @@ export const SpectrogramPage = () => {
     return { trimmedSamples: trimmedSamples, startSampleOffset: startSampleOffset }; // only used by plugins
   };
 
+  const handleWheel = (e) => {
+    e.evt.preventDefault();
+    let scrollDirection = -e.evt.wheelDeltaY / Math.abs(e.evt.wheelDeltaY);
+    let scrollAmount = scrollDirection * 2;
+    let presentingSize = (spectrogramHeight / (meta.getTotalSamples() / fftSize / zoomLevel)) * spectrogramHeight;
+    let maxValue = spectrogramHeight - presentingSize;
+    // make sure we don't scroll past the beginning or end
+    let newY = handleTop + scrollAmount;
+    newY = newY < 0 ? 0 : newY > maxValue ? maxValue : newY;
+    fetchAndRender(newY);
+  };
+
   return (
     <SpectrogramContext.Provider
       value={{
@@ -418,7 +425,7 @@ export const SpectrogramPage = () => {
 
                   <div className="flex flex-row">
                     <Stage width={spectrogramWidth} height={spectrogramHeight}>
-                      <Layer>
+                      <Layer onWheel={handleWheel}>
                         <Image image={image} x={0} y={0} width={spectrogramWidth} height={spectrogramHeight} />
                       </Layer>
                       <AnnotationViewer
@@ -510,12 +517,14 @@ export const SpectrogramPage = () => {
               Annotations
             </summary>
             <div className="outline outline-1 outline-primary p-2">
-              <AnnotationList
-                meta={meta}
-                setHandleTop={setHandleTop}
-                spectrogramHeight={spectrogramHeight}
-                setMeta={setMeta}
-              />
+              {meta && (
+                <AnnotationList
+                  meta={meta}
+                  setHandleTop={setHandleTop}
+                  spectrogramHeight={spectrogramHeight}
+                  setMeta={setMeta}
+                />
+              )}
             </div>
           </details>
 
@@ -532,9 +541,7 @@ export const SpectrogramPage = () => {
             <summary className="pl-2 mt-2 bg-primary outline outline-1 outline-primary text-lg text-base-100 hover:bg-green-800">
               Raw Metadata
             </summary>
-            <div className="outline outline-1 outline-primary p-2">
-              <MetaRaw meta={meta} />
-            </div>
+            <div className="outline outline-1 outline-primary p-2">{meta && <MetaRaw meta={meta} />}</div>
           </details>
         </div>
       </div>
