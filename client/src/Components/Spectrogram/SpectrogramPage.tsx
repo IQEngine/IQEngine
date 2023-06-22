@@ -12,7 +12,7 @@ import { selectFft, calculateTileNumbers, range, SelectFftReturn } from '@/Utils
 import { AnnotationViewer } from '@/Components/Annotation/AnnotationViewer';
 import { RulerTop } from './RulerTop';
 import { RulerSide } from './RulerSide';
-import { INITIAL_PYTHON_SNIPPET, TILE_SIZE_IN_IQ_SAMPLES } from '@/Utils/constants';
+import { INITIAL_PYTHON_SNIPPET, TILE_SIZE_IN_IQ_SAMPLES, COLORMAP_DEFAULT } from '@/Utils/constants';
 import TimeSelector from './TimeSelector';
 import AnnotationList from '@/Components/Annotation/AnnotationList';
 import { GlobalProperties } from '@/Components/GlobalProperties/GlobalProperties';
@@ -53,7 +53,7 @@ export const SpectrogramPage = () => {
   const [magnitudeMax, setMagnitudeMax] = useState(-10.0); // in dB
   const [magnitudeMin, setMagnitudeMin] = useState(-40.0); // in dB
   const [fftWindow, setFFTWindow] = useState('hamming');
-  const [colorMap, setColorMap] = useState(colMaps['jet']);
+  const [colorMap, setColorMap] = useState(colMaps[COLORMAP_DEFAULT]);
   const [autoscale, setAutoscale] = useState(false);
   const [image, setImage] = useState(null);
   const [upperTile, setUpperTile] = useState(-1);

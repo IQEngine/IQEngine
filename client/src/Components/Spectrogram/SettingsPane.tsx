@@ -9,7 +9,7 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import DualRangeSlider from '@/Components/DualRangeSlider/DualRangeSlider';
 import { SigMFMetadata } from '@/Utils/sigmfMetadata';
-import { TILE_SIZE_IN_IQ_SAMPLES } from '@/Utils/constants';
+import { TILE_SIZE_IN_IQ_SAMPLES, COLORMAP_DEFAULT } from '@/Utils/constants';
 import { colMaps } from '@/Utils/colormap';
 
 export class SettingsPaneProps {
@@ -53,7 +53,7 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
     windowFunction: 'hamming',
     zoomLevel: 1,
     saveButtonEnabled: false,
-    colorMapName: 'jet',
+    colorMapName: COLORMAP_DEFAULT,
   });
 
   const onChangeWindowFunction = (event) => {
