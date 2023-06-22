@@ -25,7 +25,7 @@ import { getMeta } from '@/api/metadata/Queries';
 import { SigMFMetadata } from '@/Utils/sigmfMetadata';
 import { getIQDataSlices, useCurrentCachedIQDataSlice } from '@/api/iqdata/Queries';
 import { applyProcessing } from '@/Sources/FetchMoreDataSource';
-import { colMap } from '@/Utils/colormap';
+import { colMaps } from '@/Utils/colormap';
 
 declare global {
   interface Window {
@@ -53,7 +53,7 @@ export const SpectrogramPage = () => {
   const [magnitudeMax, setMagnitudeMax] = useState(-10.0); // in dB
   const [magnitudeMin, setMagnitudeMin] = useState(-40.0); // in dB
   const [fftWindow, setFFTWindow] = useState('hamming');
-  const [colorMap, setColormap] = useState(colMap['jet']);
+  const [colorMap, setColorMap] = useState(colMaps['jet']);
   const [autoscale, setAutoscale] = useState(false);
   const [image, setImage] = useState(null);
   const [upperTile, setUpperTile] = useState(-1);
@@ -358,6 +358,8 @@ export const SpectrogramPage = () => {
             pythonSnippet={pythonSnippet}
             meta={meta}
             setMeta={setMeta}
+            colorMap={colorMap}
+            setColorMap={setColorMap}
           />
           <div className="flex flex-col">
             <ul className="flex space-x-2 border-b border-primary w-full sm:pl-12 lg:pl-32" id="tabsbar">
@@ -475,7 +477,7 @@ export const SpectrogramPage = () => {
                         fftSizeScrollbar={fftSize}
                         setMagnitudeMax={setMagnitudeMax}
                         setMagnitudeMin={setMagnitudeMin}
-                        colMap={colMap}
+                        colorMap={colorMap}
                       />
                     </Stage>
                   </div>

@@ -22,7 +22,7 @@ interface ScrollBarProps {
   fftSizeScrollbar: number;
   setMagnitudeMax: any;
   setMagnitudeMin: any;
-  colMap: any;
+  colorMap: any;
 }
 
 const ScrollBar = (props: ScrollBarProps) => {
@@ -35,7 +35,7 @@ const ScrollBar = (props: ScrollBarProps) => {
     handleTop,
     fetchEnabled,
     fftSizeScrollbar,
-    colMap,
+    colorMap,
   } = props;
 
   const [dataRange, setDataRange] = useState([]);
@@ -150,7 +150,7 @@ const ScrollBar = (props: ScrollBarProps) => {
       let lineOffset = i * fftSizeScrollbar * 4;
       for (let sigVal, rgba, opIdx = 0, ipIdx = startOfs; ipIdx < fftSizeScrollbar + startOfs; opIdx += 4, ipIdx++) {
         sigVal = ipBuf8[ipIdx] || 0; // if input line too short add zeros
-        rgba = colMap[sigVal]; // array of rgba values
+        rgba = colorMap[sigVal]; // array of rgba values
         // byte reverse so number aa bb gg rr
         minimapArray[lineOffset + opIdx] = rgba[0]; // red
         minimapArray[lineOffset + opIdx + 1] = rgba[1]; // green

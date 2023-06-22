@@ -31,6 +31,8 @@ export class SettingsPaneProps {
   pythonSnippet: string;
   setPythonSnippet: (pythonSnippet: string) => void;
   handleProcessTime: () => { trimmedSamples: number[]; startSampleOffset: number };
+  colorMap: any;
+  setColorMap: any;
 }
 
 const SettingsPane = (props: SettingsPaneProps) => {
