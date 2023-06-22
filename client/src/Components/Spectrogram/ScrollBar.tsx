@@ -174,7 +174,7 @@ const ScrollBar = (props: ScrollBarProps) => {
     createImageBitmap(imageData).then((ret) => {
       setMinimapImg(ret);
     });
-  }, [iqSlices.data]); // dont add anymore here, so that this triggers ONLY at the start
+  }, [iqSlices.data, colorMap]); // dont add anymore here, so that this triggers ONLY at the start
 
   const handleClick = (e) => {
     let currentY = e.evt.offsetY;
