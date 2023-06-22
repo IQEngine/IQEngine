@@ -1,18 +1,18 @@
-import io
-import base64
-import logging
 import asyncio
-import database.database
-from database.models import DataSource
-from pymongo.collection import Collection
-from azure.storage.blob import BlobClient
-from fastapi import HTTPException, Depends, APIRouter
-from typing import List
-from pydantic import BaseModel
-
+import base64
+import io
+import logging
 from asyncio import to_thread
-from .cipher import decrypt
+from typing import List
 
+import database.database
+from azure.storage.blob import BlobClient
+from database.models import DataSource
+from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
+from pymongo.collection import Collection
+
+from .cipher import decrypt
 
 router = APIRouter()
 
@@ -30,7 +30,6 @@ def get_sas_token(
         database.database.datasources_collection
     ),
 ):
-
     datasource = datasources_collection.find_one(
         {"account": account, "container": container}
     )
@@ -57,7 +56,6 @@ def get_iq(
     countBytes: int,
     sasToken: str = Depends(get_sas_token),
 ):
-
     try:
         if not sasToken:
             raise HTTPException(status_code=400, detail="Invalid SAS token")

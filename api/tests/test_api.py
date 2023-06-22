@@ -1,5 +1,6 @@
 # vim: tabstop=4 shiftwidth=4 expandtab
 import os
+
 from database.models import Metadata
 from tests.test_data import test_datasource, valid_metadata
 
