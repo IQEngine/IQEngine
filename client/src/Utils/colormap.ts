@@ -2,6 +2,8 @@
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
 
+// Colormaps are arrays of RGBA values, always 256 elements long, i.e. it acts as a lookup table
+
 // Similar to MATLAB's Jet colormap
 export const colMap = [
   [0, 0, 128, 255],

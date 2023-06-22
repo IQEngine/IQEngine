@@ -25,6 +25,7 @@ import { getMeta } from '@/api/metadata/Queries';
 import { SigMFMetadata } from '@/Utils/sigmfMetadata';
 import { getIQDataSlices, useCurrentCachedIQDataSlice } from '@/api/iqdata/Queries';
 import { applyProcessing } from '@/Sources/FetchMoreDataSource';
+import { colMap } from '@/Utils/colormap';
 
 declare global {
   interface Window {
@@ -52,6 +53,7 @@ export const SpectrogramPage = () => {
   const [magnitudeMax, setMagnitudeMax] = useState(-10.0); // in dB
   const [magnitudeMin, setMagnitudeMin] = useState(-40.0); // in dB
   const [fftWindow, setFFTWindow] = useState('hamming');
+  const [colorMap, setColormap] = useState(colMap);
   const [autoscale, setAutoscale] = useState(false);
   const [image, setImage] = useState(null);
   const [upperTile, setUpperTile] = useState(-1);
@@ -160,7 +162,8 @@ export const SpectrogramPage = () => {
       autoscale,
       zoomLevel,
       iqData,
-      {}
+      {},
+      colorMap
     );
     setFFTData(ret?.fftData);
     setFFTImage(ret);
@@ -182,7 +185,8 @@ export const SpectrogramPage = () => {
       autoscale,
       zoomLevel,
       iqData,
-      fftData
+      fftData,
+      colorMap
     );
     setFFTData(ret?.fftData);
     setFFTImage(ret);
@@ -471,6 +475,7 @@ export const SpectrogramPage = () => {
                         fftSizeScrollbar={fftSize}
                         setMagnitudeMax={setMagnitudeMax}
                         setMagnitudeMin={setMagnitudeMin}
+                        colMap={colMap}
                       />
                     </Stage>
                   </div>
