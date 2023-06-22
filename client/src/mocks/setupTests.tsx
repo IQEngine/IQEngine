@@ -42,13 +42,3 @@ export const AllProviders = ({ children }) => (
     </QueryClientProvider>
   </Provider>
 );
-
-export const FFProviders = ({ children, useIQEngineOutReach }) => (
-  <Provider store={store}>
-    <QueryClientProvider client={queryClient}>
-      <FeatureFlagsProvider flags={useIQEngineOutReach}>
-        <Router>{children}</Router>
-      </FeatureFlagsProvider>
-    </QueryClientProvider>
-  </Provider>
-);
