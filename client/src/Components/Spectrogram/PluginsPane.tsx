@@ -12,6 +12,7 @@ import { IQPlot } from './IQPlot';
 import { Layer, Image, Stage } from 'react-konva';
 import { calcFftOfTile } from '@/Utils/selector';
 import { convertFloat32ArrayToBase64, convertBase64ToFloat32Array } from '@/Utils/rfFunctions';
+import { colMaps } from '@/Utils/colormap';
 
 export interface PluginsPaneProps {
   cursorsEnabled: boolean;
@@ -144,7 +145,8 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
             'hamming',
             magnitudeMin,
             magnitudeMax,
-            false // autoscale
+            false, // autoscale
+            colMaps['jet'] // colormap
           );
           const imageData = new ImageData(ret['newFftData'], fftSize, numFfts);
           createImageBitmap(imageData).then((imageBitmap) => {
