@@ -21,7 +21,7 @@ const SiggenTile = (props) => {
         <h2>Signal Generator</h2>
         Generate your own signals in Python, with examples! Save as a SigMF recording
       </div>
-      <button onClick={handleOnClick} className="repocardbutton">
+      <button onClick={handleOnClick} className="repocardbutton" id="Siggen">
         Browse
       </button>
     </div>

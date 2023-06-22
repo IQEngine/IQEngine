@@ -21,7 +21,7 @@ const ValidatorTile = (props) => {
         <h2>SigMF Meta Validator</h2>
         Validate your .sigmf-meta file using an interactive JSON schema validator
       </div>
-      <button className="repocardbutton" onClick={handleOnClick}>
+      <button className="repocardbutton" onClick={handleOnClick} id="Validator">
         Browse
       </button>
     </div>

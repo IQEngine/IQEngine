@@ -104,7 +104,7 @@ const AzureBlobBrowser = () => {
           />
         </form>
       </div>
-      <button className="repocardbutton" onClick={onSubmit}>
+      <button className="repocardbutton" onClick={onSubmit} id="AzureBlob">
         Browse
       </button>
     </div>

@@ -2,10 +2,8 @@ import { SigMFMetadata } from '@/Utils/sigmfMetadata';
 import { useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
 import { IQDataClientFactory } from './IQDataClientFactory';
 import { range } from '@/Utils/selector';
-import { DEFAULT_FFT_PARAMETERS, FFTParams, IQDataSlice } from '@/api/Models';
+import { IQDataSlice } from '@/api/Models';
 import { TILE_SIZE_IN_IQ_SAMPLES } from '@/Utils/constants';
-import { useCallback } from 'react';
-import { applyProcessing } from '@/Sources/FetchMoreDataSource';
 
 export const getIQDataSlice = (
   meta: SigMFMetadata,
@@ -34,6 +32,7 @@ export const getIQDataSlice = (
     () => client.getIQDataSlice(meta, index, tileSize),
     {
       enabled: enabled && !!meta,
+      staleTime: Infinity,
     }
   );
 };
@@ -42,7 +41,6 @@ export const getIQDataSliceRange = (
   meta: SigMFMetadata,
   start: number,
   end: number,
-  handleNewSlice: (slice: IQDataSlice) => void = null,
   tileSize: number = TILE_SIZE_IN_IQ_SAMPLES,
   enabled = true
 ) => {
@@ -52,7 +50,7 @@ export const getIQDataSliceRange = (
     });
   }
   const indexes = range(Math.floor(start), Math.ceil(end));
-  return getIQDataSlices(meta, indexes, handleNewSlice, tileSize, enabled);
+  return getIQDataSlices(meta, indexes, tileSize, enabled);
 };
 
 export const getIQDataFullIndexes = (
