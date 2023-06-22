@@ -24,6 +24,6 @@ jobs:
         working-directory: client
         run: |
           npm install
-          npm run test 
+          npm run test
         env:
           CI: false
