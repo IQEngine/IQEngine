@@ -25,5 +25,5 @@ def encrypt(sas_token: str):
     if not key:
         return None
     cipher_suite = Fernet(key)
-    cipher_text = cipher_suite.encrypt(sas_token.encode("utf-8"))
+    cipher_text = cipher_suite.encrypt(sas_token.get_secret_value().encode())
     return cipher_text.decode("utf-8")
