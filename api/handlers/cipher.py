@@ -1,5 +1,5 @@
 import os
-
+from pydantic import SecretStr
 from cryptography.fernet import Fernet
 
 
@@ -11,7 +11,7 @@ def get_key():
     return key
 
 
-def decrypt(sas_token: str):
+def decrypt(sas_token: SecretStr):
     key = get_key()
     if not key:
         return None
@@ -20,7 +20,7 @@ def decrypt(sas_token: str):
     return plain_text.decode("utf-8")
 
 
-def encrypt(sas_token: str):
+def encrypt(sas_token: SecretStr):
     key = get_key()
     if not key:
         return None
