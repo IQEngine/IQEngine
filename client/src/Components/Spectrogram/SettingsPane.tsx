@@ -193,21 +193,7 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
         */}
       </div>
 
-      <div id="formFFT">
-        <label className="label">
-          <span className="label-text text-base">
-            FFT Size
-            <a
-              style={{ textDecoration: 'none', color: 'white', marginLeft: '5px' }}
-              target="_blank"
-              rel="noreferrer"
-              href="https://pysdr.org/content/frequency_domain.html#fft-sizing"
-            >
-              <HelpOutlineOutlinedIcon />
-            </a>
-          </span>
-        </label>
-
+      <div className="mt-2">
         <div className="dropdown dropdown-hover">
           <button tabIndex={0} className="m-1 px-16 w-full">
             FFT Size
@@ -220,6 +206,14 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
             ))}
           </ul>
         </div>
+        <a
+          style={{ textDecoration: 'none', color: 'white', marginLeft: '5px' }}
+          target="_blank"
+          rel="noreferrer"
+          href="https://pysdr.org/content/frequency_domain.html#fft-sizing"
+        >
+          <HelpOutlineOutlinedIcon />
+        </a>
       </div>
       <>
         <div className="mb-3" id="formTaps">
