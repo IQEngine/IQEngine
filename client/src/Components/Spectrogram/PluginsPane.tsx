@@ -146,7 +146,7 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
             magnitudeMin,
             magnitudeMax,
             false, // autoscale
-            colMap // colormap
+            colMap['jet'] // colormap
           );
           const imageData = new ImageData(ret['newFftData'], fftSize, numFfts);
           createImageBitmap(imageData).then((imageBitmap) => {

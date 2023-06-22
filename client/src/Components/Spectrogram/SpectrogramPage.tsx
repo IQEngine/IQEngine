@@ -53,7 +53,7 @@ export const SpectrogramPage = () => {
   const [magnitudeMax, setMagnitudeMax] = useState(-10.0); // in dB
   const [magnitudeMin, setMagnitudeMin] = useState(-40.0); // in dB
   const [fftWindow, setFFTWindow] = useState('hamming');
-  const [colorMap, setColormap] = useState(colMap);
+  const [colorMap, setColormap] = useState(colMap['jet']);
   const [autoscale, setAutoscale] = useState(false);
   const [image, setImage] = useState(null);
   const [upperTile, setUpperTile] = useState(-1);
