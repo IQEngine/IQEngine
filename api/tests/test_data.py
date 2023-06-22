@@ -5,7 +5,7 @@ test_datasource = {
     "container": "container",
     "description": "description",
     "imageURL": "imageURL",
-    "sasToken": "sasToken"
+    "sasToken": "sasToken",
 }
 
 
