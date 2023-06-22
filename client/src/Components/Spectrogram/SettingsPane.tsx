@@ -10,6 +10,7 @@ import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import DualRangeSlider from '@/Components/DualRangeSlider/DualRangeSlider';
 import { SigMFMetadata } from '@/Utils/sigmfMetadata';
 import { TILE_SIZE_IN_IQ_SAMPLES } from '@/Utils/constants';
+import { colMaps } from '@/Utils/colormap';
 
 export class SettingsPaneProps {
   meta: SigMFMetadata;
@@ -52,6 +53,7 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
     windowFunction: 'hamming',
     zoomLevel: 1,
     saveButtonEnabled: false,
+    colorMapName: 'jet',
   });
 
   const onChangeWindowFunction = (event) => {
@@ -64,6 +66,11 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
     const newSize = parseInt(event.target.text);
     setState({ ...state, size: newSize });
     props.updateFftsize(newSize);
+  };
+
+  const onChangeColorMap = (event) => {
+    setState({ ...state, colorMapName: event.target.text });
+    props.setColorMap(colMaps[event.target.text]);
   };
 
   const onChangePythonSnippet = (event) => {
@@ -191,6 +198,22 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
           Autoscale Max/Min
         </button>
         */}
+      </div>
+
+      <div className="mt-2">
+        <div className="dropdown dropdown-hover">
+          <button tabIndex={0} className="m-1 px-16 w-full">
+            Colormap
+          </button>
+          <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
+            <li data-value="jet" onClick={onChangeColorMap}>
+              {state.colorMapName === 'jet' ? <a className="bg-primary">jet</a> : <a>jet</a>}
+            </li>
+            <li data-value="viridis" onClick={onChangeColorMap}>
+              {state.colorMapName === 'viridis' ? <a className="bg-primary">viridis</a> : <a>viridis</a>}
+            </li>
+          </ul>
+        </div>
       </div>
 
       <div className="mt-2">
