@@ -5,8 +5,6 @@ on:
     # only runs on PRs that target main
     branches:
       - main
-    paths:
-      - client/**
   workflow_dispatch:
 
 jobs:
@@ -26,6 +24,6 @@ jobs:
         working-directory: client
         run: |
           npm install
-          npm run test 
+          npm run test
         env:
           CI: false
