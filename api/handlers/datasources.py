@@ -2,6 +2,7 @@ import database.database
 from database.models import DataSource
 from fastapi import APIRouter, Depends, HTTPException
 from pymongo.collection import Collection
+from pydantic import SecretStr
 
 from .cipher import decrypt, encrypt
 
@@ -73,7 +74,44 @@ def get_datasource(
         and "core.windows.net" in datasource["imageURL"]
     ):
         datasource["imageURL"] = (
-            datasource["imageURL"] + "?" + decrypt(datasource["sasToken"])
+            datasource["imageURL"] + "?" + decrypt(datasource["sasToken"]).get_secret_value()
         )
 
     return datasource
+
+@router.put(
+    "/api/datasources/{account}/{container}/datasource", 
+    status_code=204
+)
+def update_datasource(
+    account: str,
+    container: str,
+    datasource: DataSource,
+    datasources_collection: Collection[DataSource] = Depends(
+        database.database.datasources_collection
+    ),
+):
+    existingDatasource = datasources_collection.find_one(
+        {
+            "account": account,
+            "container": container,
+        }
+    )
+    if not existingDatasource:
+        raise HTTPException(status_code=404, detail="Datasource not found")
+
+    # If the incoming datasource has a sasToken, encrypt it and replace the existing one
+    # Once encrypted sasToken is just a str not a SecretStr anymore
+    if datasource.sasToken and isinstance(datasource.sasToken, SecretStr):
+        datasource.sasToken = encrypt(datasource.sasToken) # returns a str
+
+    datasource_dict = datasource.dict(by_alias=True, exclude_unset=True)
+    if "sasToken" in datasource_dict:
+        datasource_dict["sasToken"] = datasource.sasToken
+
+    datasources_collection.update_one(
+        {"account": account, "container": container},
+        {"$set": datasource_dict},
+    )
+
+    return

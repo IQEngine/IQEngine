@@ -17,7 +17,7 @@ def decrypt(sas_token: str):
         return None
     cipher_suite = Fernet(key)
     plain_text = cipher_suite.decrypt(sas_token)
-    return plain_text.decode("utf-8")
+    return SecretStr(plain_text.decode("utf-8"))
 
 
 def encrypt(sas_token: SecretStr):

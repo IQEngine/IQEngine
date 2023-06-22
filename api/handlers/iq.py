@@ -37,7 +37,7 @@ def get_sas_token(
         raise HTTPException(status_code=404, detail="Datasource not found")
 
     if "sasToken" in datasource:
-        decrypted_sas_token = decrypt(datasource["sasToken"])
+        decrypted_sas_token = decrypt(datasource["sasToken"]).get_secret_value()
     else:
         return None
     if not decrypted_sas_token:
