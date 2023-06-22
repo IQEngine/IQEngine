@@ -11,7 +11,7 @@ def get_key():
     return key
 
 
-def decrypt(sas_token: SecretStr):
+def decrypt(sas_token: str):
     key = get_key()
     if not key:
         return None
