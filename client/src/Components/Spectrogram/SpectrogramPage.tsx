@@ -167,7 +167,7 @@ export const SpectrogramPage = () => {
     );
     setFFTData(ret?.fftData);
     setFFTImage(ret);
-  }, [fftSize, magnitudeMax, magnitudeMin, fftWindow, zoomLevel]);
+  }, [fftSize, magnitudeMax, magnitudeMin, fftWindow, zoomLevel, colorMap]);
 
   useEffect(() => {
     if (!meta || lowerTile < 0 || upperTile < 0) {
