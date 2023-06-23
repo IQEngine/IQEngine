@@ -16,7 +16,7 @@ def test_api_get_config(client):
         "pluginsEndpoint": "http://localhost:5000/",  # it should add the trailing "/"
         "connectionInfo": {},
         "googleAnalyticsKey": "google_analytics_key",
-        "featureFlags": {}
+        "featureFlags": '{}'
     }
 
 
