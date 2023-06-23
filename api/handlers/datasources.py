@@ -71,11 +71,10 @@ def get_datasource(
     if (
         "imageURL" in datasource
         and "sasToken" in datasource
+        and datasource["sasToken"] is not None
         and "core.windows.net" in datasource["imageURL"]
     ):
-        datasource["imageURL"] = (
-            datasource["imageURL"] + "?" + decrypt(datasource["sasToken"]).get_secret_value()
-        )
+        datasource["imageURL"] = datasource["imageURL"] + "?" + decrypt(datasource["sasToken"]).get_secret_value()
 
     return datasource
 
