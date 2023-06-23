@@ -58,6 +58,8 @@ CONTAINER ID   IMAGE           COMMAND                  CREATED          STATUS 
 
 Stop with `docker stop plugins_container` and delete with `docker rm plugins_container`.  
 
+SSH into container with `docker exec -it plugins_container /bin/bash`
+
 ## Notes
 
 When deploying with Azure remember to go into the function apps Configuration and under Application Settings there needs to be one for AzureWebJobsStorage which is the storage account connection string, as well as MongoDBConnString
