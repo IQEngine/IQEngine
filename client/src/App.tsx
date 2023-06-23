@@ -32,7 +32,7 @@ export const App = () => {
 
   function updateLogoCurve() {
     // starting point of curve wrt SVG canvas
-    const x0 = 29.5;
+    const x0 = 29.7;
     const y0 = 92.5;
     let sinCurve = document.getElementById('logo-sin-curve');
     let cosCurve = document.getElementById('logo-cos-curve');
@@ -40,12 +40,12 @@ export const App = () => {
     let cosString = 'M ' + x0 + ',' + y0;
     const t = new Date().getTime();
     if (Math.random() > 0.95) {
-      for (let i = 0; i < 100; i++) {
+      for (let i = 0; i < 99; i++) {
         sinString += ' L ' + (x0 + i) + ',' + (y0 + Math.random() * 3 - 1.5);
         cosString += ' L ' + (x0 + i) + ',' + (y0 + Math.random() * 3 - 1.5);
       }
     } else {
-      for (let i = 0; i < 100; i++) {
+      for (let i = 0; i < 99; i++) {
         sinString += ' L ' + (x0 + i) + ',' + (y0 + Math.random() * 0.3 - 0.15);
         cosString += ' L ' + (x0 + i) + ',' + (y0 + Math.random() * 0.3 - 0.15);
       }
