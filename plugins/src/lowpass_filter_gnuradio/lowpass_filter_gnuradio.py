@@ -9,8 +9,6 @@ from gnuradio import filter
 from gnuradio.filter import firdes
 from gnuradio import gr
 from gnuradio.fft import window
-import sys
-import signal
 from gnuradio import zeromq
 import zmq
 
@@ -19,7 +17,7 @@ class gnuradio_lowpass_filter(gr.top_block):
         gr.top_block.__init__(self, "GNU Radio-based IQEngine Plugin", catch_exceptions=True)
         self.zeromq_sub_source_0 = zeromq.sub_source(gr.sizeof_gr_complex, 1, 'tcp://127.0.0.1:5001', 100, False, -1)
         self.zeromq_pub_sink_0 = zeromq.pub_sink(gr.sizeof_gr_complex, 1, 'tcp://127.0.0.1:5002', 100, False, -1)
-        self.low_pass_filter_0 = filter.fir_filter_ccf(1, firdes.low_pass(1, sample_rate, 0.25, 0.1, window.WIN_HAMMING, 6.76))
+        self.low_pass_filter_0 = filter.fir_filter_ccf(1, firdes.low_pass(1, sample_rate, cutoff, width, window.WIN_HAMMING, 6.76))
         self.connect((self.low_pass_filter_0, 0), (self.zeromq_pub_sink_0, 0))
         self.connect((self.zeromq_sub_source_0, 0), (self.low_pass_filter_0, 0))
 
@@ -29,7 +27,6 @@ class Plugin:
     center_freq: int = 0
 
     # custom params
-    numtaps: int = 51
     cutoff: float = 1e6  # relative to sample rate
     width: float = 0.1e6  # relative to sample rate
 
@@ -40,7 +37,7 @@ class Plugin:
         pub_socket.bind('tcp://*:5001')
         print("started python PUB")
 
-        tb = gnuradio_lowpass_filter()
+        tb = gnuradio_lowpass_filter(self.sample_rate, self.cutoff, self.width)
         tb.start()
         print("started flowgraph")
 
