@@ -12,6 +12,8 @@
     "example.env"
   ],
   "words": [
+    "outfile",
+    "uksouth",
     "ADLS",
     "INMEMDB",
     "RFDX",
