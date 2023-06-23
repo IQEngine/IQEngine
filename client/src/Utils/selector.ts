@@ -4,7 +4,6 @@
 
 // @ts-ignore
 import { fftshift } from 'fftshift';
-import { colMap } from './colormap';
 import { TILE_SIZE_IN_IQ_SAMPLES } from './constants';
 import { FFT } from '@/Utils/fft';
 import { SigMFMetadata } from './sigmfMetadata';
@@ -24,7 +23,8 @@ export function calcFftOfTile(
   windowFunction: string,
   magnitude_min: number,
   magnitude_max: number,
-  autoscale: boolean
+  autoscale: boolean,
+  colMap: any
 ) {
   let startTime = performance.now();
   let newFftData = new Uint8ClampedArray(fftSize * numFftsPerTile * 4); // 4 because RGBA
@@ -147,7 +147,8 @@ export const selectFft = (
   autoscale = false,
   zoomLevel: any,
   iqData: Record<number, Float32Array>,
-  fftData: Record<number, Uint8ClampedArray>
+  fftData: Record<number, Uint8ClampedArray>,
+  colMap: any
 ): SelectFftReturn | null => {
   if (!meta || !iqData) {
     return;
@@ -177,7 +178,8 @@ export const selectFft = (
       windowFunction,
       magnitude_min,
       magnitude_max,
-      autoscale
+      autoscale,
+      colMap
     );
     autoMaxs.push(autoMax);
     autoMins.push(autoMin);
