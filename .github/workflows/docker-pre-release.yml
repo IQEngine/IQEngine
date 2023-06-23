@@ -75,4 +75,3 @@ jobs:
             ghcr.io/${{ steps.set_variables.outputs.repository }}:pre
         env:
           NODE_ENV: production
-    
