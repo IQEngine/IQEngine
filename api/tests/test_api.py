@@ -9,12 +9,14 @@ def test_api_get_config(client):
     os.environ["PLUGINS_ENDPOINT"] = "http://localhost:5000"
     os.environ["CONNECTION_INFO"] = "{}"
     os.environ["GOOGLE_ANALYTICS_KEY"] = "google_analytics_key"
+    os.environ["FEATURE_FLAGS"] = "{}"
     response = client.get("/api/config")
     assert response.status_code == 200
     assert response.json() == {
         "pluginsEndpoint": "http://localhost:5000/",  # it should add the trailing "/"
         "connectionInfo": {},
         "googleAnalyticsKey": "google_analytics_key",
+        "featureFlags": {}
     }
 
 
