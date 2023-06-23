@@ -15,12 +15,11 @@ from gnuradio import zeromq
 import zmq
 
 class gnuradio_lowpass_filter(gr.top_block):
-    def __init__(self):
-        gr.top_block.__init__(self, "Not titled yet", catch_exceptions=True)
-        self.samp_rate = samp_rate = 1
+    def __init__(self, sample_rate, cutoff, width):
+        gr.top_block.__init__(self, "GNU Radio-based IQEngine Plugin", catch_exceptions=True)
         self.zeromq_sub_source_0 = zeromq.sub_source(gr.sizeof_gr_complex, 1, 'tcp://127.0.0.1:5001', 100, False, -1)
         self.zeromq_pub_sink_0 = zeromq.pub_sink(gr.sizeof_gr_complex, 1, 'tcp://127.0.0.1:5002', 100, False, -1)
-        self.low_pass_filter_0 = filter.fir_filter_ccf(1, firdes.low_pass(1, samp_rate, 0.25, 0.1, window.WIN_HAMMING, 6.76))
+        self.low_pass_filter_0 = filter.fir_filter_ccf(1, firdes.low_pass(1, sample_rate, 0.25, 0.1, window.WIN_HAMMING, 6.76))
         self.connect((self.low_pass_filter_0, 0), (self.zeromq_pub_sink_0, 0))
         self.connect((self.zeromq_sub_source_0, 0), (self.low_pass_filter_0, 0))
 
