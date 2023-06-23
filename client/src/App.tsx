@@ -38,20 +38,15 @@ export const App = () => {
     let sinString = 'M ' + x0 + ',' + y0;
     let cosString = 'M ' + x0 + ',' + y0;
     const t = new Date().getTime();
-    let noiseI;
-    if (Math.random() > 0.9) {
-      noiseI = [...Array(Math.floor(Math.random() * 20)).keys()].map((i) => i + Math.floor(Math.random() * 100));
+    if (Math.random() > 0.95) {
+      for (let i = 0; i < 100; i++) {
+        sinString += ' L ' + (x0 + i) + ',' + (y0 + Math.random() * 3 - 1.5);
+        cosString += ' L ' + (x0 + i) + ',' + (y0 + Math.random() * 3 - 1.5);
+      }
     } else {
-      noiseI = [];
-    }
-
-    for (let i = 0; i < 100; i++) {
-      if (noiseI.includes(i)) {
-        sinString += ' L ' + (x0 + i) + ',' + (y0 + 2 * Math.random() - 1);
-        cosString += ' L ' + (x0 + i) + ',' + (y0 + 2 * Math.random() - 1);
-      } else {
-        sinString += ' L ' + (x0 + i) + ',' + (y0 + 2 * Math.sin(0.5 * i - t * 0.002));
-        cosString += ' L ' + (x0 + i) + ',' + (y0 + 2 * Math.cos(0.5 * i - t * 0.002));
+      for (let i = 0; i < 100; i++) {
+        sinString += ' L ' + (x0 + i) + ',' + (y0 + Math.random() * 0.3 - 0.15);
+        cosString += ' L ' + (x0 + i) + ',' + (y0 + Math.random() * 0.3 - 0.15);
       }
     }
     sinCurve.setAttribute('d', sinString);
