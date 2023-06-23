@@ -9,7 +9,7 @@ import database.database
 from azure.storage.blob import BlobClient
 from database.models import DataSource
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, SecretStr
 from pymongo.collection import Collection
 
 from .cipher import decrypt
@@ -37,7 +37,7 @@ def get_sas_token(
         raise HTTPException(status_code=404, detail="Datasource not found")
 
     if "sasToken" in datasource:
-        decrypted_sas_token = decrypt(datasource["sasToken"]).get_secret_value()
+        decrypted_sas_token = decrypt(datasource["sasToken"])
     else:
         return None
     if not decrypted_sas_token:
@@ -54,7 +54,7 @@ def get_iq(
     filepath: str,
     offsetBytes: int,
     countBytes: int,
-    sasToken: str = Depends(get_sas_token),
+    sasToken: SecretStr = Depends(get_sas_token),
 ):
     try:
         if not sasToken:
@@ -63,7 +63,7 @@ def get_iq(
         blob_client = BlobClient.from_blob_url(
             f"https://{account}.blob.core.windows.net/"
             f"{container}/{filepath}.sigmf-data",
-            credential=sasToken,
+            credential=sasToken.get_secret_value(),
         )
 
         download_stream = blob_client.download_blob(offsetBytes, countBytes)
@@ -96,7 +96,7 @@ async def get_iq_data_slices(
     account: str,
     container: str,
     filepath: str,
-    sasToken: str = Depends(get_sas_token),
+    sasToken: SecretStr = Depends(get_sas_token),
 ):
     try:
         logger = logging.getLogger("api")
@@ -107,7 +107,7 @@ async def get_iq_data_slices(
 
         blob_client = BlobClient.from_blob_url(
             f"https://{account}.blob.core.windows.net/{container}/{filepath}.sigmf-data",
-            credential=sasToken,
+            credential=sasToken.get_secret_value(),
         )
         blob_properties = blob_client.get_blob_properties()
         blob_size = blob_properties.size
