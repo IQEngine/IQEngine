@@ -55,7 +55,7 @@ export const App = () => {
   }
 
   useEffect(() => {
-    const timerId = setInterval(updateLogoCurve, 100); // in ms
+    const timerId = setInterval(updateLogoCurve, 50); // in ms
     return function cleanup() {
       clearInterval(timerId);
     };
@@ -63,7 +63,8 @@ export const App = () => {
 
   function Gradient() {
     const stops = [];
-    for (let i = 0; i < 256; i++) {
+    // start a little past beginning and a little before end
+    for (let i = 50; i < 206; i++) {
       const rgbString = 'rgb(' + cMap[i][0] + ',' + cMap[i][1] + ',' + cMap[i][2] + ')';
       const offset = String(((i / 255) * 100).toFixed(0)) + '%';
       stops.push({ offset: offset, stopColor: rgbString });
