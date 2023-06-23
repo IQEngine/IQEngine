@@ -52,4 +52,3 @@ jobs:
             ghcr.io/${{ steps.set_variables.outputs.repository }}:${{ steps.set_variables.outputs.sha }}
             ghcr.io/${{ steps.set_variables.outputs.repository }}:${{ steps.draft_a_release.outputs.tag_name }}
             ghcr.io/${{ steps.set_variables.outputs.repository }}:latest
-
