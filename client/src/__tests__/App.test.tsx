@@ -51,4 +51,23 @@ describe('Test Feature flags', () => {
         await waitForElementToBeRemoved(screen.queryByText('GitHub'))
         expect(screen.queryByText('GitHub')).toBeNull();
     });
+
+    // displayInternalBranding
+    test('renders app component with GitHub link when no feature flag specified', () => {
+        render(<App />,  { wrapper: AllProviders });
+        expect(screen.getByText('GitHub')).toBeInTheDocument();
+    });
+
+    test('renders app component with GitHub link when flag set to true', () => {
+        import.meta.env.VITE_FEATURE_FLAGS = '{"displayInternalBranding": true}';
+        render(<App />,  { wrapper: AllProviders });
+        expect(screen.getByAltText('Internal branding logo')).toBeInTheDocument();
+    });
+
+    test('does not render app component with GitHub link when flag set to false',  async () => {
+        import.meta.env.VITE_FEATURE_FLAGS = '{"displayInternalBranding": false, "useIQEngineOutReach": true}';
+        render(<App />,  { wrapper: AllProviders });
+        await waitForElementToBeRemoved(screen.queryByAltText('Internal branding logo'))
+        expect(screen.queryByAltText('Internal branding logo')).toBeNull();
+    });
 });
