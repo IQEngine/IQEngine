@@ -11,14 +11,16 @@ from gnuradio.fft import window
 from gnuradio import zeromq
 import zmq
 
+
 class gnuradio_lowpass_filter(gr.top_block):
     def __init__(self, sample_rate, cutoff, width):
         gr.top_block.__init__(self, "GNU Radio-based IQEngine Plugin", catch_exceptions=True)
-        self.zeromq_sub_source_0 = zeromq.sub_source(gr.sizeof_gr_complex, 1, 'tcp://127.0.0.1:5001', 100, False, -1)
-        self.zeromq_pub_sink_0 = zeromq.pub_sink(gr.sizeof_gr_complex, 1, 'tcp://127.0.0.1:5002', 100, False, -1)
-        self.low_pass_filter_0 = filter.fir_filter_ccf(1, firdes.low_pass(1, sample_rate, cutoff, width, window.WIN_HAMMING, 6.76))
-        self.connect((self.low_pass_filter_0, 0), (self.zeromq_pub_sink_0, 0))
-        self.connect((self.zeromq_sub_source_0, 0), (self.low_pass_filter_0, 0))
+        self.zmq_sub_source = zeromq.sub_source(gr.sizeof_gr_complex, 1, 'tcp://127.0.0.1:5001', 100, False, -1)
+        self.zmq_pub_sink = zeromq.pub_sink(gr.sizeof_gr_complex, 1, 'tcp://127.0.0.1:5002', 100, False, -1)
+        self.filter = filter.fir_filter_ccf(1, firdes.low_pass(1, sample_rate, cutoff, width, window.WIN_HAMMING, 6.76))
+        self.connect(self.filter, self.zmq_pub_sink)
+        self.connect(self.zmq_sub_source, self.filter)
+
 
 @dataclass
 class Plugin:
@@ -57,7 +59,7 @@ class Plugin:
                 resp = sub_socket.recv()
                 newSamples = np.concatenate((newSamples, np.frombuffer(resp, dtype=np.complex64, count=-1)))
             except Exception as e: # messy way of figuring out when gnuradio is done
-                #print(e)
+                print(e)
                 break
 
         tb.stop()
