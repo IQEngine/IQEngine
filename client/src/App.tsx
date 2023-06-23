@@ -11,11 +11,12 @@ import { Link } from 'react-router-dom';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'react-hot-toast';
 import Feature from '@/Components/Feature/Feature';
-import { Animate } from 'react-move';
+import { colMaps } from '@/Utils/colormap';
 
 export const App = () => {
   const [width, setWidth] = React.useState(window.innerWidth);
   const breakpoint = 700;
+  const cMap = colMaps['viridis'];
 
   const location = useLocation();
   const config = configQuery();
@@ -60,12 +61,31 @@ export const App = () => {
     };
   }, []);
 
+  function Gradient() {
+    const stops = [];
+    for (let i = 0; i < 256; i++) {
+      const rgbString = 'rgb(' + cMap[i][0] + ',' + cMap[i][1] + ',' + cMap[i][2] + ')';
+      const offset = String(((i / 255) * 100).toFixed(0)) + '%';
+      stops.push({ offset: offset, stopColor: rgbString });
+    }
+
+    return (
+      <linearGradient id="solids">
+        {stops.map((v, index) => (
+          <stop offset={v.offset} stopColor={v.stopColor} stopOpacity="1" key={index} />
+        ))}
+      </linearGradient>
+    );
+  }
   function Logo() {
     return (
       <svg width="400" height="100" viewBox="70 68 20 27">
+        <defs>
+          <Gradient />
+        </defs>
         <g>
-          <path id="logo-sin-curve" stroke="yellow" stroke-width="0.5" fill="none" />
-          <path id="logo-cos-curve" stroke="yellow" stroke-width="0.5" fill="none" />
+          <path id="logo-sin-curve" stroke="url(#solids)" strokeWidth="0.5" fill="none" />
+          <path id="logo-cos-curve" stroke="url(#solids)" strokeWidth="0.5" fill="none" />
         </g>
         <g aria-label="IQEngine" fill="#AFAFAF">
           <path d="M 33.526375,72.431076 V 89.360275 H 29.570028 V 72.431076 Z" />
