@@ -5,7 +5,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Layer, Rect, Image } from 'react-konva';
 import { fftshift } from 'fftshift';
-import { colMap } from '@/Utils/colormap';
 import { MINIMUM_SCROLL_HANDLE_HEIGHT_PIXELS, TILE_SIZE_IN_IQ_SAMPLES } from '@/Utils/constants';
 import { FFT } from '@/Utils/fft';
 import { SigMFMetadata } from '@/Utils/sigmfMetadata';
@@ -23,6 +22,7 @@ interface ScrollBarProps {
   fftSizeScrollbar: number;
   setMagnitudeMax: any;
   setMagnitudeMin: any;
+  colorMap: any;
 }
 
 const ScrollBar = (props: ScrollBarProps) => {
@@ -35,6 +35,7 @@ const ScrollBar = (props: ScrollBarProps) => {
     handleTop,
     fetchEnabled,
     fftSizeScrollbar,
+    colorMap,
   } = props;
 
   const [dataRange, setDataRange] = useState([]);
@@ -149,7 +150,7 @@ const ScrollBar = (props: ScrollBarProps) => {
       let lineOffset = i * fftSizeScrollbar * 4;
       for (let sigVal, rgba, opIdx = 0, ipIdx = startOfs; ipIdx < fftSizeScrollbar + startOfs; opIdx += 4, ipIdx++) {
         sigVal = ipBuf8[ipIdx] || 0; // if input line too short add zeros
-        rgba = colMap[sigVal]; // array of rgba values
+        rgba = colorMap[sigVal]; // array of rgba values
         // byte reverse so number aa bb gg rr
         minimapArray[lineOffset + opIdx] = rgba[0]; // red
         minimapArray[lineOffset + opIdx + 1] = rgba[1]; // green
@@ -173,7 +174,7 @@ const ScrollBar = (props: ScrollBarProps) => {
     createImageBitmap(imageData).then((ret) => {
       setMinimapImg(ret);
     });
-  }, [iqSlices.data]); // dont add anymore here, so that this triggers ONLY at the start
+  }, [iqSlices.data, colorMap]); // dont add anymore here, so that this triggers ONLY at the start
 
   const handleClick = (e) => {
     let currentY = e.evt.offsetY;

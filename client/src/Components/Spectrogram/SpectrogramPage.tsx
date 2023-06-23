@@ -12,7 +12,7 @@ import { selectFft, calculateTileNumbers, range, SelectFftReturn } from '@/Utils
 import { AnnotationViewer } from '@/Components/Annotation/AnnotationViewer';
 import { RulerTop } from './RulerTop';
 import { RulerSide } from './RulerSide';
-import { INITIAL_PYTHON_SNIPPET, TILE_SIZE_IN_IQ_SAMPLES } from '@/Utils/constants';
+import { INITIAL_PYTHON_SNIPPET, TILE_SIZE_IN_IQ_SAMPLES, COLORMAP_DEFAULT } from '@/Utils/constants';
 import TimeSelector from './TimeSelector';
 import AnnotationList from '@/Components/Annotation/AnnotationList';
 import { GlobalProperties } from '@/Components/GlobalProperties/GlobalProperties';
@@ -25,6 +25,7 @@ import { getMeta } from '@/api/metadata/Queries';
 import { SigMFMetadata } from '@/Utils/sigmfMetadata';
 import { getIQDataSlices, useCurrentCachedIQDataSlice } from '@/api/iqdata/Queries';
 import { applyProcessing } from '@/Sources/FetchMoreDataSource';
+import { colMaps } from '@/Utils/colormap';
 
 declare global {
   interface Window {
@@ -52,6 +53,7 @@ export const SpectrogramPage = () => {
   const [magnitudeMax, setMagnitudeMax] = useState(-10.0); // in dB
   const [magnitudeMin, setMagnitudeMin] = useState(-40.0); // in dB
   const [fftWindow, setFFTWindow] = useState('hamming');
+  const [colorMap, setColorMap] = useState(colMaps[COLORMAP_DEFAULT]);
   const [autoscale, setAutoscale] = useState(false);
   const [image, setImage] = useState(null);
   const [upperTile, setUpperTile] = useState(-1);
@@ -160,11 +162,12 @@ export const SpectrogramPage = () => {
       autoscale,
       zoomLevel,
       iqData,
-      {}
+      {},
+      colorMap
     );
     setFFTData(ret?.fftData);
     setFFTImage(ret);
-  }, [fftSize, magnitudeMax, magnitudeMin, fftWindow, zoomLevel]);
+  }, [fftSize, magnitudeMax, magnitudeMin, fftWindow, zoomLevel, colorMap]);
 
   useEffect(() => {
     if (!meta || lowerTile < 0 || upperTile < 0) {
@@ -182,7 +185,8 @@ export const SpectrogramPage = () => {
       autoscale,
       zoomLevel,
       iqData,
-      fftData
+      fftData,
+      colorMap
     );
     setFFTData(ret?.fftData);
     setFFTImage(ret);
@@ -354,6 +358,8 @@ export const SpectrogramPage = () => {
             pythonSnippet={pythonSnippet}
             meta={meta}
             setMeta={setMeta}
+            colorMap={colorMap}
+            setColorMap={setColorMap}
           />
           <div className="flex flex-col">
             <ul className="flex space-x-2 border-b border-primary w-full sm:pl-12 lg:pl-32" id="tabsbar">
@@ -471,6 +477,7 @@ export const SpectrogramPage = () => {
                         fftSizeScrollbar={fftSize}
                         setMagnitudeMax={setMagnitudeMax}
                         setMagnitudeMin={setMagnitudeMin}
+                        colorMap={colorMap}
                       />
                     </Stage>
                   </div>
