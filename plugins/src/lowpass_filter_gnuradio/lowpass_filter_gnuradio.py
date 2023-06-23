@@ -4,7 +4,6 @@
 import base64
 import numpy as np
 from pydantic.dataclasses import dataclass
-from scipy import signal
 from gnuradio import filter
 from gnuradio.filter import firdes
 from gnuradio import gr
