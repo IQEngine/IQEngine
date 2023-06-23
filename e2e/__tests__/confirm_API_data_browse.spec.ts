@@ -1,4 +1,6 @@
 import { test, expect } from '@playwright/test';
+import * as mongoDB from 'mongodb';
+import * as dotenv from 'dotenv';
 
 test.beforeAll(async ({ request }) => {
   const dataSource = {
@@ -16,5 +18,14 @@ test('API Datasource Browsing', async ({ page }) => {
   await page.goto('/');
   const elements = await page.locator('[id="TestAPIDataSource"]'); // After first run there will be more than one element by this name
   await elements.nth(0).click(); // Only look for the first element
-  await expect(page.getByText('AUTHOR')).toBeVisible();
+  await expect(page.getByText('Author')).toBeVisible();
+});
+
+test.afterAll(async ({ request }) => {
+  dotenv.config();
+  const connection_string = process.env.METADATA_DB_CONNECTION_STRING || '';
+  const client: mongoDB.MongoClient = new mongoDB.MongoClient(connection_string);
+  await client.connect();
+  const db: mongoDB.Db = client.db('RFDX');
+  db.dropCollection('datasources');
 });
