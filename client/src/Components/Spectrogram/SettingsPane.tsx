@@ -9,7 +9,8 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import DualRangeSlider from '@/Components/DualRangeSlider/DualRangeSlider';
 import { SigMFMetadata } from '@/Utils/sigmfMetadata';
-import { TILE_SIZE_IN_IQ_SAMPLES } from '@/Utils/constants';
+import { TILE_SIZE_IN_IQ_SAMPLES, COLORMAP_DEFAULT } from '@/Utils/constants';
+import { colMaps } from '@/Utils/colormap';
 
 export class SettingsPaneProps {
   meta: SigMFMetadata;
@@ -31,6 +32,8 @@ export class SettingsPaneProps {
   pythonSnippet: string;
   setPythonSnippet: (pythonSnippet: string) => void;
   handleProcessTime: () => { trimmedSamples: number[]; startSampleOffset: number };
+  colorMap: any;
+  setColorMap: any;
 }
 
 const SettingsPane = (props: SettingsPaneProps) => {
@@ -50,6 +53,7 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
     windowFunction: 'hamming',
     zoomLevel: 1,
     saveButtonEnabled: false,
+    colorMapName: COLORMAP_DEFAULT,
   });
 
   const onChangeWindowFunction = (event) => {
@@ -62,6 +66,11 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
     const newSize = parseInt(event.target.text);
     setState({ ...state, size: newSize });
     props.updateFftsize(newSize);
+  };
+
+  const onChangeColorMap = (event) => {
+    setState({ ...state, colorMapName: event.target.text });
+    props.setColorMap(colMaps[event.target.text]);
   };
 
   const onChangePythonSnippet = (event) => {
@@ -191,21 +200,23 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
         */}
       </div>
 
-      <div id="formFFT">
-        <label className="label">
-          <span className="label-text text-base">
-            FFT Size
-            <a
-              style={{ textDecoration: 'none', color: 'white', marginLeft: '5px' }}
-              target="_blank"
-              rel="noreferrer"
-              href="https://pysdr.org/content/frequency_domain.html#fft-sizing"
-            >
-              <HelpOutlineOutlinedIcon />
-            </a>
-          </span>
-        </label>
+      <div className="mt-2">
+        <div className="dropdown dropdown-hover">
+          <button tabIndex={0} className="m-1 px-16 w-full">
+            Colormap
+          </button>
+          <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
+            <li data-value="jet" onClick={onChangeColorMap}>
+              {state.colorMapName === 'jet' ? <a className="bg-primary">jet</a> : <a>jet</a>}
+            </li>
+            <li data-value="viridis" onClick={onChangeColorMap}>
+              {state.colorMapName === 'viridis' ? <a className="bg-primary">viridis</a> : <a>viridis</a>}
+            </li>
+          </ul>
+        </div>
+      </div>
 
+      <div className="mt-2">
         <div className="dropdown dropdown-hover">
           <button tabIndex={0} className="m-1 px-16 w-full">
             FFT Size
@@ -218,6 +229,14 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
             ))}
           </ul>
         </div>
+        <a
+          style={{ textDecoration: 'none', color: 'white', marginLeft: '5px' }}
+          target="_blank"
+          rel="noreferrer"
+          href="https://pysdr.org/content/frequency_domain.html#fft-sizing"
+        >
+          <HelpOutlineOutlinedIcon />
+        </a>
       </div>
       <>
         <div className="mb-3" id="formTaps">

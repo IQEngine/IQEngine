@@ -4,6 +4,7 @@
 
 export const TILE_SIZE_IN_IQ_SAMPLES = Math.pow(2, 17); // should always be a power of 2
 export const MINIMUM_SCROLL_HANDLE_HEIGHT_PIXELS = 10;
+export const COLORMAP_DEFAULT = 'viridis';
 export const INITIAL_PYTHON_SNIPPET = `import numpy as np
 import time
 start_t = time.time()

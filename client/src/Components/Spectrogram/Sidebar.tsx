@@ -30,6 +30,8 @@ export interface SidebarProps {
   setPythonSnippet: (pythonSnippet: string) => void;
   meta: SigMFMetadata;
   setMeta: (meta: SigMFMetadata) => void;
+  colorMap: any;
+  setColorMap: any;
 }
 
 const Sidebar = (props) => {
@@ -60,6 +62,8 @@ const Sidebar = (props) => {
             pythonSnippet={props.pythonSnippet}
             setPythonSnippet={props.setPythonSnippet}
             handleProcessTime={props.handleProcessTime}
+            colorMap={props.colorMap}
+            setColorMap={props.setColorMap}
           />
         </div>
       </details>
