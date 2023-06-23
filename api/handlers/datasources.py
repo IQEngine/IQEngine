@@ -1,8 +1,8 @@
 import database.database
 from database.models import DataSource
 from fastapi import APIRouter, Depends, HTTPException
-from pymongo.collection import Collection
 from pydantic import SecretStr
+from pymongo.collection import Collection
 
 from .cipher import decrypt, encrypt
 
@@ -74,15 +74,17 @@ def get_datasource(
         and datasource["sasToken"] is not None
         and "core.windows.net" in datasource["imageURL"]
     ):
-        datasource["imageURL"] = datasource["imageURL"] + "?" + decrypt(datasource["sasToken"]).get_secret_value()
+        # linter fix for error: "get_secret_value" is not a known member of "None" (reportOptionalMemberAccess)
+        x = decrypt(datasource["sasToken"])
+        y = ""
+        if x is not None:
+            y = x.get_secret_value()
+        datasource["imageURL"] = datasource["imageURL"] + "?" + y
 
     return datasource
 
 
-@router.put(
-    "/api/datasources/{account}/{container}/datasource",
-    status_code=204
-)
+@router.put("/api/datasources/{account}/{container}/datasource", status_code=204)
 def update_datasource(
     account: str,
     container: str,
@@ -103,7 +105,7 @@ def update_datasource(
     # If the incoming datasource has a sasToken, encrypt it and replace the existing one
     # Once encrypted sasToken is just a str not a SecretStr anymore
     if datasource.sasToken and isinstance(datasource.sasToken, SecretStr):
-        datasource.sasToken = encrypt(datasource.sasToken) # returns a str
+        datasource.sasToken = encrypt(datasource.sasToken)  # returns a str
 
     datasource_dict = datasource.dict(by_alias=True, exclude_unset=True)
     if "sasToken" in datasource_dict:

@@ -1,6 +1,7 @@
 import os
-from pydantic import SecretStr
+
 from cryptography.fernet import Fernet
+from pydantic import SecretStr
 
 
 def get_key():
