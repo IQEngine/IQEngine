@@ -57,5 +57,4 @@ jobs:
           VITE_IQENGINE_APP_VERSION: '$${{ secrets.VITE_IQENGINE_APP_VERSION }}'
           VITE_GOOGLE_ANALYTICS_KEY: '${{ secrets.VITE_GOOGLE_ANALYTICS_KEY }}'
           VITE_PLUGINS_ENDPOINT: '${{ secrets.VITE_PLUGINS_ENDPOINT }}'
-          VITE_FEATURE_FLAGS: '${{ secrets.VITE_FEATURE_FLAGS }}'
           NODE_ENV: production

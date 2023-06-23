@@ -21,4 +21,5 @@ def get_config():
         "pluginsEndpoint": plugins_endpoint,
         "connectionInfo": connection_info,
         "googleAnalyticsKey": os.getenv("GOOGLE_ANALYTICS_KEY", None),
+        "featureFlags": os.getenv("FEATURE_FLAGS", None),
     }
