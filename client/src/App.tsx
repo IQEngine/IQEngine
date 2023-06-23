@@ -35,21 +35,31 @@ export const App = () => {
     const y0 = 92.5;
     let sinCurve = document.getElementById('logo-sin-curve');
     let cosCurve = document.getElementById('logo-cos-curve');
-    const t = (new Date().getTime() / 100) % 100;
-    const newX = x0 + t;
-    const newy = y0 + Math.cos(t);
     let sinString = 'M ' + x0 + ',' + y0;
     let cosString = 'M ' + x0 + ',' + y0;
+    const t = new Date().getTime();
+    let noiseI;
+    if (Math.random() > 0.9) {
+      noiseI = [...Array(Math.floor(Math.random() * 20)).keys()].map((i) => i + Math.floor(Math.random() * 100));
+    } else {
+      noiseI = [];
+    }
+
     for (let i = 0; i < 100; i++) {
-      sinString += ' L ' + (x0 + i) + ',' + (y0 + 2 * Math.sin(0.5 * i - t));
-      cosString += ' L ' + (x0 + i) + ',' + (y0 + 2 * Math.cos(0.5 * i - t));
+      if (noiseI.includes(i)) {
+        sinString += ' L ' + (x0 + i) + ',' + (y0 + 2 * Math.random() - 1);
+        cosString += ' L ' + (x0 + i) + ',' + (y0 + 2 * Math.random() - 1);
+      } else {
+        sinString += ' L ' + (x0 + i) + ',' + (y0 + 2 * Math.sin(0.5 * i - t * 0.002));
+        cosString += ' L ' + (x0 + i) + ',' + (y0 + 2 * Math.cos(0.5 * i - t * 0.002));
+      }
     }
     sinCurve.setAttribute('d', sinString);
     cosCurve.setAttribute('d', cosString);
   }
 
   useEffect(() => {
-    const timerId = setInterval(updateLogoCurve, 10); // in ms
+    const timerId = setInterval(updateLogoCurve, 100); // in ms
     return function cleanup() {
       clearInterval(timerId);
     };
@@ -59,8 +69,8 @@ export const App = () => {
     return (
       <svg width="400" height="100" viewBox="70 68 20 27">
         <g>
-          <path id="logo-sin-curve" stroke="yellow" stroke-width="0.75" fill="none" />
-          <path id="logo-cos-curve" stroke="yellow" stroke-width="0.75" fill="none" />
+          <path id="logo-sin-curve" stroke="yellow" stroke-width="0.5" fill="none" />
+          <path id="logo-cos-curve" stroke="yellow" stroke-width="0.5" fill="none" />
         </g>
         <g aria-label="IQEngine" fill="#AFAFAF">
           <path d="M 33.526375,72.431076 V 89.360275 H 29.570028 V 72.431076 Z" />
