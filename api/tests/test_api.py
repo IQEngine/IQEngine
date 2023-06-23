@@ -159,8 +159,9 @@ def test_api_put_datasource(client):
     response = client.post("/api/datasources", json=local_test_datasource)
     local_test_datasource["description"] = "new description"
     local_test_datasource["sasToken"] = "new sasToken"
-    response = client.put(f'/api/datasources/{local_test_datasource["account"]}/{local_test_datasource["container"]}/datasource',
-                           json=local_test_datasource)
+    response = client.put(f'/api/datasources/{local_test_datasource["account"]}'
+                          f'/{local_test_datasource["container"]}/datasource',
+                          json=local_test_datasource)
     assert response.status_code == 204
 
 

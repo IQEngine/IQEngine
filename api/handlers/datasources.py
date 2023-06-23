@@ -79,8 +79,9 @@ def get_datasource(
 
     return datasource
 
+
 @router.put(
-    "/api/datasources/{account}/{container}/datasource", 
+    "/api/datasources/{account}/{container}/datasource",
     status_code=204
 )
 def update_datasource(

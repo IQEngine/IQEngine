@@ -1,14 +1,14 @@
 from pydantic import BaseModel, Extra, Field, SecretStr
-
+from typing import Optional
 
 class DataSource(BaseModel):
     type: str
     name: str
     account: str
     container: str
-    description: str | None
-    imageURL: str | None
-    sasToken: SecretStr | None
+    description: Optional[str] = None
+    imageURL: Optional[str] = None
+    sasToken: Optional[SecretStr] = None
 
 
 class DataSourceReference(BaseModel):
