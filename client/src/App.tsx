@@ -34,14 +34,18 @@ export const App = () => {
     const x0 = 29.5;
     const y0 = 92.5;
     let sinCurve = document.getElementById('logo-sin-curve');
+    let cosCurve = document.getElementById('logo-cos-curve');
     const t = (new Date().getTime() / 100) % 100;
     const newX = x0 + t;
     const newy = y0 + Math.cos(t);
-    let dString = 'M ' + x0 + ',' + y0;
+    let sinString = 'M ' + x0 + ',' + y0;
+    let cosString = 'M ' + x0 + ',' + y0;
     for (let i = 0; i < 100; i++) {
-      dString += ' L ' + (x0 + i) + ',' + (y0 + 2 * Math.cos(0.5 * i - t));
+      sinString += ' L ' + (x0 + i) + ',' + (y0 + 2 * Math.sin(0.5 * i - t));
+      cosString += ' L ' + (x0 + i) + ',' + (y0 + 2 * Math.cos(0.5 * i - t));
     }
-    sinCurve.setAttribute('d', dString);
+    sinCurve.setAttribute('d', sinString);
+    cosCurve.setAttribute('d', cosString);
   }
 
   useEffect(() => {
@@ -55,7 +59,8 @@ export const App = () => {
     return (
       <svg width="400" height="100" viewBox="70 68 20 27">
         <g>
-          <path id="logo-sin-curve" stroke="yellow" stroke-width="0.75" />
+          <path id="logo-sin-curve" stroke="yellow" stroke-width="0.75" fill="none" />
+          <path id="logo-cos-curve" stroke="yellow" stroke-width="0.75" fill="none" />
         </g>
         <g aria-label="IQEngine" fill="#AFAFAF">
           <path d="M 33.526375,72.431076 V 89.360275 H 29.570028 V 72.431076 Z" />
