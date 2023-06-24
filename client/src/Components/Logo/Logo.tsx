@@ -15,9 +15,23 @@ export const Logo = () => {
     let cosString = 'M ' + x0 + ',' + y0;
     const t = new Date().getTime();
     if (Math.random() > 0.95) {
-      for (let i = 0; i < 99; i++) {
-        sinString += ' L ' + (x0 + i) + ',' + (y0 + Math.random() * 3 - 1.5);
-        cosString += ' L ' + (x0 + i) + ',' + (y0 + Math.random() * 3 - 1.5);
+      if (Math.random() > 0.2) {
+        const indexStart = Math.floor(Math.random() * 70);
+        const indexStop = indexStart + 5 + Math.floor(Math.random() * 15);
+        for (let i = 0; i < 99; i++) {
+          if (i >= indexStart && i < indexStop) {
+            sinString += ' L ' + (x0 + i) + ',' + (y0 + Math.random() * 5 - 2.5);
+            cosString += ' L ' + (x0 + i) + ',' + (y0 + Math.random() * 5 - 2.5);
+          } else {
+            sinString += ' L ' + (x0 + i) + ',' + (y0 + Math.random() * 0.3 - 0.15);
+            cosString += ' L ' + (x0 + i) + ',' + (y0 + Math.random() * 0.3 - 0.15);
+          }
+        }
+      } else {
+        for (let i = 0; i < 99; i++) {
+          sinString += ' L ' + (x0 + i) + ',' + (y0 + 2 * Math.sin(i));
+          cosString += ' L ' + (x0 + i) + ',' + (y0 + 2 * Math.cos(i));
+        }
       }
     } else {
       for (let i = 0; i < 99; i++) {
