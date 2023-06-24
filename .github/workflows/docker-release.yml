@@ -53,8 +53,4 @@ jobs:
             ghcr.io/${{ steps.set_variables.outputs.repository }}:${{ steps.draft_a_release.outputs.tag_name }}
             ghcr.io/${{ steps.set_variables.outputs.repository }}:latest
         env:
-          VITE_CONNECTION_INFO: '${{ secrets.VITE_CONNECTION_INFO }}'
-          VITE_IQENGINE_APP_VERSION: '$${{ secrets.VITE_IQENGINE_APP_VERSION }}'
-          VITE_GOOGLE_ANALYTICS_KEY: '${{ secrets.VITE_GOOGLE_ANALYTICS_KEY }}'
-          VITE_PLUGINS_ENDPOINT: '${{ secrets.VITE_PLUGINS_ENDPOINT }}'
           NODE_ENV: production
