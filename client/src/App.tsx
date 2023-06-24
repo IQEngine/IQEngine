@@ -93,16 +93,13 @@ export const App = () => {
           </div>
           <Link to="/" onClick={() => {}}>
             <div className="absolute mt-4 pt-2 top-0 left-1/2 transform -translate-x-1/2 flex">
-              {false && (
-                <Feature flag="displayInternalBranding">
-                  <img
-                    src="/internalbrandingeg.jpg"
-                    alt="Internal branding logo"
-                    className="md:w-32 md:h-32 mr-8 sm:w-20 sm:h-20"
-                  />
-                </Feature>
-              )}
-
+              <Feature flag="displayInternalBranding">
+                <img
+                  src="/internalbrandingeg.jpg"
+                  alt="Internal branding logo"
+                  className="md:w-32 md:h-32 mr-8 sm:w-20 sm:h-20"
+                />
+              </Feature>
               <img src="/IQEngine.svg" alt="IQEngine" />
             </div>
           </Link>
