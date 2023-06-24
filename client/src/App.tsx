@@ -93,7 +93,7 @@ export const App = () => {
             </div>
           </div>
           <Link to="/" onClick={() => {}}>
-            <div className="absolute mt-4 pt-2 top-0 left-1/2 transform -translate-x-1/2 flex">
+            <div id="IQEngineLogo" className="absolute mt-4 pt-2 top-0 left-1/2 transform -translate-x-1/2 flex">
               <Feature flag="displayInternalBranding">
                 <img
                   src="/internalbrandingeg.jpg"
