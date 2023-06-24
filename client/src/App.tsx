@@ -1,7 +1,7 @@
 // Copyright (c) 2022 Microsoft Corporation
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useFeatureFlags } from './Components/FeatureFlagsContext/FeatureFlagsContext';
 import { useLocation, Outlet } from 'react-router-dom';
 import ReactGA from 'react-ga4';
@@ -11,16 +11,17 @@ import { Link } from 'react-router-dom';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'react-hot-toast';
 import Feature from '@/Components/Feature/Feature';
+import { Logo } from '@/Components/Logo/Logo';
 
 export const App = () => {
-  const [width, setWidth] = React.useState(window.innerWidth);
+  const [width, setWidth] = useState(window.innerWidth);
   const breakpoint = 700;
 
   const location = useLocation();
   const config = configQuery();
   const { setFeatureFlags } = useFeatureFlags();
 
-  React.useEffect(() => {
+  useEffect(() => {
     const handleResizeWindow = () => setWidth(window.innerWidth);
     window.addEventListener('resize', handleResizeWindow);
     return () => {
@@ -50,7 +51,7 @@ export const App = () => {
     <ThemeSelector>
       <Toaster />
       <div>
-        <div className="container flex mb-40 sm:navbar mb-10 bg-base-100" id="topRow">
+        <div className="container flex mb-16 sm:navbar mb-10 bg-base-100" id="topRow">
           <div className="md:hidden navbar-start">
             <div className="md:hidden dropdown">
               <label tabIndex={0} className="md:hidden btn btn-ghost btn-circle">
@@ -100,7 +101,7 @@ export const App = () => {
                   className="md:w-32 md:h-32 mr-8 sm:w-20 sm:h-20"
                 />
               </Feature>
-              <img src="/IQEngine.svg" alt="IQEngine" />
+              <Logo />
             </div>
           </Link>
           <div className="absolute right-0 py-2 mr-2 ">
