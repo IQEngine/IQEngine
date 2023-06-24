@@ -92,7 +92,18 @@ export const App = () => {
               </ul>
             </div>
           </div>
-          <Logo />
+          <Link to="/" onClick={() => {}}>
+            <div className="absolute mt-4 pt-2 top-0 left-1/2 transform -translate-x-1/2 flex">
+              <Feature flag="displayInternalBranding">
+                <img
+                  src="/internalbrandingeg.jpg"
+                  alt="Internal branding logo"
+                  className="md:w-32 md:h-32 mr-8 sm:w-20 sm:h-20"
+                />
+              </Feature>
+              <Logo />
+            </div>
+          </Link>
           <div className="absolute right-0 py-2 mr-2 ">
             <ul className="flex-row flex mb-4 mt-0 space-x-5 text-sm font-medium">
               <li className="hidden md:block">
