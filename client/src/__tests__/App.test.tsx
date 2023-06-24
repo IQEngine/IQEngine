@@ -64,13 +64,13 @@ describe('Test Feature flags', () => {
 
   // displayInternalBranding
   test('renders app component with displayInternalBranding flag set to true', () => {
-    import.meta.env.VITE_FEATURE_FLAGS = { displayInternalBranding: true };
+    import.meta.env.VITE_FEATURE_FLAGS = '{"displayInternalBranding": true }';
     render(<App />, { wrapper: AllProviders });
     expect(screen.getByAltText('Internal branding logo')).toBeInTheDocument();
   });
 
   test('does not render app component with displayInternalBranding flag set to false', async () => {
-    import.meta.env.VITE_FEATURE_FLAGS = { displayInternalBranding: false, useIQEngineOutReach: true };
+    import.meta.env.VITE_FEATURE_FLAGS = '{"displayInternalBranding": false, "useIQEngineOutReach": true }';
     render(<App />, { wrapper: AllProviders });
     await waitForElementToBeRemoved(screen.queryByAltText('Internal branding logo'));
     expect(screen.queryByAltText('Internal branding logo')).toBeNull();
