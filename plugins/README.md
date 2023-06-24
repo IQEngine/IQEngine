@@ -23,9 +23,9 @@ Plugins written in other languages will have to implement the full API.
 To get a feel for how simple it is to write a Python based plugin, check out the /src/lowpass_filter/low_passfilter.py
 code that implements a low-pass filter plugin in a couple dozen lines of Python, no additional boilerplate needed!
 
-## To run FastAPI functions locally for testing
+## Run plugins locally for testing
 
-First edit your .env file to include `VITE_PLUGINS_ENDPOINT=http://localhost:8000/plugins/`
+First edit your root .env file to include `VITE_PLUGINS_ENDPOINT=http://localhost:8000/plugins/`
 
 ```
 sudo apt install uvicorn ffmpeg libsm6 libxext6 -y
@@ -41,6 +41,24 @@ To run the example call, install the vscode extension called "REST Client" then 
 The way it works is the plugin name must match the directory and .py file within that directory, for fastapi to see it (e.g. markos_detector/markos_detector.py).
 
 See the template_plugin for how the input and outputs of the function work, if you want to create your own plugin.
+
+## Run plugins locally using docker
+
+```
+cd plugins
+docker build -t plugins_image .
+docker run -dit -p 8000:8000 --name plugins_container plugins_image
+docker ps
+```
+
+`docker ps` should return the following, if everything worked.  You should then be able to run the client and set your .env file as discussed above.
+
+CONTAINER ID   IMAGE           COMMAND                  CREATED          STATUS          PORTS                    NAMES
+12ed73ede6a0   plugins_image   "uvicorn --host 0.0.…"   21 seconds ago   Up 19 seconds   0.0.0.0:8000->8000/tcp   plugins_container
+
+Stop with `docker stop plugins_container` and delete with `docker rm plugins_container`.  
+
+SSH into container with `docker exec -it plugins_container /bin/bash`
 
 ## Notes
 

@@ -12,6 +12,8 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: 'list',
+  /* Timeout 30 seconds per test to allow database warmup time */
+  timeout: 3000,
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
@@ -24,34 +26,35 @@ export default defineConfig({
   /* Start the API Server */
   webServer: [
     {
-      command: 'cd .. && . .venv/bin/activate && make run-api',
-      url: 'http://127.0.0.1:5000/api/status',
-      reuseExistingServer: !process.env.CI,
-      timeout : 3 * 1000
-    },
-    {
-      command: 'cd .. && make dev',
+      command: './webServer.sh',
       url: 'http://127.0.0.1:3000',
       reuseExistingServer: !process.env.CI,
-      timeout : 3 * 1000
-    }
+      timeout: 200 * 1000,
+    },
   ],
 
   /* Configure projects for major browsers */
   projects: [
     {
+      name: 'setup',
+      testMatch: /global.setup\.ts/,
+    },
+    {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
+      dependencies: ['setup'],
     },
 
     {
       name: 'firefox',
       use: { ...devices['Desktop Firefox'] },
+      dependencies: ['setup'],
     },
 
     {
       name: 'webkit',
       use: { ...devices['Desktop Safari'] },
+      dependencies: ['setup'],
     },
   ],
 });
