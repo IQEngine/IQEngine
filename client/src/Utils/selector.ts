@@ -108,14 +108,12 @@ export function calcFftOfTile(
 
     // Apply colormap
     let line_offset = i * fftSize * 4;
-    for (let sigVal, rgba, opIdx = 0, ipIdx = startOfs; ipIdx < fftSize + startOfs; opIdx += 4, ipIdx++) {
+    for (let sigVal, opIdx = 0, ipIdx = startOfs; ipIdx < fftSize + startOfs; opIdx += 4, ipIdx++) {
       sigVal = ipBuf8[ipIdx] || 0; // if input line too short add zeros
-      rgba = colMap[sigVal]; // array of rgba values
-      // byte reverse so number aa bb gg rr
-      newFftData[line_offset + opIdx] = rgba[0]; // red
-      newFftData[line_offset + opIdx + 1] = rgba[1]; // green
-      newFftData[line_offset + opIdx + 2] = rgba[2]; // blue
-      newFftData[line_offset + opIdx + 3] = rgba[3]; // alpha
+      newFftData[line_offset + opIdx] = colMap[sigVal][0]; // red
+      newFftData[line_offset + opIdx + 1] = colMap[sigVal][1]; // green
+      newFftData[line_offset + opIdx + 2] = colMap[sigVal][2]; // blue
+      newFftData[line_offset + opIdx + 3] = 255; // alpha
     }
   }
   let endTime = performance.now();
