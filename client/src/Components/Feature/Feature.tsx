@@ -9,6 +9,9 @@ interface FeatureProps {
 
 const Feature = ({ flag, invert, children }: FeatureProps) => {
   const { getFeatureFlag } = useFeatureFlags();
+  if (!invert) {
+    invert = false;
+  }
   const shouldInvert = typeof invert === 'string' ? invert === 'true' : invert;
 
   if(shouldInvert) {
