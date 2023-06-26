@@ -46,3 +46,8 @@ def metadata_collection():
 def metadata_versions_collection():
     collection: Collection[Metadata] = db().versions
     return collection
+
+
+def processors_collection():
+    collection: Collection[Metadata] = db().processors
+    return collection
