@@ -6,7 +6,8 @@ from pymongo.collection import Collection
 from fastapi.responses import StreamingResponse
 import httpx
 
-from .cipher import decrypt, encrypt
+from .cipher import encrypt
+from .imageurl import add_imageURL_sasToken, uiImage
 
 router = APIRouter()
 
@@ -35,26 +36,6 @@ def create_datasource(
 
     datasources.insert_one(datasource.dict(by_alias=True, exclude_unset=True))
     return datasource
-
-
-def add_imageURL_sasToken(datasource):
-    if (
-        "imageURL" in datasource
-        and "sasToken" in datasource
-        and datasource["sasToken"] is not None
-        and datasource["sasToken"] != ""
-    ):
-        # linter fix for error: "get_secret_value" is not a known member of "None" (reportOptionalMemberAccess)
-        x = decrypt(datasource["sasToken"])
-        y = ""
-        if x is not None:
-            y = x.get_secret_value()
-        
-        bloburl = f'https://{datasource["account"]}.blob.core.windows.net/{datasource["container"]}/image.jpg'
-        imageURL_sasToken = SecretStr(bloburl + "?" + y)
-        return imageURL_sasToken
-    #else:
-        #return Should show a default lost image
 
 
 @router.get("/api/datasources", response_model=list[DataSource])
@@ -90,7 +71,7 @@ async def get_datasource_image(
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
 
-    imageURL = add_imageURL_sasToken(datasource)
+    imageURL = add_imageURL_sasToken(datasource, uiImage.IMAGE)
     async with httpx.AsyncClient() as client:
         response = await client.get(imageURL.get_secret_value())
     if response.status_code != 200:

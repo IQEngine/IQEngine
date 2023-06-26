@@ -1,5 +1,4 @@
 import os
-
 from cryptography.fernet import Fernet
 from pydantic import SecretStr
 
