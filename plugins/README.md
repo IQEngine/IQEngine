@@ -25,7 +25,7 @@ code that implements a low-pass filter plugin in a couple dozen lines of Python,
 
 ## Run plugins locally for testing
 
-First edit your root .env file to include `VITE_PLUGINS_ENDPOINT=http://localhost:8000/plugins/`
+First edit your root .env file to include `IQENGINE_PLUGINS_ENDPOINT=http://localhost:8000/plugins/`
 
 ```
 sudo apt install uvicorn ffmpeg libsm6 libxext6 -y
@@ -56,7 +56,7 @@ docker ps
 CONTAINER ID   IMAGE           COMMAND                  CREATED          STATUS          PORTS                    NAMES
 12ed73ede6a0   plugins_image   "uvicorn --host 0.0.…"   21 seconds ago   Up 19 seconds   0.0.0.0:8000->8000/tcp   plugins_container
 
-Stop with `docker stop plugins_container` and delete with `docker rm plugins_container`.  
+Stop with `docker stop plugins_container` and delete with `docker rm plugins_container`.
 
 SSH into container with `docker exec -it plugins_container /bin/bash`
 
