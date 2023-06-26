@@ -138,7 +138,7 @@ To configure the project, you need to set specific environment variables. The cu
 
 * `METADATA_DB_CONNECTION_STRING`: This variable stores the connection string for the Metadata DB. If you don't want to utilize the Metadata DB, you can leave this variable empty. Please note that this variable is only used by the backend API.
 
-* `RFDX_FF_INMEMDB`: This variable switches in-memory DB on or off. The in-memory DB is intended for testing only. Use RFDX_FF_INMEMDB = 0 for off and 1 for on. PyTest tests of the API make use of the in-memory DB.
+* `IN_MEMORY_DB`: This variable switches in-memory DB on or off. The in-memory DB is intended for testing only. Use IN_MEMORY_DB = 0 for off and 1 for on. PyTest tests of the API make use of the in-memory DB.
 
 It's important to note that variables starting with `VITE` will only be available to the frontend during the build process. If you are using a public container image, these variables will not have an effect. To modify the values for the backend, use the corresponding environment variables without the `VITE` prefix.
 
