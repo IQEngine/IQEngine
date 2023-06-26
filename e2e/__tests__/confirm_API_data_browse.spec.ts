@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
-import * as mongoDB from 'mongodb';
-import * as dotenv from 'dotenv';
+import { MongoClient, Db } from 'mongodb';
+import { config } from 'dotenv';
 
 test.beforeAll(async ({ request }) => {
   const dataSource = {
@@ -22,10 +22,11 @@ test('API Datasource Browsing', async ({ page }) => {
 });
 
 test.afterAll(async ({ request }) => {
-  dotenv.config();
+  config();
   const connection_string = process.env.METADATA_DB_CONNECTION_STRING || '';
-  const client: mongoDB.MongoClient = new mongoDB.MongoClient(connection_string);
+  const client: MongoClient = new MongoClient(connection_string);
   await client.connect();
-  const db: mongoDB.Db = client.db('RFDX');
-  db.dropCollection('datasources');
+  const db: Db = client.db('RFDX');
+  const collection = db.collection('datasources');
+  collection.deleteOne({ type: 'api', name: 'Test API DataSource' });
 });
