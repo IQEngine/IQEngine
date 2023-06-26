@@ -65,3 +65,24 @@ def test_api_update_processor(client):
     response = client.put("/api/processors/test_processor", json=test_processor)
     assert response.status_code == 200
     assert response.json() == test_processor
+
+def test_api_update_processor_not_found(client):
+    test_processor = {
+        "name": "test_processor",
+        "url": "http://test_processor.com",
+    }
+    response = client.put("/api/processors/test_processor", json=test_processor)
+    assert response.status_code == 404
+
+def test_api_delete_processore(client):
+    test_processor = {
+        "name": "test_processor",
+        "url": "http://test_processor.com",
+    }
+    response = client.post("/api/processors", json=test_processor)
+    assert response.status_code == 201
+    assert response.json() == test_processor
+    response = client.delete("/api/processors/test_processor")
+    assert response.status_code == 200
+    response = client.get("/api/processors/test_processor")
+    assert response.status_code == 404

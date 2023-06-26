@@ -69,7 +69,7 @@ def delete_processor(
     """
     Delete a processor by name.
     """
-    processor = processors.find_one_and_delete({"name": processor_name})
+    processor = processors.find_one_and_delete({"name": processor_name}, {'_id': 0})
     if processor is None:
         raise HTTPException(status_code=404, detail="Processor Not Found")
     return processor
