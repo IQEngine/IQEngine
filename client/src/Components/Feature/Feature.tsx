@@ -3,13 +3,23 @@ import { useFeatureFlags } from '@/Components/FeatureFlagsContext/FeatureFlagsCo
 
 interface FeatureProps {
   flag: string;
+  invert: boolean | string;
   children: ReactNode;
 }
 
-const Feature = ({ flag, children }: FeatureProps) => {
+const Feature = ({ flag, invert, children }: FeatureProps) => {
   const { getFeatureFlag } = useFeatureFlags();
+  const shouldInvert = typeof invert === 'string' ? invert === 'true' : invert;
+  console.log(flag + ": " + getFeatureFlag(flag));
+  console.log("invert: " + invert);
 
-  return getFeatureFlag(flag) ? <>{children}</> : null;
+  if(shouldInvert) {
+    console.log("returning null")
+    return getFeatureFlag(flag) ? null : children ;
+  }
+
+
+  return getFeatureFlag(flag) ? children : null;
 };
 
 export default Feature;

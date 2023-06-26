@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { render, screen, waitForElementToBeRemoved } from '@testing-library/react';
+import { render, screen, waitForElementToBeRemoved, waitFor } from '@testing-library/react';
 import App from '@/App';
 import React from 'react';
 import '@testing-library/jest-dom';
@@ -62,17 +62,18 @@ describe('Test Feature flags', () => {
     expect(screen.getByText('GitHub')).toBeInTheDocument();
   });
 
-  // displayInternalBranding
-  test('renders app component with displayInternalBranding flag set to true', () => {
-    import.meta.env.VITE_FEATURE_FLAGS = '{"displayInternalBranding": true }';
+  // hideInternalBranding
+  test('renders app component with hideInternalBranding flag set to false', async () => {
+    import.meta.env.VITE_FEATURE_FLAGS = '{"hideInternalBranding": false }';
     render(<App />, { wrapper: AllProviders });
+    await waitFor(() => screen.getByAltText('Internal branding logo'));
+
     expect(screen.getByAltText('Internal branding logo')).toBeInTheDocument();
   });
 
-  test('does not render app component with displayInternalBranding flag set to false', async () => {
-    import.meta.env.VITE_FEATURE_FLAGS = '{"displayInternalBranding": false, "useIQEngineOutReach": true }';
+  test('does not render app component with hideInternalBranding flag set to true', () => {
+    import.meta.env.VITE_FEATURE_FLAGS = '{"hideInternalBranding": true, "useIQEngineOutReach": true }';
     render(<App />, { wrapper: AllProviders });
-    await waitForElementToBeRemoved(screen.queryByAltText('Internal branding logo'));
     expect(screen.queryByAltText('Internal branding logo')).toBeNull();
   });
 });
