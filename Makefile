@@ -40,21 +40,17 @@ clean:
 	@rm -rf client/node_modules
 	@rm -rf client/build
 
-dev: SHELL:=/bin/bash
 dev:
 	@echo "Running React application for debugging..."
 	@cd client && npm run start
 
-test: SHELL:=/bin/bash
 test:
 	@echo "Running Playwright frontend and end-to-end tests"
 	@cd e2e && npx playwright test
 	@echo "Running pytest api tests"
 	@cd api && pytest
 
-test-pw: SHELL:=/bin/bash
 test-pw:
-	@echo "Confirm the FastAPI is running on port 5000 (press any key)..." && read -n1 -s
 	@echo "Running Playwright frontend and end-to-end tests"
 	@cd e2e && npx playwright test
 
