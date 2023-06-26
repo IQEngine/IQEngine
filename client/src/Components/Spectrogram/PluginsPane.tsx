@@ -34,7 +34,7 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
   useEffect(() => {
     if (!config.data || !config.data.pluginsEndpoint) return;
     let pluginsEndpoint = 'http://127.0.0.1:8000/plugins/';
-    // In local mode, CONNECTION_INFO isn't defined
+    // In local mode, IQENGINE_CONNECTION_INFO isn't defined
     if (config.data.pluginsEndpoint) {
       pluginsEndpoint = config.data.pluginsEndpoint;
     }

@@ -13,6 +13,7 @@ export default defineConfig({
   define: {
     'process.env': {},
   },
+  envPrefix: "IQENGINE",
   server: {
     port: 3000,
     open: true,
