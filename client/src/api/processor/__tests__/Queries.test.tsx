@@ -35,14 +35,12 @@ describe('useGetProcessors', () => {
         url: 'http://localhost:3000/api/processors/gnuradio',
       },
     ];
-    const activeMocks = nock.activeMocks();
     nock('http://localhost:3000').get(`/api/processors`).reply(200, expectedProcessors);
 
     const { result } = renderHook(() => useGetProcessors(), {
       wrapper: wrapper,
     });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    const active = nock.activeMocks();
     await waitFor(() => expect(result.current.isFetching).toEqual(false), { timeout: 1000 });
     await waitFor(() => expect(result.current.data).toEqual(expectedProcessors), { timeout: 1000 });
   });
