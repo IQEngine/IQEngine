@@ -206,12 +206,11 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
             Colormap
           </button>
           <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
-            <li data-value="jet" onClick={onChangeColorMap}>
-              {state.colorMapName === 'jet' ? <a className="bg-primary">jet</a> : <a>jet</a>}
-            </li>
-            <li data-value="viridis" onClick={onChangeColorMap}>
-              {state.colorMapName === 'viridis' ? <a className="bg-primary">viridis</a> : <a>viridis</a>}
-            </li>
+            {Object.entries(colMaps).map(([key, value]) => (
+              <li data-value={key} onClick={onChangeColorMap}>
+                {state.colorMapName === key ? <a className="bg-primary">{key}</a> : <a>{key}</a>}
+              </li>
+            ))}
           </ul>
         </div>
       </div>
