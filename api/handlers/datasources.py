@@ -43,17 +43,18 @@ def add_imageURL_sasToken(datasource):
         and "sasToken" in datasource
         and datasource["sasToken"] is not None
         and datasource["sasToken"] != ""
-        and "core.windows.net" in datasource["imageURL"]
     ):
         # linter fix for error: "get_secret_value" is not a known member of "None" (reportOptionalMemberAccess)
         x = decrypt(datasource["sasToken"])
         y = ""
         if x is not None:
             y = x.get_secret_value()
-        imageURL_sasToken = SecretStr(datasource["imageURL"] + "?" + y)
+        
+        bloburl = f'https://{datasource["account"]}.blob.core.windows.net/{datasource["container"]}/image.jpg'
+        imageURL_sasToken = SecretStr(bloburl + "?" + y)
         return imageURL_sasToken
-    else:
-        return SecretStr(datasource["imageURL"])
+    #else:
+        #return Should show a default lost image
 
 
 @router.get("/api/datasources", response_model=list[DataSource])
@@ -65,7 +66,6 @@ def get_datasources(
     datasources = datasources_collection.find()
     result = []
     for datasource in datasources:
-        datasource["imageURL"] = f'/api/datasources/{datasource["account"]}/{datasource["container"]}/image'
         result.append(datasource)
     return result
 
@@ -119,7 +119,6 @@ def get_datasource(
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
 
-    datasource["imageURL"] = f'/api/datasources/{datasource["account"]}/{datasource["container"]}/image'
     return datasource
 
 
