@@ -128,19 +128,17 @@ Each component needs to import the Feature component.
 
 To configure the project, you need to set specific environment variables. The currently supported environment variables are as follows:
 
-* `VITE_CONNECTION_INFO` or `CONNECTION_INFO`: This variable contains information about the connection string and data sources. You can refer to the [example.env](example.env) file for an example.
+* `IQENGINE_CONNECTION_INFO`: This variable contains information about the connection string and data sources. You can refer to the [example.env](example.env) file for an example.
 
-* `VITE_GOOGLE_ANALYTICS_KEY` or `GOOGLE_ANALYTICS_KEY`: This variable holds the key for Google Analytics. If you don't intend to use Google Analytics, you can leave this variable empty.
+* `IQENGINE_GOOGLE_ANALYTICS_KEY`: This variable holds the key for Google Analytics. If you don't intend to use Google Analytics, you can leave this variable empty.
 
-* `VITE_PLUGINS_ENDPOINT` or `PLUGINS_ENDPOINT`: Use this variable to specify the endpoint for the detector API. If you don't plan to use the detector API, you can leave this variable empty.
+* `IQENGINE_PLUGINS_ENDPOINT`: Use this variable to specify the endpoint for the detector API. If you don't plan to use the detector API, you can leave this variable empty.
 
-* `VITE_FEATURE_FLAGS`: Use this variable to specify feature flags for the web app. If you have a Metadata database you can specify the `useAPIDatasources` flag like this: VITE_FEATURE_FLAGS = {"useAPIDatasources": false}. Additional feature flags can be added using comma separation.
+* `IQENGINE_FEATURE_FLAGS`: Use this variable to specify feature flags for the web app. If you have a Metadata database you can specify the `useAPIDatasources` flag like this: IQENGINE_FEATURE_FLAGS = {"useAPIDatasources": false}. Additional feature flags can be added using comma separation.
 
-* `METADATA_DB_CONNECTION_STRING`: This variable stores the connection string for the Metadata DB. If you don't want to utilize the Metadata DB, you can leave this variable empty. Please note that this variable is only used by the backend API.
+* `IQENGINE_METADATA_DB_CONNECTION_STRING`: This variable stores the connection string for the Metadata DB. If you don't want to utilize the Metadata DB, you can leave this variable empty. Please note that this variable is only used by the backend API.
 
 * `RFDX_FF_INMEMDB`: This variable switches in-memory DB on or off. The in-memory DB is intended for testing only. Use RFDX_FF_INMEMDB = 0 for off and 1 for on. PyTest tests of the API make use of the in-memory DB.
-
-It's important to note that variables starting with `VITE` will only be available to the frontend during the build process. If you are using a public container image, these variables will not have an effect. To modify the values for the backend, use the corresponding environment variables without the `VITE` prefix.
 
 ## Project Roadmap
 

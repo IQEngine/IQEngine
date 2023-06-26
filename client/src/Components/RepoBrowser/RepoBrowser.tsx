@@ -28,7 +28,7 @@ const RepoBrowser = () => {
   const dispatch = useAppDispatch();
   useEffect(() => {
     if (config.data) {
-      // In local mode, CONNECTION_INFO isn't defined
+      // In local mode, IQENGINE_CONNECTION_INFO isn't defined
       if (config.data.connectionInfo && config.data.connectionInfo.settings) {
         var dataSources = config.data.connectionInfo.settings.map((item) => {
           var dataSource = {
