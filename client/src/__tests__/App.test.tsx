@@ -64,7 +64,7 @@ describe('Test Feature flags', () => {
 
   // hideInternalBranding
   test('renders app component with hideInternalBranding flag set to false', async () => {
-    import.meta.env.IQENGINE_FEATURE_FLAGS = '{"hideInternalBranding": true }';
+    import.meta.env.IQENGINE_FEATURE_FLAGS = '{"hideInternalBranding": false }';
     render(<App />, { wrapper: AllProviders });
     await waitFor(() => screen.getByAltText('Internal branding logo'));
 
@@ -72,7 +72,7 @@ describe('Test Feature flags', () => {
   });
 
   test('does not render app component with hideInternalBranding flag set to true', () => {
-    import.meta.env.IQENGINE_FEATURE_FLAGS = '{"hideInternalBranding": false, "useIQEngineOutReach": true }';
+    import.meta.env.IQENGINE_FEATURE_FLAGS = '{"hideInternalBranding": true, "useIQEngineOutReach": true }';
     render(<App />, { wrapper: AllProviders });
     expect(screen.queryByAltText('Internal branding logo')).toBeNull();
   });
