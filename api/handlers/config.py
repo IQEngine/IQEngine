@@ -14,11 +14,18 @@ def get_config():
     connection_info = os.getenv("CONNECTION_INFO", None)
     if connection_info:
         connection_info = json.loads(connection_info)
+
+    feature_flags = os.getenv("FEATURE_FLAGS", None)
+    if feature_flags:
+        feature_flags = json.loads(feature_flags)
+
     plugins_endpoint = os.getenv("PLUGINS_ENDPOINT", None)
     if plugins_endpoint and plugins_endpoint[-1] != '/':
         plugins_endpoint += '/'
+
     return {
         "pluginsEndpoint": plugins_endpoint,
         "connectionInfo": connection_info,
         "googleAnalyticsKey": os.getenv("GOOGLE_ANALYTICS_KEY", None),
+        "featureFlags": feature_flags,
     }
