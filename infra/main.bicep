@@ -44,7 +44,7 @@ module containerApp 'containerapp.bicep' = {
     useExternalIngress: true
     envVars: [
       {
-        name: 'METADATA_DB_CONNECTION_STRING'
+        name: 'IQENGINE_METADATA_DB_CONNECTION_STRING'
         value: mondodb.outputs.connectionString
       }
     ]

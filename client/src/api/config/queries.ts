@@ -10,32 +10,32 @@ const fetchConfig = async () => {
       console.log('axios config not found, using env vars instead');
       return {
         data: {
-          connectionInfo: JSON.parse(import.meta.env.VITE_CONNECTION_INFO ?? null),
-          pluginsEndpoint: import.meta.env.VITE_PLUGINS_ENDPOINT,
-          googleAnalyticsKey: import.meta.env.VITE_GOOGLE_ANALYTICS_KEY,
-          featureFlags: JSON.parse(import.meta.env.VITE_FEATURE_FLAGS ?? null),
+          connectionInfo: JSON.parse(import.meta.env.IQENGINE_CONNECTION_INFO ?? null),
+          pluginsEndpoint: import.meta.env.IQENGINE_PLUGINS_ENDPOINT,
+          googleAnalyticsKey: import.meta.env.IQENGINE_GOOGLE_ANALYTICS_KEY,
+          featureFlags: JSON.parse(import.meta.env.IQENGINE_FEATURE_FLAGS ?? null),
         } as Config,
       };
     });
     if (!response.data.connectionInfo) {
-      response.data.connectionInfo = JSON.parse(import.meta.env.VITE_CONNECTION_INFO ?? null);
+      response.data.connectionInfo = JSON.parse(import.meta.env.IQENGINE_CONNECTION_INFO ?? null);
     }
     if (!response.data.pluginsEndpoint) {
-      response.data.pluginsEndpoint = import.meta.env.VITE_PLUGINS_ENDPOINT;
+      response.data.pluginsEndpoint = import.meta.env.IQENGINE_PLUGINS_ENDPOINT;
     }
     if (!response.data.googleAnalyticsKey) {
-      response.data.googleAnalyticsKey = import.meta.env.VITE_GOOGLE_ANALYTICS_KEY;
+      response.data.googleAnalyticsKey = import.meta.env.IQENGINE_GOOGLE_ANALYTICS_KEY;
     }
     if (!response.data.featureFlags) {
-      response.data.featureFlags = JSON.parse(import.meta.env.VITE_FEATURE_FLAGS ?? null);
+      response.data.featureFlags = JSON.parse(import.meta.env.IQENGINE_FEATURE_FLAGS ?? null);
     }
     return response.data;
   } catch (error) {
     return {
-      connectionInfo: JSON.parse(import.meta.env.VITE_CONNECTION_INFO ?? null),
-      pluginsEndpoint: import.meta.env.VITE_PLUGINS_ENDPOINT,
-      googleAnalyticsKey: import.meta.env.VITE_GOOGLE_ANALYTICS_KEY,
-      featureFlags: JSON.parse(import.meta.env.VITE_FEATURE_FLAGS ?? null),
+      connectionInfo: JSON.parse(import.meta.env.IQENGINE_CONNECTION_INFO ?? null),
+      pluginsEndpoint: import.meta.env.IQENGINE_PLUGINS_ENDPOINT,
+      googleAnalyticsKey: import.meta.env.IQENGINE_GOOGLE_ANALYTICS_KEY,
+      featureFlags: JSON.parse(import.meta.env.IQENGINE_FEATURE_FLAGS ?? null),
     } as Config;
   }
 };
