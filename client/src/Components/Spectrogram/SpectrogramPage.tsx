@@ -241,16 +241,7 @@ export const SpectrogramPage = () => {
     setSpectrogramHeight(newSpectrogramHeight);
     const newSpectrogramWidth = window.innerWidth - 430; // hand-tuned for now
     setSpectrogramWidth(newSpectrogramWidth);
-    // Recalc tiles in view
-    const { lowerTile, upperTile } = calculateTileNumbers(
-      handleTop,
-      meta.getTotalSamples(),
-      fftSize,
-      newSpectrogramHeight,
-      zoomLevel
-    );
-    setLowerTile(lowerTile);
-    setUpperTile(upperTile);
+
     // Time/Freq/IQ Plot width/height
     const newplotWidth = window.innerWidth - 330;
     const newPlotHeight = newSpectrogramHeight - 100;
@@ -267,7 +258,7 @@ export const SpectrogramPage = () => {
       console.log('fetching and rendering tiles', meta);
       fetchAndRender(handleTop);
     }
-  }, [meta, zoomLevel, handleTop]);
+  }, [meta, zoomLevel, handleTop, spectrogramWidth, spectrogramHeight]);
 
   // run windowResized once when page loads
   useEffect(() => {
