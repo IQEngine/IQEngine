@@ -44,7 +44,7 @@ def add_imageURL_sasToken(datasource):
         and datasource["sasToken"] is not None
         and datasource["sasToken"] != ""
         and "core.windows.net" in datasource["imageURL"]
-):
+    ):
         # linter fix for error: "get_secret_value" is not a known member of "None" (reportOptionalMemberAccess)
         x = decrypt(datasource["sasToken"])
         y = ""
@@ -54,7 +54,7 @@ def add_imageURL_sasToken(datasource):
         return imageURL_sasToken
     else:
         return SecretStr(datasource["imageURL"])
-    
+
 
 @router.get("/api/datasources", response_model=list[DataSource])
 def get_datasources(
@@ -94,7 +94,7 @@ async def get_datasource_image(
     async with httpx.AsyncClient() as client:
         response = await client.get(imageURL.get_secret_value())
     if response.status_code != 200:
-            raise HTTPException(status_code=404, detail="Image not found")
+        raise HTTPException(status_code=404, detail="Image not found")
 
     return StreamingResponse(response.iter_bytes(), media_type=response.headers["Content-Type"])
 
@@ -144,7 +144,7 @@ def update_datasource(
     # If the incoming datasource has a sasToken, encrypt it and replace the existing one
     # Once encrypted sasToken is just a str not a SecretStr anymore
     if datasource.sasToken and isinstance(datasource.sasToken, SecretStr):
-            datasource.sasToken = encrypt(datasource.sasToken)  # returns a str
+        datasource.sasToken = encrypt(datasource.sasToken)  # returns a str
 
     datasource_dict = datasource.dict(by_alias=True, exclude_unset=True)
 
