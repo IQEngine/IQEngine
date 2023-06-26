@@ -2,7 +2,6 @@
 # vim: tabstop=4 shiftwidth=4 expandtab
 
 
-
 def test_api_create_processor(client):
     test_processor = {
         "name": "test_processor",
