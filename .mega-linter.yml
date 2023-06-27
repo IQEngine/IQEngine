@@ -13,6 +13,7 @@ PYTHON_RUFF_CONFIG_FILE: .github/linters/.ruff.toml
 PYTHON_PYRIGHT_CONFIG_FILE: .github/linters/pyrightconfig.json
 PYTHON_MYPY_CONFIG_FILE: .github/linters/.mypy.ini
 CSS_STYLELINT_CONFIG_FILE: .github/linters/.stylelintrc.js
+DOCKERFILE_HADOLINT_CONFIG_FILE: .github/linters/.hadolint.yaml
 GITHUB_COMMENT_REPORTER: false
 EXCLUDED_DIRECTORIES:
   - megalinter-reports

@@ -138,17 +138,16 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
           const magnitudeMin = -40;
           const magnitudeMax = -10;
           const samples_typed = Float32Array.from(samples);
-          const ret = calcFftOfTile(
+          const newFftData = calcFftOfTile(
             samples_typed,
             fftSize,
             numFfts,
             'hamming',
             magnitudeMin,
             magnitudeMax,
-            false, // autoscale
             colMaps['jet'] // colormap
           );
-          const imageData = new ImageData(ret['newFftData'], fftSize, numFfts);
+          const imageData = new ImageData(newFftData, fftSize, numFfts);
           createImageBitmap(imageData).then((imageBitmap) => {
             setmodalSpectrogram(imageBitmap);
           });

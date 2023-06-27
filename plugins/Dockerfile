@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install ffmpeg libsm6 libxext6 -y
 # Note that GNU Radio has a bunch of python3-xyz deps so we'll install the rest of the python
 #    packages with apt instead of pip
 RUN apt-get install python3-fastapi uvicorn -y
+RUN apt-get install python3-opencv -y
 WORKDIR /src
 COPY src ./
 EXPOSE 8000
