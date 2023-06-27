@@ -7,7 +7,7 @@ from fastapi.responses import StreamingResponse
 import httpx
 
 from .cipher import encrypt
-from .imageurl import add_imageURL_sasToken, uiImage
+from .urlmapping import add_URL_sasToken, uiImage
 
 router = APIRouter()
 
@@ -71,7 +71,7 @@ async def get_datasource_image(
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
 
-    imageURL = add_imageURL_sasToken(account, container, datasource["sasToken"], "", uiImage.IMAGE)
+    imageURL = add_URL_sasToken(account, container, datasource["sasToken"], "", uiImage.IMAGE)
     if not imageURL.get_secret_value():
         return StreamingResponse((b'' for _ in range(1))) # return empty image
 

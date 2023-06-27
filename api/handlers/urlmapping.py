@@ -6,9 +6,10 @@ from enum import Enum
 class uiImage(Enum):
     IMAGE = 1
     THUMB = 2
+    IQDATA = 3
 
 
-def add_imageURL_sasToken(account, container, sasToken, filepath, uiImage: uiImage):
+def add_URL_sasToken(account, container, sasToken, filepath, uiImage: uiImage):
     if (
         sasToken is not None
         and sasToken != ""
@@ -23,6 +24,8 @@ def add_imageURL_sasToken(account, container, sasToken, filepath, uiImage: uiIma
             bloburl = f'https://{account}.blob.core.windows.net/{container}/{filepath}.jpg'
         elif uiImage == uiImage.IMAGE:
             bloburl = f'https://{account}.blob.core.windows.net/{container}/image.jpg'
+        elif uiImage == uiImage.IQDATA:
+            bloburl = f'https://{account}.blob.core.windows.net/{container}/{filepath}.sigmf-data'
         else:
             raise ValueError("Invalid uiImage value")
 
