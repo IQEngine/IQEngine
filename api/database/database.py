@@ -48,6 +48,6 @@ def metadata_versions_collection():
     return collection
 
 
-def processors_collection():
-    collection: Collection[Metadata] = db().processors
+def plugins_collection():
+    collection: Collection[Metadata] = db().plugins
     return collection

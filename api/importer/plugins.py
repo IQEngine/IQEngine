@@ -4,7 +4,7 @@ import os
 from database.database import processors_collection
 
 
-def import_processors_from_env(environment_variable_name="IQENGINE_PROCESSORS"):
+def import_plugins_from_env(environment_variable_name="IQENGINE_PROCESSORS"):
     """
     Import processors from environment variable
     Will not import if processor already exists
