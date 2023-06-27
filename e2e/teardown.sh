@@ -1,6 +1,6 @@
 #!/bin/bash
 
 docker kill iqengine
-docker kill rfdxdb
-docker network rm rfdxnet
+docker kill iqenginedb
+docker network rm iqenginenet
 docker container prune --force
