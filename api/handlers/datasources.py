@@ -74,7 +74,7 @@ async def get_datasource_image(
     imageURL = add_imageURL_sasToken(account, container, datasource["sasToken"], "", uiImage.IMAGE)
     if not imageURL.get_secret_value():
         return StreamingResponse((b'' for _ in range(1))) # return empty image
-    
+
     async with httpx.AsyncClient() as client:
         response = await client.get(imageURL.get_secret_value())
     if response.status_code != 200:
