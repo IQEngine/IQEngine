@@ -23,7 +23,7 @@ def add_URL_sasToken(account, container, sasToken, filepath, apiType: apiType):
         if apiType == apiType.THUMB and filepath is not None and filepath != "":
             bloburl = f'https://{account}.blob.core.windows.net/{container}/{filepath}.jpg'
         elif apiType == apiType.IMAGE:
-            bloburl = f'https://{account}.blob.core.windows.net/{container}/image.jpg'
+            bloburl = f'https://{account}.blob.core.windows.net/{container}/datasource_thumbnail.jpg'
         elif apiType == apiType.IQDATA:
             bloburl = f'https://{account}.blob.core.windows.net/{container}/{filepath}.sigmf-data'
         else:
