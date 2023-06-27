@@ -140,7 +140,7 @@ export const selectFft = (
     return;
   }
 
-  // Go through each of the tiles and compute the FFT and save in window.fftData
+  // Go through each of the tiles and compute the FFT and convert to RGB
   const tiles = range(Math.floor(lowerTile), Math.ceil(upperTile));
   for (let tile of tiles) {
     if (!!fftData[tile]) {
@@ -155,6 +155,7 @@ export const selectFft = (
     const fftsConcatenated = calcFftOfTile(samples, fftSize, windowFunction);
     fftData[tile] = fftToRGB(fftsConcatenated, fftSize, magnitudeMin, magnitudeMax, colMap);
   }
+
   const missingTiles = [];
   // Concatenate the full tiles
   let totalFftData = new Uint8ClampedArray(tiles.length * TILE_SIZE_IN_IQ_SAMPLES * 4); // 4 because RGBA
@@ -162,11 +163,9 @@ export const selectFft = (
     if (tile in fftData) {
       totalFftData.set(fftData[tile], index * TILE_SIZE_IN_IQ_SAMPLES * 4);
     } else {
+      // If the tile isnt available, fill with ones (white and opaque)
       missingTiles.push(tile);
-      // If the tile isnt available, fill with ones (white)
-      let fakeFftData = new Uint8ClampedArray(TILE_SIZE_IN_IQ_SAMPLES * 4);
-      fakeFftData.fill(255); // for debugging its better to have the alpha set to opaque so the missing part isnt invisible
-      totalFftData.set(fakeFftData, index * TILE_SIZE_IN_IQ_SAMPLES * 4);
+      totalFftData.fill(255, index * TILE_SIZE_IN_IQ_SAMPLES * 4, (index + 1) * TILE_SIZE_IN_IQ_SAMPLES * 4);
     }
   }
 
