@@ -9,7 +9,7 @@ from handlers.config import router as config_router
 from handlers.datasources import router as datasources_router
 from handlers.iq import router as iq_router
 from handlers.metadata import router as metadata_router
-from handlers.processors import router as processors_router
+from handlers.plugins import router as plugins_router
 from handlers.status import router as status_router
 from pydantic import BaseModel
 from pymongo.errors import ServerSelectionTimeoutError
@@ -82,7 +82,7 @@ app.include_router(datasources_router)
 app.include_router(metadata_router)
 app.include_router(status_router)
 app.include_router(config_router)
-app.include_router(processors_router)
+app.include_router(plugins_router)
 
 app.mount("/", SPAStaticFiles(directory="iqengine", html=True), name="iqengine")
 
