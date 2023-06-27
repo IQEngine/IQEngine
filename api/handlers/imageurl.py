@@ -2,9 +2,11 @@ from pydantic import SecretStr
 from .cipher import decrypt
 from enum import Enum
 
+
 class uiImage(Enum):
     IMAGE = 1
     THUMB = 2
+
 
 def add_imageURL_sasToken(account, container, sasToken, filepath, uiImage: uiImage):
     if (
@@ -27,4 +29,4 @@ def add_imageURL_sasToken(account, container, sasToken, filepath, uiImage: uiIma
         imageURL_sasToken = SecretStr(bloburl + "?" + y)
         return imageURL_sasToken
     else:
-        return "invalid image url"
+        return SecretStr("")
