@@ -89,7 +89,7 @@ async def get_meta_thumbnail(
     if response.status_code != 200:
         raise HTTPException(status_code=404, detail="Image not found")
 
-    return StreamingResponse(response.iter_bytes(), media_type=response.headers["Content-Type"])    
+    return StreamingResponse(response.iter_bytes(), media_type=response.headers["Content-Type"])
 
 
 @router.post(
