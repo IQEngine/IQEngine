@@ -53,7 +53,7 @@ test:
 
 test-pw:
 	@echo "Running Playwright frontend and end-to-end tests"
-	@cd e2e && npx playwright test 
+	@cd e2e && npx playwright test
 	@e2e/teardown.sh
 
 lint:

@@ -24,14 +24,14 @@ conn="mongodb://$MONGO_INITDB_ROOT_USERNAME:$MONGO_INITDB_ROOT_PASSWORD@iqengine
 docker build -t iqengine .
 docker network create iqenginenet
 docker run --network iqenginenet -p 27017:27017 -d \
-  -e MONGO_INITDB_ROOT_USERNAME=$MONGO_INITDB_ROOT_USERNAME \
-  -e MONGO_INITDB_ROOT_PASSWORD=$MONGO_INITDB_ROOT_PASSWORD \
+  -e MONGO_INITDB_ROOT_USERNAME="$MONGO_INITDB_ROOT_USERNAME" \
+  -e MONGO_INITDB_ROOT_PASSWORD="$MONGO_INITDB_ROOT_PASSWORD" \
   --name iqenginedb \
   mongo:latest
 docker run --network iqenginenet -p 3000:3000 \
   -e IN_MEMORY_DB=0 \
   -e VITE_FEATURE_FLAGS='{"useAPIDatasources": true}' \
-  -e IQENGINE_METADATA_DB_CONNECTION_STRING=$conn \
+  -e IQENGINE_METADATA_DB_CONNECTION_STRING="$conn" \
   --name iqengine \
   iqengine:latest
 
