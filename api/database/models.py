@@ -76,3 +76,8 @@ class Metadata(BaseModel):
     globalMetadata: MetadataGlobal = Field(alias="global")
     captures: list[MetadataCapture]
     annotations: list[MetadataAnnotation]
+
+
+class Processor(BaseModel):
+    name: str
+    url: str
