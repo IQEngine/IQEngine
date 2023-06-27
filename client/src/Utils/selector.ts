@@ -96,9 +96,7 @@ export function calcFftOfTile(
   }
   let endTime = performance.now();
   console.debug('Rendering spectrogram took', endTime - startTime, 'milliseconds'); // first cut of our code processed+rendered 0.5M samples in 760ms on marcs computer
-  return {
-    newFftData: newFftData,
-  };
+  return newFftData;
 }
 
 export interface SelectFftReturn {
@@ -140,7 +138,7 @@ export const selectFft = (
       continue;
     }
     let samples = iqData[tile.toString()];
-    const { newFftData } = calcFftOfTile(
+    const newFftData = calcFftOfTile(
       samples,
       fftSize,
       numFftsPerTile,
