@@ -18,6 +18,7 @@ import { upsertDataSource } from '@/Store/Reducers/ConnectionReducer';
 import { CLIENT_TYPE_API, CLIENT_TYPE_BLOB, DataSource } from '@/api/Models';
 import { useQueryClient } from '@tanstack/react-query';
 import Feature from '@/Components/Feature/Feature';
+import { FeatureFlag } from '@/hooks/useFeatureFlags';
 
 const RepoBrowser = () => {
   let [dataAvailable, setDataAvailable] = useState(false);
@@ -64,7 +65,7 @@ const RepoBrowser = () => {
           {blobDataSources.data?.map((item, i) => (
             <RepositoryTile key={i} item={item} />
           ))}
-          <Feature flag="useAPIDatasources">
+          <Feature flag={FeatureFlag.useAPIDatasources}>
             {apiDataSources?.data?.map((item, i) => (
               <RepositoryAPITile key={i} item={item} />
             ))}
