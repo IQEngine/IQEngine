@@ -26,7 +26,7 @@ test.afterAll(async ({ request }) => {
   const connection_string = process.env.METADATA_DB_CONNECTION_STRING || '';
   const client: MongoClient = new MongoClient(connection_string);
   await client.connect();
-  const db: Db = client.db('RFDX');
+  const db: Db = client.db('IQEngine');
   const collection = db.collection('datasources');
   collection.deleteOne({ type: 'api', name: 'Test API DataSource' });
 });
