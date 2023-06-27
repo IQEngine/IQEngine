@@ -2,7 +2,7 @@ import database.database
 from database.models import DataSource, DataSourceReference, Metadata
 from fastapi import APIRouter, Depends, HTTPException
 from pymongo.collection import Collection
-from .urlmapping import add_URL_sasToken, uiImage
+from .urlmapping import add_URL_sasToken, apiType
 from fastapi.responses import StreamingResponse
 import httpx
 
@@ -78,7 +78,7 @@ async def get_metadata_iqdata(
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
 
-    imageURL = add_URL_sasToken(account, container, datasource["sasToken"], filepath, uiImage.IQDATA)
+    imageURL = add_URL_sasToken(account, container, datasource["sasToken"], filepath, apiType.IQDATA)
     if not imageURL.get_secret_value():
         return StreamingResponse((b'' for _ in range(1))) # return empty image
 
@@ -113,7 +113,7 @@ async def get_meta_thumbnail(
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
 
-    imageURL = add_URL_sasToken(account, container, datasource["sasToken"], filepath, uiImage.THUMB)
+    imageURL = add_URL_sasToken(account, container, datasource["sasToken"], filepath, apiType.THUMB)
     if not imageURL.get_secret_value():
         return StreamingResponse((b'' for _ in range(1))) # return empty image
 

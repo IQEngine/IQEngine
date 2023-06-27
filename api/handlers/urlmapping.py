@@ -3,13 +3,13 @@ from .cipher import decrypt
 from enum import Enum
 
 
-class uiImage(Enum):
+class apiType(Enum):
     IMAGE = 1
     THUMB = 2
     IQDATA = 3
 
 
-def add_URL_sasToken(account, container, sasToken, filepath, uiImage: uiImage):
+def add_URL_sasToken(account, container, sasToken, filepath, apiType: apiType):
     if (
         sasToken is not None
         and sasToken != ""
@@ -20,16 +20,16 @@ def add_URL_sasToken(account, container, sasToken, filepath, uiImage: uiImage):
         if x is not None:
             y = x.get_secret_value()
 
-        if uiImage == uiImage.THUMB and filepath is not None and filepath != "":
+        if apiType == apiType.THUMB and filepath is not None and filepath != "":
             bloburl = f'https://{account}.blob.core.windows.net/{container}/{filepath}.jpg'
-        elif uiImage == uiImage.IMAGE:
+        elif apiType == apiType.IMAGE:
             bloburl = f'https://{account}.blob.core.windows.net/{container}/image.jpg'
-        elif uiImage == uiImage.IQDATA:
+        elif apiType == apiType.IQDATA:
             bloburl = f'https://{account}.blob.core.windows.net/{container}/{filepath}.sigmf-data'
         else:
-            raise ValueError("Invalid uiImage value")
+            raise ValueError("Invalid apiType value")
 
-        imageURL_sasToken = SecretStr(bloburl + "?" + y)
-        return imageURL_sasToken
+        api_URL_sasToken = SecretStr(bloburl + "?" + y)
+        return api_URL_sasToken
     else:
         return SecretStr("")
