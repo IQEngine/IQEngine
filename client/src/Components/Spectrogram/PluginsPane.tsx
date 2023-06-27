@@ -10,7 +10,6 @@ import { TimePlot } from './TimePlot';
 import { FrequencyPlot } from './FrequencyPlot';
 import { IQPlot } from './IQPlot';
 import { Layer, Image, Stage } from 'react-konva';
-import { calcFftOfTile, fftToRGB } from '@/Utils/selector';
 import { convertFloat32ArrayToBase64, convertBase64ToFloat32Array } from '@/Utils/rfFunctions';
 import { colMaps } from '@/Utils/colormap';
 import { fftshift } from 'fftshift';
