@@ -13,7 +13,7 @@ export interface IQDataSlice {
   iqArray: Float32Array;
 }
 
-export interface ProcessorDefinition {
+export interface PluginDefinition {
   name: string;
   url: string;
 }

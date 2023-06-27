@@ -1,21 +1,21 @@
 import json
 import os
 
-from database.database import processors_collection
+from database.database import plugins_collection
 
 
-def import_plugins_from_env(environment_variable_name="IQENGINE_PROCESSORS"):
+def import_plugins_from_env(environment_variable_name="IQENGINE_PLUGINSS"):
     """
-    Import processors from environment variable
-    Will not import if processor already exists
+    Import plugins from environment variable
+    Will not import if plugin already exists
     """
-    processors_json = os.getenv(environment_variable_name, None)
-    if not processors_json:
+    plugins_json = os.getenv(environment_variable_name, None)
+    if not plugins_json:
         return None
-    processors = json.loads(processors_json)
+    plugins = json.loads(plugins_json)
 
-    client = processors_collection()
-    for processor in processors:
-        if client.find_one({"name": processor["name"]}, {"_id": 1}):
+    client = plugins_collection()
+    for plugin in plugins:
+        if client.find_one({"name": plugin["name"]}, {"_id": 1}):
             continue
-        client.insert_one(processor)
+        client.insert_one(plugin)

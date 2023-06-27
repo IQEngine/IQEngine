@@ -1,13 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import { ProcessorDefinition } from '../Models';
+import { PluginDefinition } from '../Models';
 
-export function useGetProcessors() {
-  return useQuery<ProcessorDefinition[]>(
-    ['processors'],
+export function useGetPlugins() {
+  return useQuery<PluginDefinition[]>(
+    ['plugins'],
     async () => {
-      const response = await axios.get<ProcessorDefinition[]>('/api/processors').catch((err) => {
-        console.log('useGetProcessors error', err);
+      const response = await axios.get<PluginDefinition[]>('/api/plugins').catch((err) => {
+        console.log('useGetPlugins error', err);
         return { data: [] };
       });
       return response.data;

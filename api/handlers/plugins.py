@@ -9,9 +9,7 @@ router = APIRouter()
 @router.post("/api/plugins", status_code=201, response_model=Plugin)
 def create_plugin(
     plugin: Plugin,
-    plugins: Collection[Plugin] = Depends(
-        database.database.plugins_collection
-    ),
+    plugins: Collection[Plugin] = Depends(database.database.plugins_collection),
 ):
     """
     Create a new plugin. The plugin will be henceforth identified by name which
@@ -26,9 +24,7 @@ def create_plugin(
 
 @router.get("/api/plugins", response_model=list[Plugin])
 def get_plugins(
-    plugins: Collection[Plugin] = Depends(
-        database.database.plugins_collection
-    ),
+    plugins: Collection[Plugin] = Depends(database.database.plugins_collection),
 ):
     """
     Get a list of all plugins.
@@ -39,9 +35,7 @@ def get_plugins(
 @router.get("/api/plugins/{plugin_name}", response_model=Plugin)
 def get_plugin(
     plugin_name: str,
-    plugins: Collection[Plugin] = Depends(
-        database.database.plugins_collection
-    ),
+    plugins: Collection[Plugin] = Depends(database.database.plugins_collection),
 ):
     """
     Get a plugin by name.
@@ -56,9 +50,7 @@ def get_plugin(
 def update_plugin(
     plugin_name: str,
     plugin: Plugin,
-    plugins: Collection[Plugin] = Depends(
-        database.database.plugins_collection
-    ),
+    plugins: Collection[Plugin] = Depends(database.database.plugins_collection),
 ):
     """
     Update a plugin by name.
@@ -76,9 +68,7 @@ def update_plugin(
 @router.delete("/api/plugins/{plugin_name}")
 def delete_plugin(
     plugin_name: str,
-    plugins: Collection[Plugin] = Depends(
-        database.database.plugins_collection
-    ),
+    plugins: Collection[Plugin] = Depends(database.database.plugins_collection),
 ):
     """
     Delete a plugin by name.

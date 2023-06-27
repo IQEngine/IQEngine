@@ -1,9 +1,9 @@
 import { useAllProviders } from '@/mocks/setupTests';
 import { renderHook, waitFor } from '@testing-library/react';
 import nock from 'nock';
-import { useGetProcessors } from '../Queries';
+import { useGetPlugins } from '../Queries';
 
-describe('useGetProcessors', () => {
+describe('useGetPlugins', () => {
   afterEach(() => {
     nock.cleanAll();
     const { queryClient } = useAllProviders();
@@ -11,37 +11,37 @@ describe('useGetProcessors', () => {
   });
 
   test('should be able to fallback to empty array', async ({ expect }) => {
-    let expectedProcessors = [];
+    let expectedPlugins = [];
     const { wrapper } = useAllProviders();
-    nock('http://localhost:3000').get(`/api/processors`).reply(500, null);
+    nock('http://localhost:3000').get(`/api/plugins`).reply(500, null);
 
-    const { result } = renderHook(() => useGetProcessors(), {
+    const { result } = renderHook(() => useGetPlugins(), {
       wrapper: wrapper,
     });
     await waitFor(() => expect(result.current.isError).toBe(false));
     await waitFor(() => expect(result.current.isFetching).toEqual(false), { timeout: 1000 });
-    await waitFor(() => expect(result.current.data).toEqual(expectedProcessors), { timeout: 1000 });
+    await waitFor(() => expect(result.current.data).toEqual(expectedPlugins), { timeout: 1000 });
   });
 
-  test('should be able to get the list of processors from the api', async ({ expect }) => {
+  test('should be able to get the list of plugins from the api', async ({ expect }) => {
     const { wrapper } = useAllProviders();
-    let expectedProcessors = [
+    let expectedPlugins = [
       {
         name: 'builtIn',
-        url: 'http://localhost:3000/api/processors/builtIn',
+        url: 'http://localhost:3000/api/plugins/builtIn',
       },
       {
         name: 'gnuradio',
-        url: 'http://localhost:3000/api/processors/gnuradio',
+        url: 'http://localhost:3000/api/plugins/gnuradio',
       },
     ];
-    nock('http://localhost:3000').get(`/api/processors`).reply(200, expectedProcessors);
+    nock('http://localhost:3000').get(`/api/plugins`).reply(200, expectedPlugins);
 
-    const { result } = renderHook(() => useGetProcessors(), {
+    const { result } = renderHook(() => useGetPlugins(), {
       wrapper: wrapper,
     });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     await waitFor(() => expect(result.current.isFetching).toEqual(false), { timeout: 1000 });
-    await waitFor(() => expect(result.current.data).toEqual(expectedProcessors), { timeout: 1000 });
+    await waitFor(() => expect(result.current.data).toEqual(expectedPlugins), { timeout: 1000 });
   });
 });
