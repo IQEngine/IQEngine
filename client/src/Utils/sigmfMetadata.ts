@@ -95,7 +95,7 @@ export class SigMFMetadata {
     } else if (type === 'azure_blob') {
       return `https://${origin.account}.blob.core.windows.net/${origin.container}/${origin.file_path}`;
     } else if (type === 'api') {
-      return `/api/datasources/${origin.account}/${origin.container}/${origin.file_path}/thumbnail`;
+      return `/api/datasources/${origin.account}/${origin.container}/${origin.file_path}`;
     } else {
       return `${origin.account}/${origin.container}/${origin.file_path}`;
     }
@@ -122,7 +122,7 @@ export class SigMFMetadata {
     const origin = this.global['traceability:origin'];
     const type = origin?.type ?? 'local';
     if (type === 'api') {
-      return this.getFullFilePath();
+      return this.getFullFilePath() + '/thumbnail';
     } else return this.getFullFilePath() + '.jpeg';
   }
   getDataUrl() {
