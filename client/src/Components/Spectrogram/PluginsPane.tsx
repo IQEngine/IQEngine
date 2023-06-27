@@ -145,7 +145,6 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
             'hamming',
             magnitudeMin,
             magnitudeMax,
-            false, // autoscale
             colMaps['jet'] // colormap
           );
           const imageData = new ImageData(ret['newFftData'], fftSize, numFfts);

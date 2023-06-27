@@ -54,7 +54,6 @@ export const SpectrogramPage = () => {
   const [magnitudeMin, setMagnitudeMin] = useState(-40.0); // in dB
   const [fftWindow, setFFTWindow] = useState('hamming');
   const [colorMap, setColorMap] = useState(colMaps[COLORMAP_DEFAULT]);
-  const [autoscale, setAutoscale] = useState(false);
   const [image, setImage] = useState(null);
   const [upperTile, setUpperTile] = useState(-1);
   const [lowerTile, setLowerTile] = useState(-1);
@@ -159,7 +158,6 @@ export const SpectrogramPage = () => {
       magnitudeMin,
       meta,
       fftWindow, // dont want to conflict with the main window var
-      autoscale,
       zoomLevel,
       iqData,
       {},
@@ -182,7 +180,6 @@ export const SpectrogramPage = () => {
       magnitudeMin,
       meta,
       fftWindow, // dont want to conflict with the main window var
-      autoscale,
       zoomLevel,
       iqData,
       fftData,
@@ -203,12 +200,6 @@ export const SpectrogramPage = () => {
     createImageBitmap(fftImage.imageData).then((imageBitmap) => {
       setImage(imageBitmap);
     });
-    if (autoscale && fftImage.autoMax) {
-      console.debug('New max/min:', fftImage.autoMax, fftImage.autoMin);
-      setAutoscale(false); // toggles it off so this only will happen once
-      setMagnitudeMax(fftImage.autoMax);
-      setMagnitudeMin(fftImage.autoMin);
-    }
     setMissingTiles(fftImage.missingTiles);
     setFetchMinimap(true);
   };
@@ -333,7 +324,6 @@ export const SpectrogramPage = () => {
             updateWindowChange={setFFTWindow}
             magnitudeMax={magnitudeMax}
             magnitudeMin={magnitudeMin}
-            handleAutoScale={setAutoscale}
             cursorsEnabled={cursorsEnabled}
             handleProcessTime={handleProcessTime}
             toggleCursors={(e) => {
