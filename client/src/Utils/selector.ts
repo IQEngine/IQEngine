@@ -2,6 +2,14 @@
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
 
+/*
+stage0 - raw IQ straight from the recording
+stage1 - pre-FFT processing performed on stage1, eg FIR filter, python snippet
+stage2 - FFT output in floats, in units of dB
+stage3 - after doing decimation (max, mean, or skip) for zooming out in time
+stage4 - uint8 values after having the min/max and colormap applied
+*/
+
 // @ts-ignore
 import { fftshift } from 'fftshift';
 import { TILE_SIZE_IN_IQ_SAMPLES } from './constants';
@@ -16,21 +24,12 @@ function getStandardDeviation(array: Array<any>) {
 
 const average = (array: Array<any>) => array.reduce((a, b) => a + b) / array.length;
 
-export function calcFftOfTile(
-  samples: Float32Array,
-  fftSize: number,
-  numFftsPerTile: number,
-  windowFunction: string,
-  magnitude_min: number,
-  magnitude_max: number,
-  colMap: any
-) {
-  let startTime = performance.now();
-  let newFftData = new Uint8ClampedArray(fftSize * numFftsPerTile * 4); // 4 because RGBA
-  let startOfs = 0;
+export function calcFftOfTile(samples: Float32Array, fftSize: number, windowFunction: string) {
+  //let startTime = performance.now();
+  let fftsConcatenated = new Float32Array(TILE_SIZE_IN_IQ_SAMPLES);
 
   // loop through each row
-  for (let i = 0; i < numFftsPerTile; i++) {
+  for (let i = 0; i < TILE_SIZE_IN_IQ_SAMPLES / fftSize; i++) {
     let samples_slice = samples.slice(i * fftSize * 2, (i + 1) * fftSize * 2); // mult by 2 because this is int/floats not IQ samples
 
     // Apply a hamming window and hanning window
@@ -76,6 +75,26 @@ export function calcFftOfTile(
     magnitudes = magnitudes.map((x) => 10.0 * Math.log10(x)); // convert to dB
     magnitudes = magnitudes.map((x) => (isFinite(x) ? x : 0)); // get rid of -infinity which happens when the input is all 0s
 
+    fftsConcatenated.set(magnitudes, i * fftSize);
+  }
+  //let endTime = performance.now();
+  //console.debug('Calculating FFTs took', endTime - startTime, 'milliseconds'); // first cut of our code processed+rendered 0.5M samples in 760ms on marcs computer
+  return fftsConcatenated;
+}
+
+export function fftToRGB(
+  fftsConcatenated: Float32Array,
+  fftSize: number,
+  magnitude_min: number,
+  magnitude_max: number,
+  colMap: any
+) {
+  let startOfs = 0;
+  let newFftData = new Uint8ClampedArray(TILE_SIZE_IN_IQ_SAMPLES * 4); // 4 because RGBA
+  // loop through each row
+  for (let i = 0; i < TILE_SIZE_IN_IQ_SAMPLES / fftSize; i++) {
+    let magnitudes = fftsConcatenated.slice(i * fftSize, (i + 1) * fftSize);
+
     // apply magnitude min and max (which are in dB, same units as magnitudes prior to this point) and convert to 0-255
     const dbPer1 = 255 / (magnitude_max - magnitude_min);
     magnitudes = magnitudes.map((x) => x - magnitude_min);
@@ -94,8 +113,6 @@ export function calcFftOfTile(
       newFftData[line_offset + opIdx + 3] = 255; // alpha
     }
   }
-  let endTime = performance.now();
-  console.debug('Rendering spectrogram took', endTime - startTime, 'milliseconds'); // first cut of our code processed+rendered 0.5M samples in 760ms on marcs computer
   return newFftData;
 }
 
@@ -138,16 +155,9 @@ export const selectFft = (
       continue;
     }
     let samples = iqData[tile.toString()];
-    const newFftData = calcFftOfTile(
-      samples,
-      fftSize,
-      numFftsPerTile,
-      windowFunction,
-      magnitude_min,
-      magnitude_max,
-      colMap
-    );
-    fftData[tile] = newFftData;
+
+    const fftsConcatenated = calcFftOfTile(samples, fftSize, windowFunction);
+    fftData[tile] = fftToRGB(fftsConcatenated, fftSize, magnitude_min, magnitude_max, colMap);
   }
   const missingTiles = [];
   // Concatenate the full tiles
