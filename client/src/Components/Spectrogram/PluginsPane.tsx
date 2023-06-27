@@ -10,9 +10,10 @@ import { TimePlot } from './TimePlot';
 import { FrequencyPlot } from './FrequencyPlot';
 import { IQPlot } from './IQPlot';
 import { Layer, Image, Stage } from 'react-konva';
-import { calcFftOfTile } from '@/Utils/selector';
 import { convertFloat32ArrayToBase64, convertBase64ToFloat32Array } from '@/Utils/rfFunctions';
 import { colMaps } from '@/Utils/colormap';
+import { fftshift } from 'fftshift';
+import { FFT } from '@/Utils/fft';
 
 export interface PluginsPaneProps {
   cursorsEnabled: boolean;
@@ -138,17 +139,50 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
           const magnitudeMin = -40;
           const magnitudeMax = -10;
           const samples_typed = Float32Array.from(samples);
-          const ret = calcFftOfTile(
-            samples_typed,
-            fftSize,
-            numFfts,
-            'hamming',
-            magnitudeMin,
-            magnitudeMax,
-            false, // autoscale
-            colMaps['jet'] // colormap
-          );
-          const imageData = new ImageData(ret['newFftData'], fftSize, numFfts);
+
+          let startOfs = 0;
+          let newFftData = new Uint8ClampedArray(numFfts * fftSize * 4); // 4 because RGBA
+
+          // loop through each row
+          for (let i = 0; i < numFfts; i++) {
+            let samples_slice = samples_typed.slice(i * fftSize * 2, (i + 1) * fftSize * 2); // mult by 2 because this is int/floats not IQ samples
+
+            const f = new FFT(fftSize);
+            let out = f.createComplexArray(); // creates an empty array the length of fft.size*2
+            f.transform(out, samples_slice); // assumes input (2nd arg) is in form IQIQIQIQ and twice the length of fft.size
+
+            out = out.map((x) => x / fftSize); // divide by fftsize
+
+            // convert to magnitude
+            let magnitudes = new Array(out.length / 2);
+            for (let j = 0; j < out.length / 2; j++) {
+              magnitudes[j] = Math.sqrt(Math.pow(out[j * 2], 2) + Math.pow(out[j * 2 + 1], 2)); // take magnitude
+            }
+
+            fftshift(magnitudes); // in-place
+            magnitudes = magnitudes.map((x) => 10.0 * Math.log10(x)); // convert to dB
+            magnitudes = magnitudes.map((x) => (isFinite(x) ? x : 0)); // get rid of -infinity which happens when the input is all 0s
+
+            // apply magnitude min and max (which are in dB, same units as magnitudes prior to this point) and convert to 0-255
+            const dbPer1 = 255 / (magnitudeMax - magnitudeMin);
+            magnitudes = magnitudes.map((x) => x - magnitudeMin);
+            magnitudes = magnitudes.map((x) => x * dbPer1);
+            magnitudes = magnitudes.map((x) => (x > 255 ? 255 : x)); // clip above 255
+            magnitudes = magnitudes.map((x) => (x < 0 ? 0 : x)); // clip below 0
+            let ipBuf8 = Uint8ClampedArray.from(magnitudes); // anything over 255 or below 0 at this point will become a random number, hence clipping above
+
+            // Apply colormap
+            let line_offset = i * fftSize * 4;
+            for (let sigVal, opIdx = 0, ipIdx = startOfs; ipIdx < fftSize + startOfs; opIdx += 4, ipIdx++) {
+              sigVal = ipBuf8[ipIdx] || 0; // if input line too short add zeros
+              newFftData[line_offset + opIdx] = colMaps['jet'][sigVal][0]; // red
+              newFftData[line_offset + opIdx + 1] = colMaps['jet'][sigVal][1]; // green
+              newFftData[line_offset + opIdx + 2] = colMaps['jet'][sigVal][2]; // blue
+              newFftData[line_offset + opIdx + 3] = 255; // alpha
+            }
+          }
+
+          const imageData = new ImageData(newFftData, fftSize, numFfts);
           createImageBitmap(imageData).then((imageBitmap) => {
             setmodalSpectrogram(imageBitmap);
           });

@@ -2,6 +2,14 @@
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
 
+/*
+stage0 - raw IQ straight from the recording
+stage1 - pre-FFT processing performed on stage1, eg FIR filter, python snippet
+stage2 - FFT output in floats, in units of dB
+stage3 - after doing decimation (max, mean, or skip) for zooming out in time
+stage4 - uint8 values after having the min/max and colormap applied
+*/
+
 // @ts-ignore
 import { fftshift } from 'fftshift';
 import { TILE_SIZE_IN_IQ_SAMPLES } from './constants';
@@ -16,24 +24,12 @@ function getStandardDeviation(array: Array<any>) {
 
 const average = (array: Array<any>) => array.reduce((a, b) => a + b) / array.length;
 
-export function calcFftOfTile(
-  samples: Float32Array,
-  fftSize: number,
-  numFftsPerTile: number,
-  windowFunction: string,
-  magnitude_min: number,
-  magnitude_max: number,
-  autoscale: boolean,
-  colMap: any
-) {
-  let startTime = performance.now();
-  let newFftData = new Uint8ClampedArray(fftSize * numFftsPerTile * 4); // 4 because RGBA
-  let startOfs = 0;
-  let autoMin;
-  let autoMax;
+export function calcFftOfTile(samples: Float32Array, fftSize: number, windowFunction: string) {
+  //let startTime = performance.now();
+  let fftsConcatenated = new Float32Array(TILE_SIZE_IN_IQ_SAMPLES);
 
   // loop through each row
-  for (let i = 0; i < numFftsPerTile; i++) {
+  for (let i = 0; i < TILE_SIZE_IN_IQ_SAMPLES / fftSize; i++) {
     let samples_slice = samples.slice(i * fftSize * 2, (i + 1) * fftSize * 2); // mult by 2 because this is int/floats not IQ samples
 
     // Apply a hamming window and hanning window
@@ -79,24 +75,25 @@ export function calcFftOfTile(
     magnitudes = magnitudes.map((x) => 10.0 * Math.log10(x)); // convert to dB
     magnitudes = magnitudes.map((x) => (isFinite(x) ? x : 0)); // get rid of -infinity which happens when the input is all 0s
 
-    // When you click the button this code will run once, then it will turn itself off until you click it again
-    if (autoscale) {
-      // get the last calculated standard deviation and mean calculated from this loop and define the auto magnitude of min and max
-      const std = getStandardDeviation(magnitudes);
-      const mean = magnitudes.reduce((a, b) => a + b) / magnitudes.length;
-      // TODO: for now we're just going to use whatever the last FFT row's value is for min/max
-      autoMin = mean - 1.5 * std;
-      autoMax = mean + 1.5 * std;
-      if (autoMin < 1) {
-        autoMin = 1; // recall there was a bug with setting min to 0
-      }
-      if (autoMax > 255) {
-        autoMax = 255;
-      }
-      // It's a bit ugly with a dozen decimal places, so round to 3
-      autoMax = Math.round(autoMax * 1000) / 1000;
-      autoMin = Math.round(autoMin * 1000) / 1000;
-    }
+    fftsConcatenated.set(magnitudes, i * fftSize);
+  }
+  //let endTime = performance.now();
+  //console.debug('Calculating FFTs took', endTime - startTime, 'milliseconds'); // first cut of our code processed+rendered 0.5M samples in 760ms on marcs computer
+  return fftsConcatenated;
+}
+
+export function fftToRGB(
+  fftsConcatenated: Float32Array,
+  fftSize: number,
+  magnitude_min: number,
+  magnitude_max: number,
+  colMap: any
+) {
+  let startOfs = 0;
+  let newFftData = new Uint8ClampedArray(TILE_SIZE_IN_IQ_SAMPLES * 4); // 4 because RGBA
+  // loop through each row
+  for (let i = 0; i < TILE_SIZE_IN_IQ_SAMPLES / fftSize; i++) {
+    let magnitudes = fftsConcatenated.slice(i * fftSize, (i + 1) * fftSize);
 
     // apply magnitude min and max (which are in dB, same units as magnitudes prior to this point) and convert to 0-255
     const dbPer1 = 255 / (magnitude_max - magnitude_min);
@@ -116,19 +113,11 @@ export function calcFftOfTile(
       newFftData[line_offset + opIdx + 3] = 255; // alpha
     }
   }
-  let endTime = performance.now();
-  console.debug('Rendering spectrogram took', endTime - startTime, 'milliseconds'); // first cut of our code processed+rendered 0.5M samples in 760ms on marcs computer
-  return {
-    newFftData: newFftData,
-    autoMax: autoMax,
-    autoMin: autoMin,
-  };
+  return newFftData;
 }
 
 export interface SelectFftReturn {
   imageData: any;
-  autoMax: number;
-  autoMin: number;
   missingTiles: Array<number>;
   fftData: Record<number, Uint8ClampedArray>;
 }
@@ -142,7 +131,6 @@ export const selectFft = (
   magnitudeMin: number,
   meta: SigMFMetadata,
   windowFunction: any,
-  autoscale = false,
   zoomLevel: any,
   iqData: Record<number, Float32Array>,
   fftData: Record<number, Uint8ClampedArray>,
@@ -152,14 +140,8 @@ export const selectFft = (
     return;
   }
 
-  const numFftsPerTile = TILE_SIZE_IN_IQ_SAMPLES / fftSize;
-  let magnitude_max = magnitudeMax;
-  let magnitude_min = magnitudeMin;
-
-  // Go through each of the tiles and compute the FFT and save in window.fftData
+  // Go through each of the tiles and compute the FFT and convert to RGB
   const tiles = range(Math.floor(lowerTile), Math.ceil(upperTile));
-  let autoMaxs = [];
-  let autoMins = [];
   for (let tile of tiles) {
     if (!!fftData[tile]) {
       continue;
@@ -169,41 +151,28 @@ export const selectFft = (
       continue;
     }
     let samples = iqData[tile.toString()];
-    const { newFftData, autoMax, autoMin } = calcFftOfTile(
-      samples,
-      fftSize,
-      numFftsPerTile,
-      windowFunction,
-      magnitude_min,
-      magnitude_max,
-      autoscale,
-      colMap
-    );
-    autoMaxs.push(autoMax);
-    autoMins.push(autoMin);
-    fftData[tile] = newFftData;
+
+    const fftsConcatenated = calcFftOfTile(samples, fftSize, windowFunction);
+    fftData[tile] = fftToRGB(fftsConcatenated, fftSize, magnitudeMin, magnitudeMax, colMap);
   }
-  const missingTiles = [];
+
   // Concatenate the full tiles
-  let totalFftData = new Uint8ClampedArray(tiles.length * fftSize * numFftsPerTile * 4); // 4 because RGBA
-  let counter = 0; // can prob make this cleaner with an iterator in the for loop below
-  for (let tile of tiles) {
+  let totalFftData = new Uint8ClampedArray(tiles.length * TILE_SIZE_IN_IQ_SAMPLES * 4); // 4 because RGBA
+  const missingTiles = [];
+  for (let [index, tile] of tiles.entries()) {
     if (tile in fftData) {
-      totalFftData.set(fftData[tile], counter);
+      totalFftData.set(fftData[tile], index * TILE_SIZE_IN_IQ_SAMPLES * 4);
     } else {
+      // If the tile isnt available, fill with 255's (white and opaque)
       missingTiles.push(tile);
-      // If the tile isnt available, fill with ones (white)
-      let fakeFftData = new Uint8ClampedArray(fftSize * numFftsPerTile * 4);
-      fakeFftData.fill(255); // for debugging its better to have the alpha set to opaque so the missing part isnt invisible
-      totalFftData.set(fakeFftData, counter);
+      totalFftData.fill(255, index * TILE_SIZE_IN_IQ_SAMPLES * 4, (index + 1) * TILE_SIZE_IN_IQ_SAMPLES * 4);
     }
-    counter = counter + fftSize * numFftsPerTile * 4;
   }
 
   // Trim off the top and bottom
-  let lowerTrim = (lowerTile - Math.floor(lowerTile)) * fftSize * numFftsPerTile; // amount we want to get rid of
+  let lowerTrim = (lowerTile - Math.floor(lowerTile)) * TILE_SIZE_IN_IQ_SAMPLES; // amount we want to get rid of
   lowerTrim = lowerTrim - (lowerTrim % fftSize); // make it an even FFT size. TODO We need this rounding to happen earlier, so we get a consistent 600 ffts in the image
-  let upperTrim = (1 - (upperTile - Math.floor(upperTile))) * fftSize * numFftsPerTile; // amount we want to get rid of
+  let upperTrim = (1 - (upperTile - Math.floor(upperTile))) * TILE_SIZE_IN_IQ_SAMPLES; // amount we want to get rid of
   upperTrim = upperTrim - (upperTrim % fftSize);
   let trimmedFftData = totalFftData.slice(lowerTrim * 4, totalFftData.length - upperTrim * 4); // totalFftData.length already includes the *4
   let num_final_ffts = trimmedFftData.length / fftSize / 4;
@@ -228,8 +197,6 @@ export const selectFft = (
 
   let selectFftReturn = {
     imageData: imageData,
-    autoMax: autoMaxs.length ? average(autoMaxs) : 255,
-    autoMin: autoMins.length ? average(autoMins) : 0,
     missingTiles: missingTiles,
     fftData: fftData,
   };
