@@ -156,14 +156,14 @@ export const selectFft = (
     fftData[tile] = fftToRGB(fftsConcatenated, fftSize, magnitudeMin, magnitudeMax, colMap);
   }
 
-  const missingTiles = [];
   // Concatenate the full tiles
   let totalFftData = new Uint8ClampedArray(tiles.length * TILE_SIZE_IN_IQ_SAMPLES * 4); // 4 because RGBA
+  const missingTiles = [];
   for (let [index, tile] of tiles.entries()) {
     if (tile in fftData) {
       totalFftData.set(fftData[tile], index * TILE_SIZE_IN_IQ_SAMPLES * 4);
     } else {
-      // If the tile isnt available, fill with ones (white and opaque)
+      // If the tile isnt available, fill with 255's (white and opaque)
       missingTiles.push(tile);
       totalFftData.fill(255, index * TILE_SIZE_IN_IQ_SAMPLES * 4, (index + 1) * TILE_SIZE_IN_IQ_SAMPLES * 4);
     }
