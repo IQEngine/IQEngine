@@ -150,7 +150,7 @@ We have several feature flags currently in use. Their purposes are as follows:
 
 * `displayIQEngineGitHub`: When true this flag shows the link for the IQ Engine GitHub repo
 
-* `hideInternalBranding`: When true this flag hides an additional logo for customers using IQ Engine
+* `displayInternalBranding`: When true this flag displays an additional logo for customers using IQ Engine
 
 
 ## Project Roadmap
