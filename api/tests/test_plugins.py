@@ -23,6 +23,7 @@ def test_api_create_plugin_cannot_duplicate(client):
     response = client.post("/api/plugins", json=test_plugin)
     assert response.status_code == 409
 
+
 def test_api_create_plugin_cannot_duplicate_name(client):
     test_plugin = {
         "name": "test_plugin",
@@ -34,6 +35,7 @@ def test_api_create_plugin_cannot_duplicate_name(client):
     test_plugin["url"] = "http://test_plugin2.com"
     response = client.post("/api/plugins", json=test_plugin)
     assert response.status_code == 409
+
 
 def test_api_get_plugins(client):
     test_plugin = {
