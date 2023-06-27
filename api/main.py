@@ -9,8 +9,8 @@ from handlers.config import router as config_router
 from handlers.datasources import router as datasources_router
 from handlers.iq import router as iq_router
 from handlers.metadata import router as metadata_router
-from handlers.status import router as status_router
 from handlers.plugins import router as plugins_router
+from handlers.status import router as status_router
 from pydantic import BaseModel
 from pymongo.errors import ServerSelectionTimeoutError
 from starlette.exceptions import HTTPException
