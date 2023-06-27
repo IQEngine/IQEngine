@@ -36,7 +36,7 @@ describe('ApiClient Metadata Tests', () => {
       container: 'iqengine',
       description: 'GNU Radio hosted test data',
     };
-    nock('http://localhost:3000').get('/api/datasources/gnuradio/iqengine').reply(200, data);
+    nock('http://localhost:3000').get('/api/datasources/gnuradio/iqengine/datasource').reply(200, data);
 
     const client = new ApiClient();
     const result = await client.get('gnuradio', 'iqengine');
