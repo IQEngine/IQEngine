@@ -15,7 +15,7 @@ def client():
 
 @pytest.fixture(autouse=True)
 def database():
-    os.environ["RFDX_FF_INMEMDB"] = "1"
+    os.environ["IN_MEMORY_DB"] = "1"
     yield
     # Ensure db is recreated
     # for each test

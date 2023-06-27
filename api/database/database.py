@@ -11,20 +11,20 @@ _db = None
 def create_db_client():
     global _db
     connection_string = os.getenv("IQENGINE_METADATA_DB_CONNECTION_STRING")
-    _db = pymongo.MongoClient(connection_string)["RFDX"]
+    _db = pymongo.MongoClient(connection_string)["IQEngine"]
     return _db
 
 
 def create_in_memory_db_client():
     global _db
-    _db = pymongo_inmemory.MongoClient()["RFDX"]
+    _db = pymongo_inmemory.MongoClient()["IQEngine"]
     return _db
 
 
 def db():
     global _db
     if _db is None:
-        if "RFDX_FF_INMEMDB" in os.environ and os.environ["RFDX_FF_INMEMDB"] != str(
+        if "IN_MEMORY_DB" in os.environ and os.environ["IN_MEMORY_DB"] != str(
             "0"
         ):
             _db = create_in_memory_db_client()
