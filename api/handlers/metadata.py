@@ -4,7 +4,6 @@ from fastapi import APIRouter, Depends, HTTPException
 from pymongo.collection import Collection
 from .urlmapping import add_URL_sasToken, apiType
 from fastapi.responses import StreamingResponse
-from pydantic import SecretStr
 import httpx
 
 router = APIRouter()
