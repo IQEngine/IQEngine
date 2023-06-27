@@ -10,7 +10,7 @@ _db = None
 
 def create_db_client():
     global _db
-    connection_string = os.getenv("METADATA_DB_CONNECTION_STRING")
+    connection_string = os.getenv("IQENGINE_METADATA_DB_CONNECTION_STRING")
     _db = pymongo.MongoClient(connection_string)["IQEngine"]
     return _db
 
@@ -45,4 +45,9 @@ def metadata_collection():
 
 def metadata_versions_collection():
     collection: Collection[Metadata] = db().versions
+    return collection
+
+
+def processors_collection():
+    collection: Collection[Metadata] = db().processors
     return collection

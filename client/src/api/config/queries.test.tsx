@@ -16,16 +16,16 @@ describe('Config contains information from environment', () => {
   });
   const wrapper = ({ children }) => <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
   beforeAll(() => {
-    import.meta.env.VITE_PLUGINS_ENDPOINT = 'http://127.0.0.1:8000/plugins/';
-    import.meta.env.VITE_CONNECTION_INFO = '{}';
-    import.meta.env.VITE_GOOGLE_ANALYTICS_KEY = 'UA-TEST-KEY-1';
-    import.meta.env.VITE_FEATURE_FLAGS = '{}';
+    import.meta.env.IQENGINE_PLUGINS_ENDPOINT = 'http://127.0.0.1:8000/plugins/';
+    import.meta.env.IQENGINE_CONNECTION_INFO = '{}';
+    import.meta.env.IQENGINE_GOOGLE_ANALYTICS_KEY = 'UA-TEST-KEY-1';
+    import.meta.env.IQENGINE_FEATURE_FLAGS = '{}';
   });
   afterAll(() => {
-    delete import.meta.env.VITE_PLUGINS_ENDPOINT;
-    delete import.meta.env.VITE_CONNECTION_INFO;
-    delete import.meta.env.VITE_GOOGLE_ANALYTICS_KEY;
-    delete import.meta.env.VITE_FEATURE_FLAGS;
+    delete import.meta.env.IQENGINE_PLUGINS_ENDPOINT;
+    delete import.meta.env.IQENGINE_CONNECTION_INFO;
+    delete import.meta.env.IQENGINE_GOOGLE_ANALYTICS_KEY;
+    delete import.meta.env.IQENGINE_FEATURE_FLAGS;
   });
 
   beforeEach(() => {

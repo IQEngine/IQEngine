@@ -297,7 +297,7 @@
           "envVars": {
             "value": [
               {
-                "name": "METADATA_DB_CONNECTION_STRING",
+                "name": "IQENGINE_METADATA_DB_CONNECTION_STRING",
                 "value": "[reference(resourceId('Microsoft.Resources/deployments', 'mongodb'), '2022-09-01').outputs.connectionString.value]"
               }
             ]
