@@ -126,10 +126,18 @@ export class SigMFMetadata {
     } else return this.getFullFilePath() + '.jpeg';
   }
   getDataUrl() {
-    return this.getFullFilePath() + '.sigmf-data';
+    const origin = this.global['traceability:origin'];
+    const type = origin?.type ?? 'local';
+    if (type === 'api') {
+      return this.getFullFilePath() + '/iqdata';
+    } else return this.getFullFilePath() + '.sigmf-data';
   }
   getMetadataUrl() {
-    return this.getFullFilePath() + '.sigmf-meta';
+    const origin = this.global['traceability:origin'];
+    const type = origin?.type ?? 'local';
+    if (type === 'api') {
+      return this.getFullFilePath() + '/meta';
+    } else return this.getFullFilePath() + '.sigmf-meta';
   }
   getDataType() {
     return this.global['core:datatype'] ?? '';
