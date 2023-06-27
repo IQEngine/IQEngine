@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { render, screen, waitForElementToBeRemoved } from '@testing-library/react';
+import { render, screen, waitForElementToBeRemoved, waitFor } from '@testing-library/react';
 import App from '@/App';
 import React from 'react';
 import '@testing-library/jest-dom';
@@ -29,9 +29,10 @@ describe('Test Feature flags', () => {
   });
 
   test('does not render app component with Discord and Sign up link when flag set to false', async () => {
-    import.meta.env.IQENGINE_FEATURE_FLAGS = '{"useIQEngineOutReach": false}';
+    import.meta.env.IQENGINE_FEATURE_FLAGS = '{"useIQEngineOutReach": false, "displayInternalBranding": true}';
     render(<App />, { wrapper: AllProviders });
     await waitForElementToBeRemoved(screen.queryByText('Discord'));
+    expect(screen.getByAltText('Internal branding logo')).toBeInTheDocument();
     expect(screen.queryByText('Discord')).toBeNull();
     expect(
       screen.queryByText('Sign up for a once-a-month email update on IQEngine, such as new features, demos, and more!')
@@ -63,16 +64,23 @@ describe('Test Feature flags', () => {
   });
 
   // displayInternalBranding
-  test('renders app component with displayInternalBranding flag set to true', () => {
-    import.meta.env.IQENGINE_FEATURE_FLAGS = '{"displayInternalBranding": true }';
+  test('does not renders app component with displayInternalBranding when no feature flag specified', () => {
     render(<App />, { wrapper: AllProviders });
-    expect(screen.getByAltText('Internal branding logo')).toBeInTheDocument();
+    expect(screen.queryByAltText('Internal branding logo')).toBeNull();
+  });
+
+  test('renders app component with displayInternalBranding flag set to true', async () => {
+    import.meta.env.IQENGINE_FEATURE_FLAGS = '{"displayInternalBranding": true}';
+    render(<App />, { wrapper: AllProviders });
+    await waitFor(() => {
+      const image = screen.getByAltText('Internal branding logo');
+      expect(image).toBeInTheDocument();
+    });
   });
 
   test('does not render app component with displayInternalBranding flag set to false', async () => {
-    import.meta.env.IQENGINE_FEATURE_FLAGS = '{"displayInternalBranding": false, "useIQEngineOutReach": true }';
+    import.meta.env.IQENGINE_FEATURE_FLAGS = '{"displayInternalBranding": false }';
     render(<App />, { wrapper: AllProviders });
-    await waitForElementToBeRemoved(screen.queryByAltText('Internal branding logo'));
     expect(screen.queryByAltText('Internal branding logo')).toBeNull();
   });
 });
