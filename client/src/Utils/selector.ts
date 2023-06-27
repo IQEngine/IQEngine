@@ -140,10 +140,6 @@ export const selectFft = (
     return;
   }
 
-  const numFftsPerTile = TILE_SIZE_IN_IQ_SAMPLES / fftSize;
-  let magnitude_max = magnitudeMax;
-  let magnitude_min = magnitudeMin;
-
   // Go through each of the tiles and compute the FFT and save in window.fftData
   const tiles = range(Math.floor(lowerTile), Math.ceil(upperTile));
   for (let tile of tiles) {
@@ -157,11 +153,11 @@ export const selectFft = (
     let samples = iqData[tile.toString()];
 
     const fftsConcatenated = calcFftOfTile(samples, fftSize, windowFunction);
-    fftData[tile] = fftToRGB(fftsConcatenated, fftSize, magnitude_min, magnitude_max, colMap);
+    fftData[tile] = fftToRGB(fftsConcatenated, fftSize, magnitudeMin, magnitudeMax, colMap);
   }
   const missingTiles = [];
   // Concatenate the full tiles
-  let totalFftData = new Uint8ClampedArray(tiles.length * fftSize * numFftsPerTile * 4); // 4 because RGBA
+  let totalFftData = new Uint8ClampedArray(tiles.length * TILE_SIZE_IN_IQ_SAMPLES * 4); // 4 because RGBA
   let counter = 0; // can prob make this cleaner with an iterator in the for loop below
   for (let tile of tiles) {
     if (tile in fftData) {
@@ -169,17 +165,17 @@ export const selectFft = (
     } else {
       missingTiles.push(tile);
       // If the tile isnt available, fill with ones (white)
-      let fakeFftData = new Uint8ClampedArray(fftSize * numFftsPerTile * 4);
+      let fakeFftData = new Uint8ClampedArray(TILE_SIZE_IN_IQ_SAMPLES * 4);
       fakeFftData.fill(255); // for debugging its better to have the alpha set to opaque so the missing part isnt invisible
       totalFftData.set(fakeFftData, counter);
     }
-    counter = counter + fftSize * numFftsPerTile * 4;
+    counter = counter + TILE_SIZE_IN_IQ_SAMPLES * 4;
   }
 
   // Trim off the top and bottom
-  let lowerTrim = (lowerTile - Math.floor(lowerTile)) * fftSize * numFftsPerTile; // amount we want to get rid of
+  let lowerTrim = (lowerTile - Math.floor(lowerTile)) * TILE_SIZE_IN_IQ_SAMPLES; // amount we want to get rid of
   lowerTrim = lowerTrim - (lowerTrim % fftSize); // make it an even FFT size. TODO We need this rounding to happen earlier, so we get a consistent 600 ffts in the image
-  let upperTrim = (1 - (upperTile - Math.floor(upperTile))) * fftSize * numFftsPerTile; // amount we want to get rid of
+  let upperTrim = (1 - (upperTile - Math.floor(upperTile))) * TILE_SIZE_IN_IQ_SAMPLES; // amount we want to get rid of
   upperTrim = upperTrim - (upperTrim % fftSize);
   let trimmedFftData = totalFftData.slice(lowerTrim * 4, totalFftData.length - upperTrim * 4); // totalFftData.length already includes the *4
   let num_final_ffts = trimmedFftData.length / fftSize / 4;
