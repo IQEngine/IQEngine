@@ -22,10 +22,8 @@ export class SettingsPaneProps {
   updateMagnitudeMin: any;
   updateFftsize: any;
   toggleIncludeRfFreq: any;
-  handleAutoScale: any;
   toggleCursors: any;
   updateZoomLevel: any;
-  autoScale: boolean;
   windowFunction: string;
   zoomLevel: number;
   setTaps: (taps: number[]) => void;
@@ -190,14 +188,6 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
           setMax={props.updateMagnitudeMax}
           unit="dB"
         />
-      </div>
-      <div>
-        {/* When you press this button it will make autoscale run during the next call to selectFft, then it will turn itself off */}
-        {/*  Disable auto scale button until the functionality gets fixed
-        <button className="mb-3 w-full mt-2" onClick={props.handleAutoScale}>
-          Autoscale Max/Min
-        </button>
-        */}
       </div>
 
       <div className="mt-2">

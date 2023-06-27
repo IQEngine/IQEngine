@@ -23,14 +23,11 @@ export function calcFftOfTile(
   windowFunction: string,
   magnitude_min: number,
   magnitude_max: number,
-  autoscale: boolean,
   colMap: any
 ) {
   let startTime = performance.now();
   let newFftData = new Uint8ClampedArray(fftSize * numFftsPerTile * 4); // 4 because RGBA
   let startOfs = 0;
-  let autoMin;
-  let autoMax;
 
   // loop through each row
   for (let i = 0; i < numFftsPerTile; i++) {
@@ -79,25 +76,6 @@ export function calcFftOfTile(
     magnitudes = magnitudes.map((x) => 10.0 * Math.log10(x)); // convert to dB
     magnitudes = magnitudes.map((x) => (isFinite(x) ? x : 0)); // get rid of -infinity which happens when the input is all 0s
 
-    // When you click the button this code will run once, then it will turn itself off until you click it again
-    if (autoscale) {
-      // get the last calculated standard deviation and mean calculated from this loop and define the auto magnitude of min and max
-      const std = getStandardDeviation(magnitudes);
-      const mean = magnitudes.reduce((a, b) => a + b) / magnitudes.length;
-      // TODO: for now we're just going to use whatever the last FFT row's value is for min/max
-      autoMin = mean - 1.5 * std;
-      autoMax = mean + 1.5 * std;
-      if (autoMin < 1) {
-        autoMin = 1; // recall there was a bug with setting min to 0
-      }
-      if (autoMax > 255) {
-        autoMax = 255;
-      }
-      // It's a bit ugly with a dozen decimal places, so round to 3
-      autoMax = Math.round(autoMax * 1000) / 1000;
-      autoMin = Math.round(autoMin * 1000) / 1000;
-    }
-
     // apply magnitude min and max (which are in dB, same units as magnitudes prior to this point) and convert to 0-255
     const dbPer1 = 255 / (magnitude_max - magnitude_min);
     magnitudes = magnitudes.map((x) => x - magnitude_min);
@@ -118,17 +96,11 @@ export function calcFftOfTile(
   }
   let endTime = performance.now();
   console.debug('Rendering spectrogram took', endTime - startTime, 'milliseconds'); // first cut of our code processed+rendered 0.5M samples in 760ms on marcs computer
-  return {
-    newFftData: newFftData,
-    autoMax: autoMax,
-    autoMin: autoMin,
-  };
+  return newFftData;
 }
 
 export interface SelectFftReturn {
   imageData: any;
-  autoMax: number;
-  autoMin: number;
   missingTiles: Array<number>;
   fftData: Record<number, Uint8ClampedArray>;
 }
@@ -142,7 +114,6 @@ export const selectFft = (
   magnitudeMin: number,
   meta: SigMFMetadata,
   windowFunction: any,
-  autoscale = false,
   zoomLevel: any,
   iqData: Record<number, Float32Array>,
   fftData: Record<number, Uint8ClampedArray>,
@@ -158,8 +129,6 @@ export const selectFft = (
 
   // Go through each of the tiles and compute the FFT and save in window.fftData
   const tiles = range(Math.floor(lowerTile), Math.ceil(upperTile));
-  let autoMaxs = [];
-  let autoMins = [];
   for (let tile of tiles) {
     if (!!fftData[tile]) {
       continue;
@@ -169,18 +138,15 @@ export const selectFft = (
       continue;
     }
     let samples = iqData[tile.toString()];
-    const { newFftData, autoMax, autoMin } = calcFftOfTile(
+    const newFftData = calcFftOfTile(
       samples,
       fftSize,
       numFftsPerTile,
       windowFunction,
       magnitude_min,
       magnitude_max,
-      autoscale,
       colMap
     );
-    autoMaxs.push(autoMax);
-    autoMins.push(autoMin);
     fftData[tile] = newFftData;
   }
   const missingTiles = [];
@@ -228,8 +194,6 @@ export const selectFft = (
 
   let selectFftReturn = {
     imageData: imageData,
-    autoMax: autoMaxs.length ? average(autoMaxs) : 255,
-    autoMin: autoMins.length ? average(autoMins) : 0,
     missingTiles: missingTiles,
     fftData: fftData,
   };
