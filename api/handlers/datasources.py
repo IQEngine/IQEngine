@@ -72,8 +72,6 @@ async def get_datasource_image(
         raise HTTPException(status_code=404, detail="Datasource not found")
 
     imageURL = add_URL_sasToken(account, container, datasource["sasToken"], "", apiType.IMAGE)
-    if not imageURL.get_secret_value():
-        return StreamingResponse((b'' for _ in range(1))) # return empty image
 
     async with httpx.AsyncClient() as client:
         response = await client.get(imageURL.get_secret_value())

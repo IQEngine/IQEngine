@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pymongo.collection import Collection
 from .urlmapping import add_URL_sasToken, apiType
 from fastapi.responses import StreamingResponse
+from pydantic import SecretStr
 import httpx
 
 router = APIRouter()
@@ -79,8 +80,6 @@ async def get_metadata_iqdata(
         raise HTTPException(status_code=404, detail="Datasource not found")
 
     imageURL = add_URL_sasToken(account, container, datasource["sasToken"], filepath, apiType.IQDATA)
-    if not imageURL.get_secret_value():
-        return StreamingResponse((b'' for _ in range(1))) # return empty image
 
     async with httpx.AsyncClient() as client:
         response = await client.get(imageURL.get_secret_value())
@@ -114,8 +113,6 @@ async def get_meta_thumbnail(
         raise HTTPException(status_code=404, detail="Datasource not found")
 
     imageURL = add_URL_sasToken(account, container, datasource["sasToken"], filepath, apiType.THUMB)
-    if not imageURL.get_secret_value():
-        return StreamingResponse((b'' for _ in range(1))) # return empty image
 
     async with httpx.AsyncClient() as client:
         response = await client.get(imageURL.get_secret_value())

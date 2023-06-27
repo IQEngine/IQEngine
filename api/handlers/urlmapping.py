@@ -32,4 +32,4 @@ def add_URL_sasToken(account, container, sasToken, filepath, apiType: apiType):
         api_URL_sasToken = SecretStr(bloburl + "?" + y)
         return api_URL_sasToken
     else:
-        return SecretStr("")
+        return SecretStr("/logo192.png")
