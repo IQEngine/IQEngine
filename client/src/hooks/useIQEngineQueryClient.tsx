@@ -11,6 +11,7 @@ export function useIQEngineQueryClient() {
   });
   queryClient.setQueryDefaults(['config'], { staleTime: 1000 * 60 * 60 * 24 });
   queryClient.setQueryDefaults(['datasource', CLIENT_TYPE_BLOB], { staleTime: 1000 * 60 });
+  queryClient.setQueryDefaults(['plugins'], { staleTime: 1000 * 60 * 5 });
 
   return {
     queryClient,

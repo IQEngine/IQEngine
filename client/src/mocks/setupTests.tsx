@@ -25,6 +25,7 @@ export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: Infinity,
+      retry: false,
     },
   },
 });
@@ -42,3 +43,11 @@ export const AllProviders = ({ children }) => (
     </QueryClientProvider>
   </Provider>
 );
+
+export const useAllProviders = () => {
+  return {
+    wrapper: AllProviders,
+    queryClient,
+    store,
+  };
+};
