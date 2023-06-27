@@ -13,6 +13,11 @@ export interface IQDataSlice {
   iqArray: Float32Array;
 }
 
+export interface PluginDefinition {
+  name: string;
+  url: string;
+}
+
 export interface FFTParams {
   fftSize: number;
   windowFunction: string;

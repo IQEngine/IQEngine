@@ -80,6 +80,6 @@ class Metadata(BaseModel):
     annotations: list[MetadataAnnotation]
 
 
-class Processor(BaseModel):
+class Plugin(BaseModel):
     name: str
     url: str
