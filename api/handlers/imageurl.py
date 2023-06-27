@@ -20,7 +20,7 @@ def add_imageURL_sasToken(account, container, sasToken, filepath, uiImage: uiIma
             y = x.get_secret_value()
 
         if uiImage == uiImage.THUMB and filepath is not None and filepath != "":
-            bloburl = f'https://{account}.blob.core.windows.net/{container}/{filepath}/thumb.jpg'
+            bloburl = f'https://{account}.blob.core.windows.net/{container}/{filepath}.jpg'
         elif uiImage == uiImage.IMAGE:
             bloburl = f'https://{account}.blob.core.windows.net/{container}/image.jpg'
         else:
