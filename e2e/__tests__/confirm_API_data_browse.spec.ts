@@ -26,7 +26,7 @@ test.afterAll(async ({}) => {
   var conn = dotenv.config();
   dotenvExpand.expand(conn);
 
-  const connection_string = process.env.METADATA_DB_CONNECTION_STRING || '';
+  const connection_string = process.env.IQENGINE_METADATA_DB_CONNECTION_STRING || '';
   const client: MongoClient = new MongoClient(connection_string);
   await client.connect();
 
