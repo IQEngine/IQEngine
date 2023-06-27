@@ -2,6 +2,14 @@
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
 
+/*
+stage0 - raw IQ straight from the recording
+stage1 - pre-FFT processing performed on stage1, eg FIR filter, python snippet
+stage2 - FFT output in floats, in units of dB
+stage3 - after doing decimation (max, mean, or skip) for zooming out in time
+stage4 - uint8 values after having the min/max and colormap applied
+*/
+
 // @ts-ignore
 import { fftshift } from 'fftshift';
 import { TILE_SIZE_IN_IQ_SAMPLES } from './constants';
@@ -16,21 +24,12 @@ function getStandardDeviation(array: Array<any>) {
 
 const average = (array: Array<any>) => array.reduce((a, b) => a + b) / array.length;
 
-export function calcFftOfTile(
-  samples: Float32Array,
-  fftSize: number,
-  numFftsPerTile: number,
-  windowFunction: string,
-  magnitude_min: number,
-  magnitude_max: number,
-  colMap: any
-) {
-  let startTime = performance.now();
-  let newFftData = new Uint8ClampedArray(fftSize * numFftsPerTile * 4); // 4 because RGBA
-  let startOfs = 0;
+export function calcFftOfTile(samples: Float32Array, fftSize: number, windowFunction: string) {
+  //let startTime = performance.now();
+  let fftsConcatenated = new Float32Array(TILE_SIZE_IN_IQ_SAMPLES);
 
   // loop through each row
-  for (let i = 0; i < numFftsPerTile; i++) {
+  for (let i = 0; i < TILE_SIZE_IN_IQ_SAMPLES / fftSize; i++) {
     let samples_slice = samples.slice(i * fftSize * 2, (i + 1) * fftSize * 2); // mult by 2 because this is int/floats not IQ samples
 
     // Apply a hamming window and hanning window
@@ -76,6 +75,26 @@ export function calcFftOfTile(
     magnitudes = magnitudes.map((x) => 10.0 * Math.log10(x)); // convert to dB
     magnitudes = magnitudes.map((x) => (isFinite(x) ? x : 0)); // get rid of -infinity which happens when the input is all 0s
 
+    fftsConcatenated.set(magnitudes, i * fftSize);
+  }
+  //let endTime = performance.now();
+  //console.debug('Calculating FFTs took', endTime - startTime, 'milliseconds'); // first cut of our code processed+rendered 0.5M samples in 760ms on marcs computer
+  return fftsConcatenated;
+}
+
+export function fftToRGB(
+  fftsConcatenated: Float32Array,
+  fftSize: number,
+  magnitude_min: number,
+  magnitude_max: number,
+  colMap: any
+) {
+  let startOfs = 0;
+  let newFftData = new Uint8ClampedArray(TILE_SIZE_IN_IQ_SAMPLES * 4); // 4 because RGBA
+  // loop through each row
+  for (let i = 0; i < TILE_SIZE_IN_IQ_SAMPLES / fftSize; i++) {
+    let magnitudes = fftsConcatenated.slice(i * fftSize, (i + 1) * fftSize);
+
     // apply magnitude min and max (which are in dB, same units as magnitudes prior to this point) and convert to 0-255
     const dbPer1 = 255 / (magnitude_max - magnitude_min);
     magnitudes = magnitudes.map((x) => x - magnitude_min);
@@ -94,8 +113,6 @@ export function calcFftOfTile(
       newFftData[line_offset + opIdx + 3] = 255; // alpha
     }
   }
-  let endTime = performance.now();
-  console.debug('Rendering spectrogram took', endTime - startTime, 'milliseconds'); // first cut of our code processed+rendered 0.5M samples in 760ms on marcs computer
   return newFftData;
 }
 
@@ -123,11 +140,7 @@ export const selectFft = (
     return;
   }
 
-  const numFftsPerTile = TILE_SIZE_IN_IQ_SAMPLES / fftSize;
-  let magnitude_max = magnitudeMax;
-  let magnitude_min = magnitudeMin;
-
-  // Go through each of the tiles and compute the FFT and save in window.fftData
+  // Go through each of the tiles and compute the FFT and convert to RGB
   const tiles = range(Math.floor(lowerTile), Math.ceil(upperTile));
   for (let tile of tiles) {
     if (!!fftData[tile]) {
@@ -138,38 +151,28 @@ export const selectFft = (
       continue;
     }
     let samples = iqData[tile.toString()];
-    const newFftData = calcFftOfTile(
-      samples,
-      fftSize,
-      numFftsPerTile,
-      windowFunction,
-      magnitude_min,
-      magnitude_max,
-      colMap
-    );
-    fftData[tile] = newFftData;
+
+    const fftsConcatenated = calcFftOfTile(samples, fftSize, windowFunction);
+    fftData[tile] = fftToRGB(fftsConcatenated, fftSize, magnitudeMin, magnitudeMax, colMap);
   }
-  const missingTiles = [];
+
   // Concatenate the full tiles
-  let totalFftData = new Uint8ClampedArray(tiles.length * fftSize * numFftsPerTile * 4); // 4 because RGBA
-  let counter = 0; // can prob make this cleaner with an iterator in the for loop below
-  for (let tile of tiles) {
+  let totalFftData = new Uint8ClampedArray(tiles.length * TILE_SIZE_IN_IQ_SAMPLES * 4); // 4 because RGBA
+  const missingTiles = [];
+  for (let [index, tile] of tiles.entries()) {
     if (tile in fftData) {
-      totalFftData.set(fftData[tile], counter);
+      totalFftData.set(fftData[tile], index * TILE_SIZE_IN_IQ_SAMPLES * 4);
     } else {
+      // If the tile isnt available, fill with 255's (white and opaque)
       missingTiles.push(tile);
-      // If the tile isnt available, fill with ones (white)
-      let fakeFftData = new Uint8ClampedArray(fftSize * numFftsPerTile * 4);
-      fakeFftData.fill(255); // for debugging its better to have the alpha set to opaque so the missing part isnt invisible
-      totalFftData.set(fakeFftData, counter);
+      totalFftData.fill(255, index * TILE_SIZE_IN_IQ_SAMPLES * 4, (index + 1) * TILE_SIZE_IN_IQ_SAMPLES * 4);
     }
-    counter = counter + fftSize * numFftsPerTile * 4;
   }
 
   // Trim off the top and bottom
-  let lowerTrim = (lowerTile - Math.floor(lowerTile)) * fftSize * numFftsPerTile; // amount we want to get rid of
+  let lowerTrim = (lowerTile - Math.floor(lowerTile)) * TILE_SIZE_IN_IQ_SAMPLES; // amount we want to get rid of
   lowerTrim = lowerTrim - (lowerTrim % fftSize); // make it an even FFT size. TODO We need this rounding to happen earlier, so we get a consistent 600 ffts in the image
-  let upperTrim = (1 - (upperTile - Math.floor(upperTile))) * fftSize * numFftsPerTile; // amount we want to get rid of
+  let upperTrim = (1 - (upperTile - Math.floor(upperTile))) * TILE_SIZE_IN_IQ_SAMPLES; // amount we want to get rid of
   upperTrim = upperTrim - (upperTrim % fftSize);
   let trimmedFftData = totalFftData.slice(lowerTrim * 4, totalFftData.length - upperTrim * 4); // totalFftData.length already includes the *4
   let num_final_ffts = trimmedFftData.length / fftSize / 4;
