@@ -29,6 +29,7 @@
   "python.testing.pytestArgs": ["."],
   "python.testing.unittestEnabled": false,
   "python.testing.pytestEnabled": true,
+  "vitest.enable": true,
   "[python]": {
     "editor.defaultFormatter": "ms-python.python"
   },
