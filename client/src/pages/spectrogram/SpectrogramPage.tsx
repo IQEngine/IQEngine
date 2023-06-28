@@ -4,9 +4,9 @@
 
 import { Sidebar } from './Sidebar';
 import ScrollBar from './ScrollBar';
-import { TimePlot } from './TimePlot';
-import { FrequencyPlot } from './FrequencyPlot';
-import { IQPlot } from './IQPlot';
+import { TimePlot } from './components/TimePlot';
+import { FrequencyPlot } from './components/FrequencyPlot';
+import { IQPlot } from './components/IQPlot';
 import { Layer, Image, Stage } from 'react-konva';
 import { selectFft, calculateTileNumbers, range, SelectFftReturn } from '@/Utils/selector';
 import { AnnotationViewer } from '@/Components/Annotation/AnnotationViewer';
@@ -18,7 +18,6 @@ import AnnotationList from '@/Components/Annotation/AnnotationList';
 import { GlobalProperties } from '@/Components/GlobalProperties/GlobalProperties';
 import { MetaViewer } from '@/Components/Metadata/MetaViewer';
 import { MetaRaw } from '@/Components/Metadata/MetaRaw';
-import { SpectrogramContext } from './SpectrogramContext';
 import { useParams } from 'react-router-dom';
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { getMeta } from '@/api/metadata/Queries';
@@ -305,15 +304,7 @@ export const SpectrogramPage = () => {
   };
 
   return (
-    <SpectrogramContext.Provider
-      value={{
-        type: type,
-        account: account,
-        container: container,
-        filePath: filePath,
-        sasToken: sasToken,
-      }}
-    >
+    <>
       {status === 'loading' && <h1>Loading...</h1>}
       <div className="mt-3 mb-0 ml-0 mr-0 p-0">
         <div className="flex flex-row w-full">
@@ -535,7 +526,7 @@ export const SpectrogramPage = () => {
       </div>
       <img ref={imgRef} />
       <img ref={imgRef2} />
-    </SpectrogramContext.Provider>
+    </>
   );
 };
 
