@@ -2,6 +2,9 @@ import database.database
 from database.models import DataSource, DataSourceReference, Metadata
 from fastapi import APIRouter, Depends, HTTPException
 from pymongo.collection import Collection
+from .urlmapping import add_URL_sasToken, apiType
+from fastapi.responses import StreamingResponse
+import httpx
 
 router = APIRouter()
 
@@ -52,6 +55,70 @@ def get_meta(
     if not metadata:
         raise HTTPException(status_code=404, detail="Metadata not found")
     return metadata
+
+
+@router.get(
+    "/api/datasources/{account}/{container}/{filepath:path}/iqdata", response_class=StreamingResponse
+)
+async def get_metadata_iqdata(
+    account: str,
+    container: str,
+    filepath: str,
+    datasources_collection: Collection[DataSource] = Depends(
+        database.database.datasources_collection
+    ),
+):
+    # Create the imageURL with sasToken
+    datasource = datasources_collection.find_one(
+        {
+            "account": account,
+            "container": container,
+        }
+    )
+    if not datasource:
+        raise HTTPException(status_code=404, detail="Datasource not found")
+
+    imageURL = add_URL_sasToken(account, container, datasource["sasToken"], filepath, apiType.IQDATA)
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(imageURL.get_secret_value())
+    if response.status_code != 200:
+        raise HTTPException(status_code=404, detail="Image not found")
+
+    return StreamingResponse(response.iter_bytes(), media_type=response.headers["Content-Type"])
+
+
+@router.get(
+    "/api/datasources/{account}/{container}/{filepath:path}/thumbnail",
+    response_class=StreamingResponse,
+)
+async def get_meta_thumbnail(
+    account,
+    container,
+    filepath,
+    datasources_collection: Collection[DataSource] = Depends(
+        database.database.datasources_collection
+    ),
+):
+    # Create the imageURL with sasToken
+    datasource = datasources_collection.find_one(
+        {
+            "account": account,
+            "container": container,
+        }
+    )
+
+    if not datasource:
+        raise HTTPException(status_code=404, detail="Datasource not found")
+
+    imageURL = add_URL_sasToken(account, container, datasource["sasToken"], filepath, apiType.THUMB)
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(imageURL.get_secret_value())
+    if response.status_code != 200:
+        raise HTTPException(status_code=404, detail="Image not found")
+
+    return StreamingResponse(response.iter_bytes(), media_type=response.headers["Content-Type"])
 
 
 @router.post(

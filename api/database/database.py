@@ -24,9 +24,7 @@ def create_in_memory_db_client():
 def db():
     global _db
     if _db is None:
-        if "IN_MEMORY_DB" in os.environ and os.environ["IN_MEMORY_DB"] != str(
-            "0"
-        ):
+        if "IN_MEMORY_DB" in os.environ and os.environ["IN_MEMORY_DB"] != str("0"):
             _db = create_in_memory_db_client()
         else:
             _db = create_db_client()
@@ -48,6 +46,6 @@ def metadata_versions_collection():
     return collection
 
 
-def processors_collection():
-    collection: Collection[Metadata] = db().processors
+def plugins_collection():
+    collection: Collection[Metadata] = db().plugins
     return collection

@@ -11,7 +11,7 @@ import { Provider } from 'react-redux';
 import store from '@/Store/store';
 import { createRoot } from 'react-dom/client';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { FeatureFlagsProvider } from './Components/FeatureFlagsContext/FeatureFlagsContext';
+import { FeatureFlagsProvider } from '@/hooks/useFeatureFlags';
 import { useIQEngineQueryClient } from '@/hooks/useIQEngineQueryClient';
 import { useIQEngineRouter } from '@/hooks/useIQEngineRouter';
 

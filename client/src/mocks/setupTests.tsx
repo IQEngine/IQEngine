@@ -4,7 +4,7 @@ import React from 'react';
 import { configureStore } from '@reduxjs/toolkit';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { Provider } from 'react-redux';
-import { FeatureFlagsProvider } from '@/Components/FeatureFlagsContext/FeatureFlagsContext';
+import { FeatureFlagsProvider } from '@/hooks/useFeatureFlags';
 import { vi } from 'vitest';
 
 Object.defineProperty(window, 'matchMedia', {
@@ -25,6 +25,7 @@ export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: Infinity,
+      retry: false,
     },
   },
 });
@@ -42,3 +43,11 @@ export const AllProviders = ({ children }) => (
     </QueryClientProvider>
   </Provider>
 );
+
+export const useAllProviders = () => {
+  return {
+    wrapper: AllProviders,
+    queryClient,
+    store,
+  };
+};
