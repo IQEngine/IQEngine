@@ -1,0 +1,30 @@
+version: '3.2'
+
+services:
+  iqengine:
+    build:
+      context: .
+    image: iqengine:latest
+    environment:
+      IQENGINE_PLUGINS_ENDPOINT: plugins:8000
+      IQENGINE_METADATA_DB_CONNECTION_STRING: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongo:27017
+    depends_on:
+      - mongo
+    ports:
+      - 3000:3000
+  plugins:
+    build:
+      context: plugins
+    image: plugins:latest
+    depends_on:
+      - mongo
+    ports:
+      - 8000:8000
+  mongo:
+    image: mongo:4.2
+    restart: always
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
