@@ -2,9 +2,7 @@
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
 
-import React, { useState, useEffect } from 'react';
-import { configQuery } from '@/api/config/queries';
-import { useAppDispatch } from '@/Store/hooks';
+import React, { useState } from 'react';
 import { Annotation, SigMFMetadata } from '@/Utils/sigmfMetadata';
 import { TimePlot } from './TimePlot';
 import { FrequencyPlot } from './FrequencyPlot';
@@ -14,6 +12,9 @@ import { convertFloat32ArrayToBase64, convertBase64ToFloat32Array } from '@/Util
 import { colMaps } from '@/Utils/colormap';
 import { fftshift } from 'fftshift';
 import { FFT } from '@/Utils/fft';
+import { useGetPluginsComponents } from '../hooks/useGetPluginsComponents';
+import { useGetPlugins } from '@/api/plugin/Queries';
+import { toast } from 'react-hot-toast';
 
 export interface PluginsPaneProps {
   cursorsEnabled: boolean;
@@ -23,66 +24,31 @@ export interface PluginsPaneProps {
 }
 
 export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }: PluginsPaneProps) => {
-  const [pluginsList, setPluginsList] = useState([]);
-  const [selectedPlugin, setSelectedPlugin] = useState('default');
-  const [pluginParams, setPluginParams] = useState({});
+  const { data: plugins } = useGetPlugins();
+  const { PluginOption, EditPluginParameters, pluginParameters, setPluginParameters } = useGetPluginsComponents();
+  const [selectedPlugin, setSelectedPlugin] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [modalSamples, setModalSamples] = useState([]);
   const [modalSpectrogram, setmodalSpectrogram] = useState(null);
-  const [value, setValue] = useState(0); // integer state used to force rerender
-  const dispatch = useAppDispatch();
-  const config = configQuery();
-  useEffect(() => {
-    if (!config.data || !config.data.pluginsEndpoint) return;
-    let pluginsEndpoint = 'http://127.0.0.1:8000/plugins/';
-    // In local mode, IQENGINE_CONNECTION_INFO isn't defined
-    if (config.data.pluginsEndpoint) {
-      pluginsEndpoint = config.data.pluginsEndpoint;
-    }
-    fetch(pluginsEndpoint, { method: 'GET' })
-      .then(function (response) {
-        return response.json();
-      })
-      .then(function (data) {
-        console.debug('Plugins:', data);
-        setPluginsList(data);
-      })
-      .catch((error) => {
-        console.debug(error);
-      });
-  }, [config?.data?.pluginsEndpoint]);
 
   const handleChangePlugin = (e) => {
-    if (!config.data || !config.data.pluginsEndpoint) return;
     setSelectedPlugin(e.target.value);
-    setPluginParams({}); // in case something goes wrong
-    // Fetch the custom params for this plugin
-    fetch(config.data.pluginsEndpoint + e.target.value, { method: 'GET' })
-      .then(function (response) {
-        if (response.status === 404) {
-          return {};
-        }
-        return response.json();
-      })
-      .then(function (data) {
-        console.debug('Plugin Params:', data);
-        setPluginParams(data);
-      });
   };
 
   const handleSubmit = (e) => {
+    console.log('Plugin Params:', pluginParameters);
     e.preventDefault();
 
     if (!cursorsEnabled) {
-      alert('First enable cursors and choose a region of time to run the plugin on');
+      toast.error('First enable cursors and choose a region of time to run the plugin on');
       return;
     }
 
     // this does the tile calc and gets the right samples in currentSamples
     const { trimmedSamples, startSampleOffset } = handleProcessTime();
 
-    const sampleRate = meta['global']['core:sample_rate'];
-    const freq = meta['captures'][0]['core:frequency'];
+    const sampleRate = meta.getSampleRate();
+    const freq = meta.getCenterFrequency();
 
     const newSamps = convertFloat32ArrayToBase64(trimmedSamples);
     console.log(newSamps);
@@ -99,18 +65,18 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
       custom_params: {},
     };
     // Add custom params
-    for (const [key, value] of Object.entries(pluginParams)) {
-      if (value['type'] === 'integer') {
-        body['custom_params'][key] = parseInt(value['default']); // remember, we updated default with whatever the user enters
-      } else if (value['type'] === 'number') {
-        body['custom_params'][key] = parseFloat(value['default']);
+    for (const [key, value] of Object.entries(pluginParameters)) {
+      if (value.type === 'integer') {
+        body['custom_params'][key] = parseInt(value.value); // remember, we updated default with whatever the user enters
+      } else if (value.type === 'number') {
+        body['custom_params'][key] = parseFloat(value.value);
       } else {
-        body['custom_params'][key] = value['default'];
+        body['custom_params'][key] = value.value;
       }
     }
     console.debug(body);
 
-    fetch(config.data.pluginsEndpoint + selectedPlugin, {
+    fetch(selectedPlugin, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -122,8 +88,12 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
         return response.json();
       })
       .then(function (data) {
-        console.log('Plugin Status:', data.status);
-        console.log('data:', data);
+        console.debug('Plugin Status:', data.status);
+        console.debug('data:', data);
+        if (data.status !== 'SUCCESS') {
+          toast.error(`Plugin failed to run: ${data.status}`);
+          return;
+        }
         if (data.data_output && data.data_output.length > 0) {
           // just show the first output for now, 99% of plugins will have 0 or 1 IQ output anyway
           const samples_base64 = data.data_output[0]['samples'];
@@ -208,45 +178,24 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
       });
   };
 
-  const handleChange = (e) => {
-    pluginParams[e.target.name]['default'] = e.target.value; // the schema uses default so we'll just replace it with the new value
-    setPluginParams(pluginParams);
-    setValue((value) => value + 1); // update state to force render
-  };
-
   return (
     <div className="pluginForm" id="pluginFormId" onSubmit={handleSubmit}>
       <label className="label">
         Plugin:
         <select className="rounded bg-base-content text-base-100" value={selectedPlugin} onChange={handleChangePlugin}>
-          <option disabled value="default">
+          <option disabled selected value="">
             Select a Plugin
           </option>
-          {pluginsList.map((pluginName, index) => (
-            <option key={index} value={pluginName}>
-              {pluginName}
-            </option>
-          ))}
+          {plugins && plugins.map((plugin) => <PluginOption plugin={plugin} />)})
         </select>
       </label>
-      {Object.keys(pluginParams).length > 0 && (
-        <>
-          <div className="mb-3">
-            {Object.keys(pluginParams).map((key, index) => (
-              <div key={index + 100000}>
-                <label className="label pb-0">{pluginParams[key]['title']}</label>
-                <input
-                  type={pluginParams[key]['type']}
-                  name={key}
-                  value={pluginParams[key]['default']}
-                  onChange={handleChange}
-                  className="h-8 rounded text-base-100 ml-1 pl-2"
-                />
-              </div>
-            ))}
-          </div>
-          <button onClick={handleSubmit}>Run Plugin</button>
-        </>
+      {selectedPlugin && (
+        <EditPluginParameters
+          pluginUrl={selectedPlugin}
+          handleSubmit={handleSubmit}
+          setPluginParameters={setPluginParameters}
+          pluginParameters={pluginParameters}
+        />
       )}
 
       {modalOpen && (
