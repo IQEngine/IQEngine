@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.18.4.5664",
-      "templateHash": "13704283749360501262"
+      "templateHash": "15374147211022128749"
     }
   },
   "parameters": {
@@ -35,7 +35,7 @@
     },
     "deployContainerAppAuth": {
       "type": "bool",
-      "defaultValue": true
+      "defaultValue": false
     },
     "adAppClientId": {
       "type": "string",

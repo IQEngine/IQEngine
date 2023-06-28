@@ -4,7 +4,7 @@ param containerPort int = 3000
 param registry string = 'ghcr.io'
 param applicationName string = 'iqengine'
 param uniqueSuffix string = substring(uniqueString((resourceGroup().id)), 0, 5)
-param deployContainerAppAuth bool = true
+param deployContainerAppAuth bool = false
 param adAppClientId string = '00000000-0000-0000-0000-000000000000'
 
 
