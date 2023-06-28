@@ -94,6 +94,24 @@ describe('useGetPlugin', () => {
     await waitFor(() => expect(result.current.isFetching).toEqual(false), { timeout: 1000 });
     await waitFor(() => expect(result.current.data).toEqual(expectedPlugins), { timeout: 1000 });
   });
+
+  test('should be able to get the list of plugins from one pluging config', async ({ expect }) => {
+    const { wrapper } = useAllProviders();
+    let expectedPlugins = ['plugin1', 'plugin2'];
+    nock('http://localhost:8000')
+      .defaultReplyHeaders({
+        'access-control-allow-origin': '*',
+        'access-control-allow-credentials': 'true',
+      })
+      .get(`/api/plugins`)
+      .reply(200, { error: 'error' });
+    const { result } = renderHook(() => useGetPlugin({ name: 'gnuradio', url: 'http://localhost:8000/api/plugins' }), {
+      wrapper: wrapper,
+    });
+    await waitFor(() => expect(result.current.isSuccess).toBe(false), { timeout: 1000 });
+    await waitFor(() => expect(result.current.isFetching).toEqual(false), { timeout: 1000 });
+    await waitFor(() => expect(result.current.data).toEqual(undefined), { timeout: 1000 });
+  });
 });
 
 describe('useGetPluginParameters', () => {

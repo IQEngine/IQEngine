@@ -28,6 +28,8 @@ export function useGetPlugin(plugin: PluginDefinition) {
     ['plugin', plugin.name],
     async () => {
       const response = await axios.get<string[]>(plugin.url);
+      // make sure we onlyt return in case of a string array
+      if (!Array.isArray(response.data)) throw new Error(`Plugin ${plugin.name} does not return a string array`);
       return response.data;
     },
     {
