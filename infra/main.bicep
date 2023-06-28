@@ -7,7 +7,6 @@ param uniqueSuffix string = substring(uniqueString((resourceGroup().id)), 0, 5)
 param deployContainerAppAuth bool = false
 param adAppClientId string = '00000000-0000-0000-0000-000000000000'
 
-
 module law 'law.bicep' = {
     name: 'log-analytics-workspace'
     params: {

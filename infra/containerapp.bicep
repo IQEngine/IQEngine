@@ -52,7 +52,7 @@ resource containerApp 'Microsoft.App/containerApps@2022-11-01-preview' = {
 }
 
 resource containerAppConfig 'Microsoft.App/containerApps/authConfigs@2022-06-01-preview' = if (deployContainerAppAuth) {
-  name: 'current'  
+  name: 'current'
   parent: containerApp
   properties: {
     platform: {
@@ -61,7 +61,7 @@ resource containerAppConfig 'Microsoft.App/containerApps/authConfigs@2022-06-01-
     identityProviders: {
       azureActiveDirectory:{
         enabled: true
-        isAutoProvisioned: true 
+        isAutoProvisioned: true
         registration: {
           clientId: adAppClientId
           openIdIssuer: 'https://sts.windows.net/${subscription().tenantId}/v2.0'
