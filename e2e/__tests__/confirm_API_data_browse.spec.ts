@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { MongoClient, Db } from 'mongodb';
-import { config } from 'dotenv';
+import dotenv from 'dotenv';
+import dotenvExpand from 'dotenv-expand';
 
 test.beforeAll(async ({ request }) => {
   const dataSource = {
@@ -21,9 +22,11 @@ test('API Datasource Browsing', async ({ page }) => {
   await expect(page.getByText('Author')).toBeVisible();
 });
 
-test.afterAll(async ({ request }) => {
-  config();
-  const connection_string = process.env.METADATA_DB_CONNECTION_STRING || '';
+test.afterAll(async ({}) => {
+  var conn = dotenv.config();
+  dotenvExpand.expand(conn);
+
+  const connection_string = process.env.IQENGINE_METADATA_DB_CONNECTION_STRING || '';
   const client: MongoClient = new MongoClient(connection_string);
   await client.connect();
   const db: Db = client.db('IQEngine');
