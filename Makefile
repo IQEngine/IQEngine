@@ -47,14 +47,12 @@ dev:
 test:
 	@echo "Running Playwright frontend and end-to-end tests"
 	@cd e2e && npx playwright test
-	@e2e/teardown.sh
 	@echo "Running pytest api tests"
 	@cd api && pytest
 
 test-pw:
 	@echo "Running Playwright frontend and end-to-end tests"
 	@cd e2e && npx playwright test
-	@e2e/teardown.sh
 
 lint:
 	@echo "Do you want to lint to correct the files? [y/N] " && read ans && if [ $${ans:-'N'} = 'y' ]; then make lint-corrections; else make lint-no-corrections;fi
