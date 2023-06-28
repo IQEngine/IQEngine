@@ -12,7 +12,6 @@ const fetchConfig = async () => {
       return {
         data: {
           connectionInfo: JSON.parse(import.meta.env.IQENGINE_CONNECTION_INFO ?? null),
-          pluginsEndpoint: import.meta.env.IQENGINE_PLUGINS_ENDPOINT,
           googleAnalyticsKey: import.meta.env.IQENGINE_GOOGLE_ANALYTICS_KEY,
           featureFlags: JSON.parse(import.meta.env.IQENGINE_FEATURE_FLAGS ?? null),
         } as Config,
@@ -20,9 +19,6 @@ const fetchConfig = async () => {
     });
     if (!response.data.connectionInfo) {
       response.data.connectionInfo = JSON.parse(import.meta.env.IQENGINE_CONNECTION_INFO ?? null);
-    }
-    if (!response.data.pluginsEndpoint) {
-      response.data.pluginsEndpoint = import.meta.env.IQENGINE_PLUGINS_ENDPOINT;
     }
     if (!response.data.googleAnalyticsKey) {
       response.data.googleAnalyticsKey = import.meta.env.IQENGINE_GOOGLE_ANALYTICS_KEY;
@@ -39,10 +35,9 @@ const fetchConfig = async () => {
 
     return response.data;
   } catch (error) {
-    console.error("An error has occurred setting the environment variables.")
+    console.error('An error has occurred setting the environment variables.');
     return {
       connectionInfo: JSON.parse(import.meta.env.IQENGINE_CONNECTION_INFO ?? null),
-      pluginsEndpoint: import.meta.env.IQENGINE_PLUGINS_ENDPOINT,
       googleAnalyticsKey: import.meta.env.IQENGINE_GOOGLE_ANALYTICS_KEY,
       featureFlags: JSON.parse(import.meta.env.IQENGINE_FEATURE_FLAGS ?? null),
     } as Config;
