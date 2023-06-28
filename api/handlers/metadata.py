@@ -1,8 +1,9 @@
 import database.database
 from database.models import DataSource, DataSourceReference, Metadata
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Body
 from pymongo.collection import Collection
 from .urlmapping import add_URL_sasToken, apiType
+from .query import QueryCondition
 from fastapi.responses import StreamingResponse
 import httpx
 
@@ -119,6 +120,30 @@ async def get_meta_thumbnail(
         raise HTTPException(status_code=404, detail="Image not found")
 
     return StreamingResponse(response.iter_bytes(), media_type=response.headers["Content-Type"])
+
+
+@router.post(
+    "/api/datasources/{account}/{container}/query",
+    status_code=200,
+    response_model=list[Metadata],
+)
+def query_meta(
+    account,
+    container,
+    query_condition: QueryCondition = Body(...),
+    metadataSet: Collection[Metadata] = Depends(database.database.metadata_collection),
+):
+    query = {
+        "global.traceability:origin.account": account,
+        "global.traceability:origin.container": container,
+    }
+    query.update(query_condition.query)
+
+    metadata = metadataSet.find(query)
+    result = []
+    for datum in metadata:
+        result.append(datum)
+    return result
 
 
 @router.post(
