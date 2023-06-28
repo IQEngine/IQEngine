@@ -23,6 +23,15 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
 
+  webServer: [
+    {
+      command: './webServer.sh',
+      url: 'http://127.0.0.1:3000',
+      reuseExistingServer: !process.env.CI,
+      timeout: 200 * 1000,
+    },
+  ],
+
   /* Configure projects for major browsers */
   projects: [
     {
