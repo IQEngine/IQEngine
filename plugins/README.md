@@ -25,7 +25,7 @@ code that implements a low-pass filter plugin in a couple dozen lines of Python,
 
 ## Run plugins locally for testing
 
-First edit your root .env file to include `IQENGINE_PLUGINS_ENDPOINT=http://localhost:8000/plugins/`
+First edit your root .env file to include `IQENGINE_PLUGINS: [{"name": "BuiltIn",  "url": "plugins:8000"}]`
 
 ```
 sudo apt install uvicorn ffmpeg libsm6 libxext6 -y
