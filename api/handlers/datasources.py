@@ -1,9 +1,13 @@
 import database.database
 from database.models import DataSource
 from fastapi import APIRouter, Depends, HTTPException
+from pydantic import SecretStr
 from pymongo.collection import Collection
+from fastapi.responses import StreamingResponse
+import httpx
 
-from .cipher import decrypt, encrypt
+from .cipher import encrypt
+from .urlmapping import add_URL_sasToken, apiType
 
 router = APIRouter()
 
@@ -48,6 +52,36 @@ def get_datasources(
 
 
 @router.get(
+    "/api/datasources/{account}/{container}/image", response_class=StreamingResponse
+)
+async def get_datasource_image(
+    account: str,
+    container: str,
+    datasources_collection: Collection[DataSource] = Depends(
+        database.database.datasources_collection
+    ),
+):
+    # Create the imageURL with sasToken
+    datasource = datasources_collection.find_one(
+        {
+            "account": account,
+            "container": container,
+        }
+    )
+    if not datasource:
+        raise HTTPException(status_code=404, detail="Datasource not found")
+
+    imageURL = add_URL_sasToken(account, container, datasource["sasToken"], "", apiType.IMAGE)
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(imageURL.get_secret_value())
+    if response.status_code != 200:
+        raise HTTPException(status_code=404, detail="Image not found")
+
+    return StreamingResponse(response.iter_bytes(), media_type=response.headers["Content-Type"])
+
+
+@router.get(
     "/api/datasources/{account}/{container}/datasource", response_model=DataSource
 )
 def get_datasource(
@@ -67,13 +101,41 @@ def get_datasource(
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
 
-    if (
-        "imageURL" in datasource
-        and "sasToken" in datasource
-        and "core.windows.net" in datasource["imageURL"]
-    ):
-        datasource["imageURL"] = (
-            datasource["imageURL"] + "?" + decrypt(datasource["sasToken"])
-        )
-
     return datasource
+
+
+@router.put("/api/datasources/{account}/{container}/datasource", status_code=204)
+def update_datasource(
+    account: str,
+    container: str,
+    datasource: DataSource,
+    datasources_collection: Collection[DataSource] = Depends(
+        database.database.datasources_collection
+    ),
+):
+    existingDatasource = datasources_collection.find_one(
+        {
+            "account": account,
+            "container": container,
+        }
+    )
+    if not existingDatasource:
+        raise HTTPException(status_code=404, detail="Datasource not found")
+
+    # If the incoming datasource has a sasToken, encrypt it and replace the existing one
+    # Once encrypted sasToken is just a str not a SecretStr anymore
+    if datasource.sasToken and isinstance(datasource.sasToken, SecretStr):
+        datasource.sasToken = encrypt(datasource.sasToken)  # returns a str
+
+    datasource_dict = datasource.dict(by_alias=True, exclude_unset=True)
+
+    # if sasToken is "" or null then set it to a empty str instead of SecretStr
+    if not datasource.sasToken:
+        datasource_dict["sasToken"] = ""
+
+    datasources_collection.update_one(
+        {"account": account, "container": container},
+        {"$set": datasource_dict},
+    )
+
+    return

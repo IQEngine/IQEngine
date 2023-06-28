@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import store from '@/Store/store';
 import { CLIENT_TYPE_BLOB, DataSource } from '@/api/Models';
 import { upsertDataSource } from '@/Store/Reducers/ConnectionReducer';
+import { FeatureFlag } from '@/hooks/useFeatureFlags';
 
 const fetchConfig = async () => {
   try {
@@ -55,7 +56,7 @@ type Config = {
   pluginsEndpoint: string;
   connectionInfo: ConnectionInfo;
   googleAnalyticsKey: string;
-  featureFlags: { [key: string]: boolean };
+  featureFlags: { [key in FeatureFlag]: boolean };
 };
 
 export const configQuery = () =>
