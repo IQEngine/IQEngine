@@ -7,6 +7,7 @@ from .query import QueryCondition
 from fastapi.responses import StreamingResponse
 import httpx
 
+
 router = APIRouter()
 
 
@@ -133,6 +134,7 @@ def query_meta(
     query_condition: QueryCondition = Body(...),
     metadataSet: Collection[Metadata] = Depends(database.database.metadata_collection),
 ):
+
     query = {
         "global.traceability:origin.account": account,
         "global.traceability:origin.container": container,
