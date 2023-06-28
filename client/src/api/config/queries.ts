@@ -36,7 +36,7 @@ const fetchConfig = async () => {
     }
     return response.data;
   } catch (error) {
-    console.log("An error has occurred setting the environment variables.")
+    console.error("An error has occurred setting the environment variables.")
     return {
       connectionInfo: JSON.parse(import.meta.env.IQENGINE_CONNECTION_INFO ?? null),
       pluginsEndpoint: import.meta.env.IQENGINE_PLUGINS_ENDPOINT,
