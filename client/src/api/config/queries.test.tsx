@@ -39,7 +39,6 @@ describe('Config contains information from environment', () => {
     // Assert
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(true);
-      expect(result.current.data.pluginsEndpoint).toBe('http://127.0.0.1:8000/plugins/');
       expect(result.current.data.connectionInfo).toMatchObject({});
       expect(result.current.data.googleAnalyticsKey).toBe('UA-TEST-KEY-1');
       expect(result.current.data.featureFlags).toMatchObject({});
@@ -55,7 +54,6 @@ describe('Config contains information from environment', () => {
     // Assert
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(true);
-      expect(result.current.data.pluginsEndpoint).toBe('http://127.0.0.1:8000/plugins/');
       expect(result.current.data.connectionInfo).toMatchObject({});
       expect(result.current.data.googleAnalyticsKey).toBe('UA-TEST-KEY-1');
       expect(result.current.data.featureFlags).toMatchObject({});
@@ -67,7 +65,6 @@ describe('Config contains information from environment', () => {
     nock('http://localhost:3000')
       .get('/api/config')
       .reply(200, {
-        pluginsEndpoint: 'http://some-plugins-endpoint',
         connectionInfo: { some: 'connection-info' },
         googleAnalyticsKey: 'UA-SOME_KEY-1',
         featureFlags: { someFeature: true },
@@ -77,7 +74,6 @@ describe('Config contains information from environment', () => {
     // Assert
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(true);
-      expect(result.current.data.pluginsEndpoint).toBe('http://some-plugins-endpoint');
       expect(result.current.data.connectionInfo).toMatchObject({ some: 'connection-info' });
       expect(result.current.data.googleAnalyticsKey).toBe('UA-SOME_KEY-1');
       expect(result.current.data.featureFlags).toMatchObject({});

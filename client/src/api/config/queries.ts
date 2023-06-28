@@ -56,7 +56,6 @@ interface ConnectionInfo {
 }
 
 type Config = {
-  pluginsEndpoint: string;
   connectionInfo: ConnectionInfo;
   googleAnalyticsKey: string;
   featureFlags: { [key in FeatureFlag]: boolean };
