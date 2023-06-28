@@ -294,7 +294,7 @@ export const SpectrogramPage = () => {
 
   const handleWheel = (e) => {
     e.evt.preventDefault();
-    let scrollDirection = -e.evt.wheelDeltaY / Math.abs(e.evt.wheelDeltaY);
+    let scrollDirection = -e.evt.wheelDeltaY / Math.abs(e.evt.wheelDeltaY) || 0;
     let scrollAmount = scrollDirection * 2;
     let presentingSize = (spectrogramHeight / (meta.getTotalSamples() / fftSize / zoomLevel)) * spectrogramHeight;
     let maxValue = spectrogramHeight - presentingSize;
