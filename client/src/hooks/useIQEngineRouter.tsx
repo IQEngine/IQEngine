@@ -8,7 +8,7 @@ import { createBrowserRouter } from 'react-router-dom';
 import React from 'react';
 import RepoBrowser from '@/Components/RepoBrowser/RepoBrowser';
 import RecordingsBrowser from '@/Components/RecordingsBrowser/RecordingsBrowser';
-import SpectrogramPage from '@/Components/Spectrogram/SpectrogramPage';
+import SpectrogramPage from '@/pages/spectrogram/SpectrogramPage';
 import SwaggerUI from 'swagger-ui-react';
 
 export function useIQEngineRouter() {
