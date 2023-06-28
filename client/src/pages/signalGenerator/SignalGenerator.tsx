@@ -53,6 +53,7 @@ plt.ylabel("Time [s]")
     buttonText: 'Python Initializing...',
     downloadChecked: false,
     currentExample: 0,
+    imagesHidden: true,
   });
 
   const prePlot = `
@@ -201,6 +202,7 @@ print('NumPy Version:', numpy.version.version)
             b64ImageTime: 'data:image/png;base64, ' + timeImgStr,
             b64ImageIQ: 'data:image/png;base64, ' + iqImgStr,
             b64ImageSpectrogram: 'data:image/png;base64, ' + spectrogramImgStr,
+            imagesHidden: false,
           }); // also clear errors
           console.debug('Call to runPythonAsync took', performance.now() - startTime, 'milliseconds');
 
@@ -389,7 +391,7 @@ print('NumPy Version:', numpy.version.version)
                   theme={vscodeDark}
                 />
                 <br></br>
-                <img src={state.b64ImageFreq} width="490px" alt="hit run to load" />
+                <img src={state.b64ImageFreq} width="490px" alt="Frequency tab image" hidden={state.imagesHidden} />
               </div>
             )}
             {currentTab === 'time' && (
@@ -403,7 +405,7 @@ print('NumPy Version:', numpy.version.version)
                   theme={vscodeDark}
                 />
                 <br></br>
-                <img src={state.b64ImageTime} width="490px" alt="hit run to load" />
+                <img src={state.b64ImageTime} width="490px" alt="Time tab image" hidden={state.imagesHidden} />
               </div>
             )}
             {currentTab === 'iq' && (
@@ -417,7 +419,7 @@ print('NumPy Version:', numpy.version.version)
                   theme={vscodeDark}
                 />
                 <br></br>
-                <img src={state.b64ImageIQ} width="490px" alt="hit run to load" />
+                <img src={state.b64ImageIQ} width="490px" alt="IQ tab image" hidden={state.imagesHidden} />
               </div>
             )}
             {currentTab === 'spectrogram' && (
@@ -431,7 +433,12 @@ print('NumPy Version:', numpy.version.version)
                   theme={vscodeDark}
                 />
                 <br></br>
-                <img src={state.b64ImageSpectrogram} width="490px" alt="hit run to load" />
+                <img
+                  src={state.b64ImageSpectrogram}
+                  width="490px"
+                  alt="Spectrogram tab image"
+                  hidden={state.imagesHidden}
+                />
               </div>
             )}
           </div>
