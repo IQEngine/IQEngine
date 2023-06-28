@@ -30,8 +30,16 @@ const fetchConfig = async () => {
     if (!response.data.featureFlags) {
       response.data.featureFlags = JSON.parse(import.meta.env.IQENGINE_FEATURE_FLAGS ?? null);
     }
+
+    for (const member in response.data) {
+      if (response.data[member] === null || response.data[member] === undefined) {
+        console.log(`Member '${member}' of response.data is null or undefined`);
+      }
+    }
+
     return response.data;
   } catch (error) {
+    console.error("An error has occurred setting the environment variables.")
     return {
       connectionInfo: JSON.parse(import.meta.env.IQENGINE_CONNECTION_INFO ?? null),
       pluginsEndpoint: import.meta.env.IQENGINE_PLUGINS_ENDPOINT,
