@@ -132,7 +132,7 @@ To configure the project, you need to set specific environment variables. The cu
 
 * `IQENGINE_GOOGLE_ANALYTICS_KEY`: This variable holds the key for Google Analytics. If you don't intend to use Google Analytics, you can leave this variable empty.
 
-* `IQENGINE_PLUGINS_ENDPOINT`: Use this variable to specify the endpoint for the detector API. If you don't plan to use the detector API, you can leave this variable empty.
+* `IQENGINE_PLUGINS`: Use this variable to specify the plugins you want to use it needs to be an array of objects with the following properties: name, url. The name is the name of the plugin and the url is the url to the plugin. ex: IQENGINE_PLUGINS = [{"name": "My Plugin", "url": "http://localhost:3000"}]
 
 * `IQENGINE_FEATURE_FLAGS`: Use this variable to specify feature flags for the web app. If you have a Metadata database you can specify the `useAPIDatasources` flag like this: IQENGINE_FEATURE_FLAGS = {"useAPIDatasources": false}. Additional feature flags can be added using comma separation.
 

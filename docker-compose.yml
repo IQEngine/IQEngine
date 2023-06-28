@@ -4,7 +4,7 @@ services:
   iqengine:
     image: ghcr.io/iqengine/iqengine:latest
     environment:
-      IQENGINE_PLUGINS_ENDPOINT: plugins:8000
+      IQENGINE_PLUGINS: '[{"name": "BuiltIn",  "url": "plugins:8000"}]'
       IQENGINE_METADATA_DB_CONNECTION_STRING: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongo:27017
     depends_on:
       - mongo
