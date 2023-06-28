@@ -7,7 +7,7 @@ services:
     image: iqengine:latest
     environment:
       IQENGINE_PLUGINS_ENDPOINT: plugins:8000
-      IQENGINE_METADATA_DB_CONNECTION_STRING: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongo:27017
+      IQENGINE_METADATA_DB_CONNECTION_STRING: mongodb://mongoadmin:secret@mongo:27017
     depends_on:
       - mongo
     ports:
@@ -26,5 +26,5 @@ services:
     ports:
       - 27017:27017
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_INITDB_ROOT_USERNAME: mongoadmin
+      MONGO_INITDB_ROOT_PASSWORD: secret
