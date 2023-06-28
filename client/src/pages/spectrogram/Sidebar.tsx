@@ -4,7 +4,7 @@
 
 import React from 'react';
 import SettingsPane from './SettingsPane';
-import { PluginsPane } from './PluginsPane';
+import { PluginsPane } from './components/PluginsPane';
 import InfoPane from './InfoPane';
 import { SigMFMetadata } from '@/Utils/sigmfMetadata';
 

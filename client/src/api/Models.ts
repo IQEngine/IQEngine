@@ -18,6 +18,15 @@ export interface PluginDefinition {
   url: string;
 }
 
+export interface PluginParameters {
+  [key: string]: {
+    title: string;
+    type: string;
+    default: any;
+    value?: any;
+  };
+}
+
 export interface FFTParams {
   fftSize: number;
   windowFunction: string;
