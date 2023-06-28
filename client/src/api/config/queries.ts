@@ -20,20 +20,23 @@ const fetchConfig = async () => {
     });
     if (!response.data.connectionInfo) {
       response.data.connectionInfo = JSON.parse(import.meta.env.IQENGINE_CONNECTION_INFO ?? null);
-      console.log("Setting connectionInfo env: ", response.data.connectionInfo)
     }
     if (!response.data.pluginsEndpoint) {
       response.data.pluginsEndpoint = import.meta.env.IQENGINE_PLUGINS_ENDPOINT;
-      console.log("Setting pluginsEndpoint env: ", response.data.pluginsEndpoint)
     }
     if (!response.data.googleAnalyticsKey) {
       response.data.googleAnalyticsKey = import.meta.env.IQENGINE_GOOGLE_ANALYTICS_KEY;
-      console.log("Setting googleAnalyticsKey env: ", response.data.googleAnalyticsKey)
     }
     if (!response.data.featureFlags) {
       response.data.featureFlags = JSON.parse(import.meta.env.IQENGINE_FEATURE_FLAGS ?? null);
-      console.log("Setting featureFlags env: ", response.data.featureFlags)
     }
+
+    for (const member in response.data) {
+      if (response.data[member] === null || response.data[member] === undefined) {
+        console.log(`Member '${member}' of response.data is null or undefined`);
+      }
+    }
+
     return response.data;
   } catch (error) {
     console.error("An error has occurred setting the environment variables.")
