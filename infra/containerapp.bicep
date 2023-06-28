@@ -32,7 +32,7 @@ resource containerApp 'Microsoft.App/containerApps@2022-11-01-preview' = {
       ingress: {
         external: useExternalIngress
         targetPort: containerPort
-        allowInsecure: true
+        allowInsecure: false
       }
     }
     template: {
