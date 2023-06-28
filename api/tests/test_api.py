@@ -156,6 +156,19 @@ def test_api_create_datasource(client):
     assert response.status_code == 201
 
 
+def test_api_put_datasource(client):
+    local_test_datasource = test_datasource.copy()
+    response = client.post("/api/datasources", json=local_test_datasource)
+    local_test_datasource["description"] = "new description"
+    local_test_datasource["sasToken"] = "new sasToken"
+    response = client.put(
+        f'/api/datasources/{local_test_datasource["account"]}'
+        f'/{local_test_datasource["container"]}/datasource',
+        json=local_test_datasource,
+    )
+    assert response.status_code == 204
+
+
 def test_api_get_datasources(client):
     response = client.get("/api/datasources")
     assert response.status_code == 200

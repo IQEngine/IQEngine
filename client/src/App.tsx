@@ -2,7 +2,6 @@
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
 import React, { useEffect, useState } from 'react';
-import { useFeatureFlags } from './Components/FeatureFlagsContext/FeatureFlagsContext';
 import { useLocation, Outlet } from 'react-router-dom';
 import ReactGA from 'react-ga4';
 import ThemeSelector from './Components/Styles/ThemeSelector';
@@ -12,6 +11,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'react-hot-toast';
 import Feature from '@/Components/Feature/Feature';
 import { Logo } from '@/Components/Logo/Logo';
+import { FeatureFlag, useFeatureFlags } from '@/hooks/useFeatureFlags';
 
 export const App = () => {
   const [width, setWidth] = useState(window.innerWidth);
@@ -94,7 +94,7 @@ export const App = () => {
           </div>
           <Link to="/" onClick={() => {}}>
             <div id="IQEngineLogo" className="absolute mt-4 pt-2 top-0 left-1/2 transform -translate-x-1/2 flex">
-              <Feature flag="displayInternalBranding">
+              <Feature flag={FeatureFlag.displayInternalBranding}>
                 <img
                   src="/internalbrandingeg.jpg"
                   alt="Internal branding logo"
@@ -121,7 +121,7 @@ export const App = () => {
                   <div className="text-lg">Plugins</div>
                 </Link>
               </li>
-              <Feature flag="useIQEngineOutReach">
+              <Feature flag={FeatureFlag.useIQEngineOutReach}>
                 <li className="hidden md:block">
                   <a href="https://discord.gg/k7C8kp3b76" target="_blank" rel="noreferrer" className="text-lg">
                     <div className="flex">
@@ -149,7 +149,7 @@ export const App = () => {
                   </svg>
                 </a>
               </Feature>
-              <Feature flag="displayIQEngineGitHub">
+              <Feature flag={FeatureFlag.displayIQEngineGitHub}>
                 <li className="hidden md:block">
                   <a href="https://github.com/iqengine/iqengine" target="_blank" rel="noreferrer" className="text-lg ">
                     <div className="flex">
@@ -189,7 +189,7 @@ export const App = () => {
           rel="noreferrer"
           href="https://dashboard.mailerlite.com/forms/299501/77960409531811734/share"
         >
-          <Feature flag="useIQEngineOutReach">
+          <Feature flag={FeatureFlag.useIQEngineOutReach}>
             <h2 className="text-center py-2">
               Sign up for a once-a-month email update on IQEngine, such as new features, demos, and more!
             </h2>

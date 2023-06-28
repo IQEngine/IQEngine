@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel, Extra, Field, SecretStr
 
 
@@ -6,9 +8,9 @@ class DataSource(BaseModel):
     name: str
     account: str
     container: str
-    description: str | None
-    imageURL: str | None
-    sasToken: SecretStr | None
+    description: Optional[str] = None
+    imageURL: Optional[str] = None
+    sasToken: Optional[SecretStr] = None
 
 
 class DataSourceReference(BaseModel):
@@ -78,6 +80,6 @@ class Metadata(BaseModel):
     annotations: list[MetadataAnnotation]
 
 
-class Processor(BaseModel):
+class Plugin(BaseModel):
     name: str
     url: str
