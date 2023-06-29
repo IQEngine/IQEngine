@@ -150,23 +150,23 @@ def query_meta(
     query_condition = {"global.traceability:origin.account": account, "global.traceability:origin.container": container}
 
     if min_frequency is not None:
-        query_condition.update({"frequency": {"$gte": min_frequency}})
+        query_condition.update({"captures.core:frequency": {"$gte": min_frequency}})
     if max_frequency is not None:
-        query_condition.update({"frequency": {"$lte": max_frequency}})
+        query_condition.update({"captures.core:frequency": {"$lte": max_frequency}})
     if author is not None:
-        query_condition.update({"author": author})
+        query_condition.update({"global.core:author": author})
     if antenna_gain is not None:
-        query_condition.update({"antenna_gain": antenna_gain})
+        query_condition.update({"global.antenna:gain": antenna_gain})
     if antenna_type is not None:
-        query_condition.update({"antenna_type": antenna_type})
+        query_condition.update({"global.antenna:type": antenna_type})
     if geolocation is not None:
-        query_condition.update({"geolocation": geolocation})
+        query_condition.update({"global.core:geolocation": geolocation})
     if label is not None:
-        query_condition.update({"label": label})
+        query_condition.update({"annotations.core:label": label})
     if min_datetime is not None:
-        query_condition.update({"datetime": {"$gte": min_datetime}})
+        query_condition.update({"captures.core:datetime": {"$gte": min_datetime}})
     if max_datetime is not None:
-        query_condition.update({"datetime": {"$lte": max_datetime}})
+        query_condition.update({"captures.core:datetime": {"$lte": max_datetime}})
 
     metadata = metadataSet.find(query_condition)
 
