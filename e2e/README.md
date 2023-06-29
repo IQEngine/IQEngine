@@ -9,6 +9,15 @@ npm install playwright
 npx playwright install-deps
 ```
 
+Export the following before running tests
+
+```bash
+export MONGO_USERNAME=somebody
+export MONGO_PASSWORD=something
+```
+
+Ensure you have an `.env` file in `e2e` that includes the `IQENGINE_METADATA_DB_CONNECTION_STRING`.
+
 ## Run
 
 The simplest way to run the tests is just to do:

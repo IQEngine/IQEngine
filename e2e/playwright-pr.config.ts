@@ -22,6 +22,16 @@ export default defineConfig({
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
   },
+  
+  /* Start the API Server */
+  webServer: [
+    {
+      command: './webServer.sh',
+      url: 'http://127.0.0.1:3000',
+      reuseExistingServer: !process.env.CI,
+      timeout: 200 * 1000,
+    },
+  ],
 
 
   /* Configure projects for major browsers */
