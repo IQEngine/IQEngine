@@ -1,4 +1,3 @@
----
 name: Run Playwright frontend integration tests
 
 on:
@@ -13,6 +12,12 @@ jobs:
     name: RunPlaywrightTests
     timeout-minutes: 60
     runs-on: ubuntu-latest
+
+    services:
+      mongodb:
+        image: mongo
+        ports:
+          - 27017:27017
 
     steps:
       - uses: actions/checkout@v2
@@ -38,4 +43,3 @@ jobs:
 
       - name: Run Playwright tests
         run: cd "$GITHUB_WORKSPACE/e2e" && npx playwright test --config playwright-pr.config.ts
-
