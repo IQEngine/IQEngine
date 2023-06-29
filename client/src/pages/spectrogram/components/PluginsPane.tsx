@@ -15,6 +15,7 @@ import { FFT } from '@/Utils/fft';
 import { useGetPluginsComponents } from '../hooks/useGetPluginsComponents';
 import { useGetPlugins } from '@/api/plugin/Queries';
 import { toast } from 'react-hot-toast';
+import { Buffer } from 'buffer';
 
 export interface PluginsPaneProps {
   cursorsEnabled: boolean;
@@ -22,6 +23,9 @@ export interface PluginsPaneProps {
   meta: SigMFMetadata;
   setMeta: (meta: SigMFMetadata) => void;
 }
+
+const IQ_SIGMF_32 = 'iq/cf32_le';
+const AUDIO_WAV = 'audio/wav';
 
 export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }: PluginsPaneProps) => {
   const { data: plugins, isError } = useGetPlugins();
@@ -59,7 +63,7 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
           samples: newSamps,
           sample_rate: sampleRate,
           center_freq: freq,
-          data_type: 'iq/cf32_le',
+          data_type: IQ_SIGMF_32,
         },
       ],
       custom_params: {},
@@ -94,7 +98,7 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
           toast.error(`Plugin failed to run: ${data.status}`);
           return;
         }
-        if (data.data_output && data.data_output.length > 0) {
+        if (data.data_output[0]['data_type'] == IQ_SIGMF_32 && data.data_output && data.data_output.length > 0) {
           // just show the first output for now, 99% of plugins will have 0 or 1 IQ output anyway
           const samples_base64 = data.data_output[0]['samples'];
           const samples = convertBase64ToFloat32Array(samples_base64);
@@ -158,7 +162,33 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
           });
 
           setModalOpen(true);
+        } else {
+          // Data file
+          const samples_base64 = data.data_output[0]['samples'];
+          const samples = Buffer.from(samples_base64, 'base64');
+
+          const a = document.createElement('a');
+          document.body.appendChild(a);
+          a.style = 'display: none';
+          var blob = new Blob([samples], { type: data.data_output[0]['data_type'] }),
+            url = window.URL.createObjectURL(blob);
+          a.href = url;
+
+          var filename = '';
+          switch (data.data_output[0]['data_type']) {
+            case AUDIO_WAV:
+              filename = 'samples.wav';
+              break;
+          }
+          if (filename != '') {
+            a.download = filename;
+            a.click();
+          } else {
+            toast.error("The plugins pane doesn't handle the mime type output by the plugin.");
+          }
+          window.URL.revokeObjectURL(url);
         }
+
         if (data.annotations) {
           for (let i = 0; i < data.annotations.length; i++) {
             data.annotations[i]['core:sample_start'] += startSampleOffset;
