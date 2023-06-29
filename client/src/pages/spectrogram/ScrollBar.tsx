@@ -89,18 +89,17 @@ const ScrollBar = (props: ScrollBarProps) => {
     }
   }, [spectrogramHeight, fftSize, zoomLevel, iqSlices.data, meta]);
 
-  // This only runs once, once all the minimap fetches have occurred
+  // This only runs once, once all the minimap fetches have occurred, or when colormap changes
   useEffect(() => {
     if (!iqSlices.data || !meta) {
       return;
     }
+    console.log('Rendering Scrollbar');
     console.debug('minimap fetches complete', iqSlices.data);
     let iqData = {};
     iqSlices.data.forEach((slice: IQDataSlice) => {
       iqData[slice.index] = slice.iqArray;
     });
-
-    // Check if all minimap fetches occurred
 
     // Loop through the samples we downloaded, calc FFT and produce spectrogram image
     const fftSizeScrollbar = iqData[Object.keys(iqData)[0]].length / 2; // just use the first one to find length
