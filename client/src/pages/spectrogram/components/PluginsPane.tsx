@@ -15,7 +15,6 @@ import { FFT } from '@/Utils/fft';
 import { useGetPluginsComponents } from '../hooks/useGetPluginsComponents';
 import { useGetPlugins } from '@/api/plugin/Queries';
 import { toast } from 'react-hot-toast';
-import { Buffer } from 'buffer';
 
 export interface PluginsPaneProps {
   cursorsEnabled: boolean;
@@ -168,13 +167,18 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
           } else {
             // Data file
             const samples_base64 = data.data_output[0]['samples'];
-            const samples = Buffer.from(samples_base64, 'base64');
+            const samples = window.atob(samples_base64);
+            var blob_array = new Uint8Array(samples.length);
+            for (var i = 0; i < samples.length; i++) {
+              blob_array[i] = samples.charCodeAt(i);
+            }
+            console.debug('samples:', samples);
 
             const a = document.createElement('a');
-            document.body.appendChild(a);
-            a.style = 'display: none';
-            const blob = new Blob([samples], { type: data.data_output[0]['data_type'] }),
-              url = window.URL.createObjectURL(blob);
+            const blob = new Blob([blob_array], { type: data.data_output[0]['data_type'] });
+            console.debug('blob:', blob);
+            const url = window.URL.createObjectURL(blob);
+
             a.href = url;
 
             let filename = '';
