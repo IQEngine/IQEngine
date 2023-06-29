@@ -126,7 +126,7 @@ const ScrollBar = (props: ScrollBarProps) => {
       const magnitude_max = maximumVal - 0; // dB
       props.setMagnitudeMax(magnitude_max);
       const magnitude_min = minimumVal + 20; // dB
-      props.setMagnitudeMin(magnitude_min);
+      props.setMagnitudeMin(magnitude_min - 10); // because the minimap fft is so small, the value isnt good as-is, so subtract 10
       const dbPer1 = 255 / (magnitude_max - magnitude_min);
       magnitudes = magnitudes.map((x) => x - magnitude_min);
       magnitudes = magnitudes.map((x) => x * dbPer1);
