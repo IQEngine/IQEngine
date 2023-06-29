@@ -30,7 +30,7 @@ class Plugin:
 
     def run(self, samples):
         file_path = path.dirname(path.realpath(__file__))
-        with open(f"{file_path}/Windows Foreground.wav", mode="rb") as wavfile:
+        with open(f"{file_path}/sheep.wav", mode="rb") as wavfile:
             wav_file_content = wavfile.read()
 
         samples_obj = {
