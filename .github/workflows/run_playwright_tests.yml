@@ -26,12 +26,14 @@ jobs:
         env: 
           MONGO_USERNAME: mongoadmin
           MONGO_PASSWORD: secret
+          IQENGINE_METADATA_DB_CONNECTION_STRING: mongodb://mongoadmin:secret@localhost:27017/admin
 
       - name: Docker up
         run: docker compose -f docker-compose-e2e.yml up &
         env: 
           MONGO_USERNAME: mongoadmin
           MONGO_PASSWORD: secret
+          IQENGINE_METADATA_DB_CONNECTION_STRING: mongodb://mongoadmin:secret@localhost:27017/admin
 
         
       - name: Check build has succeeded
