@@ -15,7 +15,6 @@ import { FFT } from '@/Utils/fft';
 import { useGetPluginsComponents } from '../hooks/useGetPluginsComponents';
 import { useGetPlugins } from '@/api/plugin/Queries';
 import { toast } from 'react-hot-toast';
-import { Buffer } from 'buffer';
 
 export interface PluginsPaneProps {
   cursorsEnabled: boolean;
@@ -168,7 +167,7 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
           } else {
             // Data file
             const samples_base64 = data.data_output[0]['samples'];
-            const samples = Buffer.from(samples_base64, 'base64');
+            const samples = window.atob(samples_base64);
 
             const a = document.createElement('a');
             document.body.appendChild(a);
