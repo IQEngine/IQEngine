@@ -90,20 +90,17 @@ paths:
               type: object
               # Provide either samples (IQ samples) or samples_pointer (pointer to blob storage)
               oneOf:
-                - required: [samples]
-                - required: [samples_pointer]
+                - required: [samples_b64]
+                - required: [samples_cloud]
               properties:
                 samples_b64:
-                  $ref: '#/components/schemas/samples_b64'
+                  type: array # list of IQ samples, most functions will just have 1
+                  items:
+                    $ref: '#/components/schemas/samples_b64'
                 samples_cloud:
-                  $ref: '#/components/schemas/samples_cloud'
-                # Always provide sample rate, center freq, data type
-                data_type: # uses MIME types, plus custom types we are adding for IQ, based on SigMF
-                  $ref: '#/components/schemas/data_type'
-                sample_rate:
-                  type: number
-                center_freq:
-                  type: number
+                  type: array # list of IQ samples, most functions will just have 1
+                  items:
+                    $ref: '#/components/schemas/samples_cloud'
                 # Custom params
                 additionalProperties:
                   anyOf:
