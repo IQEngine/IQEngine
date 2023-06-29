@@ -6,14 +6,12 @@ from tests.test_data import test_datasource, valid_metadata
 
 
 def test_api_get_config(client):
-    os.environ["IQENGINE_PLUGINS_ENDPOINT"] = "http://localhost:5000"
     os.environ["IQENGINE_CONNECTION_INFO"] = "{}"
     os.environ["IQENGINE_GOOGLE_ANALYTICS_KEY"] = "google_analytics_key"
     os.environ["IQENGINE_FEATURE_FLAGS"] = "{}"
     response = client.get("/api/config")
     assert response.status_code == 200
     assert response.json() == {
-        "pluginsEndpoint": "http://localhost:5000/",  # it should add the trailing "/"
         "connectionInfo": {},
         "googleAnalyticsKey": "google_analytics_key",
         "featureFlags": {},

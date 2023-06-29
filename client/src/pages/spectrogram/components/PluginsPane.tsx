@@ -24,7 +24,7 @@ export interface PluginsPaneProps {
 }
 
 export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }: PluginsPaneProps) => {
-  const { data: plugins } = useGetPlugins();
+  const { data: plugins, isError } = useGetPlugins();
   const { PluginOption, EditPluginParameters, pluginParameters, setPluginParameters } = useGetPluginsComponents();
   const [selectedPlugin, setSelectedPlugin] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
@@ -186,7 +186,7 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
           <option disabled selected value="">
             Select a Plugin
           </option>
-          {plugins && plugins.map((plugin) => <PluginOption plugin={plugin} />)})
+          {plugins && !isError && plugins?.map((plugin) => <PluginOption plugin={plugin} />)})
         </select>
       </label>
       {selectedPlugin && (
