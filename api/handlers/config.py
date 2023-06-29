@@ -19,12 +19,7 @@ def get_config():
     if feature_flags:
         feature_flags = json.loads(feature_flags)
 
-    plugins_endpoint = os.getenv("IQENGINE_PLUGINS_ENDPOINT", None)
-    if plugins_endpoint and plugins_endpoint[-1] != "/":
-        plugins_endpoint += "/"
-
     return {
-        "pluginsEndpoint": plugins_endpoint,
         "connectionInfo": connection_info,
         "googleAnalyticsKey": os.getenv("IQENGINE_GOOGLE_ANALYTICS_KEY", None),
         "featureFlags": feature_flags,

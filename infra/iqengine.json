@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.17.1.54307",
-      "templateHash": "10118917763092221620"
+      "version": "0.18.4.5664",
+      "templateHash": "4796666320847247488"
     }
   },
   "parameters": {
@@ -32,6 +32,14 @@
     "uniqueSuffix": {
       "type": "string",
       "defaultValue": "[substring(uniqueString(resourceGroup().id), 0, 5)]"
+    },
+    "deployContainerAppAuth": {
+      "type": "bool",
+      "defaultValue": false
+    },
+    "adAppClientId": {
+      "type": "string",
+      "defaultValue": "00000000-0000-0000-0000-000000000000"
     }
   },
   "resources": [
@@ -58,8 +66,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.17.1.54307",
-              "templateHash": "11780559514344838828"
+              "version": "0.18.4.5664",
+              "templateHash": "6250843690290389370"
             }
           },
           "parameters": {
@@ -123,8 +131,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.17.1.54307",
-              "templateHash": "16599432441201025031"
+              "version": "0.18.4.5664",
+              "templateHash": "18077528559400308992"
             }
           },
           "parameters": {
@@ -217,8 +225,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.17.1.54307",
-              "templateHash": "5974518385800375086"
+              "version": "0.18.4.5664",
+              "templateHash": "294060637780153805"
             }
           },
           "parameters": {
@@ -301,6 +309,12 @@
                 "value": "[reference(resourceId('Microsoft.Resources/deployments', 'mongodb'), '2022-09-01').outputs.connectionString.value]"
               }
             ]
+          },
+          "adAppClientId": {
+            "value": "[parameters('adAppClientId')]"
+          },
+          "deployContainerAppAuth": {
+            "value": "[parameters('deployContainerAppAuth')]"
           }
         },
         "template": {
@@ -309,8 +323,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.17.1.54307",
-              "templateHash": "3818069026441952833"
+              "version": "0.18.4.5664",
+              "templateHash": "1205841287568992195"
             }
           },
           "parameters": {
@@ -350,6 +364,12 @@
             "envVars": {
               "type": "array",
               "defaultValue": []
+            },
+            "adAppClientId": {
+              "type": "string"
+            },
+            "deployContainerAppAuth": {
+              "type": "bool"
             }
           },
           "resources": [
@@ -366,7 +386,7 @@
                   "ingress": {
                     "external": "[parameters('useExternalIngress')]",
                     "targetPort": "[parameters('containerPort')]",
-                    "allowInsecure": true
+                    "allowInsecure": false
                   }
                 },
                 "template": {
@@ -383,6 +403,35 @@
                   }
                 }
               }
+            },
+            {
+              "condition": "[parameters('deployContainerAppAuth')]",
+              "type": "Microsoft.App/containerApps/authConfigs",
+              "apiVersion": "2022-06-01-preview",
+              "name": "[format('{0}/{1}', parameters('name'), 'current')]",
+              "properties": {
+                "platform": {
+                  "enabled": true
+                },
+                "identityProviders": {
+                  "azureActiveDirectory": {
+                    "enabled": true,
+                    "isAutoProvisioned": true,
+                    "registration": {
+                      "clientId": "[parameters('adAppClientId')]",
+                      "openIdIssuer": "[format('https://sts.windows.net/{0}/v2.0', subscription().tenantId)]"
+                    },
+                    "validation": {
+                      "allowedAudiences": ["[format('api://{0}', parameters('adAppClientId'))]"]
+                    }
+                  }
+                },
+                "globalValidation": {
+                  "redirectToProvider": "azureActiveDirectory",
+                  "unauthenticatedClientAction": "RedirectToLoginPage"
+                }
+              },
+              "dependsOn": ["[resourceId('Microsoft.App/containerApps', parameters('name'))]"]
             }
           ],
           "outputs": {
