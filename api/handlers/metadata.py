@@ -123,6 +123,58 @@ async def get_meta_thumbnail(
     return StreamingResponse(response.iter_bytes(), media_type=response.headers["Content-Type"])
 
 
+from typing import List, Optional
+from fastapi import Query
+from datetime import datetime
+
+@router.get(
+    "/api/datasources/{account}/{container}/query",
+    status_code=200,
+    response_model=list[Metadata],
+)
+def query_meta(
+    account: str,
+    container: str,
+    min_frequency: Optional[float] = Query(None),
+    max_frequency: Optional[float] = Query(None),
+    author: Optional[str] = Query(None),
+    antenna_gain: Optional[float] = Query(None),
+    antenna_type: Optional[str] = Query(None),
+    geolocation: Optional[str] = Query(None),
+    label: Optional[str] = Query(None),
+    min_datetime: Optional[datetime] = Query(None),
+    max_datetime: Optional[datetime] = Query(None),
+    metadataSet: Collection[Metadata] = Depends(database.database.metadata_collection),
+):
+
+    query_condition = {"global.traceability:origin.account": account, "global.traceability:origin.container": container}
+
+    if min_frequency is not None:
+        query_condition.update({"frequency": {"$gte": min_frequency}})
+    if max_frequency is not None:
+        query_condition.update({"frequency": {"$lte": max_frequency}})
+    if author is not None:
+        query_condition.update({"author": author})
+    if antenna_gain is not None:
+        query_condition.update({"antenna_gain": antenna_gain})
+    if antenna_type is not None:
+        query_condition.update({"antenna_type": antenna_type})
+    if geolocation is not None:
+        query_condition.update({"geolocation": geolocation})
+    if label is not None:
+        query_condition.update({"label": label})
+    if min_datetime is not None:
+        query_condition.update({"datetime": {"$gte": min_datetime}})
+    if max_datetime is not None:
+        query_condition.update({"datetime": {"$lte": max_datetime}})
+
+    metadata = metadataSet.find(query_condition)
+
+    result = [datum for datum in metadata]
+    return result
+
+
+
 @router.post(
     "/api/datasources/{account}/{container}/query",
     status_code=200,
