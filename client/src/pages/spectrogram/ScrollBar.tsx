@@ -19,7 +19,7 @@ interface ScrollBarProps {
   zoomLevel: number;
   handleTop: number;
   fetchEnabled: boolean;
-  fftSizeScrollbar: number;
+  fftSize: number; // fftsize used for main spectrogram, not when calc scrollbar ffts!
   setMagnitudeMax: any;
   setMagnitudeMin: any;
   colorMap: any;
@@ -34,14 +34,14 @@ const ScrollBar = (props: ScrollBarProps) => {
     zoomLevel,
     handleTop,
     fetchEnabled,
-    fftSizeScrollbar,
+    fftSize,
     colorMap,
   } = props;
 
   const [dataRange, setDataRange] = useState([]);
   const [skipNFfts, setSkipNFfts] = useState(0);
 
-  const iqSlices = getIQDataFullIndexes(meta, dataRange, fftSizeScrollbar, fetchEnabled);
+  const iqSlices = getIQDataFullIndexes(meta, dataRange, fftSize, fetchEnabled);
 
   const [minimapImg, setMinimapImg] = useState(null);
   const scrollbarWidth = 50;
@@ -55,7 +55,7 @@ const ScrollBar = (props: ScrollBarProps) => {
       // for minimap only. there's so much overhead with blob downloading that this might as well be a high value...
       const skipNFfts = Math.floor(meta.getTotalSamples() / 100e3); // sets the decimation rate (manually tweaked)
       setSkipNFfts(skipNFfts);
-      const numFfts = Math.floor(meta.getTotalSamples() / fftSizeScrollbar / (skipNFfts + 1));
+      const numFfts = Math.floor(meta.getTotalSamples() / fftSize / (skipNFfts + 1));
       let dataRange = [];
       for (let i = 0; i < numFfts; i++) {
         dataRange.push(i * skipNFfts);
@@ -67,9 +67,9 @@ const ScrollBar = (props: ScrollBarProps) => {
   // Calc scroll handle height and new scaling factor
   useEffect(() => {
     if (!meta) return;
-    let x = (spectrogramHeight / (meta.getTotalSamples() / fftSizeScrollbar / zoomLevel)) * spectrogramHeight;
-    if (x < MINIMUM_SCROLL_HANDLE_HEIGHT_PIXELS) x = MINIMUM_SCROLL_HANDLE_HEIGHT_PIXELS;
-    setHandleHeightPixels(x);
+    let newHandleHeight = (spectrogramHeight / (meta.getTotalSamples() / fftSize / zoomLevel)) * spectrogramHeight;
+    if (newHandleHeight < MINIMUM_SCROLL_HANDLE_HEIGHT_PIXELS) newHandleHeight = MINIMUM_SCROLL_HANDLE_HEIGHT_PIXELS;
+    setHandleHeightPixels(newHandleHeight);
 
     if (iqSlices.data) {
       // get the length ot any of the iqData arrays
@@ -87,7 +87,7 @@ const ScrollBar = (props: ScrollBarProps) => {
       });
       setTicks(t);
     }
-  }, [spectrogramHeight, fftSizeScrollbar, zoomLevel, iqSlices.data, meta]);
+  }, [spectrogramHeight, fftSize, zoomLevel, iqSlices.data, meta]);
 
   // This only runs once, once all the minimap fetches have occurred
   useEffect(() => {

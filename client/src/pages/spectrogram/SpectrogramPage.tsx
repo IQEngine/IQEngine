@@ -446,7 +446,7 @@ export const SpectrogramPage = () => {
                         handleTop={handleTop}
                         meta={meta}
                         fetchEnabled={fetchMinimap}
-                        fftSizeScrollbar={fftSize}
+                        fftSize={fftSize}
                         setMagnitudeMax={setMagnitudeMax}
                         setMagnitudeMin={setMagnitudeMin}
                         colorMap={colorMap}
