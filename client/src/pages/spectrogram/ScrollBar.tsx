@@ -5,7 +5,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Layer, Rect, Image } from 'react-konva';
 import { fftshift } from 'fftshift';
-import { MINIMUM_SCROLL_HANDLE_HEIGHT_PIXELS, TILE_SIZE_IN_IQ_SAMPLES } from '@/Utils/constants';
+import { MINIMUM_SCROLL_HANDLE_HEIGHT_PIXELS, TILE_SIZE_IN_IQ_SAMPLES, MINIMAP_FFT_SIZE } from '@/Utils/constants';
 import { FFT } from '@/Utils/fft';
 import { SigMFMetadata } from '@/Utils/sigmfMetadata';
 import { getIQDataFullIndexes } from '@/api/iqdata/Queries';
@@ -41,7 +41,7 @@ const ScrollBar = (props: ScrollBarProps) => {
   const [dataRange, setDataRange] = useState([]);
   const [skipNFfts, setSkipNFfts] = useState(0);
 
-  const iqSlices = getIQDataFullIndexes(meta, dataRange, fftSize, fetchEnabled);
+  const iqSlices = getIQDataFullIndexes(meta, dataRange, MINIMAP_FFT_SIZE, fetchEnabled);
 
   const [minimapImg, setMinimapImg] = useState(null);
   const scrollbarWidth = 50;
@@ -55,7 +55,7 @@ const ScrollBar = (props: ScrollBarProps) => {
       // for minimap only. there's so much overhead with blob downloading that this might as well be a high value...
       const skipNFfts = Math.floor(meta.getTotalSamples() / 100e3); // sets the decimation rate (manually tweaked)
       setSkipNFfts(skipNFfts);
-      const numFfts = Math.floor(meta.getTotalSamples() / fftSize / (skipNFfts + 1));
+      const numFfts = Math.floor(meta.getTotalSamples() / MINIMAP_FFT_SIZE / (skipNFfts + 1));
       let dataRange = [];
       for (let i = 0; i < numFfts; i++) {
         dataRange.push(i * skipNFfts);
@@ -73,19 +73,8 @@ const ScrollBar = (props: ScrollBarProps) => {
 
     if (iqSlices.data) {
       // get the length ot any of the iqData arrays
-      const fftSizeScrollbar = iqSlices.data[0].iqArray.length / 2; // just use the first one to find length
-      const newScalingFactor = spectrogramHeight / fftSizeScrollbar / (skipNFfts + 1) / dataRange.length;
+      const newScalingFactor = spectrogramHeight / MINIMAP_FFT_SIZE / (skipNFfts + 1) / dataRange.length;
       setScalingFactor(newScalingFactor);
-
-      // Recalc annotation tick placement
-      let t = [];
-      meta?.annotations.forEach((annotation) => {
-        t.push({
-          y: annotation['core:sample_start'] * newScalingFactor,
-          height: annotation['core:sample_count'] * newScalingFactor,
-        });
-      });
-      setTicks(t);
     }
   }, [spectrogramHeight, fftSize, zoomLevel, iqSlices.data, meta]);
 
@@ -102,20 +91,19 @@ const ScrollBar = (props: ScrollBarProps) => {
     });
 
     // Loop through the samples we downloaded, calc FFT and produce spectrogram image
-    const fftSizeScrollbar = iqData[Object.keys(iqData)[0]].length / 2; // just use the first one to find length
-    const newScalingFactor = spectrogramHeight / fftSizeScrollbar / (skipNFfts + 1) / dataRange.length;
+    const newScalingFactor = spectrogramHeight / MINIMAP_FFT_SIZE / (skipNFfts + 1) / dataRange.length;
     setScalingFactor(newScalingFactor);
     // Find max/min magnitudes across entire minimap
     let minimumVal = Infinity;
     let maximumVal = -Infinity;
-    let magnitudesBuffer = new Float64Array(fftSizeScrollbar * dataRange.length); // only typed arrays have set()
+    let magnitudesBuffer = new Float64Array(MINIMAP_FFT_SIZE * dataRange.length); // only typed arrays have set()
     dataRange.forEach((sampleIndex, i) => {
       const samples = iqData[sampleIndex];
       // Calc PSD
-      const f = new FFT(fftSizeScrollbar);
+      const f = new FFT(MINIMAP_FFT_SIZE);
       let out = f.createComplexArray(); // creates an empty array the length of fft.size*2
       f.transform(out, samples); // assumes input (2nd arg) is in form IQIQIQIQ and twice the length of fft.size
-      out = out.map((x) => x / fftSizeScrollbar); // divide by fftsize
+      out = out.map((x) => x / MINIMAP_FFT_SIZE); // divide by fftsize
       let magnitudes = new Array(out.length / 2);
       for (let j = 0; j < out.length / 2; j++) {
         magnitudes[j] = Math.sqrt(Math.pow(out[j * 2], 2) + Math.pow(out[j * 2 + 1], 2)); // take magnitude
@@ -125,14 +113,14 @@ const ScrollBar = (props: ScrollBarProps) => {
       magnitudes = magnitudes.map((x) => (isFinite(x) ? x : 0)); // get rid of -infinity which happens when the input is all 0s
       if (Math.min(...magnitudes) < minimumVal) minimumVal = Math.min(...magnitudes);
       if (Math.max(...magnitudes) > maximumVal) maximumVal = Math.max(...magnitudes);
-      magnitudesBuffer.set(magnitudes, i * fftSizeScrollbar);
+      magnitudesBuffer.set(magnitudes, i * MINIMAP_FFT_SIZE);
     });
 
-    let minimapArray = new Uint8ClampedArray(fftSizeScrollbar * dataRange.length * 4);
+    let minimapArray = new Uint8ClampedArray(MINIMAP_FFT_SIZE * dataRange.length * 4);
     let startOfs = 0;
     console.debug('min/max', minimumVal, maximumVal);
     for (let i = 0; i < dataRange.length; i++) {
-      let magnitudes = magnitudesBuffer.slice(i * fftSizeScrollbar, (i + 1) * fftSizeScrollbar);
+      let magnitudes = magnitudesBuffer.slice(i * MINIMAP_FFT_SIZE, (i + 1) * MINIMAP_FFT_SIZE);
 
       // apply magnitude min and max (which are in dB, same units as magnitudes prior to this point) and convert to 0-255
       const magnitude_max = maximumVal - 0; // dB
@@ -146,8 +134,8 @@ const ScrollBar = (props: ScrollBarProps) => {
       magnitudes = magnitudes.map((x) => (x < 0 ? 0 : x)); // clip below 0
       let ipBuf8 = Uint8ClampedArray.from(magnitudes); // anything over 255 or below 0 at this point will become a random number, hence clipping above
 
-      let lineOffset = i * fftSizeScrollbar * 4;
-      for (let sigVal, opIdx = 0, ipIdx = startOfs; ipIdx < fftSizeScrollbar + startOfs; opIdx += 4, ipIdx++) {
+      let lineOffset = i * MINIMAP_FFT_SIZE * 4;
+      for (let sigVal, opIdx = 0, ipIdx = startOfs; ipIdx < MINIMAP_FFT_SIZE + startOfs; opIdx += 4, ipIdx++) {
         sigVal = ipBuf8[ipIdx] || 0; // if input line too short add zeros
         minimapArray[lineOffset + opIdx] = colorMap[sigVal][0]; // red
         minimapArray[lineOffset + opIdx + 1] = colorMap[sigVal][1]; // green
@@ -156,22 +144,29 @@ const ScrollBar = (props: ScrollBarProps) => {
       }
     }
 
-    // Add a tick wherever there are annotations
-    let t = [];
-    meta.annotations.forEach((annotation) => {
-      t.push({
-        y: annotation['core:sample_start'] * newScalingFactor,
-        height: annotation['core:sample_count'] * newScalingFactor,
-      });
-    });
-    setTicks(t);
-
     // Render Image
-    const imageData = new ImageData(minimapArray, fftSizeScrollbar, dataRange.length);
+    const imageData = new ImageData(minimapArray, MINIMAP_FFT_SIZE, dataRange.length);
     createImageBitmap(imageData).then((ret) => {
       setMinimapImg(ret);
     });
   }, [iqSlices.data, colorMap]); // dont add anymore here, so that this triggers ONLY at the start
+
+  // Calc the annotation ticks
+  useEffect(() => {
+    if (!meta) {
+      return;
+    }
+    console.log('Rendering scrollbar ticks');
+    // Add a tick wherever there are annotations
+    let t = [];
+    meta.annotations.forEach((annotation) => {
+      t.push({
+        y: annotation['core:sample_start'] * scalingFactor,
+        height: annotation['core:sample_count'] * scalingFactor,
+      });
+    });
+    setTicks(t);
+  }, [meta, scalingFactor]); // dont add anymore here, so that this triggers ONLY at the start
 
   const handleClick = (e) => {
     let currentY = e.evt.offsetY;
