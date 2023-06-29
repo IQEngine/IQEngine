@@ -4,21 +4,20 @@
 
 import { Sidebar } from './Sidebar';
 import ScrollBar from './ScrollBar';
-import { TimePlot } from './TimePlot';
-import { FrequencyPlot } from './FrequencyPlot';
-import { IQPlot } from './IQPlot';
+import { TimePlot } from './components/TimePlot';
+import { FrequencyPlot } from './components/FrequencyPlot';
+import { IQPlot } from './components/IQPlot';
 import { Layer, Image, Stage } from 'react-konva';
 import { selectFft, calculateTileNumbers, range, SelectFftReturn } from '@/Utils/selector';
 import { AnnotationViewer } from '@/Components/Annotation/AnnotationViewer';
 import { RulerTop } from './RulerTop';
 import { RulerSide } from './RulerSide';
-import { INITIAL_PYTHON_SNIPPET, TILE_SIZE_IN_IQ_SAMPLES, COLORMAP_DEFAULT } from '@/Utils/constants';
+import { INITIAL_PYTHON_SNIPPET, TILE_SIZE_IN_IQ_SAMPLES, COLORMAP_DEFAULT, MINIMAP_FFT_SIZE } from '@/Utils/constants';
 import TimeSelector from './TimeSelector';
 import AnnotationList from '@/Components/Annotation/AnnotationList';
 import { GlobalProperties } from '@/Components/GlobalProperties/GlobalProperties';
 import { MetaViewer } from '@/Components/Metadata/MetaViewer';
 import { MetaRaw } from '@/Components/Metadata/MetaRaw';
-import { SpectrogramContext } from './SpectrogramContext';
 import { useParams } from 'react-router-dom';
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { getMeta } from '@/api/metadata/Queries';
@@ -294,7 +293,7 @@ export const SpectrogramPage = () => {
 
   const handleWheel = (e) => {
     e.evt.preventDefault();
-    let scrollDirection = -e.evt.wheelDeltaY / Math.abs(e.evt.wheelDeltaY);
+    let scrollDirection = -e.evt.wheelDeltaY / Math.abs(e.evt.wheelDeltaY) || 0;
     let scrollAmount = scrollDirection * 2;
     let presentingSize = (spectrogramHeight / (meta.getTotalSamples() / fftSize / zoomLevel)) * spectrogramHeight;
     let maxValue = spectrogramHeight - presentingSize;
@@ -305,17 +304,9 @@ export const SpectrogramPage = () => {
   };
 
   return (
-    <SpectrogramContext.Provider
-      value={{
-        type: type,
-        account: account,
-        container: container,
-        filePath: filePath,
-        sasToken: sasToken,
-      }}
-    >
+    <>
       {status === 'loading' && <h1>Loading...</h1>}
-      <div className="mt-3 mb-0 ml-0 mr-0 p-0">
+      <div className="mb-0 ml-0 mr-0 p-0 pt-3">
         <div className="flex flex-row w-full">
           <Sidebar
             updateMagnitudeMax={setMagnitudeMax}
@@ -446,7 +437,7 @@ export const SpectrogramPage = () => {
                       />
                     </Stage>
 
-                    <Stage width={55} height={spectrogramHeight}>
+                    <Stage width={MINIMAP_FFT_SIZE + 5} height={spectrogramHeight}>
                       <ScrollBar
                         fetchAndRender={fetchAndRender}
                         spectrogramHeight={spectrogramHeight}
@@ -455,7 +446,7 @@ export const SpectrogramPage = () => {
                         handleTop={handleTop}
                         meta={meta}
                         fetchEnabled={fetchMinimap}
-                        fftSizeScrollbar={fftSize}
+                        fftSize={fftSize}
                         setMagnitudeMax={setMagnitudeMax}
                         setMagnitudeMin={setMagnitudeMin}
                         colorMap={colorMap}
@@ -535,7 +526,7 @@ export const SpectrogramPage = () => {
       </div>
       <img ref={imgRef} />
       <img ref={imgRef2} />
-    </SpectrogramContext.Provider>
+    </>
   );
 };
 

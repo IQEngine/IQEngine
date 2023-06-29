@@ -45,7 +45,6 @@ export const FeatureFlagsProvider = ({ children, flags }: Props) => {
       return getFeatureFlagDefault(flag);
     }
     const result = featureFlags[flag]
-    console.log("In getFeatureFlag " + flag + ": " + featureFlags[flag])
     return featureFlags[flag];
   };
   return (

@@ -12,7 +12,6 @@ const fetchConfig = async () => {
       return {
         data: {
           connectionInfo: JSON.parse(import.meta.env.IQENGINE_CONNECTION_INFO ?? null),
-          pluginsEndpoint: import.meta.env.IQENGINE_PLUGINS_ENDPOINT,
           googleAnalyticsKey: import.meta.env.IQENGINE_GOOGLE_ANALYTICS_KEY,
           featureFlags: JSON.parse(import.meta.env.IQENGINE_FEATURE_FLAGS ?? null),
         } as Config,
@@ -21,20 +20,24 @@ const fetchConfig = async () => {
     if (!response.data.connectionInfo) {
       response.data.connectionInfo = JSON.parse(import.meta.env.IQENGINE_CONNECTION_INFO ?? null);
     }
-    if (!response.data.pluginsEndpoint) {
-      response.data.pluginsEndpoint = import.meta.env.IQENGINE_PLUGINS_ENDPOINT;
-    }
     if (!response.data.googleAnalyticsKey) {
       response.data.googleAnalyticsKey = import.meta.env.IQENGINE_GOOGLE_ANALYTICS_KEY;
     }
     if (!response.data.featureFlags) {
       response.data.featureFlags = JSON.parse(import.meta.env.IQENGINE_FEATURE_FLAGS ?? null);
     }
+
+    for (const member in response.data) {
+      if (response.data[member] === null || response.data[member] === undefined) {
+        console.log(`Member '${member}' of response.data is null or undefined`);
+      }
+    }
+
     return response.data;
   } catch (error) {
+    console.error('An error has occurred setting the environment variables.');
     return {
       connectionInfo: JSON.parse(import.meta.env.IQENGINE_CONNECTION_INFO ?? null),
-      pluginsEndpoint: import.meta.env.IQENGINE_PLUGINS_ENDPOINT,
       googleAnalyticsKey: import.meta.env.IQENGINE_GOOGLE_ANALYTICS_KEY,
       featureFlags: JSON.parse(import.meta.env.IQENGINE_FEATURE_FLAGS ?? null),
     } as Config;
@@ -53,7 +56,6 @@ interface ConnectionInfo {
 }
 
 type Config = {
-  pluginsEndpoint: string;
   connectionInfo: ConnectionInfo;
   googleAnalyticsKey: string;
   featureFlags: { [key in FeatureFlag]: boolean };
