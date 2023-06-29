@@ -1,10 +1,12 @@
 import database.database
 from database.models import DataSource, DataSourceReference, Metadata
-from fastapi import APIRouter, Depends, HTTPException, Body
+from fastapi import APIRouter, Depends, HTTPException, Body, Query
 from pymongo.collection import Collection
 from .urlmapping import add_URL_sasToken, apiType
 from .query import QueryCondition
 from fastapi.responses import StreamingResponse
+from typing import Optional
+from datetime import datetime
 import httpx
 
 
@@ -123,18 +125,14 @@ async def get_meta_thumbnail(
     return StreamingResponse(response.iter_bytes(), media_type=response.headers["Content-Type"])
 
 
-from typing import List, Optional
-from fastapi import Query
-from datetime import datetime
-
 @router.get(
-    "/api/datasources/{account}/{container}/query",
+    "/api/datasources/query",
     status_code=200,
     response_model=list[Metadata],
 )
 def query_meta(
-    account: str,
-    container: str,
+    account: Optional[str] = Query(None),
+    container: Optional[str] = Query(None),
     min_frequency: Optional[float] = Query(None),
     max_frequency: Optional[float] = Query(None),
     author: Optional[str] = Query(None),
@@ -142,19 +140,23 @@ def query_meta(
     antenna_type: Optional[str] = Query(None),
     geolocation: Optional[str] = Query(None),
     label: Optional[str] = Query(None),
+    description: Optional[str] = Query(None),
     min_datetime: Optional[datetime] = Query(None),
     max_datetime: Optional[datetime] = Query(None),
     metadataSet: Collection[Metadata] = Depends(database.database.metadata_collection),
 ):
 
-    query_condition = {"global.traceability:origin.account": account, "global.traceability:origin.container": container}
-
+    query_condition = {}
+    if account is not None:
+        query_condition.update({"global.traceability:origin.account": { "$regex": account, "$options": "i"}})
+    if container is not None:
+        query_condition.update({"global.traceability:origin.container": { "$regex": container, "$options": "i"}})
     if min_frequency is not None:
         query_condition.update({"captures.core:frequency": {"$gte": min_frequency}})
     if max_frequency is not None:
         query_condition.update({"captures.core:frequency": {"$lte": max_frequency}})
     if author is not None:
-        query_condition.update({"global.core:author": author})
+        query_condition.update({"global.core:author": { "$regex": author, "$options": "i"}})
     if antenna_gain is not None:
         query_condition.update({"global.antenna:gain": antenna_gain})
     if antenna_type is not None:
@@ -162,7 +164,9 @@ def query_meta(
     if geolocation is not None:
         query_condition.update({"global.core:geolocation": geolocation})
     if label is not None:
-        query_condition.update({"annotations.core:label": label})
+        query_condition.update({"annotations.core:label": { "$regex": label, "$options": "i"}})
+    if description is not None:
+        query_condition.update({"annotations.core:description": { "$regex": description, "$options": "i"}})
     if min_datetime is not None:
         query_condition.update({"captures.core:datetime": {"$gte": min_datetime}})
     if max_datetime is not None:
@@ -170,30 +174,6 @@ def query_meta(
 
     metadata = metadataSet.find(query_condition)
 
-    result = [datum for datum in metadata]
-    return result
-
-
-
-@router.post(
-    "/api/datasources/{account}/{container}/query",
-    status_code=200,
-    response_model=list[Metadata],
-)
-def query_meta(
-    account,
-    container,
-    query_condition: QueryCondition = Body(...),
-    metadataSet: Collection[Metadata] = Depends(database.database.metadata_collection),
-):
-
-    query = {
-        "global.traceability:origin.account": account,
-        "global.traceability:origin.container": container,
-    }
-    query.update(query_condition.query)
-
-    metadata = metadataSet.find(query)
     result = []
     for datum in metadata:
         result.append(datum)
