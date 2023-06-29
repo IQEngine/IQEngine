@@ -22,5 +22,5 @@ jobs:
           node-version: 18
 
       - name: Install dependencies
-        working-directory: $GITHUB_WORKSPACE/e2e
+        working-directory: e2e
         run: npm ci
