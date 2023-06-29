@@ -15,12 +15,18 @@ import { FFT } from '@/Utils/fft';
 import { useGetPluginsComponents } from '../hooks/useGetPluginsComponents';
 import { useGetPlugins } from '@/api/plugin/Queries';
 import { toast } from 'react-hot-toast';
+import { Buffer } from 'buffer';
 
 export interface PluginsPaneProps {
   cursorsEnabled: boolean;
   handleProcessTime: () => { trimmedSamples: number[]; startSampleOffset: number };
   meta: SigMFMetadata;
   setMeta: (meta: SigMFMetadata) => void;
+}
+
+export enum MimeTypes {
+  IQ_SIGMF_32 = 'iq/cf32_le',
+  AUDIO_WAV = 'audio/wav',
 }
 
 export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }: PluginsPaneProps) => {
@@ -59,7 +65,7 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
           samples: newSamps,
           sample_rate: sampleRate,
           center_freq: freq,
-          data_type: 'iq/cf32_le',
+          data_type: MimeTypes.IQ_SIGMF_32,
         },
       ],
       custom_params: {},
@@ -95,70 +101,98 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
           return;
         }
         if (data.data_output && data.data_output.length > 0) {
-          // just show the first output for now, 99% of plugins will have 0 or 1 IQ output anyway
-          const samples_base64 = data.data_output[0]['samples'];
-          const samples = convertBase64ToFloat32Array(samples_base64);
-          //const sample_rate = data.data_output[0]['sample_rate']; // Hz
-          //const center_freq = data.data_output[0]['center_freq']; // Hz
-          //const data_type = data.data_output[0]['data_type']; // assumes iq/cf32_le
-          setModalSamples(samples);
+          if (data.data_output[0]['data_type'] == MimeTypes.IQ_SIGMF_32) {
+            // just show the first output for now, 99% of plugins will have 0 or 1 IQ output anyway
+            const samples_base64 = data.data_output[0]['samples'];
+            const samples = convertBase64ToFloat32Array(samples_base64);
+            //const sample_rate = data.data_output[0]['sample_rate']; // Hz
+            //const center_freq = data.data_output[0]['center_freq']; // Hz
+            //const data_type = data.data_output[0]['data_type']; // assumes iq/cf32_le
+            setModalSamples(samples);
 
-          // create spectrogram out of all samples
-          const fftSize = 1024;
-          const numFfts = Math.floor(samples.length / 2 / fftSize);
-          const magnitudeMin = -40;
-          const magnitudeMax = -10;
-          const samples_typed = Float32Array.from(samples);
+            // create spectrogram out of all samples
+            const fftSize = 1024;
+            const numFfts = Math.floor(samples.length / 2 / fftSize);
+            const magnitudeMin = -40;
+            const magnitudeMax = -10;
+            const samples_typed = Float32Array.from(samples);
 
-          let startOfs = 0;
-          let newFftData = new Uint8ClampedArray(numFfts * fftSize * 4); // 4 because RGBA
+            let startOfs = 0;
+            let newFftData = new Uint8ClampedArray(numFfts * fftSize * 4); // 4 because RGBA
 
-          // loop through each row
-          for (let i = 0; i < numFfts; i++) {
-            let samples_slice = samples_typed.slice(i * fftSize * 2, (i + 1) * fftSize * 2); // mult by 2 because this is int/floats not IQ samples
+            // loop through each row
+            for (let i = 0; i < numFfts; i++) {
+              let samples_slice = samples_typed.slice(i * fftSize * 2, (i + 1) * fftSize * 2); // mult by 2 because this is int/floats not IQ samples
 
-            const f = new FFT(fftSize);
-            let out = f.createComplexArray(); // creates an empty array the length of fft.size*2
-            f.transform(out, samples_slice); // assumes input (2nd arg) is in form IQIQIQIQ and twice the length of fft.size
+              const f = new FFT(fftSize);
+              let out = f.createComplexArray(); // creates an empty array the length of fft.size*2
+              f.transform(out, samples_slice); // assumes input (2nd arg) is in form IQIQIQIQ and twice the length of fft.size
 
-            out = out.map((x) => x / fftSize); // divide by fftsize
+              out = out.map((x) => x / fftSize); // divide by fftsize
 
-            // convert to magnitude
-            let magnitudes = new Array(out.length / 2);
-            for (let j = 0; j < out.length / 2; j++) {
-              magnitudes[j] = Math.sqrt(Math.pow(out[j * 2], 2) + Math.pow(out[j * 2 + 1], 2)); // take magnitude
+              // convert to magnitude
+              let magnitudes = new Array(out.length / 2);
+              for (let j = 0; j < out.length / 2; j++) {
+                magnitudes[j] = Math.sqrt(Math.pow(out[j * 2], 2) + Math.pow(out[j * 2 + 1], 2)); // take magnitude
+              }
+
+              fftshift(magnitudes); // in-place
+              magnitudes = magnitudes.map((x) => 10.0 * Math.log10(x)); // convert to dB
+              magnitudes = magnitudes.map((x) => (isFinite(x) ? x : 0)); // get rid of -infinity which happens when the input is all 0s
+
+              // apply magnitude min and max (which are in dB, same units as magnitudes prior to this point) and convert to 0-255
+              const dbPer1 = 255 / (magnitudeMax - magnitudeMin);
+              magnitudes = magnitudes.map((x) => x - magnitudeMin);
+              magnitudes = magnitudes.map((x) => x * dbPer1);
+              magnitudes = magnitudes.map((x) => (x > 255 ? 255 : x)); // clip above 255
+              magnitudes = magnitudes.map((x) => (x < 0 ? 0 : x)); // clip below 0
+              let ipBuf8 = Uint8ClampedArray.from(magnitudes); // anything over 255 or below 0 at this point will become a random number, hence clipping above
+
+              // Apply colormap
+              let line_offset = i * fftSize * 4;
+              for (let sigVal, opIdx = 0, ipIdx = startOfs; ipIdx < fftSize + startOfs; opIdx += 4, ipIdx++) {
+                sigVal = ipBuf8[ipIdx] || 0; // if input line too short add zeros
+                newFftData[line_offset + opIdx] = colMaps['jet'][sigVal][0]; // red
+                newFftData[line_offset + opIdx + 1] = colMaps['jet'][sigVal][1]; // green
+                newFftData[line_offset + opIdx + 2] = colMaps['jet'][sigVal][2]; // blue
+                newFftData[line_offset + opIdx + 3] = 255; // alpha
+              }
             }
 
-            fftshift(magnitudes); // in-place
-            magnitudes = magnitudes.map((x) => 10.0 * Math.log10(x)); // convert to dB
-            magnitudes = magnitudes.map((x) => (isFinite(x) ? x : 0)); // get rid of -infinity which happens when the input is all 0s
+            const imageData = new ImageData(newFftData, fftSize, numFfts);
+            createImageBitmap(imageData).then((imageBitmap) => {
+              setmodalSpectrogram(imageBitmap);
+            });
 
-            // apply magnitude min and max (which are in dB, same units as magnitudes prior to this point) and convert to 0-255
-            const dbPer1 = 255 / (magnitudeMax - magnitudeMin);
-            magnitudes = magnitudes.map((x) => x - magnitudeMin);
-            magnitudes = magnitudes.map((x) => x * dbPer1);
-            magnitudes = magnitudes.map((x) => (x > 255 ? 255 : x)); // clip above 255
-            magnitudes = magnitudes.map((x) => (x < 0 ? 0 : x)); // clip below 0
-            let ipBuf8 = Uint8ClampedArray.from(magnitudes); // anything over 255 or below 0 at this point will become a random number, hence clipping above
+            setModalOpen(true);
+          } else {
+            // Data file
+            const samples_base64 = data.data_output[0]['samples'];
+            const samples = Buffer.from(samples_base64, 'base64');
 
-            // Apply colormap
-            let line_offset = i * fftSize * 4;
-            for (let sigVal, opIdx = 0, ipIdx = startOfs; ipIdx < fftSize + startOfs; opIdx += 4, ipIdx++) {
-              sigVal = ipBuf8[ipIdx] || 0; // if input line too short add zeros
-              newFftData[line_offset + opIdx] = colMaps['jet'][sigVal][0]; // red
-              newFftData[line_offset + opIdx + 1] = colMaps['jet'][sigVal][1]; // green
-              newFftData[line_offset + opIdx + 2] = colMaps['jet'][sigVal][2]; // blue
-              newFftData[line_offset + opIdx + 3] = 255; // alpha
+            const a = document.createElement('a');
+            document.body.appendChild(a);
+            a.style = 'display: none';
+            const blob = new Blob([samples], { type: data.data_output[0]['data_type'] }),
+              url = window.URL.createObjectURL(blob);
+            a.href = url;
+
+            let filename = '';
+            switch (data.data_output[0]['data_type']) {
+              case MimeTypes.AUDIO_WAV:
+                filename = 'samples.wav';
+                break;
             }
+            if (filename != '') {
+              a.download = filename;
+              a.click();
+            } else {
+              toast.error("The plugins pane doesn't handle the mime type output by the plugin.");
+            }
+            window.URL.revokeObjectURL(url);
           }
-
-          const imageData = new ImageData(newFftData, fftSize, numFfts);
-          createImageBitmap(imageData).then((imageBitmap) => {
-            setmodalSpectrogram(imageBitmap);
-          });
-
-          setModalOpen(true);
         }
+
         if (data.annotations) {
           for (let i = 0; i < data.annotations.length; i++) {
             data.annotations[i]['core:sample_start'] += startSampleOffset;

@@ -4,7 +4,7 @@ import os
 from database.database import plugins_collection
 
 
-def import_plugins_from_env(environment_variable_name="IQENGINE_PLUGINSS"):
+def import_plugins_from_env(environment_variable_name="IQENGINE_PLUGINS"):
     """
     Import plugins from environment variable
     Will not import if plugin already exists
