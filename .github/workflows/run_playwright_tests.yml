@@ -26,7 +26,7 @@ jobs:
         run: npm ci
 
       - name: Docker build
-        run: docker compose --help
+        run: docker compose -f docker-compose-e2e.yml build
 
       - name: Docker up
-        run: docker compose up -f docker-compose-e2e.yml
+        run: docker compose -f docker-compose-e2e.yml up
