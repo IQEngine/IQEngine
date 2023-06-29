@@ -22,8 +22,6 @@ $MONGO_USERNAME="mongoadmin"
 $MONGO_PASSWORD="secret"
 # runs from e2e folder because that's where the playwright
 # config files are
-cd ..  || exit
-echo about to run docker compose
 docker compose -f docker-compose-e2e.yml up
 echo have run docker compose, going into e2e
 cd e2e 
