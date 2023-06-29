@@ -12,7 +12,7 @@ import { selectFft, calculateTileNumbers, range, SelectFftReturn } from '@/Utils
 import { AnnotationViewer } from '@/Components/Annotation/AnnotationViewer';
 import { RulerTop } from './RulerTop';
 import { RulerSide } from './RulerSide';
-import { INITIAL_PYTHON_SNIPPET, TILE_SIZE_IN_IQ_SAMPLES, COLORMAP_DEFAULT } from '@/Utils/constants';
+import { INITIAL_PYTHON_SNIPPET, TILE_SIZE_IN_IQ_SAMPLES, COLORMAP_DEFAULT, MINIMAP_FFT_SIZE } from '@/Utils/constants';
 import TimeSelector from './TimeSelector';
 import AnnotationList from '@/Components/Annotation/AnnotationList';
 import { GlobalProperties } from '@/Components/GlobalProperties/GlobalProperties';
@@ -437,7 +437,7 @@ export const SpectrogramPage = () => {
                       />
                     </Stage>
 
-                    <Stage width={55} height={spectrogramHeight}>
+                    <Stage width={MINIMAP_FFT_SIZE + 5} height={spectrogramHeight}>
                       <ScrollBar
                         fetchAndRender={fetchAndRender}
                         spectrogramHeight={spectrogramHeight}

@@ -44,7 +44,6 @@ const ScrollBar = (props: ScrollBarProps) => {
   const iqSlices = getIQDataFullIndexes(meta, dataRange, MINIMAP_FFT_SIZE, fetchEnabled);
 
   const [minimapImg, setMinimapImg] = useState(null);
-  const scrollbarWidth = 50;
   const [ticks, setTicks] = useState([]);
   const [handleHeightPixels, setHandleHeightPixels] = useState(1);
   const [scalingFactor, setScalingFactor] = useState(1);
@@ -163,6 +162,16 @@ const ScrollBar = (props: ScrollBarProps) => {
       t.push({
         y: annotation['core:sample_start'] * scalingFactor,
         height: annotation['core:sample_count'] * scalingFactor,
+        x:
+          ((annotation['core:freq_lower_edge'] -
+            meta.captures[0]['core:frequency'] +
+            meta.global['core:sample_rate'] / 2) /
+            meta.global['core:sample_rate']) *
+          MINIMAP_FFT_SIZE,
+        width:
+          ((annotation['core:freq_upper_edge'] - annotation['core:freq_lower_edge']) /
+            meta.global['core:sample_rate']) *
+          MINIMAP_FFT_SIZE,
       });
     });
     setTicks(t);
@@ -210,7 +219,7 @@ const ScrollBar = (props: ScrollBarProps) => {
             x={0}
             y={0}
             fill="grey"
-            width={scrollbarWidth}
+            width={MINIMAP_FFT_SIZE}
             height={spectrogramHeight}
             strokeWidth={4}
             onClick={handleClick}
@@ -219,7 +228,7 @@ const ScrollBar = (props: ScrollBarProps) => {
             x={0}
             y={handleTop}
             fill="black"
-            width={scrollbarWidth}
+            width={MINIMAP_FFT_SIZE}
             height={handleHeightPixels}
             draggable={true}
             onDragMove={handleDragMove}
@@ -232,14 +241,14 @@ const ScrollBar = (props: ScrollBarProps) => {
   return (
     <>
       <Layer onWheel={handleWheel}>
-        <Image image={minimapImg} x={0} y={0} width={scrollbarWidth} height={spectrogramHeight} />
+        <Image image={minimapImg} x={0} y={0} width={MINIMAP_FFT_SIZE} height={spectrogramHeight} />
         {/* This rect is invisible */}
         <Rect
           x={0}
           y={0}
           fill="grey"
           opacity={0}
-          width={scrollbarWidth}
+          width={MINIMAP_FFT_SIZE}
           height={spectrogramHeight}
           strokeWidth={4}
           onClick={handleClick}
@@ -251,7 +260,7 @@ const ScrollBar = (props: ScrollBarProps) => {
           y={handleTop}
           fill="black"
           opacity={0.6}
-          width={scrollbarWidth}
+          width={MINIMAP_FFT_SIZE}
           height={handleHeightPixels}
           draggable={true}
           onDragMove={handleDragMove}
@@ -260,14 +269,14 @@ const ScrollBar = (props: ScrollBarProps) => {
         {/* box for each annotation */}
         {ticks.map((tick, index) => (
           <Rect
-            x={0}
+            x={tick.x}
             y={tick.y}
-            width={7}
+            width={tick.width}
             height={tick.height}
-            fillEnabled={true}
-            fill="white"
-            stroke="black"
-            strokeWidth={2}
+            fillEnabled={false}
+            //fill="white"
+            stroke="white"
+            strokeWidth={1}
             key={'annotation' + index.toString()}
           />
         ))}
@@ -275,13 +284,13 @@ const ScrollBar = (props: ScrollBarProps) => {
         {/* white boxes showing what has been downloaded */}
         {downloadedTiles.map((tile, index) => (
           <Rect
-            x={scrollbarWidth}
+            x={MINIMAP_FFT_SIZE}
             y={parseInt(tile) * TILE_SIZE_IN_IQ_SAMPLES * scalingFactor}
             width={5}
             height={TILE_SIZE_IN_IQ_SAMPLES * scalingFactor}
             fillEnabled={true}
-            fill="white"
-            stroke="black"
+            fill="grey"
+            //stroke="black"
             strokeWidth={0}
             key={Math.random() * 1000000 + Math.random()}
           />
