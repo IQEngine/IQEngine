@@ -22,4 +22,7 @@ def import_plugins_from_env(environment_variable_name="IQENGINE_PLUGINS"):
             client.insert_one(plugin)
     except Exception as e:
         # throw a custom plugin failed to load exception
-        raise Exception(f"Failed to load plugins from environment variable {environment_variable_name}", e)
+        raise Exception(
+            f"Failed to load plugins from environment variable {environment_variable_name}",
+            e,
+        )
