@@ -29,4 +29,11 @@ jobs:
         run: docker compose -f docker-compose-e2e.yml build
 
       - name: Docker up
-        run: docker compose -f docker-compose-e2e.yml up
+        run: docker compose -f docker-compose-e2e.yml up &
+        env: 
+          MONGO_USERNAME: mongoadmin
+          MONGO_PASSWORD: secret
+
+
+      - name: Docker down
+        run: docker compose -f docker-compose-e2e.yml down
