@@ -27,6 +27,9 @@ jobs:
 
       - name: Docker build
         run: docker compose -f docker-compose-e2e.yml build
+        env: 
+          MONGO_USERNAME: mongoadmin
+          MONGO_PASSWORD: secret
 
       - name: Docker up
         run: docker compose -f docker-compose-e2e.yml up &
@@ -34,6 +37,14 @@ jobs:
           MONGO_USERNAME: mongoadmin
           MONGO_PASSWORD: secret
 
+        
+      - name: Check build has succeeded
+        uses: cygnetdigital/wait_for_response@v2.0.0
+        with:
+          url: 'http://localhost:3000/'
+          responseCode: '200,500'
+          timeout: 30000
+          interval: 500
 
       - name: Docker down
         run: docker compose -f docker-compose-e2e.yml down
