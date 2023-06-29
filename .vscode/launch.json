@@ -79,6 +79,18 @@
         }
     },
     {
+        "name": "[API]: Plugin API",
+        "type": "python",
+        "request": "launch",
+        "cwd": "${workspaceFolder}/plugins/src",
+        "module": "uvicorn",
+        "args": [
+            "plugins_api:app",
+            "--reload"
+        ],
+        "justMyCode": true
+    },
+    {
       //Run 'npm run start' in client folder via integrated terminal before launching this configuration
       "name": "[CLIENT]: Web Launcher Chrome",
       "type": "chrome",
