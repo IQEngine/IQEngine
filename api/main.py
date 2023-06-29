@@ -87,11 +87,11 @@ app.include_router(plugins_router)
 
 app.mount("/", SPAStaticFiles(directory="iqengine", html=True), name="iqengine")
 
-# Import all configuration from the environment variables
+# Import all from environment variables
 try:
     import_all_from_env()
 except Exception as e:
-    logger.error("Error importing plugins from environment variables", e)
+    logger.error("Error importing environment variables", e)
 
 
 @app.exception_handler(ServerSelectionTimeoutError)
