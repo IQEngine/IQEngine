@@ -23,19 +23,18 @@ jobs:
 
       - name: Docker build
         run: docker compose -f docker-compose-e2e.yml build
-        env: 
+        env:
           MONGO_USERNAME: mongoadmin
           MONGO_PASSWORD: secret
           IQENGINE_METADATA_DB_CONNECTION_STRING: mongodb://mongoadmin:secret@localhost:27017/admin
 
       - name: Docker up
         run: docker compose -f docker-compose-e2e.yml up &
-        env: 
+        env:
           MONGO_USERNAME: mongoadmin
           MONGO_PASSWORD: secret
           IQENGINE_METADATA_DB_CONNECTION_STRING: mongodb://mongoadmin:secret@localhost:27017/admin
 
-        
       - name: Check build has succeeded
         uses: cygnetdigital/wait_for_response@v2.0.0
         with:
@@ -48,14 +47,13 @@ jobs:
         working-directory: e2e
         run: npm ci
 
-        
       - name: Install Playwright Browsers
         working-directory: e2e
         run: npx playwright install --with-deps
 
       - name: Run Playwright tests
         working-directory: e2e
-        run:  npx playwright test --config playwright-pr.config.ts
+        run: npx playwright test --config playwright-pr.config.ts
 
       - name: Docker down
         run: docker compose -f docker-compose-e2e.yml down
