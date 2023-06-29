@@ -145,7 +145,7 @@ def query_meta(
     metadataSet: Collection[Metadata] = Depends(database.database.metadata_collection),
 ):
 
-    query_condition: Dict[str, Any]  = {}
+    query_condition: Dict[str, Any] = {}
     if account is not None:
         query_condition.update({"global.traceability:origin.account": {"$regex": account, "$options": "i"}})
     if container is not None:
