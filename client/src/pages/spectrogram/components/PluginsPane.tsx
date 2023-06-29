@@ -104,9 +104,6 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
             // just show the first output for now, 99% of plugins will have 0 or 1 IQ output anyway
             const samples_base64 = data.data_output[0]['samples'];
             const samples = convertBase64ToFloat32Array(samples_base64);
-            //const sample_rate = data.data_output[0]['sample_rate']; // Hz
-            //const center_freq = data.data_output[0]['center_freq']; // Hz
-            //const data_type = data.data_output[0]['data_type']; // assumes iq/cf32_le
             setModalSamples(samples);
 
             // create spectrogram out of all samples
@@ -172,11 +169,8 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
             for (var i = 0; i < samples.length; i++) {
               blob_array[i] = samples.charCodeAt(i);
             }
-            console.debug('samples:', samples);
-
             const a = document.createElement('a');
             const blob = new Blob([blob_array], { type: data.data_output[0]['data_type'] });
-            console.debug('blob:', blob);
             const url = window.URL.createObjectURL(blob);
 
             a.href = url;
