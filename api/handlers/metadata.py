@@ -1,11 +1,10 @@
 import database.database
 from database.models import DataSource, DataSourceReference, Metadata
-from fastapi import APIRouter, Depends, HTTPException, Body, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from pymongo.collection import Collection
 from .urlmapping import add_URL_sasToken, apiType
-from .query import QueryCondition
 from fastapi.responses import StreamingResponse
-from typing import Optional
+from typing import Optional, Any, Dict
 from datetime import datetime
 import httpx
 
@@ -146,17 +145,17 @@ def query_meta(
     metadataSet: Collection[Metadata] = Depends(database.database.metadata_collection),
 ):
 
-    query_condition = {}
+    query_condition: Dict[str, Any]  = {}
     if account is not None:
-        query_condition.update({"global.traceability:origin.account": { "$regex": account, "$options": "i"}})
+        query_condition.update({"global.traceability:origin.account": {"$regex": account, "$options": "i"}})
     if container is not None:
-        query_condition.update({"global.traceability:origin.container": { "$regex": container, "$options": "i"}})
+        query_condition.update({"global.traceability:origin.container": {"$regex": container, "$options": "i"}})
     if min_frequency is not None:
         query_condition.update({"captures.core:frequency": {"$gte": min_frequency}})
     if max_frequency is not None:
         query_condition.update({"captures.core:frequency": {"$lte": max_frequency}})
     if author is not None:
-        query_condition.update({"global.core:author": { "$regex": author, "$options": "i"}})
+        query_condition.update({"global.core:author": {"$regex": author, "$options": "i"}})
     if antenna_gain is not None:
         query_condition.update({"global.antenna:gain": antenna_gain})
     if antenna_type is not None:
@@ -164,9 +163,9 @@ def query_meta(
     if geolocation is not None:
         query_condition.update({"global.core:geolocation": geolocation})
     if label is not None:
-        query_condition.update({"annotations.core:label": { "$regex": label, "$options": "i"}})
+        query_condition.update({"annotations.core:label": {"$regex": label, "$options": "i"}})
     if description is not None:
-        query_condition.update({"annotations.core:description": { "$regex": description, "$options": "i"}})
+        query_condition.update({"annotations.core:description": {"$regex": description, "$options": "i"}})
     if min_datetime is not None:
         query_condition.update({"captures.core:datetime": {"$gte": min_datetime}})
     if max_datetime is not None:
