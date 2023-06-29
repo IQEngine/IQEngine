@@ -306,7 +306,7 @@ export const SpectrogramPage = () => {
   return (
     <>
       {status === 'loading' && <h1>Loading...</h1>}
-      <div className="mt-3 mb-0 ml-0 mr-0 p-0">
+      <div className="mb-0 ml-0 mr-0 p-0 pt-3">
         <div className="flex flex-row w-full">
           <Sidebar
             updateMagnitudeMax={setMagnitudeMax}
