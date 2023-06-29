@@ -27,6 +27,9 @@ jobs:
       - name: Install Playwright Browsers
         run: cd "$GITHUB_WORKSPACE/e2e" && npx playwright install --with-deps
 
+      - name: Run webserver
+        run: cd "$GITHUB_WORKSPACE/.." && docker compose -f docker-compose-e2e.yml up
+
       - name: Run Playwright tests
-        run: |
-          cd "$GITHUB_WORKSPACE/e2e" && npx playwright test --config playwright-pr.config.ts
+        run: cd "$GITHUB_WORKSPACE/e2e" && npx playwright test --config playwright-pr.config.ts
+
