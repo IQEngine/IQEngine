@@ -52,7 +52,7 @@ const ScrollBar = (props: ScrollBarProps) => {
     console.debug('minimap meta changed', meta);
     if (meta) {
       // for minimap only. there's so much overhead with blob downloading that this might as well be a high value...
-      const skipNFfts = Math.floor(meta.getTotalSamples() / 100e3); // sets the decimation rate (manually tweaked)
+      const skipNFfts = Math.floor(meta.getTotalSamples() / 10e3); // sets the decimation rate (manually tweaked)
       setSkipNFfts(skipNFfts);
       const numFfts = Math.floor(meta.getTotalSamples() / MINIMAP_FFT_SIZE / (skipNFfts + 1));
       let dataRange = [];
