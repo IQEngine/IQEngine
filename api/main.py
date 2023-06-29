@@ -11,6 +11,7 @@ from handlers.iq import router as iq_router
 from handlers.metadata import router as metadata_router
 from handlers.plugins import router as plugins_router
 from handlers.status import router as status_router
+from importer.all import import_all_from_env
 from pydantic import BaseModel
 from pymongo.errors import ServerSelectionTimeoutError
 from starlette.exceptions import HTTPException
@@ -85,6 +86,12 @@ app.include_router(config_router)
 app.include_router(plugins_router)
 
 app.mount("/", SPAStaticFiles(directory="iqengine", html=True), name="iqengine")
+
+# Import all from environment variables
+try:
+    import_all_from_env()
+except Exception as e:
+    logger.error("Error importing environment variables", e)
 
 
 @app.exception_handler(ServerSelectionTimeoutError)

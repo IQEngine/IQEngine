@@ -73,6 +73,21 @@
             "--reload"
         ],
         "jinja": true,
+        "justMyCode": true,
+        "env": {
+            "IQENGINE_PLUGINS": "[{\"name\": \"IQEngine\", \"url\":\"https://iqengine-detector.eastus2.cloudapp.azure.com:8000/plugins\"}]"
+        }
+    },
+    {
+        "name": "[API]: Plugin API",
+        "type": "python",
+        "request": "launch",
+        "cwd": "${workspaceFolder}/plugins/src",
+        "module": "uvicorn",
+        "args": [
+            "plugins_api:app",
+            "--reload"
+        ],
         "justMyCode": true
     },
     {
