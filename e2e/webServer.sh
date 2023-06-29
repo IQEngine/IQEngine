@@ -9,17 +9,22 @@
 # in its container. Hence, it uses iqenginedb:27017 as the url.
 #
 # Test for the name/pw
-if [[ -z "$MONGO_USERNAME" ]]; then
-  echo "MONGO_USERNAME must be set."
-  exit
-fi
-if [[ -z "$MONGO_PASSWORD" ]]; then
-  echo "MONGO_PASSWORD must be set."
-  exit
-fi
+# if [[ -z "$MONGO_USERNAME" ]]; then
+#   echo "MONGO_USERNAME must be set."
+#   exit
+# fi
+# if [[ -z "$MONGO_PASSWORD" ]]; then
+#   echo "MONGO_PASSWORD must be set."
+#   exit
+# fi
 
+$MONGO_USERNAME=mongoadmin
+$MONGO_PASSWORD=secret
 # runs from e2e folder because that's where the playwright
 # config files are
-cd .. || exit
+cd .. #|| exit
+echo about to run docker compose
 docker compose -f docker-compose-e2e.yml up
+echo have run docker compose, going into e2e
 cd e2e || exit
+echo in e2e
