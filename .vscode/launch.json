@@ -73,7 +73,10 @@
             "--reload"
         ],
         "jinja": true,
-        "justMyCode": true
+        "justMyCode": true,
+        "env": {
+            "IQENGINE_PLUGINS": "[{\"name\": \"IQEngine\", \"url\":\"https://iqengine-detector.eastus2.cloudapp.azure.com:8000/plugins\"}]"
+        }
     },
     {
       //Run 'npm run start' in client folder via integrated terminal before launching this configuration
