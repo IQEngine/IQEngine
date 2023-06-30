@@ -78,7 +78,7 @@ class Plugin:
 
 ## Run plugins locally using docker
 
-```
+```bash
 cd plugins
 docker build -t plugins_image .
 docker run -dit -p 8000:8000 --name plugins_container plugins_image
