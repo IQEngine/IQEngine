@@ -31,6 +31,7 @@ jobs:
           MONGO_USERNAME: mongoadmin
           MONGO_PASSWORD: secret
           IQENGINE_METADATA_DB_CONNECTION_STRING: mongodb://mongoadmin:secret@localhost:27017/admin
+          IQENGINE_FEATURE_FLAGS = {"useAPIDatasources": true}
 
       - name: Docker up
         run: docker compose -f docker-compose-e2e.yml up &
