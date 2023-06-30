@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from pymongo.collection import Collection
 from .urlmapping import add_URL_sasToken, apiType
 from fastapi.responses import StreamingResponse
-from typing import Optional, Any, Dict
+from typing import Optional, Any, Dict, List
 from datetime import datetime
 import httpx
 
@@ -130,8 +130,8 @@ async def get_meta_thumbnail(
     response_model=list[Metadata],
 )
 def query_meta(
-    account: Optional[str] = Query(None),
-    container: Optional[str] = Query(None),
+    account: Optional[List[str]] = Query([]),
+    container: Optional[List[str]] = Query([]),
     min_frequency: Optional[float] = Query(None),
     max_frequency: Optional[float] = Query(None),
     author: Optional[str] = Query(None),
@@ -145,10 +145,20 @@ def query_meta(
 ):
 
     query_condition: Dict[str, Any] = {}
-    if account is not None:
-        query_condition.update({"global.traceability:origin.account": {"$regex": account, "$options": "i"}})
-    if container is not None:
-        query_condition.update({"global.traceability:origin.container": {"$regex": container, "$options": "i"}})
+    if account:
+        query_condition.update({
+            "$or": [
+                {"global.traceability:origin.account": {"$regex": a, "$options": "i"}}
+                for a in account
+            ]
+        })
+    if container:
+        query_condition.update({
+            "$or": [
+                {"global.traceability:origin.container": {"$regex": c, "$options": "i"}}
+                for c in container
+            ]
+        })
     if min_frequency is not None:
         query_condition.update({"captures.core:frequency": {"$gte": min_frequency}})
     if max_frequency is not None:
