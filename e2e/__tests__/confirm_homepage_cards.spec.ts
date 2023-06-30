@@ -1,9 +1,7 @@
 import { test } from '@playwright/test';
-import { MongoClient, Db } from 'mongodb';
-import dotenv from 'dotenv';
-import dotenvExpand from 'dotenv-expand';
 
 // the "Open Local Directory" and "Select 1" options are not tested
+// skipping the daniel estevez card because of single quotes in the name
 test('Confirm all cards display', async ({ page }) => {
   await page.goto('/');
 
@@ -13,8 +11,8 @@ test('Confirm all cards display', async ({ page }) => {
   // await page.locator('[id="DanielEstévez\\\'Recordings"]').click();
   // await page.locator('[id="IQEngineLogo"]').click();
 
-  // await page.locator('[id="NortheasternUniversity"]').click();
-  // await page.locator('[id="IQEngineLogo"]').click();
+  await page.locator('[id="NortheasternUniversity"]').click();
+  await page.locator('[id="IQEngineLogo"]').click();
 
   // signal generator
   await page.locator('[id="Siggen"]').click();
