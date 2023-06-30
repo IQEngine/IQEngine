@@ -12,6 +12,11 @@
     "example.env"
   ],
   "words": [
+    "INITDB",
+    "iqenginedb",
+    "iqenginenet",
+    "webserver",
+    "pytests",
     "outfile",
     "uksouth",
     "ADLS",

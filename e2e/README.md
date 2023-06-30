@@ -11,7 +11,7 @@ npx playwright install-deps
 
 ## Run
 
-The simples way to run the tests is just to do:
+The simplest way to run the tests is just to do:
 
 ```bash
 cd e2e
@@ -29,7 +29,11 @@ If you need more fine-grained control the project Makefile has targets to help y
 ```bash
 make run-api  # Start the API Server
 make dev      # Start the app server
+make test-pw  # Run the PlayWright tests
+make test     # Run PlayWright tests & pytests
 ```
+
+The test-pw and test targets build a docker container image of the API + the client app. It then runs that container together with a MongoDB container and runs the tests against the containerized system.
 
 Integration testing is implemented using a couple of tools. For the api, pytest is the tool. For the frontend, the tool is [Playwright](https://playwright.dev/docs/intro).
 
