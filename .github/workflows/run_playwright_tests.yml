@@ -26,11 +26,12 @@ jobs:
         run: npm ci
 
       - name: Docker build
-        run: docker compose -f docker-compose-e2e.yml build
+        run: |
+          echo '{"useAPIDatasources": true}' > .env
+          docker compose -f docker-compose-e2e.yml build
         env:
           MONGO_USERNAME: mongoadmin
           MONGO_PASSWORD: secret
-          IQENGINE_FEATURE_FLAGS = '{"useAPIDatasources": true}'
 
       - name: Docker up
         run: docker compose -f docker-compose-e2e.yml up &
