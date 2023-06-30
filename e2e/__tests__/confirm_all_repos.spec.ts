@@ -8,7 +8,7 @@ test.beforeAll(async ({ request }) => {
   const dataSource = {
     type: 'api',
     name: '(API) Test API DataSource',
-    account: 'test_account',
+    account: 'test_account_for_api_datasource',
     container: 'test_container',
     description: 'test description',
     imageURL: 'https://i.etsystatic.com/20456772/r/il/a94e13/3604976065/il_1588xN.3604976065_dzyi.jpg',
