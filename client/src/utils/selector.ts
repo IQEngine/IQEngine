@@ -16,13 +16,24 @@ import { TILE_SIZE_IN_IQ_SAMPLES } from './constants';
 import { FFT } from '@/utils/fft';
 import { SigMFMetadata } from './sigmfMetadata';
 
-function getStandardDeviation(array: Array<any>) {
-  const n = array.length;
-  const mean = array.reduce((a, b) => a + b) / n;
-  return Math.sqrt(array.map((x) => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n);
-}
+function maxPool(input, poolSizeY, strideY, width) {
+  const output = [];
+  const inputLength = input.length;
 
-const average = (array: Array<any>) => array.reduce((a, b) => a + b) / array.length;
+  for (let i = 0; i < inputLength; i++) {
+    if (i % width < width - poolSizeY + 1) {
+      const poolWindow = [];
+      for (let j = 0; j < poolSizeY; j++) {
+        const index = i + j * width;
+        poolWindow.push(input[index]);
+      }
+      const maxVal = Math.max(...poolWindow);
+      output.push(maxVal);
+    }
+  }
+
+  return output;
+}
 
 export function calcFftOfTile(samples: Float32Array, fftSize: number, windowFunction: string) {
   //let startTime = performance.now();
@@ -90,9 +101,9 @@ export function fftToRGB(
   colMap: any
 ) {
   let startOfs = 0;
-  let newFftData = new Uint8ClampedArray(TILE_SIZE_IN_IQ_SAMPLES * 4); // 4 because RGBA
+  let newFftData = new Uint8ClampedArray(fftsConcatenated.length * 4); // 4 because RGBA
   // loop through each row
-  for (let i = 0; i < TILE_SIZE_IN_IQ_SAMPLES / fftSize; i++) {
+  for (let i = 0; i < fftsConcatenated.length / fftSize; i++) {
     let magnitudes = fftsConcatenated.slice(i * fftSize, (i + 1) * fftSize);
 
     // apply magnitude min and max (which are in dB, same units as magnitudes prior to this point) and convert to 0-255
@@ -119,7 +130,7 @@ export function fftToRGB(
 export interface SelectFftReturn {
   imageData: any;
   missingTiles: Array<number>;
-  fftData: Record<number, Uint8ClampedArray>;
+  fftData: Record<number, Float32Array>;
 }
 
 // lowerTile and upperTile are in fractions of a tile
@@ -133,7 +144,7 @@ export const selectFft = (
   windowFunction: any,
   zoomLevel: any,
   iqData: Record<number, Float32Array>,
-  fftData: Record<number, Uint8ClampedArray>,
+  fftData: Record<number, Float32Array>,
   colMap: any
 ): SelectFftReturn | null => {
   if (!meta || !iqData) {
@@ -152,20 +163,23 @@ export const selectFft = (
     }
     let samples = iqData[tile.toString()];
 
-    const fftsConcatenated = calcFftOfTile(samples, fftSize, windowFunction);
-    fftData[tile] = fftToRGB(fftsConcatenated, fftSize, magnitudeMin, magnitudeMax, colMap);
+    //const fftsConcatenated = calcFftOfTile(samples, fftSize, windowFunction);
+
+     fftData[tile] = calcFftOfTile(samples, fftSize, windowFunction);
+
+   
   }
 
   // Concatenate the full tiles
-  let totalFftData = new Uint8ClampedArray(tiles.length * TILE_SIZE_IN_IQ_SAMPLES * 4); // 4 because RGBA
+  let totalFftData = new Float32Array(tiles.length * TILE_SIZE_IN_IQ_SAMPLES);
   const missingTiles = [];
   for (let [index, tile] of tiles.entries()) {
     if (tile in fftData) {
-      totalFftData.set(fftData[tile], index * TILE_SIZE_IN_IQ_SAMPLES * 4);
+      totalFftData.set(fftData[tile], index * TILE_SIZE_IN_IQ_SAMPLES);
     } else {
-      // If the tile isnt available, fill with 255's (white and opaque)
+      // If the tile isnt available, fill with 0's (white and opaque)
       missingTiles.push(tile);
-      totalFftData.fill(255, index * TILE_SIZE_IN_IQ_SAMPLES * 4, (index + 1) * TILE_SIZE_IN_IQ_SAMPLES * 4);
+      totalFftData.fill(0, index * TILE_SIZE_IN_IQ_SAMPLES, (index + 1) * TILE_SIZE_IN_IQ_SAMPLES);
     }
   }
 
@@ -174,26 +188,41 @@ export const selectFft = (
   lowerTrim = lowerTrim - (lowerTrim % fftSize); // make it an even FFT size. TODO We need this rounding to happen earlier, so we get a consistent 600 ffts in the image
   let upperTrim = (1 - (upperTile - Math.floor(upperTile))) * TILE_SIZE_IN_IQ_SAMPLES; // amount we want to get rid of
   upperTrim = upperTrim - (upperTrim % fftSize);
-  let trimmedFftData = totalFftData.slice(lowerTrim * 4, totalFftData.length - upperTrim * 4); // totalFftData.length already includes the *4
-  let num_final_ffts = trimmedFftData.length / fftSize / 4;
+  let trimmedFftData = totalFftData.slice(lowerTrim, totalFftData.length - upperTrim); // totalFftData.length already includes the *4
+  let num_final_ffts = trimmedFftData.length / fftSize;
 
   // zoomLevel portion (decimate by N)
   if (zoomLevel !== 1) {
     num_final_ffts = Math.floor(num_final_ffts / zoomLevel);
     console.debug(num_final_ffts);
-    let zoomedFftData = new Uint8ClampedArray(num_final_ffts * fftSize * 4);
-    // loop through ffts
-    for (let i = 0; i < num_final_ffts; i++) {
-      zoomedFftData.set(
-        trimmedFftData.slice(i * zoomLevel * fftSize * 4, (i * zoomLevel + 1) * fftSize * 4),
-        i * fftSize * 4 // item offset for this data to be inserted
-      );
+    let zoomedFftData = new Float32Array(num_final_ffts * fftSize);
+    if (zoomLevel >= 2 && zoomLevel <= 100) {
+      // max pooling
+      for (let i = 0; i < num_final_ffts; i++) {
+        const start = i * zoomLevel * fftSize;
+        const end = (i * zoomLevel + zoomLevel) * fftSize;
+  
+        const pooledFftData = maxPool(trimmedFftData.slice(start, end), fftSize, zoomLevel, fftSize);
+  
+        zoomedFftData.set(pooledFftData, i * fftSize);
+      }
+    } else {
+      for (let i = 0; i < num_final_ffts; i++) {
+        zoomedFftData.set(
+          trimmedFftData.slice(i * zoomLevel * fftSize, (i * zoomLevel + 1) * fftSize),
+          i * fftSize // item offset for this data to be inserted
+        );
+      }
     }
+  
+
     trimmedFftData = zoomedFftData;
   }
 
+  const rgbData = fftToRGB(trimmedFftData, fftSize, magnitudeMin, magnitudeMax, colMap);
+  
   // Render Image
-  const imageData = new ImageData(trimmedFftData, fftSize, num_final_ffts);
+  const imageData = new ImageData(rgbData, fftSize, num_final_ffts);
 
   let selectFftReturn = {
     imageData: imageData,

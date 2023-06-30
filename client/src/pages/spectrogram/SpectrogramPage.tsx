@@ -72,7 +72,7 @@ export const SpectrogramPage = () => {
   const [missingTiles, setMissingTiles] = useState([]);
   const metaQuery = getMeta(type, account, container, filePath);
   const tiles = range(Math.floor(lowerTile), Math.ceil(upperTile));
-  const [fftData, setFFTData] = useState<Record<number, Uint8ClampedArray>>({});
+  const [fftData, setFFTData] = useState<Record<number, Float32Array>>({});
   const [meta, setMeta] = useState<SigMFMetadata>(metaQuery.data);
   const [taps, setTaps] = useState<number[]>([1]);
   const [pythonSnippet, setPythonSnippet] = useState(INITIAL_PYTHON_SNIPPET);
