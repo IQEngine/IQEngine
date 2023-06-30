@@ -4,7 +4,6 @@ import dotenv from 'dotenv';
 import dotenvExpand from 'dotenv-expand';
 
 test.beforeAll(async ({ request }) => {
-  console.log('adding database record for api test');
   const dataSource = {
     type: 'api',
     name: 'Test API DataSource',
@@ -14,7 +13,6 @@ test.beforeAll(async ({ request }) => {
     imageURL: 'https://i.etsystatic.com/20456772/r/il/a94e13/3604976065/il_1588xN.3604976065_dzyi.jpg',
   };
   const response = await request.post('/api/datasources', { data: dataSource });
-  console.log('response from adding record:\n', response);
 });
 
 test('API Datasource Browsing', async ({ page }) => {
@@ -25,7 +23,6 @@ test('API Datasource Browsing', async ({ page }) => {
 });
 
 test.afterAll(async ({}) => {
-  console.log('cleaning up the database');
   var conn = dotenv.config();
   dotenvExpand.expand(conn);
 
@@ -36,5 +33,4 @@ test.afterAll(async ({}) => {
   const db: Db = client.db('IQEngine');
   const collection = db.collection('datasources');
   collection.deleteOne({ type: 'api', name: 'Test API DataSource' });
-  console.log('database is cleaned up');
 });
