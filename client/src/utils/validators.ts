@@ -1,5 +1,5 @@
 import Ajv from 'ajv';
-import sigmfSchema from '@/utils/sigmf-schema.json';
+import sigmfSchema from '@/data/sigmf-schema.json';
 
 interface MetadataValidator {
   metadata: string;
