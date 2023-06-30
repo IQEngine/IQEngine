@@ -140,8 +140,10 @@ def query_meta(
     geolocation: Optional[str] = Query(None),
     label: Optional[str] = Query(None),
     comment: Optional[str] = Query(None),
+    description: Optional[str] = Query(None),
     min_datetime: Optional[datetime] = Query(None),
     max_datetime: Optional[datetime] = Query(None),
+    text: Optional[str] = Query(None),
     metadataSet: Collection[Metadata] = Depends(database.database.metadata_collection),
 ):
 
@@ -162,10 +164,16 @@ def query_meta(
         query_condition.update({"global.antenna:type": antenna_type})
     if geolocation is not None:
         query_condition.update({"global.core:geolocation": geolocation})
+    if description is not None:
+        query_condition.update({"global.core:description": {"$regex": description, "$options": "i"}})
     if label is not None:
         query_condition.update({"annotations.core:label": {"$regex": label, "$options": "i"}})
     if comment is not None:
         query_condition.update({"annotations.core:description": {"$regex": comment, "$options": "i"}})
+    if text is not None:
+        query_condition.update({"global.core:description": {"$regex": text, "$options": "i"}})
+        query_condition.update({"annotations.core:label": {"$regex": text, "$options": "i"}})
+        query_condition.update({"annotations.core:description": {"$regex": text, "$options": "i"}})
     if min_datetime is not None:
         query_condition.update({"captures.core:datetime": {"$gte": min_datetime}})
     if max_datetime is not None:
