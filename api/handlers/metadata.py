@@ -135,9 +135,6 @@ def query_meta(
     min_frequency: Optional[float] = Query(None),
     max_frequency: Optional[float] = Query(None),
     author: Optional[str] = Query(None),
-    antenna_gain: Optional[float] = Query(None),
-    antenna_type: Optional[str] = Query(None),
-    geolocation: Optional[str] = Query(None),
     label: Optional[str] = Query(None),
     comment: Optional[str] = Query(None),
     description: Optional[str] = Query(None),
@@ -158,12 +155,6 @@ def query_meta(
         query_condition.update({"captures.core:frequency": {"$lte": max_frequency}})
     if author is not None:
         query_condition.update({"global.core:author": {"$regex": author, "$options": "i"}})
-    if antenna_gain is not None:
-        query_condition.update({"global.antenna:gain": antenna_gain})
-    if antenna_type is not None:
-        query_condition.update({"global.antenna:type": antenna_type})
-    if geolocation is not None:
-        query_condition.update({"global.core:geolocation": geolocation})
     if description is not None:
         query_condition.update({"global.core:description": {"$regex": description, "$options": "i"}})
     if label is not None:
