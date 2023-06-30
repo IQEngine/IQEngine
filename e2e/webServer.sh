@@ -21,5 +21,5 @@ fi
 # runs from e2e folder because that's where the playwright
 # config files are
 cd .. || exit
-docker compose -f docker-compose-e2e.yml up
+docker compose -f docker-compose-e2e.yml up --build
 cd e2e || exit
