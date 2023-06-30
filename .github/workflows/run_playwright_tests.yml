@@ -33,9 +33,7 @@ jobs:
           IQENGINE_FEATURE_FLAGS = '{"useAPIDatasources": true}'
 
       - name: Docker up
-        run: |
-          docker compose -f docker-compose-e2e.yml up &
-          docker compose -f docker-compose-e2e.yml exec iqengine printenv
+        run: docker compose -f docker-compose-e2e.yml up &
         env:
           MONGO_USERNAME: mongoadmin
           MONGO_PASSWORD: secret
@@ -50,7 +48,9 @@ jobs:
 
       - name: Install Playwright Browsers
         working-directory: e2e
-        run: npx playwright install --with-deps
+        run: |
+          docker compose -f docker-compose-e2e.yml exec iqengine printenv
+          npx playwright install --with-deps
 
       - name: Run Playwright tests
         working-directory: e2e
