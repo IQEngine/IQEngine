@@ -33,7 +33,9 @@ jobs:
           IQENGINE_FEATURE_FLAGS = '{"useAPIDatasources": true}'
 
       - name: Docker up
-        run: docker compose -f docker-compose-e2e.yml up &
+        run: |
+          docker compose -f docker-compose-e2e.yml up &
+          docker exec -it iqengine printenv
         env:
           MONGO_USERNAME: mongoadmin
           MONGO_PASSWORD: secret
