@@ -5,8 +5,7 @@
 import React from 'react';
 import SettingsPane from './SettingsPane';
 import { PluginsPane } from './components/PluginsPane';
-import InfoPane from './InfoPane';
-import { SigMFMetadata } from '@/Utils/sigmfMetadata';
+import { SigMFMetadata } from '@/utils/sigmfMetadata';
 
 export interface SidebarProps {
   updateMagnitudeMax: (magnitudeMax: number) => void;

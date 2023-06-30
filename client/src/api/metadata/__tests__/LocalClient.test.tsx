@@ -1,7 +1,7 @@
 import { test, describe } from 'vitest';
 import { LocalClient } from '@/api/metadata/LocalClient';
-import store from '@/Store/store';
-import { setLocalClient } from '@/Store/Reducers/LocalClientReducer';
+import store from '@/store/store';
+import { setLocalClient } from '@/store/reducers/LocalClientReducer';
 import { FileWithDirectoryAndFileHandle } from 'browser-fs-access';
 const account = 'local';
 const container = 'local';

@@ -23,21 +23,27 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
 
+  /* Start the API Server */
+  webServer: [
+    {
+      command: './webServer.sh',
+      url: 'http://127.0.0.1:3000',
+      reuseExistingServer: true,
+      timeout: 200 * 1000,
+    },
+  ],
+
+
   /* Configure projects for major browsers */
   projects: [
     {
+      name: 'setup',
+      testMatch: /global.setup\.ts/,
+    },
+    {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
-    },
-
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
-
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
+      dependencies: ['setup'],
     },
   ],
 });

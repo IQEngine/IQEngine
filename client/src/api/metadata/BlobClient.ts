@@ -1,4 +1,4 @@
-import { Annotation, CaptureSegment, SigMFMetadata } from '@/Utils/sigmfMetadata';
+import { Annotation, CaptureSegment, SigMFMetadata } from '@/utils/sigmfMetadata';
 import { BlobServiceClient, ContainerClient } from '@azure/storage-blob';
 import { MetadataClient } from './MetadataClient';
 import { getContainerClient } from '@/api/utils/AzureBlob';

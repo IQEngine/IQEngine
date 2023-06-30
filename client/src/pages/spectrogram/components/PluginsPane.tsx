@@ -3,15 +3,15 @@
 // Licensed under the MIT License
 
 import React, { useState } from 'react';
-import { Annotation, SigMFMetadata } from '@/Utils/sigmfMetadata';
+import { Annotation, SigMFMetadata } from '@/utils/sigmfMetadata';
 import { TimePlot } from './TimePlot';
 import { FrequencyPlot } from './FrequencyPlot';
 import { IQPlot } from './IQPlot';
 import { Layer, Image, Stage } from 'react-konva';
-import { convertFloat32ArrayToBase64, convertBase64ToFloat32Array } from '@/Utils/rfFunctions';
-import { colMaps } from '@/Utils/colormap';
+import { convertFloat32ArrayToBase64, convertBase64ToFloat32Array } from '@/utils/rfFunctions';
+import { colMaps } from '@/utils/colormap';
 import { fftshift } from 'fftshift';
-import { FFT } from '@/Utils/fft';
+import { FFT } from '@/utils/fft';
 import { useGetPluginsComponents } from '../hooks/useGetPluginsComponents';
 import { useGetPlugins } from '@/api/plugin/Queries';
 import { toast } from 'react-hot-toast';

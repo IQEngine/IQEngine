@@ -1,7 +1,7 @@
-import { SigMFMetadata } from '@/Utils/sigmfMetadata';
+import { SigMFMetadata } from '@/utils/sigmfMetadata';
 import { DataSourceClient } from './DataSourceClient';
 import { DataSource } from '@/api/Models';
-import store from '@/Store/store';
+import store from '@/store/store';
 import { getDataSourceFromConnection } from '@/api/utils/AzureBlob';
 
 export class BlobClient implements DataSourceClient {

@@ -4,13 +4,13 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, Outlet } from 'react-router-dom';
 import ReactGA from 'react-ga4';
-import ThemeSelector from './Components/Styles/ThemeSelector';
-import { configQuery } from './api/config/queries';
+import ThemeSelector from '@/features/ui/styles/ThemeSelector';
+import { configQuery } from '@/api/config/queries';
 import { Link } from 'react-router-dom';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'react-hot-toast';
-import Feature from '@/Components/Feature/Feature';
-import { Logo } from '@/Components/Logo/Logo';
+import Feature from '@/features/feature/Feature';
+import { Logo } from '@/features/ui/logo/Logo';
 import { FeatureFlag, useFeatureFlags } from '@/hooks/useFeatureFlags';
 
 export const App = () => {
