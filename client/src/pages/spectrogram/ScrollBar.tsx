@@ -5,9 +5,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Layer, Rect, Image } from 'react-konva';
 import { fftshift } from 'fftshift';
-import { MINIMUM_SCROLL_HANDLE_HEIGHT_PIXELS, TILE_SIZE_IN_IQ_SAMPLES, MINIMAP_FFT_SIZE } from '@/Utils/constants';
-import { FFT } from '@/Utils/fft';
-import { SigMFMetadata } from '@/Utils/sigmfMetadata';
+import { MINIMUM_SCROLL_HANDLE_HEIGHT_PIXELS, TILE_SIZE_IN_IQ_SAMPLES, MINIMAP_FFT_SIZE } from '@/utils/constants';
+import { FFT } from '@/utils/fft';
+import { SigMFMetadata } from '@/utils/sigmfMetadata';
 import { getIQDataFullIndexes } from '@/api/iqdata/Queries';
 import { IQDataSlice } from '@/api/Models';
 

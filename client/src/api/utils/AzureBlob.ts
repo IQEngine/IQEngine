@@ -1,7 +1,7 @@
 import { BlobClient, BlobServiceClient, ContainerClient } from '@azure/storage-blob';
 import { DataSource } from '@/api/Models';
 
-import store from '@/Store/store';
+import store from '@/store/store';
 
 export function getDataSourceFromConnection(account: string, container: string): DataSource {
   const connection = store.getState().connection;

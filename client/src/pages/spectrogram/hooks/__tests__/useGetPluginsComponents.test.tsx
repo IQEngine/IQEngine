@@ -1,5 +1,5 @@
 import { useAllProviders } from '@/mocks/setupTests';
-import { render, renderHook, screen } from '@testing-library/react';
+import { render, renderHook } from '@testing-library/react';
 import nock from 'nock';
 import { useGetPluginsComponents } from '../useGetPluginsComponents';
 import React from 'react';

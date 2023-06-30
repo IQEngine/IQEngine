@@ -1,7 +1,7 @@
 import { test, describe } from 'vitest';
 import nock from 'nock';
 import { ApiClient } from '@/api/metadata/ApiClient';
-import { SigMFMetadata, Annotation, CaptureSegment } from '@/Utils/sigmfMetadata';
+import { SigMFMetadata, Annotation, CaptureSegment } from '@/utils/sigmfMetadata';
 
 const account = 'gnuradio';
 const container = 'iqengine';
