@@ -78,7 +78,7 @@ export const SpectrogramPage = () => {
   const [pythonSnippet, setPythonSnippet] = useState(INITIAL_PYTHON_SNIPPET);
   const [fetchMinimap, setFetchMinimap] = useState(false);
   const [iqData, setIQData] = useState<Record<number, Float32Array>>({});
-  const [iqRaw, setIQRaw] = useState<Record<number, Float32Array>>({});
+  const [iqRaw, setIQRaw] = useStateWithCallbackLazy<Record<number, Float32Array>>({});
   const [fftImage, setFFTImage] = useState<SelectFftReturn>(null);
   const { downloadedTiles } = useCurrentCachedIQDataSlice(meta, TILE_SIZE_IN_IQ_SAMPLES);
   const iqQuery = getIQDataSlices(metaQuery.data, tiles, TILE_SIZE_IN_IQ_SAMPLES, !!metaQuery.data && tiles.length > 0);
@@ -112,20 +112,12 @@ export const SpectrogramPage = () => {
   }, [iqQuery.reduce((previous, current) => previous + current.dataUpdatedAt, '')]);
 
   useEffect(() => {
-    (async () => {
-      let data = Object.keys(iqRaw).reduce((acc, index) => {
-        let iqArray = iqRaw[index];
-        if (!iqArray) {
-          return acc;
-        }
-        let iqArrayTransformed = applyProcessing(iqArray, taps, pythonSnippet, pyodide);
-        acc[index] = iqArrayTransformed;
-        return acc;
-      }, {});
-      setFFTData({});
-      setIQData(data);
-    })();
-  }, [pythonSnippet, taps, pyodide]);
+    // clear IQ data or else it will take ages to calc the new IQ if the user has already jumped around a lot
+    setIQRaw({});
+    setIQData({});
+    setFFTData({});
+    fetchAndRender(handleTop);
+  }, [pythonSnippet, taps]);
 
   useEffect(() => {
     console.debug('IQ Raw Changed');
