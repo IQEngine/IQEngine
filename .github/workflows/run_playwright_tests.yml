@@ -38,6 +38,12 @@ jobs:
           MONGO_USERNAME: mongoadmin
           MONGO_PASSWORD: secret
 
+      - name: Display environment
+        run: docker compose -f docker-compose-e2e.yml exec iqengine printenv
+        env:
+          MONGO_USERNAME: mongoadmin
+          MONGO_PASSWORD: secret
+
       - name: Check build has succeeded
         uses: cygnetdigital/wait_for_response@v2.0.0
         with:
@@ -48,9 +54,7 @@ jobs:
 
       - name: Install Playwright Browsers
         working-directory: e2e
-        run: |
-          docker compose -f docker-compose-e2e.yml exec iqengine printenv
-          npx playwright install --with-deps
+        run: npx playwright install --with-deps
 
       - name: Run Playwright tests
         working-directory: e2e
