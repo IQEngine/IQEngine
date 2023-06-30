@@ -1,4 +1,4 @@
-import { SigMFMetadata } from '@/Utils/sigmfMetadata';
+import { SigMFMetadata } from '@/utils/sigmfMetadata';
 
 export interface MetadataClient {
   getMeta(account: string, container: string, filePath: string): Promise<SigMFMetadata>;

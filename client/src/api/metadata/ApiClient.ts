@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { MetadataClient } from './MetadataClient';
-import { SigMFMetadata, Annotation, CaptureSegment } from '@/Utils/sigmfMetadata';
+import { SigMFMetadata, Annotation, CaptureSegment } from '@/utils/sigmfMetadata';
 
 export class ApiClient implements MetadataClient {
   async getMeta(account: string, container: string, filePath: string): Promise<SigMFMetadata> {

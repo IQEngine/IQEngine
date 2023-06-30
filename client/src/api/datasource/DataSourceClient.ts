@@ -1,4 +1,4 @@
-import { SigMFMetadata } from '@/Utils/sigmfMetadata';
+import { SigMFMetadata } from '@/utils/sigmfMetadata';
 import { DataSource } from '@/api/Models';
 
 export interface DataSourceClient {

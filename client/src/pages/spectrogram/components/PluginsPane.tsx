@@ -3,19 +3,18 @@
 // Licensed under the MIT License
 
 import React, { useState } from 'react';
-import { Annotation, SigMFMetadata } from '@/Utils/sigmfMetadata';
+import { Annotation, SigMFMetadata } from '@/utils/sigmfMetadata';
 import { TimePlot } from './TimePlot';
 import { FrequencyPlot } from './FrequencyPlot';
 import { IQPlot } from './IQPlot';
 import { Layer, Image, Stage } from 'react-konva';
-import { convertFloat32ArrayToBase64, convertBase64ToFloat32Array } from '@/Utils/rfFunctions';
-import { colMaps } from '@/Utils/colormap';
+import { convertFloat32ArrayToBase64, convertBase64ToFloat32Array } from '@/utils/rfFunctions';
+import { colMaps } from '@/utils/colormap';
 import { fftshift } from 'fftshift';
-import { FFT } from '@/Utils/fft';
+import { FFT } from '@/utils/fft';
 import { useGetPluginsComponents } from '../hooks/useGetPluginsComponents';
 import { useGetPlugins } from '@/api/plugin/Queries';
 import { toast } from 'react-hot-toast';
-import { Buffer } from 'buffer';
 
 export interface PluginsPaneProps {
   cursorsEnabled: boolean;
@@ -105,9 +104,6 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
             // just show the first output for now, 99% of plugins will have 0 or 1 IQ output anyway
             const samples_base64 = data.data_output[0]['samples'];
             const samples = convertBase64ToFloat32Array(samples_base64);
-            //const sample_rate = data.data_output[0]['sample_rate']; // Hz
-            //const center_freq = data.data_output[0]['center_freq']; // Hz
-            //const data_type = data.data_output[0]['data_type']; // assumes iq/cf32_le
             setModalSamples(samples);
 
             // create spectrogram out of all samples
@@ -168,13 +164,15 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
           } else {
             // Data file
             const samples_base64 = data.data_output[0]['samples'];
-            const samples = Buffer.from(samples_base64, 'base64');
-
+            const samples = window.atob(samples_base64);
+            var blob_array = new Uint8Array(samples.length);
+            for (var i = 0; i < samples.length; i++) {
+              blob_array[i] = samples.charCodeAt(i);
+            }
             const a = document.createElement('a');
-            document.body.appendChild(a);
-            a.style = 'display: none';
-            const blob = new Blob([samples], { type: data.data_output[0]['data_type'] }),
-              url = window.URL.createObjectURL(blob);
+            const blob = new Blob([blob_array], { type: data.data_output[0]['data_type'] });
+            const url = window.URL.createObjectURL(blob);
+
             a.href = url;
 
             let filename = '';

@@ -8,23 +8,23 @@ import { TimePlot } from './components/TimePlot';
 import { FrequencyPlot } from './components/FrequencyPlot';
 import { IQPlot } from './components/IQPlot';
 import { Layer, Image, Stage } from 'react-konva';
-import { selectFft, calculateTileNumbers, range, SelectFftReturn } from '@/Utils/selector';
-import { AnnotationViewer } from '@/Components/Annotation/AnnotationViewer';
+import { selectFft, calculateTileNumbers, range, SelectFftReturn } from '@/utils/selector';
+import { AnnotationViewer } from '@/pages/spectrogram/components/annotation/AnnotationViewer';
 import { RulerTop } from './RulerTop';
 import { RulerSide } from './RulerSide';
-import { INITIAL_PYTHON_SNIPPET, TILE_SIZE_IN_IQ_SAMPLES, COLORMAP_DEFAULT, MINIMAP_FFT_SIZE } from '@/Utils/constants';
+import { INITIAL_PYTHON_SNIPPET, TILE_SIZE_IN_IQ_SAMPLES, COLORMAP_DEFAULT, MINIMAP_FFT_SIZE } from '@/utils/constants';
 import TimeSelector from './TimeSelector';
-import AnnotationList from '@/Components/Annotation/AnnotationList';
-import { GlobalProperties } from '@/Components/GlobalProperties/GlobalProperties';
-import { MetaViewer } from '@/Components/Metadata/MetaViewer';
-import { MetaRaw } from '@/Components/Metadata/MetaRaw';
+import AnnotationList from '@/pages/spectrogram/components/annotation/AnnotationList';
+import { GlobalProperties } from '@/pages/spectrogram/components/global-properties/GlobalProperties';
+import { MetaViewer } from '@/pages/spectrogram/components/Metadata/MetaViewer';
+import { MetaRaw } from '@/pages/spectrogram/components/Metadata/MetaRaw';
 import { useParams } from 'react-router-dom';
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { getMeta } from '@/api/metadata/Queries';
-import { SigMFMetadata } from '@/Utils/sigmfMetadata';
+import { SigMFMetadata } from '@/utils/sigmfMetadata';
 import { getIQDataSlices, useCurrentCachedIQDataSlice } from '@/api/iqdata/Queries';
-import { applyProcessing } from '@/Sources/FetchMoreDataSource';
-import { colMaps } from '@/Utils/colormap';
+import { applyProcessing } from '@/utils/FetchMoreDataSource';
+import { colMaps } from '@/utils/colormap';
 
 declare global {
   interface Window {

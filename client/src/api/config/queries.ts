@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
-import store from '@/Store/store';
+import store from '@/store/store';
 import { CLIENT_TYPE_BLOB, DataSource } from '@/api/Models';
-import { upsertDataSource } from '@/Store/Reducers/ConnectionReducer';
+import { upsertDataSource } from '@/store/reducers/ConnectionReducer';
 import { FeatureFlag } from '@/hooks/useFeatureFlags';
 
 const fetchConfig = async () => {

@@ -1,9 +1,9 @@
-import { SigMFMetadata, TraceabilityOrigin } from '@/Utils/sigmfMetadata';
-import store from '@/Store/store';
+import { SigMFMetadata, TraceabilityOrigin } from '@/utils/sigmfMetadata';
+import store from '@/store/store';
 import { FileWithDirectoryAndFileHandle } from 'browser-fs-access';
 import { IQDataClient } from './IQDataClient';
 import { IQDataSlice } from '@/api/Models';
-import { convertToFloat32 } from '@/Sources/FetchMoreDataSource';
+import { convertToFloat32 } from '@/utils/FetchMoreDataSource';
 
 export class LocalClient implements IQDataClient {
   getIQDataSlices(meta: SigMFMetadata, indexes: number[], tileSize: number): Promise<IQDataSlice[]> {
