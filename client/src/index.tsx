@@ -5,10 +5,10 @@
 import React from 'react';
 import 'swagger-ui-react/swagger-ui.css';
 // @ts-ignore
-import reportWebVitals from './reportWebVitals';
+import reportWebVitals from '@/utils/reportWebVitals';
 import { RouterProvider } from 'react-router-dom';
 import { Provider } from 'react-redux';
-import store from '@/Store/store';
+import store from '@/store/store';
 import { createRoot } from 'react-dom/client';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { FeatureFlagsProvider } from '@/hooks/useFeatureFlags';

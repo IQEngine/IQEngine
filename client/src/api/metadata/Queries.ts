@@ -1,4 +1,4 @@
-import { SigMFMetadata } from '@/Utils/sigmfMetadata';
+import { SigMFMetadata } from '@/utils/sigmfMetadata';
 import { MetadataClientFactory } from './MetadataClientFactory';
 import { QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 

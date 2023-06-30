@@ -2,12 +2,12 @@ import { App } from '@/App';
 import { About } from '@/pages/About';
 import { SigMF } from '@/pages/SigMF';
 import { Plugins } from '@/pages/Plugins';
-import SignalGenerator from '@/pages/signalGenerator/SignalGenerator';
-import Validator from '@/Components/Validator/Validator';
+import SignalGenerator from '@/pages/signal-generator/SignalGenerator';
+import Validator from '@/pages/validator/Validator';
 import { createBrowserRouter } from 'react-router-dom';
 import React from 'react';
-import RepoBrowser from '@/Components/RepoBrowser/RepoBrowser';
-import RecordingsBrowser from '@/Components/RecordingsBrowser/RecordingsBrowser';
+import RepoBrowser from '@/pages/repo-browser/RepoBrowser';
+import RecordingsBrowser from '@/pages/recordings-browser/RecordingsBrowser';
 import SpectrogramPage from '@/pages/spectrogram/SpectrogramPage';
 import SwaggerUI from 'swagger-ui-react';
 
