@@ -12,6 +12,10 @@ import { SigMFMetadata } from '@/Utils/sigmfMetadata';
 import { TILE_SIZE_IN_IQ_SAMPLES, COLORMAP_DEFAULT } from '@/Utils/constants';
 import { colMaps } from '@/Utils/colormap';
 
+const zoomLevels = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ];
+// Replace above with this when we've done the mods to fetching tiles
+// const zoomLevels = [ 1, 2, 5, 10, 20, 50, 100, 1000, 10000, 100000 ];
+
 export class SettingsPaneProps {
   meta: SigMFMetadata;
   magnitudeMax: number;
@@ -109,7 +113,7 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
 
   const onChangeZoomLevel = (e) => {
     setState({ ...state, zoomLevel: e.target.value });
-    props.updateZoomLevel(e.target.value);
+    props.updateZoomLevel(zoomLevels[e.target.value]);
   };
 
   const onToggleCursors = (e) => {
@@ -154,7 +158,7 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
           className="range range-xs range-primary"
           value={state.zoomLevel}
           min={1}
-          max={10}
+          max={zoomLevels.length}
           step={1}
           onChange={onChangeZoomLevel}
         />
