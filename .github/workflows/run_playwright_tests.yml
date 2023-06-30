@@ -35,7 +35,7 @@ jobs:
       - name: Docker up
         run: |
           docker compose -f docker-compose-e2e.yml up &
-          docker exec -it iqengine printenv
+          docker compose -f docker-compose-e2e.yml exec iqengine printenv
         env:
           MONGO_USERNAME: mongoadmin
           MONGO_PASSWORD: secret
