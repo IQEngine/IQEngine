@@ -16,25 +16,6 @@ import { TILE_SIZE_IN_IQ_SAMPLES } from './constants';
 import { FFT } from '@/utils/fft';
 import { SigMFMetadata } from './sigmfMetadata';
 
-function maxPool(input, poolSizeY, strideY, width) {
-  const output = [];
-  const inputLength = input.length;
-
-  for (let i = 0; i < inputLength; i++) {
-    if (i % width < width - poolSizeY + 1) {
-      const poolWindow = [];
-      for (let j = 0; j < poolSizeY; j++) {
-        const index = i + j * width;
-        poolWindow.push(input[index]);
-      }
-      const maxVal = Math.max(...poolWindow);
-      output.push(maxVal);
-    }
-  }
-
-  return output;
-}
-
 export function calcFftOfTile(samples: Float32Array, fftSize: number, windowFunction: string) {
   //let startTime = performance.now();
   let fftsConcatenated = new Float32Array(TILE_SIZE_IN_IQ_SAMPLES);
@@ -165,9 +146,7 @@ export const selectFft = (
 
     //const fftsConcatenated = calcFftOfTile(samples, fftSize, windowFunction);
 
-     fftData[tile] = calcFftOfTile(samples, fftSize, windowFunction);
-
-   
+    fftData[tile] = calcFftOfTile(samples, fftSize, windowFunction);
   }
 
   // Concatenate the full tiles
@@ -179,7 +158,7 @@ export const selectFft = (
     } else {
       // If the tile isnt available, fill with 0's (white and opaque)
       missingTiles.push(tile);
-      totalFftData.fill(0, index * TILE_SIZE_IN_IQ_SAMPLES, (index + 1) * TILE_SIZE_IN_IQ_SAMPLES);
+      totalFftData.fill(-Infinity, index * TILE_SIZE_IN_IQ_SAMPLES, (index + 1) * TILE_SIZE_IN_IQ_SAMPLES);
     }
   }
 
@@ -192,19 +171,20 @@ export const selectFft = (
   let num_final_ffts = trimmedFftData.length / fftSize;
 
   // zoomLevel portion (decimate by N)
+  performance.mark('zoom start');
   if (zoomLevel !== 1) {
     num_final_ffts = Math.floor(num_final_ffts / zoomLevel);
     console.debug(num_final_ffts);
     let zoomedFftData = new Float32Array(num_final_ffts * fftSize);
-    if (zoomLevel >= 2 && zoomLevel <= 100) {
+    if (zoomLevel >= 2 && zoomLevel <= 10) {
       // max pooling
       for (let i = 0; i < num_final_ffts; i++) {
-        const start = i * zoomLevel * fftSize;
-        const end = (i * zoomLevel + zoomLevel) * fftSize;
-  
-        const pooledFftData = maxPool(trimmedFftData.slice(start, end), fftSize, zoomLevel, fftSize);
-  
-        zoomedFftData.set(pooledFftData, i * fftSize);
+        for (let j = 0; j < fftSize; j++) {
+          zoomedFftData[i * fftSize + j] = Math.max(
+            trimmedFftData[i * zoomLevel * fftSize + j],
+            trimmedFftData[(i * zoomLevel + 1) * fftSize + j]
+          );
+        }
       }
     } else {
       for (let i = 0; i < num_final_ffts; i++) {
@@ -214,13 +194,17 @@ export const selectFft = (
         );
       }
     }
-  
 
     trimmedFftData = zoomedFftData;
   }
+  performance.mark('zoom end');
+  console.debug(performance.measure('zoom', 'zoom start', 'zoom end'));
 
+  performance.mark('rgb start');
   const rgbData = fftToRGB(trimmedFftData, fftSize, magnitudeMin, magnitudeMax, colMap);
-  
+  performance.mark('rgb end');
+  console.debug(performance.measure('rgb', 'rgb start', 'rgb end'));
+
   // Render Image
   const imageData = new ImageData(rgbData, fftSize, num_final_ffts);
 
