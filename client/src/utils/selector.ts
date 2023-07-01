@@ -176,17 +176,20 @@ export const selectFft = (
     num_final_ffts = Math.floor(num_final_ffts / zoomLevel);
     console.debug(num_final_ffts);
     let zoomedFftData = new Float32Array(num_final_ffts * fftSize);
+    zoomedFftData.fill(-Infinity);
     if (zoomLevel >= 2 && zoomLevel <= 10) {
       // max pooling
       for (let i = 0; i < num_final_ffts; i++) {
         for (let j = 0; j < fftSize; j++) {
-          zoomedFftData[i * fftSize + j] = Math.max(
-            trimmedFftData[i * zoomLevel * fftSize + j],
-            trimmedFftData[(i * zoomLevel + 1) * fftSize + j]
-          );
+          for (let k = 0; k < zoomLevel; k++) {
+            if (trimmedFftData[(i * zoomLevel + k) * fftSize + j] > zoomedFftData[i * fftSize + j]) {
+              zoomedFftData[i * fftSize + j] = trimmedFftData[(i * zoomLevel + k) * fftSize + j];
+            }
+          }
         }
       }
     } else {
+      // skip
       for (let i = 0; i < num_final_ffts; i++) {
         zoomedFftData.set(
           trimmedFftData.slice(i * zoomLevel * fftSize, (i * zoomLevel + 1) * fftSize),
