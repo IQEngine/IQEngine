@@ -83,9 +83,20 @@ export function fftToRGB(
 ) {
   let startOfs = 0;
   let newFftData = new Uint8ClampedArray(fftsConcatenated.length * 4); // 4 because RGBA
+
+  if (fftsConcatenated[0] === Number.NEGATIVE_INFINITY) {
+    newFftData.fill(255);
+    return newFftData;
+  }
+
   // loop through each row
   for (let i = 0; i < fftsConcatenated.length / fftSize; i++) {
     let magnitudes = fftsConcatenated.slice(i * fftSize, (i + 1) * fftSize);
+
+    if (magnitudes[0] === Number.NEGATIVE_INFINITY) {
+      newFftData.fill(255, i * fftSize * 4, (i + 1) * fftSize * 4);
+      continue;
+    }
 
     // apply magnitude min and max (which are in dB, same units as magnitudes prior to this point) and convert to 0-255
     const dbPer1 = 255 / (magnitude_max - magnitude_min);
@@ -143,8 +154,6 @@ export const selectFft = (
       continue;
     }
     let samples = iqData[tile.toString()];
-
-    //const fftsConcatenated = calcFftOfTile(samples, fftSize, windowFunction);
 
     fftData[tile] = calcFftOfTile(samples, fftSize, windowFunction);
   }
