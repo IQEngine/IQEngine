@@ -89,7 +89,7 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
             sample_rate: sampleRate,
             center_freq: freq,
             data_type: MimeTypes[meta.getDataType()],
-            byte_offset: startSampleOffset * calculateMultiplier,
+            byte_offset: startSampleOffset * calculateMultiplier * 2,
             byte_length: trimmedSamples.length * calculateMultiplier,
           },
         ],

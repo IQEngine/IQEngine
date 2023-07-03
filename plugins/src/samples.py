@@ -5,7 +5,7 @@ import io
 import numpy as np
 from models.plugins import Plugin, SamplesB64, SamplesCloud
 from azure.storage.blob import BlobClient
-
+ 
 data_mapping = {
     'iq/ci8_le' : np.int8,
     'iq/ci16_le' : np.int16,
@@ -41,11 +41,16 @@ async def get_from_samples_cloud(samples_cloud: SamplesCloud):
         download_stream = await asyncio.to_thread(
             blob_client.download_blob
         )
-            
-    return np.frombuffer(io.BytesIO(download_stream.readall()).read(), dtype=data_mapping[samples_cloud.data_type])
+
+    buffer = np.frombuffer(io.BytesIO(download_stream.readall()).read(), dtype=data_mapping[samples_cloud.data_type])
+    buffer = buffer.astype(np.float32) / np.iinfo('int16').max
+    return buffer.view(dtype=np.complex64)
 
 def validate_samples(samples_b64: SamplesB64, samples_cloud: SamplesCloud):
     if samples_b64 and samples_cloud:
         raise ValueError("Only one of samples_b64 or samples_cloud can be specified")
     if not samples_b64 and not samples_cloud:
         raise ValueError("One of samples_b64 or samples_cloud must be specified")
+
+def convert_to_complex_64(buffer: np.ndarray):
+  return buffer.view(dtype=np.complex64)
