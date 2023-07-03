@@ -43,8 +43,17 @@ async def get_from_samples_cloud(samples_cloud: SamplesCloud):
         )
 
     buffer = np.frombuffer(io.BytesIO(download_stream.readall()).read(), dtype=data_mapping[samples_cloud.data_type])
-    buffer = buffer.astype(np.float32) / np.iinfo('int16').max
+    buffer = get_float32_buffer(buffer)
     return buffer.view(dtype=np.complex64)
+
+def get_float32_buffer(buffer: any):
+    if buffer.dtype == np.float32:
+        return buffer
+    elif buffer.dtype == np.int16:
+        return buffer.astype(np.float32) / np.iinfo('int16').max
+    elif buffer.dtype == np.int8:
+        return buffer.astype(np.float32) / np.iinfo('int8').max
+    return
 
 def validate_samples(samples_b64: SamplesB64, samples_cloud: SamplesCloud):
     if samples_b64 and samples_cloud:

@@ -15,8 +15,10 @@ import { FFT } from '@/utils/fft';
 import { useGetPluginsComponents } from '../hooks/useGetPluginsComponents';
 import { useGetPlugins } from '@/api/plugin/Queries';
 import { toast } from 'react-hot-toast';
-import { configQuery } from '@/api/config/queries';
 import { dataTypeToBytesPerSample } from '@/utils/selector';
+import { useParams } from 'react-router-dom';
+import { useUserSettings } from '@/api/user-settings/use-user-settings';
+
 export interface PluginsPaneProps {
   cursorsEnabled: boolean;
   handleProcessTime: () => { trimmedSamples: number[]; startSampleOffset: number };
@@ -32,13 +34,14 @@ export enum MimeTypes {
 }
 
 export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }: PluginsPaneProps) => {
+  const { account, container, filename } = useParams();
   const { data: plugins, isError } = useGetPlugins();
   const { PluginOption, EditPluginParameters, pluginParameters, setPluginParameters } = useGetPluginsComponents();
   const [selectedPlugin, setSelectedPlugin] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [modalSamples, setModalSamples] = useState([]);
   const [modalSpectrogram, setmodalSpectrogram] = useState(null);
-  const config = configQuery();
+  const { dataSourcesQuery } = useUserSettings();
 
   const handleChangePlugin = (e) => {
     setSelectedPlugin(e.target.value);
@@ -75,17 +78,17 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
       custom_params: {},
     };
 
-    const connectionInfo = config?.data?.connectionInfo;
+    const connectionInfo = dataSourcesQuery?.data[`${account}/${container}`];
     const calculateMultiplier = dataTypeToBytesPerSample(MimeTypes[meta.getDataType()]);
     if (connectionInfo) {
       body = {
         samples_b64: [],
         samples_cloud: [
           {
-            account_name: connectionInfo.settings[0].accountName,
-            container_name: connectionInfo.settings[0].containerName,
+            account_name: connectionInfo.account,
+            container_name: connectionInfo.container,
             file_path: meta.getFileName(),
-            sas_token: connectionInfo.settings[0].sasToken,
+            sas_token: connectionInfo.sasToken,
             sample_rate: sampleRate,
             center_freq: freq,
             data_type: MimeTypes[meta.getDataType()],
