@@ -83,9 +83,20 @@ export function fftToRGB(
 ) {
   let startOfs = 0;
   let newFftData = new Uint8ClampedArray(fftsConcatenated.length * 4); // 4 because RGBA
+
+  if (fftsConcatenated[0] === Number.NEGATIVE_INFINITY) {
+    newFftData.fill(255);
+    return newFftData;
+  }
+
   // loop through each row
   for (let i = 0; i < fftsConcatenated.length / fftSize; i++) {
     let magnitudes = fftsConcatenated.slice(i * fftSize, (i + 1) * fftSize);
+
+    if (magnitudes[0] === Number.NEGATIVE_INFINITY) {
+      newFftData.fill(255, i * fftSize * 4, (i + 1) * fftSize * 4);
+      continue;
+    }
 
     // apply magnitude min and max (which are in dB, same units as magnitudes prior to this point) and convert to 0-255
     const dbPer1 = 255 / (magnitude_max - magnitude_min);
@@ -144,8 +155,6 @@ export const selectFft = (
     }
     let samples = iqData[tile.toString()];
 
-    //const fftsConcatenated = calcFftOfTile(samples, fftSize, windowFunction);
-
     fftData[tile] = calcFftOfTile(samples, fftSize, windowFunction);
   }
 
@@ -175,17 +184,20 @@ export const selectFft = (
     num_final_ffts = Math.floor(num_final_ffts / zoomLevel);
     console.debug(num_final_ffts);
     let zoomedFftData = new Float32Array(num_final_ffts * fftSize);
+    zoomedFftData.fill(-Infinity);
     if (zoomLevel >= 2 && zoomLevel <= 10) {
       // max pooling
       for (let i = 0; i < num_final_ffts; i++) {
         for (let j = 0; j < fftSize; j++) {
-          zoomedFftData[i * fftSize + j] = Math.max(
-            trimmedFftData[i * zoomLevel * fftSize + j],
-            trimmedFftData[(i * zoomLevel + 1) * fftSize + j]
-          );
+          for (let k = 0; k < zoomLevel; k++) {
+            if (trimmedFftData[(i * zoomLevel + k) * fftSize + j] > zoomedFftData[i * fftSize + j]) {
+              zoomedFftData[i * fftSize + j] = trimmedFftData[(i * zoomLevel + k) * fftSize + j];
+            }
+          }
         }
       }
     } else {
+      // skip
       for (let i = 0; i < num_final_ffts; i++) {
         zoomedFftData.set(
           trimmedFftData.slice(i * zoomLevel * fftSize, (i * zoomLevel + 1) * fftSize),

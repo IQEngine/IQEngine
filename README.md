@@ -1,10 +1,10 @@
-#
-
+![GitHub release](https://img.shields.io/github/v/release/IQEngine/IQEngine)
+[![Discord](https://img.shields.io/discord/1063315697498853498?label=Discord)](https://discord.gg/k7C8kp3b76)
 <p align="center">
   <img width=250 src="client/public/IQEngine_Black.svg" />
 </p>
 
-_<p align="center"><a href="https://www.iqengine.org">www.iqengine.org</a></p>_
+<p align="center">Try it out at <a href="https://www.iqengine.org">www.iqengine.org</a></p>
 
 <h4 style="text-align: center;"><i>A web-based SDR toolkit for analyzing, processing, and sharing RF recordings</i></h4>
 

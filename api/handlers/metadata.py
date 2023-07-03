@@ -1,10 +1,13 @@
 import database.database
 from database.models import DataSource, DataSourceReference, Metadata
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from pymongo.collection import Collection
 from .urlmapping import add_URL_sasToken, apiType
 from fastapi.responses import StreamingResponse
+from typing import Optional, Any, Dict, List
+from datetime import datetime
 import httpx
+
 
 router = APIRouter()
 
@@ -119,6 +122,70 @@ async def get_meta_thumbnail(
         raise HTTPException(status_code=404, detail="Image not found")
 
     return StreamingResponse(response.iter_bytes(), media_type=response.headers["Content-Type"])
+
+
+@router.get(
+    "/api/datasources/query",
+    status_code=200,
+    response_model=list[Metadata],
+)
+def query_meta(
+    account: Optional[List[str]] = Query([]),
+    container: Optional[List[str]] = Query([]),
+    min_frequency: Optional[float] = Query(None),
+    max_frequency: Optional[float] = Query(None),
+    author: Optional[str] = Query(None),
+    label: Optional[str] = Query(None),
+    comment: Optional[str] = Query(None),
+    description: Optional[str] = Query(None),
+    min_datetime: Optional[datetime] = Query(None),
+    max_datetime: Optional[datetime] = Query(None),
+    text: Optional[str] = Query(None),
+    metadataSet: Collection[Metadata] = Depends(database.database.metadata_collection),
+):
+
+    query_condition: Dict[str, Any] = {}
+    if account:
+        query_condition.update({
+            "$or": [
+                {"global.traceability:origin.account": {"$regex": a, "$options": "i"}}
+                for a in account
+            ]
+        })
+    if container:
+        query_condition.update({
+            "$or": [
+                {"global.traceability:origin.container": {"$regex": c, "$options": "i"}}
+                for c in container
+            ]
+        })
+    if min_frequency is not None:
+        query_condition.update({"captures.core:frequency": {"$gte": min_frequency}})
+    if max_frequency is not None:
+        query_condition.update({"captures.core:frequency": {"$lte": max_frequency}})
+    if author is not None:
+        query_condition.update({"global.core:author": {"$regex": author, "$options": "i"}})
+    if description is not None:
+        query_condition.update({"global.core:description": {"$regex": description, "$options": "i"}})
+    if label is not None:
+        query_condition.update({"annotations.core:label": {"$regex": label, "$options": "i"}})
+    if comment is not None:
+        query_condition.update({"annotations.core:description": {"$regex": comment, "$options": "i"}})
+    if text is not None:
+        query_condition.update({"global.core:description": {"$regex": text, "$options": "i"}})
+        query_condition.update({"annotations.core:label": {"$regex": text, "$options": "i"}})
+        query_condition.update({"annotations.core:description": {"$regex": text, "$options": "i"}})
+    if min_datetime is not None:
+        query_condition.update({"captures.core:datetime": {"$gte": min_datetime}})
+    if max_datetime is not None:
+        query_condition.update({"captures.core:datetime": {"$lte": max_datetime}})
+
+    metadata = metadataSet.find(query_condition)
+
+    result = []
+    for datum in metadata:
+        result.append(datum)
+    return result
 
 
 @router.post(
