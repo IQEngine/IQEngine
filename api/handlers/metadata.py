@@ -141,6 +141,9 @@ def query_meta(
     min_datetime: Optional[datetime] = Query(None),
     max_datetime: Optional[datetime] = Query(None),
     text: Optional[str] = Query(None),
+    geo_lat: Optional[float] = Query(None),
+    geo_long: Optional[float] = Query(None),
+    geo_radius: Optional[float] = Query(None),
     metadataSet: Collection[Metadata] = Depends(database.database.metadata_collection),
 ):
 
@@ -171,6 +174,19 @@ def query_meta(
         query_condition.update({"annotations.core:label": {"$regex": label, "$options": "i"}})
     if comment is not None:
         query_condition.update({"annotations.core:description": {"$regex": comment, "$options": "i"}})
+
+    if geo_lat is not None and geo_long is not None and geo_radius is not None:
+        query_condition.update({
+            "global.core:geolocation": {
+                "$near": {
+                    "$geometry": {
+                        "type": "Point",
+                        "coordinates": [geo_long, geo_lat]
+                    },
+                    "$maxDistance": geo_radius
+                }
+            }
+        })
 
     if text is not None:
         or_condition = [
