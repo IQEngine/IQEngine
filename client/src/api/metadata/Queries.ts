@@ -80,7 +80,6 @@ export const getMeta = (type: string, account: string, container: string, filePa
       { datasources: dataSourcesQuery.data, files: filesQuery.data },
     ],
     () => {
-      console.log(' DEPENDENCIES GET META', dataSourcesQuery.data, filesQuery.data);
       const metadataClient = MetadataClientFactory(type, filesQuery.data, dataSourcesQuery.data);
       return fetchMeta(metadataClient, type, account, container, filePath);
     },
@@ -106,14 +105,13 @@ export const useUpdateMeta = (meta: SigMFMetadata) => {
       return updateDataSourceMeta(metadataClient, account, container, filePath, newMeta);
     },
     onMutate: async () => {
-      console.log('onMutate');
       await client.cancelQueries(['datasource', type, account, container, filePath, 'meta']);
       const previousMeta = client.getQueryData(['datasource', type, account, container, filePath, 'meta']);
       client.setQueryData(['datasource', type, account, container, filePath, 'meta'], meta);
       return { previousMeta };
     },
     onError: (err, newMeta, context) => {
-      console.log('onError', err);
+      console.error('onError', err);
       client.setQueryData(['datasource', type, account, container, filePath, 'meta'], context.previousMeta);
     },
   });

@@ -35,7 +35,7 @@ export class ApiClient implements IQDataClient {
           bytes[i] = byteCharacters.charCodeAt(i);
         }
         const iqArray = convertToFloat32(bytes.buffer, meta.getDataType());
-        console.log(`getIQDataSlice ${file_path} ${item.index} took:`, performance.now() - startTime, 'ms');
+        console.debug(`getIQDataSlice ${file_path} ${item.index} took:`, performance.now() - startTime, 'ms');
         let index = item.index;
         return { index, iqArray };
       })

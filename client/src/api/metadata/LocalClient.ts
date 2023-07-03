@@ -76,7 +76,7 @@ export class LocalClient implements MetadataClient {
     let metadataFile: FileWithDirectoryAndFileHandle | undefined = localDirectory.find((file) => {
       return file.webkitRelativePath === filePath + '.sigmf-meta' || file.name === filePath + '.sigmf-meta';
     });
-    console.log('metadataFile', metadataFile);
+    console.debug('metadataFile', metadataFile);
     if (!metadataFile) {
       return Promise.reject('No file found');
     }

@@ -72,7 +72,6 @@ export class BlobClient implements MetadataClient {
   }
 
   async getDataSourceMeta(account: string, container: string): Promise<SigMFMetadata[]> {
-    console.log('getDataSourceMeta', account, container, this.dataSources);
     const containerClient = getContainerClient(this.dataSources, account, container);
     const blobNames: Array<string> = [];
     for await (const i of containerClient.listBlobsFlat()) blobNames.push(i.name);

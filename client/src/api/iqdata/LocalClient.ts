@@ -20,7 +20,6 @@ export class LocalClient implements IQDataClient {
       Promise.reject('No local directory found');
     }
     const filePath = meta.getOrigin().file_path;
-    console.log('getIQDataSlice', filePath, index);
     const dataFile = localDirectory.find((file) => {
       return file.webkitRelativePath === filePath + '.sigmf-data' || file.name === filePath + '.sigmf-data';
     });

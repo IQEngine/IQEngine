@@ -4,7 +4,6 @@ import { FileWithDirectoryAndFileHandle } from 'browser-fs-access';
 import { AppConfig, useConfigQuery } from '@/api/config/queries';
 import { useState } from 'react';
 
-
 async function getDataSources(config: AppConfig): Promise<Record<string, DataSource>> {
   return config.connectionInfo && config.connectionInfo.settings
     ? config.connectionInfo.settings.reduce((acc, item) => {
@@ -18,17 +17,16 @@ async function getDataSources(config: AppConfig): Promise<Record<string, DataSou
           description: item.description,
         } as DataSource;
         return acc;
-      }
-    , {} as Record<string, DataSource>)
+      }, {} as Record<string, DataSource>)
     : {};
-
 }
 
 export const useUserSettings = () => {
-
   const queryClient = useQueryClient();
 
-  const filesQuery = useQuery<FileWithDirectoryAndFileHandle[]>(['user-settings', 'local-files'], () =>  Promise.resolve([]));
+  const filesQuery = useQuery<FileWithDirectoryAndFileHandle[]>(['user-settings', 'local-files'], () =>
+    Promise.resolve([])
+  );
 
   const setFiles = (files: FileWithDirectoryAndFileHandle[]) => {
     queryClient.setQueryData(['user-settings', 'local-files'], files);
@@ -46,11 +44,14 @@ export const useUserSettings = () => {
     }
   };
 
-
   const { data: config } = useConfigQuery();
-  const dataSourcesQuery = useQuery<Record<string, DataSource>>(['user-settings', 'blob-data-sources'],() => getDataSources(config), {
-    enabled: !!config    
-  });
+  const dataSourcesQuery = useQuery<Record<string, DataSource>>(
+    ['user-settings', 'blob-data-sources'],
+    () => getDataSources(config),
+    {
+      enabled: !!config,
+    }
+  );
 
   return {
     filesQuery,
@@ -58,5 +59,4 @@ export const useUserSettings = () => {
     addDataSource,
     setFiles,
   };
-
 };

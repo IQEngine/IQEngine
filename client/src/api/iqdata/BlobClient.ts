@@ -12,7 +12,6 @@ export class BlobClient implements IQDataClient {
   }
 
   getIQDataSlices(meta: SigMFMetadata, indexes: number[], tileSize: number): Promise<IQDataSlice[]> {
-    console.log('getIQDataSlices', indexes, this.dataSources);
     return Promise.all(indexes.map((index) => this.getIQDataSlice(meta, index, tileSize)));
   }
 
@@ -31,7 +30,7 @@ export class BlobClient implements IQDataClient {
     const download = await blobClient.download(offsetBytes, countBytes);
     const blobBody = await (await download.blobBody).arrayBuffer();
     const iqArray = convertToFloat32(blobBody, meta.getDataType());
-    console.log(`getIQDataSlice ${file_path} ${index} took:`, performance.now() - startTime, 'ms');
+    console.debug(`getIQDataSlice ${file_path} ${index} took:`, performance.now() - startTime, 'ms');
     return { index, iqArray };
   }
 }

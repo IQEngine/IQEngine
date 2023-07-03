@@ -24,10 +24,10 @@ export function getContainerClient(
 ): ContainerClient {
   const dataSource = getDataSourceFromDatasources(dataSources, account, container);
   if (!dataSource || !dataSource.sasToken) {
-    console.log(`DATASOURECE NOT FOUND: ${account}/${container}`, dataSources);
+    console.debug(`DATASOURCE NOT FOUND: ${account}/${container}`, dataSources);
     throw new Error('No connection found');
   }
-  console.log(`DATASOURECE FOUND: ${dataSource.account}/${dataSource.container} ${dataSource.sasToken}`);
+  console.debug(`DATASOURCE FOUND: ${dataSource.account}/${dataSource.container} ${dataSource.sasToken}`);
   const blobServiceClient = new BlobServiceClient(
     `https://${dataSource.account}.blob.core.windows.net?${dataSource.sasToken}`
   );
