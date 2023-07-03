@@ -1,6 +1,6 @@
 # IQEngine Frontend
 
-This is the frontend for IQEngine. It is a React app that connectes to the backend API and and it is responsible for the UI and the user experience.
+This is the frontend for IQEngine. It is a React app that connects to the backend API and and it is responsible for the UI and the user experience.
 
 ## Running the frontend
 
