@@ -171,7 +171,6 @@ export const selectFft = (
   let num_final_ffts = trimmedFftData.length / fftSize;
 
   // zoomLevel portion (decimate by N)
-  performance.mark('zoom start');
   if (zoomLevel !== 1) {
     num_final_ffts = Math.floor(num_final_ffts / zoomLevel);
     console.debug(num_final_ffts);
@@ -197,13 +196,7 @@ export const selectFft = (
 
     trimmedFftData = zoomedFftData;
   }
-  performance.mark('zoom end');
-  console.debug(performance.measure('zoom', 'zoom start', 'zoom end'));
-
-  performance.mark('rgb start');
   const rgbData = fftToRGB(trimmedFftData, fftSize, magnitudeMin, magnitudeMax, colMap);
-  performance.mark('rgb end');
-  console.debug(performance.measure('rgb', 'rgb start', 'rgb end'));
 
   // Render Image
   const imageData = new ImageData(rgbData, fftSize, num_final_ffts);
