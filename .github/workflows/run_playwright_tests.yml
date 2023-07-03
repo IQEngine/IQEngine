@@ -30,14 +30,15 @@ jobs:
         env:
           MONGO_USERNAME: mongoadmin
           MONGO_PASSWORD: secret
-          IQENGINE_METADATA_DB_CONNECTION_STRING: mongodb://mongoadmin:secret@localhost:27017/admin
 
       - name: Docker up
         run: docker compose -f docker-compose-e2e.yml up &
         env:
+          IN_MEMORY_DB: '0'
+          IQENGINE_FEATURE_FLAGS: '{"useAPIDatasources": true}'
+          IQENGINE_CONNECTION_INFO: '{"settings": []}'
           MONGO_USERNAME: mongoadmin
           MONGO_PASSWORD: secret
-          IQENGINE_METADATA_DB_CONNECTION_STRING: mongodb://mongoadmin:secret@localhost:27017/admin
 
       - name: Check build has succeeded
         uses: cygnetdigital/wait_for_response@v2.0.0
@@ -53,7 +54,13 @@ jobs:
 
       - name: Run Playwright tests
         working-directory: e2e
-        run: npx playwright test --config playwright-pr.config.ts
+        run: |
+          npx playwright test --config playwright-pr.config.ts confirm_API_data_browse
+          npx playwright test --config playwright-pr.config.ts confirm_api_datasource
+          npx playwright test --config playwright-pr.config.ts confirm_siggen_card
+          npx playwright test --config playwright-pr.config.ts confirm_validator
+        env:
+          IQENGINE_METADATA_DB_CONNECTION_STRING: mongodb://mongoadmin:secret@localhost:27017/admin
 
       - name: Docker down
         run: docker compose -f docker-compose-e2e.yml down
