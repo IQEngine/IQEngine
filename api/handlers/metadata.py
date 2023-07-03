@@ -171,14 +171,21 @@ def query_meta(
         query_condition.update({"annotations.core:label": {"$regex": label, "$options": "i"}})
     if comment is not None:
         query_condition.update({"annotations.core:description": {"$regex": comment, "$options": "i"}})
+
     if text is not None:
-        query_condition.update({"global.core:description": {"$regex": text, "$options": "i"}})
-        query_condition.update({"annotations.core:label": {"$regex": text, "$options": "i"}})
-        query_condition.update({"annotations.core:description": {"$regex": text, "$options": "i"}})
+        or_condition = [
+            {"global.core:description": {"$regex": text, "$options": "i"}},
+            {"annotations.core:label": {"$regex": text, "$options": "i"}},
+            {"annotations.core:description": {"$regex": text, "$options": "i"}}
+        ]
+        query_condition.update({"$or": or_condition})
+    
     if min_datetime is not None:
-        query_condition.update({"captures.core:datetime": {"$gte": min_datetime}})
+        min_datetime_formatted = min_datetime.strftime('%Y-%m-%dT%H:%M:%S')
+        query_condition.update({"captures.core:datetime": {"$gte": min_datetime_formatted}})
     if max_datetime is not None:
-        query_condition.update({"captures.core:datetime": {"$lte": max_datetime}})
+        max_datetime_formatted = max_datetime.strftime('%Y-%m-%dT%H:%M:%S')
+        query_condition.update({"captures.core:datetime": {"$lte": max_datetime_formatted}})
 
     metadata = metadataSet.find(query_condition)
 
