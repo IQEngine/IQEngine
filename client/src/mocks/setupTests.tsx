@@ -28,24 +28,19 @@ export const queryClient = new QueryClient({
   },
 });
 
-export const store = configureStore({
-  reducer: {},
-});
+
 
 export const AllProviders = ({ children }) => (
-  <Provider store={store}>
     <QueryClientProvider client={queryClient}>
       <FeatureFlagsProvider flags={null}>
         <Router>{children}</Router>
       </FeatureFlagsProvider>
     </QueryClientProvider>
-  </Provider>
 );
 
 export const useAllProviders = () => {
   return {
     wrapper: AllProviders,
-    queryClient,
-    store,
+    queryClient
   };
 };
