@@ -1,17 +1,21 @@
 import { SigMFMetadata, TraceabilityOrigin } from '@/utils/sigmfMetadata';
-import store from '@/store/store';
 import { FileWithDirectoryAndFileHandle } from 'browser-fs-access';
 import { IQDataClient } from './IQDataClient';
 import { IQDataSlice } from '@/api/Models';
 import { convertToFloat32 } from '@/utils/FetchMoreDataSource';
 
 export class LocalClient implements IQDataClient {
+  files: FileWithDirectoryAndFileHandle[];
+
+  constructor(files: FileWithDirectoryAndFileHandle[]) {
+    this.files = files;
+  }
   getIQDataSlices(meta: SigMFMetadata, indexes: number[], tileSize: number): Promise<IQDataSlice[]> {
     return Promise.all(indexes.map((index) => this.getIQDataSlice(meta, index, tileSize)));
   }
 
   async getIQDataSlice(meta: SigMFMetadata, index: number, tileSize: number): Promise<IQDataSlice> {
-    const localDirectory: FileWithDirectoryAndFileHandle[] = store.getState().localClient.files;
+    const localDirectory: FileWithDirectoryAndFileHandle[] = this.files;
     if (!localDirectory) {
       Promise.reject('No local directory found');
     }

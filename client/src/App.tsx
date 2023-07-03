@@ -5,21 +5,24 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, Outlet } from 'react-router-dom';
 import ReactGA from 'react-ga4';
 import ThemeSelector from '@/features/ui/styles/ThemeSelector';
-import { configQuery } from '@/api/config/queries';
+import { useConfigQuery } from '@/api/config/queries';
 import { Link } from 'react-router-dom';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'react-hot-toast';
 import Feature from '@/features/feature/Feature';
 import { Logo } from '@/features/ui/logo/Logo';
 import { FeatureFlag, useFeatureFlags } from '@/hooks/useFeatureFlags';
+import { CLIENT_TYPE_BLOB, DataSource } from '@/api/Models';
+import { useUserSettings } from '@/api/user-settings/use-user-settings';
 
 export const App = () => {
   const [width, setWidth] = useState(window.innerWidth);
   const breakpoint = 700;
 
   const location = useLocation();
-  const config = configQuery();
+  const config = useConfigQuery();
   const { setFeatureFlags } = useFeatureFlags();
+  const { addDataSource } = useUserSettings();
 
   useEffect(() => {
     const handleResizeWindow = () => setWidth(window.innerWidth);
@@ -45,7 +48,20 @@ export const App = () => {
       });
     }
     setFeatureFlags(config.data.featureFlags);
-  }, [config]);
+    config.data.connectionInfo?.settings?.forEach((setting) => {
+      const dataSource: DataSource = {
+        type: CLIENT_TYPE_BLOB,
+        name: setting.name,
+        description: setting.description,
+        imageURL: setting.imageURL,
+        account: setting.accountName,
+        container: setting.containerName,
+        sasToken: setting.sasToken,
+      };
+      addDataSource(dataSource);
+    });
+
+  }, [config.data]);
 
   return (
     <ThemeSelector>

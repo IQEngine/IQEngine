@@ -2,11 +2,18 @@ import { IQDataClient } from './IQDataClient';
 import { convertToFloat32 } from '@/utils/FetchMoreDataSource';
 import { getBlobClient } from '@/api/utils/AzureBlob';
 import { SigMFMetadata } from '@/utils/sigmfMetadata';
-import { TILE_SIZE_IN_IQ_SAMPLES } from '@/utils/constants';
-import { IQDataSlice } from '@/api/Models';
+import { DataSource, IQDataSlice } from '@/api/Models';
 
 export class BlobClient implements IQDataClient {
+  dataSources: Record<string, DataSource>;
+
+  constructor(dataSources: Record<string, DataSource>) {
+    this.dataSources = dataSources;
+  }
+
+  
   getIQDataSlices(meta: SigMFMetadata, indexes: number[], tileSize: number): Promise<IQDataSlice[]> {
+    console.log('getIQDataSlices', indexes, this.dataSources);
     return Promise.all(indexes.map((index) => this.getIQDataSlice(meta, index, tileSize)));
   }
 
@@ -20,7 +27,7 @@ export class BlobClient implements IQDataClient {
     const bytesPerSample = meta.getBytesPerSample();
     const offsetBytes = index * tileSize * bytesPerSample * 2;
     const countBytes = tileSize * bytesPerSample * 2;
-    const blobClient = getBlobClient(account, container, file_path);
+    const blobClient = getBlobClient(this.dataSources, account, container, file_path);
     // Thi is ugly but it is the only way to get the blob as an ArrayBuffer
     const download = await blobClient.download(offsetBytes, countBytes);
     const blobBody = await (await download.blobBody).arrayBuffer();

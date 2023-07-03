@@ -1,5 +1,5 @@
 import { describe, expect, test, beforeAll, afterAll } from 'vitest';
-import { configQuery } from './queries';
+import { useConfigQuery } from './queries';
 
 import nock from 'nock';
 import React from 'react';
@@ -35,7 +35,7 @@ describe('Config contains information from environment', () => {
     // Arrange
     nock('http://localhost:3000').get('/api/config').reply(200, {});
     // Act
-    const { result } = renderHook(() => configQuery(), { wrapper });
+    const { result } = renderHook(() => useConfigQuery(), { wrapper });
     // Assert
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(true);
@@ -50,7 +50,7 @@ describe('Config contains information from environment', () => {
     nock('http://localhost:3000').get('/api/config').reply(500, {});
 
     // Act
-    const { result } = renderHook(() => configQuery(), { wrapper });
+    const { result } = renderHook(() => useConfigQuery(), { wrapper });
     // Assert
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(true);
@@ -70,7 +70,7 @@ describe('Config contains information from environment', () => {
         featureFlags: { someFeature: true },
       });
     // Act
-    const { result } = renderHook(() => configQuery(), { wrapper });
+    const { result } = renderHook(() => useConfigQuery(), { wrapper });
     // Assert
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(true);

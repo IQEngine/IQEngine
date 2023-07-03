@@ -7,8 +7,6 @@ import 'swagger-ui-react/swagger-ui.css';
 // @ts-ignore
 import reportWebVitals from '@/utils/reportWebVitals';
 import { RouterProvider } from 'react-router-dom';
-import { Provider } from 'react-redux';
-import store from '@/store/store';
 import { createRoot } from 'react-dom/client';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { FeatureFlagsProvider } from '@/hooks/useFeatureFlags';
@@ -22,11 +20,9 @@ const { queryClient } = useIQEngineQueryClient();
 const { router } = useIQEngineRouter();
 root.render(
   <QueryClientProvider client={queryClient}>
-    <Provider store={store}>
       <FeatureFlagsProvider flags={null}>
-        <RouterProvider router={router} />
+          <RouterProvider router={router} />
       </FeatureFlagsProvider>
-    </Provider>
   </QueryClientProvider>
 );
 

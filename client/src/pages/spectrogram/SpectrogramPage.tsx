@@ -19,7 +19,7 @@ import { GlobalProperties } from '@/pages/spectrogram/components/global-properti
 import { MetaViewer } from '@/pages/spectrogram/components/Metadata/MetaViewer';
 import { MetaRaw } from '@/pages/spectrogram/components/Metadata/MetaRaw';
 import { useParams } from 'react-router-dom';
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { getMeta } from '@/api/metadata/Queries';
 import { SigMFMetadata } from '@/utils/sigmfMetadata';
 import { getIQDataSlices, useCurrentCachedIQDataSlice } from '@/api/iqdata/Queries';

@@ -4,12 +4,10 @@
 
 import { configureStore } from '@reduxjs/toolkit';
 
-import connectionReducer from './reducers/ConnectionReducer';
 import localClientReducer from './reducers/LocalClientReducer';
 
 const store = configureStore({
   reducer: {
-    connection: connectionReducer,
     localClient: localClientReducer,
   },
   middleware: (getDefaultMiddleware) =>
