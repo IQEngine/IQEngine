@@ -23,7 +23,7 @@ export const getDataSources = (type: string, enabled = true) =>{
 
 export const getDataSource = (type: string, account: string, container: string, enabled = true) => {
   const { dataSourcesQuery, filesQuery  } = useUserSettings();
-  return useQuery(['datasource', type, account, container], () => 
+  return useQuery(['datasource', type, account, container], () =>
   {
     const client = DataSourceClientFactory(type, filesQuery.data, dataSourcesQuery.data);
     return fetchDataSource(client, account, container)

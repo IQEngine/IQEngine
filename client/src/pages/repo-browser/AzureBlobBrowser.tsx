@@ -68,7 +68,7 @@ const AzureBlobBrowser = () => {
       sasToken: sasToken,
       description: 'Azure Blob Storage',
     } as DataSource;
-    
+
     addDataSource(dataSource);
     navigate(`/recordings/${CLIENT_TYPE_BLOB}/${account}/${container}/${encodeURIComponent(sasToken)}`);
   };

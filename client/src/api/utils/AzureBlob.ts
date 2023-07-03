@@ -1,7 +1,11 @@
 import { BlobClient, BlobServiceClient, ContainerClient } from '@azure/storage-blob';
 import { DataSource } from '@/api/Models';
 
-export function getDataSourceFromDatasources(dataSources: Record<string,DataSource>,  account: string, container: string): DataSource {
+export function getDataSourceFromDatasources(
+  dataSources: Record<string, DataSource>,
+  account: string,
+  container: string
+): DataSource {
   if (!dataSources) {
     throw new Error('No data sources found');
   }
@@ -13,11 +17,14 @@ export function getDataSourceFromDatasources(dataSources: Record<string,DataSour
   return dataSource;
 }
 
-export function getContainerClient(dataSources: Record<string,DataSource>, account: string, container: string): ContainerClient {
+export function getContainerClient(
+  dataSources: Record<string, DataSource>,
+  account: string,
+  container: string
+): ContainerClient {
   const dataSource = getDataSourceFromDatasources(dataSources, account, container);
   if (!dataSource || !dataSource.sasToken) {
-    
-   console.log(`DATASOURECE NOT FOUND: ${account}/${container}`, dataSources);
+    console.log(`DATASOURECE NOT FOUND: ${account}/${container}`, dataSources);
     throw new Error('No connection found');
   }
   console.log(`DATASOURECE FOUND: ${dataSource.account}/${dataSource.container} ${dataSource.sasToken}`);
@@ -27,7 +34,12 @@ export function getContainerClient(dataSources: Record<string,DataSource>, accou
   return blobServiceClient.getContainerClient(dataSource.container);
 }
 
-export function getBlobClient(dataSources: Record<string,DataSource>, account: string, container: string, blobName: string): BlobClient {
+export function getBlobClient(
+  dataSources: Record<string, DataSource>,
+  account: string,
+  container: string,
+  blobName: string
+): BlobClient {
   const containerClient = getContainerClient(dataSources, account, container);
   return containerClient.getBlobClient(blobName);
 }

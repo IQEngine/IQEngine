@@ -11,7 +11,6 @@ export class BlobClient implements IQDataClient {
     this.dataSources = dataSources;
   }
 
-  
   getIQDataSlices(meta: SigMFMetadata, indexes: number[], tileSize: number): Promise<IQDataSlice[]> {
     console.log('getIQDataSlices', indexes, this.dataSources);
     return Promise.all(indexes.map((index) => this.getIQDataSlice(meta, index, tileSize)));

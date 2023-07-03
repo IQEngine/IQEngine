@@ -17,7 +17,7 @@ export const getIQDataSlice = (
   }
   const { type, account, container, file_path } = meta.getOrigin();
   const { filesQuery, dataSourcesQuery } = useUserSettings();
-  
+
   return useQuery(
     [
       'datasource',
@@ -72,7 +72,7 @@ export const getIQDataFullIndexes = (
     );
   }
   const { type, account, container, file_path } = meta.getOrigin();
-  
+
   return useQuery<IQDataSlice[]>({
     queryKey: ['datasource', type, account, container, file_path, 'iq', { indexes: indexes, tileSize: tileSize }],
     queryFn: () => {

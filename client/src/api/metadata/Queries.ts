@@ -4,12 +4,24 @@ import { QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/re
 import { MetadataClient } from './MetadataClient';
 import { useUserSettings } from '@/api/user-settings/use-user-settings';
 
-export const fetchMeta = async (client: MetadataClient, type: string, account: string, container: string, filePath: string) => {
+export const fetchMeta = async (
+  client: MetadataClient,
+  type: string,
+  account: string,
+  container: string,
+  filePath: string
+) => {
   const response = await client.getMeta(account, container, filePath);
   return response;
 };
 
-const fetchDataSourceMeta = async (client: MetadataClient, queryClient: QueryClient, type: string, account: string, container: string) => {
+const fetchDataSourceMeta = async (
+  client: MetadataClient,
+  queryClient: QueryClient,
+  type: string,
+  account: string,
+  container: string
+) => {
   const response = await client.getDataSourceMeta(account, container);
   for (const meta of response) {
     queryClient.setQueryData(['datasource', type, account, container, meta.getOrigin().file_path, 'meta'], meta);
@@ -34,8 +46,7 @@ export const getDataSourceMeta = (
   account: string,
   container: string,
   enabled = true
-) =>
-{
+) => {
   const { dataSourcesQuery, filesQuery } = useUserSettings();
   if (!dataSourcesQuery.data || !filesQuery.data) {
     return useQuery(['invalidQuery'], () => null);
@@ -44,35 +55,41 @@ export const getDataSourceMeta = (
     ['datasource', type, account, container, 'meta'],
     () => {
       const metadataClient = MetadataClientFactory(type, filesQuery.data, dataSourcesQuery.data);
-      return fetchDataSourceMeta(metadataClient, client, type, account, container)
+      return fetchDataSourceMeta(metadataClient, client, type, account, container);
     },
     {
       enabled: enabled,
       staleTime: Infinity,
     }
   );
-}
+};
 
 export const getMeta = (type: string, account: string, container: string, filePath: string, enabled = true) => {
-
   const { dataSourcesQuery, filesQuery } = useUserSettings();
   if (!dataSourcesQuery.data || !filesQuery.data) {
     return useQuery(['invalidQuery'], () => null);
   }
   return useQuery(
-    ['datasource', type, account, container, filePath, 'meta', { datasources: dataSourcesQuery.data, files: filesQuery.data}],
-    () => 
-    {
-      console.log(' DEPENDENCIES GET META', dataSourcesQuery.data, filesQuery.data)
+    [
+      'datasource',
+      type,
+      account,
+      container,
+      filePath,
+      'meta',
+      { datasources: dataSourcesQuery.data, files: filesQuery.data },
+    ],
+    () => {
+      console.log(' DEPENDENCIES GET META', dataSourcesQuery.data, filesQuery.data);
       const metadataClient = MetadataClientFactory(type, filesQuery.data, dataSourcesQuery.data);
-      return fetchMeta(metadataClient, type, account, container, filePath)
+      return fetchMeta(metadataClient, type, account, container, filePath);
     },
     {
       enabled: enabled && !!dataSourcesQuery.data && !!filesQuery.data,
       staleTime: Infinity,
     }
   );
-}
+};
 
 export const useUpdateMeta = (meta: SigMFMetadata) => {
   let client = useQueryClient();
@@ -82,11 +99,11 @@ export const useUpdateMeta = (meta: SigMFMetadata) => {
   }
   const { type, account, container, file_path: filePath } = meta.getOrigin();
   const { dataSourcesQuery, filesQuery } = useUserSettings();
-  
+
   return useMutation({
     mutationFn: (newMeta: SigMFMetadata) => {
       const metadataClient = MetadataClientFactory(type, filesQuery.data, dataSourcesQuery.data);
-      return updateDataSourceMeta(metadataClient, account, container, filePath, newMeta)
+      return updateDataSourceMeta(metadataClient, account, container, filePath, newMeta);
     },
     onMutate: async () => {
       console.log('onMutate');
@@ -101,8 +118,6 @@ export const useUpdateMeta = (meta: SigMFMetadata) => {
     },
   });
 };
-
-
 
 export const useGetMetadataFeatures = (type: string) => {
   const { filesQuery, dataSourcesQuery } = useUserSettings();
