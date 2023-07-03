@@ -25,10 +25,10 @@ export interface PluginsPaneProps {
 }
 
 export enum MimeTypes {
-  IQ_CI8_LE = 'iq/ci8_le',
-  IQ_CI16_LE = 'iq/ci16_le',
-  IQ_CF32_LE = 'iq/cf32_le',
-  AUDIO_WAV = 'audio/wav',
+  ci8_le = 'iq/ci8_le',
+  ci16_le = 'iq/ci16_le',
+  cf32_le = 'iq/cf32_le',
+  audio_wav = 'audio/wav',
 }
 
 export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }: PluginsPaneProps) => {
@@ -68,7 +68,7 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
           samples: newSamps,
           sample_rate: sampleRate,
           center_freq: freq,
-          data_type: meta.getDataType(),
+          data_type: MimeTypes[meta.getDataType()],
         },
       ],
       samples_cloud: [],
@@ -76,7 +76,7 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
     };
 
     const connectionInfo = config?.data?.connectionInfo;
-    const calculateMultiplier = dataTypeToBytesPerSample(meta.getDataType());
+    const calculateMultiplier = dataTypeToBytesPerSample(MimeTypes[meta.getDataType()]);
     if (connectionInfo) {
       body = {
         samples_b64: [],
@@ -88,7 +88,7 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
             sas_token: connectionInfo.settings[0].sasToken,
             sample_rate: sampleRate,
             center_freq: freq,
-            data_type: meta.getDataType(),
+            data_type: MimeTypes[meta.getDataType()],
             byte_offset: startSampleOffset * calculateMultiplier,
             byte_length: trimmedSamples.length * calculateMultiplier,
           },
@@ -128,7 +128,7 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
           return;
         }
         if (data.data_output && data.data_output.length > 0) {
-          if (data.data_output[0]['data_type'] == MimeTypes.IQ_CF32_LE) {
+          if (data.data_output[0]['data_type'] == MimeTypes.cf32_le) {
             // just show the first output for now, 99% of plugins will have 0 or 1 IQ output anyway
             const samples_base64 = data.data_output[0]['samples'];
             const samples = convertBase64ToFloat32Array(samples_base64);
