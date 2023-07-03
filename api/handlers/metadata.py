@@ -179,7 +179,7 @@ def query_meta(
             {"annotations.core:description": {"$regex": text, "$options": "i"}}
         ]
         query_condition.update({"$or": or_condition})
-    
+
     if min_datetime is not None:
         min_datetime_formatted = min_datetime.strftime('%Y-%m-%dT%H:%M:%S')
         query_condition.update({"captures.core:datetime": {"$gte": min_datetime_formatted}})
