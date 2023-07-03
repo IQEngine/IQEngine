@@ -27,7 +27,7 @@ code that implements a low-pass filter plugin in a couple dozen lines of Python,
 
 First edit your root .env file to include `IQENGINE_PLUGINS: [{"name": "BuiltIn",  "url": "plugins:8000"}]`
 
-```
+```bash
 sudo apt install uvicorn ffmpeg libsm6 libxext6 -y
 cd plugins/src
 sudo pip install -r requirements.txt
@@ -38,13 +38,47 @@ IQEngine is currently set up to use <http://127.0.0.1:8000/plugins/> as the plug
 
 To run the example call, install the vscode extension called "REST Client" then when you open the .http file there should be a "send request" button
 
-The way it works is the plugin name must match the directory and .py file within that directory, for fastapi to see it (e.g. markos_detector/markos_detector.py).
-
 See the template_plugin for how the input and outputs of the function work, if you want to create your own plugin.
+
+## Steps to write a plugin
+
+* Create a folder in plugins/src (for example, myplugin)
+* Create the python file. (For example, myplugin/myplugin.py)
+* The folder and file name must match exactly.
+* Copy this code into myplugin.py:
+```python
+import base64
+
+from pydantic.dataclasses import dataclass
+
+@dataclass
+class Plugin:
+    sample_rate: int = 0
+    center_freq: int = 0
+
+    # custom params - at least one required at present
+    sample_input: int = 51
+
+    def run(self, samples):
+    """
+    Do stuff here and put results into outputs_obj
+    """
+        outputs_obj = {
+            "samples": base64.b64encode(samples),
+            "sample_rate": self.sample_rate,
+            "center_freq": self.center_freq,
+            "data_type": "iq/cf32_le",
+        }
+        return {"status": "SUCCESS", "data_output": [outputs_obj], "annotations": []}
+```
+* sample_rate and center_freq are standard and must be included in output
+* There must be at least one custom param or the Run Plugin button will not show up.
+* data_output is a required part of the interface
+* data_type is a required part of the interface
 
 ## Run plugins locally using docker
 
-```
+```bash
 cd plugins
 docker build -t plugins_image .
 docker run -dit -p 8000:8000 --name plugins_container plugins_image
@@ -65,6 +99,6 @@ SSH into container with `docker exec -it plugins_container /bin/bash`
 When deploying with Azure remember to go into the function apps Configuration and under Application Settings there needs to be one for AzureWebJobsStorage which is the storage account connection string, as well as MongoDBConnString
 
 To set up certs, configure the DNS name for the VM (under Overview) then fill out "DNS name label" to get a xxx.cloudapp.azure.com domain, then follow these instructions <https://certbot.eff.org/instructions?ws=other&os=ubuntufocal>.  Certs get saved in /etc/letsencrypt/live/xxx so the new uvicorn command is:
-```
+```bash
 sudo uvicorn plugins_api:app --host 0.0.0.0 --port 8000 --ssl-keyfile=/etc/letsencrypt/live/iqengine-detector.eastus2.cloudapp.azure.com/privkey.pem --ssl-certfile=/etc/letsencrypt/live/iqengine-detector.eastus2.cloudapp.azure.com/fullchain.pem
 ```
