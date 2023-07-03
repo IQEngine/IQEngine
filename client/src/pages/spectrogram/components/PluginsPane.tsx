@@ -15,7 +15,10 @@ import { FFT } from '@/utils/fft';
 import { useGetPluginsComponents } from '../hooks/useGetPluginsComponents';
 import { useGetPlugins } from '@/api/plugin/Queries';
 import { toast } from 'react-hot-toast';
-
+import { configQuery } from '@/api/config/queries';
+import { CLIENT_TYPE_BLOB } from '@/api/Models';
+import { getDataSources } from '@/api/datasource/Queries';
+import { dataTypeToBytesPerSample } from '@/utils/selector';
 export interface PluginsPaneProps {
   cursorsEnabled: boolean;
   handleProcessTime: () => { trimmedSamples: number[]; startSampleOffset: number };
@@ -24,8 +27,11 @@ export interface PluginsPaneProps {
 }
 
 export enum MimeTypes {
-  IQ_SIGMF_32 = 'iq/cf32_le',
+  IQ_CI8_LE = 'iq/ci8_le',
+  IQ_CI16_LE = 'iq/ci16_le',
+  IQ_CF32_LE = 'iq/cf32_le',
   AUDIO_WAV = 'audio/wav',
+  IQ_SIGMF_32 = 'IQ_SIGMF_32',
 }
 
 export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }: PluginsPaneProps) => {
@@ -35,6 +41,10 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
   const [modalOpen, setModalOpen] = useState(false);
   const [modalSamples, setModalSamples] = useState([]);
   const [modalSpectrogram, setmodalSpectrogram] = useState(null);
+  let [dataAvailable, setDataAvailable] = useState(false);
+  const blobDataSources = getDataSources(CLIENT_TYPE_BLOB, dataAvailable);
+
+  const config = configQuery();
 
   const handleChangePlugin = (e) => {
     setSelectedPlugin(e.target.value);
@@ -59,16 +69,40 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
     console.log(newSamps);
 
     let body = {
-      data_input: [
+      samples_b64: [
         {
           samples: newSamps,
           sample_rate: sampleRate,
           center_freq: freq,
-          data_type: MimeTypes.IQ_SIGMF_32,
+          data_type: meta.getDataType(),
         },
       ],
+      samples_cloud: [],
       custom_params: {},
     };
+
+    const connectionInfo = config?.data?.connectionInfo;
+    const calculateMultiplier = dataTypeToBytesPerSample(meta.getDataType());
+    if (connectionInfo) {
+      body = {
+        samples_b64: [],
+        samples_cloud: [
+          {
+            account_name: connectionInfo.settings[0].accountName,
+            container_name: connectionInfo.settings[0].containerName,
+            file_path: meta.getFileName(),
+            sas_token: connectionInfo.settings[0].sasToken,
+            sample_rate: sampleRate,
+            center_freq: freq,
+            data_type: meta.getDataType(),
+            byte_offset: startSampleOffset * calculateMultiplier,
+            byte_length: trimmedSamples.length * calculateMultiplier,
+          },
+        ],
+        custom_params: {},
+      };
+    }
+
     // Add custom params
     for (const [key, value] of Object.entries(pluginParameters)) {
       if (value.type === 'integer') {

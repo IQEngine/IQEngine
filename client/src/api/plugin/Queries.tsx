@@ -9,6 +9,7 @@ export function useGetPlugins() {
       const response = await axios.get<PluginDefinition[]>('/api/plugins').catch((err) => {
         console.error('Failing getting plugins from api', err);
         if (import.meta.env.IQENGINE_PLUGINS) {
+          const test = import.meta.env.IQENGINE_PLUGINS;
           const plugins = JSON.parse(import.meta.env.IQENGINE_PLUGINS);
           return { data: plugins };
         } else {

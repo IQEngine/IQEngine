@@ -161,23 +161,23 @@ components:
     samples_cloud: # a pointer to IQ samples in cloud storage
       type: object
       required:
-        - accountName
-        - containerName
+        - account_name
+        - container_name
         - file_path
         - data_type
       properties:
-        accountName:
+        account_name:
           type: string
-        containerName:
+        container_name:
           type: string
         file_path:
           type: string
         sas_token:
           type: string
-        sample_start:
+        byte_offset:
           type: integer
           default: 0
-        sample_count: # default is to grab all of the samples in the file
+        byte_length: # default is to grab all of the samples in the file
           type: integer
         data_type:
           $ref: '#/components/schemas/data_type'
