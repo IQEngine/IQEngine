@@ -1,6 +1,6 @@
 # IQEngine Frontend
 
-This is the frontend for IQEngine. It is a React app that connects to the backend API and and it is responsible for the UI and the user experience.
+This is the frontend for IQEngine. It is a React app that connects to the backend API and it is responsible for the UI and the user experience.
 
 ## Running the frontend
 
@@ -31,13 +31,13 @@ This will create a `build` folder with the static files that can be served by a 
 
 ### Folder structure
 
-The organization of the file structure it is heavily inpires by the [Web dev simplified article](https://blog.webdevsimplified.com/2022-07/react-folder-structure/) on how to structure a React project.
+The organization of the file structure it is heavily inspired by the [Web dev simplified article](https://blog.webdevsimplified.com/2022-07/react-folder-structure/) on how to structure a React project.
 
 The frontend is organized in the following folders:
 
 - `public`: Contains the static files that are served by the web server.
 - `src`: Contains the source code of the frontend.
-  - `features`: Contains the features and components that are used acroos multiple pages.
+  - `features`: Contains the features and components that are used across multiple pages.
     - `<feature-name>` Contains the React components that are used to build the feature with the name `<feature name>`.
       - `components`: Contains the React components that are used to build the feature with the name `<feature name>`.
       - `hooks`: Contains the React hooks that are used to build the feature with the name `<feature name>`.
