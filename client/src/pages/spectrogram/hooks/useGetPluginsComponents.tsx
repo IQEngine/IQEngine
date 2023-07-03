@@ -24,12 +24,7 @@ interface PluginParametersProps {
   pluginParameters: PluginParameters;
 }
 
-export function EditPluginParameters({
-  pluginUrl,
-  handleSubmit,
-  setPluginParameters,
-  pluginParameters,
-}: PluginParametersProps) {
+export function EditPluginParameters({ pluginUrl, setPluginParameters, pluginParameters }: PluginParametersProps) {
   const { data: parameters } = useGetPluginParameters(pluginUrl);
   useEffect(() => {
     console.log('parameters', parameters);
@@ -75,7 +70,6 @@ export function EditPluginParameters({
               </div>
             ))}
           </div>
-          <button onClick={handleSubmit}>Run Plugin</button>
         </>
       )}
     </>

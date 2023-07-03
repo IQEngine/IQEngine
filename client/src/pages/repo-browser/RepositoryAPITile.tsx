@@ -5,11 +5,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { useAppDispatch } from '@/store/hooks';
 import { CLIENT_TYPE_API } from '@/api/Models';
 
 const RepositoryAPITile = (props) => {
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { item } = props;
 

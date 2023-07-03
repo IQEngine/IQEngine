@@ -46,7 +46,6 @@ The frontend is organized in the following folders:
     - `<page-name>`: Contains the React components that are used to build the page with the name `<page name>`.
       - `components`: Contains the React components that are used to build the page with the name `<page name>`.
       - `hooks`: Contains the React hooks that are used to build the page with the name `<page name>`.
-  - `store`: [DEPRECATED] Contains the Redux store and the Redux reducers. ( deprecated because we are using React Query instead of Redux)
   - `api`: Contains the functions and hooks that are used to make API calls to the backend.
     - `<api-area>`: Contains the functions and hooks that are used to make API calls to the backend for the area `<api-area>`.
     - `utils`: Contains utility functions that are used to make API calls to the backend.

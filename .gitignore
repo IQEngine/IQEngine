@@ -47,3 +47,6 @@ tiling/spectrogram.pmtiles
 **/test-results/
 **/playwright-report/
 **/playwright/.cache/
+
+# in case someone by mistake do npm i in the root do not check in package-lock.json
+/package-lock.json

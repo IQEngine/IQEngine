@@ -1,7 +1,8 @@
 import { Annotation, CaptureSegment, SigMFMetadata } from '@/utils/sigmfMetadata';
-import { BlobServiceClient, ContainerClient } from '@azure/storage-blob';
+import { ContainerClient } from '@azure/storage-blob';
 import { MetadataClient } from './MetadataClient';
 import { getContainerClient } from '@/api/utils/AzureBlob';
+import { DataSource } from '../Models';
 
 function readBlobAsText(blob: Blob): Promise<string> {
   return new Promise<string>((resolve, reject) => {
@@ -59,13 +60,19 @@ async function blobNameToMetadata(blobName: string, containerClient: ContainerCl
 }
 
 export class BlobClient implements MetadataClient {
+  dataSources: Record<string, DataSource>;
+
+  constructor(dataSources: Record<string, DataSource>) {
+    this.dataSources = dataSources;
+  }
+
   async getMeta(account: string, container: string, filePath: string): Promise<SigMFMetadata> {
-    const containerClient = getContainerClient(account, container);
+    const containerClient = getContainerClient(this.dataSources, account, container);
     return blobNameToMetadata(filePath, containerClient);
   }
 
   async getDataSourceMeta(account: string, container: string): Promise<SigMFMetadata[]> {
-    const containerClient = getContainerClient(account, container);
+    const containerClient = getContainerClient(this.dataSources, account, container);
     const blobNames: Array<string> = [];
     for await (const i of containerClient.listBlobsFlat()) blobNames.push(i.name);
     const blobsToProcess = blobNames.filter(
@@ -83,13 +90,6 @@ export class BlobClient implements MetadataClient {
 
   async updateMeta(account: string, container: string, filePath: string, meta: SigMFMetadata): Promise<any> {
     // Currently update meta doesnt even try to update the blob so we are just going to return here
-    return meta;
-
-    const containerClient = getContainerClient(account, container);
-    const blockBlobClient = containerClient.getBlockBlobClient(filePath);
-    const metaString = JSON.stringify(meta);
-    const metaBlob = new Blob([metaString]);
-    await blockBlobClient.upload(metaBlob, metaString.length);
     return meta;
   }
 

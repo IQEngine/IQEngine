@@ -4,17 +4,17 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
 
 import { directoryOpen, fileOpen, supported } from 'browser-fs-access';
 import { FileWithDirectoryAndFileHandle } from 'browser-fs-access';
 import { getDataSource } from '@/api/datasource/Queries';
 import { CLIENT_TYPE_LOCAL } from '@/api/Models';
-import { setLocalClient } from '@/store/reducers/LocalClientReducer';
+import { useUserSettings } from '@/api/user-settings/use-user-settings';
+
 
 const LocalFileBrowser = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const { setFiles } = useUserSettings();
   const [container, setContainer] = useState<string>(null);
   const [filePath, setFilePath] = useState<string>(null);
   const dataSourceQuery = getDataSource(CLIENT_TYPE_LOCAL, 'local', container, !!container || !!filePath);
@@ -40,7 +40,7 @@ const LocalFileBrowser = () => {
     });
     console.log('files', files);
     let fileWithoutExtrension = files[0].name.replace('.sigmf-meta', '').replace('.sigmf-data', '');
-    dispatch(setLocalClient(files));
+    setFiles(files);
     setFilePath(fileWithoutExtrension);
   };
 
@@ -53,7 +53,7 @@ const LocalFileBrowser = () => {
       return;
     }
     let containerPath = dirHandle[0].webkitRelativePath.split('/')[0];
-    dispatch(setLocalClient(dirHandle));
+    setFiles(dirHandle);
     setContainer(containerPath);
   };
 
