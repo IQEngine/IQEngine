@@ -33,9 +33,6 @@ resource containerApp 'Microsoft.App/containerApps@2022-11-01-preview' = {
         external: useExternalIngress
         targetPort: containerPort
         allowInsecure: false
-        stickySessions: {
-          affinity: 'sticky'
-        }
       }
     }
     template: {
