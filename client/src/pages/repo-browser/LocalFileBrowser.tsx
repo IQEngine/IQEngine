@@ -4,7 +4,6 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
 
 import { directoryOpen, fileOpen, supported } from 'browser-fs-access';
 import { FileWithDirectoryAndFileHandle } from 'browser-fs-access';

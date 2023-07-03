@@ -11,7 +11,6 @@ import RepositoryAPITile from './RepositoryAPITile';
 import SiggenTile from './SiggenTile';
 import ValidatorTile from './ValidatorTile';
 import { useConfigQuery } from '@/api/config/queries';
-// import { preFetchDataSourcesMeta } from '@/api/metadata/Queries';
 import { getDataSources } from '@/api/datasource/Queries';
 import { CLIENT_TYPE_API, CLIENT_TYPE_BLOB, DataSource } from '@/api/Models';
 import { useQueryClient } from '@tanstack/react-query';
@@ -48,14 +47,6 @@ const RepoBrowser = () => {
       }
     }
   }, [config.data]);
-
-  useEffect(() => {
-    if (blobDataSources.data) {
-      blobDataSources.data.forEach((item) => {
-        // preFetchDataSourcesMeta(queryClient, CLIENT_TYPE_BLOB, item.account, item.container);
-      });
-    }
-  }, [blobDataSources.data]);
 
   return (
     <div className="py-3">

@@ -37,7 +37,9 @@ export const getDataSourceMeta = (
 ) =>
 {
   const { dataSourcesQuery, filesQuery } = useUserSettings();
-  
+  if (!dataSourcesQuery.data || !filesQuery.data) {
+    return useQuery(['invalidQuery'], () => null);
+  }
   return useQuery(
     ['datasource', type, account, container, 'meta'],
     () => {
@@ -45,7 +47,7 @@ export const getDataSourceMeta = (
       return fetchDataSourceMeta(metadataClient, client, type, account, container)
     },
     {
-      enabled: enabled && !dataSourcesQuery.isFetching && !filesQuery.isFetching,
+      enabled: enabled,
       staleTime: Infinity,
     }
   );
@@ -54,9 +56,11 @@ export const getDataSourceMeta = (
 export const getMeta = (type: string, account: string, container: string, filePath: string, enabled = true) => {
 
   const { dataSourcesQuery, filesQuery } = useUserSettings();
-  
+  if (!dataSourcesQuery.data || !filesQuery.data) {
+    return useQuery(['invalidQuery'], () => null);
+  }
   return useQuery(
-    ['datasource', type, account, container, filePath, 'meta'],
+    ['datasource', type, account, container, filePath, 'meta', { datasources: dataSourcesQuery.data, files: filesQuery.data}],
     () => 
     {
       console.log(' DEPENDENCIES GET META', dataSourcesQuery.data, filesQuery.data)
@@ -98,13 +102,7 @@ export const useUpdateMeta = (meta: SigMFMetadata) => {
   });
 };
 
-// export const preFetchDataSourcesMeta = (client: QueryClient, type: string, account: string, container: string) => {
-//   const { getDataSources, getFiles } = useUserSettings();
-//   const metadataClient = MetadataClientFactory(type, getFiles, getDataSources);
-//   client.prefetchQuery(['datasource', type, account, container, 'meta'], () =>
-//     fetchDataSourceMeta(metadataClient, client, type, account, container)
-//   );
-// };
+
 
 export const useGetMetadataFeatures = (type: string) => {
   const { filesQuery, dataSourcesQuery } = useUserSettings();

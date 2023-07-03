@@ -1,13 +1,14 @@
+from datetime import datetime
+from typing import Any, Dict, List, Optional
+
 import database.database
+import httpx
 from database.models import DataSource, DataSourceReference, Metadata
 from fastapi import APIRouter, Depends, HTTPException, Query
-from pymongo.collection import Collection
-from .urlmapping import add_URL_sasToken, apiType
 from fastapi.responses import StreamingResponse
-from typing import Optional, Any, Dict, List
-from datetime import datetime
-import httpx
+from pymongo.collection import Collection
 
+from .urlmapping import add_URL_sasToken, apiType
 
 router = APIRouter()
 
@@ -61,7 +62,8 @@ def get_meta(
 
 
 @router.get(
-    "/api/datasources/{account}/{container}/{filepath:path}/iqdata", response_class=StreamingResponse
+    "/api/datasources/{account}/{container}/{filepath:path}/iqdata",
+    response_class=StreamingResponse,
 )
 async def get_metadata_iqdata(
     account: str,
@@ -81,14 +83,18 @@ async def get_metadata_iqdata(
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
 
-    imageURL = add_URL_sasToken(account, container, datasource["sasToken"], filepath, apiType.IQDATA)
+    imageURL = add_URL_sasToken(
+        account, container, datasource["sasToken"], filepath, apiType.IQDATA
+    )
 
     async with httpx.AsyncClient() as client:
         response = await client.get(imageURL.get_secret_value())
     if response.status_code != 200:
         raise HTTPException(status_code=404, detail="Image not found")
 
-    return StreamingResponse(response.iter_bytes(), media_type=response.headers["Content-Type"])
+    return StreamingResponse(
+        response.iter_bytes(), media_type=response.headers["Content-Type"]
+    )
 
 
 @router.get(
@@ -114,14 +120,18 @@ async def get_meta_thumbnail(
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
 
-    imageURL = add_URL_sasToken(account, container, datasource["sasToken"], filepath, apiType.THUMB)
+    imageURL = add_URL_sasToken(
+        account, container, datasource["sasToken"], filepath, apiType.THUMB
+    )
 
     async with httpx.AsyncClient() as client:
         response = await client.get(imageURL.get_secret_value())
     if response.status_code != 200:
         raise HTTPException(status_code=404, detail="Image not found")
 
-    return StreamingResponse(response.iter_bytes(), media_type=response.headers["Content-Type"])
+    return StreamingResponse(
+        response.iter_bytes(), media_type=response.headers["Content-Type"]
+    )
 
 
 @router.get(
@@ -143,38 +153,65 @@ def query_meta(
     text: Optional[str] = Query(None),
     metadataSet: Collection[Metadata] = Depends(database.database.metadata_collection),
 ):
-
     query_condition: Dict[str, Any] = {}
     if account:
-        query_condition.update({
-            "$or": [
-                {"global.traceability:origin.account": {"$regex": a, "$options": "i"}}
-                for a in account
-            ]
-        })
+        query_condition.update(
+            {
+                "$or": [
+                    {
+                        "global.traceability:origin.account": {
+                            "$regex": a,
+                            "$options": "i",
+                        }
+                    }
+                    for a in account
+                ]
+            }
+        )
     if container:
-        query_condition.update({
-            "$or": [
-                {"global.traceability:origin.container": {"$regex": c, "$options": "i"}}
-                for c in container
-            ]
-        })
+        query_condition.update(
+            {
+                "$or": [
+                    {
+                        "global.traceability:origin.container": {
+                            "$regex": c,
+                            "$options": "i",
+                        }
+                    }
+                    for c in container
+                ]
+            }
+        )
     if min_frequency is not None:
         query_condition.update({"captures.core:frequency": {"$gte": min_frequency}})
     if max_frequency is not None:
         query_condition.update({"captures.core:frequency": {"$lte": max_frequency}})
     if author is not None:
-        query_condition.update({"global.core:author": {"$regex": author, "$options": "i"}})
+        query_condition.update(
+            {"global.core:author": {"$regex": author, "$options": "i"}}
+        )
     if description is not None:
-        query_condition.update({"global.core:description": {"$regex": description, "$options": "i"}})
+        query_condition.update(
+            {"global.core:description": {"$regex": description, "$options": "i"}}
+        )
     if label is not None:
-        query_condition.update({"annotations.core:label": {"$regex": label, "$options": "i"}})
+        query_condition.update(
+            {"annotations.core:label": {"$regex": label, "$options": "i"}}
+        )
     if comment is not None:
-        query_condition.update({"annotations.core:description": {"$regex": comment, "$options": "i"}})
+        query_condition.update(
+            {"annotations.core:description": {"$regex": comment, "$options": "i"}}
+        )
     if text is not None:
-        query_condition.update({"global.core:description": {"$regex": text, "$options": "i"}})
-        query_condition.update({"annotations.core:label": {"$regex": text, "$options": "i"}})
-        query_condition.update({"annotations.core:description": {"$regex": text, "$options": "i"}})
+        query_condition.update(
+            {"global.core:description": {"$regex": text, "$options": "i"}}
+        )
+        query_condition.update(
+            {"annotations.core:label": {"$regex": text, "$options": "i"}}
+        )
+        query_condition.update(
+            {"annotations.core:description": {"$regex": text, "$options": "i"}}
+        )
     if min_datetime is not None:
         query_condition.update({"captures.core:datetime": {"$gte": min_datetime}})
     if max_datetime is not None:

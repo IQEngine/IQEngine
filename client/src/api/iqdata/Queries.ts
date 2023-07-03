@@ -64,21 +64,23 @@ export const getIQDataFullIndexes = (
   tileSize: number = TILE_SIZE_IN_IQ_SAMPLES,
   enabled = true
 ) => {
-  if (!meta) {
-    return useQuery<IQDataSlice[]>({
-      queryKey: ['invalidQuery'],
-      queryFn: () => null,
-    });
+  const { filesQuery, dataSourcesQuery } = useUserSettings();
+  if (!meta || !indexes || !indexes.length || !filesQuery.data || !dataSourcesQuery.data) {
+    return useQuery(
+      ["invalidQuery"],
+      () => null,
+    );
   }
   const { type, account, container, file_path } = meta.getOrigin();
-  const { filesQuery, dataSourcesQuery } = useUserSettings();
+  
   return useQuery<IQDataSlice[]>({
     queryKey: ['datasource', type, account, container, file_path, 'iq', { indexes: indexes, tileSize: tileSize }],
     queryFn: () => {
       const iqDataClient = IQDataClientFactory(type, filesQuery.data, dataSourcesQuery.data);
+      console.log('getIQDataFullIndexes', indexes, meta, filesQuery.data, dataSourcesQuery.data);
       return iqDataClient.getIQDataSlices(meta, indexes, tileSize);
     },
-    enabled: enabled && !!meta,
+    enabled: enabled && !!meta && !!filesQuery.data && !!dataSourcesQuery.data,
     staleTime: Infinity,
   });
 };
@@ -89,14 +91,13 @@ export const getIQDataSlices = (
   tileSize: number = TILE_SIZE_IN_IQ_SAMPLES,
   enabled = true
 ) => {
-  if (!meta || !indexes || indexes.length === 0) {
+  const { filesQuery, dataSourcesQuery } = useUserSettings();
+  if (!meta || !indexes || !indexes.length || !filesQuery.data || !dataSourcesQuery.data) {
     return useQueries({
       queries: [],
     });
   }
   const { type, account, container, file_path } = meta?.getOrigin();
-  const { filesQuery, dataSourcesQuery } = useUserSettings();
-  
   return useQueries({
     queries: indexes.map((index) => {
       return {
