@@ -1,3 +1,4 @@
+---
 version: '3.2'
 
 services:
@@ -6,6 +7,9 @@ services:
       context: .
     image: iqengine:latest
     environment:
+      IN_MEMORY_DB: ${IN_MEMORY_DB}
+      IQENGINE_CONNECTION_INFO: ${IQENGINE_CONNECTION_INFO}
+      IQENGINE_FEATURE_FLAGS: ${IQENGINE_FEATURE_FLAGS}
       IQENGINE_PLUGINS: '[{"name": "BuiltIn",  "url": "plugins:8000"}]'
       IQENGINE_METADATA_DB_CONNECTION_STRING: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongo:27017
     depends_on:
