@@ -16,8 +16,6 @@ import { useGetPluginsComponents } from '../hooks/useGetPluginsComponents';
 import { useGetPlugins } from '@/api/plugin/Queries';
 import { toast } from 'react-hot-toast';
 import { configQuery } from '@/api/config/queries';
-import { CLIENT_TYPE_BLOB } from '@/api/Models';
-import { getDataSources } from '@/api/datasource/Queries';
 import { dataTypeToBytesPerSample } from '@/utils/selector';
 export interface PluginsPaneProps {
   cursorsEnabled: boolean;
@@ -31,7 +29,6 @@ export enum MimeTypes {
   IQ_CI16_LE = 'iq/ci16_le',
   IQ_CF32_LE = 'iq/cf32_le',
   AUDIO_WAV = 'audio/wav',
-  IQ_SIGMF_32 = 'IQ_SIGMF_32',
 }
 
 export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }: PluginsPaneProps) => {
@@ -41,9 +38,6 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
   const [modalOpen, setModalOpen] = useState(false);
   const [modalSamples, setModalSamples] = useState([]);
   const [modalSpectrogram, setmodalSpectrogram] = useState(null);
-  let [dataAvailable, setDataAvailable] = useState(false);
-  const blobDataSources = getDataSources(CLIENT_TYPE_BLOB, dataAvailable);
-
   const config = configQuery();
 
   const handleChangePlugin = (e) => {
@@ -134,7 +128,7 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
           return;
         }
         if (data.data_output && data.data_output.length > 0) {
-          if (data.data_output[0]['data_type'] == MimeTypes.IQ_SIGMF_32) {
+          if (data.data_output[0]['data_type'] == MimeTypes.IQ_CF32_LE) {
             // just show the first output for now, 99% of plugins will have 0 or 1 IQ output anyway
             const samples_base64 = data.data_output[0]['samples'];
             const samples = convertBase64ToFloat32Array(samples_base64);
