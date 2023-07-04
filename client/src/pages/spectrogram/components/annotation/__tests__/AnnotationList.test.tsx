@@ -54,6 +54,7 @@ describe('Annotation list component', () => {
     expect(await screen.findByText('1.35MHz')).toBeInTheDocument();
     expect(await screen.findByText('LTE')).toBeInTheDocument();
     expect(await screen.findByText('5ms')).toBeInTheDocument();
+    expect(await screen.findByText('Sample comment')).toBeInTheDocument();
   });
 
   test.each`
