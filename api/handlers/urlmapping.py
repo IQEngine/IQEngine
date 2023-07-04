@@ -10,6 +10,16 @@ class apiType(Enum):
 
 
 def add_URL_sasToken(account, container, sasToken, filepath, apiType: apiType):
+
+    if apiType == apiType.THUMB and filepath is not None and filepath != "":
+        bloburl = f'https://{account}.blob.core.windows.net/{container}/{filepath}.jpg'
+    elif apiType == apiType.IMAGE:
+        bloburl = f'https://{account}.blob.core.windows.net/{container}/datasource_thumbnail.jpg'
+    elif apiType == apiType.IQDATA:
+        bloburl = f'https://{account}.blob.core.windows.net/{container}/{filepath}.sigmf-data'
+    else:
+        raise ValueError("Invalid apiType value")
+
     if (
         sasToken is not None
         and sasToken != ""
@@ -19,17 +29,8 @@ def add_URL_sasToken(account, container, sasToken, filepath, apiType: apiType):
         y = ""
         if x is not None:
             y = x.get_secret_value()
-
-        if apiType == apiType.THUMB and filepath is not None and filepath != "":
-            bloburl = f'https://{account}.blob.core.windows.net/{container}/{filepath}.jpg'
-        elif apiType == apiType.IMAGE:
-            bloburl = f'https://{account}.blob.core.windows.net/{container}/datasource_thumbnail.jpg'
-        elif apiType == apiType.IQDATA:
-            bloburl = f'https://{account}.blob.core.windows.net/{container}/{filepath}.sigmf-data'
-        else:
-            raise ValueError("Invalid apiType value")
-
         api_URL_sasToken = SecretStr(bloburl + "?" + y)
-        return api_URL_sasToken
     else:
-        return SecretStr("/logo192.png")
+        api_URL_sasToken = SecretStr(bloburl)
+
+    return api_URL_sasToken
