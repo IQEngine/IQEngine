@@ -11,8 +11,8 @@ paths:
     get:
       summary: Returns the list of RF Functions available at this ip/host, as a list of strings, must match functionName below.
       responses:
-        "200":
-          description: "OK"
+        '200':
+          description: 'OK'
           content:
             application/json:
               schema:
@@ -33,10 +33,10 @@ paths:
           required: true
           description: Name of RF Function
       responses:
-        "400":
+        '400':
           description: Bad request. RF Function does not exist.
-        "200":
-          description: "OK"
+        '200':
+          description: 'OK'
           content:
             application/json:
               schema:
@@ -52,11 +52,11 @@ paths:
                     type: integer
                     default: 1
                     minimum: 0
-                  custom_params:  # This object is essentially just a json schema that is at most 1 layer deep
-                                  # e.g.:
-                                  # {'param1': {'title': 'Param1', 'default': 1,       'type': 'integer'},
-                                  #  'param2': {'title': 'Param2', 'default': 'test2', 'type': 'string'},
-                                  #  'param3': {'title': 'Param3', 'default': 5.67,    'type': 'number'}}
+                  custom_params: # This object is essentially just a json schema that is at most 1 layer deep
+                    # e.g.:
+                    # {'param1': {'title': 'Param1', 'default': 1,       'type': 'integer'},
+                    #  'param2': {'title': 'Param2', 'default': 'test2', 'type': 'string'},
+                    #  'param3': {'title': 'Param3', 'default': 5.67,    'type': 'number'}}
                     type: object
                     minProperties: 1
                     maxProperties: 100
@@ -109,12 +109,12 @@ paths:
                     - type: integer
                     - type: boolean
       responses:
-        "400":
+        '400':
           description: Bad request. RF Function does not exist.
-        "401":
+        '401':
           description: Bad request. Missing a required param.
-        "200":
-          description: "OK"
+        '200':
+          description: 'OK'
           content:
             application/json:
               schema:
@@ -134,7 +134,6 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/annotation'
-
 
 # A way to specify properties that are reused, or simply too large to have look good within parameters/responses objects
 components:
@@ -191,7 +190,7 @@ components:
     data_type:
       type: string
       enum:
-        - iq/ci8_le  # from SigMF
+        - iq/ci8_le # from SigMF
         - iq/ci16_le # from SigMF
         - iq/cf32_le # from SigMF
         - image/png
@@ -206,7 +205,7 @@ components:
         - core:sample_count
       properties:
         core:comment:
-          default: ""
+          default: ''
           description: A human-readable comment
           type: string
         core:freq_lower_edge:

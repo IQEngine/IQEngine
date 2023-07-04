@@ -1,8 +1,7 @@
-from enum import Enum
 from typing import Optional
-import numpy as np
 
 from pydantic import BaseModel, Extra, Field
+
 
 class Annotation(BaseModel):
     core_sample_start: int = Field(alias="core:sample_start")
@@ -13,16 +12,17 @@ class Annotation(BaseModel):
     core_freq_lower_edge: float | None = Field(alias="core:freq_lower_edge")
     core_freq_upper_edge: float | None = Field(alias="core:freq_upper_edge")
     core_uuid: str | None = Field(alias="core:uuid")
+
     class Config:
         extra = Extra.allow
+
 
 class SamplesB64(BaseModel):
     samples: str
     data_type: str
     sample_rate: Optional[int] = None
     center_freq: Optional[int] = None
-    start_freq: Optional[int] = None
-    stop_freq: Optional[int] = None
+
 
 class SamplesCloud(BaseModel):
     account_name: str
@@ -34,12 +34,12 @@ class SamplesCloud(BaseModel):
     byte_offset: Optional[int] = 0
     byte_length: Optional[int] = None
     center_freq: Optional[int] = 0
-    start_freq: Optional[int] = None
-    stop_freq: Optional[int] = None
+
 
 class CustomParams(BaseModel):
     class Config:
         extra = Extra.allow
+
 
 class Plugin(BaseModel):
     samples_b64: Optional[list[SamplesB64]] = None
