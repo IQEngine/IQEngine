@@ -22,12 +22,6 @@ class Plugin:
     sample_rate: int = 0
     center_freq: int = 0
 
-    # custom params - these are returned if you GET /plugins/plugin-name
-    #
-    numtaps: int = 51
-    # cutoff: float = 1e6  # relative to sample rate
-    # width: float = 0.1e6  # relative to sample rate
-
     def run(self, samples):
         file_path = path.dirname(path.realpath(__file__))
         with open(f"{file_path}/sheep.wav", mode="rb") as wavfile:
