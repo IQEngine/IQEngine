@@ -73,7 +73,7 @@ async def get_datasource_image(
 
     if not datasource["sasToken"]:
         datasource["sasToken"] = ""  # set to empty str if null
-        
+
     imageURL = add_URL_sasToken(account, container, datasource["sasToken"], "", apiType.IMAGE)
 
     async with httpx.AsyncClient() as client:

@@ -59,7 +59,7 @@ def get_iq(
             blob_client = BlobClient.from_blob_url(
                 f"https://{account}.blob.core.windows.net/"
                 f"{container}/{filepath}.sigmf-data"
-            )        
+            )
         else:
             blob_client = BlobClient.from_blob_url(
                 f"https://{account}.blob.core.windows.net/"
