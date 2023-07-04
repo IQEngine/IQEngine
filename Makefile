@@ -15,7 +15,7 @@ run-react:
 
 run-plugins:
 	@echo "Running plugins backend on port 8000..."
-	@cd plugins && uvicorn plugins_api:app --reload
+	@cd plugins/src && uvicorn plugins_api:app --reload
 
 build-docker:
 	@echo "Building Docker image for IQEngine..."

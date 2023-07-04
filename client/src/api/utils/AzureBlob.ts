@@ -18,12 +18,17 @@ export function getDataSourceFromConnection(account: string, container: string):
 
 export function getContainerClient(account: string, container: string): ContainerClient {
   const dataSource = getDataSourceFromConnection(account, container);
-  if (!dataSource || !dataSource.sasToken) {
+  if (!dataSource) {
     throw new Error('No connection found');
   }
-  const blobServiceClient = new BlobServiceClient(
-    `https://${dataSource.account}.blob.core.windows.net?${dataSource.sasToken}`
-  );
+  let blobServiceClient = undefined;
+  if (dataSource.sasToken) {
+    blobServiceClient = new BlobServiceClient(
+      `https://${dataSource.account}.blob.core.windows.net?${dataSource.sasToken}`
+    );
+  } else {
+    blobServiceClient = new BlobServiceClient(`https://${dataSource.account}.blob.core.windows.net`, undefined);
+  }
   return blobServiceClient.getContainerClient(dataSource.container);
 }
 

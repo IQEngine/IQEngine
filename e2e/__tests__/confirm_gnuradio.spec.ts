@@ -1,5 +1,11 @@
 import { test, expect } from '@playwright/test';
 
+test('GNURadio repocard displays without sas token @test', async ({ page }) => {
+  await page.goto('/');
+  const locateText = page.locator('div.repocardbody').filter({ hasText: 'GNU Radio' }).filter({ hasText: 'SAS Token' });
+  await expect(locateText).toHaveCount(0);
+});
+
 test('GNURadio repocard displays spectrogram page', async ({ page }) => {
   await page.goto('/');
 

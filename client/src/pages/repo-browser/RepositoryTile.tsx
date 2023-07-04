@@ -17,13 +17,27 @@ export const RepositoryTile = (props) => {
   const [isDisabled, setIsDisabled] = useState(false);
   const [isWarning, setIsWarning] = useState(false);
   const [isError, setIsError] = useState(false);
+  const [isPublic, setIsPublic] = useState(false);
   const [dayDifference, setDayDifference] = useState<number>();
   const [expires, setExpires] = useState();
   const [writeableBool, setWriteableBool] = useState<any>();
 
   useEffect(() => {
-    const tempExpires = sasToken.slice(sasToken.search('se')).split('&')[0].slice(3, 13); // YEAR-MONTH-DAY
-    const writeable = sasToken.slice(sasToken.search('sp')).split('&')[0].includes('w'); // boolean
+    let writeable = false;
+    if (sasToken == '') {
+      setIsPublic(true);
+    } else {
+      const tempExpires = sasToken.slice(sasToken.search('se')).split('&')[0].slice(3, 13); // YEAR-MONTH-DAY
+      writeable = sasToken.slice(sasToken.search('sp')).split('&')[0].includes('w'); // boolean
+      const todayDate = new Date();
+      const todayFormattedDate = todayDate.toISOString().substring(0, 10);
+      const tempDayDifference = Math.abs((Date.parse(todayFormattedDate) - Date.parse(tempExpires)) / 86400000);
+      setIsWarning(todayFormattedDate <= tempExpires && tempDayDifference <= 7);
+      setIsError(todayFormattedDate > tempExpires);
+      if (todayFormattedDate > tempExpires) setIsDisabled(true);
+      setExpires(tempExpires);
+      setDayDifference(tempDayDifference);
+    }
     if (writeable) {
       setWriteableBool(<div className="mr-2 mt-2 text-xs">R/W</div>);
     } else {
@@ -33,14 +47,6 @@ export const RepositoryTile = (props) => {
         </div>
       );
     }
-    const todayDate = new Date();
-    const todayFormattedDate = todayDate.toISOString().substring(0, 10);
-    const tempDayDifference = Math.abs((Date.parse(todayFormattedDate) - Date.parse(tempExpires)) / 86400000);
-    setIsWarning(todayFormattedDate <= tempExpires && tempDayDifference <= 7);
-    setIsError(todayFormattedDate > tempExpires);
-    if (todayFormattedDate > tempExpires) setIsDisabled(true);
-    setExpires(tempExpires);
-    setDayDifference(tempDayDifference);
   }, [sasToken]);
 
   const handleOnClick = async () => {
@@ -57,7 +63,7 @@ export const RepositoryTile = (props) => {
         <h2>{name}</h2>
         <div className="text-primary absolute right-1 translate-x-1">{writeableBool}</div>
         <p>{description}</p>
-        {!isError && !isWarning && (
+        {!isError && !isWarning && !isPublic && (
           <div className="text-secondary">
             <span>SAS Token Expiration: {expires}</span>
           </div>
