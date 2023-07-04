@@ -14,7 +14,7 @@ data_mapping = {
 
 
 def get_blob(account_name, container_name, file_path, sas_token):
-    if(sas_token == None):
+    if(sas_token == None or sas_token == ""):
         return BlobClient.from_blob_url(
             f"https://{account_name}.blob.core.windows.net/{container_name}/{file_path}.sigmf-data",
         )
