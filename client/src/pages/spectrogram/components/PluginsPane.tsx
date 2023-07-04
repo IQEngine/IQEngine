@@ -41,7 +41,9 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
   const [modalOpen, setModalOpen] = useState(false);
   const [modalSamples, setModalSamples] = useState([]);
   const [modalSpectrogram, setmodalSpectrogram] = useState(null);
+  const [useCloudStorage, setUseCloudStorage] = useState(true);
   const { dataSourcesQuery } = useUserSettings();
+  const connectionInfo = dataSourcesQuery?.data[`${account}/${container}`];
 
   const handleChangePlugin = (e) => {
     setSelectedPlugin(e.target.value);
@@ -62,25 +64,14 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
     const sampleRate = meta.getSampleRate();
     const freq = meta.getCenterFrequency();
 
-    const newSamps = convertFloat32ArrayToBase64(trimmedSamples);
-    console.log(newSamps);
-
     let body = {
-      samples_b64: [
-        {
-          samples: newSamps,
-          sample_rate: sampleRate,
-          center_freq: freq,
-          data_type: MimeTypes[meta.getDataType()],
-        },
-      ],
+      samples_b64: [],
       samples_cloud: [],
       custom_params: {},
     };
 
-    const connectionInfo = dataSourcesQuery?.data[`${account}/${container}`];
     const calculateMultiplier = dataTypeToBytesPerSample(MimeTypes[meta.getDataType()]);
-    if (connectionInfo) {
+    if (useCloudStorage && connectionInfo) {
       body = {
         samples_b64: [],
         samples_cloud: [
@@ -92,10 +83,26 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
             sample_rate: sampleRate,
             center_freq: freq,
             data_type: MimeTypes[meta.getDataType()],
-            byte_offset: startSampleOffset * calculateMultiplier * 2,
+            byte_offset: Math.floor(startSampleOffset) * calculateMultiplier * 2,
             byte_length: trimmedSamples.length * calculateMultiplier,
           },
         ],
+        custom_params: {},
+      };
+    } else {
+      const newSamps = convertFloat32ArrayToBase64(trimmedSamples);
+      console.log(newSamps);
+
+      body = {
+        samples_b64: [
+          {
+            samples: newSamps,
+            sample_rate: sampleRate,
+            center_freq: freq,
+            data_type: MimeTypes[meta.getDataType()],
+          },
+        ],
+        samples_cloud: [],
         custom_params: {},
       };
     }
@@ -110,7 +117,6 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
         body['custom_params'][key] = value.value;
       }
     }
-    console.debug(body);
 
     fetch(selectedPlugin, {
       method: 'POST',
@@ -208,7 +214,7 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
 
             let filename = '';
             switch (data.data_output[0]['data_type']) {
-              case MimeTypes.AUDIO_WAV:
+              case MimeTypes.audio_wav:
                 filename = 'samples.wav';
                 break;
             }
@@ -245,13 +251,30 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
     <div className="pluginForm" id="pluginFormId" onSubmit={handleSubmit}>
       <label className="label">
         Plugin:
-        <select className="rounded bg-base-content text-base-100" value={selectedPlugin} onChange={handleChangePlugin}>
+        <select
+          className="rounded bg-base-content text-base-100 w-44"
+          value={selectedPlugin}
+          onChange={handleChangePlugin}
+        >
           <option disabled value="">
             Select a Plugin
           </option>
           {plugins && !isError && plugins?.map((plugin) => <PluginOption plugin={plugin} />)})
         </select>
       </label>
+      {connectionInfo && (
+        <label className="label cursor-pointer">
+          <span>Use Cloud Storage</span>
+          <input
+            type="checkbox"
+            checked={useCloudStorage}
+            className="checkbox checkbox-primary"
+            onChange={() => {
+              setUseCloudStorage(!useCloudStorage);
+            }}
+          />
+        </label>
+      )}
       {selectedPlugin && (
         <>
           <EditPluginParameters

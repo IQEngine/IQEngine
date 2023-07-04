@@ -20,7 +20,7 @@ def get_blob(account_name, container_name, file_path, sas_token):
     )
 
 
-def get_custom_params(plugin: Plugin, samples: any):
+def get_custom_params(plugin: Plugin, samples: SamplesB64 | SamplesCloud):
     custom_params = plugin.custom_params
     custom_params["sample_rate"] = samples.sample_rate
     custom_params["center_freq"] = samples.center_freq
@@ -33,7 +33,7 @@ def get_from_samples_b64(samples_b64: SamplesB64):
     )
 
 
-async def get_from_samples_cloud(samples_cloud: SamplesCloud):
+async def get_from_samples_cloud(samples_cloud: SamplesCloud) -> np.ndarray:
     blob_client = get_blob(
         samples_cloud.account_name,
         samples_cloud.container_name,
@@ -48,25 +48,27 @@ async def get_from_samples_cloud(samples_cloud: SamplesCloud):
             samples_cloud.byte_length,
         )
     else:
-        # TODO: This is timing out, we need to find an asychronus way of processing the file without blocking a successful response
+        # TODO: This is timing out, we need to find an asychronus way of
+        # processing the file without blocking a successful response
         download_stream = await asyncio.to_thread(blob_client.download_blob)
 
     buffer = np.frombuffer(
         io.BytesIO(download_stream.readall()).read(),
         dtype=data_mapping[samples_cloud.data_type],
     )
+    i, = np.where(buffer == np.iinfo('int16').min)
+    j, = np.where(buffer == np.iinfo('int16').max)
     buffer = get_float32_buffer(buffer)
+
     return buffer.view(dtype=np.complex64)
 
 
-def get_float32_buffer(buffer: any):
-    if buffer.dtype == np.float32:
-        return buffer
-    elif buffer.dtype == np.int16:
+def get_float32_buffer(buffer: np.ndarray):
+    if buffer.dtype == np.int16:
         return buffer.astype(np.float32) / np.iinfo("int16").max
     elif buffer.dtype == np.int8:
         return buffer.astype(np.float32) / np.iinfo("int8").max
-    return
+    return buffer
 
 
 def validate_samples(samples_b64: SamplesB64, samples_cloud: SamplesCloud):
