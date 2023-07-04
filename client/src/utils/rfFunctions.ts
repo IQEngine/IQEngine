@@ -24,16 +24,18 @@ export function calculateSampleCount(start: string, current: string, sampleRate:
 
 // Prints a number in Hz, using units most appropriate
 export function getFrequency(freq: number) {
+  if (!freq || isNaN(freq)) return { freq: 0, unit: 'Hz' };
+
   freq = Number(freq.toFixed(0));
-  if (freq.toString().length >= 10) {
+  if (freq?.toString().length >= 10) {
     return { freq: freq / 1e9, unit: 'GHz' };
   }
 
-  if (freq.toString().length >= 7) {
+  if (freq?.toString().length >= 7) {
     return { freq: freq / 1e6, unit: 'MHz' };
   }
 
-  if (freq.toString().length >= 4) {
+  if (freq?.toString().length >= 4) {
     return { freq: freq / 1e3, unit: 'kHz' };
   }
 
@@ -41,19 +43,21 @@ export function getFrequency(freq: number) {
 }
 
 export function getOriginalFrequency(freq: number, unit: string) {
+  if (!freq || isNaN(freq)) return 0;
+
   if (unit === 'GHz') {
-    return Number((freq * 1e9).toFixed(0));
+    return Number((freq * 1e9)?.toFixed(0));
   }
 
   if (unit === 'MHz') {
-    return Number((freq * 1e6).toFixed(0));
+    return Number((freq * 1e6)?.toFixed(0));
   }
 
   if (unit === 'kHz') {
-    return Number((freq * 1e3).toFixed(0));
+    return Number((freq * 1e3)?.toFixed(0));
   }
 
-  return Number(freq.toFixed(0));
+  return Number(freq?.toFixed(0));
 }
 
 // Prints a number in seconds, using units most appropriate

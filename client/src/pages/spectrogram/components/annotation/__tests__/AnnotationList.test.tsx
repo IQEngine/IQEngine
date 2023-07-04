@@ -238,4 +238,57 @@ describe('Annotation list component', () => {
     const textarea = await screen.findByLabelText('Annotation 0 Modal Text Area');
     expect(textarea.innerHTML).toContain(expected);
   });
+
+  test.each`
+    key                       | label                               | type            | expected
+    ${'core:freq_lower_edge'} | ${'Annotation 0 - Frequency Start'} | ${'spinbutton'} | ${860}
+    ${'core:freq_upper_edge'} | ${'Annotation 0 - Frequency End'}   | ${'spinbutton'} | ${900}
+  `('When no frequencies, display default value', async ({ key, label, type, expected }) => {
+    //Arrange
+    const meta = Object.assign(new SigMFMetadata(), JSON.parse(JSON.stringify(metadataJson)));
+    delete meta.annotations[0][key];
+
+    //Act
+    render(
+      <AnnotationList
+        meta={meta}
+        setHandleTop={() => {}}
+        spectrogramHeight={200}
+        setMeta={() => {
+          delete meta.annotations[0][key];
+        }}
+      ></AnnotationList>
+    );
+
+    // Assert
+    const current = await screen.findByRole(type, { name: label });
+    expect(current).toHaveValue(expected);
+  });
+
+  test.each`
+    key                       | label                               | type            | expected
+    ${'core:freq_lower_edge'} | ${'Annotation 0 - Frequency Start'} | ${'spinbutton'} | ${-20}
+    ${'core:freq_upper_edge'} | ${'Annotation 0 - Frequency End'}   | ${'spinbutton'} | ${20}
+  `('When no frequencies or center frequency, display default value', async ({ key, label, type, expected }) => {
+    //Arrange
+    const meta = Object.assign(new SigMFMetadata(), JSON.parse(JSON.stringify(metadataJson)));
+    delete meta.annotations[0][key];
+    delete meta.captures[0]['core:frequency'];
+
+    //Act
+    render(
+      <AnnotationList
+        meta={meta}
+        setHandleTop={() => {}}
+        spectrogramHeight={200}
+        setMeta={() => {
+          delete meta.annotations[0][key];
+        }}
+      ></AnnotationList>
+    );
+
+    // Assert
+    const current = await screen.findByRole(type, { name: label });
+    expect(current).toHaveValue(expected);
+  });
 });

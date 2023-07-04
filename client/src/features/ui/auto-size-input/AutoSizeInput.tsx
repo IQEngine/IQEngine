@@ -8,6 +8,7 @@ export const AutoSizeInput = ({
   className = null,
   onBlur = null,
   label = null,
+  minWidth = null,
 }) => {
   const [content, setContent] = useState(value);
   const [width, setWidth] = useState(0);
@@ -60,7 +61,7 @@ export const AutoSizeInput = ({
           title={content}
           value={content}
           className={`bg-base-100 input input-autosize no-spin ${className}`}
-          style={{ minWidth: width }}
+          style={{ width, minWidth: minWidth ?? width }}
           autoFocus
           onChange={changeHandler}
           onBlur={blurHandler}
