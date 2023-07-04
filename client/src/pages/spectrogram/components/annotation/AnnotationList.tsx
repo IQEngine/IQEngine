@@ -118,7 +118,7 @@ export const AnnotationList = ({ meta, setHandleTop, spectrogramHeight, setMeta 
         upperEdge = upperEdge ? upperEdge : centerFrequency + sampleRate / 2;
       } else {
         lowerEdge = lowerEdge ? lowerEdge : 0 - sampleRate / 2;
-        upperEdge = upperEdge ? upperEdge : 0 - sampleRate / 2;
+        upperEdge = upperEdge ? upperEdge : 0 + sampleRate / 2;
       }
 
       const startFrequency = getFrequency(lowerEdge);
