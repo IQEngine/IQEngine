@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.18.4.5664",
-      "templateHash": "4796666320847247488"
+      "templateHash": "4313779772772738316"
     }
   },
   "parameters": {
@@ -269,7 +269,9 @@
           }
         }
       },
-      "dependsOn": ["[resourceId('Microsoft.Resources/deployments', 'log-analytics-workspace')]"]
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'log-analytics-workspace')]"
+      ]
     },
     {
       "type": "Microsoft.Resources/deployments",
@@ -324,7 +326,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.18.4.5664",
-              "templateHash": "1205841287568992195"
+              "templateHash": "12042743638296679520"
             }
           },
           "parameters": {
@@ -386,7 +388,10 @@
                   "ingress": {
                     "external": "[parameters('useExternalIngress')]",
                     "targetPort": "[parameters('containerPort')]",
-                    "allowInsecure": false
+                    "allowInsecure": false,
+                    "stickySessions": {
+                      "affinity": "sticky"
+                    }
                   }
                 },
                 "template": {
@@ -422,7 +427,9 @@
                       "openIdIssuer": "[format('https://sts.windows.net/{0}/v2.0', subscription().tenantId)]"
                     },
                     "validation": {
-                      "allowedAudiences": ["[format('api://{0}', parameters('adAppClientId'))]"]
+                      "allowedAudiences": [
+                        "[format('api://{0}', parameters('adAppClientId'))]"
+                      ]
                     }
                   }
                 },
@@ -431,7 +438,9 @@
                   "unauthenticatedClientAction": "RedirectToLoginPage"
                 }
               },
-              "dependsOn": ["[resourceId('Microsoft.App/containerApps', parameters('name'))]"]
+              "dependsOn": [
+                "[resourceId('Microsoft.App/containerApps', parameters('name'))]"
+              ]
             }
           ],
           "outputs": {
