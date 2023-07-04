@@ -1,20 +1,17 @@
 import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
-import store from '@/store/store';
-import { CLIENT_TYPE_BLOB, DataSource } from '@/api/Models';
-import { upsertDataSource } from '@/store/reducers/ConnectionReducer';
 import { FeatureFlag } from '@/hooks/useFeatureFlags';
 
 const fetchConfig = async () => {
   try {
-    const response = await axios.get<Config>('/api/config').catch((error) => {
+    const response = await axios.get<AppConfig>('/api/config').catch((error) => {
       console.log('axios config not found, using env vars instead');
       return {
         data: {
           connectionInfo: JSON.parse(import.meta.env.IQENGINE_CONNECTION_INFO ?? null),
           googleAnalyticsKey: import.meta.env.IQENGINE_GOOGLE_ANALYTICS_KEY,
           featureFlags: JSON.parse(import.meta.env.IQENGINE_FEATURE_FLAGS ?? null),
-        } as Config,
+        } as AppConfig,
       };
     });
     if (!response.data.connectionInfo) {
@@ -40,7 +37,7 @@ const fetchConfig = async () => {
       connectionInfo: JSON.parse(import.meta.env.IQENGINE_CONNECTION_INFO ?? null),
       googleAnalyticsKey: import.meta.env.IQENGINE_GOOGLE_ANALYTICS_KEY,
       featureFlags: JSON.parse(import.meta.env.IQENGINE_FEATURE_FLAGS ?? null),
-    } as Config;
+    } as AppConfig;
   }
 };
 
@@ -55,26 +52,10 @@ interface ConnectionInfo {
   }>;
 }
 
-type Config = {
+export type AppConfig = {
   connectionInfo: ConnectionInfo;
   googleAnalyticsKey: string;
   featureFlags: { [key in FeatureFlag]: boolean };
 };
 
-export const configQuery = () =>
-  useQuery(['config'], fetchConfig, {
-    onSuccess: (data) => {
-      data.connectionInfo?.settings?.forEach((setting) => {
-        const dataSource: DataSource = {
-          type: CLIENT_TYPE_BLOB,
-          name: setting.name,
-          description: setting.description,
-          imageURL: setting.imageURL,
-          account: setting.accountName,
-          container: setting.containerName,
-          sasToken: setting.sasToken,
-        };
-        store.dispatch({ type: upsertDataSource.type, payload: dataSource });
-      });
-    },
-  });
+export const useConfigQuery = () => useQuery(['config'], fetchConfig);

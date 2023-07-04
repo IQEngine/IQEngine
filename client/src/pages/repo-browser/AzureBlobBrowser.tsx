@@ -4,16 +4,15 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { upsertDataSource } from '@/store/reducers/ConnectionReducer';
-import { useAppDispatch } from '@/store/hooks';
 import { CLIENT_TYPE_BLOB, DataSource } from '@/api/Models';
+import { useUserSettings } from '@/api/user-settings/use-user-settings';
 import toast from 'react-hot-toast';
 
 const AzureBlobBrowser = () => {
-  const dispatch = useAppDispatch();
   const [account, setAccount] = useState('');
   const [container, setContainer] = useState('');
   const [sasToken, setSasToken] = useState('');
+  const { addDataSource } = useUserSettings();
   const navigate = useNavigate();
   const onAccountNameChange = (event) => {
     setAccount(event.target.value);
@@ -63,13 +62,14 @@ const AzureBlobBrowser = () => {
     }
     var dataSource = {
       name: account + '/' + container,
-      type: 'blob',
+      type: CLIENT_TYPE_BLOB,
       account: account,
       container: container,
       sasToken: sasToken,
       description: 'Azure Blob Storage',
     } as DataSource;
-    dispatch(upsertDataSource(dataSource));
+
+    addDataSource(dataSource);
     navigate(`/recordings/${CLIENT_TYPE_BLOB}/${account}/${container}/${encodeURIComponent(sasToken)}`);
   };
 

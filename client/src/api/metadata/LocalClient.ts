@@ -1,9 +1,14 @@
 import { MetadataClient } from './MetadataClient';
 import { Annotation, CaptureSegment, SigMFMetadata, TraceabilityOrigin } from '@/utils/sigmfMetadata';
-import store from '@/store/store';
 import { FileWithDirectoryAndFileHandle } from 'browser-fs-access';
 
 export class LocalClient implements MetadataClient {
+  files: FileWithDirectoryAndFileHandle[];
+
+  constructor(files: FileWithDirectoryAndFileHandle[]) {
+    this.files = files;
+  }
+
   async getMetaFromFile(
     file: FileWithDirectoryAndFileHandle,
     dataFile: FileWithDirectoryAndFileHandle,
@@ -37,10 +42,10 @@ export class LocalClient implements MetadataClient {
 
   async getDataSourceMeta(account: string, container: string): Promise<SigMFMetadata[]> {
     console.debug('getDataSourceMeta', account, container);
-    if (!store.getState().localClient?.files) {
+    if (!this.files) {
       return Promise.reject('No local directory found');
     }
-    const localFiles: FileWithDirectoryAndFileHandle[] = store.getState().localClient.files;
+    const localFiles: FileWithDirectoryAndFileHandle[] = this.files;
     let result: SigMFMetadata[] = [];
     for (let i = 0; i < localFiles.length; i++) {
       const file = localFiles[i];
@@ -64,14 +69,14 @@ export class LocalClient implements MetadataClient {
   }
 
   async getMeta(account: string, container: string, filePath: string): Promise<SigMFMetadata> {
-    const localDirectory: FileWithDirectoryAndFileHandle[] = store.getState().localClient.files;
+    const localDirectory: FileWithDirectoryAndFileHandle[] = this.files;
     if (!localDirectory) {
       Promise.reject('No local directory found');
     }
     let metadataFile: FileWithDirectoryAndFileHandle | undefined = localDirectory.find((file) => {
       return file.webkitRelativePath === filePath + '.sigmf-meta' || file.name === filePath + '.sigmf-meta';
     });
-    console.log('metadataFile', metadataFile);
+    console.debug('metadataFile', metadataFile);
     if (!metadataFile) {
       return Promise.reject('No file found');
     }

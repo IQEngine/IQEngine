@@ -1,15 +1,27 @@
 import { SigMFMetadata } from '@/utils/sigmfMetadata';
 import { MetadataClientFactory } from './MetadataClientFactory';
 import { QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { MetadataClient } from './MetadataClient';
+import { useUserSettings } from '@/api/user-settings/use-user-settings';
 
-export const fetchMeta = async (type: string, account: string, container: string, filePath: string) => {
-  const client = MetadataClientFactory(type);
+export const fetchMeta = async (
+  client: MetadataClient,
+  type: string,
+  account: string,
+  container: string,
+  filePath: string
+) => {
   const response = await client.getMeta(account, container, filePath);
   return response;
 };
 
-const fetchDataSourceMeta = async (queryClient: QueryClient, type: string, account: string, container: string) => {
-  const client = MetadataClientFactory(type);
+const fetchDataSourceMeta = async (
+  client: MetadataClient,
+  queryClient: QueryClient,
+  type: string,
+  account: string,
+  container: string
+) => {
   const response = await client.getDataSourceMeta(account, container);
   for (const meta of response) {
     queryClient.setQueryData(['datasource', type, account, container, meta.getOrigin().file_path, 'meta'], meta);
@@ -18,13 +30,12 @@ const fetchDataSourceMeta = async (queryClient: QueryClient, type: string, accou
 };
 
 const updateDataSourceMeta = async (
-  type: string,
+  client: MetadataClient,
   account: string,
   container: string,
   filePath: string,
   meta: SigMFMetadata
 ) => {
-  const client = MetadataClientFactory(type);
   const response = await client.updateMeta(account, container, filePath, meta);
   return response;
 };
@@ -35,25 +46,48 @@ export const getDataSourceMeta = (
   account: string,
   container: string,
   enabled = true
-) =>
-  useQuery(
+) => {
+  const { dataSourcesQuery, filesQuery } = useUserSettings();
+  if (!dataSourcesQuery.data || !filesQuery.data) {
+    return useQuery(['invalidQuery'], () => null);
+  }
+  return useQuery(
     ['datasource', type, account, container, 'meta'],
-    () => fetchDataSourceMeta(client, type, account, container),
+    () => {
+      const metadataClient = MetadataClientFactory(type, filesQuery.data, dataSourcesQuery.data);
+      return fetchDataSourceMeta(metadataClient, client, type, account, container);
+    },
     {
       enabled: enabled,
       staleTime: Infinity,
     }
   );
+};
 
-export const getMeta = (type: string, account: string, container: string, filePath: string, enabled = true) =>
-  useQuery(
-    ['datasource', type, account, container, filePath, 'meta'],
-    () => fetchMeta(type, account, container, filePath),
+export const getMeta = (type: string, account: string, container: string, filePath: string, enabled = true) => {
+  const { dataSourcesQuery, filesQuery } = useUserSettings();
+  if (!dataSourcesQuery.data || !filesQuery.data) {
+    return useQuery(['invalidQuery'], () => null);
+  }
+  return useQuery(
+    [
+      'datasource',
+      type,
+      account,
+      container,
+      filePath,
+      'meta'
+    ],
+    () => {
+      const metadataClient = MetadataClientFactory(type, filesQuery.data, dataSourcesQuery.data);
+      return fetchMeta(metadataClient, type, account, container, filePath);
+    },
     {
-      enabled: enabled,
+      enabled: enabled && !!dataSourcesQuery.data && !!filesQuery.data,
       staleTime: Infinity,
     }
   );
+};
 
 export const useUpdateMeta = (meta: SigMFMetadata) => {
   let client = useQueryClient();
@@ -62,29 +96,28 @@ export const useUpdateMeta = (meta: SigMFMetadata) => {
     throw new Error('Meta is missing origin');
   }
   const { type, account, container, file_path: filePath } = meta.getOrigin();
+  const { dataSourcesQuery, filesQuery } = useUserSettings();
+
   return useMutation({
-    mutationFn: (newMeta: SigMFMetadata) => updateDataSourceMeta(type, account, container, filePath, newMeta),
+    mutationFn: (newMeta: SigMFMetadata) => {
+      const metadataClient = MetadataClientFactory(type, filesQuery.data, dataSourcesQuery.data);
+      return updateDataSourceMeta(metadataClient, account, container, filePath, newMeta);
+    },
     onMutate: async () => {
-      console.log('onMutate');
       await client.cancelQueries(['datasource', type, account, container, filePath, 'meta']);
       const previousMeta = client.getQueryData(['datasource', type, account, container, filePath, 'meta']);
       client.setQueryData(['datasource', type, account, container, filePath, 'meta'], meta);
       return { previousMeta };
     },
     onError: (err, newMeta, context) => {
-      console.log('onError', err);
+      console.error('onError', err);
       client.setQueryData(['datasource', type, account, container, filePath, 'meta'], context.previousMeta);
     },
   });
 };
 
-export const preFetchDataSourcesMeta = (client: QueryClient, type: string, account: string, container: string) => {
-  client.prefetchQuery(['datasource', type, account, container, 'meta'], () =>
-    fetchDataSourceMeta(client, type, account, container)
-  );
-};
-
 export const useGetMetadataFeatures = (type: string) => {
-  const client = MetadataClientFactory(type);
-  return client.features();
+  const { filesQuery, dataSourcesQuery } = useUserSettings();
+  const metadataClient = MetadataClientFactory(type, filesQuery.data, dataSourcesQuery.data);
+  return metadataClient.features();
 };

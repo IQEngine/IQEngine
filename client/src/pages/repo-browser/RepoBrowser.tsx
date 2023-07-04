@@ -10,23 +10,21 @@ import RepositoryTile from './RepositoryTile';
 import RepositoryAPITile from './RepositoryAPITile';
 import SiggenTile from './SiggenTile';
 import ValidatorTile from './ValidatorTile';
-import { configQuery } from '@/api/config/queries';
-import { preFetchDataSourcesMeta } from '@/api/metadata/Queries';
+import { useConfigQuery } from '@/api/config/queries';
 import { getDataSources } from '@/api/datasource/Queries';
-import { useAppDispatch } from '@/store/hooks';
-import { upsertDataSource } from '@/store/reducers/ConnectionReducer';
 import { CLIENT_TYPE_API, CLIENT_TYPE_BLOB, DataSource } from '@/api/Models';
 import { useQueryClient } from '@tanstack/react-query';
 import Feature from '@/features/feature/Feature';
 import { FeatureFlag } from '@/hooks/useFeatureFlags';
+import { useUserSettings } from '@/api/user-settings/use-user-settings';
 
 const RepoBrowser = () => {
   let [dataAvailable, setDataAvailable] = useState(false);
-  const config = configQuery();
+  const config = useConfigQuery();
   const apiDataSources = getDataSources(CLIENT_TYPE_API);
   const blobDataSources = getDataSources(CLIENT_TYPE_BLOB, dataAvailable);
   const queryClient = useQueryClient();
-  const dispatch = useAppDispatch();
+  const { addDataSource } = useUserSettings();
   useEffect(() => {
     if (config.data) {
       // In local mode, IQENGINE_CONNECTION_INFO isn't defined
@@ -34,14 +32,14 @@ const RepoBrowser = () => {
         var dataSources = config.data.connectionInfo.settings.map((item) => {
           var dataSource = {
             name: item.name,
-            type: 'blob',
+            type: CLIENT_TYPE_BLOB,
             account: item.accountName,
             container: item.containerName,
             imageURL: item.imageURL,
             sasToken: item.sasToken,
             description: item.description,
           } as DataSource;
-          dispatch(upsertDataSource(dataSource));
+          addDataSource(dataSource);
           return dataSource;
         });
         queryClient.setQueryData(['datasource', CLIENT_TYPE_BLOB], dataSources);
@@ -49,14 +47,6 @@ const RepoBrowser = () => {
       }
     }
   }, [config.data]);
-
-  useEffect(() => {
-    if (blobDataSources.data) {
-      blobDataSources.data.forEach((item) => {
-        preFetchDataSourcesMeta(queryClient, CLIENT_TYPE_BLOB, item.account, item.container);
-      });
-    }
-  }, [blobDataSources.data]);
 
   return (
     <div className="py-3">
