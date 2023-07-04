@@ -14,6 +14,10 @@ data_mapping = {
 
 
 def get_blob(account_name, container_name, file_path, sas_token):
+    if(sas_token == None):
+        return BlobClient.from_blob_url(
+            f"https://{account_name}.blob.core.windows.net/{container_name}/{file_path}.sigmf-data",
+        )
     return BlobClient.from_blob_url(
         f"https://{account_name}.blob.core.windows.net/{container_name}/{file_path}.sigmf-data",
         credential=sas_token,
@@ -64,7 +68,7 @@ async def get_from_samples_cloud(samples_cloud: SamplesCloud) -> np.ndarray:
 def get_float32_buffer(buffer: np.ndarray):
     if buffer.dtype == np.int16:
         return buffer.astype(np.float32) / np.iinfo("int16").max
-    elif buffer.dtype == np.int8:
+    if buffer.dtype == np.int8:
         return buffer.astype(np.float32) / np.iinfo("int8").max
     return buffer
 
