@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.18.4.5664",
-      "templateHash": "4796666320847247488"
+      "templateHash": "4313779772772738316"
     }
   },
   "parameters": {
@@ -324,7 +324,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.18.4.5664",
-              "templateHash": "1205841287568992195"
+              "templateHash": "12042743638296679520"
             }
           },
           "parameters": {
@@ -386,7 +386,10 @@
                   "ingress": {
                     "external": "[parameters('useExternalIngress')]",
                     "targetPort": "[parameters('containerPort')]",
-                    "allowInsecure": false
+                    "allowInsecure": false,
+                    "stickySessions": {
+                      "affinity": "sticky"
+                    }
                   }
                 },
                 "template": {

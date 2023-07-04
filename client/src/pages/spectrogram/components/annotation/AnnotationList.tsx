@@ -30,6 +30,7 @@ export const AnnotationList = ({ meta, setHandleTop, spectrogramHeight, setMeta 
     { title: 'BW', dataIndex: 'bandwidthHz' },
     { title: 'Label', dataIndex: 'label' },
     { title: 'Time Range', dataIndex: 'timeRange' },
+    { title: 'Comment', dataIndex: 'comment' },
     { title: 'Duration', dataIndex: 'duration' },
     { title: 'Actions', dataIndex: 'actions' },
   ];
@@ -152,6 +153,12 @@ export const AnnotationList = ({ meta, setHandleTop, spectrogramHeight, setMeta 
           name: 'core:sample_count',
           error: currentParents[i]?.endTime?.error,
         },
+        comment: {
+          index: i,
+          annotation: annotation,
+          name: 'core:comment',
+          error: currentParents[i]?.comment?.error,
+        },
       };
 
       let currentData = {
@@ -192,6 +199,15 @@ export const AnnotationList = ({ meta, setHandleTop, spectrogramHeight, setMeta 
           />
         ),
         duration: duration.time + duration.unit,
+        comment: (
+          <AutoSizeInput
+            label={`Annotation ${i} - Comment`}
+            parent={currentParents[i].comment}
+            value={annotation['core:comment']}
+            onBlur={updateAnnotation}
+            className={'min-w-200'}
+          />
+        ),
         actions: (
           <Actions
             startSampleCount={startSampleCount}
