@@ -1,10 +1,10 @@
 import database.database
+import httpx
 from database.models import DataSource
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import StreamingResponse
 from pydantic import SecretStr
 from pymongo.collection import Collection
-from fastapi.responses import StreamingResponse
-import httpx
 
 from .cipher import encrypt
 from .urlmapping import add_URL_sasToken, apiType
@@ -74,14 +74,18 @@ async def get_datasource_image(
     if not datasource["sasToken"]:
         datasource["sasToken"] = ""  # set to empty str if null
 
-    imageURL = add_URL_sasToken(account, container, datasource["sasToken"], "", apiType.IMAGE)
+    imageURL = add_URL_sasToken(
+        account, container, datasource["sasToken"], "", apiType.IMAGE
+    )
 
     async with httpx.AsyncClient() as client:
         response = await client.get(imageURL.get_secret_value())
     if response.status_code != 200:
         raise HTTPException(status_code=404, detail="Image not found")
 
-    return StreamingResponse(response.iter_bytes(), media_type=response.headers["Content-Type"])
+    return StreamingResponse(
+        response.iter_bytes(), media_type=response.headers["Content-Type"]
+    )
 
 
 @router.get(
