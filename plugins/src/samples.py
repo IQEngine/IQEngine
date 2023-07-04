@@ -56,8 +56,6 @@ async def get_from_samples_cloud(samples_cloud: SamplesCloud) -> np.ndarray:
         io.BytesIO(download_stream.readall()).read(),
         dtype=data_mapping[samples_cloud.data_type],
     )
-    i, = np.where(buffer == np.iinfo('int16').min)
-    j, = np.where(buffer == np.iinfo('int16').max)
     buffer = get_float32_buffer(buffer)
 
     return buffer.view(dtype=np.complex64)
