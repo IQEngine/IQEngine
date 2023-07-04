@@ -4,7 +4,6 @@
   "private": true,
   "dependencies": {
     "@azure/storage-blob": "^12.14.0",
-    "@azure/identity": "^3.2.3",
     "@codemirror/lang-python": "^6.1.2",
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
