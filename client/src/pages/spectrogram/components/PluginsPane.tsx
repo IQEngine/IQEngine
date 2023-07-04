@@ -215,19 +215,22 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
       <label className="label">
         Plugin:
         <select className="rounded bg-base-content text-base-100" value={selectedPlugin} onChange={handleChangePlugin}>
-          <option disabled selected value="">
+          <option disabled value="">
             Select a Plugin
           </option>
           {plugins && !isError && plugins?.map((plugin) => <PluginOption plugin={plugin} />)})
         </select>
       </label>
       {selectedPlugin && (
-        <EditPluginParameters
-          pluginUrl={selectedPlugin}
-          handleSubmit={handleSubmit}
-          setPluginParameters={setPluginParameters}
-          pluginParameters={pluginParameters}
-        />
+        <>
+          <EditPluginParameters
+            pluginUrl={selectedPlugin}
+            handleSubmit={handleSubmit}
+            setPluginParameters={setPluginParameters}
+            pluginParameters={pluginParameters}
+          />
+          <button onClick={handleSubmit}>Run Plugin</button>
+        </>
       )}
 
       {modalOpen && (
