@@ -23,7 +23,7 @@ export function getContainerClient(
   container: string
 ): ContainerClient {
   const dataSource = getDataSourceFromDatasources(dataSources, account, container);
-  if (!dataSource || !dataSource.sasToken) {
+  if (!dataSource) {
     console.debug(`DATASOURCE NOT FOUND: ${account}/${container}`, dataSources);
     throw new Error('No connection found');
   }

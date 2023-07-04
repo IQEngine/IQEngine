@@ -1,6 +1,6 @@
 import { test } from '@playwright/test';
 
-test('Confirm Validator and AzureBlob cards', async ({ page }) => {
+test('Confirm Validator and AzureBlob cards @CICompatible', async ({ page }) => {
   await page.goto('/');
 
   // signal generator
