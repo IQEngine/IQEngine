@@ -105,7 +105,7 @@ export const AnnotationList = ({ meta, setHandleTop, spectrogramHeight, setMeta 
       const sampleRate = Number(meta.global['core:sample_rate']);
       const startSampleCount = Number(annotation['core:sample_start']);
       const sampleCount = Number(annotation['core:sample_count']);
-      const centerFrequency = startCapture['core:frequency'] ?? 0;
+      const centerFrequency = meta.getCenterFrequency();
       const lowerEdge = annotation['core:freq_lower_edge']
         ? annotation['core:freq_lower_edge']
         : centerFrequency - sampleRate / 2;

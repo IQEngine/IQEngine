@@ -240,8 +240,12 @@ export class Annotation {
       y2: 0,
       visible: false,
     };
-    let freq_lower_edge = this['core:freq_lower_edge'];
-    let freq_upper_edge = this['core:freq_upper_edge'];
+    let freq_lower_edge = this['core:freq_lower_edge']
+      ? this['core:freq_lower_edge']
+      : centerFrequency - sampleRate / 2;
+    let freq_upper_edge = this['core:freq_upper_edge']
+      ? this['core:freq_upper_edge']
+      : centerFrequency + sampleRate / 2;
     let sample_start = this['core:sample_start'];
     let sample_count = this['core:sample_count'];
 
