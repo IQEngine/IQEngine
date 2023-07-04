@@ -76,10 +76,10 @@ export const AnnotationList = ({ meta, setHandleTop, spectrogramHeight, setMeta 
       }
 
       if (parent.name == 'core:freq_lower_edge') {
-        newAnnotationValue = getOriginalFrequency(value, parent.object.unit);
+        newAnnotationValue = getOriginalFrequency(Number(value), parent.object.unit);
         parent.error = validateFrequency(newAnnotationValue, minFreq, maxFreq);
       } else if (parent.name == 'core:freq_upper_edge') {
-        newAnnotationValue = getOriginalFrequency(value, parent.object.unit);
+        newAnnotationValue = getOriginalFrequency(Number(value), parent.object.unit);
         parent.error = validateFrequency(newAnnotationValue, minFreq, maxFreq);
       }
       let updatedAnnotation = { ...parent.annotation };
@@ -105,18 +105,29 @@ export const AnnotationList = ({ meta, setHandleTop, spectrogramHeight, setMeta 
       const sampleRate = Number(meta.global['core:sample_rate']);
       const startSampleCount = Number(annotation['core:sample_start']);
       const sampleCount = Number(annotation['core:sample_count']);
+      const centerFrequency = startCapture['core:frequency'];
+      let lowerEdge = annotation['core:freq_lower_edge'];
+      let upperEdge = annotation['core:freq_upper_edge'];
 
       // Get description
       const description = annotation['core:description'];
 
       // Get start frequency range
-      const startFrequency = getFrequency(annotation['core:freq_lower_edge']);
+      if (centerFrequency) {
+        lowerEdge = lowerEdge ? lowerEdge : centerFrequency - sampleRate / 2;
+        upperEdge = upperEdge ? upperEdge : centerFrequency + sampleRate / 2;
+      } else {
+        lowerEdge = lowerEdge ? lowerEdge : 0 - sampleRate / 2;
+        upperEdge = upperEdge ? upperEdge : 0 + sampleRate / 2;
+      }
+
+      const startFrequency = getFrequency(lowerEdge);
 
       // Get end frequency range
-      const endFrequency = getFrequency(annotation['core:freq_upper_edge']);
+      const endFrequency = getFrequency(upperEdge);
 
       // Get bandwidth
-      const bandwidthHz = getFrequency(annotation['core:freq_upper_edge'] - annotation['core:freq_lower_edge']);
+      const bandwidthHz = getFrequency(upperEdge - lowerEdge);
 
       // Get duration
       const duration = getSeconds(sampleCount / sampleRate);
@@ -189,7 +200,7 @@ export const AnnotationList = ({ meta, setHandleTop, spectrogramHeight, setMeta 
             <div className="flex items-center">{endFrequency.unit}</div>
           </div>
         ),
-        bandwidthHz: bandwidthHz.freq + bandwidthHz.unit,
+        bandwidthHz: bandwidthHz?.freq + bandwidthHz.unit,
         label: (
           <AutoSizeInput
             label={`Annotation ${i} - Label`}
@@ -205,7 +216,7 @@ export const AnnotationList = ({ meta, setHandleTop, spectrogramHeight, setMeta 
             parent={currentParents[i].comment}
             value={annotation['core:comment']}
             onBlur={updateAnnotation}
-            className={'min-w-200'}
+            minWidth={200}
           />
         ),
         actions: (

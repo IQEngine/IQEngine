@@ -83,6 +83,9 @@ async def get_metadata_iqdata(
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
 
+    if not datasource.get("sasToken"):
+        datasource["sasToken"] = ""  # set to empty str if null
+
     imageURL = add_URL_sasToken(
         account, container, datasource["sasToken"], filepath, apiType.IQDATA
     )
@@ -90,7 +93,7 @@ async def get_metadata_iqdata(
     async with httpx.AsyncClient() as client:
         response = await client.get(imageURL.get_secret_value())
     if response.status_code != 200:
-        raise HTTPException(status_code=404, detail="Image not found")
+        raise HTTPException(status_code=404, detail="File not found")
 
     return StreamingResponse(
         response.iter_bytes(), media_type=response.headers["Content-Type"]
@@ -120,6 +123,9 @@ async def get_meta_thumbnail(
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
 
+    if not datasource.get("sasToken"):
+        datasource["sasToken"] = ""  # set to empty str if null
+
     imageURL = add_URL_sasToken(
         account, container, datasource["sasToken"], filepath, apiType.THUMB
     )
@@ -127,7 +133,7 @@ async def get_meta_thumbnail(
     async with httpx.AsyncClient() as client:
         response = await client.get(imageURL.get_secret_value())
     if response.status_code != 200:
-        raise HTTPException(status_code=404, detail="Image not found")
+        raise HTTPException(status_code=404, detail="File not found")
 
     return StreamingResponse(
         response.iter_bytes(), media_type=response.headers["Content-Type"]

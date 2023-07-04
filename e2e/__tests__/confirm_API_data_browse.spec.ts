@@ -15,7 +15,7 @@ test.beforeAll(async ({ request }) => {
   const response = await request.post('/api/datasources', { data: dataSource });
 });
 
-test('API Datasource Browsing', async ({ page }) => {
+test('API Datasource Browsing @CICompatible', async ({ page }) => {
   await page.goto('/');
   const elements = await page.locator('[id="TestAPIDataSource"]'); // After first run there will be more than one element by this name
   await elements.nth(0).click(); // Only look for the first element
