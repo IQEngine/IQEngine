@@ -269,9 +269,7 @@
           }
         }
       },
-      "dependsOn": [
-        "[resourceId('Microsoft.Resources/deployments', 'log-analytics-workspace')]"
-      ]
+      "dependsOn": ["[resourceId('Microsoft.Resources/deployments', 'log-analytics-workspace')]"]
     },
     {
       "type": "Microsoft.Resources/deployments",
@@ -427,9 +425,7 @@
                       "openIdIssuer": "[format('https://sts.windows.net/{0}/v2.0', subscription().tenantId)]"
                     },
                     "validation": {
-                      "allowedAudiences": [
-                        "[format('api://{0}', parameters('adAppClientId'))]"
-                      ]
+                      "allowedAudiences": ["[format('api://{0}', parameters('adAppClientId'))]"]
                     }
                   }
                 },
@@ -438,9 +434,7 @@
                   "unauthenticatedClientAction": "RedirectToLoginPage"
                 }
               },
-              "dependsOn": [
-                "[resourceId('Microsoft.App/containerApps', parameters('name'))]"
-              ]
+              "dependsOn": ["[resourceId('Microsoft.App/containerApps', parameters('name'))]"]
             }
           ],
           "outputs": {
