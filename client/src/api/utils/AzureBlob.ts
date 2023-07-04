@@ -28,9 +28,15 @@ export function getContainerClient(
     throw new Error('No connection found');
   }
   console.debug(`DATASOURCE FOUND: ${dataSource.account}/${dataSource.container} ${dataSource.sasToken}`);
-  const blobServiceClient = new BlobServiceClient(
-    `https://${dataSource.account}.blob.core.windows.net?${dataSource.sasToken}`
-  );
+
+  let blobServiceClient = undefined;
+  if (dataSource.sasToken) {
+    blobServiceClient = new BlobServiceClient(
+      `https://${dataSource.account}.blob.core.windows.net?${dataSource.sasToken}`
+    );
+  } else {
+    blobServiceClient = new BlobServiceClient(`https://${dataSource.account}.blob.core.windows.net`, undefined);
+  }
   return blobServiceClient.getContainerClient(dataSource.container);
 }
 
