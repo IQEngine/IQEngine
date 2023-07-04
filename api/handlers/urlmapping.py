@@ -11,14 +11,15 @@ class apiType(Enum):
 
 def add_URL_sasToken(account, container, sasToken, filepath, apiType: apiType):
 
-    if apiType == apiType.THUMB and filepath is not None and filepath != "":
-        bloburl = f'https://{account}.blob.core.windows.net/{container}/{filepath}.jpg'
-    elif apiType == apiType.IMAGE:
-        bloburl = f'https://{account}.blob.core.windows.net/{container}/datasource_thumbnail.jpg'
-    elif apiType == apiType.IQDATA:
-        bloburl = f'https://{account}.blob.core.windows.net/{container}/{filepath}.sigmf-data'
-    else:
-        raise ValueError("Invalid apiType value")
+    match apiType:
+        case apiType.THUMB if filepath and filepath.strip():
+            bloburl = f'https://{account}.blob.core.windows.net/{container}/{filepath}.jpg'
+        case apiType.IMAGE:
+            bloburl = f'https://{account}.blob.core.windows.net/{container}/datasource_thumbnail.jpg'
+        case apiType.IQDATA if filepath and filepath.strip():
+            bloburl = f'https://{account}.blob.core.windows.net/{container}/{filepath}.sigmf-data'
+        case _:
+            raise ValueError("Invalid apiType value")
 
     if (
         sasToken is not None
