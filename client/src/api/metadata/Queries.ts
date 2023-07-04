@@ -76,8 +76,7 @@ export const getMeta = (type: string, account: string, container: string, filePa
       account,
       container,
       filePath,
-      'meta',
-      { datasources: dataSourcesQuery.data, files: filesQuery.data },
+      'meta'
     ],
     () => {
       const metadataClient = MetadataClientFactory(type, filesQuery.data, dataSourcesQuery.data);
