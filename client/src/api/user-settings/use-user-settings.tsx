@@ -21,6 +21,10 @@ async function getDataSources(config: AppConfig): Promise<Record<string, DataSou
     : {};
 }
 
+export interface UserPreferences {
+  colorMap: string;
+}
+
 export const useUserSettings = () => {
   const queryClient = useQueryClient();
 
@@ -44,6 +48,16 @@ export const useUserSettings = () => {
     }
   };
 
+  const userPreferencesQuery = useQuery<UserPreferences>(['user-settings', 'preferences'], () =>
+    Promise.resolve({
+      colorMap: 'viridis',
+    })
+  );
+
+  const setUserPreferences = (preferences: UserPreferences) => {
+    queryClient.setQueryData(['user-settings', 'preferences'], preferences);
+  };
+
   const { data: config } = useConfigQuery();
   const dataSourcesQuery = useQuery<Record<string, DataSource>>(
     ['user-settings', 'blob-data-sources'],
@@ -55,8 +69,10 @@ export const useUserSettings = () => {
 
   return {
     filesQuery,
+    setFiles,
     dataSourcesQuery,
     addDataSource,
-    setFiles,
+    userPreferencesQuery,
+    setUserPreferences,
   };
 };
