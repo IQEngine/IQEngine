@@ -3,13 +3,12 @@ import { colMaps } from '@/utils/colormap';
 
 export const Logo = () => {
   const [stops, setStops] = useState([]);
+  const [dSin, setDSin] = useState('');
+  const [dCos, setDCos] = useState('');
 
   function updateLogoCurve() {
-    // starting point of curve wrt SVG canvas
-    const x0 = 29.7;
+    const x0 = 29.7; // starting point of curve wrt SVG canvas
     const y0 = 92.5;
-    let sinCurve = document.getElementById('logo-sin-curve');
-    let cosCurve = document.getElementById('logo-cos-curve');
     let sinString = 'M ' + x0 + ',' + y0;
     let cosString = 'M ' + x0 + ',' + y0;
     const t = new Date().getTime();
@@ -38,8 +37,8 @@ export const Logo = () => {
         cosString += ' L ' + (x0 + i) + ',' + (y0 + Math.random() * 0.3 - 0.15);
       }
     }
-    sinCurve.setAttribute('d', sinString);
-    cosCurve.setAttribute('d', cosString);
+    setDSin(sinString);
+    setDCos(cosString);
   }
 
   useEffect(() => {
@@ -73,8 +72,8 @@ export const Logo = () => {
             </linearGradient>
           </defs>
           <g>
-            <path id="logo-sin-curve" stroke="url(#logoGradient)" strokeWidth="0.5" fill="none" />
-            <path id="logo-cos-curve" stroke="url(#logoGradient)" strokeWidth="0.5" fill="none" />
+            <path id="logo-sin-curve" d={dSin} stroke="url(#logoGradient)" strokeWidth="0.5" fill="none" />
+            <path id="logo-cos-curve" d={dCos} stroke="url(#logoGradient)" strokeWidth="0.5" fill="none" />
           </g>
           <g aria-label="IQEngine" fill="#AFAFAF">
             <path d="M 33.526375,72.431076 V 89.360275 H 29.570028 V 72.431076 Z" />
