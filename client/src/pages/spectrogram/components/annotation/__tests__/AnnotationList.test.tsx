@@ -54,6 +54,7 @@ describe('Annotation list component', () => {
     expect(await screen.findByText('1.35MHz')).toBeInTheDocument();
     expect(await screen.findByText('LTE')).toBeInTheDocument();
     expect(await screen.findByText('5ms')).toBeInTheDocument();
+    expect(await screen.findByText('Sample comment')).toBeInTheDocument();
   });
 
   test.each`
@@ -209,6 +210,7 @@ describe('Annotation list component', () => {
     ${'New Description'}          | ${'core:description'}     | ${'New Description'} | ${'Annotation 0 - Label'}           | ${'textbox'}    | ${'New Description'}
     ${'2022-03-17T16:43:30.002Z'} | ${'core:sample_start'}    | ${10001}             | ${'Annotation 0 - Start Time'}      | ${'textbox'}    | ${10001}
     ${'2022-03-17T16:45:30.003Z'} | ${'core:sample_count'}    | ${10002}             | ${'Annotation 0 - End Time'}        | ${'textbox'}    | ${10002}
+    ${'New Comment'}              | ${'core:comment'}         | ${'New Comment'}     | ${'Annotation 0 - Comment'}         | ${'textbox'}    | ${'New Comment'}
   `('Annotation updates action value correctly on alteration', async ({ input, key, value, label, type, expected }) => {
     //Arrange
     const meta = Object.assign(new SigMFMetadata(), JSON.parse(JSON.stringify(metadataJson)));
@@ -235,5 +237,58 @@ describe('Annotation list component', () => {
     // Assert
     const textarea = await screen.findByLabelText('Annotation 0 Modal Text Area');
     expect(textarea.innerHTML).toContain(expected);
+  });
+
+  test.each`
+    key                       | label                               | type            | expected
+    ${'core:freq_lower_edge'} | ${'Annotation 0 - Frequency Start'} | ${'spinbutton'} | ${860}
+    ${'core:freq_upper_edge'} | ${'Annotation 0 - Frequency End'}   | ${'spinbutton'} | ${900}
+  `('When no frequencies, display default value', async ({ key, label, type, expected }) => {
+    //Arrange
+    const meta = Object.assign(new SigMFMetadata(), JSON.parse(JSON.stringify(metadataJson)));
+    delete meta.annotations[0][key];
+
+    //Act
+    render(
+      <AnnotationList
+        meta={meta}
+        setHandleTop={() => {}}
+        spectrogramHeight={200}
+        setMeta={() => {
+          delete meta.annotations[0][key];
+        }}
+      ></AnnotationList>
+    );
+
+    // Assert
+    const current = await screen.findByRole(type, { name: label });
+    expect(current).toHaveValue(expected);
+  });
+
+  test.each`
+    key                       | label                               | type            | expected
+    ${'core:freq_lower_edge'} | ${'Annotation 0 - Frequency Start'} | ${'spinbutton'} | ${-20}
+    ${'core:freq_upper_edge'} | ${'Annotation 0 - Frequency End'}   | ${'spinbutton'} | ${20}
+  `('When no frequencies or center frequency, display default value', async ({ key, label, type, expected }) => {
+    //Arrange
+    const meta = Object.assign(new SigMFMetadata(), JSON.parse(JSON.stringify(metadataJson)));
+    delete meta.annotations[0][key];
+    delete meta.captures[0]['core:frequency'];
+
+    //Act
+    render(
+      <AnnotationList
+        meta={meta}
+        setHandleTop={() => {}}
+        spectrogramHeight={200}
+        setMeta={() => {
+          delete meta.annotations[0][key];
+        }}
+      ></AnnotationList>
+    );
+
+    // Assert
+    const current = await screen.findByRole(type, { name: label });
+    expect(current).toHaveValue(expected);
   });
 });

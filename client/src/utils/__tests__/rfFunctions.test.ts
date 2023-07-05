@@ -56,6 +56,8 @@ describe('Get frequency', () => {
     ${1e2}           | ${{ freq: 1e2, unit: 'Hz' }}
     ${1}             | ${{ freq: 1, unit: 'Hz' }}
     ${1.00000000001} | ${{ freq: 1, unit: 'Hz' }}
+    ${'invalid'}     | ${{ freq: 0, unit: 'Hz' }}
+    ${null}          | ${{ freq: 0, unit: 'Hz' }}
   `('should get frequency correctly', ({ freq, expected }) => {
     // Act
     const result = getFrequency(freq);
@@ -89,6 +91,8 @@ describe('Get original frequency', () => {
     ${1e1}           | ${'GHz'} | ${10000000000}
     ${1}             | ${'GHz'} | ${1000000000}
     ${1.00000000001} | ${'GHz'} | ${1000000000}
+    ${'invalid'}     | ${'Hz'}  | ${0}
+    ${null}          | ${'Hz'}  | ${0}
   `('should get original frequency correctly', ({ freq, unit, expected }) => {
     // Act
     const result = getOriginalFrequency(freq, unit);

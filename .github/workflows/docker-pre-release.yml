@@ -75,3 +75,17 @@ jobs:
             ghcr.io/${{ steps.set_variables.outputs.repository }}:pre
         env:
           NODE_ENV: production
+      - name: Build and Push Plugins
+        uses: docker/build-push-action@v2
+        if: steps.draft_a_release.outputs.tag_name != ''
+        with:
+          context: plugins
+          labels: |
+            org.opencontainers.image.source=https://github.com/IQEngine/IQEngine
+          push: true
+          tags: |
+            ghcr.io/${{ steps.set_variables.outputs.repository }}-plugins:${{ steps.set_variables.outputs.sha }}
+            ghcr.io/${{ steps.set_variables.outputs.repository }}-plugins:${{ steps.draft_a_release.outputs.tag_name }}
+            ghcr.io/${{ steps.set_variables.outputs.repository }}-plugins:pre
+        env:
+          NODE_ENV: production
