@@ -10,7 +10,7 @@ import { getDataSourceMeta } from '@/api/metadata/Queries';
 import { DirectoryNode, groupDataByDirectories } from './DirectoryNode';
 import { useQueryClient } from '@tanstack/react-query';
 
-export default function RecordingsBrowser() {
+export function RecordingsBrowser() {
   const { type, account, container, sasToken } = useParams();
   const queryClient = useQueryClient();
   const metadata_collection = getDataSourceMeta(queryClient, type, account, container);
