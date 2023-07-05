@@ -1,6 +1,7 @@
 import SignalGenerator from '@/pages/signal-generator/SignalGenerator';
 import { createBrowserRouter } from 'react-router-dom';
 import React from 'react';
+import SwaggerUI from 'swagger-ui-react';
 
 export function useIQEngineRouter() {
   const router = createBrowserRouter([
@@ -65,18 +66,11 @@ export function useIQEngineRouter() {
     },
     {
       path: '/openapi',
-      async lazy() {
-        let { SwaggerUI } = await import('swagger-ui-react');
-        return {
-          Component: () => {
-            return (
-              <div className="bg-white">
-                <SwaggerUI url="https://raw.githubusercontent.com/IQEngine/IQEngine/main/plugins/openapi.yaml" />
-              </div>
-            );
-          },
-        };
-      },
+      element: (
+        <div className="bg-white">
+          <SwaggerUI url="https://raw.githubusercontent.com/IQEngine/IQEngine/main/plugins/plugins_openapi.yaml" />
+        </div>
+      ),
     },
   ]);
 
