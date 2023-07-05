@@ -44,14 +44,14 @@ def create_datasource(args):
 
     url = f'{config["API_URL_BASE"]}/api/datasources'
     data = {
+        "type": f"{args.type}",
         "name": f"{args.name}",
         "account": f"{args.accountName}",
         "container": f"{args.containerName}",
         "description": f"{args.description}",
+        "sasToken": f"{args.sasToken}",
     }
     resp = call_create_datasource_api(url, payload=data)
-
-    print(resp.text)
 
     return resp.text
 
@@ -98,7 +98,7 @@ def create_meta(accountName: str, containerName: str, filepath: str, document: s
         f"/{containerName}/{quoted_filepath}/meta"
     )
     resp = call_create_meta_api(url, payload=document)
-    return resp.text
+    return resp.status_code
 
 
 def initial_load_meta(args):
@@ -131,6 +131,7 @@ def initial_load_meta(args):
         filepath = f"{dirname}/{filename_base}"
 
         if f"{filepath}.sigmf-data" not in blob_names:
+            print(f"Skipping file {basename} because there is no sigmf-data.")
             continue
 
         blob_client = container_client.get_blob_client(blob=blob_name)
@@ -141,7 +142,9 @@ def initial_load_meta(args):
             args.accountName, args.containerName, filepath, json.loads(blob_text)
         )
 
-        overall_response = overall_response and resp == "Success"
+        print(f"Load of {basename} into the database {'succeeded' if resp==201 else 'failed'}.")
+
+        overall_response = overall_response and resp == 201
 
     return overall_response
 
@@ -164,10 +167,12 @@ def start():
     datasource_create_parser = datasource_subparsers.add_parser(
         "create", description="Create a datasource"
     )
+    datasource_create_parser.add_argument("-type", required=True)
     datasource_create_parser.add_argument("-name", required=True)
     datasource_create_parser.add_argument("-accountName", required=True)
     datasource_create_parser.add_argument("-containerName", required=True)
     datasource_create_parser.add_argument("-description", required=True)
+    datasource_create_parser.add_argument("-sasToken")
     datasource_create_parser.set_defaults(func=create_datasource)
 
     datasource_list_parser = datasource_subparsers.add_parser(
