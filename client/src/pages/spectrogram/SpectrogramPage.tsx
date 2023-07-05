@@ -16,8 +16,8 @@ import { INITIAL_PYTHON_SNIPPET, TILE_SIZE_IN_IQ_SAMPLES, COLORMAP_DEFAULT, MINI
 import TimeSelector from './TimeSelector';
 import AnnotationList from '@/pages/spectrogram/components/annotation/AnnotationList';
 import { GlobalProperties } from '@/pages/spectrogram/components/global-properties/GlobalProperties';
-import { MetaViewer } from '@/pages/spectrogram/components/Metadata/MetaViewer';
-import { MetaRaw } from '@/pages/spectrogram/components/Metadata/MetaRaw';
+import { MetaViewer } from '@/pages/spectrogram/components/metadata/MetaViewer';
+import { MetaRaw } from '@/pages/spectrogram/components/metadata/MetaRaw';
 import { useParams } from 'react-router-dom';
 import React, { useState, useEffect, useRef } from 'react';
 import { getMeta } from '@/api/metadata/Queries';

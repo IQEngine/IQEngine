@@ -1,13 +1,12 @@
 import * as React from 'react';
-
-const TailwindTheme = React.lazy(() => import('./TailwindStyle'));
+import TailwindStyle from './TailwindStyle';
 
 // @ts-ignore
 const ThemeSelector = ({ children }): any => {
   return (
     <>
       <React.Suspense fallback={<></>}>
-        <TailwindTheme />
+        <TailwindStyle />
       </React.Suspense>
       {children}
     </>
