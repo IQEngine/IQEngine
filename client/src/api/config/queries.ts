@@ -5,7 +5,7 @@ import { FeatureFlag } from '@/hooks/useFeatureFlags';
 const fetchConfig = async () => {
   try {
     const response = await axios.get<AppConfig>('/api/config').catch((error) => {
-      console.log('axios config not found, using env vars instead');
+      console.error('the failed GET above is due to axios config not found, using env vars instead');
       return {
         data: {
           connectionInfo: JSON.parse(import.meta.env.IQENGINE_CONNECTION_INFO ?? null),

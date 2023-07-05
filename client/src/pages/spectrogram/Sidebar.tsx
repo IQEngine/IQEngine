@@ -68,12 +68,14 @@ const Sidebar = (props) => {
           Plugins
         </summary>
         <div className="outline outline-1 outline-primary p-2">
-          <PluginsPane
-            cursorsEnabled={props.cursorsEnabled}
-            handleProcessTime={props.handleProcessTime}
-            meta={props.meta}
-            setMeta={props.setMeta}
-          />
+          {props.meta && (
+            <PluginsPane
+              cursorsEnabled={props.cursorsEnabled}
+              handleProcessTime={props.handleProcessTime}
+              meta={props.meta}
+              setMeta={props.setMeta}
+            />
+          )}
         </div>
       </details>
     </div>

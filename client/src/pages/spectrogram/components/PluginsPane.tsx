@@ -15,6 +15,9 @@ import { FFT } from '@/utils/fft';
 import { useGetPluginsComponents } from '../hooks/useGetPluginsComponents';
 import { useGetPlugins } from '@/api/plugin/Queries';
 import { toast } from 'react-hot-toast';
+import { dataTypeToBytesPerSample } from '@/utils/selector';
+import { useParams } from 'react-router-dom';
+import { useUserSettings } from '@/api/user-settings/use-user-settings';
 
 export interface PluginsPaneProps {
   cursorsEnabled: boolean;
@@ -24,17 +27,23 @@ export interface PluginsPaneProps {
 }
 
 export enum MimeTypes {
-  IQ_SIGMF_32 = 'iq/cf32_le',
-  AUDIO_WAV = 'audio/wav',
+  ci8_le = 'iq/ci8_le',
+  ci16_le = 'iq/ci16_le',
+  cf32_le = 'iq/cf32_le',
+  audio_wav = 'audio/wav',
 }
 
 export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }: PluginsPaneProps) => {
+  const { account, container, filename } = useParams();
   const { data: plugins, isError } = useGetPlugins();
   const { PluginOption, EditPluginParameters, pluginParameters, setPluginParameters } = useGetPluginsComponents();
   const [selectedPlugin, setSelectedPlugin] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [modalSamples, setModalSamples] = useState([]);
   const [modalSpectrogram, setmodalSpectrogram] = useState(null);
+  const [useCloudStorage, setUseCloudStorage] = useState(true);
+  const { dataSourcesQuery } = useUserSettings();
+  const connectionInfo = dataSourcesQuery?.data[`${account}/${container}`];
 
   const handleChangePlugin = (e) => {
     setSelectedPlugin(e.target.value);
@@ -55,20 +64,49 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
     const sampleRate = meta.getSampleRate();
     const freq = meta.getCenterFrequency();
 
-    const newSamps = convertFloat32ArrayToBase64(trimmedSamples);
-    console.log(newSamps);
-
     let body = {
-      data_input: [
-        {
-          samples: newSamps,
-          sample_rate: sampleRate,
-          center_freq: freq,
-          data_type: MimeTypes.IQ_SIGMF_32,
-        },
-      ],
+      samples_b64: [],
+      samples_cloud: [],
       custom_params: {},
     };
+
+    const calculateMultiplier = dataTypeToBytesPerSample(MimeTypes[meta.getDataType()]);
+    if (useCloudStorage && connectionInfo) {
+      body = {
+        samples_b64: [],
+        samples_cloud: [
+          {
+            account_name: connectionInfo.account,
+            container_name: connectionInfo.container,
+            file_path: meta.getFileName(),
+            sas_token: connectionInfo.sasToken,
+            sample_rate: sampleRate,
+            center_freq: freq,
+            data_type: MimeTypes[meta.getDataType()],
+            byte_offset: Math.floor(startSampleOffset) * calculateMultiplier * 2,
+            byte_length: trimmedSamples.length * calculateMultiplier,
+          },
+        ],
+        custom_params: {},
+      };
+    } else {
+      const newSamps = convertFloat32ArrayToBase64(trimmedSamples);
+      console.log(newSamps);
+
+      body = {
+        samples_b64: [
+          {
+            samples: newSamps,
+            sample_rate: sampleRate,
+            center_freq: freq,
+            data_type: MimeTypes[meta.getDataType()],
+          },
+        ],
+        samples_cloud: [],
+        custom_params: {},
+      };
+    }
+
     // Add custom params
     for (const [key, value] of Object.entries(pluginParameters)) {
       if (value.type === 'integer') {
@@ -79,7 +117,6 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
         body['custom_params'][key] = value.value;
       }
     }
-    console.debug(body);
 
     fetch(selectedPlugin, {
       method: 'POST',
@@ -100,7 +137,7 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
           return;
         }
         if (data.data_output && data.data_output.length > 0) {
-          if (data.data_output[0]['data_type'] == MimeTypes.IQ_SIGMF_32) {
+          if (data.data_output[0]['data_type'] == MimeTypes.cf32_le) {
             // just show the first output for now, 99% of plugins will have 0 or 1 IQ output anyway
             const samples_base64 = data.data_output[0]['samples'];
             const samples = convertBase64ToFloat32Array(samples_base64);
@@ -177,7 +214,7 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
 
             let filename = '';
             switch (data.data_output[0]['data_type']) {
-              case MimeTypes.AUDIO_WAV:
+              case MimeTypes.audio_wav:
                 filename = 'samples.wav';
                 break;
             }
@@ -214,13 +251,30 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
     <div className="pluginForm" id="pluginFormId" onSubmit={handleSubmit}>
       <label className="label">
         Plugin:
-        <select className="rounded bg-base-content text-base-100" value={selectedPlugin} onChange={handleChangePlugin}>
+        <select
+          className="rounded bg-base-content text-base-100 w-44"
+          value={selectedPlugin}
+          onChange={handleChangePlugin}
+        >
           <option disabled value="">
             Select a Plugin
           </option>
           {plugins && !isError && plugins?.map((plugin) => <PluginOption plugin={plugin} />)})
         </select>
       </label>
+      {connectionInfo && (
+        <label className="label cursor-pointer">
+          <span>Use Cloud Storage</span>
+          <input
+            type="checkbox"
+            checked={useCloudStorage}
+            className="checkbox checkbox-primary"
+            onChange={() => {
+              setUseCloudStorage(!useCloudStorage);
+            }}
+          />
+        </label>
+      )}
       {selectedPlugin && (
         <>
           <EditPluginParameters

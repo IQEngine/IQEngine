@@ -105,22 +105,18 @@ export const AnnotationList = ({ meta, setHandleTop, spectrogramHeight, setMeta 
       const sampleRate = Number(meta.global['core:sample_rate']);
       const startSampleCount = Number(annotation['core:sample_start']);
       const sampleCount = Number(annotation['core:sample_count']);
-      const centerFrequency = startCapture['core:frequency'];
-      let lowerEdge = annotation['core:freq_lower_edge'];
-      let upperEdge = annotation['core:freq_upper_edge'];
+      const centerFrequency = meta.getCenterFrequency();
+      const lowerEdge = annotation['core:freq_lower_edge']
+        ? annotation['core:freq_lower_edge']
+        : centerFrequency - sampleRate / 2;
+      const upperEdge = annotation['core:freq_upper_edge']
+        ? annotation['core:freq_upper_edge']
+        : centerFrequency + sampleRate / 2;
 
       // Get description
       const description = annotation['core:description'];
 
       // Get start frequency range
-      if (centerFrequency) {
-        lowerEdge = lowerEdge ? lowerEdge : centerFrequency - sampleRate / 2;
-        upperEdge = upperEdge ? upperEdge : centerFrequency + sampleRate / 2;
-      } else {
-        lowerEdge = lowerEdge ? lowerEdge : 0 - sampleRate / 2;
-        upperEdge = upperEdge ? upperEdge : 0 + sampleRate / 2;
-      }
-
       const startFrequency = getFrequency(lowerEdge);
 
       // Get end frequency range
