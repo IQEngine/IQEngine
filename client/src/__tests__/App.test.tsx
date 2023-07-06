@@ -30,7 +30,6 @@ describe('Test Feature flags', () => {
 
   test('does not render app component with Discord and Sign up link when flag set to false', async () => {
     import.meta.env.IQENGINE_FEATURE_FLAGS = '{"useIQEngineOutReach": false, "displayInternalBranding": true}';
-    import.meta.env.IQENGINE_INTERNAL_BRANDING = '{"useIQEngineOutReach": false, "displayInternalBranding": true}';
     render(<App />, { wrapper: AllProviders });
     await waitForElementToBeRemoved(screen.queryByText('Discord'));
     expect(screen.getByAltText('Internal branding logo')).toBeInTheDocument();
