@@ -16,7 +16,7 @@ def test_api_get_config(client):
         "connectionInfo": {},
         "googleAnalyticsKey": "google_analytics_key",
         "featureFlags": {},
-        "internalBranding": "internal_branding_string"
+        "internalBranding": "internal_branding_string",
     }
 
 

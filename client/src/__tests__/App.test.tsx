@@ -30,6 +30,7 @@ describe('Test Feature flags', () => {
 
   test('does not render app component with Discord and Sign up link when flag set to false', async () => {
     import.meta.env.IQENGINE_FEATURE_FLAGS = '{"useIQEngineOutReach": false, "displayInternalBranding": true}';
+    import.meta.env.IQENGINE_INTERNAL_BRANDING = '{"useIQEngineOutReach": false, "displayInternalBranding": true}';
     render(<App />, { wrapper: AllProviders });
     await waitForElementToBeRemoved(screen.queryByText('Discord'));
     expect(screen.getByAltText('Internal branding logo')).toBeInTheDocument();
@@ -71,6 +72,7 @@ describe('Test Feature flags', () => {
 
   test('renders app component with displayInternalBranding flag set to true', async () => {
     import.meta.env.IQENGINE_FEATURE_FLAGS = '{"displayInternalBranding": true}';
+    import.meta.env.IQENGINE_INTERNAL_BRANDING = '/internalbrandingeg.svg';
     render(<App />, { wrapper: AllProviders });
     await waitFor(() => {
       const image = screen.getByAltText('Internal branding logo');
@@ -80,6 +82,7 @@ describe('Test Feature flags', () => {
 
   test('does not render app component with displayInternalBranding flag set to false', async () => {
     import.meta.env.IQENGINE_FEATURE_FLAGS = '{"displayInternalBranding": false }';
+    import.meta.env.IQENGINE_INTERNAL_BRANDING = '/internalbrandingeg.svg';
     render(<App />, { wrapper: AllProviders });
     expect(screen.queryByAltText('Internal branding logo')).toBeNull();
   });
