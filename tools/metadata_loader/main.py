@@ -142,7 +142,9 @@ def initial_load_meta(args):
             args.accountName, args.containerName, filepath, json.loads(blob_text)
         )
 
-        print(f"Load of {basename} into the database {'succeeded' if resp==201 else 'failed'}.")
+        print(
+            f"Load of {basename} into the database {'succeeded' if resp==201 else 'failed'}."
+        )
 
         overall_response = overall_response and resp == 201
 
