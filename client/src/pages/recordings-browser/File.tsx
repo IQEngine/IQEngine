@@ -3,17 +3,36 @@
 // Licensed under the MIT License
 
 import React, { useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 
 import { SigMFMetadata } from '@/utils/sigmfMetadata';
+import { CLIENT_TYPE_BLOB } from '@/api/Models';
 
 interface FileRowProps {
   item: SigMFMetadata;
 }
 export default function FileRow({ item }: FileRowProps) {
+  const { type, account, container, sasToken } = useParams();
+  console.log('FILE', 'type: ', type, 'account: ', account, 'container: ', container, 'sasToken: ', sasToken);
   const spectogramLink = `/spectrogram/${item.getOrigin().type}/${item.getOrigin().account}/${
     item.getOrigin().container
   }/${encodeURIComponent(item.getFilePath())}`;
+
+  const getUrlWithAuth = (url) => {
+    if (type == CLIENT_TYPE_BLOB && sasToken) {
+      url += `?${sasToken}`;
+    }
+    return url;
+  };
+  const getThumbnailUrl = () => {
+    return getUrlWithAuth(item.getThumbnailUrl());
+  };
+  const getDataUrl = () => {
+    return getUrlWithAuth(item.getDataUrl());
+  };
+  const getMetadataUrl = () => {
+    return getUrlWithAuth(item.getMetadataUrl());
+  };
   const modal = useRef(null);
   const toggle = () => {
     if (modal.current.className === 'modal w-full h-full') {
@@ -55,11 +74,7 @@ export default function FileRow({ item }: FileRowProps) {
           <td className="px-4 min-w-fit">
             <Link to={spectogramLink} onClick={() => {}}>
               <div className="zoom">
-                <img
-                  src={item.getThumbnailUrl()}
-                  alt="Spectrogram Thumbnail"
-                  style={{ width: '200px', height: '100px' }}
-                />
+                <img src={getThumbnailUrl()} alt="Spectrogram Thumbnail" style={{ width: '200px', height: '100px' }} />
               </div>
             </Link>
           </td>
@@ -71,9 +86,9 @@ export default function FileRow({ item }: FileRowProps) {
             {/* File download links */}
             <>
               {'('}download:&nbsp;
-              <a href={item.getDataUrl()}>data</a>
+              <a href={getDataUrl()}>data</a>
               ,&nbsp;
-              <a href={item.getMetadataUrl()}>meta</a>
+              <a href={getMetadataUrl()}>meta</a>
               {')'}
             </>
           </td>
