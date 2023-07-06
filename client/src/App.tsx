@@ -111,11 +111,13 @@ export const App = () => {
           <Link to="/" onClick={() => {}}>
             <div id="IQEngineLogo" className="absolute mt-4 pt-2 top-0 left-1/2 transform -translate-x-1/2 flex">
               <Feature flag={FeatureFlag.displayInternalBranding}>
+              {config.data && config.data.internalBranding && (
                 <img
-                  src="/internalbrandingeg.jpg"
+                  src={config.data.internalBranding}
                   alt="Internal branding logo"
                   className="md:w-32 md:h-32 mr-8 sm:w-20 sm:h-20"
                 />
+              )}
               </Feature>
               <Logo />
             </div>
