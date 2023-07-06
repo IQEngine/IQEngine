@@ -118,12 +118,12 @@ export class SigMFMetadata {
     return shortDescription;
   }
 
-  getThumbnailUrl() {
+  getThumbnailUrl(sas_token: string) {
     const origin = this.global['traceability:origin'];
     const type = origin?.type ?? 'local';
     if (type === 'api') {
       return this.getFullFilePath() + '/thumbnail';
-    } else return this.getFullFilePath() + '.jpeg';
+    } else return this.getFullFilePath() + '.jpeg?' + sas_token;
   }
   getDataUrl() {
     const origin = this.global['traceability:origin'];

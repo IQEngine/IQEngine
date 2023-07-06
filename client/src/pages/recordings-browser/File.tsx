@@ -3,14 +3,18 @@
 // Licensed under the MIT License
 
 import React, { useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 
 import { SigMFMetadata } from '@/utils/sigmfMetadata';
+import { useUserSettings } from '@/api/user-settings/use-user-settings';
 
 interface FileRowProps {
   item: SigMFMetadata;
 }
 export default function FileRow({ item }: FileRowProps) {
+  const { account, container } = useParams();
+  const { dataSourcesQuery } = useUserSettings();
+  const connectionInfo = dataSourcesQuery?.data[`${account}/${container}`];
   const spectogramLink = `/spectrogram/${item.getOrigin().type}/${item.getOrigin().account}/${
     item.getOrigin().container
   }/${encodeURIComponent(item.getFilePath())}`;
@@ -56,7 +60,7 @@ export default function FileRow({ item }: FileRowProps) {
             <Link to={spectogramLink} onClick={() => {}}>
               <div className="zoom">
                 <img
-                  src={item.getThumbnailUrl()}
+                  src={item.getThumbnailUrl(connectionInfo?.sasToken)}
                   alt="Spectrogram Thumbnail"
                   style={{ width: '200px', height: '100px' }}
                 />
