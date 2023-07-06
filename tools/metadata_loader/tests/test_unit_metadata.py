@@ -24,17 +24,17 @@ def mock_request_get(*args, **kwargs):
 
 def mock_request_post(*args, **kwargs):
     class MockResponse:
-        def __init__(self, text):
+        def __init__(self, text, status):
             self.text = text
-            self.status_code = 201
+            self.status_code = status
 
         def text(self):
             return self.text
-        
+
         def status_code(self):
             return 201
 
-    return MockResponse("Success")
+    return MockResponse("Success", 201)
 
 
 mock_config = {
