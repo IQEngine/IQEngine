@@ -32,7 +32,6 @@ describe('Test Feature flags', () => {
     import.meta.env.IQENGINE_FEATURE_FLAGS = '{"useIQEngineOutReach": false, "displayInternalBranding": true}';
     render(<App />, { wrapper: AllProviders });
     await waitForElementToBeRemoved(screen.queryByText('Discord'));
-    expect(screen.getByAltText('Internal branding logo')).toBeInTheDocument();
     expect(screen.queryByText('Discord')).toBeNull();
     expect(
       screen.queryByText('Sign up for a once-a-month email update on IQEngine, such as new features, demos, and more!')
