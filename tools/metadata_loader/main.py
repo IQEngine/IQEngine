@@ -57,7 +57,7 @@ def create_datasource(args):
 
 
 def call_get_all_metadata_api(url: str):
-    return requests.get(url, timeout=5)
+    return requests.get(url, timeout=15)
 
 
 def get_all_meta(args):
@@ -86,7 +86,7 @@ def get_all_meta(args):
 
 
 def call_create_meta_api(url, payload):
-    return requests.post(url, json=payload, timeout=5)
+    return requests.post(url, json=payload, timeout=30)
 
 
 def create_meta(accountName: str, containerName: str, filepath: str, document: str):
