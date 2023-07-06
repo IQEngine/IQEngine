@@ -19,9 +19,21 @@ export default function FileRow({ item }: FileRowProps) {
   }/${encodeURIComponent(item.getFilePath())}`;
 
   const getUrlWithAuth = (url) => {
+    console.log('getUrlWithAuth', 'type: ', type, 'sasToken: ', sasToken);
     if (type == CLIENT_TYPE_BLOB && sasToken) {
-      url += `?${sasToken}`;
+      // get the value of sig in the sas token
+      const sig = sasToken
+        .split('&')
+        .find((item) => item.startsWith('sig='))
+        .split('=')[1];
+      // url encode the sig
+      const encodedSig = encodeURIComponent(sig);
+      // replace the sig in the sas token with the encoded sig
+      const encodedSasToken = sasToken.replace(sig, encodedSig);
+      console.log('getUrlWithAuth', 'encodedSasToken: ', encodedSasToken);
+      url += `?${encodedSasToken}`;
     }
+    console.log('getUrlWithAuth', 'url: ', url);
     return url;
   };
   const getThumbnailUrl = () => {
