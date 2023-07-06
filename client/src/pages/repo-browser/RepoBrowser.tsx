@@ -18,7 +18,7 @@ import Feature from '@/features/feature/Feature';
 import { FeatureFlag } from '@/hooks/useFeatureFlags';
 import { useUserSettings } from '@/api/user-settings/use-user-settings';
 
-const RepoBrowser = () => {
+export const RepoBrowser = () => {
   let [dataAvailable, setDataAvailable] = useState(false);
   const config = useConfigQuery();
   const apiDataSources = getDataSources(CLIENT_TYPE_API);

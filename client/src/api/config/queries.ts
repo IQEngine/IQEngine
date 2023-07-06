@@ -11,6 +11,7 @@ const fetchConfig = async () => {
           connectionInfo: JSON.parse(import.meta.env.IQENGINE_CONNECTION_INFO ?? null),
           googleAnalyticsKey: import.meta.env.IQENGINE_GOOGLE_ANALYTICS_KEY,
           featureFlags: JSON.parse(import.meta.env.IQENGINE_FEATURE_FLAGS ?? null),
+          internalBranding: import.meta.env.IQENGINE_INTERNAL_BRANDING,
         } as AppConfig,
       };
     });
@@ -22,6 +23,10 @@ const fetchConfig = async () => {
     }
     if (!response.data.featureFlags) {
       response.data.featureFlags = JSON.parse(import.meta.env.IQENGINE_FEATURE_FLAGS ?? null);
+    }
+
+    if (!response.data.internalBranding) {
+      response.data.internalBranding = import.meta.env.IQENGINE_INTERNAL_BRANDING;
     }
 
     for (const member in response.data) {
@@ -37,6 +42,7 @@ const fetchConfig = async () => {
       connectionInfo: JSON.parse(import.meta.env.IQENGINE_CONNECTION_INFO ?? null),
       googleAnalyticsKey: import.meta.env.IQENGINE_GOOGLE_ANALYTICS_KEY,
       featureFlags: JSON.parse(import.meta.env.IQENGINE_FEATURE_FLAGS ?? null),
+      internalBranding: import.meta.env.IQENGINE_INTERNAL_BRANDING,
     } as AppConfig;
   }
 };
@@ -56,6 +62,7 @@ export type AppConfig = {
   connectionInfo: ConnectionInfo;
   googleAnalyticsKey: string;
   featureFlags: { [key in FeatureFlag]: boolean };
+  internalBranding: string;
 };
 
 export const useConfigQuery = () => useQuery(['config'], fetchConfig);

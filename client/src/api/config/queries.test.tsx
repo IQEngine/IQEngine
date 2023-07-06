@@ -19,11 +19,13 @@ describe('Config contains information from environment', () => {
     import.meta.env.IQENGINE_CONNECTION_INFO = '{}';
     import.meta.env.IQENGINE_GOOGLE_ANALYTICS_KEY = 'UA-TEST-KEY-1';
     import.meta.env.IQENGINE_FEATURE_FLAGS = '{}';
+    import.meta.env.IQENGINE_INTERNAL_BRANDING = 'BRANDING-STR';
   });
   afterAll(() => {
     delete import.meta.env.IQENGINE_CONNECTION_INFO;
     delete import.meta.env.IQENGINE_GOOGLE_ANALYTICS_KEY;
     delete import.meta.env.IQENGINE_FEATURE_FLAGS;
+    delete import.meta.env.IQENGINE_INTERNAL_BRANDING;
   });
 
   beforeEach(() => {
@@ -42,6 +44,7 @@ describe('Config contains information from environment', () => {
       expect(result.current.data.connectionInfo).toMatchObject({});
       expect(result.current.data.googleAnalyticsKey).toBe('UA-TEST-KEY-1');
       expect(result.current.data.featureFlags).toMatchObject({});
+      expect(result.current.data.internalBranding).toBe('BRANDING-STR');
     });
   });
 
@@ -57,6 +60,7 @@ describe('Config contains information from environment', () => {
       expect(result.current.data.connectionInfo).toMatchObject({});
       expect(result.current.data.googleAnalyticsKey).toBe('UA-TEST-KEY-1');
       expect(result.current.data.featureFlags).toMatchObject({});
+      expect(result.current.data.internalBranding).toBe('BRANDING-STR');
     });
   });
 
@@ -77,6 +81,7 @@ describe('Config contains information from environment', () => {
       expect(result.current.data.connectionInfo).toMatchObject({ some: 'connection-info' });
       expect(result.current.data.googleAnalyticsKey).toBe('UA-SOME_KEY-1');
       expect(result.current.data.featureFlags).toMatchObject({});
+      expect(result.current.data.internalBranding).toBe('BRANDING-STR');
     });
   });
 });
