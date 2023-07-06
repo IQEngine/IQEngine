@@ -1,37 +1,74 @@
-import { App } from '@/App';
-import { About } from '@/pages/About';
-import { SigMF } from '@/pages/SigMF';
-import { Plugins } from '@/pages/Plugins';
 import SignalGenerator from '@/pages/signal-generator/SignalGenerator';
-import Validator from '@/pages/validator/Validator';
 import { createBrowserRouter } from 'react-router-dom';
 import React from 'react';
-import RepoBrowser from '@/pages/repo-browser/RepoBrowser';
-import RecordingsBrowser from '@/pages/recordings-browser/RecordingsBrowser';
-import SpectrogramPage from '@/pages/spectrogram/SpectrogramPage';
 import SwaggerUI from 'swagger-ui-react';
 
 export function useIQEngineRouter() {
   const router = createBrowserRouter([
     {
       path: '/',
-      element: <App />,
+      async lazy() {
+        let { App } = await import('@/App');
+        return { Component: App };
+      },
       children: [
-        { path: 'about', element: <About /> },
-        { path: 'sigmf', element: <SigMF /> },
+        {
+          path: 'about',
+          async lazy() {
+            let { About } = await import('@/pages/About');
+            return { Component: About };
+          },
+        },
+        {
+          path: 'sigmf',
+          async lazy() {
+            let { SigMF } = await import('@/pages/SigMF');
+            return { Component: SigMF };
+          },
+        },
         { path: 'siggen', element: <SignalGenerator /> },
-        { path: 'plugins', element: <Plugins /> },
-        { path: 'validator', element: <Validator /> },
-        { index: true, element: <RepoBrowser /> },
-        { path: 'recordings/:type/:account/:container/:sasToken?', element: <RecordingsBrowser /> },
-        { path: 'spectrogram/:type/:account/:container/:filePath/:sasToken?', element: <SpectrogramPage /> },
+        {
+          path: 'plugins',
+          async lazy() {
+            let { Plugins } = await import('@/pages/Plugins');
+            return { Component: Plugins };
+          },
+        },
+        {
+          path: 'validator',
+          async lazy() {
+            let { Validator } = await import('@/pages/validator/Validator');
+            return { Component: Validator };
+          },
+        },
+        {
+          index: true,
+          async lazy() {
+            let { RepoBrowser } = await import('@/pages/repo-browser/RepoBrowser');
+            return { Component: RepoBrowser };
+          },
+        },
+        {
+          path: 'recordings/:type/:account/:container/:sasToken?',
+          async lazy() {
+            let { RecordingsBrowser } = await import('@/pages/recordings-browser/RecordingsBrowser');
+            return { Component: RecordingsBrowser };
+          },
+        },
+        {
+          path: 'spectrogram/:type/:account/:container/:filePath/:sasToken?',
+          async lazy() {
+            let { SpectrogramPage } = await import('@/pages/spectrogram/SpectrogramPage');
+            return { Component: SpectrogramPage };
+          },
+        },
       ],
     },
     {
       path: '/openapi',
       element: (
         <div className="bg-white">
-          <SwaggerUI url="https://raw.githubusercontent.com/IQEngine/IQEngine/main/plugins/openapi.yaml" />
+          <SwaggerUI url="https://raw.githubusercontent.com/IQEngine/IQEngine/main/plugins/plugins_openapi.yaml" />
         </div>
       ),
     },
