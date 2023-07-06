@@ -115,7 +115,7 @@ export const App = () => {
                 <img
                   src={config.data.internalBranding}
                   alt="Internal branding logo"
-                  className="md:w-32 md:h-32 mr-8 sm:w-20 sm:h-20"
+                  className="md:w-82 md:h-32 mr-8 sm:w-60 sm:h-20"
                 />
               )}
               </Feature>
