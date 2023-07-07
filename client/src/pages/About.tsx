@@ -162,7 +162,7 @@ export const About = () => {
       </p>
 
       <center>
-        <img className="w-1/2" alt="sprintern" src="./sprinterns.jpeg"></img>
+        <img className="w-1/4" alt="sprintern" src="./sprinterns.jpeg"></img>
         <p className="text-lg pt-1">Winter '23 Sprinterns from UMD and GMU</p>
       </center>
     </div>
