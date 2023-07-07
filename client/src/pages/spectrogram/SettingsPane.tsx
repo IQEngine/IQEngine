@@ -196,9 +196,9 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
             Colormap
           </button>
           <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
-            {Object.entries(colMaps).map(([key, value]) => (
-              <li data-value={key} onClick={onChangeColorMap}>
-                {state.colorMapName === key ? <a className="bg-primary">{key}</a> : <a>{key}</a>}
+            {Object.entries(colMaps).map(([value, index]) => (
+              <li key={index} data-value={value} onClick={onChangeColorMap}>
+                {state.colorMapName === value ? <a className="bg-primary">{value}</a> : <a>{value}</a>}
               </li>
             ))}
           </ul>
@@ -211,8 +211,8 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
             FFT Size
           </button>
           <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
-            {fftSizes.map((x) => (
-              <li data-value={String(x)} onClick={onChangeFftsize}>
+            {fftSizes.map((x, index) => (
+              <li key={index} data-value={String(x)} onClick={onChangeFftsize}>
                 {state.size === x ? <a className="bg-primary">{x}</a> : <a>{x}</a>}
               </li>
             ))}
@@ -262,12 +262,14 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
             </button>
             <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
               <li
+                key={0}
                 data-value="[0.021019600765633,0.05574786251380393,0.04504671465435009,-0.012858837474581268,-0.042883835223827396,0.013822126400016621,0.05882808073316635,-0.014316809227248763,-0.10299625870988743,0.015410773935742991,0.31701869995313076,0.48460819626209206,0.31701869995313076,0.015410773935742991,-0.10299625870988743,-0.014316809227248763,0.05882808073316635,0.013822126400016621,-0.042883835223827396,-0.012858837474581268,0.04504671465435009,0.05574786251380393,0.021019600765633]"
                 onClick={onClickPremadeTaps}
               >
                 <a>Low Pass Filter, Keep Center 50%</a>
               </li>
               <li
+                key={1}
                 data-value="[0.016149208122345958,0.0315506154302014,0.044989927419396177,0.05039076977222029,0.036274497853720514,0.007612901271369674,-0.02948294665811137,-0.053019565543615366,-0.048888438402198676,-0.004134055886676617,0.07118987013413654,0.15929327646574953,0.22747019061450077,0.2546143327815347,0.22747019061450077,0.15929327646574953,0.07118987013413654,-0.004134055886676617,-0.048888438402198676,-0.053019565543615366,-0.02948294665811137,0.007612901271369674,0.036274497853720514,0.05039076977222029,0.044989927419396177,0.0315506154302014,0.016149208122345958]"
                 onClick={onClickPremadeTaps}
               >
@@ -292,19 +294,19 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
             Window
           </button>
           <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
-            <li data-value="hamming" onClick={onChangeWindowFunction}>
+            <li key={0} data-value="hamming" onClick={onChangeWindowFunction}>
               {state.windowFunction === 'hamming' ? <a className="bg-primary">Hamming</a> : <a>Hamming</a>}
             </li>
-            <li data-value="rectangle" onClick={onChangeWindowFunction}>
+            <li key={1} data-value="rectangle" onClick={onChangeWindowFunction}>
               {state.windowFunction === 'rectangle' ? <a className="bg-primary">Rectangle</a> : <a>Rectangle</a>}
             </li>
-            <li data-value="hanning" onClick={onChangeWindowFunction}>
+            <li key={2} data-value="hanning" onClick={onChangeWindowFunction}>
               {state.windowFunction === 'hanning' ? <a className="bg-primary">Hanning</a> : <a>Hanning</a>}
             </li>
-            <li data-value="barlett" onClick={onChangeWindowFunction}>
+            <li key={3} data-value="barlett" onClick={onChangeWindowFunction}>
               {state.windowFunction === 'barlett' ? <a className="bg-primary">Barlett</a> : <a>Barlett</a>}
             </li>
-            <li data-value="blackman" onClick={onChangeWindowFunction}>
+            <li key={4} data-value="blackman" onClick={onChangeWindowFunction}>
               {state.windowFunction === 'blackman' ? <a className="bg-primary">Blackman</a> : <a>Blackman</a>}
             </li>
           </ul>
