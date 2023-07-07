@@ -73,7 +73,7 @@ const AnnotationViewer = ({
         description: annotation.getDescription(),
         index: index,
       };
-      if (selectedAnnotation > -1 && !position.visible) {
+      if (selectedAnnotation == index && !position.visible) {
         setSelectedAnnotation(-1);
       }
       return result;
