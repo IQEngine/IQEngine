@@ -31,6 +31,7 @@ const AnnotationViewer = ({
   function onDragEnd(e) {
     const x = e.target.x(); // coords of the corner box
     const y = e.target.y();
+    console.log('Meta ID:', e.target.id());
     const annot_indx = e.target.id().split('-')[0];
     const annot_pos_x = e.target.id().split('-')[1];
     const annot_pos_y = e.target.id().split('-')[2];
