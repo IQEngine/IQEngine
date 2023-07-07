@@ -3,17 +3,12 @@
 // Licensed under the MIT License
 
 import { Sidebar } from './Sidebar';
-import ScrollBar from './ScrollBar';
 import { TimePlot } from './components/TimePlot';
 import { FrequencyPlot } from './components/FrequencyPlot';
 import { IQPlot } from './components/IQPlot';
-import { Layer, Image, Stage } from 'react-konva';
 import { selectFft, calculateTileNumbers, range, SelectFftReturn } from '@/utils/selector';
-import { AnnotationViewer } from '@/pages/spectrogram/components/annotation/AnnotationViewer';
-import { RulerTop } from './RulerTop';
-import { RulerSide } from './RulerSide';
+import { SpectrogramViewer } from '@/pages/spectrogram/components/spectrogram/SpectrogramViewer';
 import { INITIAL_PYTHON_SNIPPET, TILE_SIZE_IN_IQ_SAMPLES, COLORMAP_DEFAULT, MINIMAP_FFT_SIZE } from '@/utils/constants';
-import TimeSelector from './TimeSelector';
 import AnnotationList from '@/pages/spectrogram/components/annotation/AnnotationList';
 import { GlobalProperties } from '@/pages/spectrogram/components/global-properties/GlobalProperties';
 import { MetaViewer } from '@/pages/spectrogram/components/metadata/MetaViewer';
@@ -233,7 +228,7 @@ export const SpectrogramPage = () => {
     const newPlotHeight = newSpectrogramHeight - 100;
     setPlotWidth(newplotWidth);
     setPlotHeight(newPlotHeight);
-  };
+  }
 
   useEffect(() => {
     setMeta(metaQuery.data);
@@ -251,7 +246,7 @@ export const SpectrogramPage = () => {
     windowResized();
     return () => {
       window.removeEventListener('resize', windowResized);
-    }
+    };
   }, [meta]);
 
   const toggleIncludeRfFreq = () => {
@@ -288,18 +283,6 @@ export const SpectrogramPage = () => {
 
     const startSampleOffset = timeSelectionStart * TILE_SIZE_IN_IQ_SAMPLES; // in IQ samples
     return { trimmedSamples: trimmedSamples, startSampleOffset: startSampleOffset }; // only used by plugins
-  };
-
-  const handleWheel = (e) => {
-    e.evt.preventDefault();
-    let scrollDirection = -e.evt.wheelDeltaY / Math.abs(e.evt.wheelDeltaY) || 0;
-    let scrollAmount = scrollDirection * 2;
-    let presentingSize = (spectrogramHeight / (meta.getTotalSamples() / fftSize / zoomLevel)) * spectrogramHeight;
-    let maxValue = spectrogramHeight - presentingSize;
-    // make sure we don't scroll past the beginning or end
-    let newY = handleTop + scrollAmount;
-    newY = newY < 0 ? 0 : newY > maxValue ? maxValue : newY;
-    fetchAndRender(newY);
   };
 
   return (
@@ -389,70 +372,31 @@ export const SpectrogramPage = () => {
             </ul>
             <div className="p-0 ml-0 mr-0 mb-0 mt-2">
               <div className={currentTab === 'spectrogram' ? 'block' : 'hidden'}>
-                <div className="flex flex-col pl-3">
-                  <Stage width={spectrogramWidth + 110} height={rulerTopHeight}>
-                    <RulerTop
-                      sampleRate={meta?.getSampleRate()}
-                      spectrogramWidth={spectrogramWidth}
-                      spectrogramWidthScale={spectrogramWidth / fftSize}
-                      includeRfFreq={includeRfFreq}
-                      coreFrequency={meta?.getCenterFrequency()}
-                    />
-                  </Stage>
-
-                  <div className="flex flex-row">
-                    <Stage width={spectrogramWidth} height={spectrogramHeight}>
-                      <Layer onWheel={handleWheel}>
-                        <Image image={image} x={0} y={0} width={spectrogramWidth} height={spectrogramHeight} />
-                      </Layer>
-                      <AnnotationViewer
-                        meta={meta}
-                        spectrogramWidthScale={spectrogramWidth / fftSize}
-                        fftSize={fftSize}
-                        lowerTile={lowerTile}
-                        upperTile={upperTile}
-                        zoomLevel={zoomLevel}
-                        setMeta={setMeta}
-                      />
-                      {cursorsEnabled && (
-                        <TimeSelector
-                          spectrogramWidth={spectrogramWidth}
-                          spectrogramHeight={spectrogramHeight}
-                          upperTile={upperTile}
-                          lowerTile={lowerTile}
-                          handleTimeSelectionStart={setTimeSelectionStart}
-                          handleTimeSelectionEnd={setTimeSelectionEnd}
-                        />
-                      )}
-                    </Stage>
-
-                    <Stage width={rulerSideWidth} height={spectrogramHeight} className="mr-1">
-                      <RulerSide
-                        spectrogramWidth={spectrogramWidth}
-                        fftSize={fftSize}
-                        sampleRate={meta?.getSampleRate()}
-                        currentRowAtTop={(lowerTile * TILE_SIZE_IN_IQ_SAMPLES) / fftSize}
-                        spectrogramHeight={spectrogramHeight}
-                      />
-                    </Stage>
-
-                    <Stage width={MINIMAP_FFT_SIZE + 5} height={spectrogramHeight}>
-                      <ScrollBar
-                        fetchAndRender={fetchAndRender}
-                        spectrogramHeight={spectrogramHeight}
-                        downloadedTiles={downloadedTiles}
-                        zoomLevel={zoomLevel}
-                        handleTop={handleTop}
-                        meta={meta}
-                        fetchEnabled={fetchMinimap}
-                        fftSize={fftSize}
-                        setMagnitudeMax={setMagnitudeMax}
-                        setMagnitudeMin={setMagnitudeMin}
-                        colorMap={colorMap}
-                      />
-                    </Stage>
-                  </div>
-                </div>
+                <SpectrogramViewer
+                  rulerTopHeight={rulerTopHeight}
+                  rulerSideWidth={rulerSideWidth}
+                  fftSize={fftSize}
+                  upperTile={upperTile}
+                  setUpperTile={setUpperTile}
+                  lowerTile={lowerTile}
+                  setLowerTile={setLowerTile}
+                  includeRfFreq={includeRfFreq}
+                  cursorsEnabled={cursorsEnabled}
+                  fetchMinimap={fetchMinimap}
+                  meta={meta}
+                  setMeta={setMeta}
+                  spectrogramHeight={spectrogramHeight}
+                  spectrogramWidth={spectrogramWidth}
+                  zoomLevel={zoomLevel}
+                  handleTop={handleTop}
+                  setHandleTop={setHandleTop}
+                  image={image}
+                  setTimeSelectionStart={setTimeSelectionStart}
+                  setTimeSelectionEnd={setTimeSelectionEnd}
+                  setMagnitudeMax={setMagnitudeMax}
+                  setMagnitudeMin={setMagnitudeMin}
+                  colorMap={colorMap}
+                />
               </div>
               <div className={currentTab === 'time' ? 'block' : 'hidden'}>
                 {/* Reduces lag by only rendering the time/freq/iq components when they are selected */}
