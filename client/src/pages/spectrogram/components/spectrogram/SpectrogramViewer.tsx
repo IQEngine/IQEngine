@@ -2,8 +2,8 @@
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
 
-import React, { useState, Fragment, useCallback } from 'react';
-import { Annotation, SigMFMetadata } from '@/utils/sigmfMetadata';
+import React from 'react';
+import { SigMFMetadata } from '@/utils/sigmfMetadata';
 import { Layer, Image, Stage } from 'react-konva';
 import { AnnotationViewer } from '@/pages/spectrogram/components/annotation/AnnotationViewer';
 import TimeSelector from './TimeSelector';
