@@ -60,7 +60,6 @@ export const App = () => {
       };
       addDataSource(dataSource);
     });
-
   }, [config.data]);
 
   return (
@@ -105,19 +104,24 @@ export const App = () => {
                     Plugins
                   </Link>
                 </li>
+                <li>
+                  <Link to="/admin" onClick={() => {}}>
+                    Admin
+                  </Link>
+                </li>
               </ul>
             </div>
           </div>
           <Link to="/" onClick={() => {}}>
             <div id="IQEngineLogo" className="absolute mt-4 pt-2 top-0 left-1/2 transform -translate-x-1/2 flex">
               <Feature flag={FeatureFlag.displayInternalBranding}>
-              {config.data && config.data.internalBranding && (
-                <img
-                  src={config.data.internalBranding}
-                  alt="Internal branding logo"
-                  className="mt-4 md:w-82 md:h-30 mr-8 sm:w-60 sm:h-20"
-                />
-              )}
+                {config.data && config.data.internalBranding && (
+                  <img
+                    src={config.data.internalBranding}
+                    alt="Internal branding logo"
+                    className="mt-4 md:w-82 md:h-30 mr-8 sm:w-60 sm:h-20"
+                  />
+                )}
               </Feature>
               <Logo />
             </div>
@@ -137,6 +141,11 @@ export const App = () => {
               <li className="hidden md:block">
                 <Link to="/plugins" onClick={() => {}}>
                   <div className="text-lg">Plugins</div>
+                </Link>
+              </li>
+              <li className="hidden md:block">
+                <Link to="/admin" onClick={() => {}}>
+                  <div className="text-lg">Admin</div>
                 </Link>
               </li>
               <Feature flag={FeatureFlag.useIQEngineOutReach}>
