@@ -63,6 +63,28 @@ export class LocalClient implements MetadataClient {
     return result;
   }
 
+  async getDataSourceMetaPaths(account: string, container: string): Promise<string[]> {
+    console.debug('getDataSourceMetaPaths', account, container);
+    if (!this.files) {
+      return Promise.reject('No local directory found');
+    }
+    const localFiles: FileWithDirectoryAndFileHandle[] = this.files;
+    let result: string[] = [];
+    for (let i = 0; i < localFiles.length; i++) {
+      const file = localFiles[i];
+      if (file.name.split('.').pop() !== 'sigmf-meta') {
+        continue;
+      }
+      // check if there is a corresponding sigmf-data file
+      const dataFile = localFiles.find((f) => f.name === file.name.split('.')[0] + '.sigmf-data');
+      if (!dataFile) {
+        continue;
+      }
+      result.push(file.name.replace('.sigmf-meta', ''));
+    }
+    return result;
+  }
+
   updateMeta(account: string, container: string, filePath: string, meta: object): Promise<any> {
     // We do not save the metadata to the file system
     return Promise.resolve(meta as SigMFMetadata);

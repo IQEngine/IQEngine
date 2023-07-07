@@ -40,6 +40,35 @@ def get_all_meta(
 
 
 @router.get(
+    "/api/datasources/{account}/{container}/meta/names",
+    status_code=200,
+    response_model=list[Metadata],
+)
+def get_all_meta_name(
+    account,
+    container,
+    metadatas: Collection[Metadata] = Depends(database.database.metadata_collection),
+):
+    # TODO: Should we validate datasource_id?
+
+    # Return all metadata for this datasource, could be an empty
+    # list
+    metadata = metadatas.find(
+        {
+            "global.traceability:origin.account": account,
+            "global.traceability:origin.container": container,
+        },
+        {
+            "global.traceability:origin.file_path": 1,
+        }
+    )
+    result = []
+    for datum in metadata:
+        result.append(datum)
+    return result
+
+
+@router.get(
     "/api/datasources/{account}/{container}/{filepath:path}/meta",
     response_model=Metadata,
 )
