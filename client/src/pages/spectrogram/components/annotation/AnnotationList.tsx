@@ -18,9 +18,16 @@ interface AnnotationListProps {
   setHandleTop: any;
   spectrogramHeight: number;
   setMeta: (meta: SigMFMetadata) => void;
+  setSelectedAnnotation: (index: number) => void;
 }
 
-export const AnnotationList = ({ meta, setHandleTop, spectrogramHeight, setMeta }: AnnotationListProps) => {
+export const AnnotationList = ({
+  meta,
+  setHandleTop,
+  spectrogramHeight,
+  setMeta,
+  setSelectedAnnotation,
+}: AnnotationListProps) => {
   const [parents, setParents] = useState([]);
   const [data, setData] = useState([]);
 
@@ -223,6 +230,7 @@ export const AnnotationList = ({ meta, setHandleTop, spectrogramHeight, setMeta 
             meta={meta}
             setHandleTop={setHandleTop}
             setMeta={setMeta}
+            setSelectedAnnotation={setSelectedAnnotation}
           />
         ),
       };

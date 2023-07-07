@@ -504,6 +504,7 @@ export const SpectrogramPage = () => {
                   setHandleTop={setHandleTop}
                   spectrogramHeight={spectrogramHeight}
                   setMeta={setMeta}
+                  setSelectedAnnotation={setSelectedAnnotation}
                 />
               )}
             </div>

@@ -33,7 +33,6 @@ const AnnotationViewer = ({
   function onDragEnd(e) {
     const x = e.target.x(); // coords of the corner box
     const y = e.target.y();
-    console.log('Meta ID:', e.target.id());
     const annot_indx = e.target.id().split('-')[0];
     const annot_pos_x = e.target.id().split('-')[1];
     const annot_pos_y = e.target.id().split('-')[2];
@@ -74,6 +73,9 @@ const AnnotationViewer = ({
         description: annotation.getDescription(),
         index: index,
       };
+      if (selectedAnnotation > -1 && !position.visible) {
+        setSelectedAnnotation(-1);
+      }
       return result;
     }) ?? [];
 
@@ -200,7 +202,7 @@ const AnnotationViewer = ({
             width={(annotation.x2 - annotation.x1) * spectrogramWidthScale}
             height={annotation.y2 - annotation.y1}
             fillEnabled={true}
-            stroke={selectedAnnotation == index ? 'red' : 'black'}
+            stroke={selectedAnnotation == index ? 'pink' : 'black'}
             strokeWidth={4}
             key={index}
           />
@@ -283,7 +285,7 @@ const AnnotationViewer = ({
             fontSize={24}
             x={annotation.x1 * spectrogramWidthScale}
             y={annotation.y1 - 23}
-            fill="black"
+            fill={selectedAnnotation == index ? 'pink' : 'black'}
             fontStyle="bold"
             key={index + 1000000}
             onClick={handleTextClick}
