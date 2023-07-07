@@ -199,7 +199,7 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
 
             setModalOpen(true);
           } else {
-            // Data file
+            // non-IQ Data file
             const samples_base64 = data.data_output[0]['samples'];
             const samples = window.atob(samples_base64);
             var blob_array = new Uint8Array(samples.length);
