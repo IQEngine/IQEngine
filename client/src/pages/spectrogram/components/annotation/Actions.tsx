@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ArrowRightIcon, ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
 import { Annotation, SigMFMetadata } from '@/utils/sigmfMetadata';
 import { metadataValidator } from '@/utils/validators';
@@ -10,9 +10,18 @@ interface ActionsProps {
   index: number;
   setHandleTop: (handleTop: number) => void;
   setMeta: (meta: SigMFMetadata) => void;
+  setSelectedAnnotation: (index: number) => void;
 }
 
-export const Actions = ({ meta, startSampleCount, spectrogramHeight, index, setHandleTop, setMeta }: ActionsProps) => {
+export const Actions = ({
+  meta,
+  startSampleCount,
+  spectrogramHeight,
+  index,
+  setHandleTop,
+  setMeta,
+  setSelectedAnnotation,
+}: ActionsProps) => {
   const modal = useRef(null);
   const [currentAnnotation, setCurrentAnnotation] = useState(JSON.stringify(meta.annotations[index], undefined, 4));
   const [errors, setErrors] = useState([]);
@@ -57,6 +66,7 @@ export const Actions = ({ meta, startSampleCount, spectrogramHeight, index, setH
         onClick={() => {
           const fractionIntoFile = startSampleCount / meta.getLengthInIQSamples();
           const handleTop = fractionIntoFile * spectrogramHeight;
+          setSelectedAnnotation(index);
           setHandleTop(handleTop);
         }}
       >
