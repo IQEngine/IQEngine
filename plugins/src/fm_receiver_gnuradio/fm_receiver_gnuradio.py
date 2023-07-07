@@ -21,17 +21,13 @@ class flowgraph(gr.top_block):
 
         self.zmq_sub_source = zeromq.sub_source(gr.sizeof_gr_complex, 1, 'tcp://127.0.0.1:5001', 100, False, -1)
         self.zmq_pub_sink = zeromq.pub_sink(gr.sizeof_float, 1, 'tcp://127.0.0.1:5002', 100, False, -1)
-
-        self.pfb_arb_resampler_xxx_0 = pfb.arb_resampler_ccf(500e3/samp_rate, taps=[], flt_size=32)
-        #self.pfb_arb_resampler_xxx_0.declare_sample_delay(0)
-
-        self.analog_wfm_rcv_0 = analog.wfm_rcv(quad_rate=500e3, audio_decimation=10)
-
+        self.pfb_arb_resampler = pfb.arb_resampler_ccf(500e3/samp_rate, taps=[], flt_size=32)
+        self.analog_wfm_rcv = analog.wfm_rcv(quad_rate=500e3, audio_decimation=10)
         self.rational_resampler = filter.rational_resampler_fff(interpolation=50, decimation=48, taps=[], fractional_bw=0)
 
-        self.connect(self.zmq_sub_source, self.pfb_arb_resampler_xxx_0)
-        self.connect(self.pfb_arb_resampler_xxx_0, self.analog_wfm_rcv_0)
-        self.connect(self.analog_wfm_rcv_0, self.rational_resampler)
+        self.connect(self.zmq_sub_source, self.pfb_arb_resampler)
+        self.connect(self.pfb_arb_resampler, self.analog_wfm_rcv)
+        self.connect(self.analog_wfm_rcv, self.rational_resampler)
         self.connect(self.rational_resampler, self.zmq_pub_sink)
 
 @dataclass
@@ -75,8 +71,7 @@ class Plugin:
 
         # Create wav file out of real samples
         scaled_float_out = np.int16(float_out / np.max(np.abs(float_out)) * 32767)
-        bytes_wav = bytes()
-        byte_io = io.BytesIO(bytes_wav)
+        byte_io = io.BytesIO(bytes())
         write(byte_io, 48000, scaled_float_out)
 
         samples_obj = {
