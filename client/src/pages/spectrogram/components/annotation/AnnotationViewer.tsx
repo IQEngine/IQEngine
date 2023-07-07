@@ -175,6 +175,14 @@ const AnnotationViewer = ({
     [setSelectedAnnotation]
   );
 
+  const onBoxClick = useCallback(
+    (e) => {
+      const annot_indx = e.target.id();
+      setSelectedAnnotation(annot_indx);
+    },
+    [setSelectedAnnotation]
+  );
+
   return (
     <Layer>
       {/* Button to add a new annotation */}
@@ -204,7 +212,9 @@ const AnnotationViewer = ({
             fillEnabled={true}
             stroke={selectedAnnotation == index ? 'pink' : 'black'}
             strokeWidth={4}
+            onClick={onBoxClick}
             key={index}
+            id={index.toString()}
           />
           {/* Top Left Corner */}
           <Rect
