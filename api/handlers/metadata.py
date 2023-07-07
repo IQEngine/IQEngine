@@ -42,7 +42,7 @@ def get_all_meta(
 @router.get(
     "/api/datasources/{account}/{container}/meta/names",
     status_code=200,
-    response_model=list[Metadata],
+    response_model=list[str],
 )
 def get_all_meta_name(
     account,
@@ -64,7 +64,7 @@ def get_all_meta_name(
     )
     result = []
     for datum in metadata:
-        result.append(datum)
+        result.append(datum["global"]["traceability:origin"]["file_path"])
     return result
 
 
