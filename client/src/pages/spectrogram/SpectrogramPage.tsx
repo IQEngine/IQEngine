@@ -7,8 +7,8 @@ import ScrollBar from './ScrollBar';
 import { TimePlot } from './components/TimePlot';
 import { FrequencyPlot } from './components/FrequencyPlot';
 import { IQPlot } from './components/IQPlot';
-import { Layer, Image, Stage } from 'react-konva';
-import { selectFft, calculateTileNumbers, range, SelectFftReturn } from '@/utils/selector';
+import { Layer, Stage } from 'react-konva';
+import { selectFft, calculateTileNumbers, range } from '@/utils/selector';
 import { AnnotationViewer } from '@/pages/spectrogram/components/annotation/AnnotationViewer';
 import { RulerTop } from './RulerTop';
 import { RulerSide } from './RulerSide';
@@ -25,6 +25,7 @@ import { SigMFMetadata } from '@/utils/sigmfMetadata';
 import { getIQDataSlices, useCurrentCachedIQDataSlice } from '@/api/iqdata/Queries';
 import { applyProcessing } from '@/utils/FetchMoreDataSource';
 import { colMaps } from '@/utils/colormap';
+import { FFTImageClient } from '@/pages/spectrogram/components/image/FFTImageClient';
 
 declare global {
   interface Window {
@@ -53,7 +54,6 @@ export const SpectrogramPage = () => {
   const [magnitudeMin, setMagnitudeMin] = useState(-40.0); // in dB
   const [fftWindow, setFFTWindow] = useState('hamming');
   const [colorMap, setColorMap] = useState(colMaps[COLORMAP_DEFAULT]);
-  const [image, setImage] = useState(null);
   const [upperTile, setUpperTile] = useState(-1);
   const [lowerTile, setLowerTile] = useState(-1);
   const [currentSamples, setCurrentSamples] = useState<Float32Array>(Float32Array.from([]));
@@ -69,7 +69,6 @@ export const SpectrogramPage = () => {
   const [includeRfFreq, setIncludeRfFreq] = useState(false);
   const [plotWidth, setPlotWidth] = useState(0);
   const [plotHeight, setPlotHeight] = useState(0);
-  const [missingTiles, setMissingTiles] = useState([]);
   const metaQuery = getMeta(type, account, container, filePath);
   const tiles = range(Math.floor(lowerTile), Math.ceil(upperTile));
   const [fftData, setFFTData] = useState<Record<number, Float32Array>>({});
@@ -79,7 +78,6 @@ export const SpectrogramPage = () => {
   const [fetchMinimap, setFetchMinimap] = useState(false);
   const [iqData, setIQData] = useState<Record<number, Float32Array>>({});
   const [iqRaw, setIQRaw] = useState<Record<number, Float32Array>>({});
-  const [fftImage, setFFTImage] = useState<SelectFftReturn>(null);
   const { downloadedTiles } = useCurrentCachedIQDataSlice(meta, TILE_SIZE_IN_IQ_SAMPLES);
   const iqQuery = getIQDataSlices(metaQuery.data, tiles, TILE_SIZE_IN_IQ_SAMPLES, !!metaQuery.data && tiles.length > 0);
   const [selectedAnnotation, setSelectedAnnotation] = useState(-1);
@@ -140,65 +138,6 @@ export const SpectrogramPage = () => {
       return { ...oldData, ...data };
     });
   }, [iqRaw]);
-
-  useEffect(() => {
-    if (!meta || lowerTile < 0 || upperTile < 0) {
-      return;
-    }
-    console.debug('FFT Changed');
-    const ret = selectFft(
-      lowerTile,
-      upperTile,
-      fftSize,
-      magnitudeMax,
-      magnitudeMin,
-      meta,
-      fftWindow, // dont want to conflict with the main window var
-      zoomLevel,
-      iqData,
-      {},
-      colorMap
-    );
-    setFFTData(ret?.fftData);
-    setFFTImage(ret);
-  }, [fftSize, magnitudeMax, magnitudeMin, fftWindow, zoomLevel, colorMap]);
-
-  useEffect(() => {
-    if (!meta || lowerTile < 0 || upperTile < 0) {
-      return;
-    }
-    console.debug('FFT Repositioned');
-    const ret = selectFft(
-      lowerTile,
-      upperTile,
-      fftSize,
-      magnitudeMax,
-      magnitudeMin,
-      meta,
-      fftWindow, // dont want to conflict with the main window var
-      zoomLevel,
-      iqData,
-      fftData,
-      colorMap
-    );
-    setFFTData(ret?.fftData);
-    setFFTImage(ret);
-  }, [lowerTile, upperTile, missingTiles.length, iqData]);
-
-  useEffect(() => {
-    renderImage();
-  }, [fftImage]);
-
-  const renderImage = async () => {
-    if (!fftImage) {
-      return;
-    }
-    createImageBitmap(fftImage.imageData).then((imageBitmap) => {
-      setImage(imageBitmap);
-    });
-    setMissingTiles(fftImage.missingTiles);
-    setFetchMinimap(true);
-  };
 
   const fetchAndRender = (handleTop) => {
     if (!meta) {
@@ -404,7 +343,23 @@ export const SpectrogramPage = () => {
                   <div className="flex flex-row">
                     <Stage width={spectrogramWidth} height={spectrogramHeight}>
                       <Layer onWheel={handleWheel}>
-                        <Image image={image} x={0} y={0} width={spectrogramWidth} height={spectrogramHeight} />
+                        <FFTImageClient
+                          spectrogramWidth={spectrogramWidth}
+                          spectrogramHeight={spectrogramHeight}
+                          meta={meta}
+                          lowerTile={lowerTile}
+                          upperTile={upperTile}
+                          fftSize={fftSize}
+                          magnitudeMax={magnitudeMax}
+                          magnitudeMin={magnitudeMin}
+                          fftWindow={fftWindow}
+                          zoomLevel={zoomLevel}
+                          iqData={iqData}
+                          colorMap={colorMap}
+                          setFetchMinimap={setFetchMinimap}
+                          fftData={fftData}
+                          setFFTData={setFFTData}
+                        />
                       </Layer>
                       <AnnotationViewer
                         meta={meta}
