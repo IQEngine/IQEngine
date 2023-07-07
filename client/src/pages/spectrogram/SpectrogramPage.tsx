@@ -414,6 +414,7 @@ export const SpectrogramPage = () => {
                         upperTile={upperTile}
                         zoomLevel={zoomLevel}
                         setMeta={setMeta}
+                        selectedAnnotation={selectedAnnotation}
                         setSelectedAnnotation={setSelectedAnnotation}
                       />
                       {cursorsEnabled && (

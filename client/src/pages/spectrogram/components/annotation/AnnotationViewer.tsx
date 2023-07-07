@@ -15,6 +15,7 @@ interface AnnotationViewerProps {
   upperTile: number;
   zoomLevel: number;
   setMeta: (meta: SigMFMetadata) => void;
+  selectedAnnotation: number;
   setSelectedAnnotation: (index: number) => void;
 }
 
@@ -26,6 +27,7 @@ const AnnotationViewer = ({
   zoomLevel,
   upperTile,
   setMeta,
+  selectedAnnotation,
   setSelectedAnnotation,
 }: AnnotationViewerProps) => {
   function onDragEnd(e) {
@@ -54,6 +56,7 @@ const AnnotationViewer = ({
     console.log(meta.annotations[f]);
     let new_meta = Object.assign(new SigMFMetadata(), meta);
     setMeta(new_meta);
+    setSelectedAnnotation(annot_indx);
   }
 
   const annotations =
@@ -111,6 +114,7 @@ const AnnotationViewer = ({
     );
     let new_meta = Object.assign(new SigMFMetadata(), meta);
     setMeta(new_meta);
+    setSelectedAnnotation(annot_indx);
   }, [annotations, meta, lowerTile, fftSize, zoomLevel, setMeta]);
 
   // Ability to update annotation labels
@@ -161,6 +165,14 @@ const AnnotationViewer = ({
     [annotations, meta, setMeta]
   );
 
+  const onBoxCornerClick = useCallback(
+    (e) => {
+      const annot_indx = e.target.id().split('-')[0];
+      setSelectedAnnotation(annot_indx);
+    },
+    [setSelectedAnnotation]
+  );
+
   return (
     <Layer>
       {/* Button to add a new annotation */}
@@ -188,7 +200,7 @@ const AnnotationViewer = ({
             width={(annotation.x2 - annotation.x1) * spectrogramWidthScale}
             height={annotation.y2 - annotation.y1}
             fillEnabled={true}
-            stroke="black"
+            stroke={selectedAnnotation == index ? 'red' : 'black'}
             strokeWidth={4}
             key={index}
           />
@@ -207,6 +219,7 @@ const AnnotationViewer = ({
             onDragEnd={onDragEnd}
             onMouseOver={onMouseOver}
             onMouseOut={onMouseOut}
+            onClick={onBoxCornerClick}
             id={index.toString() + '-x1-y1'} // tells the event which annotation, and which x and y to update
           />
           {/* Top Right Corner */}
@@ -224,6 +237,7 @@ const AnnotationViewer = ({
             onDragEnd={onDragEnd}
             onMouseOver={onMouseOver}
             onMouseOut={onMouseOut}
+            onClick={onBoxCornerClick}
             id={index.toString() + '-x2-y1'} // tells the event which annotation, and which x and y to update
           />
           {/* Bottom Left Corner */}
@@ -241,6 +255,7 @@ const AnnotationViewer = ({
             onDragEnd={onDragEnd}
             onMouseOver={onMouseOver}
             onMouseOut={onMouseOut}
+            onClick={onBoxCornerClick}
             id={index.toString() + '-x1-y2'} // tells the event which annotation, and which x and y to update
           />
           {/* Bottom Right Corner */}
@@ -258,6 +273,7 @@ const AnnotationViewer = ({
             onDragEnd={onDragEnd}
             onMouseOver={onMouseOver}
             onMouseOut={onMouseOut}
+            onClick={onBoxCornerClick}
             id={index.toString() + '-x2-y2'} // tells the event which annotation, and which x and y to update
           />
           {/* Description Label */}
