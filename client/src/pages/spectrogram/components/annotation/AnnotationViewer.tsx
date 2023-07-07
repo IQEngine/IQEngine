@@ -15,6 +15,7 @@ interface AnnotationViewerProps {
   upperTile: number;
   zoomLevel: number;
   setMeta: (meta: SigMFMetadata) => void;
+  setSelectedAnnotation: (index: number) => void;
 }
 
 const AnnotationViewer = ({
@@ -25,6 +26,7 @@ const AnnotationViewer = ({
   zoomLevel,
   upperTile,
   setMeta,
+  setSelectedAnnotation,
 }: AnnotationViewerProps) => {
   function onDragEnd(e) {
     const x = e.target.x(); // coords of the corner box
