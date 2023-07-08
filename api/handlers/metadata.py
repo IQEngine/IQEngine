@@ -49,10 +49,6 @@ def get_all_meta_name(
     container,
     metadatas: Collection[Metadata] = Depends(database.database.metadata_collection),
 ):
-    # TODO: Should we validate datasource_id?
-
-    # Return all metadata for this datasource, could be an empty
-    # list
     metadata = metadatas.find(
         {
             "global.traceability:origin.account": account,
