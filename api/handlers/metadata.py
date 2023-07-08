@@ -40,7 +40,7 @@ def get_all_meta(
 
 
 @router.get(
-    "/api/datasources/{account}/{container}/meta/names",
+    "/api/datasources/{account}/{container}/meta/paths",
     status_code=200,
     response_model=list[str],
 )
@@ -59,6 +59,7 @@ def get_all_meta_name(
             "global.traceability:origin.container": container,
         },
         {
+            "_id": 0,
             "global.traceability:origin.file_path": 1,
         }
     )

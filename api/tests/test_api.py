@@ -151,6 +151,24 @@ def test_api_get_all_meta(client):
     assert len(response.json()) == 2
 
 
+def test_api_get_all_meta_path(client):
+    client.post("/api/datasources", json=test_datasource).json()
+    client.post(
+        f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/record_a/meta',
+        json=valid_metadata,
+    )
+    client.post(
+        f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/record_b/meta',
+        json=valid_metadata,
+    )
+    response = client.get(
+        f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/meta/paths'
+    )
+    assert response.status_code == 200    
+    assert "record_a" in response.json() 
+    assert "record_b" in response.json()
+
+
 def test_api_create_datasource(client):
     response = client.post("/api/datasources", json=test_datasource)
     assert response.status_code == 201
