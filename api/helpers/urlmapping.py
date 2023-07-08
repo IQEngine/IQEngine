@@ -13,6 +13,19 @@ class ApiType(Enum):
 
 
 def get_content_type(apiType: ApiType):
+    """
+    Get the content type for the apiType
+
+    Parameters
+    ----------
+    apiType : ApiType
+        The type of the api
+    
+    Returns
+    -------
+    str
+        The MIME content type
+    """
     match apiType:
         case ApiType.THUMB:
             return "image/jpeg"
@@ -26,7 +39,23 @@ def get_content_type(apiType: ApiType):
             raise ValueError("Invalid ApiType value")
 
 
-def get_file_name(filepath:str, apiType: ApiType) -> str:
+def get_file_name(filepath: str, apiType: ApiType) -> str:
+    """
+    Get the file name for the apiType
+
+    Parameters
+    ----------
+    filepath : str
+        The file path
+    apiType : ApiType
+        The type of the api
+    
+    Returns
+    -------
+    str
+        The file name with extension
+    """
+
     match apiType:
         case ApiType.THUMB:
             return filepath + ".jpg"
@@ -41,6 +70,28 @@ def get_file_name(filepath:str, apiType: ApiType) -> str:
 
 
 def add_URL_sasToken(account, container, sasToken, filepath, apiType: ApiType):
+    """
+    Add the SAS token to the URL
+
+    Parameters
+    ----------
+    account : str
+        The account name.
+    container : str
+        The container name.
+    sasToken : str
+        The SAS token.
+    filepath : str
+        The file path.
+    apiType : ApiType
+        The type of the api
+    
+    Returns
+    -------
+    SecretStr
+        The URL with SAS token
+    """
+    
     match apiType:
         case ApiType.THUMB if filepath and filepath.strip():
             bloburl = (

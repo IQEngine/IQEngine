@@ -5,7 +5,7 @@ from pydantic import SecretStr
 class AzureBlobClient:
     """
     AzureBlobClient is a wrapper around the Azure BlobClient class.
-    
+
 
     Parameters
     ----------
@@ -14,6 +14,7 @@ class AzureBlobClient:
     container : str
         The Azure container name.
     """
+
     account: str
     container: str
     sas_token: SecretStr = None
@@ -52,7 +53,7 @@ class AzureBlobClient:
     ) -> bytes:
         blob_client = self.get_blob_client(filepath)
         return blob_client.download_blob(offset=offset, length=length).readall()
-    
+
     def upload_blob(self, filepath: str, data: bytes):
         blob_client = self.get_blob_client(filepath)
         blob_client.upload_blob(data, overwrite=True)

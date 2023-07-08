@@ -50,8 +50,24 @@ def plugins_collection():
     collection: Collection[Metadata] = db().plugins
     return collection
 
+
 def get_datasource(account, container) -> DataSource:
+    """
+    Get a datasource by account and container
+
+    Parameters
+    ----------
+    account : str
+        The account name.
+    container : str
+        The container name.
+
+    Returns
+    -------
+    DataSource
+        The datasource.
+    """
+    
     return datasources_collection().find_one(
         {"account": account, "container": container}
     )
-    

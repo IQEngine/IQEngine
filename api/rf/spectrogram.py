@@ -3,7 +3,6 @@ import io
 import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
-
 from rf.samples import get_samples
 
 
@@ -72,7 +71,13 @@ def generate_image(spectrogram, cmap="viridis", format="jpeg") -> bytes:
     return data
 
 
-def get_spectrogram_image(content: bytes, data_type:str, fftSize: int, cmap:str="viridis", format:str="jpeg") -> bytes:
+def get_spectrogram_image(
+    content: bytes,
+    data_type: str,
+    fftSize: int,
+    cmap: str = "viridis",
+    format: str = "jpeg",
+) -> bytes:
     """
     Generate a spectrogram image from bytes.
 

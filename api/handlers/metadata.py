@@ -1,21 +1,36 @@
 from datetime import datetime
 from typing import Any, Dict, List, Optional
-from rf.spectrogram import get_spectrogram_image
 
 import database.database
-from database.database import metadata_collection, datasources_collection, get_datasource
 import httpx
 from blob.azure_client import AzureBlobClient
+from database.database import (
+    datasources_collection,
+    get_datasource,
+    metadata_collection,
+)
 from database.models import DataSource, DataSourceReference, Metadata
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Response
 from fastapi.responses import StreamingResponse
-from helpers.urlmapping import add_URL_sasToken, ApiType, get_file_name, get_content_type
 from helpers.cipher import decrypt
+from helpers.urlmapping import (
+    ApiType,
+    add_URL_sasToken,
+    get_content_type,
+    get_file_name,
+)
 from pymongo.collection import Collection
+from rf.spectrogram import get_spectrogram_image
 
 router = APIRouter()
 
-def get_metadata(account, container, filepath, metadata_set: Collection[Metadata] = Depends(metadata_collection)):
+
+def get_metadata(
+    account,
+    container,
+    filepath,
+    metadata_set: Collection[Metadata] = Depends(metadata_collection),
+):
     return metadata_set.find_one(
         {
             "global.traceability:origin.account": account,
@@ -107,8 +122,7 @@ async def get_metadata_iqdata(
     account: str,
     container: str,
     filepath: str,
-    datasources_collection: Collection[DataSource] = Depends(datasources_collection
-    ),
+    datasources_collection: Collection[DataSource] = Depends(datasources_collection),
 ):
     # Create the imageURL with sasToken
     datasource = datasources_collection.find_one(
@@ -157,13 +171,17 @@ async def get_meta_thumbnail(
     if not azure_client.blob_exist(thumbnail_path):
         iq_path = get_file_name(filepath, ApiType.IQDATA)
         fftSize = 1024
-        content = azure_client.get_blob_content(iq_path,8000, fftSize*512)
-        metadata = get_metadata(datasource["account"], datasource["container"], filepath, metadata_set)
+        content = azure_client.get_blob_content(iq_path, 8000, fftSize * 512)
+        metadata = get_metadata(
+            datasource["account"], datasource["container"], filepath, metadata_set
+        )
         if not metadata:
             raise HTTPException(status_code=404, detail="Metadata not found")
         data_type = metadata["global"]["core:datatype"]
         image = get_spectrogram_image(content, data_type, fftSize)
-        background_tasks.add_task(azure_client.upload_blob, filepath=thumbnail_path, data=image)
+        background_tasks.add_task(
+            azure_client.upload_blob, filepath=thumbnail_path, data=image
+        )
         return Response(content=image, media_type=content_type)
 
     return Response(
