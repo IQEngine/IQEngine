@@ -12,7 +12,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, SecretStr
 from pymongo.collection import Collection
 
-from .cipher import decrypt
+from helpers.cipher import decrypt
 
 router = APIRouter()
 

@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import Any, Dict, List, Optional
+from blob.azure_client import AzureBlobClient
 
 import database.database
 import httpx
@@ -8,7 +9,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import StreamingResponse
 from pymongo.collection import Collection
 
-from .urlmapping import add_URL_sasToken, apiType
+from helpers.urlmapping import add_URL_sasToken, apiType
 
 router = APIRouter()
 
@@ -137,6 +138,7 @@ async def get_meta_thumbnail(
     datasources_collection: Collection[DataSource] = Depends(
         database.database.datasources_collection
     ),
+    azure_client = Depends(AzureBlobClient)
 ):
     # Create the imageURL with sasToken
     datasource = datasources_collection.find_one(
