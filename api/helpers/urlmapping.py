@@ -5,24 +5,55 @@ from pydantic import SecretStr
 from .cipher import decrypt
 
 
-class apiType(Enum):
+class ApiType(Enum):
     IMAGE = 1
     THUMB = 2
     IQDATA = 3
+    METADATA = 4
 
 
-def add_URL_sasToken(account, container, sasToken, filepath, apiType: apiType):
+def get_content_type(apiType: ApiType):
     match apiType:
-        case apiType.THUMB if filepath and filepath.strip():
+        case ApiType.THUMB:
+            return "image/jpeg"
+        case ApiType.IMAGE:
+            return "image/jpeg"
+        case ApiType.IQDATA:
+            return "application/octet-stream"
+        case ApiType.METADATA:
+            return "application/json"
+        case _:
+            raise ValueError("Invalid ApiType value")
+
+
+def get_file_name(filepath:str, apiType: ApiType) -> str:
+    match apiType:
+        case ApiType.THUMB:
+            return filepath + ".jpg"
+        case ApiType.IMAGE:
+            return "datasource_thumbnail.jpg"
+        case ApiType.IQDATA:
+            return filepath + ".sigmf-data"
+        case ApiType.METADATA:
+            return filepath + ".sigmf-meta"
+        case _:
+            raise ValueError("Invalid ApiType value")
+
+
+def add_URL_sasToken(account, container, sasToken, filepath, apiType: ApiType):
+    match apiType:
+        case ApiType.THUMB if filepath and filepath.strip():
             bloburl = (
                 f"https://{account}.blob.core.windows.net/{container}/{filepath}.jpg"
             )
-        case apiType.IMAGE:
+        case ApiType.IMAGE:
             bloburl = f"https://{account}.blob.core.windows.net/{container}/datasource_thumbnail.jpg"
-        case apiType.IQDATA if filepath and filepath.strip():
+        case ApiType.IQDATA if filepath and filepath.strip():
             bloburl = f"https://{account}.blob.core.windows.net/{container}/{filepath}.sigmf-data"
+        case ApiType.METADATA if filepath and filepath.strip():
+            bloburl = f"https://{account}.blob.core.windows.net/{container}/{filepath}.sigmf-meta"
         case _:
-            raise ValueError("Invalid apiType value")
+            raise ValueError("Invalid ApiType value")
 
     if sasToken is not None and sasToken != "":
         # linter fix for error: "get_secret_value" is not a known member of "None" (reportOptionalMemberAccess)

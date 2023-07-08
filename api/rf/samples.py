@@ -11,7 +11,7 @@ def get_samples(data_bytes, data_type) -> np.ndarray:
         The bytes to convert to samples.
     data_type : str
         The data type of the bytes.
-        
+
     Returns
     -------
     np.ndarray
@@ -27,5 +27,5 @@ def get_samples(data_bytes, data_type) -> np.ndarray:
         samples = np.frombuffer(data_bytes, data_type=np.int8)
         samples = samples[::2] + 1j * samples[1::2]
     else:
-        raise("Datatype " + data_type + " not implemented")        
+        raise ("Datatype " + data_type + " not implemented")
     return samples

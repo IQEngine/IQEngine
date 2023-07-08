@@ -1,8 +1,9 @@
+import io
 
 import matplotlib.pyplot as plt
 import numpy as np
-import io
 from PIL import Image
+
 
 def generate_spectrogram(samples, fftSize) -> np.ndarray:
     """
@@ -26,12 +27,13 @@ def generate_spectrogram(samples, fftSize) -> np.ndarray:
     for i in range(num_rows):
         spectrogram[i, :] = 10 * np.log10(
             np.abs(
-                np.fft.fftshift(np.fft.fft(samples[i * fftSize: (i + 1) * fftSize]))
+                np.fft.fftshift(np.fft.fft(samples[i * fftSize : (i + 1) * fftSize]))
             )
             ** 2
         )
 
-def generate_image(spectrogram, cmap = "viridis", format="jpeg") -> bytes:
+
+def generate_image(spectrogram, cmap="viridis", format="jpeg") -> bytes:
     """
     Generate an image from a spectrogram.
 
@@ -49,12 +51,14 @@ def generate_image(spectrogram, cmap = "viridis", format="jpeg") -> bytes:
     bytes
         The image data.
     """
-    
+
     fig = plt.figure(frameon=False)
     ax = plt.Axes(fig, [0.0, 0.0, 1.0, 1.0])
     ax.set_axis_off()
     fig.add_axes(ax)
-    ax.imshow(spectrogram, cmap=cmap, aspect="auto", vmin=30+np.min(np.min(spectrogram)))
+    ax.imshow(
+        spectrogram, cmap=cmap, aspect="auto", vmin=30 + np.min(np.min(spectrogram))
+    )
     img_buf = io.BytesIO()
     plt.savefig(img_buf, bbox_inches="tight", pad_inches=0)
     img_buf.seek(0)

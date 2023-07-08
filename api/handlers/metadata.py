@@ -1,15 +1,14 @@
 from datetime import datetime
 from typing import Any, Dict, List, Optional
-from blob.azure_client import AzureBlobClient
 
 import database.database
 import httpx
+from blob.azure_client import AzureBlobClient
 from database.models import DataSource, DataSourceReference, Metadata
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import StreamingResponse
+from helpers.urlmapping import add_URL_sasToken, ApiType, get_file_name, get_content_type
 from pymongo.collection import Collection
-
-from helpers.urlmapping import add_URL_sasToken, apiType
 
 router = APIRouter()
 
@@ -114,7 +113,7 @@ async def get_metadata_iqdata(
         datasource["sasToken"] = ""  # set to empty str if null
 
     imageURL = add_URL_sasToken(
-        account, container, datasource["sasToken"], filepath, apiType.IQDATA
+        account, container, datasource["sasToken"], filepath, ApiType.IQDATA
     )
 
     async with httpx.AsyncClient() as client:
@@ -138,7 +137,7 @@ async def get_meta_thumbnail(
     datasources_collection: Collection[DataSource] = Depends(
         database.database.datasources_collection
     ),
-    azure_client = Depends(AzureBlobClient)
+    azure_client: AzureBlobClient = Depends(AzureBlobClient),
 ):
     # Create the imageURL with sasToken
     datasource = datasources_collection.find_one(
@@ -151,20 +150,14 @@ async def get_meta_thumbnail(
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
 
-    if not datasource.get("sasToken"):
-        datasource["sasToken"] = ""  # set to empty str if null
+    azure_client.set_sas_token(datasource.get("sasToken"))
+    thumbnail_path = get_file_name(filepath, ApiType.THUMB)
 
-    imageURL = add_URL_sasToken(
-        account, container, datasource["sasToken"], filepath, apiType.THUMB
-    )
-
-    async with httpx.AsyncClient() as client:
-        response = await client.get(imageURL.get_secret_value())
-    if response.status_code != 200:
+    if not azure_client.blob_exist(thumbnail_path):
         raise HTTPException(status_code=404, detail="File not found")
 
     return StreamingResponse(
-        response.iter_bytes(), media_type=response.headers["Content-Type"]
+        azure_client.get_blob_content(thumbnail_path), media_type=get_content_type(ApiType.THUMB)
     )
 
 
