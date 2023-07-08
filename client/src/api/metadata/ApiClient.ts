@@ -28,6 +28,11 @@ export class ApiClient implements MetadataClient {
     return responseMetaData;
   }
 
+  async getDataSourceMetaPaths(account: string, container: string): Promise<string[]> {
+    const response = await axios.get(`/api/datasources/${account}/${container}/meta/paths`);
+    return response.data;
+  }
+
   async updateMeta(account: string, container: string, filePath: string, meta: SigMFMetadata): Promise<SigMFMetadata> {
     return await axios
       .put(`/api/datasources/${account}/${container}/${filePath}/meta`, meta)

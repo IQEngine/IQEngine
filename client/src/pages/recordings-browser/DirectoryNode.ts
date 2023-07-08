@@ -3,10 +3,10 @@ import { SigMFMetadata } from '@/utils/sigmfMetadata';
 export interface DirectoryNode {
   name: string;
   children: DirectoryNode[];
-  files: SigMFMetadata[];
+  files: string[];
 }
 
-export function groupDataByDirectories(data: SigMFMetadata[], rootPath = '/'): DirectoryNode {
+export function groupDataByDirectories(data: string[], rootPath = '/'): DirectoryNode {
   const root: DirectoryNode = {
     name: rootPath,
     children: [],
@@ -14,7 +14,7 @@ export function groupDataByDirectories(data: SigMFMetadata[], rootPath = '/'): D
   };
 
   for (const item of data) {
-    const filePath = item.getFilePath();
+    const filePath = item;
     const directories = getDirectoriesFromPath(filePath);
     let currentNode = root;
 
