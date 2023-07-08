@@ -164,8 +164,8 @@ def test_api_get_all_meta_path(client):
     response = client.get(
         f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/meta/paths'
     )
-    assert response.status_code == 200    
-    assert "record_a" in response.json() 
+    assert response.status_code == 200
+    assert "record_a" in response.json()
     assert "record_b" in response.json()
 
 

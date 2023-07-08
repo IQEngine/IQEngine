@@ -61,7 +61,7 @@ def get_all_meta_name(
         {
             "_id": 0,
             "global.traceability:origin.file_path": 1,
-        }
+        },
     )
     result = []
     for datum in metadata:
