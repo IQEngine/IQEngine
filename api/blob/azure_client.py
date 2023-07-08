@@ -1,4 +1,5 @@
 from azure.storage.blob import BlobClient, BlobProperties
+from pydantic import SecretStr
 
 
 class AzureBlobClient:
@@ -13,6 +14,10 @@ class AzureBlobClient:
     container : str
         The Azure container name.
     """
+    account: str
+    container: str
+    sas_token: SecretStr = None
+
     def __init__(self, account, container):
         self.account = account
         self.container = container
@@ -47,3 +52,7 @@ class AzureBlobClient:
     ) -> bytes:
         blob_client = self.get_blob_client(filepath)
         return blob_client.download_blob(offset=offset, length=length).readall()
+    
+    def upload_blob(self, filepath: str, data: bytes):
+        blob_client = self.get_blob_client(filepath)
+        blob_client.upload_blob(data, overwrite=True)

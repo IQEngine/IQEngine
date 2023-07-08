@@ -1,16 +1,28 @@
 from datetime import datetime
 from typing import Any, Dict, List, Optional
+from rf.spectrogram import get_spectrogram_image
 
 import database.database
+from database.database import metadata_collection, datasources_collection, get_datasource
 import httpx
 from blob.azure_client import AzureBlobClient
 from database.models import DataSource, DataSourceReference, Metadata
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Response
 from fastapi.responses import StreamingResponse
 from helpers.urlmapping import add_URL_sasToken, ApiType, get_file_name, get_content_type
+from helpers.cipher import decrypt
 from pymongo.collection import Collection
 
 router = APIRouter()
+
+def get_metadata(account, container, filepath, metadata_set: Collection[Metadata] = Depends(metadata_collection)):
+    return metadata_set.find_one(
+        {
+            "global.traceability:origin.account": account,
+            "global.traceability:origin.container": container,
+            "global.traceability:origin.file_path": filepath,
+        }
+    )
 
 
 @router.get(
@@ -21,7 +33,7 @@ router = APIRouter()
 def get_all_meta(
     account,
     container,
-    metadatas: Collection[Metadata] = Depends(database.database.metadata_collection),
+    metadatas: Collection[Metadata] = Depends(metadata_collection),
 ):
     # TODO: Should we validate datasource_id?
 
@@ -47,7 +59,7 @@ def get_all_meta(
 def get_all_meta_name(
     account,
     container,
-    metadatas: Collection[Metadata] = Depends(database.database.metadata_collection),
+    metadatas: Collection[Metadata] = Depends(metadata_collection),
 ):
     metadata = metadatas.find(
         {
@@ -73,7 +85,7 @@ def get_meta(
     account,
     container,
     filepath,
-    metadatas: Collection[Metadata] = Depends(database.database.metadata_collection),
+    metadatas: Collection[Metadata] = Depends(metadata_collection),
 ):
     metadata = metadatas.find_one(
         {
@@ -95,8 +107,7 @@ async def get_metadata_iqdata(
     account: str,
     container: str,
     filepath: str,
-    datasources_collection: Collection[DataSource] = Depends(
-        database.database.datasources_collection
+    datasources_collection: Collection[DataSource] = Depends(datasources_collection
     ),
 ):
     # Create the imageURL with sasToken
@@ -131,33 +142,32 @@ async def get_metadata_iqdata(
     response_class=StreamingResponse,
 )
 async def get_meta_thumbnail(
-    account,
-    container,
-    filepath,
-    datasources_collection: Collection[DataSource] = Depends(
-        database.database.datasources_collection
-    ),
+    filepath: str,
+    background_tasks: BackgroundTasks,
+    datasource: DataSource = Depends(get_datasource),
     azure_client: AzureBlobClient = Depends(AzureBlobClient),
+    metadata_set: Collection[Metadata] = Depends(metadata_collection),
 ):
-    # Create the imageURL with sasToken
-    datasource = datasources_collection.find_one(
-        {
-            "account": account,
-            "container": container,
-        }
-    )
-
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
 
-    azure_client.set_sas_token(datasource.get("sasToken"))
+    azure_client.set_sas_token(decrypt(datasource.get("sasToken")))
     thumbnail_path = get_file_name(filepath, ApiType.THUMB)
-
+    content_type = get_content_type(ApiType.THUMB)
     if not azure_client.blob_exist(thumbnail_path):
-        raise HTTPException(status_code=404, detail="File not found")
+        iq_path = get_file_name(filepath, ApiType.IQDATA)
+        fftSize = 1024
+        content = azure_client.get_blob_content(iq_path,8000, fftSize*512)
+        metadata = get_metadata(datasource["account"], datasource["container"], filepath, metadata_set)
+        if not metadata:
+            raise HTTPException(status_code=404, detail="Metadata not found")
+        data_type = metadata["global"]["core:datatype"]
+        image = get_spectrogram_image(content, data_type, fftSize)
+        background_tasks.add_task(azure_client.upload_blob, filepath=thumbnail_path, data=image)
+        return Response(content=image, media_type=content_type)
 
-    return StreamingResponse(
-        azure_client.get_blob_content(thumbnail_path), media_type=get_content_type(ApiType.THUMB)
+    return Response(
+        content=azure_client.get_blob_content(thumbnail_path), media_type=content_type
     )
 
 

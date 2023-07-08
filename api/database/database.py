@@ -49,3 +49,9 @@ def metadata_versions_collection():
 def plugins_collection():
     collection: Collection[Metadata] = db().plugins
     return collection
+
+def get_datasource(account, container) -> DataSource:
+    return datasources_collection().find_one(
+        {"account": account, "container": container}
+    )
+    

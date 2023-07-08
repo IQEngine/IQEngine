@@ -19,12 +19,12 @@ def get_samples(data_bytes, data_type) -> np.ndarray:
     """
 
     if data_type == "ci16_le" or data_type == "ci16":
-        samples = np.frombuffer(data_bytes, data_type=np.int16)
+        samples = np.frombuffer(data_bytes, dtype=np.int16)
         samples = samples[::2] + 1j * samples[1::2]
     elif data_type == "cf32_le":
-        samples = np.frombuffer(data_bytes, data_type=np.complex64)
+        samples = np.frombuffer(data_bytes, dtype=np.complex64)
     elif data_type == "ci8" or data_type == "i8":
-        samples = np.frombuffer(data_bytes, data_type=np.int8)
+        samples = np.frombuffer(data_bytes, dtype=np.int8)
         samples = samples[::2] + 1j * samples[1::2]
     else:
         raise ("Datatype " + data_type + " not implemented")

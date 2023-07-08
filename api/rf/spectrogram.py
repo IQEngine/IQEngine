@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
 
+from rf.samples import get_samples
+
 
 def generate_spectrogram(samples, fftSize) -> np.ndarray:
     """
@@ -31,6 +33,7 @@ def generate_spectrogram(samples, fftSize) -> np.ndarray:
             )
             ** 2
         )
+    return spectrogram
 
 
 def generate_image(spectrogram, cmap="viridis", format="jpeg") -> bytes:
@@ -67,3 +70,31 @@ def generate_image(spectrogram, cmap="viridis", format="jpeg") -> bytes:
     im.convert("RGB").save(img_byte_arr, format=format)
     data = img_byte_arr.getvalue()
     return data
+
+
+def get_spectrogram_image(content: bytes, data_type:str, fftSize: int, cmap:str="viridis", format:str="jpeg") -> bytes:
+    """
+    Generate a spectrogram image from bytes.
+
+    Parameters
+    ----------
+    content : bytes
+        The samples to convert to a spectrogram.
+    data_type : str
+        The data type of the samples.
+    fftSize : int
+        The size of the FFT to use.
+    cmap : str, optional
+        The colormap to use. Defaults to "viridis".
+    format : str, optional
+        The format of the image. Defaults to "jpeg".
+
+    Returns
+    -------
+    bytes
+        The image data.
+    """
+
+    samples = get_samples(content, data_type)
+    spectrogram = generate_spectrogram(samples, fftSize)
+    return generate_image(spectrogram, cmap=cmap, format=format)

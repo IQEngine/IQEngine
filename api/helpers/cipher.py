@@ -13,6 +13,8 @@ def get_key():
 
 
 def decrypt(sas_token: str):
+    if not sas_token:
+        return None
     key = get_key()
     if not key:
         return None
