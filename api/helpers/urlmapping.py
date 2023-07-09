@@ -20,7 +20,7 @@ def get_content_type(apiType: ApiType):
     ----------
     apiType : ApiType
         The type of the api
-    
+
     Returns
     -------
     str
@@ -49,7 +49,7 @@ def get_file_name(filepath: str, apiType: ApiType) -> str:
         The file path
     apiType : ApiType
         The type of the api
-    
+
     Returns
     -------
     str
@@ -85,13 +85,13 @@ def add_URL_sasToken(account, container, sasToken, filepath, apiType: ApiType):
         The file path.
     apiType : ApiType
         The type of the api
-    
+
     Returns
     -------
     SecretStr
         The URL with SAS token
     """
-    
+
     match apiType:
         case ApiType.THUMB if filepath and filepath.strip():
             bloburl = (

@@ -67,7 +67,7 @@ def get_datasource(account, container) -> DataSource:
     DataSource
         The datasource.
     """
-    
+
     return datasources_collection().find_one(
         {"account": account, "container": container}
     )
