@@ -227,8 +227,8 @@ def query_meta(
     min_datetime: Optional[datetime] = Query(None),
     max_datetime: Optional[datetime] = Query(None),
     text: Optional[str] = Query(None),
-    captures_geolocation: Optional[str] = Query(None),
-    annotations_geolocation: Optional[str] = Query(None),
+    captures_geo: Optional[str] = Query(None),
+    annotations_geo: Optional[str] = Query(None),
     metadataSet: Collection[Metadata] = Depends(database.database.metadata_collection),
 ):
     query_condition: Dict[str, Any] = {}
@@ -281,10 +281,10 @@ def query_meta(
             {"annotations.core:description": {"$regex": comment, "$options": "i"}}
         )
 
-    if captures_geolocation:
-        query_condition.update(process_geolocation("captures", captures_geolocation))
-    if annotations_geolocation:
-        query_condition.update(process_geolocation("annotations", annotations_geolocation))
+    if captures_geo:
+        query_condition.update(process_geolocation("captures", captures_geo))
+    if annotations_geo:
+        query_condition.update(process_geolocation("annotations", annotations_geo))
 
     if text is not None:
         or_condition = [
