@@ -9,7 +9,7 @@ from main import app
 
 
 @pytest.fixture
-def client():
+def client() -> TestClient:
     return TestClient(app)
 
 

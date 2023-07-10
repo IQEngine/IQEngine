@@ -6,7 +6,6 @@ import httpx
 from blob.azure_client import AzureBlobClient
 from database.database import (
     datasources_collection,
-    get_datasource,
     metadata_collection,
 )
 from database.models import DataSource, DataSourceReference, Metadata
@@ -157,7 +156,7 @@ async def get_metadata_iqdata(
 async def get_meta_thumbnail(
     filepath: str,
     background_tasks: BackgroundTasks,
-    datasource: DataSource = Depends(get_datasource),
+    datasource: DataSource = Depends(database.database.get_datasource),
     azure_client: AzureBlobClient = Depends(AzureBlobClient),
 ):
     if not datasource:
