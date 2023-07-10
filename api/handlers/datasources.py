@@ -37,8 +37,8 @@ def get_datasources(
 ):
     datasources = datasources_collection.find()
     result = []
-    for datasource in datasources:
-        result.append(datasource)
+    for datasource_item in datasources:
+        result.append(datasource_item)
     return result
 
 

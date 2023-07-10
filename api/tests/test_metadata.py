@@ -55,7 +55,7 @@ def test_api_get_thumbnail_with_no_image(
     mock_get_new_thumbnail: Mock,
     mock_get_metadata: Mock,
     mock_blob_exist: Mock,
-    client: TestClient,
+    client,
 ):
     client.app.dependency_overrides[datasource.get] = override_dependency_datasource
     response = client.get(
