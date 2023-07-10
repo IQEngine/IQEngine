@@ -24,13 +24,17 @@ def mock_request_get(*args, **kwargs):
 
 def mock_request_post(*args, **kwargs):
     class MockResponse:
-        def __init__(self, text):
+        def __init__(self, text, status):
             self.text = text
+            self.status_code = status
 
         def text(self):
             return self.text
 
-    return MockResponse("Success")
+        def status_code(self):
+            return 201
+
+    return MockResponse("Success", 201)
 
 
 mock_config = {
@@ -109,7 +113,7 @@ class TestMetadata(TestCase):
                 mock_args.filepath,
                 mock_args.document,
             ),
-            "Success",
+            201,
         )
 
     @patch("metadata_loader.main.call_create_meta_api", side_effect=mock_request_post)
