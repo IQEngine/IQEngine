@@ -184,10 +184,11 @@ def process_geolocation(target: str, geolocation: str):
         geo_long = float(geo_long_str)
         geo_lat = float(geo_lat_str)
         geo_radius = float(geo_radius_str)
+        target_field = ""
         if target == "captures":
             target_field = "captures.core:geolocation"
-        elif target == "annotations":
-            target_field = "annotations.core:geolocation" 
+        if target == "annotations":
+            target_field = "annotations.core:geolocation"
 
         return {
                 target_field: {
