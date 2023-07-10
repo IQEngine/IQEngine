@@ -1,7 +1,7 @@
 from unittest import mock
 from unittest.mock import Mock
 
-from database.database import get_datasource
+from database import datasource
 from database.models import DataSource, Metadata
 from fastapi.testclient import TestClient
 from tests.test_data import test_datasource, valid_metadata
@@ -27,7 +27,7 @@ def test_api_get_thumbnail_with_image(
     mock_blob_exist: Mock,
     client,
 ):
-    client.app.dependency_overrides[get_datasource] = override_dependency_datasource
+    client.app.dependency_overrides[datasource.get] = override_dependency_datasource
     response = client.get(
         f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path/thumbnail'
     )
@@ -57,7 +57,7 @@ def test_api_get_thumbnail_with_no_image(
     mock_blob_exist: Mock,
     client: TestClient,
 ):
-    client.app.dependency_overrides[get_datasource] = override_dependency_datasource
+    client.app.dependency_overrides[datasource.get] = override_dependency_datasource
     response = client.get(
         f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path/thumbnail'
     )
