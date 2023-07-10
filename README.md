@@ -140,6 +140,10 @@ To configure the project, you need to set specific environment variables. The cu
 
 * `IN_MEMORY_DB`: This variable switches in-memory DB on or off. The in-memory DB is intended for testing only. Use IN_MEMORY_DB = 0 for off and 1 for on. PyTest tests of the API make use of the in-memory DB.
 
+* `IQENGINE_APP_ID` = For your administrative user, it is crucial to set up this variable. Create a registration app dedicated to the administrative user within your application. This variable is necessary to enable their login functionality. Remember to include your website's redirect URI as a Single Page Application (SPA) redirect. The redirect should consist of your site's URL followed by "/admin.".
+
+* `IQENGINE_APP_AUTHORITY`: This is the authority for your application that will login to the third party provider.
+
 ## Feature Flags
 
 We have several feature flags currently in use. Their purposes are as follows:

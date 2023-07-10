@@ -20,12 +20,16 @@ describe('Config contains information from environment', () => {
     import.meta.env.IQENGINE_GOOGLE_ANALYTICS_KEY = 'UA-TEST-KEY-1';
     import.meta.env.IQENGINE_FEATURE_FLAGS = '{}';
     import.meta.env.IQENGINE_INTERNAL_BRANDING = 'BRANDING-STR';
+    import.meta.env.IQENGINE_APP_ID = 'APP-ID';
+    import.meta.env.IQENGINE_APP_AUTHORITY = 'APP-NAME';
   });
   afterAll(() => {
     delete import.meta.env.IQENGINE_CONNECTION_INFO;
     delete import.meta.env.IQENGINE_GOOGLE_ANALYTICS_KEY;
     delete import.meta.env.IQENGINE_FEATURE_FLAGS;
     delete import.meta.env.IQENGINE_INTERNAL_BRANDING;
+    delete import.meta.env.IQENGINE_APP_ID;
+    delete import.meta.env.IQENGINE_APP_AUTHORITY;
   });
 
   beforeEach(() => {
@@ -45,6 +49,8 @@ describe('Config contains information from environment', () => {
       expect(result.current.data.googleAnalyticsKey).toBe('UA-TEST-KEY-1');
       expect(result.current.data.featureFlags).toMatchObject({});
       expect(result.current.data.internalBranding).toBe('BRANDING-STR');
+      expect(result.current.data.appId).toBe('APP-ID');
+      expect(result.current.data.appAuthority).toBe('APP-NAME');
     });
   });
 
@@ -61,6 +67,8 @@ describe('Config contains information from environment', () => {
       expect(result.current.data.googleAnalyticsKey).toBe('UA-TEST-KEY-1');
       expect(result.current.data.featureFlags).toMatchObject({});
       expect(result.current.data.internalBranding).toBe('BRANDING-STR');
+      expect(result.current.data.appId).toBe('APP-ID');
+      expect(result.current.data.appAuthority).toBe('APP-NAME');
     });
   });
 
@@ -72,6 +80,8 @@ describe('Config contains information from environment', () => {
         connectionInfo: { some: 'connection-info' },
         googleAnalyticsKey: 'UA-SOME_KEY-1',
         featureFlags: { someFeature: true },
+        appId: 'APP-ID2',
+        appAuthority: 'APP-NAME2',
       });
     // Act
     const { result } = renderHook(() => useConfigQuery(), { wrapper });
@@ -82,6 +92,8 @@ describe('Config contains information from environment', () => {
       expect(result.current.data.googleAnalyticsKey).toBe('UA-SOME_KEY-1');
       expect(result.current.data.featureFlags).toMatchObject({});
       expect(result.current.data.internalBranding).toBe('BRANDING-STR');
+      expect(result.current.data.appId).toBe('APP-ID2');
+      expect(result.current.data.appAuthority).toBe('APP-NAME2');
     });
   });
 });

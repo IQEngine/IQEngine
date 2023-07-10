@@ -24,4 +24,6 @@ def get_config():
         "googleAnalyticsKey": os.getenv("IQENGINE_GOOGLE_ANALYTICS_KEY", None),
         "featureFlags": feature_flags,
         "internalBranding": os.getenv("IQENGINE_INTERNAL_BRANDING", None),
+        "appId": os.getenv("IQENGINE_APP_ID", None),
+        "appAuthority": os.getenv("IQENGINE_APP_AUTHORITY", None),
     }
