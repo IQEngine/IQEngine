@@ -1,14 +1,12 @@
 from unittest import mock
 from unittest.mock import Mock
 
-from api.database import datasource_repo
+from database import datasource_repo
 from database.models import DataSource, Metadata
 from tests.test_data import test_datasource, valid_metadata
 
-
-def override_dependency_datasource():
+def override_dependency_datasource_repo_get():
     return DataSource(**test_datasource)
-
 
 @mock.patch("handlers.metadata.AzureBlobClient.blob_exist", return_value=True)
 @mock.patch(
@@ -26,9 +24,8 @@ def test_api_get_thumbnail_with_image(
     mock_blob_exist: Mock,
     client,
 ):
-    client.app.dependency_overrides[
-        datasource_repo.get
-    ] = override_dependency_datasource
+    client.app.dependency_overrides[datasource_repo.get] = override_dependency_datasource_repo_get
+
     response = client.get(
         f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path/thumbnail'
     )
@@ -58,9 +55,7 @@ def test_api_get_thumbnail_with_no_image(
     mock_blob_exist: Mock,
     client,
 ):
-    client.app.dependency_overrides[
-        datasource_repo.get
-    ] = override_dependency_datasource
+    client.app.dependency_overrides[datasource_repo.get] = override_dependency_datasource_repo_get
     response = client.get(
         f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path/thumbnail'
     )
