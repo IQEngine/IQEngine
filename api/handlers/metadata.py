@@ -185,10 +185,10 @@ async def get_meta_thumbnail(
 
 def process_geolocation(target: str, geolocation: str):
     try:
-        geo_long, geo_lat, geo_radius = geolocation.split(",")
-        geo_long = float(geo_long)
-        geo_lat = float(geo_lat)
-        geo_radius = float(geo_radius)
+        geo_long_str, geo_lat_str, geo_radius_str = geolocation.split(",")
+        geo_long = float(geo_long_str)
+        geo_lat = float(geo_lat_str)
+        geo_radius = float(geo_radius_str)
         if target == "captures":
             target_field = "captures.core:geolocation"
         elif target == "annotations":
@@ -206,7 +206,7 @@ def process_geolocation(target: str, geolocation: str):
                 }
             }
 
-    except Exception as e:
+    except Exception:
         raise HTTPException(status_code=400, detail="Invalid geolocation format, expected: long, lat, radius")
 
 
