@@ -10,6 +10,8 @@ def test_api_get_config(client):
     os.environ["IQENGINE_GOOGLE_ANALYTICS_KEY"] = "google_analytics_key"
     os.environ["IQENGINE_FEATURE_FLAGS"] = "{}"
     os.environ["IQENGINE_INTERNAL_BRANDING"] = "internal_branding_string"
+    os.environ["IQENGINE_APP_ID"] = "app_id"
+    os.environ["IQENGINE_APP_AUTHORITY"] = "app_authority"
     response = client.get("/api/config")
     assert response.status_code == 200
     assert response.json() == {
@@ -17,6 +19,8 @@ def test_api_get_config(client):
         "googleAnalyticsKey": "google_analytics_key",
         "featureFlags": {},
         "internalBranding": "internal_branding_string",
+        "appId": "app_id",
+        "appAuthority": "app_authority",
     }
 
 
