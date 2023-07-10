@@ -82,6 +82,7 @@ export const SpectrogramPage = () => {
   const [fftImage, setFFTImage] = useState<SelectFftReturn>(null);
   const { downloadedTiles } = useCurrentCachedIQDataSlice(meta, TILE_SIZE_IN_IQ_SAMPLES);
   const iqQuery = getIQDataSlices(metaQuery.data, tiles, TILE_SIZE_IN_IQ_SAMPLES, !!metaQuery.data && tiles.length > 0);
+  const [selectedAnnotation, setSelectedAnnotation] = useState(-1);
 
   useEffect(() => {
     if (!pyodide) {
@@ -233,7 +234,7 @@ export const SpectrogramPage = () => {
     const newPlotHeight = newSpectrogramHeight - 100;
     setPlotWidth(newplotWidth);
     setPlotHeight(newPlotHeight);
-  };
+  }
 
   useEffect(() => {
     setMeta(metaQuery.data);
@@ -251,7 +252,7 @@ export const SpectrogramPage = () => {
     windowResized();
     return () => {
       window.removeEventListener('resize', windowResized);
-    }
+    };
   }, [meta]);
 
   const toggleIncludeRfFreq = () => {
@@ -413,6 +414,8 @@ export const SpectrogramPage = () => {
                         upperTile={upperTile}
                         zoomLevel={zoomLevel}
                         setMeta={setMeta}
+                        selectedAnnotation={selectedAnnotation}
+                        setSelectedAnnotation={setSelectedAnnotation}
                       />
                       {cursorsEnabled && (
                         <TimeSelector
@@ -501,6 +504,7 @@ export const SpectrogramPage = () => {
                   setHandleTop={setHandleTop}
                   spectrogramHeight={spectrogramHeight}
                   setMeta={setMeta}
+                  setSelectedAnnotation={setSelectedAnnotation}
                 />
               )}
             </div>
