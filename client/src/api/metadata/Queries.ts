@@ -64,20 +64,31 @@ export const getDataSourceMeta = (
   );
 };
 
+export const useQueryDataSourceMetaPaths = (type: string, account: string, container: string, enabled = true) => {
+  const { dataSourcesQuery, filesQuery } = useUserSettings();
+  if (!dataSourcesQuery.data || !filesQuery.data) {
+    return useQuery(['invalidQuery'], () => null);
+  }
+  return useQuery(
+    ['datasource', type, account, container, 'meta', 'paths'],
+    () => {
+      const metadataClient = MetadataClientFactory(type, filesQuery.data, dataSourcesQuery.data);
+      return metadataClient.getDataSourceMetaPaths(account, container);
+    },
+    {
+      enabled: enabled,
+      staleTime: Infinity,
+    }
+  );
+};
+
 export const getMeta = (type: string, account: string, container: string, filePath: string, enabled = true) => {
   const { dataSourcesQuery, filesQuery } = useUserSettings();
   if (!dataSourcesQuery.data || !filesQuery.data) {
     return useQuery(['invalidQuery'], () => null);
   }
   return useQuery(
-    [
-      'datasource',
-      type,
-      account,
-      container,
-      filePath,
-      'meta'
-    ],
+    ['datasource', type, account, container, filePath, 'meta'],
     () => {
       const metadataClient = MetadataClientFactory(type, filesQuery.data, dataSourcesQuery.data);
       return fetchMeta(metadataClient, type, account, container, filePath);

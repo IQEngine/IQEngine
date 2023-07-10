@@ -149,8 +149,9 @@ export const About = () => {
         recordings or visually edit annotations.
         <br></br>
         <br></br>
-        Implementation of IQEngine began during a 1-week internal hackathon at Microsoft, where Marc and several of his
-        SDR coworkers built a proof-of-concept prototype. It was open sourced and shown off at GNU Radio Conference '22.
+        Implementation of IQEngine began during a 1-week internal hackathon at Microsoft, where Marc and SDR coworkers 
+        Luke, Craig, Johanna, Ani, Marko, and Tensae built a proof-of-concept prototype.
+        It was open sourced and <a href="https://youtu.be/hZy0lIsBlkg">shown off at GNU Radio Conference '22</a>.
         The first full version was completed in January '23 with help from a group of undergraduate "sprinterns" at
         Microsoft, consisting of students from UMD and GMU that were part of the{' '}
         <a href="https://www.breakthroughtech.org/" target="_blank">
@@ -161,7 +162,7 @@ export const About = () => {
       </p>
 
       <center>
-        <img className="w-1/2" alt="sprintern" src="./sprinterns.jpeg"></img>
+        <img className="w-1/4" alt="sprintern" src="./sprinterns.jpeg"></img>
         <p className="text-lg pt-1">Winter '23 Sprinterns from UMD and GMU</p>
       </center>
     </div>

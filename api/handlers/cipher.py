@@ -5,7 +5,7 @@ from pydantic import SecretStr
 
 def get_key():
     key = os.getenv("DB_ENCRYPTION_KEY", None)
-    if not key:
+    if not key or key.strip() == "":
         key = Fernet.generate_key()
         os.environ["DB_ENCRYPTION_KEY"] = key.decode("utf-8")
     return key
