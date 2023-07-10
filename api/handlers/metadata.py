@@ -4,10 +4,7 @@ from typing import Any, Dict, List, Optional
 import database.database
 import httpx
 from blob.azure_client import AzureBlobClient
-from database.database import (
-    datasources_collection,
-    metadata_collection,
-)
+from database.database import datasources_collection, metadata_collection
 from database.models import DataSource, DataSourceReference, Metadata
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Response
 from fastapi.responses import StreamingResponse
