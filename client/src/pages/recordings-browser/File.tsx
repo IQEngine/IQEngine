@@ -7,30 +7,53 @@ import { Link, useParams } from 'react-router-dom';
 
 import { SigMFMetadata } from '@/utils/sigmfMetadata';
 import { CLIENT_TYPE_BLOB } from '@/api/Models';
+import { getMeta } from '@/api/metadata/Queries';
 
 interface FileRowProps {
-  item: SigMFMetadata;
+  filepath: string;
 }
-export default function FileRow({ item }: FileRowProps) {
+export default function FileRow({ filepath }: FileRowProps) {
   const { type, account, container, sasToken } = useParams();
+  const { data: item } = getMeta(type, account, container, filepath);
   console.log('FILE', 'type: ', type, 'account: ', account, 'container: ', container, 'sasToken: ', sasToken);
-  const spectogramLink = `/spectrogram/${item.getOrigin().type}/${item.getOrigin().account}/${
-    item.getOrigin().container
-  }/${encodeURIComponent(item.getFilePath())}`;
+  const spectogramLink = `/spectrogram/${item?.getOrigin().type}/${item?.getOrigin().account}/${
+    item?.getOrigin().container
+  }/${encodeURIComponent(item?.getFilePath())}`;
 
   const getUrlWithAuth = (url) => {
+    console.log('getUrlWithAuth', 'type: ', type, 'sasToken: ', sasToken);
     if (type == CLIENT_TYPE_BLOB && sasToken) {
-      url += `?${sasToken}`;
+      // get the value of sig in the sas token
+      const sig = sasToken
+        .split('&')
+        .find((item) => item.startsWith('sig='))
+        .split('=')[1];
+      // url encode the sig
+      const encodedSig = encodeURIComponent(sig);
+      // replace the sig in the sas token with the encoded sig
+      const encodedSasToken = sasToken.replace(sig, encodedSig);
+      console.log('getUrlWithAuth', 'encodedSasToken: ', encodedSasToken);
+      url += `?${encodedSasToken}`;
     }
+    console.log('getUrlWithAuth', 'url: ', url);
     return url;
   };
   const getThumbnailUrl = () => {
+    if (!item) {
+      return '';
+    }
     return getUrlWithAuth(item.getThumbnailUrl());
   };
   const getDataUrl = () => {
+    if (!item) {
+      return '';
+    }
     return getUrlWithAuth(item.getDataUrl());
   };
   const getMetadataUrl = () => {
+    if (!item) {
+      return '';
+    }
     return getUrlWithAuth(item.getMetadataUrl());
   };
   const modal = useRef(null);
@@ -41,7 +64,7 @@ export default function FileRow({ item }: FileRowProps) {
       modal.current.className = 'modal w-full h-full';
     }
   };
-  const annotationsData = item.annotations?.map((item, index) => {
+  const annotationsData = item?.annotations?.map((item, index) => {
     const deepItemCopy = JSON.parse(JSON.stringify(item));
     delete deepItemCopy['core:sample_start'];
     delete deepItemCopy['core:sample_count'];
@@ -66,11 +89,27 @@ export default function FileRow({ item }: FileRowProps) {
     return <div className="datatypetext">{text}</div>;
   }
 
+  if (!item) {
+    return (
+      <tr className="hover:bg-info/10 text-center py-2 h-32">
+        <td className="px-4 min-w-fit"></td>
+        <td className="align-middle text-left">
+          <h2>{filepath}</h2>
+        </td>
+        <td className="align-middle"></td>
+        <td className="align-middle"></td>
+        <td className="align-middle"></td>
+        <td className="align-middle"></td>
+        <td className="align-middle"></td>
+        <td className="align-middle"></td>
+      </tr>
+    );
+  }
   return (
     <tr className="hover:bg-info/10 text-center py-2 h-32">
-      {/* If we are looking at a recording from blob storage */}
       {
         <>
+          {/* If we are looking at a recording from blob storage */}
           <td className="px-4 min-w-fit">
             <Link to={spectogramLink} onClick={() => {}}>
               <div className="zoom">

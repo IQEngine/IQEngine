@@ -40,6 +40,32 @@ def get_all_meta(
 
 
 @router.get(
+    "/api/datasources/{account}/{container}/meta/paths",
+    status_code=200,
+    response_model=list[str],
+)
+def get_all_meta_name(
+    account,
+    container,
+    metadatas: Collection[Metadata] = Depends(database.database.metadata_collection),
+):
+    metadata = metadatas.find(
+        {
+            "global.traceability:origin.account": account,
+            "global.traceability:origin.container": container,
+        },
+        {
+            "_id": 0,
+            "global.traceability:origin.file_path": 1,
+        },
+    )
+    result = []
+    for datum in metadata:
+        result.append(datum["global"]["traceability:origin"]["file_path"])
+    return result
+
+
+@router.get(
     "/api/datasources/{account}/{container}/{filepath:path}/meta",
     response_model=Metadata,
 )
