@@ -1,10 +1,10 @@
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-import database.database
 import httpx
+from api.database import datasource_repo, metadata_repo
 from blob.azure_client import AzureBlobClient
-from database import datasource
+from database import database
 from database.database import metadata_collection
 from database.models import DataSource, DataSourceReference, Metadata
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Response
@@ -19,21 +19,6 @@ from helpers.urlmapping import (
 from pymongo.collection import Collection
 
 router = APIRouter()
-
-
-def get_metadata(
-    account,
-    container,
-    filepath,
-    metadata_set: Collection[Metadata] = Depends(metadata_collection),
-):
-    return metadata_set.find_one(
-        {
-            "global.traceability:origin.account": account,
-            "global.traceability:origin.container": container,
-            "global.traceability:origin.file_path": filepath,
-        }
-    )
 
 
 @router.get(
@@ -70,7 +55,7 @@ def get_all_meta(
 def get_all_meta_name(
     account,
     container,
-    metadatas: Collection[Metadata] = Depends(metadata_collection),
+    metadatas: Collection[Metadata] = Depends(metadata_repo.collection),
 ):
     metadata = metadatas.find(
         {
@@ -93,18 +78,8 @@ def get_all_meta_name(
     response_model=Metadata,
 )
 def get_meta(
-    account,
-    container,
-    filepath,
-    metadatas: Collection[Metadata] = Depends(metadata_collection),
+    metadata: Metadata = Depends(metadata_repo.get),
 ):
-    metadata = metadatas.find_one(
-        {
-            "global.traceability:origin.account": account,
-            "global.traceability:origin.container": container,
-            "global.traceability:origin.file_path": filepath,
-        }
-    )
     if not metadata:
         raise HTTPException(status_code=404, detail="Metadata not found")
     return metadata
@@ -118,7 +93,7 @@ async def get_metadata_iqdata(
     account: str,
     container: str,
     filepath: str,
-    datasource: DataSource = Depends(datasource.get),
+    datasource: DataSource = Depends(datasource_repo.get),
 ):
     # Create the imageURL with sasToken
     if not datasource:
@@ -128,7 +103,11 @@ async def get_metadata_iqdata(
         datasource.sasToken = ""  # set to empty str if null
 
     imageURL = add_URL_sasToken(
-        account, container, datasource["sasToken"], filepath, ApiType.IQDATA
+        account,
+        container,
+        datasource.sasToken.get_secret_value(),
+        filepath,
+        ApiType.IQDATA,
     )
 
     async with httpx.AsyncClient() as client:
@@ -148,7 +127,7 @@ async def get_metadata_iqdata(
 async def get_meta_thumbnail(
     filepath: str,
     background_tasks: BackgroundTasks,
-    datasource: DataSource = Depends(datasource.get),
+    datasource: DataSource = Depends(datasource_repo.get),
     azure_client: AzureBlobClient = Depends(AzureBlobClient),
 ):
     if not datasource:
@@ -158,7 +137,7 @@ async def get_meta_thumbnail(
     thumbnail_path = get_file_name(filepath, ApiType.THUMB)
     content_type = get_content_type(ApiType.THUMB)
     if not azure_client.blob_exist(thumbnail_path):
-        metadata = database.database.get_metadata(
+        metadata = metadata.get(
             datasource.account,
             datasource.container,
             filepath,
@@ -198,7 +177,7 @@ def query_meta(
     geo_lat: Optional[float] = Query(None),
     geo_long: Optional[float] = Query(None),
     geo_radius: Optional[float] = Query(None),
-    metadataSet: Collection[Metadata] = Depends(database.database.metadata_collection),
+    metadataSet: Collection[Metadata] = Depends(metadata_repo.collection),
 ):
     query_condition: Dict[str, Any] = {}
     if account:
@@ -302,11 +281,9 @@ def create_meta(
     container: str,
     filepath: str,
     metadata: Metadata,
-    datasources: Collection[DataSource] = Depends(datasource.collection),
-    metadatas: Collection[Metadata] = Depends(database.database.metadata_collection),
-    versions: Collection[Metadata] = Depends(
-        database.database.metadata_versions_collection
-    ),
+    datasources: Collection[DataSource] = Depends(datasource_repo.collection),
+    metadatas: Collection[Metadata] = Depends(metadata_repo.collection),
+    versions: Collection[Metadata] = Depends(metadata_repo.versions_collection),
 ):
     # Check datasource id is valid
     datasource = datasources.find_one({"account": account, "container": container})
@@ -351,10 +328,8 @@ def update_meta(
     container,
     filepath,
     metadata: Metadata,
-    metadatas: Collection[Metadata] = Depends(database.database.metadata_collection),
-    versions: Collection[Metadata] = Depends(
-        database.database.metadata_versions_collection
-    ),
+    metadatas: Collection[Metadata] = Depends(metadata_repo.collection),
+    versions: Collection[Metadata] = Depends(metadata_repo.versions_collection),
 ):
     current = metadatas.find_one(
         {

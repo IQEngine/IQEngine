@@ -1,7 +1,7 @@
 from unittest import mock
 from unittest.mock import Mock
 
-from database import datasource
+from api.database import datasource_repo
 from database.models import DataSource, Metadata
 from tests.test_data import test_datasource, valid_metadata
 
@@ -15,7 +15,7 @@ def override_dependency_datasource():
     "handlers.metadata.AzureBlobClient.get_blob_content", return_value=b"<image data>"
 )
 @mock.patch(
-    "handlers.metadata.database.database.get_metadata",
+    "handlers.metadata.database.metadata_repo.get",
     return_value=Metadata(**valid_metadata),
 )
 @mock.patch("handlers.metadata.decrypt", return_value="secret")
@@ -26,7 +26,9 @@ def test_api_get_thumbnail_with_image(
     mock_blob_exist: Mock,
     client,
 ):
-    client.app.dependency_overrides[datasource.get] = override_dependency_datasource
+    client.app.dependency_overrides[
+        datasource_repo.get
+    ] = override_dependency_datasource
     response = client.get(
         f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path/thumbnail'
     )
@@ -56,7 +58,9 @@ def test_api_get_thumbnail_with_no_image(
     mock_blob_exist: Mock,
     client,
 ):
-    client.app.dependency_overrides[datasource.get] = override_dependency_datasource
+    client.app.dependency_overrides[
+        datasource_repo.get
+    ] = override_dependency_datasource
     response = client.get(
         f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path/thumbnail'
     )

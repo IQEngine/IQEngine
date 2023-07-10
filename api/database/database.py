@@ -31,16 +31,6 @@ def db():
     return _db
 
 
-def metadata_collection():
-    collection: Collection[Metadata] = db().metadata
-    return collection
-
-
-def metadata_versions_collection():
-    collection: Collection[Metadata] = db().versions
-    return collection
-
-
 def plugins_collection():
     collection: Collection[Metadata] = db().plugins
     return collection
