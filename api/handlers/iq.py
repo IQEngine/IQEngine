@@ -5,7 +5,7 @@ import logging
 from asyncio import to_thread
 from typing import List
 
-from api.database import datasource_repo
+from database import datasource_repo
 from azure.storage.blob import BlobClient
 from database.models import DataSource
 from fastapi import APIRouter, Depends, HTTPException

@@ -2,10 +2,8 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 import httpx
-from api.database import datasource_repo, metadata_repo
+from database import datasource_repo, metadata_repo
 from blob.azure_client import AzureBlobClient
-from database import database
-from database.database import metadata_collection
 from database.models import DataSource, DataSourceReference, Metadata
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Response
 from fastapi.responses import StreamingResponse
@@ -29,7 +27,7 @@ router = APIRouter()
 def get_all_meta(
     account,
     container,
-    metadatas: Collection[Metadata] = Depends(metadata_collection),
+    metadatas: Collection[Metadata] = Depends(metadata_repo.collection),
 ):
     # TODO: Should we validate datasource_id?
 
