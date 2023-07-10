@@ -20,7 +20,6 @@ from helpers.urlmapping import (
     get_file_name,
 )
 from pymongo.collection import Collection
-from rf.spectrogram import get_spectrogram_image
 
 router = APIRouter()
 

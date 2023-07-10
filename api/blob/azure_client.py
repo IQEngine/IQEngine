@@ -1,8 +1,7 @@
 from azure.storage.blob import BlobClient, BlobProperties
+from helpers.urlmapping import ApiType, get_file_name
 from pydantic import SecretStr
 from rf.spectrogram import get_spectrogram_image
-
-from helpers.urlmapping import ApiType, get_file_name
 
 
 class AzureBlobClient:
@@ -61,10 +60,9 @@ class AzureBlobClient:
         blob_client = self.get_blob_client(filepath)
         blob_client.upload_blob(data, overwrite=True)
 
-    def get_new_thumbnail(self,data_type: str, filepath: str) -> bytes:
+    def get_new_thumbnail(self, data_type: str, filepath: str) -> bytes:
         iq_path = get_file_name(filepath, ApiType.IQDATA)
         fftSize = 1024
         content = self.get_blob_content(iq_path, 8000, fftSize * 512)
         image = get_spectrogram_image(content, data_type, fftSize)
         return image
-    

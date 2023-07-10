@@ -68,9 +68,13 @@ def get_datasource(account, container) -> DataSource:
         The datasource.
     """
 
-    return DataSource.parse_obj(datasources_collection().find_one(
+    datasource = datasources_collection().find_one(
         {"account": account, "container": container}
-    ))
+    )
+    if datasource is None:
+        return None
+    return DataSource(**datasource)
+
 
 def get_metadata(account, container, filepath) -> Metadata:
     """
@@ -90,10 +94,13 @@ def get_metadata(account, container, filepath) -> Metadata:
     Metadata
         The Sigmf metadata.
     """
-    return Metadata.parse_obj(metadata_collection().find_one(
+    metadata = metadata_collection().find_one(
         {
             "global.traceability:origin.account": account,
             "global.traceability:origin.container": container,
             "global.traceability:origin.file_path": filepath,
         }
-    ))
+    )
+    if metadata is None:
+        return None
+    return Metadata(**metadata)
