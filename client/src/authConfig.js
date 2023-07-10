@@ -4,7 +4,7 @@ export const msalConfig = {
   auth: {
     clientId: import.meta.env.IQENGINE_APP_ID,
     authority: import.meta.env.IQENGINE_APP_AUTHORITY,
-    redirectUri: '/admin',
+    redirectUri: '/',
     postLogoutRedirectUri: '/',
     navigateToLoginRequestUrl: false,
   },
@@ -40,5 +40,5 @@ export const msalConfig = {
 };
 
 export const loginRequest = {
-  scopes: [],
+  scopes: ['User.Read'],
 };

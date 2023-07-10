@@ -2,19 +2,9 @@ import SignalGenerator from '@/pages/signal-generator/SignalGenerator';
 import { createBrowserRouter } from 'react-router-dom';
 import React from 'react';
 import SwaggerUI from 'swagger-ui-react';
-import { PublicClientApplication, EventType } from '@azure/msal-browser';
-import { msalConfig } from '@/pages/admin/authConfig';
+import { useIQEngineProtectedRoute } from './useIQEngineProtectedRoute';
 
-const msalInstance = new PublicClientApplication(msalConfig);
-
-msalInstance.addEventCallback((event) => {
-  if (event.eventType === EventType.LOGIN_SUCCESS && event.payload.account) {
-    const account = event.payload.account;
-    msalInstance.setActiveAccount(account);
-  }
-});
-
-export function useIQEngineRouter() {
+export function useIQEngineRouter(msalInstance) {
   const router = createBrowserRouter([
     {
       path: '/',
@@ -51,7 +41,8 @@ export function useIQEngineRouter() {
             let { Admin } = await import('@/pages/admin/Admin');
             return {
               Component: () => {
-                return <Admin instance={msalInstance} />;
+                const admin = <Admin instance={msalInstance} />;
+                return useIQEngineProtectedRoute(admin);
               },
             };
           },

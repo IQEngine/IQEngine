@@ -14,8 +14,28 @@ import { Logo } from '@/features/ui/logo/Logo';
 import { FeatureFlag, useFeatureFlags } from '@/hooks/useFeatureFlags';
 import { CLIENT_TYPE_BLOB, DataSource } from '@/api/Models';
 import { useUserSettings } from '@/api/user-settings/use-user-settings';
+import { useMsal } from '@azure/msal-react';
+import { loginRequest } from '@/authConfig';
 
 export const App = () => {
+  const { instance } = useMsal();
+  const activeAccount = instance.getActiveAccount();
+
+  const handleLoginPopup = () => {
+    instance
+      .loginPopup({
+        ...loginRequest,
+        redirectUri: '/',
+      })
+      .catch((error) => console.log(error));
+  };
+
+  const handleLogoutPopup = () => {
+    instance.logoutPopup({
+      postLogoutRedirectUri: '/',
+    });
+  };
+
   const [width, setWidth] = useState(window.innerWidth);
   const breakpoint = 700;
 
@@ -104,11 +124,22 @@ export const App = () => {
                     Plugins
                   </Link>
                 </li>
-                <li>
-                  <Link to="/admin" onClick={() => {}}>
-                    Admin
-                  </Link>
-                </li>
+                {activeAccount ? (
+                  <>
+                    <li>
+                      <Link to="/admin" onClick={() => {}}>
+                        Admin
+                      </Link>
+                    </li>
+                    <li>
+                      <a onClick={handleLogoutPopup}>Logout</a>
+                    </li>
+                  </>
+                ) : (
+                  <li>
+                    <a onClick={handleLoginPopup}>Login</a>
+                  </li>
+                )}
               </ul>
             </div>
           </div>
@@ -143,11 +174,27 @@ export const App = () => {
                   <div className="text-lg">Plugins</div>
                 </Link>
               </li>
-              <li className="hidden md:block">
-                <Link to="/admin" onClick={() => {}}>
-                  <div className="text-lg">Admin</div>
-                </Link>
-              </li>
+
+              {activeAccount ? (
+                <>
+                  <li className="hidden md:block">
+                    <Link to="/admin" onClick={() => {}}>
+                      <div className="text-lg">Admin</div>
+                    </Link>
+                  </li>
+                  <li className="hidden md:block">
+                    <a className="text-lg" onClick={handleLogoutPopup}>
+                      Logout
+                    </a>
+                  </li>
+                </>
+              ) : (
+                <li className="hidden md:block">
+                  <a className="text-lg" onClick={handleLoginPopup}>
+                    Login
+                  </a>
+                </li>
+              )}
               <Feature flag={FeatureFlag.useIQEngineOutReach}>
                 <li className="hidden md:block">
                   <a href="https://discord.gg/k7C8kp3b76" target="_blank" rel="noreferrer" className="text-lg">
