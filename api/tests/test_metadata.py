@@ -15,7 +15,7 @@ def override_dependency_datasource():
     "handlers.metadata.AzureBlobClient.get_blob_content", return_value=b"<image data>"
 )
 @mock.patch(
-    "handlers.metadata.database.metadata_repo.get",
+    "handlers.metadata.metadata_repo.get",
     return_value=Metadata(**valid_metadata),
 )
 @mock.patch("handlers.metadata.decrypt", return_value="secret")
@@ -41,7 +41,7 @@ def test_api_get_thumbnail_with_image(
 
 @mock.patch("handlers.metadata.AzureBlobClient.blob_exist", return_value=False)
 @mock.patch(
-    "handlers.metadata.database.database.get_metadata",
+    "handlers.metadata.metadata_repo.get",
     return_value=Metadata(**valid_metadata),
 )
 @mock.patch(

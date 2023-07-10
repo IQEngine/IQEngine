@@ -1,4 +1,4 @@
-from api.database import datasource_repo
+from database import datasource_repo
 from database.models import DataSource
 from fastapi import APIRouter, Depends
 from pymongo.collection import Collection

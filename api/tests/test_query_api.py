@@ -1,5 +1,5 @@
 from unittest.mock import MagicMock
-import database.database
+from database import metadata_repo
 from main import app
 from .test_data import valid_metadata_array
 
@@ -17,7 +17,7 @@ def test_query_meta_success(client):
 
     # Override the dependency
     app.dependency_overrides[
-        database.database.metadata_collection
+        metadata_repo.collection
     ] = override_metadata_collection
 
     response = client.get(

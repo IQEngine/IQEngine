@@ -135,7 +135,7 @@ async def get_meta_thumbnail(
     thumbnail_path = get_file_name(filepath, ApiType.THUMB)
     content_type = get_content_type(ApiType.THUMB)
     if not azure_client.blob_exist(thumbnail_path):
-        metadata = metadata.get(
+        metadata = metadata_repo.get(
             datasource.account,
             datasource.container,
             filepath,
