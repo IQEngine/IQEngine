@@ -2,8 +2,9 @@ import SignalGenerator from '@/pages/signal-generator/SignalGenerator';
 import { createBrowserRouter } from 'react-router-dom';
 import React from 'react';
 import SwaggerUI from 'swagger-ui-react';
+import { useIQEngineProtectedRoute } from './useIQEngineProtectedRoute';
 
-export function useIQEngineRouter() {
+export function useIQEngineRouter(msalInstance) {
   const router = createBrowserRouter([
     {
       path: '/',
@@ -32,6 +33,17 @@ export function useIQEngineRouter() {
           async lazy() {
             let { Plugins } = await import('@/pages/Plugins');
             return { Component: Plugins };
+          },
+        },
+        {
+          path: 'admin',
+          async lazy() {
+            let { Admin } = await import('@/pages/admin/Admin');
+            return {
+              Component: () => {
+                return useIQEngineProtectedRoute(<Admin />);
+              },
+            };
           },
         },
         {
