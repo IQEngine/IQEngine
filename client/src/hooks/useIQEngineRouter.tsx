@@ -41,8 +41,7 @@ export function useIQEngineRouter(msalInstance) {
             let { Admin } = await import('@/pages/admin/Admin');
             return {
               Component: () => {
-                const admin = <Admin instance={msalInstance} />;
-                return useIQEngineProtectedRoute(admin);
+                return useIQEngineProtectedRoute(<Admin />);
               },
             };
           },
