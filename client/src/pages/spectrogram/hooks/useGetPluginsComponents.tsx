@@ -4,14 +4,19 @@ import { useGetPlugin, useGetPluginParameters } from '@/api/plugin/Queries';
 
 interface PluginOptionProps {
   plugin: PluginDefinition;
+  groupIndex: number;
 }
 
-export function PluginOption({ plugin }: PluginOptionProps) {
+export function PluginOption({ plugin, groupIndex }: PluginOptionProps) {
   const { data } = useGetPlugin(plugin);
   return (
-    <optgroup label={plugin.name}>
-      {data?.map((parameter) => {
-        return <option value={`${plugin.url}/${parameter}`}>{parameter}</option>;
+    <optgroup key={plugin.name + groupIndex} label={plugin.name}>
+      {data?.map((parameter, optionIndex) => {
+        return (
+          <option key={parameter + optionIndex} value={`${plugin.url}/${parameter}`}>
+            {parameter}
+          </option>
+        );
       })}
     </optgroup>
   );

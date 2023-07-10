@@ -15,6 +15,8 @@ interface AnnotationViewerProps {
   upperTile: number;
   zoomLevel: number;
   setMeta: (meta: SigMFMetadata) => void;
+  selectedAnnotation: number;
+  setSelectedAnnotation: (index: number) => void;
 }
 
 const AnnotationViewer = ({
@@ -25,6 +27,8 @@ const AnnotationViewer = ({
   zoomLevel,
   upperTile,
   setMeta,
+  selectedAnnotation,
+  setSelectedAnnotation,
 }: AnnotationViewerProps) => {
   function onDragEnd(e) {
     const x = e.target.x(); // coords of the corner box
@@ -51,6 +55,7 @@ const AnnotationViewer = ({
     console.log(meta.annotations[f]);
     let new_meta = Object.assign(new SigMFMetadata(), meta);
     setMeta(new_meta);
+    setSelectedAnnotation(annot_indx);
   }
 
   const annotations =
@@ -68,6 +73,9 @@ const AnnotationViewer = ({
         description: annotation.getDescription(),
         index: index,
       };
+      if (selectedAnnotation == index && !position.visible) {
+        setSelectedAnnotation(-1);
+      }
       return result;
     }) ?? [];
 
@@ -108,6 +116,7 @@ const AnnotationViewer = ({
     );
     let new_meta = Object.assign(new SigMFMetadata(), meta);
     setMeta(new_meta);
+    setSelectedAnnotation(annot_indx);
   }, [annotations, meta, lowerTile, fftSize, zoomLevel, setMeta]);
 
   // Ability to update annotation labels
@@ -158,6 +167,22 @@ const AnnotationViewer = ({
     [annotations, meta, setMeta]
   );
 
+  const onBoxCornerClick = useCallback(
+    (e) => {
+      const annot_indx = e.target.id().split('-')[0];
+      setSelectedAnnotation(annot_indx);
+    },
+    [setSelectedAnnotation]
+  );
+
+  const onBoxClick = useCallback(
+    (e) => {
+      const annot_indx = e.target.id();
+      setSelectedAnnotation(annot_indx);
+    },
+    [setSelectedAnnotation]
+  );
+
   return (
     <Layer>
       {/* Button to add a new annotation */}
@@ -185,9 +210,11 @@ const AnnotationViewer = ({
             width={(annotation.x2 - annotation.x1) * spectrogramWidthScale}
             height={annotation.y2 - annotation.y1}
             fillEnabled={true}
-            stroke="black"
+            stroke={selectedAnnotation == index ? 'pink' : 'black'}
             strokeWidth={4}
+            onClick={onBoxClick}
             key={index}
+            id={index.toString()}
           />
           {/* Top Left Corner */}
           <Rect
@@ -204,6 +231,7 @@ const AnnotationViewer = ({
             onDragEnd={onDragEnd}
             onMouseOver={onMouseOver}
             onMouseOut={onMouseOut}
+            onClick={onBoxCornerClick}
             id={index.toString() + '-x1-y1'} // tells the event which annotation, and which x and y to update
           />
           {/* Top Right Corner */}
@@ -221,6 +249,7 @@ const AnnotationViewer = ({
             onDragEnd={onDragEnd}
             onMouseOver={onMouseOver}
             onMouseOut={onMouseOut}
+            onClick={onBoxCornerClick}
             id={index.toString() + '-x2-y1'} // tells the event which annotation, and which x and y to update
           />
           {/* Bottom Left Corner */}
@@ -238,6 +267,7 @@ const AnnotationViewer = ({
             onDragEnd={onDragEnd}
             onMouseOver={onMouseOver}
             onMouseOut={onMouseOut}
+            onClick={onBoxCornerClick}
             id={index.toString() + '-x1-y2'} // tells the event which annotation, and which x and y to update
           />
           {/* Bottom Right Corner */}
@@ -255,6 +285,7 @@ const AnnotationViewer = ({
             onDragEnd={onDragEnd}
             onMouseOver={onMouseOver}
             onMouseOut={onMouseOut}
+            onClick={onBoxCornerClick}
             id={index.toString() + '-x2-y2'} // tells the event which annotation, and which x and y to update
           />
           {/* Description Label */}
@@ -264,7 +295,7 @@ const AnnotationViewer = ({
             fontSize={24}
             x={annotation.x1 * spectrogramWidthScale}
             y={annotation.y1 - 23}
-            fill="black"
+            fill={selectedAnnotation == index ? 'pink' : 'black'}
             fontStyle="bold"
             key={index + 1000000}
             onClick={handleTextClick}

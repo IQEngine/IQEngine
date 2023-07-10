@@ -256,10 +256,11 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
           value={selectedPlugin}
           onChange={handleChangePlugin}
         >
-          <option disabled value="">
-            Select a Plugin
-          </option>
-          {plugins && !isError && plugins?.map((plugin) => <PluginOption plugin={plugin} />)})
+          {plugins &&
+            !isError &&
+            plugins?.map((plugin, groupIndex) => (
+              <PluginOption key={groupIndex} groupIndex={groupIndex} plugin={plugin} />
+            ))}
         </select>
       </label>
       {connectionInfo && (

@@ -59,7 +59,7 @@ function Directory({ directory, setExpanded, isExpanded }: DirectoryProps) {
                 />
               )
           )}
-          {!childExpanded && directory.files.map((file) => <FileRow key={file.getFileName()} item={file} />)}
+          {!childExpanded && directory.files.map((file) => <FileRow key={file} filepath={file} />)}
         </>
       )}
     </>

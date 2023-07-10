@@ -6,14 +6,13 @@ import React, { useEffect, useState } from 'react';
 import Directory from './Directory';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { useParams } from 'react-router-dom';
-import { getDataSourceMeta } from '@/api/metadata/Queries';
+import { useQueryDataSourceMetaPaths } from '@/api/metadata/Queries';
 import { DirectoryNode, groupDataByDirectories } from './DirectoryNode';
 import { useQueryClient } from '@tanstack/react-query';
 
 export function RecordingsBrowser() {
   const { type, account, container, sasToken } = useParams();
-  const queryClient = useQueryClient();
-  const metadata_collection = getDataSourceMeta(queryClient, type, account, container);
+  const metadata_collection = useQueryDataSourceMetaPaths(type, account, container);
   const [directoryNode, setDirectoryNode] = useState<DirectoryNode>(null);
   useEffect(() => {
     if (metadata_collection.data && metadata_collection.data.length > 0) {
