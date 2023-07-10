@@ -12,6 +12,8 @@ const fetchConfig = async () => {
           googleAnalyticsKey: import.meta.env.IQENGINE_GOOGLE_ANALYTICS_KEY,
           featureFlags: JSON.parse(import.meta.env.IQENGINE_FEATURE_FLAGS ?? null),
           internalBranding: import.meta.env.IQENGINE_INTERNAL_BRANDING,
+          appId: import.meta.env.IQENGINE_APP_ID,
+          appAuthority: import.meta.env.IQENGINE_APP_AUTHORITY,
         } as AppConfig,
       };
     });
@@ -27,6 +29,14 @@ const fetchConfig = async () => {
 
     if (!response.data.internalBranding) {
       response.data.internalBranding = import.meta.env.IQENGINE_INTERNAL_BRANDING;
+    }
+
+    if (!response.data.appId) {
+      response.data.appId = import.meta.env.IQENGINE_APP_ID;
+    }
+
+    if (!response.data.appAuthority) {
+      response.data.appAuthority = import.meta.env.IQENGINE_APP_AUTHORITY;
     }
 
     for (const member in response.data) {
@@ -63,6 +73,8 @@ export type AppConfig = {
   googleAnalyticsKey: string;
   featureFlags: { [key in FeatureFlag]: boolean };
   internalBranding: string;
+  appId: string;
+  appAuthority: string;
 };
 
 export const useConfigQuery = () => useQuery(['config'], fetchConfig);

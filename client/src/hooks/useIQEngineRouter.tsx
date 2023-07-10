@@ -4,7 +4,7 @@ import React from 'react';
 import SwaggerUI from 'swagger-ui-react';
 import { useIQEngineProtectedRoute } from './useIQEngineProtectedRoute';
 
-export function useIQEngineRouter(msalInstance) {
+export function useIQEngineRouter() {
   const router = createBrowserRouter([
     {
       path: '/',
