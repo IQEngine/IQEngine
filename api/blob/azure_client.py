@@ -1,7 +1,6 @@
 from azure.storage.blob import BlobClient, BlobProperties
 from pydantic import SecretStr
-from api.handlers.metadata import get_metadata
-from api.rf.spectrogram import get_spectrogram_image
+from rf.spectrogram import get_spectrogram_image
 
 from helpers.urlmapping import ApiType, get_file_name
 
