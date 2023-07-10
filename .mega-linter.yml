@@ -51,5 +51,4 @@ DISABLE_LINTERS:
 PRE_COMMANDS:
   - command: |
       pip install -r api/requirements.txt
-      pip install -r api/requirements-dev.txt
     cwd: workspace

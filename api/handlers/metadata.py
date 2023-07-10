@@ -4,7 +4,8 @@ from typing import Any, Dict, List, Optional
 import database.database
 import httpx
 from blob.azure_client import AzureBlobClient
-from database.database import datasources_collection, metadata_collection
+from database import datasource
+from database.database import metadata_collection
 from database.models import DataSource, DataSourceReference, Metadata
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Response
 from fastapi.responses import StreamingResponse
@@ -117,20 +118,14 @@ async def get_metadata_iqdata(
     account: str,
     container: str,
     filepath: str,
-    datasources_collection: Collection[DataSource] = Depends(datasources_collection),
+    datasource: DataSource = Depends(datasource.get),
 ):
     # Create the imageURL with sasToken
-    datasource = datasources_collection.find_one(
-        {
-            "account": account,
-            "container": container,
-        }
-    )
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
 
-    if not datasource.get("sasToken"):
-        datasource["sasToken"] = ""  # set to empty str if null
+    if not datasource.sasToken:
+        datasource.sasToken = ""  # set to empty str if null
 
     imageURL = add_URL_sasToken(
         account, container, datasource["sasToken"], filepath, ApiType.IQDATA
@@ -153,7 +148,7 @@ async def get_metadata_iqdata(
 async def get_meta_thumbnail(
     filepath: str,
     background_tasks: BackgroundTasks,
-    datasource: DataSource = Depends(database.database.get_datasource),
+    datasource: DataSource = Depends(datasource.get),
     azure_client: AzureBlobClient = Depends(AzureBlobClient),
 ):
     if not datasource:
@@ -307,9 +302,7 @@ def create_meta(
     container: str,
     filepath: str,
     metadata: Metadata,
-    datasources: Collection[DataSource] = Depends(
-        database.database.datasources_collection
-    ),
+    datasources: Collection[DataSource] = Depends(datasource.collection),
     metadatas: Collection[Metadata] = Depends(database.database.metadata_collection),
     versions: Collection[Metadata] = Depends(
         database.database.metadata_versions_collection
