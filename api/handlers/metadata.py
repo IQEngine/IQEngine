@@ -3,14 +3,36 @@ from typing import Any, Dict, List, Optional
 
 import database.database
 import httpx
+from blob.azure_client import AzureBlobClient
+from database.database import datasources_collection, metadata_collection
 from database.models import DataSource, DataSourceReference, Metadata
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Response
 from fastapi.responses import StreamingResponse
+from helpers.cipher import decrypt
+from helpers.urlmapping import (
+    ApiType,
+    add_URL_sasToken,
+    get_content_type,
+    get_file_name,
+)
 from pymongo.collection import Collection
 
-from .urlmapping import add_URL_sasToken, apiType
-
 router = APIRouter()
+
+
+def get_metadata(
+    account,
+    container,
+    filepath,
+    metadata_set: Collection[Metadata] = Depends(metadata_collection),
+):
+    return metadata_set.find_one(
+        {
+            "global.traceability:origin.account": account,
+            "global.traceability:origin.container": container,
+            "global.traceability:origin.file_path": filepath,
+        }
+    )
 
 
 @router.get(
@@ -21,7 +43,7 @@ router = APIRouter()
 def get_all_meta(
     account,
     container,
-    metadatas: Collection[Metadata] = Depends(database.database.metadata_collection),
+    metadatas: Collection[Metadata] = Depends(metadata_collection),
 ):
     # TODO: Should we validate datasource_id?
 
@@ -47,7 +69,7 @@ def get_all_meta(
 def get_all_meta_name(
     account,
     container,
-    metadatas: Collection[Metadata] = Depends(database.database.metadata_collection),
+    metadatas: Collection[Metadata] = Depends(metadata_collection),
 ):
     metadata = metadatas.find(
         {
@@ -73,7 +95,7 @@ def get_meta(
     account,
     container,
     filepath,
-    metadatas: Collection[Metadata] = Depends(database.database.metadata_collection),
+    metadatas: Collection[Metadata] = Depends(metadata_collection),
 ):
     metadata = metadatas.find_one(
         {
@@ -95,9 +117,7 @@ async def get_metadata_iqdata(
     account: str,
     container: str,
     filepath: str,
-    datasources_collection: Collection[DataSource] = Depends(
-        database.database.datasources_collection
-    ),
+    datasources_collection: Collection[DataSource] = Depends(datasources_collection),
 ):
     # Create the imageURL with sasToken
     datasource = datasources_collection.find_one(
@@ -113,7 +133,7 @@ async def get_metadata_iqdata(
         datasource["sasToken"] = ""  # set to empty str if null
 
     imageURL = add_URL_sasToken(
-        account, container, datasource["sasToken"], filepath, apiType.IQDATA
+        account, container, datasource["sasToken"], filepath, ApiType.IQDATA
     )
 
     async with httpx.AsyncClient() as client:
@@ -131,38 +151,35 @@ async def get_metadata_iqdata(
     response_class=StreamingResponse,
 )
 async def get_meta_thumbnail(
-    account,
-    container,
-    filepath,
-    datasources_collection: Collection[DataSource] = Depends(
-        database.database.datasources_collection
-    ),
+    filepath: str,
+    background_tasks: BackgroundTasks,
+    datasource: DataSource = Depends(database.database.get_datasource),
+    azure_client: AzureBlobClient = Depends(AzureBlobClient),
 ):
-    # Create the imageURL with sasToken
-    datasource = datasources_collection.find_one(
-        {
-            "account": account,
-            "container": container,
-        }
-    )
-
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
 
-    if not datasource.get("sasToken"):
-        datasource["sasToken"] = ""  # set to empty str if null
+    azure_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
+    thumbnail_path = get_file_name(filepath, ApiType.THUMB)
+    content_type = get_content_type(ApiType.THUMB)
+    if not azure_client.blob_exist(thumbnail_path):
+        metadata = database.database.get_metadata(
+            datasource.account,
+            datasource.container,
+            filepath,
+        )
+        if not metadata:
+            raise HTTPException(status_code=404, detail="Metadata not found")
+        datatype = metadata.globalMetadata.core_datatype
+        image = azure_client.get_new_thumbnail(data_type=datatype, filepath=filepath)
+        # Upload the thumbnail in the background
+        background_tasks.add_task(
+            azure_client.upload_blob, filepath=thumbnail_path, data=image
+        )
+        return Response(content=image, media_type=content_type)
 
-    imageURL = add_URL_sasToken(
-        account, container, datasource["sasToken"], filepath, apiType.THUMB
-    )
-
-    async with httpx.AsyncClient() as client:
-        response = await client.get(imageURL.get_secret_value())
-    if response.status_code != 200:
-        raise HTTPException(status_code=404, detail="File not found")
-
-    return StreamingResponse(
-        response.iter_bytes(), media_type=response.headers["Content-Type"]
+    return Response(
+        content=azure_client.get_blob_content(thumbnail_path), media_type=content_type
     )
 
 
