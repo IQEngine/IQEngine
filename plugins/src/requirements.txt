@@ -5,3 +5,11 @@ jsonschema
 PyYAML
 pre-commit
 uvicorn
+azure-storage-blob
+azure-functions
+matplotlib
+Pillow
+urllib3
+json5
+pymongo==4.2.0
+opencv-python

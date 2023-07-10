@@ -8,23 +8,23 @@ import { TimePlot } from './components/TimePlot';
 import { FrequencyPlot } from './components/FrequencyPlot';
 import { IQPlot } from './components/IQPlot';
 import { Layer, Image, Stage } from 'react-konva';
-import { selectFft, calculateTileNumbers, range, SelectFftReturn } from '@/Utils/selector';
-import { AnnotationViewer } from '@/Components/Annotation/AnnotationViewer';
+import { selectFft, calculateTileNumbers, range, SelectFftReturn } from '@/utils/selector';
+import { AnnotationViewer } from '@/pages/spectrogram/components/annotation/AnnotationViewer';
 import { RulerTop } from './RulerTop';
 import { RulerSide } from './RulerSide';
-import { INITIAL_PYTHON_SNIPPET, TILE_SIZE_IN_IQ_SAMPLES, COLORMAP_DEFAULT } from '@/Utils/constants';
+import { INITIAL_PYTHON_SNIPPET, TILE_SIZE_IN_IQ_SAMPLES, COLORMAP_DEFAULT, MINIMAP_FFT_SIZE } from '@/utils/constants';
 import TimeSelector from './TimeSelector';
-import AnnotationList from '@/Components/Annotation/AnnotationList';
-import { GlobalProperties } from '@/Components/GlobalProperties/GlobalProperties';
-import { MetaViewer } from '@/Components/Metadata/MetaViewer';
-import { MetaRaw } from '@/Components/Metadata/MetaRaw';
+import AnnotationList from '@/pages/spectrogram/components/annotation/AnnotationList';
+import { GlobalProperties } from '@/pages/spectrogram/components/global-properties/GlobalProperties';
+import { MetaViewer } from '@/pages/spectrogram/components/metadata/MetaViewer';
+import { MetaRaw } from '@/pages/spectrogram/components/metadata/MetaRaw';
 import { useParams } from 'react-router-dom';
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { getMeta } from '@/api/metadata/Queries';
-import { SigMFMetadata } from '@/Utils/sigmfMetadata';
+import { SigMFMetadata } from '@/utils/sigmfMetadata';
 import { getIQDataSlices, useCurrentCachedIQDataSlice } from '@/api/iqdata/Queries';
-import { applyProcessing } from '@/Sources/FetchMoreDataSource';
-import { colMaps } from '@/Utils/colormap';
+import { applyProcessing } from '@/utils/FetchMoreDataSource';
+import { colMaps } from '@/utils/colormap';
 
 declare global {
   interface Window {
@@ -72,7 +72,7 @@ export const SpectrogramPage = () => {
   const [missingTiles, setMissingTiles] = useState([]);
   const metaQuery = getMeta(type, account, container, filePath);
   const tiles = range(Math.floor(lowerTile), Math.ceil(upperTile));
-  const [fftData, setFFTData] = useState<Record<number, Uint8ClampedArray>>({});
+  const [fftData, setFFTData] = useState<Record<number, Float32Array>>({});
   const [meta, setMeta] = useState<SigMFMetadata>(metaQuery.data);
   const [taps, setTaps] = useState<number[]>([1]);
   const [pythonSnippet, setPythonSnippet] = useState(INITIAL_PYTHON_SNIPPET);
@@ -82,17 +82,14 @@ export const SpectrogramPage = () => {
   const [fftImage, setFFTImage] = useState<SelectFftReturn>(null);
   const { downloadedTiles } = useCurrentCachedIQDataSlice(meta, TILE_SIZE_IN_IQ_SAMPLES);
   const iqQuery = getIQDataSlices(metaQuery.data, tiles, TILE_SIZE_IN_IQ_SAMPLES, !!metaQuery.data && tiles.length > 0);
+  const [selectedAnnotation, setSelectedAnnotation] = useState(-1);
 
   useEffect(() => {
-    window.addEventListener('resize', windowResized);
     if (!pyodide) {
       initPyodide().then((pyodide) => {
         setPyodide(pyodide);
       });
     }
-    return () => {
-      window.removeEventListener('resize', windowResized);
-    };
   }, []);
 
   useEffect(() => {
@@ -219,7 +216,7 @@ export const SpectrogramPage = () => {
     setHandleTop(handleTop);
   };
 
-  const windowResized = () => {
+  function windowResized() {
     if (!meta) {
       return;
     }
@@ -237,7 +234,7 @@ export const SpectrogramPage = () => {
     const newPlotHeight = newSpectrogramHeight - 100;
     setPlotWidth(newplotWidth);
     setPlotHeight(newPlotHeight);
-  };
+  }
 
   useEffect(() => {
     setMeta(metaQuery.data);
@@ -250,10 +247,13 @@ export const SpectrogramPage = () => {
     }
   }, [meta, zoomLevel, handleTop, spectrogramWidth, spectrogramHeight]);
 
-  // run windowResized once when page loads
   useEffect(() => {
+    window.addEventListener('resize', windowResized);
     windowResized();
-  }, []);
+    return () => {
+      window.removeEventListener('resize', windowResized);
+    };
+  }, [meta]);
 
   const toggleIncludeRfFreq = () => {
     setIncludeRfFreq(!includeRfFreq);
@@ -306,7 +306,7 @@ export const SpectrogramPage = () => {
   return (
     <>
       {status === 'loading' && <h1>Loading...</h1>}
-      <div className="mt-3 mb-0 ml-0 mr-0 p-0">
+      <div className="mb-0 ml-0 mr-0 p-0 pt-3">
         <div className="flex flex-row w-full">
           <Sidebar
             updateMagnitudeMax={setMagnitudeMax}
@@ -414,6 +414,8 @@ export const SpectrogramPage = () => {
                         upperTile={upperTile}
                         zoomLevel={zoomLevel}
                         setMeta={setMeta}
+                        selectedAnnotation={selectedAnnotation}
+                        setSelectedAnnotation={setSelectedAnnotation}
                       />
                       {cursorsEnabled && (
                         <TimeSelector
@@ -437,7 +439,7 @@ export const SpectrogramPage = () => {
                       />
                     </Stage>
 
-                    <Stage width={55} height={spectrogramHeight}>
+                    <Stage width={MINIMAP_FFT_SIZE + 5} height={spectrogramHeight}>
                       <ScrollBar
                         fetchAndRender={fetchAndRender}
                         spectrogramHeight={spectrogramHeight}
@@ -446,7 +448,7 @@ export const SpectrogramPage = () => {
                         handleTop={handleTop}
                         meta={meta}
                         fetchEnabled={fetchMinimap}
-                        fftSizeScrollbar={fftSize}
+                        fftSize={fftSize}
                         setMagnitudeMax={setMagnitudeMax}
                         setMagnitudeMin={setMagnitudeMin}
                         colorMap={colorMap}
@@ -502,6 +504,7 @@ export const SpectrogramPage = () => {
                   setHandleTop={setHandleTop}
                   spectrogramHeight={spectrogramHeight}
                   setMeta={setMeta}
+                  setSelectedAnnotation={setSelectedAnnotation}
                 />
               )}
             </div>

@@ -1,4 +1,4 @@
-import { SigMFMetadata } from '@/Utils/sigmfMetadata';
+import { SigMFMetadata } from '@/utils/sigmfMetadata';
 import { test, describe } from 'vitest';
 import { useCurrentCachedIQDataSlice } from '@/api/iqdata/Queries';
 import { renderHook } from '@testing-library/react';

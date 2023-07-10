@@ -32,3 +32,4 @@ tomli==2.0.1
 typing_extensions==4.6.1
 uvicorn==0.22.0
 Werkzeug==2.3.4
+matplotlib==3.7.2

@@ -4,14 +4,19 @@ import { useGetPlugin, useGetPluginParameters } from '@/api/plugin/Queries';
 
 interface PluginOptionProps {
   plugin: PluginDefinition;
+  groupIndex: number;
 }
 
-export function PluginOption({ plugin }: PluginOptionProps) {
+export function PluginOption({ plugin, groupIndex }: PluginOptionProps) {
   const { data } = useGetPlugin(plugin);
   return (
-    <optgroup label={plugin.name}>
-      {data?.map((parameter) => {
-        return <option value={`${plugin.url}/${parameter}`}>{parameter}</option>;
+    <optgroup key={plugin.name + groupIndex} label={plugin.name}>
+      {data?.map((parameter, optionIndex) => {
+        return (
+          <option key={parameter + optionIndex} value={`${plugin.url}/${parameter}`}>
+            {parameter}
+          </option>
+        );
       })}
     </optgroup>
   );
@@ -24,12 +29,7 @@ interface PluginParametersProps {
   pluginParameters: PluginParameters;
 }
 
-export function EditPluginParameters({
-  pluginUrl,
-  handleSubmit,
-  setPluginParameters,
-  pluginParameters,
-}: PluginParametersProps) {
+export function EditPluginParameters({ pluginUrl, setPluginParameters, pluginParameters }: PluginParametersProps) {
   const { data: parameters } = useGetPluginParameters(pluginUrl);
   useEffect(() => {
     console.log('parameters', parameters);
@@ -75,7 +75,6 @@ export function EditPluginParameters({
               </div>
             ))}
           </div>
-          <button onClick={handleSubmit}>Run Plugin</button>
         </>
       )}
     </>

@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { IQDataClient } from './IQDataClient';
-import { SigMFMetadata } from '@/Utils/sigmfMetadata';
+import { SigMFMetadata } from '@/utils/sigmfMetadata';
 import { IQDataSlice } from '@/api/Models';
-import { convertToFloat32 } from '@/Sources/FetchMoreDataSource';
+import { convertToFloat32 } from '@/utils/FetchMoreDataSource';
 
 export class ApiClient implements IQDataClient {
   async getIQDataSlices(meta: SigMFMetadata, indexes: number[], tileSize: number): Promise<IQDataSlice[]> {
@@ -35,7 +35,7 @@ export class ApiClient implements IQDataClient {
           bytes[i] = byteCharacters.charCodeAt(i);
         }
         const iqArray = convertToFloat32(bytes.buffer, meta.getDataType());
-        console.log(`getIQDataSlice ${file_path} ${item.index} took:`, performance.now() - startTime, 'ms');
+        console.debug(`getIQDataSlice ${file_path} ${item.index} took:`, performance.now() - startTime, 'ms');
         let index = item.index;
         return { index, iqArray };
       })

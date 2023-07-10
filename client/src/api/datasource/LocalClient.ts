@@ -1,12 +1,16 @@
 import { DataSourceClient } from './DataSourceClient';
 import { DataSource } from '@/api/Models';
-import { SigMFMetadata, TraceabilityOrigin } from '@/Utils/sigmfMetadata';
-import store from '@/Store/store';
 import { FileWithDirectoryAndFileHandle } from 'browser-fs-access';
 
 export class LocalClient implements DataSourceClient {
+  files: FileWithDirectoryAndFileHandle[];
+
+  constructor(files: FileWithDirectoryAndFileHandle[]) {
+    this.files = files;
+  }
+
   list(): Promise<DataSource[]> {
-    const localDirectory: FileWithDirectoryAndFileHandle[] = store.getState().localClient.files;
+    const localDirectory: FileWithDirectoryAndFileHandle[] = this.files;
     if (!localDirectory) {
       return Promise.reject('No local directory found');
     }
@@ -22,7 +26,7 @@ export class LocalClient implements DataSourceClient {
   }
 
   get(account: string, container: string): Promise<DataSource> {
-    const localDirectory: FileWithDirectoryAndFileHandle[] = store.getState().localClient.files;
+    const localDirectory: FileWithDirectoryAndFileHandle[] = this.files;
     if (!localDirectory) {
       return Promise.reject('No local directory found');
     }

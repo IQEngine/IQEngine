@@ -11,8 +11,8 @@ paths:
     get:
       summary: Returns the list of RF Functions available at this ip/host, as a list of strings, must match functionName below.
       responses:
-        "200":
-          description: "OK"
+        '200':
+          description: 'OK'
           content:
             application/json:
               schema:
@@ -33,10 +33,10 @@ paths:
           required: true
           description: Name of RF Function
       responses:
-        "400":
+        '400':
           description: Bad request. RF Function does not exist.
-        "200":
-          description: "OK"
+        '200':
+          description: 'OK'
           content:
             application/json:
               schema:
@@ -52,11 +52,11 @@ paths:
                     type: integer
                     default: 1
                     minimum: 0
-                  custom_params:  # This object is essentially just a json schema that is at most 1 layer deep
-                                  # e.g.:
-                                  # {'param1': {'title': 'Param1', 'default': 1,       'type': 'integer'},
-                                  #  'param2': {'title': 'Param2', 'default': 'test2', 'type': 'string'},
-                                  #  'param3': {'title': 'Param3', 'default': 5.67,    'type': 'number'}}
+                  custom_params: # This object is essentially just a json schema that is at most 1 layer deep
+                    # e.g.:
+                    # {'param1': {'title': 'Param1', 'default': 1,       'type': 'integer'},
+                    #  'param2': {'title': 'Param2', 'default': 'test2', 'type': 'string'},
+                    #  'param3': {'title': 'Param3', 'default': 5.67,    'type': 'number'}}
                     type: object
                     minProperties: 1
                     maxProperties: 100
@@ -90,20 +90,17 @@ paths:
               type: object
               # Provide either samples (IQ samples) or samples_pointer (pointer to blob storage)
               oneOf:
-                - required: [samples]
-                - required: [samples_pointer]
+                - required: [samples_b64]
+                - required: [samples_cloud]
               properties:
                 samples_b64:
-                  $ref: '#/components/schemas/samples_b64'
+                  type: array # list of IQ samples, most functions will just have 1
+                  items:
+                    $ref: '#/components/schemas/samples_b64'
                 samples_cloud:
-                  $ref: '#/components/schemas/samples_cloud'
-                # Always provide sample rate, center freq, data type
-                data_type: # uses MIME types, plus custom types we are adding for IQ, based on SigMF
-                  $ref: '#/components/schemas/data_type'
-                sample_rate:
-                  type: number
-                center_freq:
-                  type: number
+                  type: array # list of IQ samples, most functions will just have 1
+                  items:
+                    $ref: '#/components/schemas/samples_cloud'
                 # Custom params
                 additionalProperties:
                   anyOf:
@@ -112,12 +109,12 @@ paths:
                     - type: integer
                     - type: boolean
       responses:
-        "400":
+        '400':
           description: Bad request. RF Function does not exist.
-        "401":
+        '401':
           description: Bad request. Missing a required param.
-        "200":
-          description: "OK"
+        '200':
+          description: 'OK'
           content:
             application/json:
               schema:
@@ -137,7 +134,6 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/annotation'
-
 
 # A way to specify properties that are reused, or simply too large to have look good within parameters/responses objects
 components:
@@ -164,23 +160,23 @@ components:
     samples_cloud: # a pointer to IQ samples in cloud storage
       type: object
       required:
-        - accountName
-        - containerName
+        - account_name
+        - container_name
         - file_path
         - data_type
       properties:
-        accountName:
+        account_name:
           type: string
-        containerName:
+        container_name:
           type: string
         file_path:
           type: string
         sas_token:
           type: string
-        sample_start:
+        byte_offset:
           type: integer
           default: 0
-        sample_count: # default is to grab all of the samples in the file
+        byte_length: # default is to grab all of the samples in the file
           type: integer
         data_type:
           $ref: '#/components/schemas/data_type'
@@ -194,7 +190,7 @@ components:
     data_type:
       type: string
       enum:
-        - iq/ci8_le  # from SigMF
+        - iq/ci8_le # from SigMF
         - iq/ci16_le # from SigMF
         - iq/cf32_le # from SigMF
         - image/png
@@ -209,7 +205,7 @@ components:
         - core:sample_count
       properties:
         core:comment:
-          default: ""
+          default: ''
           description: A human-readable comment
           type: string
         core:freq_lower_edge:

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { MetadataClient } from './MetadataClient';
-import { SigMFMetadata, Annotation, CaptureSegment } from '@/Utils/sigmfMetadata';
+import { SigMFMetadata, Annotation, CaptureSegment } from '@/utils/sigmfMetadata';
 
 export class ApiClient implements MetadataClient {
   async getMeta(account: string, container: string, filePath: string): Promise<SigMFMetadata> {
@@ -26,6 +26,11 @@ export class ApiClient implements MetadataClient {
       return newMeta;
     });
     return responseMetaData;
+  }
+
+  async getDataSourceMetaPaths(account: string, container: string): Promise<string[]> {
+    const response = await axios.get(`/api/datasources/${account}/${container}/meta/paths`);
+    return response.data;
   }
 
   async updateMeta(account: string, container: string, filePath: string, meta: SigMFMetadata): Promise<SigMFMetadata> {

@@ -1,7 +1,5 @@
 import { test, describe } from 'vitest';
 import { LocalClient } from '@/api/metadata/LocalClient';
-import store from '@/Store/store';
-import { setLocalClient } from '@/Store/Reducers/LocalClientReducer';
 import { FileWithDirectoryAndFileHandle } from 'browser-fs-access';
 const account = 'local';
 const container = 'local';
@@ -72,8 +70,7 @@ describe('Local Client Metadata Tests', () => {
       size: 1024,
     } as FileWithDirectoryAndFileHandle;
 
-    store.dispatch(setLocalClient([metadataFile, dataFile]));
-    const client = new LocalClient();
+    const client = new LocalClient([metadataFile, dataFile]);
     const result = await client.getMeta(account, container, filePath);
     expect(result.annotations).toEqual(baseMetadataFile.annotations);
     expect(result.captures).toEqual(baseMetadataFile.captures);
@@ -96,8 +93,7 @@ describe('Local Client Metadata Tests', () => {
       size: 1024,
     } as FileWithDirectoryAndFileHandle;
 
-    store.dispatch(setLocalClient([metadataFile, dataFile]));
-    const client = new LocalClient();
+    const client = new LocalClient([metadataFile, dataFile]);
     const result = await client.getMeta(account, container, filePath);
     expect(result.annotations).toEqual(baseMetadataFile.annotations);
     expect(result.captures).toEqual(baseMetadataFile.captures);

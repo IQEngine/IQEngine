@@ -1,20 +1,18 @@
 import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
-import store from '@/Store/store';
-import { CLIENT_TYPE_BLOB, DataSource } from '@/api/Models';
-import { upsertDataSource } from '@/Store/Reducers/ConnectionReducer';
 import { FeatureFlag } from '@/hooks/useFeatureFlags';
 
 const fetchConfig = async () => {
   try {
-    const response = await axios.get<Config>('/api/config').catch((error) => {
-      console.log('axios config not found, using env vars instead');
+    const response = await axios.get<AppConfig>('/api/config').catch((error) => {
+      console.error('the failed GET above is due to axios config not found, using env vars instead');
       return {
         data: {
           connectionInfo: JSON.parse(import.meta.env.IQENGINE_CONNECTION_INFO ?? null),
           googleAnalyticsKey: import.meta.env.IQENGINE_GOOGLE_ANALYTICS_KEY,
           featureFlags: JSON.parse(import.meta.env.IQENGINE_FEATURE_FLAGS ?? null),
-        } as Config,
+          internalBranding: import.meta.env.IQENGINE_INTERNAL_BRANDING,
+        } as AppConfig,
       };
     });
     if (!response.data.connectionInfo) {
@@ -25,6 +23,10 @@ const fetchConfig = async () => {
     }
     if (!response.data.featureFlags) {
       response.data.featureFlags = JSON.parse(import.meta.env.IQENGINE_FEATURE_FLAGS ?? null);
+    }
+
+    if (!response.data.internalBranding) {
+      response.data.internalBranding = import.meta.env.IQENGINE_INTERNAL_BRANDING;
     }
 
     for (const member in response.data) {
@@ -40,7 +42,8 @@ const fetchConfig = async () => {
       connectionInfo: JSON.parse(import.meta.env.IQENGINE_CONNECTION_INFO ?? null),
       googleAnalyticsKey: import.meta.env.IQENGINE_GOOGLE_ANALYTICS_KEY,
       featureFlags: JSON.parse(import.meta.env.IQENGINE_FEATURE_FLAGS ?? null),
-    } as Config;
+      internalBranding: import.meta.env.IQENGINE_INTERNAL_BRANDING,
+    } as AppConfig;
   }
 };
 
@@ -55,26 +58,11 @@ interface ConnectionInfo {
   }>;
 }
 
-type Config = {
+export type AppConfig = {
   connectionInfo: ConnectionInfo;
   googleAnalyticsKey: string;
   featureFlags: { [key in FeatureFlag]: boolean };
+  internalBranding: string;
 };
 
-export const configQuery = () =>
-  useQuery(['config'], fetchConfig, {
-    onSuccess: (data) => {
-      data.connectionInfo?.settings?.forEach((setting) => {
-        const dataSource: DataSource = {
-          type: CLIENT_TYPE_BLOB,
-          name: setting.name,
-          description: setting.description,
-          imageURL: setting.imageURL,
-          account: setting.accountName,
-          container: setting.containerName,
-          sasToken: setting.sasToken,
-        };
-        store.dispatch({ type: upsertDataSource.type, payload: dataSource });
-      });
-    },
-  });
+export const useConfigQuery = () => useQuery(['config'], fetchConfig);

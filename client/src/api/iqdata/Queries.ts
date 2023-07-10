@@ -1,9 +1,10 @@
-import { SigMFMetadata } from '@/Utils/sigmfMetadata';
+import { SigMFMetadata } from '@/utils/sigmfMetadata';
 import { useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
 import { IQDataClientFactory } from './IQDataClientFactory';
-import { range } from '@/Utils/selector';
+import { range } from '@/utils/selector';
 import { IQDataSlice } from '@/api/Models';
-import { TILE_SIZE_IN_IQ_SAMPLES } from '@/Utils/constants';
+import { TILE_SIZE_IN_IQ_SAMPLES } from '@/utils/constants';
+import { useUserSettings } from '@/api/user-settings/use-user-settings';
 
 export const getIQDataSlice = (
   meta: SigMFMetadata,
@@ -15,7 +16,8 @@ export const getIQDataSlice = (
     return useQuery(['invalidQuery'], () => null);
   }
   const { type, account, container, file_path } = meta.getOrigin();
-  const client = IQDataClientFactory(type);
+  const { filesQuery, dataSourcesQuery } = useUserSettings();
+
   return useQuery(
     [
       'datasource',
@@ -29,7 +31,10 @@ export const getIQDataSlice = (
         tileSize: tileSize,
       },
     ],
-    () => client.getIQDataSlice(meta, index, tileSize),
+    () => {
+      const iqDataClient = IQDataClientFactory(type, filesQuery.data, dataSourcesQuery.data);
+      return iqDataClient.getIQDataSlice(meta, index, tileSize);
+    },
     {
       enabled: enabled && !!meta,
       staleTime: Infinity,
@@ -59,18 +64,23 @@ export const getIQDataFullIndexes = (
   tileSize: number = TILE_SIZE_IN_IQ_SAMPLES,
   enabled = true
 ) => {
-  if (!meta) {
-    return useQuery<IQDataSlice[]>({
-      queryKey: ['invalidQuery'],
-      queryFn: () => null,
-    });
+  const { filesQuery, dataSourcesQuery } = useUserSettings();
+  if (!meta || !indexes || !indexes.length || !filesQuery.data || !dataSourcesQuery.data) {
+    return useQuery(
+      ["invalidQuery"],
+      () => null,
+    );
   }
   const { type, account, container, file_path } = meta.getOrigin();
-  const client = IQDataClientFactory(type);
+
   return useQuery<IQDataSlice[]>({
     queryKey: ['datasource', type, account, container, file_path, 'iq', { indexes: indexes, tileSize: tileSize }],
-    queryFn: () => client.getIQDataSlices(meta, indexes, tileSize),
-    enabled: enabled && !!meta,
+    queryFn: () => {
+      const iqDataClient = IQDataClientFactory(type, filesQuery.data, dataSourcesQuery.data);
+      console.log('getIQDataFullIndexes', indexes, meta, filesQuery.data, dataSourcesQuery.data);
+      return iqDataClient.getIQDataSlices(meta, indexes, tileSize);
+    },
+    enabled: enabled && !!meta && !!filesQuery.data && !!dataSourcesQuery.data,
     staleTime: Infinity,
   });
 };
@@ -81,18 +91,21 @@ export const getIQDataSlices = (
   tileSize: number = TILE_SIZE_IN_IQ_SAMPLES,
   enabled = true
 ) => {
-  if (!meta || !indexes || indexes.length === 0) {
+  const { filesQuery, dataSourcesQuery } = useUserSettings();
+  if (!meta || !indexes || !indexes.length || !filesQuery.data || !dataSourcesQuery.data) {
     return useQueries({
       queries: [],
     });
   }
   const { type, account, container, file_path } = meta?.getOrigin();
-  const client = IQDataClientFactory(type);
   return useQueries({
     queries: indexes.map((index) => {
       return {
         queryKey: ['datasource', type, account, container, file_path, 'iq', { index: index, tileSize: tileSize }],
-        queryFn: () => client.getIQDataSlice(meta, index, tileSize),
+        queryFn: () => {
+          const iqDataClient = IQDataClientFactory(type, filesQuery.data, dataSourcesQuery.data);
+          return iqDataClient.getIQDataSlice(meta, index, tileSize)
+        },
         enabled: enabled && !!meta && index >= 0,
         staleTime: Infinity,
       };
@@ -111,6 +124,10 @@ export const useCurrentCachedIQDataSlice = (meta: SigMFMetadata, tileSize: numbe
   const downloadedTiles = queryClient
     .getQueriesData(['datasource', type, account, container, filePath, 'iq'])
     .map((slice) => {
+      if (!slice || !slice[0] || !slice[0].length) {
+        console.log('slice is null');
+        return null;
+      }
       let queryData = slice[0][slice[0].length - 1] as { tileSize: number; index: number };
       if (queryData && queryData.tileSize === tileSize) {
         return queryData.index;

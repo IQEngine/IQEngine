@@ -5,8 +5,7 @@
 import React from 'react';
 import SettingsPane from './SettingsPane';
 import { PluginsPane } from './components/PluginsPane';
-import InfoPane from './InfoPane';
-import { SigMFMetadata } from '@/Utils/sigmfMetadata';
+import { SigMFMetadata } from '@/utils/sigmfMetadata';
 
 export interface SidebarProps {
   updateMagnitudeMax: (magnitudeMax: number) => void;
@@ -69,12 +68,14 @@ const Sidebar = (props) => {
           Plugins
         </summary>
         <div className="outline outline-1 outline-primary p-2">
-          <PluginsPane
-            cursorsEnabled={props.cursorsEnabled}
-            handleProcessTime={props.handleProcessTime}
-            meta={props.meta}
-            setMeta={props.setMeta}
-          />
+          {props.meta && (
+            <PluginsPane
+              cursorsEnabled={props.cursorsEnabled}
+              handleProcessTime={props.handleProcessTime}
+              meta={props.meta}
+              setMeta={props.setMeta}
+            />
+          )}
         </div>
       </details>
     </div>

@@ -5,14 +5,13 @@ import logging
 from asyncio import to_thread
 from typing import List
 
-import database.database
 from azure.storage.blob import BlobClient
+from database import datasource
 from database.models import DataSource
 from fastapi import APIRouter, Depends, HTTPException
+from helpers.cipher import decrypt
 from pydantic import BaseModel, SecretStr
 from pymongo.collection import Collection
-
-from .cipher import decrypt
 
 router = APIRouter()
 
@@ -26,9 +25,7 @@ class IQData(BaseModel):
 def get_sas_token(
     account: str,
     container: str,
-    datasources_collection: Collection[DataSource] = Depends(
-        database.database.datasources_collection
-    ),
+    datasources_collection: Collection[DataSource] = Depends(datasource.collection),
 ):
     datasource = datasources_collection.find_one(
         {"account": account, "container": container}
@@ -36,13 +33,11 @@ def get_sas_token(
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
 
-    if "sasToken" in datasource:
+    if "sasToken" in datasource and datasource["sasToken"] != "":
         decrypted_sas_token = decrypt(datasource["sasToken"])
+        return decrypted_sas_token
     else:
-        return None
-    if not decrypted_sas_token:
-        return None
-    return decrypted_sas_token
+        return SecretStr("")
 
 
 @router.get(
@@ -58,13 +53,16 @@ def get_iq(
 ):
     try:
         if not sasToken:
-            raise HTTPException(status_code=400, detail="Invalid SAS token")
-
-        blob_client = BlobClient.from_blob_url(
-            f"https://{account}.blob.core.windows.net/"
-            f"{container}/{filepath}.sigmf-data",
-            credential=sasToken.get_secret_value(),
-        )
+            blob_client = BlobClient.from_blob_url(
+                f"https://{account}.blob.core.windows.net/"
+                f"{container}/{filepath}.sigmf-data"
+            )
+        else:
+            blob_client = BlobClient.from_blob_url(
+                f"https://{account}.blob.core.windows.net/"
+                f"{container}/{filepath}.sigmf-data",
+                credential=sasToken.get_secret_value(),
+            )
 
         download_stream = blob_client.download_blob(offsetBytes, countBytes)
         data = io.BytesIO(download_stream.readall())
@@ -103,12 +101,15 @@ async def get_iq_data_slices(
         logger.info(f"tile_size: {iq_data.tile_size}")
 
         if not sasToken:
-            raise HTTPException(status_code=400, detail="Invalid SAS token")
+            blob_client = BlobClient.from_blob_url(
+                f"https://{account}.blob.core.windows.net/{container}/{filepath}.sigmf-data"
+            )
+        else:
+            blob_client = BlobClient.from_blob_url(
+                f"https://{account}.blob.core.windows.net/{container}/{filepath}.sigmf-data",
+                credential=sasToken.get_secret_value(),
+            )
 
-        blob_client = BlobClient.from_blob_url(
-            f"https://{account}.blob.core.windows.net/{container}/{filepath}.sigmf-data",
-            credential=sasToken.get_secret_value(),
-        )
         blob_properties = blob_client.get_blob_properties()
         blob_size = blob_properties.size
 

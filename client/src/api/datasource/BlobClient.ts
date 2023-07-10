@@ -1,20 +1,23 @@
-import { SigMFMetadata } from '@/Utils/sigmfMetadata';
 import { DataSourceClient } from './DataSourceClient';
 import { DataSource } from '@/api/Models';
-import store from '@/Store/store';
-import { getDataSourceFromConnection } from '@/api/utils/AzureBlob';
+import { getDataSourceFromDatasources } from '@/api/utils/AzureBlob';
 
 export class BlobClient implements DataSourceClient {
+  dataSources: Record<string, DataSource>;
+
+  constructor(dataSources: Record<string, DataSource>) {
+    this.dataSources = dataSources;
+  }
+
   list(): Promise<DataSource[]> {
-    const connection = store.getState().connection;
-    if (!connection) {
-      return Promise.reject('No connection found');
+    if (!this.dataSources) {
+      return Promise.reject('No data sources found');
     }
-    return Promise.resolve(Object.values(connection.dataSources));
+    return Promise.resolve(Object.values(this.dataSources));
   }
 
   get(account: string, container: string): Promise<DataSource> {
-    const dataSource = getDataSourceFromConnection(account, container);
+    const dataSource = getDataSourceFromDatasources(this.dataSources, account, container);
     if (!dataSource) {
       return Promise.reject('No connection found');
     }

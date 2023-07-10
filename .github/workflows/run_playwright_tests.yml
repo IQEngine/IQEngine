@@ -2,11 +2,10 @@
 name: Run Playwright frontend integration tests
 
 on:
-  workflow_run:
-    workflows: ['Deploy To Staging']
-    branches: [main]
-    types:
-      - completed
+  pull_request:
+    # only runs on PRs that target main
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
@@ -23,11 +22,42 @@ jobs:
           node-version: 18
 
       - name: Install dependencies
-        run: cd "$GITHUB_WORKSPACE/e2e" && npm ci
+        working-directory: e2e
+        run: npm ci
+
+      - name: Docker build
+        run: docker compose -f docker-compose-e2e.yml build
+        env:
+          MONGO_USERNAME: mongoadmin
+          MONGO_PASSWORD: secret
+
+      - name: Docker up
+        run: docker compose -f docker-compose-e2e.yml up &
+        env:
+          IN_MEMORY_DB: '0'
+          IQENGINE_FEATURE_FLAGS: '{"useAPIDatasources": true}'
+          IQENGINE_CONNECTION_INFO: '{"settings": [{"name": "GNU Radio SigMF Repo","containerName": "iqengine","accountName": "gnuradio","sasToken": "","description": "A collection of example SigMF recordings hosted by the GNU Radio project (contact Marc to have your recordings added)","imageURL": "https://gnuradio.blob.core.windows.net/iqengine/cellular_downlink_880MHz.jpeg"}]}'
+          MONGO_USERNAME: mongoadmin
+          MONGO_PASSWORD: secret
+
+      - name: Check build has succeeded
+        uses: cygnetdigital/wait_for_response@v2.0.0
+        with:
+          url: 'http://localhost:3000/'
+          responseCode: '200,500'
+          timeout: 30000
+          interval: 500
 
       - name: Install Playwright Browsers
-        run: cd "$GITHUB_WORKSPACE/e2e" && npx playwright install --with-deps
+        working-directory: e2e
+        run: npx playwright install --with-deps
 
       - name: Run Playwright tests
+        working-directory: e2e
         run: |
-          cd "$GITHUB_WORKSPACE/e2e" && npx playwright test --config playwright-pr.config.ts
+          npx playwright test --config playwright-pr.config.ts --grep @CICompatible
+        env:
+          IQENGINE_METADATA_DB_CONNECTION_STRING: mongodb://mongoadmin:secret@localhost:27017/admin
+
+      - name: Docker down
+        run: docker compose -f docker-compose-e2e.yml down

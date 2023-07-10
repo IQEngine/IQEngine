@@ -1,10 +1,10 @@
-#
-
+![GitHub release](https://img.shields.io/github/v/release/IQEngine/IQEngine)
+[![Discord](https://img.shields.io/discord/1063315697498853498?label=Discord)](https://discord.gg/k7C8kp3b76)
 <p align="center">
   <img width=250 src="client/public/IQEngine_Black.svg" />
 </p>
 
-_<p align="center"><a href="https://www.iqengine.org">www.iqengine.org</a></p>_
+<p align="center">Try it out at <a href="https://www.iqengine.org">www.iqengine.org</a></p>
 
 <h4 style="text-align: center;"><i>A web-based SDR toolkit for analyzing, processing, and sharing RF recordings</i></h4>
 
@@ -139,6 +139,10 @@ To configure the project, you need to set specific environment variables. The cu
 * `IQENGINE_METADATA_DB_CONNECTION_STRING`: This variable stores the connection string for the Metadata DB. If you don't want to utilize the Metadata DB, you can leave this variable empty. Please note that this variable is only used by the backend API.
 
 * `IN_MEMORY_DB`: This variable switches in-memory DB on or off. The in-memory DB is intended for testing only. Use IN_MEMORY_DB = 0 for off and 1 for on. PyTest tests of the API make use of the in-memory DB.
+
+* `IQENGINE_APP_ID` = For your administrative user, it is crucial to set up this variable. Create a registration app dedicated to the administrative user within your application. This variable is necessary to enable their login functionality. Remember to include your website's redirect URI as a Single Page Application (SPA) redirect. The redirect should consist of your site's URL followed by "/admin.".
+
+* `IQENGINE_APP_AUTHORITY`: This is the authority for your application that will login to the third party provider.
 
 ## Feature Flags
 

@@ -9,12 +9,14 @@ def test_api_get_config(client):
     os.environ["IQENGINE_CONNECTION_INFO"] = "{}"
     os.environ["IQENGINE_GOOGLE_ANALYTICS_KEY"] = "google_analytics_key"
     os.environ["IQENGINE_FEATURE_FLAGS"] = "{}"
+    os.environ["IQENGINE_INTERNAL_BRANDING"] = "internal_branding_string"
     response = client.get("/api/config")
     assert response.status_code == 200
     assert response.json() == {
         "connectionInfo": {},
         "googleAnalyticsKey": "google_analytics_key",
         "featureFlags": {},
+        "internalBranding": "internal_branding_string",
     }
 
 
@@ -147,6 +149,24 @@ def test_api_get_all_meta(client):
     )
     assert response.status_code == 200
     assert len(response.json()) == 2
+
+
+def test_api_get_all_meta_path(client):
+    client.post("/api/datasources", json=test_datasource).json()
+    client.post(
+        f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/record_a/meta',
+        json=valid_metadata,
+    )
+    client.post(
+        f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/record_b/meta',
+        json=valid_metadata,
+    )
+    response = client.get(
+        f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/meta/paths'
+    )
+    assert response.status_code == 200
+    assert "record_a" in response.json()
+    assert "record_b" in response.json()
 
 
 def test_api_create_datasource(client):
