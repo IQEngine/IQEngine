@@ -207,7 +207,7 @@ def process_geolocation(target: str, geolocation: str):
             }
 
     except Exception as e:
-        raise HTTPException(status_code=400, detail="Invalid geolocation format, expected: type, long, lat, radius")
+        raise HTTPException(status_code=400, detail="Invalid geolocation format, expected: long, lat, radius")
 
 
 @router.get(
