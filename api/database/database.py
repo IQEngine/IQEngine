@@ -71,3 +71,29 @@ def get_datasource(account, container) -> DataSource:
     return datasources_collection().find_one(
         {"account": account, "container": container}
     )
+
+def get_metadata(account, container, filepath) -> Metadata:
+    """
+    Get a metadata by account, container and filepath
+
+    Parameters
+    ----------
+    account : str
+        The account name.
+    container : str
+        The container name.
+    filepath : str
+        The filepath
+
+    Returns
+    -------
+    Metadata
+        The Sigmf metadata.
+    """
+    return metadata_collection().find_one(
+        {
+            "global.traceability:origin.account": account,
+            "global.traceability:origin.container": container,
+            "global.traceability:origin.file_path": filepath,
+        }
+    )

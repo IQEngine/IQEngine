@@ -160,7 +160,6 @@ async def get_meta_thumbnail(
     background_tasks: BackgroundTasks,
     datasource: DataSource = Depends(get_datasource),
     azure_client: AzureBlobClient = Depends(AzureBlobClient),
-    metadata_set: Collection[Metadata] = Depends(metadata_collection),
 ):
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
@@ -169,16 +168,16 @@ async def get_meta_thumbnail(
     thumbnail_path = get_file_name(filepath, ApiType.THUMB)
     content_type = get_content_type(ApiType.THUMB)
     if not azure_client.blob_exist(thumbnail_path):
-        iq_path = get_file_name(filepath, ApiType.IQDATA)
-        fftSize = 1024
-        content = azure_client.get_blob_content(iq_path, 8000, fftSize * 512)
-        metadata = get_metadata(
-            datasource["account"], datasource["container"], filepath, metadata_set
+        metadata = database.database.get_metadata(
+            datasource.account,
+            datasource.container,
+            filepath,
         )
         if not metadata:
             raise HTTPException(status_code=404, detail="Metadata not found")
-        data_type = metadata["global"]["core:datatype"]
-        image = get_spectrogram_image(content, data_type, fftSize)
+        datatype = metadata.globalMetadata.core_datatype
+        image = azure_client.get_new_thumbnail(data_type=datatype, filepath=filepath)
+        # Upload the thumbnail in the background
         background_tasks.add_task(
             azure_client.upload_blob, filepath=thumbnail_path, data=image
         )
