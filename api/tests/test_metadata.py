@@ -3,7 +3,6 @@ from unittest.mock import Mock
 
 from database import datasource
 from database.models import DataSource, Metadata
-from fastapi.testclient import TestClient
 from tests.test_data import test_datasource, valid_metadata
 
 
