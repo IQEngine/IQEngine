@@ -1,20 +1,13 @@
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-import httpx
 from blob.azure_client import AzureBlobClient
 from database import datasource_repo, metadata_repo
 from database.models import DataSource, DataSourceReference, Metadata
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Response
 from fastapi.responses import StreamingResponse
 from helpers.cipher import decrypt
-from helpers.urlmapping import (
-    ApiType,
-    add_URL_sasToken,
-    get_content_type,
-    get_file_name,
-)
-from pydantic import SecretStr
+from helpers.urlmapping import ApiType, get_content_type, get_file_name
 from pymongo.collection import Collection
 
 router = APIRouter()
@@ -25,7 +18,7 @@ router = APIRouter()
     status_code=200,
     response_model=list[Metadata],
 )
-def get_all_meta(
+async def get_all_meta(
     account,
     container,
     metadatas: Collection[Metadata] = Depends(metadata_repo.collection),
@@ -51,7 +44,7 @@ def get_all_meta(
     status_code=200,
     response_model=list[str],
 )
-def get_all_meta_name(
+async def get_all_meta_name(
     account,
     container,
     metadatas: Collection[Metadata] = Depends(metadata_repo.collection),
@@ -76,7 +69,7 @@ def get_all_meta_name(
     "/api/datasources/{account}/{container}/{filepath:path}/meta",
     response_model=Metadata,
 )
-def get_meta(
+async def get_meta(
     metadata: Metadata = Depends(metadata_repo.get),
 ):
     if not metadata:
@@ -89,34 +82,22 @@ def get_meta(
     response_class=StreamingResponse,
 )
 async def get_metadata_iqdata(
-    account: str,
-    container: str,
     filepath: str,
     datasource: DataSource = Depends(datasource_repo.get),
+    azure_client: AzureBlobClient = Depends(AzureBlobClient),
 ):
     # Create the imageURL with sasToken
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
 
-    if not datasource.sasToken:
-        datasource.sasToken = SecretStr("")  # set to empty str if null
-
-    imageURL = add_URL_sasToken(
-        account,
-        container,
-        datasource.sasToken.get_secret_value(),
-        filepath,
-        ApiType.IQDATA,
-    )
-
-    async with httpx.AsyncClient() as client:
-        response = await client.get(imageURL.get_secret_value())
-    if response.status_code != 200:
+    azure_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
+    content_type = get_content_type(ApiType.IQDATA)
+    iq_path = get_file_name(filepath, ApiType.IQDATA)
+    if not azure_client.blob_exist(iq_path):
         raise HTTPException(status_code=404, detail="File not found")
 
-    return StreamingResponse(
-        response.iter_bytes(), media_type=response.headers["Content-Type"]
-    )
+    response = await azure_client.get_blob_stream(iq_path)
+    return StreamingResponse(response.chunks(), media_type=content_type)
 
 
 @router.get(
@@ -135,7 +116,7 @@ async def get_meta_thumbnail(
     azure_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
     thumbnail_path = get_file_name(filepath, ApiType.THUMB)
     content_type = get_content_type(ApiType.THUMB)
-    if not azure_client.blob_exist(thumbnail_path):
+    if not await azure_client.blob_exist(thumbnail_path):
         metadata = metadata_repo.get(
             datasource.account,
             datasource.container,
@@ -144,19 +125,19 @@ async def get_meta_thumbnail(
         if not metadata:
             raise HTTPException(status_code=404, detail="Metadata not found")
         datatype = metadata.globalMetadata.core_datatype
-        image = azure_client.get_new_thumbnail(data_type=datatype, filepath=filepath)
+        image = await azure_client.get_new_thumbnail(
+            data_type=datatype, filepath=filepath
+        )
         # Upload the thumbnail in the background
         background_tasks.add_task(
             azure_client.upload_blob, filepath=thumbnail_path, data=image
         )
         return Response(content=image, media_type=content_type)
-
-    return Response(
-        content=azure_client.get_blob_content(thumbnail_path), media_type=content_type
-    )
+    content = await azure_client.get_blob_content(thumbnail_path)
+    return Response(content=content, media_type=content_type)
 
 
-def process_geolocation(target: str, geolocation: str):
+async def process_geolocation(target: str, geolocation: str):
     try:
         geo_long_str, geo_lat_str, geo_radius_str = geolocation.split(",")
         geo_long = float(geo_long_str)
@@ -169,19 +150,22 @@ def process_geolocation(target: str, geolocation: str):
             target_field = "annotations.core:geolocation"
 
         return {
-                target_field: {
-                    "$near": {
-                        "$geometry": {
-                            "type": "Point",
-                            "coordinates": [geo_long, geo_lat],
-                        },
-                        "$maxDistance": geo_radius,
-                    }
+            target_field: {
+                "$near": {
+                    "$geometry": {
+                        "type": "Point",
+                        "coordinates": [geo_long, geo_lat],
+                    },
+                    "$maxDistance": geo_radius,
                 }
             }
+        }
 
     except Exception:
-        raise HTTPException(status_code=400, detail="Invalid geolocation format, expected: long, lat, radius")
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid geolocation format, expected: long, lat, radius",
+        )
 
 
 @router.get(
@@ -189,7 +173,7 @@ def process_geolocation(target: str, geolocation: str):
     status_code=200,
     response_model=list[Metadata],
 )
-def query_meta(
+async def query_meta(
     account: Optional[List[str]] = Query([]),
     container: Optional[List[str]] = Query([]),
     min_frequency: Optional[float] = Query(None),
@@ -256,9 +240,11 @@ def query_meta(
         )
 
     if captures_geo:
-        query_condition.update(process_geolocation("captures", captures_geo))
+        query_condition.update(await process_geolocation("captures", captures_geo))
     if annotations_geo:
-        query_condition.update(process_geolocation("annotations", annotations_geo))
+        query_condition.update(
+            await process_geolocation("annotations", annotations_geo)
+        )
 
     if text is not None:
         or_condition = [
@@ -291,7 +277,7 @@ def query_meta(
     status_code=201,
     response_model=Metadata,
 )
-def create_meta(
+async def create_meta(
     account: str,
     container: str,
     filepath: str,
@@ -338,7 +324,7 @@ def create_meta(
     "/api/datasources/{account}/{container}/{filepath:path}/meta",
     status_code=204,
 )
-def update_meta(
+async def update_meta(
     account,
     container,
     filepath,
