@@ -2,7 +2,6 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 import httpx
-from pydantic import SecretStr
 from blob.azure_client import AzureBlobClient
 from database import datasource_repo, metadata_repo
 from database.models import DataSource, DataSourceReference, Metadata
@@ -15,6 +14,7 @@ from helpers.urlmapping import (
     get_content_type,
     get_file_name,
 )
+from pydantic import SecretStr
 from pymongo.collection import Collection
 
 router = APIRouter()
