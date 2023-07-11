@@ -1,6 +1,8 @@
 from unittest.mock import MagicMock
+
 from database import metadata_repo
 from main import app
+
 from .test_data import valid_metadata_array
 
 
@@ -16,9 +18,7 @@ def test_query_meta_success(client):
     query_condition = "min_frequency=8486280000&max_frequency=8486290000"
 
     # Override the dependency
-    app.dependency_overrides[
-        metadata_repo.collection
-    ] = override_metadata_collection
+    app.dependency_overrides[metadata_repo.collection] = override_metadata_collection
 
     response = client.get(
         f"/api/datasources/query?account={account}&container={container}&{query_condition}"

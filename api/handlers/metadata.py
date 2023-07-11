@@ -2,8 +2,9 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 import httpx
-from database import datasource_repo, metadata_repo
+from pydantic import SecretStr
 from blob.azure_client import AzureBlobClient
+from database import datasource_repo, metadata_repo
 from database.models import DataSource, DataSourceReference, Metadata
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Response
 from fastapi.responses import StreamingResponse
@@ -98,7 +99,7 @@ async def get_metadata_iqdata(
         raise HTTPException(status_code=404, detail="Datasource not found")
 
     if not datasource.sasToken:
-        datasource.sasToken = ""  # set to empty str if null
+        datasource.sasToken = SecretStr("")  # set to empty str if null
 
     imageURL = add_URL_sasToken(
         account,
