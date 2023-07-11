@@ -77,4 +77,3 @@ describe('Test query validation objects', () => {
   });
 
 });
-

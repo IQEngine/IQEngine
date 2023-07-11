@@ -32,9 +32,9 @@ export const MetadataQuery = () => {
       if (selections[item].selected) {
         const Component = selections[item].component;
         return (
-          <Component 
-            key={item} 
-            queryName={item} 
+          <Component
+            key={item}
+            queryName={item}
             validator={selections[item].validator}
             description={selections[item].description}
             handleQueryValid={handleQueryValid}
@@ -104,7 +104,6 @@ export const MetadataQuery = () => {
       </div>
       {renderResults()}
     </div>
-    
   );
 }
 

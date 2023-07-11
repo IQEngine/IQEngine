@@ -107,7 +107,7 @@ describe('Test Results', () => {
         queryString=""
       />
     );
-    
+
   });
   test('Basic Rendering', async () => {
     render(

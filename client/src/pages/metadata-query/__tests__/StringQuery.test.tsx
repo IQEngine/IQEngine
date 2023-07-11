@@ -8,7 +8,6 @@ import StringQuery from '@/pages/metadata-query/StringQuery';
 describe('Test StringQuery', () => {
 
   test('Basic Rendering', () => {
-    
     render(
       <StringQuery
         queryName='test query'
@@ -43,7 +42,7 @@ describe('Test StringQuery', () => {
   test('Typing invalid text into the input calls the validator function and handleQueryInValid', () => {
     const validatorMock = vi.fn(() => false);
     const handleQueryInvalidMock = vi.fn();
-  
+
     render(
       <StringQuery
         queryName='test query'

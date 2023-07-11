@@ -20,7 +20,6 @@ export const DateQuery = ({
     const value = e.target.value;
     const newDateRange = {...dateRange};
     newDateRange[name] = value;
-    console.log(name, value);
     setDateRange(newDateRange);
     let valid = name === 'from' ? validator({from: value, to: dateRange.to}) : validator({from: dateRange.from, to: value});
     if (valid){

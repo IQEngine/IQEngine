@@ -3,8 +3,8 @@ import React from "react";
 import Band from './Band';
 
 export const MultipleSelection = ({
-  selected, 
-  handleSelection, 
+  selected,
+  handleSelection,
   bands
 }) => {
   return (
