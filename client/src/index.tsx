@@ -12,7 +12,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { FeatureFlagsProvider } from '@/hooks/useFeatureFlags';
 import { useIQEngineQueryClient } from '@/hooks/useIQEngineQueryClient';
 import { useIQEngineRouter } from '@/hooks/useIQEngineRouter';
-import { useIQEngineAuthProvider } from './hooks/useIQEngineAuthProvider';
+import { useIQEngineAuthProvider } from '@/auth/hooks/useIQEngineAuthProvider';
 
 const container = document.getElementById('root');
 if (!container) throw new Error('No root element found');

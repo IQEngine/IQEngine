@@ -1,5 +1,5 @@
 import { PublicClientApplication, EventType } from '@azure/msal-browser';
-import { msalConfig } from '@/authConfig';
+import { msalConfig } from '@/auth/authConfig';
 import { useConfigQuery } from '@/api/config/queries';
 import { MsalProvider } from '@azure/msal-react';
 import React from 'react';
