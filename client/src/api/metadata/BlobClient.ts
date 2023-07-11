@@ -71,23 +71,6 @@ export class BlobClient implements MetadataClient {
     return blobNameToMetadata(filePath, containerClient);
   }
 
-  async getDataSourceMeta(account: string, container: string): Promise<SigMFMetadata[]> {
-    const containerClient = getContainerClient(this.dataSources, account, container);
-    const blobNames: Array<string> = [];
-    for await (const i of containerClient.listBlobsFlat()) blobNames.push(i.name);
-    const blobsToProcess = blobNames.filter(
-      (blobName) =>
-        blobName.split('.').pop() === 'sigmf-meta' && blobNames.includes(blobName.split('.')[0] + '.sigmf-data')
-    );
-
-    let blobOperations = blobsToProcess.map(async (blobName) => {
-      return await blobNameToMetadata(blobName, containerClient);
-    });
-    let recordings = await Promise.all(blobOperations);
-    recordings = recordings.filter((recording) => recording !== null) as SigMFMetadata[];
-    return recordings.filter((recording) => recording !== null) as SigMFMetadata[];
-  }
-
   async getDataSourceMetaPaths(account: string, container: string): Promise<string[]> {
     const containerClient = getContainerClient(this.dataSources, account, container);
     const blobNames: Array<string> = [];
