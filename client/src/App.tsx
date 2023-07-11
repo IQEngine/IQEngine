@@ -193,8 +193,8 @@ export const App = () => {
                   </li>
                 </>
               ) : (
-                <li className="hidden md:block cursor-pointer">
-                  <a className="text-lg" onClick={handleLoginPopup}>
+                <li className="hidden md:block">
+                  <a className="text-lg cursor-pointer" onClick={handleLoginPopup}>
                     Login
                   </a>
                 </li>
