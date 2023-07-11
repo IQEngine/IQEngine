@@ -156,6 +156,34 @@ async def get_meta_thumbnail(
     )
 
 
+def process_geolocation(target: str, geolocation: str):
+    try:
+        geo_long_str, geo_lat_str, geo_radius_str = geolocation.split(",")
+        geo_long = float(geo_long_str)
+        geo_lat = float(geo_lat_str)
+        geo_radius = float(geo_radius_str)
+        target_field = ""
+        if target == "captures":
+            target_field = "captures.core:geolocation"
+        if target == "annotations":
+            target_field = "annotations.core:geolocation"
+
+        return {
+                target_field: {
+                    "$near": {
+                        "$geometry": {
+                            "type": "Point",
+                            "coordinates": [geo_long, geo_lat],
+                        },
+                        "$maxDistance": geo_radius,
+                    }
+                }
+            }
+
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid geolocation format, expected: long, lat, radius")
+
+
 @router.get(
     "/api/datasources/query",
     status_code=200,
@@ -173,9 +201,8 @@ def query_meta(
     min_datetime: Optional[datetime] = Query(None),
     max_datetime: Optional[datetime] = Query(None),
     text: Optional[str] = Query(None),
-    geo_lat: Optional[float] = Query(None),
-    geo_long: Optional[float] = Query(None),
-    geo_radius: Optional[float] = Query(None),
+    captures_geo: Optional[str] = Query(None),
+    annotations_geo: Optional[str] = Query(None),
     metadataSet: Collection[Metadata] = Depends(metadata_repo.collection),
 ):
     query_condition: Dict[str, Any] = {}
@@ -228,20 +255,10 @@ def query_meta(
             {"annotations.core:description": {"$regex": comment, "$options": "i"}}
         )
 
-    if geo_lat is not None and geo_long is not None and geo_radius is not None:
-        query_condition.update(
-            {
-                "global.core:geolocation": {
-                    "$near": {
-                        "$geometry": {
-                            "type": "Point",
-                            "coordinates": [geo_long, geo_lat],
-                        },
-                        "$maxDistance": geo_radius,
-                    }
-                }
-            }
-        )
+    if captures_geo:
+        query_condition.update(process_geolocation("captures", captures_geo))
+    if annotations_geo:
+        query_condition.update(process_geolocation("annotations", annotations_geo))
 
     if text is not None:
         or_condition = [
