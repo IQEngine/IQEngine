@@ -15,20 +15,6 @@ export const fetchMeta = async (
   return response;
 };
 
-const fetchDataSourceMeta = async (
-  client: MetadataClient,
-  queryClient: QueryClient,
-  type: string,
-  account: string,
-  container: string
-) => {
-  const response = await client.getDataSourceMeta(account, container);
-  for (const meta of response) {
-    queryClient.setQueryData(['datasource', type, account, container, meta.getOrigin().file_path, 'meta'], meta);
-  }
-  return response;
-};
-
 const updateDataSourceMeta = async (
   client: MetadataClient,
   account: string,
@@ -38,30 +24,6 @@ const updateDataSourceMeta = async (
 ) => {
   const response = await client.updateMeta(account, container, filePath, meta);
   return response;
-};
-
-export const getDataSourceMeta = (
-  client: QueryClient,
-  type: string,
-  account: string,
-  container: string,
-  enabled = true
-) => {
-  const { dataSourcesQuery, filesQuery } = useUserSettings();
-  if (!dataSourcesQuery.data || !filesQuery.data) {
-    return useQuery(['invalidQuery'], () => null);
-  }
-  return useQuery(
-    ['datasource', type, account, container, 'meta'],
-    () => {
-      const metadataClient = MetadataClientFactory(type, filesQuery.data, dataSourcesQuery.data);
-      return fetchDataSourceMeta(metadataClient, client, type, account, container);
-    },
-    {
-      enabled: enabled,
-      staleTime: Infinity,
-    }
-  );
 };
 
 export const useQueryDataSourceMetaPaths = (type: string, account: string, container: string, enabled = true) => {
