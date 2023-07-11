@@ -61,8 +61,8 @@ lint:
 
 lint-corrections:
 	@echo "Linting with megalinter and applying corrections..."
-	@docker run -v $(shell git rev-parse --show-toplevel):/tmp/lint ghcr.io/oxsecurity/megalinter:v6
+	@docker run -v $(shell git rev-parse --show-toplevel):/tmp/lint ghcr.io/oxsecurity/megalinter:v7
 
 lint-no-corrections:
 	@echo "Linting with megalinter..."
-	@docker run -e APPLY_FIXES=none -v $(shell git rev-parse --show-toplevel):/tmp/lint ghcr.io/oxsecurity/megalinter:v6
+	@docker run -e APPLY_FIXES=none -v $(shell git rev-parse --show-toplevel):/tmp/lint ghcr.io/oxsecurity/megalinter:v7

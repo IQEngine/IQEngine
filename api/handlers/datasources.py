@@ -1,6 +1,6 @@
 import httpx
-from database import datasource
-from database.datasource import datasource_exists
+from database import datasource_repo
+from database.datasource_repo import datasource_exists
 from database.models import DataSource
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
@@ -15,7 +15,7 @@ router = APIRouter()
 @router.post("/api/datasources", status_code=201, response_model=DataSource)
 def create_datasource(
     datasource: DataSource,
-    datasources: Collection[DataSource] = Depends(datasource.collection),
+    datasources: Collection[DataSource] = Depends(datasource_repo.collection),
 ):
     """
     Create a new datasource. The datasource will be henceforth identified by account/container which
@@ -33,7 +33,9 @@ def create_datasource(
 
 @router.get("/api/datasources", response_model=list[DataSource])
 def get_datasources(
-    datasources_collection: Collection[DataSource] = Depends(datasource.collection),
+    datasources_collection: Collection[DataSource] = Depends(
+        datasource_repo.collection
+    ),
 ):
     datasources = datasources_collection.find()
     result = []
@@ -48,7 +50,9 @@ def get_datasources(
 async def get_datasource_image(
     account: str,
     container: str,
-    datasources_collection: Collection[DataSource] = Depends(datasource.collection),
+    datasources_collection: Collection[DataSource] = Depends(
+        datasource_repo.collection
+    ),
 ):
     # Create the imageURL with sasToken
     datasource = datasources_collection.find_one(
@@ -81,7 +85,7 @@ async def get_datasource_image(
     "/api/datasources/{account}/{container}/datasource", response_model=DataSource
 )
 def get_datasource(
-    datasource: DataSource = Depends(datasource.get),
+    datasource: DataSource = Depends(datasource_repo.get),
 ):
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
@@ -94,7 +98,9 @@ def update_datasource(
     account: str,
     container: str,
     datasource: DataSource,
-    datasources_collection: Collection[DataSource] = Depends(datasource.collection),
+    datasources_collection: Collection[DataSource] = Depends(
+        datasource_repo.collection
+    ),
 ):
     existingDatasource = datasources_collection.find_one(
         {
