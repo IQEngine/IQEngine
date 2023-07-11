@@ -2,7 +2,7 @@ import SignalGenerator from '@/pages/signal-generator/SignalGenerator';
 import { createBrowserRouter } from 'react-router-dom';
 import React from 'react';
 import SwaggerUI from 'swagger-ui-react';
-import { useIQEngineProtectedRoute } from './useIQEngineProtectedRoute';
+import { useIQEngineProtectedRoute } from '@/auth/hooks/useIQEngineProtectedRoute';
 
 export function useIQEngineRouter() {
   const router = createBrowserRouter([

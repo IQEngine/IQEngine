@@ -268,16 +268,15 @@ def query_meta(
         ]
         query_condition.update({"$or": or_condition})
 
-    if min_datetime is not None:
-        min_datetime_formatted = min_datetime.strftime("%Y-%m-%dT%H:%M:%S")
-        query_condition.update(
-            {"captures.core:datetime": {"$gte": min_datetime_formatted}}
-        )
-    if max_datetime is not None:
-        max_datetime_formatted = max_datetime.strftime("%Y-%m-%dT%H:%M:%S")
-        query_condition.update(
-            {"captures.core:datetime": {"$lte": max_datetime_formatted}}
-        )
+    if min_datetime is not None or max_datetime is not None:
+        datetime_query = {}
+        if min_datetime is not None:
+            min_datetime_formatted = min_datetime.strftime("%Y-%m-%dT%H:%M:%S")
+            datetime_query.update({"$gte": min_datetime_formatted})
+        if max_datetime is not None:
+            max_datetime_formatted = max_datetime.strftime("%Y-%m-%dT%H:%M:%S")
+            datetime_query.update({"$lte": max_datetime_formatted})
+        query_condition.update({"captures.core:datetime": datetime_query})
 
     metadata = metadataSet.find(query_condition)
 
