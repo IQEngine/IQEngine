@@ -6,7 +6,7 @@ from asyncio import to_thread
 from typing import List
 
 from azure.storage.blob import BlobClient
-from database import datasource
+from database import datasource_repo
 from database.models import DataSource
 from fastapi import APIRouter, Depends, HTTPException
 from helpers.cipher import decrypt
@@ -25,7 +25,9 @@ class IQData(BaseModel):
 def get_sas_token(
     account: str,
     container: str,
-    datasources_collection: Collection[DataSource] = Depends(datasource.collection),
+    datasources_collection: Collection[DataSource] = Depends(
+        datasource_repo.collection
+    ),
 ):
     datasource = datasources_collection.find_one(
         {"account": account, "container": container}
