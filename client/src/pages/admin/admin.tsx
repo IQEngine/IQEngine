@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, Outlet } from 'react-router-dom';
 
 export const Admin = () => {
-  const [active, setActive] = React.useState(null);
+  const [active, setActive] = React.useState(0);
 
   return (
     <>

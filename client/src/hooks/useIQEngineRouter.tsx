@@ -39,13 +39,22 @@ export function useIQEngineRouter() {
           path: 'admin',
           async lazy() {
             let { Admin } = await import('@/pages/admin/admin');
+
             return {
               Component: () => {
                 return useIQEngineProtectedRoute(<Admin />);
               },
             };
           },
+
           children: [
+            {
+              path: '',
+              async lazy() {
+                let { Users } = await import('@/pages/admin/pages/users');
+                return { Component: Users };
+              },
+            },
             {
               path: 'data-sources',
               async lazy() {
