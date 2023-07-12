@@ -15,7 +15,7 @@ import { getDataSources } from '@/api/datasource/Queries';
 import { CLIENT_TYPE_API, CLIENT_TYPE_BLOB, DataSource } from '@/api/Models';
 import { useQueryClient } from '@tanstack/react-query';
 import Feature from '@/features/feature/Feature';
-import { FeatureFlag } from '@/hooks/useFeatureFlags';
+import { FeatureFlag } from '@/hooks/use-feature-flags';
 import { useUserSettings } from '@/api/user-settings/use-user-settings';
 
 export const RepoBrowser = () => {

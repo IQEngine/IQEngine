@@ -2,7 +2,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
-import { FeatureFlagsProvider } from '@/hooks/useFeatureFlags';
+import { FeatureFlagsProvider } from '@/hooks/use-feature-flags';
 import { vi } from 'vitest';
 
 Object.defineProperty(window, 'matchMedia', {
@@ -28,19 +28,17 @@ export const queryClient = new QueryClient({
   },
 });
 
-
-
 export const AllProviders = ({ children }) => (
-    <QueryClientProvider client={queryClient}>
-      <FeatureFlagsProvider flags={null}>
-        <Router>{children}</Router>
-      </FeatureFlagsProvider>
-    </QueryClientProvider>
+  <QueryClientProvider client={queryClient}>
+    <FeatureFlagsProvider flags={null}>
+      <Router>{children}</Router>
+    </FeatureFlagsProvider>
+  </QueryClientProvider>
 );
 
 export const useAllProviders = () => {
   return {
     wrapper: AllProviders,
-    queryClient
+    queryClient,
   };
 };

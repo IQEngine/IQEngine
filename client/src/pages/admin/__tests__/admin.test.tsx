@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import Admin from '@/pages/admin/admin';
 import '@testing-library/jest-dom';
 import React from 'react';
-import { AllProviders } from '@/mocks/setupTests';
+import { AllProviders } from '@/mocks/setup-tests';
 
 describe('Test Admin', () => {
   test('Basic Rendering', async () => {

@@ -11,11 +11,11 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'react-hot-toast';
 import Feature from '@/features/feature/Feature';
 import { Logo } from '@/features/ui/logo/Logo';
-import { FeatureFlag, useFeatureFlags } from '@/hooks/useFeatureFlags';
+import { FeatureFlag, useFeatureFlags } from '@/hooks/use-feature-flags';
 import { CLIENT_TYPE_BLOB, DataSource } from '@/api/Models';
 import { useUserSettings } from '@/api/user-settings/use-user-settings';
 import { useMsal } from '@azure/msal-react';
-import { loginRequest } from '@/auth/authConfig';
+import { loginRequest } from '@/auth/auth-config';
 
 export const App = () => {
   const { instance } = useMsal();

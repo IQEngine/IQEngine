@@ -2,9 +2,9 @@ import SignalGenerator from '@/pages/signal-generator/SignalGenerator';
 import { createBrowserRouter } from 'react-router-dom';
 import React from 'react';
 import SwaggerUI from 'swagger-ui-react';
-import { useIQEngineProtectedRoute } from '@/auth/hooks/useIQEngineProtectedRoute';
+import { useProtectedRoute } from '@/auth/hooks/use-protected-route';
 
-export function useIQEngineRouter() {
+export function useRouter() {
   const router = createBrowserRouter([
     {
       path: '/',
@@ -42,7 +42,7 @@ export function useIQEngineRouter() {
 
             return {
               Component: () => {
-                return useIQEngineProtectedRoute(<Admin />);
+                return useProtectedRoute(<Admin />);
               },
             };
           },

@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import Feature from '@/features/feature/Feature';
 import React from 'react';
 import '@testing-library/jest-dom';
-import { AllProviders } from '@/mocks/setupTests';
+import { AllProviders } from '@/mocks/setup-tests';
 
 describe('Test Feature flags', () => {
   test('Renders when true', async () => {
