@@ -3,13 +3,13 @@ import base64
 import io
 import logging
 from typing import List
-from helpers.urlmapping import ApiType, get_file_name
 
 from blob.azure_client import AzureBlobClient
 from database import datasource_repo
 from database.models import DataSource
 from fastapi import APIRouter, Depends, HTTPException
 from helpers.cipher import decrypt
+from helpers.urlmapping import ApiType, get_file_name
 from pydantic import BaseModel, SecretStr
 
 router = APIRouter()
@@ -78,6 +78,7 @@ async def download_blob(
     data = io.BytesIO(blob)
     encoded_data = base64.b64encode(data.getvalue()).decode("utf-8")
     return {"index": index, "data": encoded_data}
+
 
 @router.post(
     "/api/datasources/{account}/{container}/{filepath:path}/iqslices", status_code=200

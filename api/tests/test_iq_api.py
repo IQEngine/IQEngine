@@ -1,13 +1,14 @@
 import base64
 from unittest import mock
-from unittest.mock import Mock, patch
-from azure.storage.blob import BlobProperties
+from unittest.mock import Mock
 
+from azure.storage.blob import BlobProperties
 from tests.test_data import test_datasource, valid_metadata
 
 test_binary = b"the quick brown fox jumps over the lazy dog"
 test_blob_properties = BlobProperties()
 test_blob_properties.size = 100
+
 
 @mock.patch("handlers.iq.AzureBlobClient.set_sas_token", return_value=None)
 @mock.patch("handlers.iq.AzureBlobClient.get_blob_content", return_value=test_binary)
@@ -31,10 +32,18 @@ def test_get_iq(mock_get_blob_content, mock_set_sas_token, client):
     assert mock_get_blob_content.call_args[1]["length"] == 10
     assert mock_set_sas_token.call_count == 1
 
+
 @mock.patch("handlers.iq.AzureBlobClient.set_sas_token", return_value=None)
 @mock.patch("handlers.iq.AzureBlobClient.get_blob_content", return_value=test_binary)
-@mock.patch("handlers.iq.AzureBlobClient.get_blob_properties", return_value=test_blob_properties)
-def test_get_iq_data_slices(mock_set_sas_token: Mock, mock_get_blob_content: Mock, mock_get_blob_properties: Mock, client):
+@mock.patch(
+    "handlers.iq.AzureBlobClient.get_blob_properties", return_value=test_blob_properties
+)
+def test_get_iq_data_slices(
+    mock_set_sas_token: Mock,
+    mock_get_blob_content: Mock,
+    mock_get_blob_properties: Mock,
+    client,
+):
     mock_get_blob_properties.size = 100
     response = client.post("/api/datasources", json=test_datasource).json()
     response = client.post(
@@ -57,4 +66,3 @@ def test_get_iq_data_slices(mock_set_sas_token: Mock, mock_get_blob_content: Moc
     assert mock_get_blob_content.call_args_list[2][1]["length"] == 16
     assert mock_set_sas_token.call_count == 1
     assert mock_get_blob_properties.call_count == 1
-    
