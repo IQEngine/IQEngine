@@ -13,7 +13,7 @@ router = APIRouter()
 
 
 @router.post("/api/datasources", status_code=201, response_model=DataSource)
-def create_datasource(
+async def create_datasource(
     datasource: DataSource,
     datasources: Collection[DataSource] = Depends(datasource_repo.collection),
 ):
@@ -32,7 +32,7 @@ def create_datasource(
 
 
 @router.get("/api/datasources", response_model=list[DataSource])
-def get_datasources(
+async def get_datasources(
     datasources_collection: Collection[DataSource] = Depends(
         datasource_repo.collection
     ),
@@ -84,7 +84,7 @@ async def get_datasource_image(
 @router.get(
     "/api/datasources/{account}/{container}/datasource", response_model=DataSource
 )
-def get_datasource(
+async def get_datasource(
     datasource: DataSource = Depends(datasource_repo.get),
 ):
     if not datasource:
@@ -94,7 +94,7 @@ def get_datasource(
 
 
 @router.put("/api/datasources/{account}/{container}/datasource", status_code=204)
-def update_datasource(
+async def update_datasource(
     account: str,
     container: str,
     datasource: DataSource,
