@@ -45,6 +45,36 @@ export function useIQEngineRouter() {
               },
             };
           },
+          children: [
+            {
+              path: 'data-sources',
+              async lazy() {
+                let { DataSources } = await import('@/pages/admin/components/DataSources');
+                return { Component: DataSources };
+              },
+            },
+            {
+              path: 'configuration',
+              async lazy() {
+                let { Configuration } = await import('@/pages/admin/components/Configuration');
+                return { Component: Configuration };
+              },
+            },
+            {
+              path: 'plugins',
+              async lazy() {
+                let { Plugins } = await import('@/pages/admin/components/Plugins');
+                return { Component: Plugins };
+              },
+            },
+            {
+              path: 'users',
+              async lazy() {
+                let { Users } = await import('@/pages/admin/components/Users');
+                return { Component: Users };
+              },
+            },
+          ],
         },
         {
           path: 'validator',
