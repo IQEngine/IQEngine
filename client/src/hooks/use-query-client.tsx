@@ -1,7 +1,7 @@
 import { CLIENT_TYPE_BLOB } from '@/api/Models';
 import { QueryClient } from '@tanstack/react-query';
 
-export function useIQEngineQueryClient() {
+export function useQueryClient() {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {

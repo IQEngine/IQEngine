@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
-import { FeatureFlag } from '@/hooks/useFeatureFlags';
+import { FeatureFlag } from '@/hooks/use-feature-flags';
 
 const fetchConfig = async () => {
   try {

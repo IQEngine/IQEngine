@@ -3,7 +3,7 @@ import { render, screen, waitForElementToBeRemoved, waitFor } from '@testing-lib
 import App from '@/App';
 import React from 'react';
 import '@testing-library/jest-dom';
-import { AllProviders, queryClient } from '@/mocks/setupTests';
+import { AllProviders, queryClient } from '@/mocks/setup-tests';
 
 describe('Test Feature flags', () => {
   beforeEach(() => {
