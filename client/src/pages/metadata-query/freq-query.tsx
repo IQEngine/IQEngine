@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import BandSelection from './BandSelection';
+import BandSelection from './band-selection';
 
 export const FreqQuery = ({
   description,

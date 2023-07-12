@@ -3,6 +3,7 @@ import "leaflet/dist/leaflet.css";
 import { MapContainer, TileLayer, Marker, Circle, LayerGroup } from 'react-leaflet';
 import { Icon } from 'leaflet';
 
+import GeoQueryTypes from './geo-query-types';
 
 
 function DraggableMarker({updatePosition, defaultPosition, radius}) {
@@ -57,11 +58,16 @@ export const GeoQuery = ({
   const [position, setPosition] = useState(defaultCenter);
   const [radius, setRadius] = useState(defaultRadius);
   const [show, setShow] = useState(true);
+  const queryTypes = [
+    'captures',
+    'annotations'
+  ]
+  const [selectedQueryType, setSelectedQueryType] = useState('captures');
 
   const handleRadiusChange = (e) => {
     const value = parseInt(e.target.value);
     setRadius(value);
-    const valid = validator({lat: position.lat, lon: position.lng, radius: value});
+    const valid = validator({lat: position.lat, lon: position.lng, radius: value, queryType: selectedQueryType});
     handleQueryValid(queryName, valid);
   }
 
@@ -70,7 +76,7 @@ export const GeoQuery = ({
   }
 
   const handlePositionChange = (updatedPosition) => {
-    const valid = validator({lat: updatedPosition.lat, lon: updatedPosition.lng, radius: getRadius()});
+    const valid = validator({lat: updatedPosition.lat, lon: updatedPosition.lng, radius: getRadius(), queryType: selectedQueryType});
     setPosition(updatedPosition);
     handleQueryValid(queryName, valid);
   }
@@ -85,6 +91,11 @@ export const GeoQuery = ({
       {show && <div>
         <input onChange={handleRadiusChange} type="range" min={minRadius} max={maxRadius} value={radius} step={100} className="range range-success" />
         <div className="badge badge-lg mb-5">Radius: {radius}m</div>
+        <GeoQueryTypes 
+          types={queryTypes}
+          selected={selectedQueryType}
+          handleSelection={setSelectedQueryType}
+        />
         <MapContainer center={position} zoom={8} scrollWheelZoom={true}>
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

@@ -3,7 +3,7 @@ import { BrowserRouter } from 'react-router-dom'
 import { render, screen, fireEvent } from '@testing-library/react';
 import React from 'react';
 
-import Results from '@/pages/metadata-query/Results';
+import Results from '@/pages/metadata-query/results';
 import { SigMFMetadata, Annotation, CaptureSegment } from '@/utils/sigmfMetadata';
 import { queryMeta } from '@/api/metadata/Queries';
 

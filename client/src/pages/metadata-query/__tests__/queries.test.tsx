@@ -20,8 +20,8 @@ describe('Test query validation objects', () => {
     const lat = 1;
     const lon = 2;
     const radius = 3;
-    const expected = `geo_lat=${lat}&geo_long=${lon}&geo_radius=${radius}`;
-    const result = validator({lat, lon, radius});
+    const expected = `captures_geo=${lon},${lat},${radius}`;
+    const result = validator({lat, lon, radius, queryType: 'captures'});
     expect(result).toBe(expected);
   });
   test('author validation returns correct query string', () => {

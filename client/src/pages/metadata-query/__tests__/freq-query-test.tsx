@@ -3,7 +3,7 @@ import { render, screen, fireEvent} from '@testing-library/react';
 
 import React from 'react';
 
-import FreqQuery from '@/pages/metadata-query/FreqQuery';
+import FreqQuery from '@/pages/metadata-query/freq-query';
 
 describe('Test FreqQuery', () => {
   const mockName = 'frequency name';

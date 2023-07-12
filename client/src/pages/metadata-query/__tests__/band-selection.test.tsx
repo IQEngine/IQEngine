@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event'
 
 import React from 'react';
 
-import BandSelection from '@/pages/metadata-query/BandSelection';
+import BandSelection from '@/pages/metadata-query/band-selection';
 
 describe('Test BandSelection', () => {
 

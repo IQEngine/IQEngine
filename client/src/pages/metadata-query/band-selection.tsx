@@ -1,6 +1,6 @@
 import React from "react";
 
-import Band from './Band';
+import Band from './band';
 
 export const MultipleSelection = ({
   selected,

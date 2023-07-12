@@ -1,8 +1,8 @@
 import moment from 'moment';
-import { DateQuery } from "./DateQuery";
-import { StringQuery } from "./StringQuery";
-import { FreqQuery } from "./FreqQuery";
-import { GeoQuery } from './GeoQuery';
+import { DateQuery } from "./date-query";
+import { StringQuery } from "./string-query";
+import { FreqQuery } from "./freq-query";
+import { GeoQuery } from './geo-query';
 
 export const queries = {
   date: {
@@ -17,22 +17,22 @@ export const queries = {
       }
       return false;
     },
-    value: ""  
+    value: ""
   },
   geo: {
     component: GeoQuery,
     selected: false,
     description: "lat and long with radius for geo search",
-    validator: ({lat, lon, radius}) => {
-      return `geo_lat=${lat}&geo_long=${lon}&geo_radius=${radius}`;
+    validator: ({lat, lon, radius, queryType}) => {
+      return `${queryType}_geo=${lon},${lat},${radius}`
     },
-    value: ""  
+    value: ""
   },
   author: {
     component: StringQuery,
     selected: false,
     description: "The author of the document",
-    validator: (author: string) => {  
+    validator: (author: string) => {
       if (!author) {
         return false;
       }

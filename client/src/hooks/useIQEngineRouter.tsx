@@ -38,7 +38,7 @@ export function useIQEngineRouter(msalInstance) {
         {
           path: 'query',
           async lazy() {
-            let { MetadataQuery } = await import('@/pages/metadata-query/MetadataQuery');
+            let { MetadataQuery } = await import('@/pages/metadata-query/metadata-query');
             return { Component: MetadataQuery };
           },
         },

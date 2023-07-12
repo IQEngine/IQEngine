@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 
 import React from 'react';
 
-import StringQuery from '@/pages/metadata-query/StringQuery';
+import StringQuery from '@/pages/metadata-query/string-query';
 
 describe('Test StringQuery', () => {
 

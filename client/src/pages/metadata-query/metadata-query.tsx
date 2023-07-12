@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import Results from './Results';
+import Results from './results';
 import { queries} from './queries';
 
 
