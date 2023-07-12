@@ -1,27 +1,54 @@
 # vim: tabstop=4 shiftwidth=4 expandtab
 import os
+from unittest import mock
 
-from database.models import Metadata
+from database.models import Configuration, Metadata
 from tests.test_data import test_datasource, valid_metadata
 
 
 def test_api_get_config(client):
     os.environ["IQENGINE_CONNECTION_INFO"] = "{}"
     os.environ["IQENGINE_GOOGLE_ANALYTICS_KEY"] = "google_analytics_key"
-    os.environ["IQENGINE_FEATURE_FLAGS"] = "{}"
     os.environ["IQENGINE_INTERNAL_BRANDING"] = "internal_branding_string"
     os.environ["IQENGINE_APP_ID"] = "app_id"
     os.environ["IQENGINE_APP_AUTHORITY"] = "app_authority"
-    response = client.get("/api/config")
-    assert response.status_code == 200
-    assert response.json() == {
-        "connectionInfo": {},
-        "googleAnalyticsKey": "google_analytics_key",
-        "featureFlags": {},
-        "internalBranding": "internal_branding_string",
-        "appId": "app_id",
-        "appAuthority": "app_authority",
-    }
+
+    test_get_config = Configuration()
+
+    with mock.patch("handlers.config.get", return_value=test_get_config):
+        response = client.get("/api/config")
+        assert response.status_code == 200
+        assert response.json() == {
+            "connectionInfo": {"settings": None},
+            "googleAnalyticsKey": "google_analytics_key",
+            "featureFlags": {},
+            "internalBranding": "internal_branding_string",
+            "appId": "app_id",
+            "appAuthority": "app_authority",
+        }
+
+
+def test_api_get_config_feature_flags(client):
+    os.environ["IQENGINE_CONNECTION_INFO"] = "{}"
+    os.environ["IQENGINE_GOOGLE_ANALYTICS_KEY"] = "google_analytics_key"
+    os.environ["IQENGINE_INTERNAL_BRANDING"] = "internal_branding_string"
+    os.environ["IQENGINE_APP_ID"] = "app_id"
+    os.environ["IQENGINE_APP_AUTHORITY"] = "app_authority"
+
+    test_get_config = Configuration()
+    test_get_config.feature_flags = {"test": True}
+
+    with mock.patch("handlers.config.get", return_value=test_get_config):
+        response = client.get("/api/config")
+        assert response.status_code == 200
+        assert response.json() == {
+            "connectionInfo": {"settings": None},
+            "googleAnalyticsKey": "google_analytics_key",
+            "featureFlags": {"test": True},
+            "internalBranding": "internal_branding_string",
+            "appId": "app_id",
+            "appAuthority": "app_authority",
+        }
 
 
 def test_api_returns_ok(client):
