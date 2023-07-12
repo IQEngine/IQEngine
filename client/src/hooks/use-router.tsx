@@ -2,9 +2,9 @@ import SignalGenerator from '@/pages/signal-generator/SignalGenerator';
 import { createBrowserRouter } from 'react-router-dom';
 import React from 'react';
 import SwaggerUI from 'swagger-ui-react';
-import { useIQEngineProtectedRoute } from '@/auth/hooks/useIQEngineProtectedRoute';
+import { useProtectedRoute } from '@/auth/hooks/use-protected-route';
 
-export function useIQEngineRouter() {
+export function useRouter() {
   const router = createBrowserRouter([
     {
       path: '/',
@@ -38,13 +38,52 @@ export function useIQEngineRouter() {
         {
           path: 'admin',
           async lazy() {
-            let { Admin } = await import('@/pages/admin/Admin');
+            let { Admin } = await import('@/pages/admin/admin');
+
             return {
               Component: () => {
-                return useIQEngineProtectedRoute(<Admin />);
+                return useProtectedRoute(<Admin />);
               },
             };
           },
+
+          children: [
+            {
+              path: '',
+              async lazy() {
+                let { Users } = await import('@/pages/admin/pages/users');
+                return { Component: Users };
+              },
+            },
+            {
+              path: 'data-sources',
+              async lazy() {
+                let { DataSources } = await import('@/pages/admin/pages/data-sources');
+                return { Component: DataSources };
+              },
+            },
+            {
+              path: 'configuration',
+              async lazy() {
+                let { Configuration } = await import('@/pages/admin/pages/configuration');
+                return { Component: Configuration };
+              },
+            },
+            {
+              path: 'plugins',
+              async lazy() {
+                let { Plugins } = await import('@/pages/admin/pages/plugins');
+                return { Component: Plugins };
+              },
+            },
+            {
+              path: 'users',
+              async lazy() {
+                let { Users } = await import('@/pages/admin/pages/users');
+                return { Component: Users };
+              },
+            },
+          ],
         },
         {
           path: 'validator',

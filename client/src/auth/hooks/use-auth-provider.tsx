@@ -1,5 +1,5 @@
 import { PublicClientApplication, EventType } from '@azure/msal-browser';
-import { msalConfig } from '@/auth/authConfig';
+import { msalConfig } from '@/auth/auth-config';
 import { useConfigQuery } from '@/api/config/queries';
 import { MsalProvider } from '@azure/msal-react';
 import React from 'react';
@@ -24,6 +24,6 @@ export const AuthProvider = ({ children }) => {
   return <MsalProvider instance={msalInstance}>{children}</MsalProvider>;
 };
 
-export function useIQEngineAuthProvider() {
+export function useAuthProvider() {
   return { AuthProvider };
 }
