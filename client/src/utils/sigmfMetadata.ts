@@ -123,7 +123,7 @@ export class SigMFMetadata {
     const type = origin?.type ?? 'local';
     if (type === 'api') {
       return this.getFullFilePath() + '/thumbnail';
-    } else return this.getFullFilePath() + '.jpeg';
+    } else return this.getFullFilePath() + '.jpg';
   }
   getDataUrl() {
     const origin = this.global['traceability:origin'];
