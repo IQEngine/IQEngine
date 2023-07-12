@@ -1,7 +1,7 @@
 import { useAllProviders } from '@/mocks/setup-tests';
 import { render, renderHook } from '@testing-library/react';
 import nock from 'nock';
-import { useGetPluginsComponents } from '../useGetPluginsComponents';
+import { useGetPluginsComponents } from '@/pages/spectrogram/hooks/use-get-plugins-components';
 import React from 'react';
 
 describe('useGetPluginsComponents', () => {
@@ -11,7 +11,7 @@ describe('useGetPluginsComponents', () => {
     queryClient.clear();
   });
 
-  test('plugin option gets data from the plugins', async ({ expect }) => {
+  test('plugin option gets data from the plugins', async () => {
     const pluginTest = {
       name: 'test',
       url: 'http://localhost:3000/api/plugins/test',
@@ -26,12 +26,12 @@ describe('useGetPluginsComponents', () => {
       wrapper: wrapper,
     });
     const PluginOption = result.current.PluginOption;
-    const content = render(<PluginOption plugin={pluginTest} />, { wrapper: wrapper });
+    const content = render(<PluginOption plugin={pluginTest} groupIndex={0} />, { wrapper: wrapper });
     expect(await content.findByText('test1')).toBeInstanceOf(HTMLOptionElement);
     expect(await content.findByText('test2')).toBeInstanceOf(HTMLOptionElement);
   });
 
-  test('edit plugin parameters gets the correct inputs', async ({ expect }) => {
+  test('edit plugin parameters gets the correct inputs', async () => {
     const pluginUrl = 'http://localhost:8000/api/plugins/test';
     const { wrapper, queryClient } = useAllProviders();
     const parameters = {
