@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import Users from '@/pages/admin/components/Users';
+import Users from '@/pages/admin/pages/users';
 import '@testing-library/jest-dom';
 import React from 'react';
 

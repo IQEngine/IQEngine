@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import Admin from '@/pages/admin/Admin';
+import Admin from '@/pages/admin/admin';
 import '@testing-library/jest-dom';
 import React from 'react';
 import { AllProviders } from '@/mocks/setupTests';

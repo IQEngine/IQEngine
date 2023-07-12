@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import Configuration from '@/pages/admin/components/Configuration';
+import Configuration from '@/pages/admin/pages/configuration';
 import '@testing-library/jest-dom';
 import React from 'react';
 

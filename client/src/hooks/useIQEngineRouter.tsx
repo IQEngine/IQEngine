@@ -38,7 +38,7 @@ export function useIQEngineRouter() {
         {
           path: 'admin',
           async lazy() {
-            let { Admin } = await import('@/pages/admin/Admin');
+            let { Admin } = await import('@/pages/admin/admin');
             return {
               Component: () => {
                 return useIQEngineProtectedRoute(<Admin />);
@@ -49,28 +49,28 @@ export function useIQEngineRouter() {
             {
               path: 'data-sources',
               async lazy() {
-                let { DataSources } = await import('@/pages/admin/components/DataSources');
+                let { DataSources } = await import('@/pages/admin/pages/data-sources');
                 return { Component: DataSources };
               },
             },
             {
               path: 'configuration',
               async lazy() {
-                let { Configuration } = await import('@/pages/admin/components/Configuration');
+                let { Configuration } = await import('@/pages/admin/pages/configuration');
                 return { Component: Configuration };
               },
             },
             {
               path: 'plugins',
               async lazy() {
-                let { Plugins } = await import('@/pages/admin/components/Plugins');
+                let { Plugins } = await import('@/pages/admin/pages/plugins');
                 return { Component: Plugins };
               },
             },
             {
               path: 'users',
               async lazy() {
-                let { Users } = await import('@/pages/admin/components/Users');
+                let { Users } = await import('@/pages/admin/pages/users');
                 return { Component: Users };
               },
             },

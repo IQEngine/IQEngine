@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import DataSources from '@/pages/admin/components/DataSources';
+import DataSources from '@/pages/admin/pages/data-sources';
 import '@testing-library/jest-dom';
 import React from 'react';
 
