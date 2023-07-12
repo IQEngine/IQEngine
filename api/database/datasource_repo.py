@@ -1,14 +1,13 @@
 from database.database import db
 from database.models import DataSource
-from pymongo.collection import Collection
+from motor.motor_asyncio import AsyncIOMotorCollection
 
-
-def collection() -> Collection[DataSource]:
-    collection: Collection[DataSource] = db().datasources
+def collection() -> AsyncIOMotorCollection:
+    collection: AsyncIOMotorCollection = db().datasources
     return collection
 
 
-def get(account, container) -> DataSource:
+async def get(account, container) -> DataSource:
     """
     Get a datasource by account and container
 
@@ -25,13 +24,14 @@ def get(account, container) -> DataSource:
         The datasource.
     """
 
-    datasource = collection().find_one({"account": account, "container": container})
+    datasource_collection: AsyncIOMotorCollection = collection()
+    datasource = await datasource_collection.find_one({"account": account, "container": container})
     if datasource is None:
         return None
     return DataSource(**datasource)
 
 
-def datasource_exists(account, container) -> bool:
+async def datasource_exists(account, container) -> bool:
     """
     Check if a datasource exists by account and container
 
@@ -47,4 +47,4 @@ def datasource_exists(account, container) -> bool:
     bool
         True if the datasource exists, False otherwise.
     """
-    return get(account, container) is not None
+    return await get(account, container) is not None

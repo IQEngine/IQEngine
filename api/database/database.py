@@ -1,9 +1,8 @@
 import os
-
-import pymongo
+import asyncio
 import pymongo_inmemory
+from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorCollection
 from database.models import Metadata
-from pymongo.collection import Collection
 
 _db = None
 
@@ -11,13 +10,16 @@ _db = None
 def create_db_client():
     global _db
     connection_string = os.getenv("IQENGINE_METADATA_DB_CONNECTION_STRING")
-    _db = pymongo.MongoClient(connection_string)["IQEngine"]
+    loop = asyncio.new_event_loop()
+    _db = AsyncIOMotorClient(connection_string,io_loop=loop)["IQEngine"]
     return _db
 
 
 def create_in_memory_db_client():
-    global _db
-    _db = pymongo_inmemory.MongoClient()["IQEngine"]
+    global _db, in_memory_db
+    in_memory_db = pymongo_inmemory.MongoClient('localhost',27017)["IQEngine"]
+    loop = asyncio.new_event_loop()
+    _db = AsyncIOMotorClient('localhost',27017, io_loop=loop)["IQEngine"]
     return _db
 
 
@@ -32,5 +34,5 @@ def db():
 
 
 def plugins_collection():
-    collection: Collection[Metadata] = db().plugins
+    collection:  AsyncIOMotorCollection = db().plugins
     return collection
