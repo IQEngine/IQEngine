@@ -5,7 +5,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from motor.core import AgnosticDatabase
 
 _db: AgnosticDatabase = None
-
+in_memory_db: pymongo_inmemory.MongoClient = None
 
 def create_db_client() -> AgnosticDatabase:
     global _db
@@ -29,6 +29,7 @@ def db() -> AgnosticDatabase:
         else:
             _db = create_db_client()
     return _db
+
 
 async def reset_db():
     global _db
