@@ -64,7 +64,8 @@ export const SpectrogramPage = () => {
   const [timeSelectionEnd, setTimeSelectionEnd] = useState(10);
   const [freqSelectionLower, setFreqSelectionLower] = useState(0); // between -0.5 and 0.5
   const [freqSelectionUpper, setFreqSelectionUpper] = useState(0); // between -0.5 and 0.5
-  const [cursorsEnabled, setCursorsEnabled] = useState(false);
+  const [timeCursorsEnabled, setTimeCursorsEnabled] = useState(false);
+  const [freqCursorsEnabled, setFreqCursorsEnabled] = useState(false);
   const [currentTab, setCurrentTab] = useState('spectrogram');
   const [pyodide, setPyodide] = useState(null);
   const [handleTop, setHandleTop] = useState(0);
@@ -318,11 +319,13 @@ export const SpectrogramPage = () => {
             updateWindowChange={setFFTWindow}
             magnitudeMax={magnitudeMax}
             magnitudeMin={magnitudeMin}
-            cursorsEnabled={cursorsEnabled}
-            handleProcessTime={handleProcessTime}
-            toggleCursors={(e) => {
-              setCursorsEnabled(e.target.checked);
+            toggleTimeCursors={(e) => {
+              setTimeCursorsEnabled(e.target.checked);
             }}
+            toggleFreqCursors={(e) => {
+              setFreqCursorsEnabled(e.target.checked);
+            }}
+            handleProcessTime={handleProcessTime}
             toggleIncludeRfFreq={toggleIncludeRfFreq}
             updateZoomLevel={setZoomLevel}
             zoomLevel={zoomLevel}
@@ -420,7 +423,7 @@ export const SpectrogramPage = () => {
                         selectedAnnotation={selectedAnnotation}
                         setSelectedAnnotation={setSelectedAnnotation}
                       />
-                      {cursorsEnabled && (
+                      {timeCursorsEnabled && (
                         <TimeSelector
                           spectrogramWidth={spectrogramWidth}
                           spectrogramHeight={spectrogramHeight}
@@ -431,7 +434,7 @@ export const SpectrogramPage = () => {
                           sampleRate={meta?.getSampleRate()}
                         />
                       )}
-                      {cursorsEnabled && (
+                      {freqCursorsEnabled && (
                         <FreqSelector
                           spectrogramWidth={spectrogramWidth}
                           spectrogramHeight={spectrogramHeight}
