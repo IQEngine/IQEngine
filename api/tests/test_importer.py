@@ -13,8 +13,6 @@ async def test_import_plugins_from_env(mock_collection):
     os.environ[
         "IQENGINE_PLUGINS"
     ] = '[{"name": "test_plugin", "url": "http://test_plugin"}]'
-    # Mock plugins_collection from database.database
-    # from database.database import plugins_collection
     os.environ["IQENGINE_FEATURE_FLAGS"] = '{"test": true}'
 
     mock_collection.return_value.find_one = AsyncMock()
@@ -33,8 +31,6 @@ async def test_import_feature_flags_from_env(mock_collection):
     os.environ[
         "IQENGINE_PLUGINS"
     ] = '[{"name": "test_plugin", "url": "http://test_plugin"}]'
-    # Mock plugins_collection from database.database
-    # from database.database import plugins_collection
     os.environ["IQENGINE_FEATURE_FLAGS"] = '{"test": true}'
 
     mock_collection.return_value.insert_one = AsyncMock()
@@ -51,8 +47,6 @@ async def test_import_all_from_env_with_broken_plugin(mock_collection):
     os.environ[
         "IQENGINE_PLUGINS"
     ] = '["name": "test_plugin", "url": "http://test_plugin"}]'
-    # Mock plugins_collection from database.database
-    # from database.database import plugins_collection
 
     mock_collection.return_value.find_one = AsyncMock()
     mock_collection.return_value.find_one.return_value = None
@@ -72,8 +66,6 @@ async def test_import_feature_flags_from_env_update(mock_get, mock_collection):
     os.environ[
         "IQENGINE_PLUGINS"
     ] = '[{"name": "test_plugin", "url": "http://test_plugin"}]'
-    # Mock plugins_collection from database.database
-    # from database.database import plugins_collection
     os.environ["IQENGINE_FEATURE_FLAGS"] = '{"test": true}'
 
     test_config = Configuration()
@@ -98,8 +90,6 @@ async def test_import_feature_flags_from_env_no_insert_or_update(
     os.environ[
         "IQENGINE_PLUGINS"
     ] = '[{"name": "test_plugin", "url": "http://test_plugin"}]'
-    # Mock plugins_collection from database.database
-    # from database.database import plugins_collection
     os.environ["IQENGINE_FEATURE_FLAGS"] = '{"test": true}'
 
     test_config = Configuration()
