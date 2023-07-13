@@ -267,7 +267,7 @@ async def query_meta(
     metadata = metadataSet.find(query_condition)
 
     result = []
-    for datum in metadata:
+    async for datum in metadata:
         result.append(datum)
     return result
 

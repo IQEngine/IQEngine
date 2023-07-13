@@ -34,6 +34,7 @@ async def reset_db():
     global _db
     if _db is None:
         return
-    await _db.client.drop_database("IQEngine")
+    if "IN_MEMORY_DB" in os.environ and os.environ["IN_MEMORY_DB"] != str("0"):
+        await _db.client.drop_database("IQEngine")
     _db.client.close()
     _db = None
