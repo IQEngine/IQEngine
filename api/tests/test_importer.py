@@ -4,6 +4,7 @@ from unittest.mock import AsyncMock, Mock, patch
 import pytest
 from importer.all import import_all_from_env
 
+
 @pytest.mark.asyncio
 async def test_import_plugins_from_env():
     os.environ[
@@ -22,6 +23,7 @@ async def test_import_plugins_from_env():
         await import_all_from_env()
         mock_collection.insert_one.assert_called_once()
         mock_collection.find_one.assert_called_once()
+
 
 @pytest.mark.asyncio
 async def test_import_feature_flags_from_env():
@@ -62,6 +64,7 @@ async def test_import_all_from_env_with_broken_plugin(client):
                 0
             ] == "Failed to load plugins from environment variable IQENGINE_PLUGINS"
 
+
 @pytest.mark.asyncio
 async def test_import_feature_flags_from_env_update():
     os.environ[
@@ -81,6 +84,7 @@ async def test_import_feature_flags_from_env_update():
             mockGetCall.return_value = mock_get_config
             await import_all_from_env()
             mock_collection.update_one.assert_called_once()
+
 
 @pytest.mark.asyncio
 async def test_import_feature_flags_from_env_no_insert_or_update():

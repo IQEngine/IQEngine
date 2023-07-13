@@ -29,6 +29,7 @@ async def test_api_get_config(client):
             "appAuthority": "app_authority",
         }
 
+
 @pytest.mark.asyncio
 async def test_api_get_config_feature_flags(client):
     os.environ["IQENGINE_CONNECTION_INFO"] = "{}"

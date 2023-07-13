@@ -94,6 +94,7 @@ class ConnectionInfo(BaseModel):
     class Config:
         extra = Extra.allow
 
+
 class Configuration(BaseModel):
     connection_info: ConnectionInfo = Field({}, alias="connectionInfo")
     feature_flags: FeatureFlags = Field({}, alias="featureFlags")

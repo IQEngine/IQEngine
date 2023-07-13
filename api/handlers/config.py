@@ -35,6 +35,7 @@ async def get_config():
 
     return configuration
 
+
 @router.put("/api/config", status_code=200)
 async def update_config(
     config: Configuration,
