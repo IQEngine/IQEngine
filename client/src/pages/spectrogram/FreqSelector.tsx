@@ -69,6 +69,7 @@ const FreqSelector = (props) => {
             height={spectrogramHeight}
             fill="black"
             opacity={0.4}
+            listening={false}
           />
 
           <Rect

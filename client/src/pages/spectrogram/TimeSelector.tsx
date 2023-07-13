@@ -81,6 +81,7 @@ const TimeSelector = (props) => {
             height={((endTileNum - startTileNum) / tileDiff) * spectrogramHeight}
             fill="black"
             opacity={0.4}
+            listening={false}
           />
 
           <Rect
