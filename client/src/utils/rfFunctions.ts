@@ -32,6 +32,7 @@ export function getFrequency(freq: number) {
   }
 
   if (freq?.toString().length >= 7) {
+    freq = Math.round(freq / 1e3) * 1e3;
     return { freq: freq / 1e6, unit: 'MHz' };
   }
 

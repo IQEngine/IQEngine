@@ -14,6 +14,7 @@ import { RulerTop } from './RulerTop';
 import { RulerSide } from './RulerSide';
 import { INITIAL_PYTHON_SNIPPET, TILE_SIZE_IN_IQ_SAMPLES, COLORMAP_DEFAULT, MINIMAP_FFT_SIZE } from '@/utils/constants';
 import TimeSelector from './TimeSelector';
+import FreqSelector from './FreqSelector';
 import AnnotationList from '@/pages/spectrogram/components/annotation/AnnotationList';
 import { GlobalProperties } from '@/pages/spectrogram/components/global-properties/GlobalProperties';
 import { MetaViewer } from '@/pages/spectrogram/components/metadata/MetaViewer';
@@ -61,6 +62,8 @@ export const SpectrogramPage = () => {
   const [spectrogramWidth, setSpectrogramWidth] = useState(1000);
   const [timeSelectionStart, setTimeSelectionStart] = useState(0);
   const [timeSelectionEnd, setTimeSelectionEnd] = useState(10);
+  const [freqSelectionLower, setFreqSelectionLower] = useState(0); // between -0.5 and 0.5
+  const [freqSelectionUpper, setFreqSelectionUpper] = useState(0); // between -0.5 and 0.5
   const [cursorsEnabled, setCursorsEnabled] = useState(false);
   const [currentTab, setCurrentTab] = useState('spectrogram');
   const [pyodide, setPyodide] = useState(null);
@@ -425,6 +428,15 @@ export const SpectrogramPage = () => {
                           lowerTile={lowerTile}
                           handleTimeSelectionStart={setTimeSelectionStart}
                           handleTimeSelectionEnd={setTimeSelectionEnd}
+                        />
+                      )}
+                      {cursorsEnabled && (
+                        <FreqSelector
+                          spectrogramWidth={spectrogramWidth}
+                          spectrogramHeight={spectrogramHeight}
+                          setFreqSelectionLower={setFreqSelectionLower}
+                          setFreqSelectionUpper={setFreqSelectionUpper}
+                          sampleRate={meta?.getSampleRate()}
                         />
                       )}
                     </Stage>

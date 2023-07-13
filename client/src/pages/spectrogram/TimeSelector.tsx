@@ -28,7 +28,7 @@ const TimeSelector = (props) => {
   useEffectOnce(() => {
     handleTimeSelectionStart(startTileNum);
     handleTimeSelectionEnd(endTileNum);
-  }, []); // dont put dep here
+  }); // dont put dep here
 
   // Sample-start bar
   const handleDragMoveStart = (e) => {
