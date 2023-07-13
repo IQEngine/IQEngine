@@ -7,14 +7,14 @@ router = APIRouter()
 
 
 @router.get("/api/status")
-def get_status(
+async def get_status(
     datasources_collection: AsyncIOMotorCollection = Depends(
         datasource_repo.collection
     ),
 ):
     # Validate system functionality
     try:
-        datasources_collection.database.command("ping")
+        await datasources_collection.database.command("ping")
     except ServerSelectionTimeoutError:
         return "No Database Connection Available"
     return "OK"

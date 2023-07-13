@@ -6,8 +6,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from helpers.cipher import encrypt
 from helpers.urlmapping import ApiType, add_URL_sasToken
-from pydantic import SecretStr
 from motor.motor_asyncio import AsyncIOMotorCollection
+from pydantic import SecretStr
 
 router = APIRouter()
 
@@ -21,7 +21,7 @@ async def create_datasource(
     Create a new datasource. The datasource will be henceforth identified by account/container which
     must be unique or this function will return a 400.
     """
-    if datasource_exists(datasource.account, datasource.container):
+    if await datasource_exists(datasource.account, datasource.container):
         raise HTTPException(status_code=409, detail="Datasource Already Exists")
 
     if datasource.sasToken:

@@ -8,6 +8,7 @@ from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, R
 from fastapi.responses import StreamingResponse
 from helpers.cipher import decrypt
 from helpers.urlmapping import ApiType, get_content_type, get_file_name
+from motor.core import AgnosticCollection
 from motor.motor_asyncio import AsyncIOMotorCollection
 
 router = APIRouter()
@@ -21,7 +22,7 @@ router = APIRouter()
 async def get_all_meta(
     account,
     container,
-    metadatas: AsyncIOMotorCollection = Depends(metadata_repo.collection),
+    metadatas: AgnosticCollection = Depends(metadata_repo.collection),
 ):
     # TODO: Should we validate datasource_id?
 
@@ -47,7 +48,7 @@ async def get_all_meta(
 async def get_all_meta_name(
     account,
     container,
-    metadatas: AsyncIOMotorCollection = Depends(metadata_repo.collection),
+    metadatas: AgnosticCollection = Depends(metadata_repo.collection),
 ):
     metadata = metadatas.find(
         {
@@ -117,7 +118,7 @@ async def get_meta_thumbnail(
     thumbnail_path = get_file_name(filepath, ApiType.THUMB)
     content_type = get_content_type(ApiType.THUMB)
     if not await azure_client.blob_exist(thumbnail_path):
-        metadata = metadata_repo.get(
+        metadata = await metadata_repo.get(
             datasource.account,
             datasource.container,
             filepath,
@@ -187,7 +188,7 @@ async def query_meta(
     text: Optional[str] = Query(None),
     captures_geo: Optional[str] = Query(None),
     annotations_geo: Optional[str] = Query(None),
-    metadataSet: AsyncIOMotorCollection = Depends(metadata_repo.collection),
+    metadataSet: AgnosticCollection = Depends(metadata_repo.collection),
 ):
     query_condition: Dict[str, Any] = {}
     if account:
@@ -267,7 +268,7 @@ async def query_meta(
     metadata = metadataSet.find(query_condition)
 
     result = []
-    async for datum in metadata:
+    for datum in metadata:
         result.append(datum)
     return result
 
@@ -287,7 +288,9 @@ async def create_meta(
     versions: AsyncIOMotorCollection = Depends(metadata_repo.versions_collection),
 ):
     # Check datasource id is valid
-    datasource = datasources.find_one({"account": account, "container": container})
+    datasource = await datasources.find_one(
+        {"account": account, "container": container}
+    )
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
 

@@ -1,6 +1,7 @@
 from unittest import mock
 from unittest.mock import Mock
 
+import pytest
 from database import datasource_repo
 from database.models import DataSource, Metadata
 from tests.test_data import test_datasource, valid_metadata
@@ -19,6 +20,7 @@ def override_dependency_datasource_repo_get():
     return_value=Metadata(**valid_metadata),
 )
 @mock.patch("handlers.metadata.decrypt", return_value="secret")
+@pytest.mark.asyncio
 def test_api_get_thumbnail_with_image(
     mock_decrypt: Mock,
     mock_get_metadata: Mock,
@@ -51,6 +53,7 @@ def test_api_get_thumbnail_with_image(
 )
 @mock.patch("handlers.metadata.AzureBlobClient.upload_blob", return_value=None)
 @mock.patch("handlers.metadata.decrypt", return_value="secret")
+@pytest.mark.asyncio
 def test_api_get_thumbnail_with_no_image(
     mock_decrypt: Mock,
     mock_upload_blob: Mock,

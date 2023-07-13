@@ -1,15 +1,15 @@
 from database.database import db
 from database.models import Metadata
-from motor.motor_asyncio import AsyncIOMotorCollection
+from motor.core import AgnosticCollection
 
 
-def collection():
-    collection: AsyncIOMotorCollection = db().metadata
+def collection() -> AgnosticCollection:
+    collection: AgnosticCollection = db().metadata
     return collection
 
 
-def versions_collection():
-    collection: AsyncIOMotorCollection = db().versions
+def versions_collection() -> AgnosticCollection:
+    collection: AgnosticCollection = db().versions
     return collection
 
 
@@ -31,7 +31,7 @@ async def get(account, container, filepath) -> Metadata:
     Metadata
         The Sigmf metadata.
     """
-    metadata_collection: AsyncIOMotorCollection = collection()
+    metadata_collection: AgnosticCollection = collection()
     metadata = await metadata_collection.find_one(
         {
             "global.traceability:origin.account": account,

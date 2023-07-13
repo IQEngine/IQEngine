@@ -1,9 +1,10 @@
 from database.database import db
 from database.models import DataSource
-from motor.motor_asyncio import AsyncIOMotorCollection
+from motor.core import AgnosticCollection
 
-def collection() -> AsyncIOMotorCollection:
-    collection: AsyncIOMotorCollection = db().datasources
+
+def collection() -> AgnosticCollection:
+    collection: AgnosticCollection = db().datasources
     return collection
 
 
@@ -24,8 +25,10 @@ async def get(account, container) -> DataSource:
         The datasource.
     """
 
-    datasource_collection: AsyncIOMotorCollection = collection()
-    datasource = await datasource_collection.find_one({"account": account, "container": container})
+    datasource_collection: AgnosticCollection = collection()
+    datasource = await datasource_collection.find_one(
+        {"account": account, "container": container}
+    )
     if datasource is None:
         return None
     return DataSource(**datasource)
