@@ -40,7 +40,7 @@ async def test_import_feature_flags_from_env():
         mock_collection.insert_one.assert_called_once()
 
 
-d@pytest.mark.asyncio
+@pytest.mark.asyncio
 async def test_import_all_from_env_with_broken_plugin(client):
     os.environ[
         "IQENGINE_PLUGINS"
