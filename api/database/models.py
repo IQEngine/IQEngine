@@ -91,8 +91,8 @@ class FeatureFlags(BaseModel):
 
 
 class ConnectionInfo(BaseModel):
-    settings: list[DataSource] = Field(None, alias="settings")
-
+    class Config:
+        extra = Extra.allow
 
 class Configuration(BaseModel):
     connection_info: ConnectionInfo = Field({}, alias="connectionInfo")

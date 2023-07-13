@@ -19,7 +19,7 @@ def test_api_get_config(client):
         response = client.get("/api/config")
         assert response.status_code == 200
         assert response.json() == {
-            "connectionInfo": {"settings": None},
+            "connectionInfo": {},
             "googleAnalyticsKey": "google_analytics_key",
             "featureFlags": {},
             "internalBranding": "internal_branding_string",
@@ -42,7 +42,7 @@ def test_api_get_config_feature_flags(client):
         response = client.get("/api/config")
         assert response.status_code == 200
         assert response.json() == {
-            "connectionInfo": {"settings": None},
+            "connectionInfo": {},
             "googleAnalyticsKey": "google_analytics_key",
             "featureFlags": {"test": True},
             "internalBranding": "internal_branding_string",
