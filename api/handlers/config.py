@@ -11,7 +11,10 @@ router = APIRouter()
 
 
 @router.get("/api/config", status_code=200, response_model=Configuration)
-async def get_config():
+async def get_config():    
+    """
+    get the IQEngine configuration
+    """
     configuration = await get()
 
     if configuration is None:
@@ -41,6 +44,9 @@ async def update_config(
     config: Configuration,
     configuration: AgnosticCollection = Depends(config_repo.collection),
 ):
+    """
+    update the IQEngine configuration
+    """
     if not (await exists()):
         raise HTTPException(status_code=409, detail="Configuration does not exist")
 
