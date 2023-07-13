@@ -9,7 +9,6 @@ from fastapi.responses import StreamingResponse
 from helpers.cipher import decrypt
 from helpers.urlmapping import ApiType, get_content_type, get_file_name
 from motor.core import AgnosticCollection
-from motor.motor_asyncio import AsyncIOMotorCollection
 
 router = APIRouter()
 
@@ -283,9 +282,9 @@ async def create_meta(
     container: str,
     filepath: str,
     metadata: Metadata,
-    datasources: AsyncIOMotorCollection = Depends(datasource_repo.collection),
-    metadatas: AsyncIOMotorCollection = Depends(metadata_repo.collection),
-    versions: AsyncIOMotorCollection = Depends(metadata_repo.versions_collection),
+    datasources: AgnosticCollection = Depends(datasource_repo.collection),
+    metadatas: AgnosticCollection = Depends(metadata_repo.collection),
+    versions: AgnosticCollection = Depends(metadata_repo.versions_collection),
 ):
     # Check datasource id is valid
     datasource = await datasources.find_one(
@@ -332,8 +331,8 @@ async def update_meta(
     container,
     filepath,
     metadata: Metadata,
-    metadatas: AsyncIOMotorCollection = Depends(metadata_repo.collection),
-    versions: AsyncIOMotorCollection = Depends(metadata_repo.versions_collection),
+    metadatas: AgnosticCollection = Depends(metadata_repo.collection),
+    versions: AgnosticCollection = Depends(metadata_repo.versions_collection),
 ):
     current = await metadatas.find_one(
         {
