@@ -19,7 +19,7 @@ async def import_plugins_from_env(environment_variable_name="IQENGINE_PLUGINS"):
         for plugin in plugins:
             if await client.find_one({"name": plugin["name"]}, {"_id": 1}):
                 continue
-            client.insert_one(plugin)
+            await client.insert_one(plugin)
     except Exception as e:
         # throw a custom plugin failed to load exception
         raise Exception(

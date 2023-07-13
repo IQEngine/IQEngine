@@ -1,5 +1,7 @@
 from unittest.mock import MagicMock
 
+import pytest
+
 from database import metadata_repo
 from main import app
 
@@ -12,7 +14,8 @@ def override_metadata_collection():
     return mock_collection
 
 
-def test_query_meta_success(client):
+@pytest.mark.asyncio
+async def test_query_meta_success(client):
     account = "test_account"
     container = "test_container"
     query_condition = "min_frequency=8486280000&max_frequency=8486290000"

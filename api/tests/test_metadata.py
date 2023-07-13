@@ -21,7 +21,7 @@ def override_dependency_datasource_repo_get():
 )
 @mock.patch("handlers.metadata.decrypt", return_value="secret")
 @pytest.mark.asyncio
-def test_api_get_thumbnail_with_image(
+async def test_api_get_thumbnail_with_image(
     mock_decrypt: Mock,
     mock_get_metadata: Mock,
     mock_get_blob_content: Mock,
@@ -54,7 +54,7 @@ def test_api_get_thumbnail_with_image(
 @mock.patch("handlers.metadata.AzureBlobClient.upload_blob", return_value=None)
 @mock.patch("handlers.metadata.decrypt", return_value="secret")
 @pytest.mark.asyncio
-def test_api_get_thumbnail_with_no_image(
+async def test_api_get_thumbnail_with_no_image(
     mock_decrypt: Mock,
     mock_upload_blob: Mock,
     mock_get_new_thumbnail: Mock,

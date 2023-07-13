@@ -15,7 +15,7 @@ test_blob_properties.size = 100
 @mock.patch("handlers.iq.AzureBlobClient.set_sas_token", return_value=None)
 @mock.patch("handlers.iq.AzureBlobClient.get_blob_content", return_value=test_binary)
 @pytest.mark.asyncio
-def test_get_iq(mock_get_blob_content, mock_set_sas_token, client: TestClient):
+async def test_get_iq(mock_get_blob_content, mock_set_sas_token, client: TestClient):
     response = client.post("/api/datasources", json=test_datasource).json()
     response = client.post(
         f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path/meta',
@@ -42,7 +42,7 @@ def test_get_iq(mock_get_blob_content, mock_set_sas_token, client: TestClient):
     "handlers.iq.AzureBlobClient.get_blob_properties", return_value=test_blob_properties
 )
 @pytest.mark.asyncio
-def test_get_iq_data_slices(
+async def test_get_iq_data_slices(
     mock_set_sas_token: Mock,
     mock_get_blob_content: Mock,
     mock_get_blob_properties: Mock,

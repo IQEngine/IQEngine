@@ -26,14 +26,6 @@ async def test_api_get_config(client):
     }
 
 
-# @pytest.mark.anyio
-# async def test_api_returns_ok():
-#     async with AsyncClient(app=app, base_url="http://test") as client:
-#         response = await client.get("/api/status")
-#         assert response.status_code == 200
-#         assert response.json() == "OK"
-
-
 # This test no longer valid as URL will never be valid with made up account and container
 @pytest.mark.asyncio
 async def test_api_post_meta_bad_datasource_id(client):
@@ -55,7 +47,7 @@ async def test_api_post_meta_missing_datasource(client):
 
 
 @pytest.mark.asyncio
-def test_api_post_meta(client):
+async def test_api_post_meta(client):
     client.post("/api/datasources", json=test_datasource).json()
     response = client.post(
         f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path/meta',
@@ -85,7 +77,7 @@ def test_api_post_meta(client):
 
 
 @pytest.mark.asyncio
-def test_api_post_existing_meta(client):
+async def test_api_post_existing_meta(client):
     client.post("/api/datasources", json=test_datasource).json()
     response = client.post(
         f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path/meta',
@@ -100,7 +92,7 @@ def test_api_post_existing_meta(client):
 
 
 @pytest.mark.asyncio
-def test_api_put_meta(client):
+async def test_api_put_meta(client):
     client.post("/api/datasources", json=test_datasource).json()
     response = client.post(
         f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path/meta',
@@ -115,7 +107,7 @@ def test_api_put_meta(client):
 
 
 @pytest.mark.asyncio
-def test_api_put_meta_not_existing(client):
+async def test_api_put_meta_not_existing(client):
     client.post("/api/datasources", json=test_datasource).json()
     response = client.put(
         f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path/meta',
@@ -125,7 +117,7 @@ def test_api_put_meta_not_existing(client):
 
 
 @pytest.mark.asyncio
-def test_api_get_meta(client):
+async def test_api_get_meta(client):
     client.post("/api/datasources", json=test_datasource).json()
     response = client.post(
         f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path/meta',
@@ -279,7 +271,7 @@ async def test_api_filename_non_url_encoded(client):
 
 
 @pytest.mark.asyncio
-def test_api_update_file_version(client):
+async def test_api_update_file_version(client):
     client.post("/api/datasources", json=test_datasource).json()
     response = client.post(
         f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file/path/meta',
