@@ -13,11 +13,13 @@ async def env_setup():
     yield
     db._db = None
 
+
 @pytest_asyncio.fixture(scope="function")
 def client():
-    with mock.patch('importer.all.import_all_from_env') as mock_i:
+    with mock.patch("importer.all.import_all_from_env") as mock_i:
         mock_i.return_value = None
         from main import app
+
         app.add_event_handler("shutdown", db.reset_db)
         with TestClient(app) as test_client:
             yield test_client
