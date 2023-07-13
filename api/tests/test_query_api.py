@@ -9,8 +9,15 @@ from .test_data import valid_metadata_array
 
 
 def override_metadata_collection():
+    # mock_collection = MagicMock()
+    # mock_collection.find.return_value = valid_metadata_array
+    # return mock_collection
+    async def async_generator():
+        for item in valid_metadata_array:
+            yield item
+
     mock_collection = MagicMock()
-    mock_collection.find.return_value = valid_metadata_array
+    mock_collection.find.return_value = async_generator()
     return mock_collection
 
 
