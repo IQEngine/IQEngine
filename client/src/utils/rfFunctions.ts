@@ -79,6 +79,27 @@ export function getSeconds(time: number) {
   return { time: timePico, unit: 'ps' };
 }
 
+// Prints a number of samples, using units most appropriate
+export function getSamples(samples: number) {
+  if (!samples || isNaN(samples)) return { samples: 0, unit: '' };
+
+  samples = Number(samples.toFixed(0));
+  if (samples?.toString().length >= 10) {
+    return { samples: samples / 1e9, unit: 'B' };
+  }
+
+  if (samples?.toString().length >= 7) {
+    samples = Math.round(samples / 1e3) * 1e3;
+    return { samples: samples / 1e6, unit: 'M' };
+  }
+
+  if (samples?.toString().length >= 4) {
+    return { samples: samples / 1e3, unit: 'k' };
+  }
+
+  return { samples: samples, unit: '' };
+}
+
 export function validateFrequency(value: number, minFreq: number, maxFreq: number) {
   if (Object.prototype.toString.call(value) !== '[object Number]') {
     return 'Invalid frequency';

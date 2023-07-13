@@ -428,6 +428,7 @@ export const SpectrogramPage = () => {
                           lowerTile={lowerTile}
                           handleTimeSelectionStart={setTimeSelectionStart}
                           handleTimeSelectionEnd={setTimeSelectionEnd}
+                          sampleRate={meta?.getSampleRate()}
                         />
                       )}
                       {cursorsEnabled && (

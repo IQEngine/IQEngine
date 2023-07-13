@@ -3,8 +3,11 @@
 // Licensed under the MIT License
 
 import React, { useState, useEffect } from 'react';
-import { Layer, Rect } from 'react-konva';
+import { Layer, Rect, Text } from 'react-konva';
 import { useEffectOnce } from 'usehooks-ts';
+import { TILE_SIZE_IN_IQ_SAMPLES } from '@/utils/constants';
+import { getSamples, getSeconds } from '@/utils/rfFunctions';
+
 const TimeSelector = (props) => {
   const {
     spectrogramHeight,
@@ -13,12 +16,15 @@ const TimeSelector = (props) => {
     lowerTile,
     handleTimeSelectionStart,
     handleTimeSelectionEnd,
+    sampleRate,
   } = props;
   const tileDiff = upperTile - lowerTile; // amount of samples displayed on the spectrogram in units of tiles
 
   const [startTileNum, setStartTileNum] = useState(lowerTile + 0.25 * tileDiff || 2);
   const [endTileNum, setEndTileNum] = useState(lowerTile + 0.75 * tileDiff || 7);
   const [width, setWidth] = useState(spectrogramWidth);
+  const [diffSamples, setDiffSamples] = useState('');
+  const [diffSeconds, setDiffSeconds] = useState('');
 
   useEffect(() => {
     setWidth(props.spectrogramWidth);
@@ -29,6 +35,16 @@ const TimeSelector = (props) => {
     handleTimeSelectionStart(startTileNum);
     handleTimeSelectionEnd(endTileNum);
   }); // dont put dep here
+
+  // update diff
+  useEffect(() => {
+    const diffSamples = Math.round(Math.abs(endTileNum - startTileNum) * TILE_SIZE_IN_IQ_SAMPLES);
+    const diffSeconds = diffSamples / sampleRate;
+    const formatted = getSamples(diffSamples);
+    setDiffSamples('Δ ' + formatted.samples + formatted.unit + ' samples');
+    const formattedSeconds = getSeconds(diffSeconds);
+    setDiffSeconds('Δ ' + formattedSeconds.time + ' ' + formattedSeconds.unit);
+  }, [startTileNum, endTileNum]);
 
   // Sample-start bar
   const handleDragMoveStart = (e) => {
@@ -66,6 +82,7 @@ const TimeSelector = (props) => {
             fill="black"
             opacity={0.4}
           />
+
           <Rect
             x={0}
             y={((startTileNum - lowerTile) / tileDiff) * spectrogramHeight}
@@ -78,6 +95,7 @@ const TimeSelector = (props) => {
             strokeWidth={5}
             stroke="white"
           ></Rect>
+
           <Rect
             x={0}
             y={((endTileNum - lowerTile) / tileDiff) * spectrogramHeight}
@@ -89,6 +107,24 @@ const TimeSelector = (props) => {
             strokeEnabled={true}
             strokeWidth={5}
             stroke="white"
+          />
+
+          <Text
+            text={diffSamples}
+            fontFamily="serif"
+            fontSize={24}
+            x={0}
+            y={((startTileNum - lowerTile) / tileDiff) * spectrogramHeight + 5}
+            fill={'white'}
+          />
+
+          <Text
+            text={diffSeconds}
+            fontFamily="serif"
+            fontSize={24}
+            x={0}
+            y={((startTileNum - lowerTile) / tileDiff) * spectrogramHeight + 35}
+            fill={'white'}
           />
         </>
       </Layer>
