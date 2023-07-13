@@ -11,7 +11,7 @@ router = APIRouter()
 
 
 @router.get("/api/config", status_code=200, response_model=Configuration)
-async def get_config():    
+async def get_config():
     """
     get the IQEngine configuration
     """
