@@ -83,3 +83,22 @@ class Metadata(BaseModel):
 class Plugin(BaseModel):
     name: str
     url: str
+
+
+class FeatureFlags(BaseModel):
+    class Config:
+        extra = Extra.allow
+
+
+class ConnectionInfo(BaseModel):
+    class Config:
+        extra = Extra.allow
+
+
+class Configuration(BaseModel):
+    connection_info: ConnectionInfo = Field({}, alias="connectionInfo")
+    feature_flags: FeatureFlags = Field({}, alias="featureFlags")
+    google_analytics_key: str = Field(None, alias="googleAnalyticsKey")
+    internal_branding: str = Field(None, alias="internalBranding")
+    app_id: str = Field(None, alias="appId")
+    app_authority: str = Field(None, alias="appAuthority")
