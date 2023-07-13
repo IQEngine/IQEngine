@@ -6,7 +6,7 @@ from database.config_repo import collection, get
 from database.models import Configuration
 
 
-def import_default_config_from_env():
+async def import_default_config_from_env():
     try:
         configuration = get()
         updated_configuration = copy.deepcopy(configuration)
