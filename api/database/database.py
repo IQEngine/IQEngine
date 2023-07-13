@@ -7,6 +7,7 @@ from motor.core import AgnosticDatabase
 _db: AgnosticDatabase = None
 in_memory_db: pymongo_inmemory.MongoClient = None
 
+
 def create_db_client() -> AgnosticDatabase:
     global _db
     connection_string = os.getenv("IQENGINE_METADATA_DB_CONNECTION_STRING")
