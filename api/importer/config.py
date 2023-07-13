@@ -19,11 +19,11 @@ async def import_default_config_from_env():
             updated_configuration.feature_flags = json.loads(feature_flags)
 
         if configuration is None:
-            collection().insert_one(
+            await collection().insert_one(
                 updated_configuration.dict(by_alias=True, exclude_unset=True)
             )
         elif configuration.feature_flags is None:
-            collection().update_one(
+            await collection().update_one(
                 {},
                 {"$set": updated_configuration.dict(by_alias=True, exclude_unset=True)},
             )

@@ -1,6 +1,7 @@
 import logging
 import os
 from logging.config import dictConfig
+from importer.all import import_all_from_env
 
 from database.database import db
 from dotenv import load_dotenv
@@ -89,7 +90,7 @@ app.mount("/", SPAStaticFiles(directory="iqengine", html=True), name="iqengine")
 
 
 app.add_event_handler("startup", db)
-# app.add_event_handler("startup", import_all_from_env)
+app.add_event_handler("startup", import_all_from_env)
 
 
 @app.exception_handler(ServerSelectionTimeoutError)

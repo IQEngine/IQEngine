@@ -55,7 +55,6 @@ async def test_api_get_plugins(client):
     assert response.status_code == 200
     assert response.json() == [test_plugin]
 
-
 @pytest.mark.asyncio
 async def test_api_get_plugin(client):
     test_plugin = {
