@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from helpers.cipher import encrypt
 from helpers.urlmapping import ApiType, add_URL_sasToken
-from motor.motor_asyncio import AsyncIOMotorCollection
+from motor.core import AgnosticCollection
 from pydantic import SecretStr
 
 router = APIRouter()
@@ -15,7 +15,7 @@ router = APIRouter()
 @router.post("/api/datasources", status_code=201, response_model=DataSource)
 async def create_datasource(
     datasource: DataSource,
-    datasources: AsyncIOMotorCollection = Depends(datasource_repo.collection),
+    datasources: AgnosticCollection = Depends(datasource_repo.collection),
 ):
     """
     Create a new datasource. The datasource will be henceforth identified by account/container which
@@ -33,7 +33,7 @@ async def create_datasource(
 
 @router.get("/api/datasources", response_model=list[DataSource])
 async def get_datasources(
-    datasources_collection: AsyncIOMotorCollection = Depends(
+    datasources_collection: AgnosticCollection = Depends(
         datasource_repo.collection
     ),
 ):
@@ -50,7 +50,7 @@ async def get_datasources(
 async def get_datasource_image(
     account: str,
     container: str,
-    datasources_collection: AsyncIOMotorCollection = Depends(
+    datasources_collection: AgnosticCollection = Depends(
         datasource_repo.collection
     ),
 ):
@@ -98,7 +98,7 @@ async def update_datasource(
     account: str,
     container: str,
     datasource: DataSource,
-    datasources_collection: AsyncIOMotorCollection = Depends(
+    datasources_collection: AgnosticCollection = Depends(
         datasource_repo.collection
     ),
 ):
