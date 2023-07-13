@@ -5,14 +5,14 @@ from database import config_repo
 from database.config_repo import exists, get
 from database.models import Configuration
 from fastapi import APIRouter, Depends, HTTPException
-from pymongo.collection import Collection
+from motor.core import AgnosticCollection
 
 router = APIRouter()
 
 
 @router.get("/api/config", status_code=200, response_model=Configuration)
-def get_config():
-    configuration = get()
+async def get_config():
+    configuration = await get()
 
     if configuration is None:
         configuration = Configuration()
@@ -35,25 +35,12 @@ def get_config():
 
     return configuration
 
-
-@router.post("/api/config", status_code=201)
-async def create_config(
-    config: Configuration,
-    configuration: Collection[Configuration] = Depends(config_repo.collection),
-):
-    if exists():
-        raise HTTPException(status_code=409, detail="Configuration already exists")
-
-    configuration.insert_one(config.dict(by_alias=True, exclude_unset=True))
-    return 201
-
-
 @router.put("/api/config", status_code=200)
 async def update_config(
     config: Configuration,
-    configuration: Collection[Configuration] = Depends(config_repo.collection),
+    configuration: AgnosticCollection = Depends(config_repo.collection),
 ):
-    if not exists():
+    if not (await exists()):
         raise HTTPException(status_code=409, detail="Configuration does not exist")
 
     configuration.update_one(

@@ -8,7 +8,7 @@ from database.models import Configuration
 
 async def import_default_config_from_env():
     try:
-        configuration = get()
+        configuration = await get()
         updated_configuration = copy.deepcopy(configuration)
 
         if updated_configuration is None:
@@ -22,7 +22,7 @@ async def import_default_config_from_env():
             collection().insert_one(
                 updated_configuration.dict(by_alias=True, exclude_unset=True)
             )
-        elif get().feature_flags is None:
+        elif configuration.feature_flags is None:
             collection().update_one(
                 {},
                 {"$set": updated_configuration.dict(by_alias=True, exclude_unset=True)},

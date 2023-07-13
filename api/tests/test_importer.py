@@ -5,7 +5,7 @@ import pytest
 from importer.all import import_all_from_env
 
 @pytest.mark.asyncio
-async def test_import_all_from_env(client):
+async def test_import_plugins_from_env():
     os.environ[
         "IQENGINE_PLUGINS"
     ] = '[{"name": "test_plugin", "url": "http://test_plugin"}]'
@@ -36,7 +36,7 @@ async def test_import_feature_flags_from_env():
         mock_collection = Mock()
         mock_collection.insert_one.return_value = None
         mockCollectionCall.return_value = mock_collection
-        import_all_from_env()
+        await import_all_from_env()
         mock_collection.insert_one.assert_called_once()
 
 
@@ -79,7 +79,7 @@ async def test_import_feature_flags_from_env_update():
             mock_get_config = Mock()
             mock_get_config.feature_flags = None
             mockGetCall.return_value = mock_get_config
-            import_all_from_env()
+            await import_all_from_env()
             mock_collection.update_one.assert_called_once()
 
 @pytest.mark.asyncio
@@ -99,6 +99,6 @@ async def test_import_feature_flags_from_env_no_insert_or_update():
             mock_get_config = Mock()
             mock_get_config.feature_flags = {"test": True}
             mockGetCall.return_value = mock_get_config
-            import_all_from_env()
+            await import_all_from_env()
             mock_collection.insert_one.assert_not_called()
             mock_collection.update_one.assert_not_called()

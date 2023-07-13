@@ -1,19 +1,19 @@
 from database.database import db
 from database.models import Configuration
-from pymongo.collection import Collection
+from motor.core import AgnosticCollection
 
 
-def collection() -> Configuration:
-    collection: Collection[Configuration] = db().configuration
+def collection() -> AgnosticCollection:
+    collection: AgnosticCollection = db().configuration
     return collection
 
 
-def get() -> Configuration | None:
-    current = db().configuration.find_one()
+async def get() -> Configuration | None:
+    current = await collection().configuration.find_one()
     if current is None:
         return None
     return Configuration(**current)
 
 
-def exists() -> bool:
-    return get() is not None
+async def exists() -> bool:
+    return (await get()) is not None
