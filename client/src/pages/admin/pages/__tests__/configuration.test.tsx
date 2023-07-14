@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { queryByRole, render, screen } from '@testing-library/react';
 import Configuration from '@/pages/admin/pages/configuration';
 import '@testing-library/jest-dom';
 import React from 'react';
@@ -53,6 +53,26 @@ describe('Test Configuration', () => {
     expect(await screen.findByRole('checkbox', { name: 'displayIQEngineGitHub', checked: true })).toBeChecked();
     expect(await screen.findByRole('checkbox', { name: 'displayInternalBranding', checked: true })).toBeChecked();
     expect(await screen.findByRole('checkbox', { name: 'useAPIDatasources', checked: true })).toBeChecked();
+  });
+
+  test('Feature Flags Displays Returned Values', async () => {
+    nock('http://localhost:3000')
+      .get('/api/config')
+      .reply(200, {
+        featureFlags: {
+          useIQEngineOutReach: true,
+          displayInternalBranding: true,
+          useAPIDatasources: true,
+          invalidFlag: true,
+        },
+      });
+    render(<Configuration></Configuration>, { wrapper: AllProviders });
+
+    expect(await screen.findByRole('checkbox', { name: 'useIQEngineOutReach', checked: true })).toBeChecked();
+    expect(await screen.findByRole('checkbox', { name: 'displayIQEngineGitHub', checked: false })).not.toBeChecked();
+    expect(await screen.findByRole('checkbox', { name: 'displayInternalBranding', checked: true })).toBeChecked();
+    expect(await screen.findByRole('checkbox', { name: 'useAPIDatasources', checked: true })).toBeChecked();
+    expect(screen.queryByRole('checkbox', { name: 'invalidFlag' })).not.toBeInTheDocument();
   });
 
   test('Feature Flags Updates', async () => {
