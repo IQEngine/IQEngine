@@ -18,10 +18,9 @@ const TimeSelector = (props) => {
     handleTimeSelectionEnd,
     sampleRate,
   } = props;
-  const tileDiff = upperTile - lowerTile; // amount of samples displayed on the spectrogram in units of tiles
 
-  const [startTileNum, setStartTileNum] = useState(lowerTile + 0.25 * tileDiff || 2);
-  const [endTileNum, setEndTileNum] = useState(lowerTile + 0.75 * tileDiff || 7);
+  const [startTileNum, setStartTileNum] = useState(lowerTile + 0.25 * (upperTile - lowerTile) || 2);
+  const [endTileNum, setEndTileNum] = useState(lowerTile + 0.75 * (upperTile - lowerTile) || 7);
   const [width, setWidth] = useState(spectrogramWidth);
   const [diffSamples, setDiffSamples] = useState('');
   const [diffSeconds, setDiffSeconds] = useState('');
@@ -62,7 +61,7 @@ const TimeSelector = (props) => {
     if (newY > spectrogramHeight - 2) newY = spectrogramHeight - 2;
     e.target.y(newY);
     e.target.x(0); // keep line in the same x location
-    return (newY / spectrogramHeight) * tileDiff + lowerTile;
+    return (newY / spectrogramHeight) * (upperTile - lowerTile) + lowerTile;
   };
 
   const updateTimeSelection = (e) => {
@@ -76,9 +75,9 @@ const TimeSelector = (props) => {
         <>
           <Rect
             x={0}
-            y={((startTileNum - lowerTile) / tileDiff) * spectrogramHeight}
+            y={((startTileNum - lowerTile) / (upperTile - lowerTile)) * spectrogramHeight}
             width={width}
-            height={((endTileNum - startTileNum) / tileDiff) * spectrogramHeight}
+            height={((endTileNum - startTileNum) / (upperTile - lowerTile)) * spectrogramHeight}
             fill="black"
             opacity={0.4}
             listening={false}
@@ -86,7 +85,7 @@ const TimeSelector = (props) => {
 
           <Rect
             x={0}
-            y={((startTileNum - lowerTile) / tileDiff) * spectrogramHeight}
+            y={((startTileNum - lowerTile) / (upperTile - lowerTile)) * spectrogramHeight}
             width={width}
             height={0}
             draggable={true}
@@ -99,7 +98,7 @@ const TimeSelector = (props) => {
 
           <Rect
             x={0}
-            y={((endTileNum - lowerTile) / tileDiff) * spectrogramHeight}
+            y={((endTileNum - lowerTile) / (upperTile - lowerTile)) * spectrogramHeight}
             width={width}
             height={0}
             draggable={true}
@@ -115,7 +114,7 @@ const TimeSelector = (props) => {
             fontFamily="serif"
             fontSize={24}
             x={0}
-            y={((startTileNum - lowerTile) / tileDiff) * spectrogramHeight + 5}
+            y={((startTileNum - lowerTile) / (upperTile - lowerTile)) * spectrogramHeight + 5}
             fill={'white'}
           />
 
@@ -124,7 +123,7 @@ const TimeSelector = (props) => {
             fontFamily="serif"
             fontSize={24}
             x={0}
-            y={((startTileNum - lowerTile) / tileDiff) * spectrogramHeight + 35}
+            y={((startTileNum - lowerTile) / (upperTile - lowerTile)) * spectrogramHeight + 35}
             fill={'white'}
           />
         </>

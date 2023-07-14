@@ -60,8 +60,8 @@ export const SpectrogramPage = () => {
   const [currentSamples, setCurrentSamples] = useState<Float32Array>(Float32Array.from([]));
   const [spectrogramHeight, setSpectrogramHeight] = useState(800);
   const [spectrogramWidth, setSpectrogramWidth] = useState(1000);
-  const [timeSelectionStart, setTimeSelectionStart] = useState(0);
-  const [timeSelectionEnd, setTimeSelectionEnd] = useState(10);
+  const [timeSelectionStart, setTimeSelectionStart] = useState(0); // in units of tiles
+  const [timeSelectionEnd, setTimeSelectionEnd] = useState(10); // in units of tiles
   const [freqSelectionLower, setFreqSelectionLower] = useState(0); // between -0.5 and 0.5
   const [freqSelectionUpper, setFreqSelectionUpper] = useState(0); // between -0.5 and 0.5
   const [timeCursorsEnabled, setTimeCursorsEnabled] = useState(false);
