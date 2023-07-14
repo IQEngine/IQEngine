@@ -30,7 +30,7 @@ describe('Test DataSources', () => {
           type: ClientType.API,
           name: 'Test API',
           description: 'Test API Description',
-          imageURL: 'https://test.blob.core.windows.net/test/test.png',
+          imageURL: 'https://test.blob.core.windows.net/api/test.png',
           account: 'test',
           container: 'test',
           sasToken: 'test',
@@ -42,6 +42,17 @@ describe('Test DataSources', () => {
     });
     expect(await screen.findByRole('heading', { name: 'Data Sources' })).toBeInTheDocument();
     expect(screen.getByText('Test Blob')).toBeInTheDocument();
+    expect(screen.getByText('Test Blob Description')).toBeInTheDocument();
+    expect(screen.getByText(ClientType.BLOB)).toBeInTheDocument();
+    const imageBlob = screen.getByAltText('Test Blob Description');
+    expect(imageBlob).toBeInTheDocument();
+    expect(imageBlob).toHaveAttribute('src', 'https://test.blob.core.windows.net/test/test.png');
+
     expect(screen.getByText('Test API')).toBeInTheDocument();
+    expect(screen.getByText('Test API Description')).toBeInTheDocument();
+    expect(screen.getByText(ClientType.API)).toBeInTheDocument();
+    const imageAPI = screen.getByAltText('Test API Description');
+    expect(imageAPI).toBeInTheDocument();
+    expect(imageAPI).toHaveAttribute('src', 'https://test.blob.core.windows.net/api/test.png');
   });
 });
