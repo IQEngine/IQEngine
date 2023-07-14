@@ -50,7 +50,7 @@ async def update_config(
     if not (await exists()):
         raise HTTPException(status_code=409, detail="Configuration does not exist")
 
-    configuration.update_one(
+    await configuration.update_one(
         {}, {"$set": config.dict(by_alias=True, exclude_unset=True)}
     )
     return 200
