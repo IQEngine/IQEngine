@@ -21,14 +21,9 @@ const TimeSelector = (props) => {
     sampleRate,
   } = props;
 
-  const [width, setWidth] = useState(spectrogramWidth);
   const [diffSamples, setDiffSamples] = useState('');
   const [diffSeconds, setDiffSeconds] = useState('');
   const [scalingFactor, setScalingFactor] = useState(spectrogramHeight / (upperTile - lowerTile));
-
-  useEffect(() => {
-    setWidth(props.spectrogramWidth);
-  }, [props.spectrogramWidth]);
 
   useEffect(() => {
     setScalingFactor(spectrogramHeight / (upperTile - lowerTile));
@@ -82,7 +77,7 @@ const TimeSelector = (props) => {
           <Rect
             x={0}
             y={(timeSelectionStart - lowerTile) * scalingFactor}
-            width={width}
+            width={spectrogramWidth}
             height={(timeSelectionEnd - timeSelectionStart) * scalingFactor}
             fill="black"
             opacity={0.4}
@@ -92,7 +87,7 @@ const TimeSelector = (props) => {
           <Rect
             x={0}
             y={(timeSelectionStart - lowerTile) * scalingFactor}
-            width={width}
+            width={spectrogramWidth}
             height={0}
             draggable={true}
             onDragMove={handleDragMoveStart}
@@ -105,7 +100,7 @@ const TimeSelector = (props) => {
           <Rect
             x={0}
             y={(timeSelectionEnd - lowerTile) * scalingFactor}
-            width={width}
+            width={spectrogramWidth}
             height={0}
             draggable={true}
             onDragMove={handleDragMoveEnd}
