@@ -26,14 +26,17 @@ export const DataSources = () => {
   const { apiQuery, blobQuery } = useGetDatasources();
 
   return (
-    <div className="flex flex-wrap gap-4">
-      {apiQuery.data?.map((item, i) => (
-        <DataSourceRow key={i} dataSource={item} />
-      ))}
-      {blobQuery.data?.map((item, i) => (
-        <DataSourceRow key={i} dataSource={item} />
-      ))}
-    </div>
+    <>
+      <h1 className="text-3xl font-bold">Data Sources</h1>
+      <div className="flex flex-wrap gap-4">
+        {apiQuery.data?.map((item, i) => (
+          <DataSourceRow key={i} dataSource={item} />
+        ))}
+        {blobQuery.data?.map((item, i) => (
+          <DataSourceRow key={i} dataSource={item} />
+        ))}
+      </div>
+    </>
   );
 };
 
