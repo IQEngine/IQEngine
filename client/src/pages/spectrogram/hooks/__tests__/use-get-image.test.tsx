@@ -1,6 +1,6 @@
 import { test, describe } from 'vitest';
 import { useGetImage } from '../use-get-image';
-import { renderHook } from '@testing-library/react';
+import { renderHook, waitFor } from '@testing-library/react';
 import { TILE_SIZE_IN_IQ_SAMPLES, COLORMAP_DEFAULT } from '@/utils/constants';
 
 describe('DevTest Spectrogram Tests', () => {
@@ -14,6 +14,10 @@ describe('DevTest Spectrogram Tests', () => {
     const { result } = renderHook(() =>
       useGetImage(totalFftData, fftSize, magnitudeMin, magnitudeMax, COLORMAP_DEFAULT)
     );
-    expect(result.current.image).toEqual(null);
+    waitFor(() => {
+      expect(result.current.image).not.toBeNull();
+    }).then(() => {
+      expect(result.current.image.width).toBe(fftSize);
+    });
   });
 });
