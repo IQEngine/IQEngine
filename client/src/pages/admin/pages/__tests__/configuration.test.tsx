@@ -14,16 +14,6 @@ describe('Test Configuration', () => {
   });
 
   test('Basic Rendering', async () => {
-    nock('http://localhost:3000')
-      .get('/api/config')
-      .reply(200, {
-        featureFlags: {
-          useIQEngineOutReach: true,
-          displayIQEngineGitHub: true,
-          displayInternalBranding: true,
-          useAPIDatasources: true,
-        },
-      });
     render(<Configuration></Configuration>, { wrapper: AllProviders });
     expect(await screen.findByRole('heading', { name: 'Configuration' })).toBeInTheDocument();
   });
