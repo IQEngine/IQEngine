@@ -1,10 +1,11 @@
 import os
-from unittest import TestCase, mock
+from unittest import mock
 from unittest.mock import AsyncMock, Mock
 
 import pytest
 from database.models import Configuration
 from importer.all import import_all_from_env
+
 
 @mock.patch("importer.plugins.plugin_repo.collection", return_value=Mock())
 @mock.patch("importer.config.import_default_config_from_env", return_value=None)
@@ -25,13 +26,12 @@ async def test_import_plugins_from_env(mock_plugins, mock_collection):
     mock_collection.return_value.find_one.assert_called_once()
     mock.patch.stopall()
 
+
 @mock.patch("importer.config.collection", return_value=Mock())
 @mock.patch("importer.config.get", return_value=None)
 @mock.patch("importer.plugins.import_plugins_from_env", return_value=None)
 @pytest.mark.asyncio
-async def test_import_feature_flags_from_env(
-    mock_plugins, mock_get, mock_collection
-):
+async def test_import_feature_flags_from_env(mock_plugins, mock_get, mock_collection):
     os.environ[
         "IQENGINE_PLUGINS"
     ] = '[{"name": "test_plugin", "url": "http://test_plugin"}]'
@@ -43,7 +43,7 @@ async def test_import_feature_flags_from_env(
     await import_all_from_env()
 
     mock_collection.return_value.insert_one.assert_called_once()
-    
+
 
 @mock.patch("importer.config.collection", return_value=Mock())
 @mock.patch("importer.config.get")
@@ -68,6 +68,7 @@ async def test_import_feature_flags_from_env_update(
 
     mock_collection.return_value.update_one.assert_called_once()
     mock_collection.return_value.insert_one.assert_not_called()
+
 
 @mock.patch("importer.config.collection", return_value=Mock())
 @mock.patch("importer.config.get")
