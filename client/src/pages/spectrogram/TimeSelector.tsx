@@ -24,10 +24,15 @@ const TimeSelector = (props) => {
   const [width, setWidth] = useState(spectrogramWidth);
   const [diffSamples, setDiffSamples] = useState('');
   const [diffSeconds, setDiffSeconds] = useState('');
+  const [scalingFactor, setScalingFactor] = useState(spectrogramHeight / (upperTile - lowerTile));
 
   useEffect(() => {
     setWidth(props.spectrogramWidth);
   }, [props.spectrogramWidth]);
+
+  useEffect(() => {
+    setScalingFactor(spectrogramHeight / (upperTile - lowerTile));
+  }, [upperTile, lowerTile, spectrogramHeight]);
 
   // Run once at beginning to set value in SpectrogramPage
   useEffectOnce(() => {
@@ -75,9 +80,9 @@ const TimeSelector = (props) => {
         <>
           <Rect
             x={0}
-            y={((startTileNum - lowerTile) / (upperTile - lowerTile)) * spectrogramHeight}
+            y={(startTileNum - lowerTile) * scalingFactor}
             width={width}
-            height={((endTileNum - startTileNum) / (upperTile - lowerTile)) * spectrogramHeight}
+            height={(endTileNum - startTileNum) * scalingFactor}
             fill="black"
             opacity={0.4}
             listening={false}
@@ -85,7 +90,7 @@ const TimeSelector = (props) => {
 
           <Rect
             x={0}
-            y={((startTileNum - lowerTile) / (upperTile - lowerTile)) * spectrogramHeight}
+            y={(startTileNum - lowerTile) * scalingFactor}
             width={width}
             height={0}
             draggable={true}
@@ -98,7 +103,7 @@ const TimeSelector = (props) => {
 
           <Rect
             x={0}
-            y={((endTileNum - lowerTile) / (upperTile - lowerTile)) * spectrogramHeight}
+            y={(endTileNum - lowerTile) * scalingFactor}
             width={width}
             height={0}
             draggable={true}
@@ -114,7 +119,7 @@ const TimeSelector = (props) => {
             fontFamily="serif"
             fontSize={24}
             x={0}
-            y={((startTileNum - lowerTile) / (upperTile - lowerTile)) * spectrogramHeight + 5}
+            y={(startTileNum - lowerTile) * scalingFactor + 5}
             fill={'white'}
           />
 
@@ -123,7 +128,7 @@ const TimeSelector = (props) => {
             fontFamily="serif"
             fontSize={24}
             x={0}
-            y={((startTileNum - lowerTile) / (upperTile - lowerTile)) * spectrogramHeight + 35}
+            y={(startTileNum - lowerTile) * scalingFactor + 35}
             fill={'white'}
           />
         </>
