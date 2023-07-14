@@ -12,6 +12,7 @@ from handlers.iq import router as iq_router
 from handlers.metadata import router as metadata_router
 from handlers.plugins import router as plugins_router
 from handlers.status import router as status_router
+from importer.all import import_all_from_env
 from pydantic import BaseModel
 from pymongo.errors import ServerSelectionTimeoutError
 from starlette.exceptions import HTTPException
@@ -89,7 +90,7 @@ app.mount("/", SPAStaticFiles(directory="iqengine", html=True), name="iqengine")
 
 
 app.add_event_handler("startup", db)
-# app.add_event_handler("startup", import_all_from_env)
+app.add_event_handler("startup", import_all_from_env)
 
 
 @app.exception_handler(ServerSelectionTimeoutError)

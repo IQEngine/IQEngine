@@ -1,6 +1,6 @@
 import { test, describe } from 'vitest';
 import nock from 'nock';
-import { ApiClient } from '@/api/datasource/ApiClient';
+import { ApiClient } from '@/api/datasource/api-client';
 import { DataSource } from '@/api/Models';
 
 describe('ApiClient Metadata Tests', () => {
