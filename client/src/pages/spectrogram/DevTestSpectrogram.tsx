@@ -1,50 +1,23 @@
 import { Layer, Image, Stage } from 'react-konva';
-import React, { useState, useEffect, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
 import { useGetImage } from '@/hooks/use-get-image';
+import { TILE_SIZE_IN_IQ_SAMPLES, COLORMAP_DEFAULT } from '@/utils/constants';
 
 export const DevTestPage = () => {
-  const [image, setImage] = useState(null);
-  const { type, account, container, filePath } = useParams();
-
-  const [fftSize, setFFTSize] = useState(1024);
-  const [handleTop, setHandleTop] = useState(0);
-  const [zoomLevel, setZoomLevel] = useState(1);
   const [spectrogramHeight, setSpectrogramHeight] = useState(800);
   const [spectrogramWidth, setSpectrogramWidth] = useState(1000);
-  const [iqRaw, setIQRaw] = useState<Record<number, Float32Array>>({});
 
-  const { tiles, iqQuery } = useGetImage(
-    type,
-    account,
-    container,
-    filePath,
-    fftSize,
-    handleTop,
-    zoomLevel,
-    spectrogramHeight
-  );
+  let totalFftData = new Float32Array(7 * TILE_SIZE_IN_IQ_SAMPLES);
+  totalFftData[0] = Number.NEGATIVE_INFINITY;
+  const fftSize = 1024;
+  const magnitudeMin = -10.0;
+  const magnitudeMax = -40.0;
 
-  useEffect(() => {
-    let data = iqQuery
-      .map((slice) => slice.data)
-      .filter((data) => data !== null)
-      .reduce((acc, data) => {
-        if (!data || !!iqRaw[data.index]) {
-          return acc;
-        }
-        acc[data.index] = data.iqArray;
-        return acc;
-      }, {});
-    setIQRaw((oldData) => {
-      return { ...oldData, ...data };
-    });
-  }, [iqQuery.reduce((previous, current) => previous + current.dataUpdatedAt, '')]);
+  const { image } = useGetImage(totalFftData, fftSize, magnitudeMin, magnitudeMax, COLORMAP_DEFAULT);
 
   return (
     <div className="block">
       <div className="flex flex-col pl-3">
-        <div> {tiles} </div>
         <div className="flex flex-row">
           <Stage width={spectrogramWidth} height={spectrogramHeight}>
             <Layer>
