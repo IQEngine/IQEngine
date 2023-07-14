@@ -12,7 +12,7 @@ const filePath = 'bluetooth';
 const fftSize = 1024;
 const handleTop = 0;
 const zoomLevel = 1;
-const spectrogramHeight = 800;
+const spectrogramHeight = 1280;
 
 const baseMetadataFile = {
   global: {
@@ -25,7 +25,7 @@ const baseMetadataFile = {
     'core:author': 'Marc',
     'core:recorder': 'GNU Radio 3.8.2',
     'core:license': 'https://creativecommons.org/licenses/by/4.0/',
-    'traceability:sample_length': 400000000,
+    'traceability:sample_length': 131072000,
     'traceability:origin': {
       type: 'local',
       account: account,
@@ -64,7 +64,7 @@ const baseMetadataFile = {
 };
 
 describe('DevTest Spectrogram Tests', () => {
-  test('useGetImage should return tiles 0123456', async ({ expect }) => {
+  test('useGetImage should return tiles 0123456789', async ({ expect }) => {
     const queryClient = new QueryClient();
     queryClient.defaultQueryOptions({ staleTime: Infinity });
     const recording = Object.assign(new SigMFMetadata(), baseMetadataFile);
@@ -77,7 +77,7 @@ describe('DevTest Spectrogram Tests', () => {
       { wrapper }
     );
 
-    expect(result.current.tiles).toEqual([0, 1, 2, 3, 4, 5, 6]);
+    expect(result.current.tiles).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
   });
 
   test('useGetImage should return tiles 1234567', async ({ expect }) => {
@@ -88,10 +88,13 @@ describe('DevTest Spectrogram Tests', () => {
     queryClient.setQueryData(['user-settings', 'local-files'], 'files');
     queryClient.setQueryData(['user-settings', 'blob-data-sources'], 'dataSources');
     const wrapper = ({ children }) => <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
-    const { result } = renderHook(() => useGetImage(type, account, container, filePath, fftSize, 0, zoomLevel, 128), {
-      wrapper,
-    });
+    const { result } = renderHook(
+      () => useGetImage(type, account, container, filePath, fftSize, 128, zoomLevel, spectrogramHeight),
+      {
+        wrapper,
+      }
+    );
 
-    expect(result.current.tiles).toEqual([1, 2, 3, 4, 5, 6, 7]);
+    expect(result.current.tiles).toEqual([100, 101, 102, 103, 104, 105, 106, 107, 108, 109]);
   });
 });
