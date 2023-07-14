@@ -23,11 +23,8 @@ const TimeSelector = (props) => {
 
   const [diffSamples, setDiffSamples] = useState('');
   const [diffSeconds, setDiffSeconds] = useState('');
-  const [scalingFactor, setScalingFactor] = useState(spectrogramHeight / (upperTile - lowerTile));
 
-  useEffect(() => {
-    setScalingFactor(spectrogramHeight / (upperTile - lowerTile));
-  }, [upperTile, lowerTile, spectrogramHeight]);
+  const scalingFactor = spectrogramHeight / (upperTile - lowerTile); // this will auto update as the 3 params update
 
   // Run once at beginning to set value in SpectrogramPage
   useEffectOnce(() => {
