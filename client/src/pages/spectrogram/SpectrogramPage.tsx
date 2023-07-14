@@ -478,7 +478,7 @@ export const SpectrogramPage = () => {
                 {currentTab === 'time' && (
                   <TimePlot
                     currentSamples={currentSamples}
-                    cursorsEnabled={cursorsEnabled}
+                    cursorsEnabled={timeCursorsEnabled}
                     plotWidth={plotWidth}
                     plotHeight={plotHeight}
                   />
@@ -488,7 +488,7 @@ export const SpectrogramPage = () => {
                 {currentTab === 'frequency' && (
                   <FrequencyPlot
                     currentSamples={currentSamples}
-                    cursorsEnabled={cursorsEnabled}
+                    cursorsEnabled={timeCursorsEnabled}
                     plotWidth={plotWidth}
                     plotHeight={plotHeight}
                   />
@@ -498,7 +498,7 @@ export const SpectrogramPage = () => {
                 {currentTab === 'iq' && (
                   <IQPlot
                     currentSamples={currentSamples}
-                    cursorsEnabled={cursorsEnabled}
+                    cursorsEnabled={timeCursorsEnabled}
                     plotWidth={plotWidth}
                     plotHeight={plotHeight}
                   />
