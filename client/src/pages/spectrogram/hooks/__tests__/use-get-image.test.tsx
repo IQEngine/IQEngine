@@ -7,11 +7,25 @@ import { imageToBlob } from 'browser-fs-access';
 const fftSize = 1024;
 const magnitudeMin = -10.0;
 const magnitudeMax = -40.0;
-
 describe('DevTest Spectrogram Tests', () => {
+  test('useGetImage fftToRGB magnitudeMin', async ({ expect }) => {
+    const fftsConcatenated = new Float32Array(7 * TILE_SIZE_IN_IQ_SAMPLES);
+
+    const magnitudeAvg = (magnitudeMax + magnitudeMin) / 2;
+    fftsConcatenated.fill(magnitudeAvg);
+
+    // run the code-under-test
+    const { result } = renderHook(() =>
+      useGetImage(fftsConcatenated, fftSize, magnitudeMin, magnitudeMax, COLORMAP_DEFAULT)
+    );
+    await waitFor(() => {
+      expect(result.current.image).not.toBeNull();
+    });
+  });
+
   test('useGetImage fftToRGB white box', async ({ expect }) => {
-    const totalFftData = new Float32Array(7 * TILE_SIZE_IN_IQ_SAMPLES);
-    totalFftData[0] = Number.NEGATIVE_INFINITY;
+    const fftsConcatenated = new Float32Array(7 * TILE_SIZE_IN_IQ_SAMPLES);
+    fftsConcatenated[0] = Number.NEGATIVE_INFINITY;
 
     // generate expected outcome
     let expectedData = new Uint8ClampedArray(7 * TILE_SIZE_IN_IQ_SAMPLES * 4);
@@ -21,7 +35,7 @@ describe('DevTest Spectrogram Tests', () => {
 
     // run the code-under-test
     const { result } = renderHook(() =>
-      useGetImage(totalFftData, fftSize, magnitudeMin, magnitudeMax, COLORMAP_DEFAULT)
+      useGetImage(fftsConcatenated, fftSize, magnitudeMin, magnitudeMax, COLORMAP_DEFAULT)
     );
     await waitFor(() => {
       expect(result.current.image).not.toBeNull();
@@ -56,8 +70,8 @@ describe('DevTest Spectrogram Tests', () => {
     [null, null, null, null, null],
   ])(
     'Image doesnt throw when gettings %s values',
-    async (totalFftData, fftSize, magnitudeMin, magnitudeMax, colmap) => {
-      const { result } = renderHook(() => useGetImage(totalFftData, fftSize, magnitudeMin, magnitudeMax, colmap));
+    async (fftsConcatenated, fftSize, magnitudeMin, magnitudeMax, colmap) => {
+      const { result } = renderHook(() => useGetImage(fftsConcatenated, fftSize, magnitudeMin, magnitudeMax, colmap));
       await waitFor(() => {
         expect(result.current.image).toBeNull();
       });
