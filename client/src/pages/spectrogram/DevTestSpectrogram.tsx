@@ -1,7 +1,7 @@
 import { Layer, Image, Stage } from 'react-konva';
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { useGetImage } from '@/api/metadata/DevTestSpectrogram';
+import { useGetImage } from '@/api/metadata/use-get-image';
 
 export const DevTestPage = () => {
   const [image, setImage] = useState(null);
