@@ -1,8 +1,8 @@
 # vim: tabstop=4 shiftwidth=4 expandtab
 
 
+from unittest import mock
 import pytest
-
 
 @pytest.mark.asyncio
 async def test_api_create_plugin(client):
