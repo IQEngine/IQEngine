@@ -1,18 +1,15 @@
 import { fftToRGB } from '@/utils/selector';
-import { range } from '@/utils/selector';
-import { TILE_SIZE_IN_IQ_SAMPLES, COLORMAP_DEFAULT } from '@/utils/constants';
 import { colMaps } from '@/utils/colormap';
 import { useEffect, useState } from 'react';
 
 export const useGetImage = (totalFftData, fftSize, magnitudeMin, magnitudeMax, colmap) => {
   const [image, setImage] = useState(null);
 
-  const colorMap = colMaps[colmap];
-
   useEffect(() => {
-    const rgbData = fftToRGB(totalFftData, fftSize, magnitudeMin, magnitudeMax, colorMap);
+    const rgbData = fftToRGB(totalFftData, fftSize, magnitudeMin, magnitudeMax, colMaps[colmap]);
     let num_final_ffts = totalFftData.length / fftSize;
     const imageData = new ImageData(rgbData, fftSize, num_final_ffts);
+
     createImageBitmap(imageData).then((imageBitmap) => {
       setImage(imageBitmap);
     });
