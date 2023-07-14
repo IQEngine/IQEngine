@@ -1,5 +1,5 @@
 import { Layer, Image, Stage } from 'react-konva';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useGetImage } from '@/pages/spectrogram/hooks/use-get-image';
 import { TILE_SIZE_IN_IQ_SAMPLES, COLORMAP_DEFAULT } from '@/utils/constants';
 
