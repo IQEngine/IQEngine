@@ -8,74 +8,32 @@ interface DataSourceRowProps {
 
 export const DataSourceRow = ({ dataSource }: DataSourceRowProps) => {
   return (
-    <tr>
-      <td>{dataSource.name}</td>
-      <td>{dataSource.type}</td>
-      <td>{dataSource.account}</td>
-      <td>{dataSource.container}</td>
-      <td>
+    <div className="block card w-80 bg-base-100 shadow-xl hover:bg-secondary border-secondary border-2">
+      <figure className="p-4">
         <img src={dataSource.imageURL} alt={dataSource.description} />
-      </td>
-      <td>{dataSource.description}</td>
-    </tr>
+      </figure>
+      <div className="card-body">
+        <h2 className="card-title">
+          {dataSource.name}
+          <div className="badge badge-accent">{dataSource.type}</div>
+        </h2>
+        <p>{dataSource.description}</p>
+      </div>
+    </div>
   );
 };
 
 export const DataSources = () => {
   const { apiQuery, blobQuery } = useGetDatasources();
-  const originalColumns = [
-    { title: 'Name', dataIndex: 'name' },
-    { title: 'Type', dataIndex: 'type' },
-    { title: 'Account', dataIndex: 'account' },
-    { title: 'Container', dataIndex: 'container' },
-    { title: 'Image', dataIndex: 'imageURL' },
-    { title: 'Description', dataIndex: 'description' },
-  ];
+
   return (
-    <div className="card shadow-lg compact side bg-base-100">
-      <h2>Data Sources</h2>
-      <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded ">
-        <div className="rounded-t mb-0 px-4 py-3 border-0">
-          <div className="flex flex-wrap items-center">
-            <div className="relative w-full px-4 max-w-full flex-grow flex-1">
-              <h3 className="font-semibold text-base text-blueGray-700">API</h3>
-            </div>
-          </div>
-        </div>
-        <div className="block w-full overflow-x-auto"></div>
-        <table className="items-center bg-transparent w-full border-collapse">
-          <thead>
-            <tr>
-              <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                Name
-              </th>
-              <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                Type
-              </th>
-              <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                Account
-              </th>
-              <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                Container
-              </th>
-              <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                Image
-              </th>
-              <th className="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                Description
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {blobQuery.data?.map((item, i) => (
-              <DataSourceRow key={i} dataSource={item} />
-            ))}
-            {apiQuery.data?.map((item, i) => (
-              <DataSourceRow key={i} dataSource={item} />
-            ))}
-          </tbody>
-        </table>
-      </div>
+    <div className="flex flex-1">
+      {apiQuery.data?.map((item, i) => (
+        <DataSourceRow key={i} dataSource={item} />
+      ))}
+      {blobQuery.data?.map((item, i) => (
+        <DataSourceRow key={i} dataSource={item} />
+      ))}
     </div>
   );
 };

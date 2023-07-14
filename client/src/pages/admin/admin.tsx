@@ -47,7 +47,7 @@ export const Admin = () => {
             </li>
           </ul>
         </div>
-        <div className="w-2/5 p-2">
+        <div className="w-3/4 p-2">
           <Outlet />
         </div>
       </div>
