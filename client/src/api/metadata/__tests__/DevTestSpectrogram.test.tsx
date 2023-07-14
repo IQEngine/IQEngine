@@ -1,6 +1,6 @@
 import { SigMFMetadata } from '@/utils/sigmfMetadata';
 import { test, describe, vi } from 'vitest';
-import { useGetImage } from '../use-get-image';
+import { useGetImage } from '../../../hooks/use-get-image';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook } from '@testing-library/react';
 import React from 'react';
