@@ -6,8 +6,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from helpers.cipher import encrypt
 from helpers.urlmapping import ApiType, add_URL_sasToken
+from motor.core import AgnosticCollection
 from pydantic import SecretStr
-from pymongo.collection import Collection
 
 router = APIRouter()
 
@@ -15,31 +15,31 @@ router = APIRouter()
 @router.post("/api/datasources", status_code=201, response_model=DataSource)
 async def create_datasource(
     datasource: DataSource,
-    datasources: Collection[DataSource] = Depends(datasource_repo.collection),
+    datasources: AgnosticCollection = Depends(datasource_repo.collection),
 ):
     """
     Create a new datasource. The datasource will be henceforth identified by account/container which
     must be unique or this function will return a 400.
     """
-    if datasource_exists(datasource.account, datasource.container):
+    if await datasource_exists(datasource.account, datasource.container):
         raise HTTPException(status_code=409, detail="Datasource Already Exists")
 
     if datasource.sasToken:
         datasource.sasToken = encrypt(datasource.sasToken)
 
-    datasources.insert_one(datasource.dict(by_alias=True, exclude_unset=True))
+    await datasources.insert_one(datasource.dict(by_alias=True, exclude_unset=True))
     return datasource
 
 
 @router.get("/api/datasources", response_model=list[DataSource])
 async def get_datasources(
-    datasources_collection: Collection[DataSource] = Depends(
+    datasources_collection: AgnosticCollection = Depends(
         datasource_repo.collection
     ),
 ):
     datasources = datasources_collection.find()
     result = []
-    for datasource_item in datasources:
+    async for datasource_item in datasources:
         result.append(datasource_item)
     return result
 
@@ -50,12 +50,12 @@ async def get_datasources(
 async def get_datasource_image(
     account: str,
     container: str,
-    datasources_collection: Collection[DataSource] = Depends(
+    datasources_collection: AgnosticCollection = Depends(
         datasource_repo.collection
     ),
 ):
     # Create the imageURL with sasToken
-    datasource = datasources_collection.find_one(
+    datasource = await datasources_collection.find_one(
         {
             "account": account,
             "container": container,
@@ -98,11 +98,11 @@ async def update_datasource(
     account: str,
     container: str,
     datasource: DataSource,
-    datasources_collection: Collection[DataSource] = Depends(
+    datasources_collection: AgnosticCollection = Depends(
         datasource_repo.collection
     ),
 ):
-    existingDatasource = datasources_collection.find_one(
+    existingDatasource = await datasources_collection.find_one(
         {
             "account": account,
             "container": container,
@@ -122,7 +122,7 @@ async def update_datasource(
     if not datasource.sasToken:
         datasource_dict["sasToken"] = ""
 
-    datasources_collection.update_one(
+    await datasources_collection.update_one(
         {"account": account, "container": container},
         {"$set": datasource_dict},
     )
