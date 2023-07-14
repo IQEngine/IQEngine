@@ -3,7 +3,7 @@ import { colMaps } from '@/utils/colormap';
 import { useEffect, useState } from 'react';
 
 export const useGetImage = (totalFftData, fftSize, magnitudeMin, magnitudeMax, colmap) => {
-  const [image, setImage] = useState(null);
+  const [image, setImage] = useState<ImageBitmap>(null);
 
   useEffect(() => {
     const rgbData = fftToRGB(totalFftData, fftSize, magnitudeMin, magnitudeMax, colMaps[colmap]);

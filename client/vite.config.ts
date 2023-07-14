@@ -13,7 +13,7 @@ export default defineConfig({
   define: {
     'process.env': {},
   },
-  envPrefix: "IQENGINE_",
+  envPrefix: 'IQENGINE_',
   server: {
     port: 3000,
     open: true,
@@ -42,6 +42,10 @@ export default defineConfig({
   plugins: [react(), viteTsconfigPaths(), svgrPlugin(), envCompatible()],
   test: {
     globals: true,
+    setupFiles: ['./vitest.setup.ts'],
     environment: 'jsdom',
+    deps: {
+      inline: ['vitest-canvas-mock'],
+    },
   },
 });
