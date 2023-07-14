@@ -181,7 +181,7 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
         style={{ width: '100%', marginTop: '5px' }}
         disabled={!state.saveButtonEnabled}
       >
-        Save Selection in Time
+        Download Selected Samples
       </button>
 
       <div className="mb-3" id="formMagMax">
