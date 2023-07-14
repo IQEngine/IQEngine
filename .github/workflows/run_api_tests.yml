@@ -19,7 +19,12 @@ jobs:
         with:
           python-version: '3.10'
 
-      - run: |
+      - name: Install dependencies
+        run: |
           pip install -r ./requirements.txt
+        working-directory: api
+
+      - name: Run pytest
+        run: |
           pytest
         working-directory: api

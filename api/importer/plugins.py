@@ -1,10 +1,10 @@
 import json
 import os
 
-from database.database import plugins_collection
+from database import plugin_repo
 
 
-def import_plugins_from_env(environment_variable_name="IQENGINE_PLUGINS"):
+async def import_plugins_from_env(environment_variable_name="IQENGINE_PLUGINS"):
     """
     Import plugins from environment variable
     Will not import if plugin already exists
@@ -15,11 +15,11 @@ def import_plugins_from_env(environment_variable_name="IQENGINE_PLUGINS"):
             return None
         plugins = json.loads(plugins_json)
 
-        client = plugins_collection()
+        client = plugin_repo.collection()
         for plugin in plugins:
-            if client.find_one({"name": plugin["name"]}, {"_id": 1}):
+            if await client.find_one({"name": plugin["name"]}, {"_id": 1}):
                 continue
-            client.insert_one(plugin)
+            await client.insert_one(plugin)
     except Exception as e:
         # throw a custom plugin failed to load exception
         raise Exception(

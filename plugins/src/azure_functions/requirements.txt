@@ -9,5 +9,6 @@ matplotlib
 Pillow
 urllib3
 json5
-pymongo==4.2.0
+pymongo==4.4.0
+Motor==3.2.0
 fastapi

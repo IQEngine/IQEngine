@@ -8,7 +8,7 @@ from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, R
 from fastapi.responses import StreamingResponse
 from helpers.cipher import decrypt
 from helpers.urlmapping import ApiType, get_content_type, get_file_name
-from pymongo.collection import Collection
+from motor.core import AgnosticCollection
 
 router = APIRouter()
 
@@ -21,7 +21,7 @@ router = APIRouter()
 async def get_all_meta(
     account,
     container,
-    metadatas: Collection[Metadata] = Depends(metadata_repo.collection),
+    metadatas: AgnosticCollection = Depends(metadata_repo.collection),
 ):
     # TODO: Should we validate datasource_id?
 
@@ -34,7 +34,7 @@ async def get_all_meta(
         }
     )
     result = []
-    for datum in metadata:
+    async for datum in metadata:
         result.append(datum)
     return result
 
@@ -47,7 +47,7 @@ async def get_all_meta(
 async def get_all_meta_name(
     account,
     container,
-    metadatas: Collection[Metadata] = Depends(metadata_repo.collection),
+    metadatas: AgnosticCollection = Depends(metadata_repo.collection),
 ):
     metadata = metadatas.find(
         {
@@ -60,7 +60,7 @@ async def get_all_meta_name(
         },
     )
     result = []
-    for datum in metadata:
+    async for datum in metadata:
         result.append(datum["global"]["traceability:origin"]["file_path"])
     return result
 
@@ -117,7 +117,7 @@ async def get_meta_thumbnail(
     thumbnail_path = get_file_name(filepath, ApiType.THUMB)
     content_type = get_content_type(ApiType.THUMB)
     if not await azure_client.blob_exist(thumbnail_path):
-        metadata = metadata_repo.get(
+        metadata = await metadata_repo.get(
             datasource.account,
             datasource.container,
             filepath,
@@ -187,7 +187,7 @@ async def query_meta(
     text: Optional[str] = Query(None),
     captures_geo: Optional[str] = Query(None),
     annotations_geo: Optional[str] = Query(None),
-    metadataSet: Collection[Metadata] = Depends(metadata_repo.collection),
+    metadataSet: AgnosticCollection = Depends(metadata_repo.collection),
 ):
     query_condition: Dict[str, Any] = {}
     if account:
@@ -267,7 +267,7 @@ async def query_meta(
     metadata = metadataSet.find(query_condition)
 
     result = []
-    for datum in metadata:
+    async for datum in metadata:
         result.append(datum)
     return result
 
@@ -282,17 +282,19 @@ async def create_meta(
     container: str,
     filepath: str,
     metadata: Metadata,
-    datasources: Collection[DataSource] = Depends(datasource_repo.collection),
-    metadatas: Collection[Metadata] = Depends(metadata_repo.collection),
-    versions: Collection[Metadata] = Depends(metadata_repo.versions_collection),
+    datasources: AgnosticCollection = Depends(datasource_repo.collection),
+    metadatas: AgnosticCollection = Depends(metadata_repo.collection),
+    versions: AgnosticCollection = Depends(metadata_repo.versions_collection),
 ):
     # Check datasource id is valid
-    datasource = datasources.find_one({"account": account, "container": container})
+    datasource = await datasources.find_one(
+        {"account": account, "container": container}
+    )
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
 
     # Check metadata doesn't already exist
-    if metadatas.find_one(
+    if await metadatas.find_one(
         {
             "global.traceability:origin.account": account,
             "global.traceability:origin.container": container,
@@ -311,10 +313,10 @@ async def create_meta(
         }
     )
     metadata.globalMetadata.traceability_revision = 0
-    metadatas.insert_one(
+    await metadatas.insert_one(
         metadata.dict(by_alias=True, exclude_unset=True, exclude_none=True)
     )
-    versions.insert_one(
+    await versions.insert_one(
         metadata.dict(by_alias=True, exclude_unset=True, exclude_none=True)
     )
     return metadata
@@ -329,10 +331,10 @@ async def update_meta(
     container,
     filepath,
     metadata: Metadata,
-    metadatas: Collection[Metadata] = Depends(metadata_repo.collection),
-    versions: Collection[Metadata] = Depends(metadata_repo.versions_collection),
+    metadatas: AgnosticCollection = Depends(metadata_repo.collection),
+    versions: AgnosticCollection = Depends(metadata_repo.versions_collection),
 ):
-    current = metadatas.find_one(
+    current = await metadatas.find_one(
         {
             "global.traceability:origin.account": account,
             "global.traceability:origin.container": container,
@@ -350,10 +352,10 @@ async def update_meta(
         metadata.globalMetadata.traceability_origin = current["global"][
             "traceability:origin"
         ]
-        versions.insert_one(
+        await versions.insert_one(
             metadata.dict(by_alias=True, exclude_unset=True, exclude_none=True)
         )
-        metadatas.update_one(
+        await metadatas.update_one(
             {"_id": id},
             {
                 "$set": metadata.dict(

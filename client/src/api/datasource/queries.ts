@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { DataSourceClientFactory } from './DataSourceClientFactory';
-import { DataSourceClient } from './DataSourceClient';
+import { DataSourceClientFactory } from './datasource-client-factory';
+import { DataSourceClient } from './datasource-client';
 import { useUserSettings } from '@/api/user-settings/use-user-settings';
 
 const fetchDataSources = async (client: DataSourceClient) => {
