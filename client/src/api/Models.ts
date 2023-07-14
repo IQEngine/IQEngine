@@ -41,6 +41,12 @@ export const DEFAULT_FFT_PARAMETERS: FFTParams = {
   magnitude_max: 20,
 };
 
+export enum ClientType {
+  API = 'api',
+  LOCAL = 'local',
+  BLOB = 'azure_blob',
+}
+
 export const CLIENT_TYPE_API = 'api';
 export const CLIENT_TYPE_LOCAL = 'local';
 export const CLIENT_TYPE_BLOB = 'azure_blob';

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { DataSourceClient } from './DataSourceClient';
+import { DataSourceClient } from './datasource-client';
 import { DataSource } from '@/api/Models';
 
 export class ApiClient implements DataSourceClient {
