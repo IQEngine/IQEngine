@@ -429,8 +429,10 @@ export const SpectrogramPage = () => {
                           spectrogramHeight={spectrogramHeight}
                           upperTile={upperTile}
                           lowerTile={lowerTile}
-                          handleTimeSelectionStart={setTimeSelectionStart}
-                          handleTimeSelectionEnd={setTimeSelectionEnd}
+                          timeSelectionStart={timeSelectionStart}
+                          timeSelectionEnd={timeSelectionEnd}
+                          setTimeSelectionStart={setTimeSelectionStart}
+                          setTimeSelectionEnd={setTimeSelectionEnd}
                           sampleRate={meta?.getSampleRate()}
                         />
                       )}

@@ -14,13 +14,13 @@ const TimeSelector = (props) => {
     spectrogramWidth,
     upperTile,
     lowerTile,
-    handleTimeSelectionStart,
-    handleTimeSelectionEnd,
+    timeSelectionStart,
+    timeSelectionEnd,
+    setTimeSelectionStart,
+    setTimeSelectionEnd,
     sampleRate,
   } = props;
 
-  const [startTileNum, setStartTileNum] = useState(lowerTile + 0.25 * (upperTile - lowerTile) || 2);
-  const [endTileNum, setEndTileNum] = useState(lowerTile + 0.75 * (upperTile - lowerTile) || 7);
   const [width, setWidth] = useState(spectrogramWidth);
   const [diffSamples, setDiffSamples] = useState('');
   const [diffSeconds, setDiffSeconds] = useState('');
@@ -36,28 +36,28 @@ const TimeSelector = (props) => {
 
   // Run once at beginning to set value in SpectrogramPage
   useEffectOnce(() => {
-    handleTimeSelectionStart(startTileNum);
-    handleTimeSelectionEnd(endTileNum);
-  }); // dont put dep here
+    setTimeSelectionStart(lowerTile + 0.25 * (upperTile - lowerTile) || 2);
+    setTimeSelectionEnd(lowerTile + 0.75 * (upperTile - lowerTile) || 7);
+  });
 
   // update diff
   useEffect(() => {
-    const diffSamples = Math.round(Math.abs(endTileNum - startTileNum) * TILE_SIZE_IN_IQ_SAMPLES);
+    const diffSamples = Math.round(Math.abs(timeSelectionEnd - timeSelectionStart) * TILE_SIZE_IN_IQ_SAMPLES);
     const diffSeconds = diffSamples / sampleRate;
     const formatted = getSamples(diffSamples);
     setDiffSamples('Δ ' + formatted.samples + formatted.unit + ' samples');
     const formattedSeconds = getSeconds(diffSeconds);
     setDiffSeconds('Δ ' + formattedSeconds.time + ' ' + formattedSeconds.unit);
-  }, [startTileNum, endTileNum]);
+  }, [timeSelectionStart, timeSelectionEnd]);
 
   // Sample-start bar
   const handleDragMoveStart = (e) => {
-    setStartTileNum(handleMovement(e));
+    setTimeSelectionStart(handleMovement(e));
   };
 
   // Sample-end bar
   const handleDragMoveEnd = (e) => {
-    setEndTileNum(handleMovement(e));
+    setTimeSelectionEnd(handleMovement(e));
   };
 
   const handleMovement = (e) => {
@@ -69,9 +69,10 @@ const TimeSelector = (props) => {
     return (newY / spectrogramHeight) * (upperTile - lowerTile) + lowerTile;
   };
 
+  // at drag end is when we'll swap the two if they changed sides, so that Start < End
   const updateTimeSelection = (e) => {
-    handleTimeSelectionStart(Math.min(startTileNum, endTileNum));
-    handleTimeSelectionEnd(Math.max(startTileNum, endTileNum));
+    setTimeSelectionStart(Math.min(timeSelectionStart, timeSelectionEnd));
+    setTimeSelectionEnd(Math.max(timeSelectionStart, timeSelectionEnd));
   };
 
   return (
@@ -80,9 +81,9 @@ const TimeSelector = (props) => {
         <>
           <Rect
             x={0}
-            y={(startTileNum - lowerTile) * scalingFactor}
+            y={(timeSelectionStart - lowerTile) * scalingFactor}
             width={width}
-            height={(endTileNum - startTileNum) * scalingFactor}
+            height={(timeSelectionEnd - timeSelectionStart) * scalingFactor}
             fill="black"
             opacity={0.4}
             listening={false}
@@ -90,7 +91,7 @@ const TimeSelector = (props) => {
 
           <Rect
             x={0}
-            y={(startTileNum - lowerTile) * scalingFactor}
+            y={(timeSelectionStart - lowerTile) * scalingFactor}
             width={width}
             height={0}
             draggable={true}
@@ -103,7 +104,7 @@ const TimeSelector = (props) => {
 
           <Rect
             x={0}
-            y={(endTileNum - lowerTile) * scalingFactor}
+            y={(timeSelectionEnd - lowerTile) * scalingFactor}
             width={width}
             height={0}
             draggable={true}
@@ -119,7 +120,7 @@ const TimeSelector = (props) => {
             fontFamily="serif"
             fontSize={24}
             x={0}
-            y={(startTileNum - lowerTile) * scalingFactor + 5}
+            y={(timeSelectionStart - lowerTile) * scalingFactor + 5}
             fill={'white'}
           />
 
@@ -128,7 +129,7 @@ const TimeSelector = (props) => {
             fontFamily="serif"
             fontSize={24}
             x={0}
-            y={(startTileNum - lowerTile) * scalingFactor + 35}
+            y={(timeSelectionStart - lowerTile) * scalingFactor + 35}
             fill={'white'}
           />
         </>
