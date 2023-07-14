@@ -62,6 +62,7 @@ async def test_import_all_from_env_with_broken_plugin(mock_collection):
     except Exception as e:
         e.args[0] == "Failed to load plugins from environment variable IQENGINE_PLUGINS"
 
+
 @mock.patch("importer.config.collection", return_value=Mock())
 @mock.patch("importer.config.get")
 @mock.patch("importer.plugins.import_plugins_from_env", return_value=None)
