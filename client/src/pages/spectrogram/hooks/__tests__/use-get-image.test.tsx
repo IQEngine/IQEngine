@@ -6,6 +6,43 @@ import { SampleType, generateSampleRecording } from '@/utils/testFunctions';
 
 describe('DevTest Spectrogram Tests', () => {
   test.each([
+    [TILE_SIZE_IN_IQ_SAMPLES, 128, 0.0, 0.0, COLORMAP_DEFAULT, SampleType.MultipleBuckets],
+    [TILE_SIZE_IN_IQ_SAMPLES, 256, -20.0, -30.0, 'jet', SampleType.MultipleBuckets],
+    [TILE_SIZE_IN_IQ_SAMPLES, 512, -60.0, -60.0, 'plasma', SampleType.MultipleBuckets],
+    [TILE_SIZE_IN_IQ_SAMPLES, 1024, -40.0, 100.0, COLORMAP_DEFAULT, SampleType.MultipleBuckets],
+    [TILE_SIZE_IN_IQ_SAMPLES, 1024, -140.0, -10.0, 'jet', SampleType.MultipleBuckets],
+    [TILE_SIZE_IN_IQ_SAMPLES, 0, -40.0, -10.0, 'jet', SampleType.MultipleBuckets],
+
+    [TILE_SIZE_IN_IQ_SAMPLES, 128, 0.0, 0.0, COLORMAP_DEFAULT, SampleType.WhiteBox],
+    [TILE_SIZE_IN_IQ_SAMPLES, 256, -20.0, -30.0, 'jet', SampleType.WhiteBox],
+    [TILE_SIZE_IN_IQ_SAMPLES, 512, -60.0, -60.0, 'plasma', SampleType.WhiteBox],
+    [TILE_SIZE_IN_IQ_SAMPLES, 1024, -40.0, 100.0, COLORMAP_DEFAULT, SampleType.WhiteBox],
+    [TILE_SIZE_IN_IQ_SAMPLES, 1024, -140.0, -10.0, 'jet', SampleType.WhiteBox],
+    [TILE_SIZE_IN_IQ_SAMPLES, 0, -40.0, -10.0, 'jet', SampleType.WhiteBox],
+  ])(
+    'multiple failing tests parameterized as %s',
+    async (tile_size, fftSize, magnitudeMin, magnitudeMax, colorMap, sampleType) => {
+      const { sampleRecording, num_ffts, expectedImageData } = generateSampleRecording(
+        tile_size,
+        fftSize,
+        sampleType,
+        magnitudeMin,
+        magnitudeMax,
+        colorMap
+      );
+
+      // run the code-under-test
+      const { result } = renderHook(() => useGetImage(sampleRecording, fftSize, magnitudeMin, magnitudeMax, colorMap));
+      await waitFor(() => {
+        expect(result.current.image).toBeNull();
+      });
+    }
+  );
+
+  test.each([
+    [TILE_SIZE_IN_IQ_SAMPLES, 128, -40.0, 0.0, COLORMAP_DEFAULT, SampleType.MultipleBuckets],
+    [TILE_SIZE_IN_IQ_SAMPLES, 256, -30.0, -20.0, 'jet', SampleType.MultipleBuckets],
+    [TILE_SIZE_IN_IQ_SAMPLES, 512, -60.0, 10.0, 'plasma', SampleType.MultipleBuckets],
     [TILE_SIZE_IN_IQ_SAMPLES, 1024, -40.0, -10.0, COLORMAP_DEFAULT, SampleType.MultipleBuckets],
     [TILE_SIZE_IN_IQ_SAMPLES, 1024, -40.0, -10.0, 'jet', SampleType.MultipleBuckets],
     [TILE_SIZE_IN_IQ_SAMPLES, 2048, -40.0, -10.0, 'jet', SampleType.MultipleBuckets],
@@ -14,6 +51,9 @@ describe('DevTest Spectrogram Tests', () => {
     [TILE_SIZE_IN_IQ_SAMPLES, 8192, -60.0, 50.0, 'inferno', SampleType.MultipleBuckets],
     [TILE_SIZE_IN_IQ_SAMPLES, 16384, -100.0, 50.0, 'inferno', SampleType.MultipleBuckets],
 
+    [TILE_SIZE_IN_IQ_SAMPLES, 128, -40.0, -10.0, COLORMAP_DEFAULT, SampleType.WhiteBox],
+    [TILE_SIZE_IN_IQ_SAMPLES, 256, -30.0, -20.0, 'jet', SampleType.WhiteBox],
+    [TILE_SIZE_IN_IQ_SAMPLES, 512, -60.0, 10.0, 'plasma', SampleType.WhiteBox],
     [TILE_SIZE_IN_IQ_SAMPLES, 1024, -40.0, -10.0, COLORMAP_DEFAULT, SampleType.WhiteBox],
     [TILE_SIZE_IN_IQ_SAMPLES, 1024, -40.0, -10.0, 'jet', SampleType.WhiteBox],
     [TILE_SIZE_IN_IQ_SAMPLES, 2048, -40.0, -10.0, 'jet', SampleType.WhiteBox],
@@ -22,7 +62,7 @@ describe('DevTest Spectrogram Tests', () => {
     [TILE_SIZE_IN_IQ_SAMPLES, 8192, -60.0, 50.0, 'inferno', SampleType.WhiteBox],
     [TILE_SIZE_IN_IQ_SAMPLES, 16384, -100.0, 50.0, 'inferno', SampleType.WhiteBox],
   ])(
-    'multiple tests parameterized as %s',
+    'multiple passing tests parameterized as %s',
     async (tile_size, fftSize, magnitudeMin, magnitudeMax, colorMap, sampleType) => {
       const { sampleRecording, num_ffts, expectedImageData } = generateSampleRecording(
         tile_size,

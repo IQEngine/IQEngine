@@ -25,6 +25,10 @@ export const generateSampleRecording = (
   magnitudeMax: number,
   colorMap: string
 ) => {
+  if (fftSize == 0) {
+    return { sampleRecording: null, num_ffts: 0, expectedImageData: null };
+  }
+
   const sampleRecording = new Float32Array(tile_size);
   let num_ffts = sampleRecording.length / fftSize;
   let expectedImageData = new ImageData(1, 1);
