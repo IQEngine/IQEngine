@@ -10,7 +10,6 @@ export const useGetImage = (
   colmap: string
 ) => {
   const [image, setImage] = useState<ImageBitmap>(null);
-  const [imageData, setImageData] = useState<ImageData>(null);
 
   useEffect(() => {
     if (!totalFftData || !fftSize || !magnitudeMin || !magnitudeMax || !colmap) {
@@ -20,7 +19,6 @@ export const useGetImage = (
     const rgbData = fftToRGB(totalFftData, fftSize, magnitudeMin, magnitudeMax, colMaps[colmap]);
     let num_final_ffts = totalFftData.length / fftSize;
     const newImageData = new ImageData(rgbData, fftSize, num_final_ffts);
-    setImageData(newImageData);
 
     createImageBitmap(newImageData).then((imageBitmap) => {
       setImage(imageBitmap);
@@ -40,5 +38,5 @@ export const useGetImage = (
     );
   }, [totalFftData, fftSize, magnitudeMin, magnitudeMax, colmap]);
 
-  return { imageData, image };
+  return { image };
 };
