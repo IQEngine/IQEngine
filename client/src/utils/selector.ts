@@ -236,7 +236,7 @@ export function calculateTileNumbers(
   const lowerTile = (totalIQSamples * fractionIntoFile) / TILE_SIZE_IN_IQ_SAMPLES;
   const upperTile = fftsOnScreen / fftsPerTile + lowerTile;
 
-  console.debug('lowerTile:', lowerTile, ', upperTile:', upperTile);
+  console.debug('lowerTile:', lowerTile, 'upperTile:', upperTile);
   return { lowerTile: lowerTile, upperTile: upperTile };
 }
 
