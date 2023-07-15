@@ -24,7 +24,7 @@ export const useGetImage = (
       setImage(imageBitmap);
     });
 
-    console.log(
+    console.debug(
       'size of totalFftData:',
       totalFftData.length,
       'fftSize:',
