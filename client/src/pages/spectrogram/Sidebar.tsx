@@ -14,9 +14,9 @@ export interface SidebarProps {
   updateWindowChange: (fftWindow: string) => void;
   magnitudeMax: number;
   magnitudeMin: number;
-  toggleCursors: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  toggleTimeCursors: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  toggleFreqCursors: (e: React.ChangeEvent<HTMLInputElement>) => void;
   toggleIncludeRfFreq: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  cursorsEnabled: boolean;
   handleProcessTime: (processTime: number) => void;
   zoomLevel: number;
   taps: [];
@@ -47,7 +47,8 @@ const Sidebar = (props) => {
             updateWindowChange={props.updateWindowChange}
             magnitudeMax={props.magnitudeMax}
             magnitudeMin={props.magnitudeMin}
-            toggleCursors={props.toggleCursors}
+            toggleTimeCursors={props.toggleTimeCursors}
+            toggleFreqCursors={props.toggleFreqCursors}
             toggleIncludeRfFreq={props.toggleIncludeRfFreq}
             updateZoomLevel={props.updateZoomLevel}
             zoomLevel={props.zoomLevel}
