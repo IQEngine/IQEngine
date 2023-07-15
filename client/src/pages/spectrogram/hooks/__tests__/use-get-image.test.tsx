@@ -2,9 +2,30 @@ import { test, describe } from 'vitest';
 import { useGetImage } from '../use-get-image';
 import { renderHook, waitFor } from '@testing-library/react';
 import { TILE_SIZE_IN_IQ_SAMPLES, COLORMAP_DEFAULT } from '@/utils/constants';
-import { SampleType, generateSampleRecording } from '@/utils/testFunctions';
+import { SampleType, generateSampleRecording, normalizeMagnitude } from '@/utils/testFunctions';
 
 describe('DevTest Spectrogram Tests', () => {
+  test.each([
+    [-40, -40, -10, 0],
+    [-10, -40, -10, 255],
+    [-25, -40, -10, 127.5],
+    [-40, -30, -20, 0],
+    [-20, -30, -20, 255],
+    [-25, -30, -20, 127.5],
+    [-40, -50, 50, 25.5],
+    [0, -50, 50, 127.5],
+    [10, -50, 50, 153],
+  ])(
+    'test the normalizeMagnitude function',
+    async (magnitude_in_db, magnitudeMin, magnitudeMax, normalized_magnitude) => {
+      const test_value = normalizeMagnitude(magnitude_in_db, magnitudeMin, magnitudeMax);
+
+      // this is to eliminate rounding errors
+      const diff = Math.abs(test_value - normalized_magnitude);
+      expect(diff).toBeLessThan(0.000001);
+    }
+  );
+
   test.each([
     [TILE_SIZE_IN_IQ_SAMPLES, 128, 0.0, 0.0, COLORMAP_DEFAULT, SampleType.MultipleBuckets],
     [TILE_SIZE_IN_IQ_SAMPLES, 256, -20.0, -30.0, 'jet', SampleType.MultipleBuckets],

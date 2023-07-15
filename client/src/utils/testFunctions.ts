@@ -9,7 +9,7 @@ export enum SampleType {
 // 16 elements exactly
 const BucketsOfDb = [-100, -90, -80, -70, -60, -50, -40, -30, -20, -10, 0, 10, 20, 30, 40, 50];
 
-const normalizeMagnitude = (magnitude_in_db: number, magnitudeMin: number, magnitudeMax: number) => {
+export const normalizeMagnitude = (magnitude_in_db: number, magnitudeMin: number, magnitudeMax: number) => {
   const dbPer1 = 255 / (magnitudeMax - magnitudeMin);
   let magnitude = (magnitude_in_db - magnitudeMin) * dbPer1; // normalize to 0-255
   magnitude = magnitude > 255 ? 255 : magnitude; // clip above 255
