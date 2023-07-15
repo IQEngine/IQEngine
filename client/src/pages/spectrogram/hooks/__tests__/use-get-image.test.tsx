@@ -76,15 +76,13 @@ describe('DevTest Spectrogram Tests', () => {
       expect(result.current.image).not.toBeNull();
     });
 
-    const lastCall = createImageBitmap.mock.lastCall;
-    const imageDataCalled = lastCall[0];
     // compare the ImageData objects - looking for a better way...
     let imagesAreTheSame = true;
-    if (expectedImageData.data.length != imageDataCalled.data.length) {
+    if (expectedImageData.data.length != result.current.imageData.data.length) {
       imagesAreTheSame = false;
     } else {
       for (var i = 0; i < expectedImageData.data.length; ++i) {
-        if (expectedImageData.data[i] != imageDataCalled.data[i]) {
+        if (expectedImageData.data[i] != result.current.imageData.data[i]) {
           imagesAreTheSame = false;
           break;
         }
