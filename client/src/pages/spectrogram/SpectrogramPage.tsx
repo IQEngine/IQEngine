@@ -63,8 +63,8 @@ export const SpectrogramPage = () => {
   const [spectrogramWidth, setSpectrogramWidth] = useState(1000);
   const [timeSelectionStart, setTimeSelectionStart] = useState(0); // in units of tiles
   const [timeSelectionEnd, setTimeSelectionEnd] = useState(10); // in units of tiles
-  const [freqSelectionLower, setFreqSelectionLower] = useState(0); // between -0.5 and 0.5
-  const [freqSelectionUpper, setFreqSelectionUpper] = useState(0); // between -0.5 and 0.5
+  const [freqSelectionLower, setFreqSelectionLower] = useState(-0.1); // between -0.5 and 0.5
+  const [freqSelectionUpper, setFreqSelectionUpper] = useState(0.1); // between -0.5 and 0.5
   const [timeCursorsEnabled, setTimeCursorsEnabled] = useState(false);
   const [freqCursorsEnabled, setFreqCursorsEnabled] = useState(false);
   const [currentTab, setCurrentTab] = useState('spectrogram');
@@ -441,6 +441,8 @@ export const SpectrogramPage = () => {
                         <FreqSelector
                           spectrogramWidth={spectrogramWidth}
                           spectrogramHeight={spectrogramHeight}
+                          freqSelectionLower={freqSelectionLower}
+                          freqSelectionUpper={freqSelectionUpper}
                           setFreqSelectionLower={setFreqSelectionLower}
                           setFreqSelectionUpper={setFreqSelectionUpper}
                           sampleRate={meta?.getSampleRate()}

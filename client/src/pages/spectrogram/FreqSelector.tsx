@@ -4,23 +4,25 @@
 
 import React, { useEffect, useState } from 'react';
 import { Layer, Rect, Text } from 'react-konva';
-import { useEffectOnce } from 'usehooks-ts';
 import { getFrequency } from '@/utils/rfFunctions';
 
 const FreqSelector = (props) => {
-  const { spectrogramWidth, spectrogramHeight, setFreqSelectionLower, setFreqSelectionUpper, sampleRate } = props;
+  const {
+    spectrogramWidth,
+    spectrogramHeight,
+    freqSelectionLower,
+    freqSelectionUpper,
+    setFreqSelectionLower,
+    setFreqSelectionUpper,
+    sampleRate,
+  } = props;
 
-  const [lowerPosition, setLowerPosition] = useState(spectrogramWidth * 0.4); // in pixels
-  const [upperPosition, setUpperPosition] = useState(spectrogramWidth * 0.6); // in pixels
   const [lowerText, setLowerText] = useState('');
   const [upperText, setUpperText] = useState('');
   const [diffText, setDiffText] = useState('');
 
-  // Run once at beginning to set value in SpectrogramPage
-  useEffectOnce(() => {
-    setFreqSelectionLower((lowerPosition / spectrogramWidth - 0.5) * sampleRate);
-    setFreqSelectionUpper((upperPosition / spectrogramWidth - 0.5) * sampleRate);
-  }); // dont put dep here
+  const lowerPosition = (freqSelectionLower + 0.5) * spectrogramWidth; // in pixels. this auto-updates
+  const upperPosition = (freqSelectionUpper + 0.5) * spectrogramWidth;
 
   useEffect(() => {
     const formatted = getFrequency((lowerPosition / spectrogramWidth - 0.5) * sampleRate);
@@ -37,11 +39,11 @@ const FreqSelector = (props) => {
   }, [upperPosition]);
 
   const handleDragMoveLower = (e) => {
-    setLowerPosition(handleMovement(e));
+    setFreqSelectionLower(handleMovement(e));
   };
 
   const handleDragMoveUpper = (e) => {
-    setUpperPosition(handleMovement(e));
+    setFreqSelectionUpper(handleMovement(e));
   };
 
   const handleMovement = (e) => {
@@ -50,12 +52,12 @@ const FreqSelector = (props) => {
     if (newX > spectrogramWidth - 2) newX = spectrogramWidth - 2;
     e.target.x(newX);
     e.target.y(0); // keep line in the same y location
-    return newX;
+    return newX / spectrogramWidth - 0.5;
   };
 
   const handleDragEnd = (e) => {
-    setFreqSelectionLower((lowerPosition / spectrogramWidth - 0.5) * sampleRate);
-    setFreqSelectionUpper((upperPosition / spectrogramWidth - 0.5) * sampleRate);
+    setFreqSelectionLower(Math.min(lowerPosition / spectrogramWidth - 0.5, upperPosition / spectrogramWidth - 0.5));
+    setFreqSelectionUpper(Math.max(lowerPosition / spectrogramWidth - 0.5, upperPosition / spectrogramWidth - 0.5));
   };
 
   return (
@@ -82,7 +84,11 @@ const FreqSelector = (props) => {
             onDragEnd={handleDragEnd}
             strokeEnabled={true}
             strokeWidth={5}
-            stroke="white"
+            stroke="blue"
+            opacity={0.75}
+            shadowColor="blue"
+            shadowOffsetX={-3}
+            shadowBlur={5}
           ></Rect>
 
           <Rect
@@ -95,7 +101,11 @@ const FreqSelector = (props) => {
             onDragEnd={handleDragEnd}
             strokeEnabled={true}
             strokeWidth={5}
-            stroke="white"
+            stroke="blue"
+            opacity={0.75}
+            shadowColor="blue"
+            shadowOffsetX={3}
+            shadowBlur={5}
           />
 
           <Text text={lowerText} fontFamily="serif" fontSize={24} x={lowerPosition + 5} y={0} fill={'white'} />
