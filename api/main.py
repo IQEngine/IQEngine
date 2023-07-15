@@ -2,6 +2,7 @@ import logging
 import os
 from logging.config import dictConfig
 
+from database.database import db
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
@@ -87,11 +88,9 @@ app.include_router(plugins_router)
 
 app.mount("/", SPAStaticFiles(directory="iqengine", html=True), name="iqengine")
 
-# Import all from environment variables
-try:
-    import_all_from_env()
-except Exception as e:
-    logger.error("Error importing environment variables", e)
+
+app.add_event_handler("startup", db)
+app.add_event_handler("startup", import_all_from_env)
 
 
 @app.exception_handler(ServerSelectionTimeoutError)

@@ -1,4 +1,4 @@
-import { DataSourceClient } from './DataSourceClient';
+import { DataSourceClient } from './datasource-client';
 import { DataSource } from '@/api/Models';
 import { FileWithDirectoryAndFileHandle } from 'browser-fs-access';
 

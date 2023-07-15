@@ -1,19 +1,19 @@
 from database.database import db
 from database.models import Metadata
-from pymongo.collection import Collection
+from motor.core import AgnosticCollection
 
 
-def collection():
-    collection: Collection[Metadata] = db().metadata
+def collection() -> AgnosticCollection:
+    collection: AgnosticCollection = db().metadata
     return collection
 
 
-def versions_collection():
-    collection: Collection[Metadata] = db().versions
+def versions_collection() -> AgnosticCollection:
+    collection: AgnosticCollection = db().versions
     return collection
 
 
-def get(account, container, filepath) -> Metadata:
+async def get(account, container, filepath) -> Metadata:
     """
     Get a metadata by account, container and filepath
 
@@ -31,7 +31,8 @@ def get(account, container, filepath) -> Metadata:
     Metadata
         The Sigmf metadata.
     """
-    metadata = collection().find_one(
+    metadata_collection: AgnosticCollection = collection()
+    metadata = await metadata_collection.find_one(
         {
             "global.traceability:origin.account": account,
             "global.traceability:origin.container": container,
