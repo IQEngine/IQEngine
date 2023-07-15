@@ -92,6 +92,10 @@ const TimeSelector = (props) => {
             strokeEnabled={true}
             strokeWidth={5}
             stroke="red"
+            opacity={0.75}
+            shadowColor="red"
+            shadowOffsetY={-3}
+            shadowBlur={5}
           ></Rect>
 
           <Rect
@@ -105,6 +109,10 @@ const TimeSelector = (props) => {
             strokeEnabled={true}
             strokeWidth={5}
             stroke="red"
+            opacity={0.75}
+            shadowColor="red"
+            shadowOffsetY={3}
+            shadowBlur={5}
           />
 
           <Text
