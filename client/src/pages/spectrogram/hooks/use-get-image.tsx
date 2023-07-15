@@ -2,10 +2,20 @@ import { fftToRGB } from '@/utils/selector';
 import { colMaps } from '@/utils/colormap';
 import { useEffect, useState } from 'react';
 
-export const useGetImage = (totalFftData, fftSize, magnitudeMin, magnitudeMax, colmap) => {
+export const useGetImage = (
+  totalFftData: Float32Array,
+  fftSize: number,
+  magnitudeMin: number,
+  magnitudeMax: number,
+  colmap: string
+) => {
   const [image, setImage] = useState<ImageBitmap>(null);
 
   useEffect(() => {
+    if (!totalFftData || !fftSize || !magnitudeMin || !magnitudeMax || !colmap) {
+      setImage(null);
+      return;
+    }
     const rgbData = fftToRGB(totalFftData, fftSize, magnitudeMin, magnitudeMax, colMaps[colmap]);
     let num_final_ffts = totalFftData.length / fftSize;
     const imageData = new ImageData(rgbData, fftSize, num_final_ffts);
