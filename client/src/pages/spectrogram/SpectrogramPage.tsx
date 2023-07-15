@@ -14,6 +14,7 @@ import { RulerTop } from './RulerTop';
 import { RulerSide } from './RulerSide';
 import { INITIAL_PYTHON_SNIPPET, TILE_SIZE_IN_IQ_SAMPLES, COLORMAP_DEFAULT, MINIMAP_FFT_SIZE } from '@/utils/constants';
 import TimeSelector from './TimeSelector';
+import TimeSelectorMinimap from './TimeSelectorMinimap';
 import FreqSelector from './FreqSelector';
 import AnnotationList from '@/pages/spectrogram/components/annotation/AnnotationList';
 import { GlobalProperties } from '@/pages/spectrogram/components/global-properties/GlobalProperties';
@@ -471,6 +472,20 @@ export const SpectrogramPage = () => {
                         setMagnitudeMin={setMagnitudeMin}
                         colorMap={colorMap}
                       />
+
+                      {timeCursorsEnabled && (
+                        <TimeSelectorMinimap
+                          width={MINIMAP_FFT_SIZE}
+                          spectrogramHeight={spectrogramHeight}
+                          upperTile={upperTile}
+                          lowerTile={lowerTile}
+                          timeSelectionStart={timeSelectionStart}
+                          timeSelectionEnd={timeSelectionEnd}
+                          setTimeSelectionStart={setTimeSelectionStart}
+                          setTimeSelectionEnd={setTimeSelectionEnd}
+                          totalSamples={meta?.getTotalSamples()}
+                        />
+                      )}
                     </Stage>
                   </div>
                 </div>

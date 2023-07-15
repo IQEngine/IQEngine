@@ -56,6 +56,7 @@ const TimeSelector = (props) => {
     let newY = e.target.y();
     if (newY <= 2) newY = 2;
     if (newY > spectrogramHeight - 2) newY = spectrogramHeight - 2;
+    e.target.y(newY);
     e.target.x(0); // keep line in the same x location
     return (newY / spectrogramHeight) * (upperTile - lowerTile) + lowerTile;
   };
@@ -90,7 +91,7 @@ const TimeSelector = (props) => {
             onDragEnd={updateTimeSelection}
             strokeEnabled={true}
             strokeWidth={5}
-            stroke="white"
+            stroke="red"
           ></Rect>
 
           <Rect
@@ -103,7 +104,7 @@ const TimeSelector = (props) => {
             onDragEnd={updateTimeSelection}
             strokeEnabled={true}
             strokeWidth={5}
-            stroke="white"
+            stroke="red"
           />
 
           <Text
