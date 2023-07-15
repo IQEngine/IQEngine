@@ -55,7 +55,7 @@ export const RepoBrowser = () => {
           {blobDataSources.data?.map((item, i) => (
             <RepositoryTile key={i} item={item} />
           ))}
-          <Feature flag={FeatureFlag.useAPIDatasources}>
+          <Feature flag={FeatureFlag.useAPIDatasources.name}>
             {apiDataSources?.data?.map((item, i) => (
               <RepositoryAPITile key={i} item={item} />
             ))}
