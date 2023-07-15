@@ -99,6 +99,7 @@ class Configuration(BaseModel):
     connection_info: ConnectionInfo = Field({}, alias="connectionInfo")
     feature_flags: FeatureFlags = Field(None, alias="featureFlags")
     google_analytics_key: str = Field(None, alias="googleAnalyticsKey")
+    UPLOAD_PAGE_BLOB_SAS_URL: str = Field(None, alias="uploadPageBlobSasUrl")
     internal_branding: str = Field(None, alias="internalBranding")
     app_id: str = Field(None, alias="appId")
     app_authority: str = Field(None, alias="appAuthority")
