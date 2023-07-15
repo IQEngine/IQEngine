@@ -6,7 +6,6 @@ import React, { useState } from 'react';
 import { useConfigQuery } from '@/api/config/queries';
 import { ContainerClient } from '@azure/storage-blob';
 import { fileOpen } from 'browser-fs-access';
-import { stringToArray } from 'konva/lib/shapes/Text';
 
 function readFile(file: Blob): Promise<ArrayBuffer> {
   return new Promise<ArrayBuffer>((resolve, reject) => {
