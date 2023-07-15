@@ -67,22 +67,24 @@ describe('DevTest Spectrogram Tests', () => {
     const height = (7 * TILE_SIZE_IN_IQ_SAMPLES) / fftSize;
     expectedData.fill(255);
     const expectedImageData = new ImageData(expectedData, fftSize, height);
-
     // run the code-under-test
     const { result } = renderHook(() =>
       useGetImage(fftsConcatenated, fftSize, magnitudeMin, magnitudeMax, COLORMAP_DEFAULT)
     );
+
     await waitFor(() => {
       expect(result.current.image).not.toBeNull();
     });
 
+    const lastCall = createImageBitmap.mock.lastCall;
+    const imageDataCalled = lastCall[0];
     // compare the ImageData objects - looking for a better way...
     let imagesAreTheSame = true;
-    if (expectedImageData.data.length != result.current.imageData.data.length) {
+    if (expectedImageData.data.length != imageDataCalled.data.length) {
       imagesAreTheSame = false;
     } else {
       for (var i = 0; i < expectedImageData.data.length; ++i) {
-        if (expectedImageData.data[i] != result.current.imageData.data[i]) {
+        if (expectedImageData.data[i] != imageDataCalled.data[i]) {
           imagesAreTheSame = false;
           break;
         }
