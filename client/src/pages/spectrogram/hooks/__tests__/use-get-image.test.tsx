@@ -5,10 +5,6 @@ import { TILE_SIZE_IN_IQ_SAMPLES, COLORMAP_DEFAULT } from '@/utils/constants';
 import { colMaps } from '@/utils/colormap';
 import { Simulate } from 'react-dom/test-utils';
 
-// const fftSize = 1024;
-// const magnitudeMin = -40.0;
-// const magnitudeMax = -10.0;
-
 // 16 elements exactly
 const BucketsOfDb = [-100, -90, -80, -70, -60, -50, -40, -30, -20, -10, 0, 10, 20, 30, 40, 50];
 
