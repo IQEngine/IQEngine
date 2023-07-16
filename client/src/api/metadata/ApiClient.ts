@@ -16,18 +16,6 @@ export class ApiClient implements MetadataClient {
     return responseMetaData;
   }
 
-  async getDataSourceMeta(account: string, container: string): Promise<SigMFMetadata[]> {
-    const response = await axios.get(`/api/datasources/${account}/${container}/meta`);
-    let objectFromJson = response.data;
-    let responseMetaData: SigMFMetadata[] = objectFromJson.map((meta) => {
-      let newMeta = Object.assign(new SigMFMetadata(), meta);
-      newMeta.annotations = newMeta.annotations?.map((annotation) => Object.assign(new Annotation(), annotation));
-      newMeta.captures = newMeta.captures?.map((capture) => Object.assign(new CaptureSegment(), capture));
-      return newMeta;
-    });
-    return responseMetaData;
-  }
-
   async getDataSourceMetaPaths(account: string, container: string): Promise<string[]> {
     const response = await axios.get(`/api/datasources/${account}/${container}/meta/paths`);
     return response.data;

@@ -11,11 +11,11 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'react-hot-toast';
 import Feature from '@/features/feature/Feature';
 import { Logo } from '@/features/ui/logo/Logo';
-import { FeatureFlag, useFeatureFlags } from '@/hooks/useFeatureFlags';
+import { FeatureFlag, useFeatureFlags } from '@/hooks/use-feature-flags';
 import { CLIENT_TYPE_BLOB, DataSource } from '@/api/Models';
 import { useUserSettings } from '@/api/user-settings/use-user-settings';
 import { useMsal } from '@azure/msal-react';
-import { loginRequest } from '@/authConfig';
+import { loginRequest } from '@/auth/auth-config';
 
 export const App = () => {
   const { instance } = useMsal();
@@ -132,12 +132,16 @@ export const App = () => {
                       </Link>
                     </li>
                     <li>
-                      <a onClick={handleLogoutPopup}>Logout</a>
+                      <a className="cursor-pointer" onClick={handleLogoutPopup}>
+                        Logout
+                      </a>
                     </li>
                   </>
                 ) : (
                   <li>
-                    <a onClick={handleLoginPopup}>Login</a>
+                    <a className="cursor-pointer" onClick={handleLoginPopup}>
+                      Login
+                    </a>
                   </li>
                 )}
               </ul>
@@ -183,14 +187,14 @@ export const App = () => {
                     </Link>
                   </li>
                   <li className="hidden md:block">
-                    <a className="text-lg" onClick={handleLogoutPopup}>
+                    <a className="text-lg cursor-pointer" onClick={handleLogoutPopup}>
                       Logout
                     </a>
                   </li>
                 </>
               ) : (
                 <li className="hidden md:block">
-                  <a className="text-lg" onClick={handleLoginPopup}>
+                  <a className="text-lg cursor-pointer" onClick={handleLoginPopup}>
                     Login
                   </a>
                 </li>

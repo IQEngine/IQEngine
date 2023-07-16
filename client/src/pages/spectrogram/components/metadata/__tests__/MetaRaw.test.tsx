@@ -5,7 +5,7 @@ import { render, screen } from '@testing-library/react';
 
 import { Annotation, CaptureSegment, SigMFMetadata } from '@/utils/sigmfMetadata';
 import { MetaRaw } from '@/pages/spectrogram/components/metadata/MetaRaw';
-import { AllProviders } from '@/mocks/setupTests';
+import { AllProviders } from '@/mocks/setup-tests';
 import userEvent from '@testing-library/user-event';
 import { Toaster } from 'react-hot-toast';
 import nock from 'nock';

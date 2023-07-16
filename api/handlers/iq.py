@@ -2,16 +2,15 @@ import asyncio
 import base64
 import io
 import logging
-from asyncio import to_thread
 from typing import List
 
-from azure.storage.blob import BlobClient
-from database import datasource
+from blob.azure_client import AzureBlobClient
+from database import datasource_repo
 from database.models import DataSource
 from fastapi import APIRouter, Depends, HTTPException
 from helpers.cipher import decrypt
+from helpers.urlmapping import ApiType, get_file_name
 from pydantic import BaseModel, SecretStr
-from pymongo.collection import Collection
 
 router = APIRouter()
 
@@ -22,14 +21,9 @@ class IQData(BaseModel):
     bytes_per_sample: int
 
 
-def get_sas_token(
-    account: str,
-    container: str,
-    datasources_collection: Collection[DataSource] = Depends(datasource.collection),
+async def get_sas_token(
+    datasource: DataSource = Depends(datasource_repo.get),
 ):
-    datasource = datasources_collection.find_one(
-        {"account": account, "container": container}
-    )
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
 
@@ -43,29 +37,22 @@ def get_sas_token(
 @router.get(
     "/api/datasources/{account}/{container}/{filepath:path}/iqslice", status_code=200
 )
-def get_iq(
-    account: str,
-    container: str,
+async def get_iq(
     filepath: str,
     offsetBytes: int,
     countBytes: int,
-    sasToken: SecretStr = Depends(get_sas_token),
+    datasource: DataSource = Depends(datasource_repo.get),
+    azure_client: AzureBlobClient = Depends(AzureBlobClient),
 ):
+    if not datasource:
+        raise HTTPException(status_code=404, detail="Datasource not found")
     try:
-        if not sasToken:
-            blob_client = BlobClient.from_blob_url(
-                f"https://{account}.blob.core.windows.net/"
-                f"{container}/{filepath}.sigmf-data"
-            )
-        else:
-            blob_client = BlobClient.from_blob_url(
-                f"https://{account}.blob.core.windows.net/"
-                f"{container}/{filepath}.sigmf-data",
-                credential=sasToken.get_secret_value(),
-            )
-
-        download_stream = blob_client.download_blob(offsetBytes, countBytes)
-        data = io.BytesIO(download_stream.readall())
+        azure_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
+        iq_file = get_file_name(filepath, ApiType.IQDATA)
+        blob = await azure_client.get_blob_content(
+            filepath=iq_file, offset=offsetBytes, length=countBytes
+        )
+        data = io.BytesIO(blob)
         encoded_data = base64.b64encode(data.getvalue()).decode("utf-8")
         return {"data": encoded_data}
 
@@ -73,15 +60,22 @@ def get_iq(
         raise HTTPException(status_code=400, detail=str(e))
 
 
-async def download_blob(blob_client, index, tile_size, bytes_per_sample, blob_size):
+async def download_blob(
+    azure_client: AzureBlobClient,
+    filepath: str,
+    index: int,
+    tile_size: int,
+    bytes_per_sample: int,
+    blob_size: int,
+):
     offsetBytes = index * tile_size * bytes_per_sample * 2
     countBytes = tile_size * bytes_per_sample * 2
     if (offsetBytes + countBytes) > blob_size:
         countBytes = blob_size - offsetBytes
-    download_stream = await to_thread(
-        blob_client.download_blob, offsetBytes, countBytes
+    blob = await azure_client.get_blob_content(
+        filepath=filepath, offset=offsetBytes, length=countBytes
     )
-    data = io.BytesIO(download_stream.readall())
+    data = io.BytesIO(blob)
     encoded_data = base64.b64encode(data.getvalue()).decode("utf-8")
     return {"index": index, "data": encoded_data}
 
@@ -91,26 +85,18 @@ async def download_blob(blob_client, index, tile_size, bytes_per_sample, blob_si
 )
 async def get_iq_data_slices(
     iq_data: IQData,
-    account: str,
-    container: str,
     filepath: str,
-    sasToken: SecretStr = Depends(get_sas_token),
+    datasource: DataSource = Depends(datasource_repo.get),
+    azure_client: AzureBlobClient = Depends(AzureBlobClient),
 ):
+    if not datasource:
+        raise HTTPException(status_code=404, detail="Datasource not found")
     try:
+        azure_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
         logger = logging.getLogger("api")
         logger.info(f"tile_size: {iq_data.tile_size}")
-
-        if not sasToken:
-            blob_client = BlobClient.from_blob_url(
-                f"https://{account}.blob.core.windows.net/{container}/{filepath}.sigmf-data"
-            )
-        else:
-            blob_client = BlobClient.from_blob_url(
-                f"https://{account}.blob.core.windows.net/{container}/{filepath}.sigmf-data",
-                credential=sasToken.get_secret_value(),
-            )
-
-        blob_properties = blob_client.get_blob_properties()
+        iq_file = get_file_name(filepath, ApiType.IQDATA)
+        blob_properties = await azure_client.get_blob_properties(iq_file)
         blob_size = blob_properties.size
 
         data_list = []
@@ -118,7 +104,8 @@ async def get_iq_data_slices(
         # asyncio solution. Much faster
         tasks = [
             download_blob(
-                blob_client,
+                azure_client,
+                iq_file,
                 index,
                 iq_data.tile_size,
                 iq_data.bytes_per_sample,

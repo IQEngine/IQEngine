@@ -12,7 +12,7 @@ import { convertFloat32ArrayToBase64, convertBase64ToFloat32Array } from '@/util
 import { colMaps } from '@/utils/colormap';
 import { fftshift } from 'fftshift';
 import { FFT } from '@/utils/fft';
-import { useGetPluginsComponents } from '../hooks/useGetPluginsComponents';
+import { useGetPluginsComponents } from '@/pages/spectrogram/hooks/use-get-plugins-components';
 import { useGetPlugins } from '@/api/plugin/Queries';
 import { toast } from 'react-hot-toast';
 import { dataTypeToBytesPerSample } from '@/utils/selector';

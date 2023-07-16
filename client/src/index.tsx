@@ -9,44 +9,28 @@ import reportWebVitals from '@/utils/reportWebVitals';
 import { RouterProvider } from 'react-router-dom';
 import { createRoot } from 'react-dom/client';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { FeatureFlagsProvider } from '@/hooks/useFeatureFlags';
-import { useIQEngineQueryClient } from '@/hooks/useIQEngineQueryClient';
-import { useIQEngineRouter } from '@/hooks/useIQEngineRouter';
-import { MsalProvider } from '@azure/msal-react';
-import { PublicClientApplication, EventType } from '@azure/msal-browser';
-import { msalConfig } from '@/authConfig';
-
-export const msalInstance = new PublicClientApplication(msalConfig);
-
-if (!msalInstance.getActiveAccount() && msalInstance.getAllAccounts().length > 0) {
-  msalInstance.setActiveAccount(msalInstance.getAllAccounts()[0]);
-}
-
-msalInstance.enableAccountStorageEvents();
-
-msalInstance.addEventCallback((event) => {
-  if (event.eventType === EventType.LOGIN_SUCCESS && event.payload.account) {
-    const account = event.payload.account;
-    msalInstance.setActiveAccount(account);
-  }
-});
+import { FeatureFlagsProvider } from '@/hooks/use-feature-flags';
+import { useQueryClient } from '@/hooks/use-query-client';
+import { useRouter } from '@/hooks/use-router';
+import { useAuthProvider } from '@/auth/hooks/use-auth-provider';
 
 const container = document.getElementById('root');
 if (!container) throw new Error('No root element found');
 const root = createRoot(container);
-const { queryClient } = useIQEngineQueryClient();
-const { router } = useIQEngineRouter(msalInstance);
+const { queryClient } = useQueryClient();
+const { router } = useRouter();
+const { AuthProvider } = useAuthProvider();
 root.render(
-  <MsalProvider instance={msalInstance}>
-    <QueryClientProvider client={queryClient}>
+  <QueryClientProvider client={queryClient}>
+    <AuthProvider>
       <FeatureFlagsProvider flags={null}>
         <RouterProvider router={router} />
       </FeatureFlagsProvider>
-    </QueryClientProvider>
-  </MsalProvider>
+    </AuthProvider>
+  </QueryClientProvider>
 );
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+reportWebVitals(console.log);

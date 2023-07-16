@@ -1,3 +1,4 @@
+---
 APPLY_FIXES: all
 SHOW_ELAPSED_TIME: true
 DEFAULT_BRANCH: main
@@ -46,9 +47,5 @@ DISABLE_LINTERS:
   - REPOSITORY_SEMGREP
   - REPOSITORY_SYFT
   - REPOSITORY_TRIVY
+  - REPOSITORY_KICS
   - PYTHON_PYLINT
-
-PRE_COMMANDS:
-  - command: |
-      pip install -r api/requirements.txt
-    cwd: workspace

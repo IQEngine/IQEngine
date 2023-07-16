@@ -1,8 +1,11 @@
 # vim: tabstop=4 shiftwidth=4 expandtab
-# vim: tabstop=4 shiftwidth=4 expandtab
 
 
-def test_api_create_plugin(client):
+import pytest
+
+
+@pytest.mark.asyncio
+async def test_api_create_plugin(client):
     test_plugin = {
         "name": "test_plugin",
         "url": "http://test_plugin.com",
@@ -12,7 +15,8 @@ def test_api_create_plugin(client):
     assert response.json() == test_plugin
 
 
-def test_api_create_plugin_cannot_duplicate(client):
+@pytest.mark.asyncio
+async def test_api_create_plugin_cannot_duplicate(client):
     test_plugin = {
         "name": "test_plugin",
         "url": "http://test_plugin.com",
@@ -24,7 +28,8 @@ def test_api_create_plugin_cannot_duplicate(client):
     assert response.status_code == 409
 
 
-def test_api_create_plugin_cannot_duplicate_name(client):
+@pytest.mark.asyncio
+async def test_api_create_plugin_cannot_duplicate_name(client):
     test_plugin = {
         "name": "test_plugin",
         "url": "http://test_plugin.com",
@@ -37,7 +42,8 @@ def test_api_create_plugin_cannot_duplicate_name(client):
     assert response.status_code == 409
 
 
-def test_api_get_plugins(client):
+@pytest.mark.asyncio
+async def test_api_get_plugins(client):
     test_plugin = {
         "name": "test_plugin",
         "url": "http://test_plugin.com",
@@ -50,7 +56,8 @@ def test_api_get_plugins(client):
     assert response.json() == [test_plugin]
 
 
-def test_api_get_plugin(client):
+@pytest.mark.asyncio
+async def test_api_get_plugin(client):
     test_plugin = {
         "name": "test_plugin",
         "url": "http://test_plugin.com",
@@ -63,12 +70,14 @@ def test_api_get_plugin(client):
     assert response.json() == test_plugin
 
 
-def test_api_get_plugin_not_found(client):
+@pytest.mark.asyncio
+async def test_api_get_plugin_not_found(client):
     response = client.get("/api/plugins/test_plugin")
     assert response.status_code == 404
 
 
-def test_api_update_plugin(client):
+@pytest.mark.asyncio
+async def test_api_update_plugin(client):
     test_plugin = {
         "name": "test_plugin",
         "url": "http://test_plugin.com",
@@ -82,7 +91,8 @@ def test_api_update_plugin(client):
     assert response.json() == test_plugin
 
 
-def test_api_update_plugin_not_found(client):
+@pytest.mark.asyncio
+async def test_api_update_plugin_not_found(client):
     test_plugin = {
         "name": "test_plugin",
         "url": "http://test_plugin.com",
@@ -91,7 +101,8 @@ def test_api_update_plugin_not_found(client):
     assert response.status_code == 404
 
 
-def test_api_delete_plugine(client):
+@pytest.mark.asyncio
+async def test_api_delete_plugine(client):
     test_plugin = {
         "name": "test_plugin",
         "url": "http://test_plugin.com",

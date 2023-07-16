@@ -295,19 +295,19 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
           </button>
           <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
             <li key={0} data-value="hamming" onClick={onChangeWindowFunction}>
-              {state.windowFunction === 'hamming' ? <a className="bg-primary">Hamming</a> : <a>Hamming</a>}
+              {state.windowFunction === 'hamming' ? <a className="active">Hamming</a> : <a>Hamming</a>}
             </li>
             <li key={1} data-value="rectangle" onClick={onChangeWindowFunction}>
-              {state.windowFunction === 'rectangle' ? <a className="bg-primary">Rectangle</a> : <a>Rectangle</a>}
+              {state.windowFunction === 'rectangle' ? <a className="active">Rectangle</a> : <a>Rectangle</a>}
             </li>
             <li key={2} data-value="hanning" onClick={onChangeWindowFunction}>
-              {state.windowFunction === 'hanning' ? <a className="bg-primary">Hanning</a> : <a>Hanning</a>}
+              {state.windowFunction === 'hanning' ? <a className="active">Hanning</a> : <a>Hanning</a>}
             </li>
             <li key={3} data-value="barlett" onClick={onChangeWindowFunction}>
-              {state.windowFunction === 'barlett' ? <a className="bg-primary">Barlett</a> : <a>Barlett</a>}
+              {state.windowFunction === 'barlett' ? <a className="active">Barlett</a> : <a>Barlett</a>}
             </li>
             <li key={4} data-value="blackman" onClick={onChangeWindowFunction}>
-              {state.windowFunction === 'blackman' ? <a className="bg-primary">Blackman</a> : <a>Blackman</a>}
+              {state.windowFunction === 'blackman' ? <a className="active">Blackman</a> : <a>Blackman</a>}
             </li>
           </ul>
         </div>
