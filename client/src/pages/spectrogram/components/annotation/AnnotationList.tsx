@@ -108,7 +108,7 @@ export const AnnotationList = ({
     if (!meta?.annotations) return;
 
     for (let i = 0; i < meta.annotations?.length; i++) {
-      const annotation = meta.annotations[i];
+      const annotation = Object.assign(new Annotation(), meta.annotations[i]);
       const sampleRate = Number(meta.global['core:sample_rate']);
       const startSampleCount = Number(annotation['core:sample_start']);
       const sampleCount = Number(annotation['core:sample_count']);
