@@ -70,7 +70,7 @@ const AnnotationViewer = ({
       );
       let result = {
         ...position,
-        description: annotation.getDescription(),
+        label: annotation.getLabel(),
         index: index,
       };
       if (selectedAnnotation == index && !position.visible) {
@@ -93,7 +93,7 @@ const AnnotationViewer = ({
       x2: 400,
       y1: 200,
       y2: 400,
-      description: 'Fill Me In',
+      label: 'Fill Me In',
       index: -1,
       visible: true,
     });
@@ -111,7 +111,7 @@ const AnnotationViewer = ({
         'core:sample_count': (annotations[annot_indx].y2 - annotations[annot_indx].y1) * fftSize * zoomLevel,
         'core:freq_lower_edge': (annotations[annot_indx].x1 / fftSize) * meta.global['core:sample_rate'] + lower_freq,
         'core:freq_upper_edge': (annotations[annot_indx].x2 / fftSize) * meta.global['core:sample_rate'] + lower_freq,
-        'core:description': annotations[annot_indx]['description'],
+        'core:label': annotations[annot_indx]['label'],
       })
     );
     let new_meta = Object.assign(new SigMFMetadata(), meta);
@@ -154,9 +154,9 @@ const AnnotationViewer = ({
       textarea.addEventListener('keydown', function (e) {
         if (e.key === 'Enter') {
           console.debug(textarea.value, textarea.id);
-          annotations[textarea.id]['description'] = textarea.value; // update the local version first
+          annotations[textarea.id]['label'] = textarea.value; // update the local version first
           // Now update the actual meta info
-          meta.annotations[annotations[textarea.id]['index']]['core:description'] = textarea.value;
+          meta.annotations[annotations[textarea.id]['index']]['core:label'] = textarea.value;
           let new_meta = Object.assign(new SigMFMetadata(), meta);
           setMeta(new_meta);
           document.body.removeChild(textarea);
@@ -288,9 +288,9 @@ const AnnotationViewer = ({
             onClick={onBoxCornerClick}
             id={index.toString() + '-x2-y2'} // tells the event which annotation, and which x and y to update
           />
-          {/* Description Label */}
+          {/* Label */}
           <Text
-            text={annotation.description}
+            text={annotation.label}
             fontFamily="serif"
             fontSize={24}
             x={annotation.x1 * spectrogramWidthScale}
