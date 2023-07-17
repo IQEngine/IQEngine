@@ -11,12 +11,13 @@ RUN apt-get update && apt-get install ffmpeg libsm6 libxext6 -y
 # Satdump
 RUN apt install git cmake libpng-dev libluajit-5.1-dev libnng-dev libzstd-dev libomp-dev -y
 RUN git clone --depth 1 --branch 1.0.3 https://github.com/altillimity/satdump.git
-RUN cd satdump
-RUN mkdir build && cd build
+WORKDIR /src/satdump
+RUN mkdir build
+WORKDIR /src/satdump/build
 RUN cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_GUI=OFF -DCMAKE_INSTALL_PREFIX=/usr ..
 RUN make -j`nproc`
 RUN make install
-RUN cd ../..
+WORKDIR /src
 
 # Python stuff
 RUN apt-get install python3-full python3-pip -y
