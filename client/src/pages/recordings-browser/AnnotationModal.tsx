@@ -17,8 +17,6 @@ export const AnnotationModal = ({ setShowModal, fileName, annotations }: Props) 
   const [pieChartValues, setPieChartValues] = useState([]); // so that it can be directly used in the pie chart https://plotly.com/javascript/pie-charts/
   const [pieChartLabels, setPieChartLabels] = useState([]);
 
-  console.log(annotations);
-
   // Calc Pie chart data
   useEffect(() => {
     const counts = {};
@@ -36,7 +34,6 @@ export const AnnotationModal = ({ setShowModal, fileName, annotations }: Props) 
       labels.push(k);
       vals.push(v);
     });
-    console.log(vals, labels);
     setPieChartValues(vals);
     setPieChartLabels(labels);
   }, [annotations]); // TODO make sure this isnt going to be sluggish when currentSamples is huge
