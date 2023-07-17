@@ -18,14 +18,11 @@ export default function FileRow({ filepath }: FileRowProps) {
   const { type, account, container, sasToken } = useParams();
   const { data: item } = getMeta(type, account, container, filepath);
 
-  //console.log('FILE', 'type: ', type, 'account: ', account, 'container: ', container, 'sasToken: ', sasToken);
-
   const spectogramLink = `/spectrogram/${item?.getOrigin().type}/${item?.getOrigin().account}/${
     item?.getOrigin().container
   }/${encodeURIComponent(item?.getFilePath())}`;
 
   const getUrlWithAuth = (url) => {
-    //console.log('getUrlWithAuth', 'type: ', type, 'sasToken: ', sasToken);
     if (type == CLIENT_TYPE_BLOB && sasToken) {
       // get the value of sig in the sas token
       const sig = sasToken
@@ -39,7 +36,6 @@ export default function FileRow({ filepath }: FileRowProps) {
       //console.log('getUrlWithAuth', 'encodedSasToken: ', encodedSasToken);
       url += `?${encodedSasToken}`;
     }
-    //console.log('getUrlWithAuth', 'url: ', url);
     return url;
   };
 
