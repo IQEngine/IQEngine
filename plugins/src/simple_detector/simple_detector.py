@@ -65,7 +65,7 @@ class Plugin:
             an['core:freq_upper_edge'] = int((x + w) / fft_size * self.sample_rate - (self.sample_rate / 2) + self.center_freq) # Hz
             an['core:sample_start'] = int(y * fft_size)
             an['core:sample_count'] = int(h * fft_size)
-            an["core:description"] = "Unknown"
+            an["core:label"] = "Unknown"
             annotations.append(an)
 
         return {

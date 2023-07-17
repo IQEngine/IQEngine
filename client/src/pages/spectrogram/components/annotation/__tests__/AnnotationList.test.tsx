@@ -204,13 +204,13 @@ describe('Annotation list component', () => {
   });
 
   test.each`
-    input                         | key                       | value                | label                               | type            | expected
-    ${'883'}                      | ${'core:freq_lower_edge'} | ${883000000}         | ${'Annotation 0 - Frequency Start'} | ${'spinbutton'} | ${883000000}
-    ${'885'}                      | ${'core:freq_upper_edge'} | ${885000000}         | ${'Annotation 0 - Frequency End'}   | ${'spinbutton'} | ${885000000}
-    ${'New Description'}          | ${'core:description'}     | ${'New Description'} | ${'Annotation 0 - Label'}           | ${'textbox'}    | ${'New Description'}
-    ${'2022-03-17T16:43:30.002Z'} | ${'core:sample_start'}    | ${10001}             | ${'Annotation 0 - Start Time'}      | ${'textbox'}    | ${10001}
-    ${'2022-03-17T16:45:30.003Z'} | ${'core:sample_count'}    | ${10002}             | ${'Annotation 0 - End Time'}        | ${'textbox'}    | ${10002}
-    ${'New Comment'}              | ${'core:comment'}         | ${'New Comment'}     | ${'Annotation 0 - Comment'}         | ${'textbox'}    | ${'New Comment'}
+    input                         | key                       | value            | label                               | type            | expected
+    ${'883'}                      | ${'core:freq_lower_edge'} | ${883000000}     | ${'Annotation 0 - Frequency Start'} | ${'spinbutton'} | ${883000000}
+    ${'885'}                      | ${'core:freq_upper_edge'} | ${885000000}     | ${'Annotation 0 - Frequency End'}   | ${'spinbutton'} | ${885000000}
+    ${'New Label'}                | ${'core:label'}           | ${'New Label'}   | ${'Annotation 0 - Label'}           | ${'textbox'}    | ${'New Label'}
+    ${'2022-03-17T16:43:30.002Z'} | ${'core:sample_start'}    | ${10001}         | ${'Annotation 0 - Start Time'}      | ${'textbox'}    | ${10001}
+    ${'2022-03-17T16:45:30.003Z'} | ${'core:sample_count'}    | ${10002}         | ${'Annotation 0 - End Time'}        | ${'textbox'}    | ${10002}
+    ${'New Comment'}              | ${'core:comment'}         | ${'New Comment'} | ${'Annotation 0 - Comment'}         | ${'textbox'}    | ${'New Comment'}
   `('Annotation updates action value correctly on alteration', async ({ input, key, value, label, type, expected }) => {
     //Arrange
     const meta = Object.assign(new SigMFMetadata(), JSON.parse(JSON.stringify(metadataJson)));

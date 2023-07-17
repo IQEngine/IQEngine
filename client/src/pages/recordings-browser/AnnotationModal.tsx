@@ -8,20 +8,34 @@ import React, { useEffect, useState } from 'react';
 export const AnnotationModal = (props) => {
   let { setShowModal, fileName, annotations } = props;
 
+  console.log(annotations);
+
+  // Pie chart data
+  const counts = {};
+  for (let item in annotations) {
+    const label = item['core:label'];
+    if (label in counts) {
+      counts[label] = counts[label] + 1;
+    } else {
+      counts[label] = 1;
+    }
+  }
+  console.log(counts);
+
   const annotationsData = annotations?.map((item, index) => {
     const deepItemCopy = JSON.parse(JSON.stringify(item));
     delete deepItemCopy['core:sample_start'];
     delete deepItemCopy['core:sample_count'];
     delete deepItemCopy['core:freq_lower_edge'];
     delete deepItemCopy['core:freq_upper_edge'];
-    delete deepItemCopy['core:description'];
+    delete deepItemCopy['core:label'];
     return (
       <tr key={index} className="h-12">
         <td>{item['core:sample_start']}</td>
         <td>{item['core:sample_count']}</td>
         <td>{item['core:freq_lower_edge'] / 1e6}</td>
         <td>{item['core:freq_upper_edge'] / 1e6}</td>
-        <td>{item['core:description']}</td>
+        <td>{item['core:label']}</td>
         <td>{JSON.stringify(deepItemCopy, null, 4).replaceAll('{', '').replaceAll('}', '').replaceAll('"', '')}</td>
       </tr>
     );
@@ -47,7 +61,7 @@ export const AnnotationModal = (props) => {
                 <th>Sample Count</th>
                 <th>Frequency Min [MHz]</th>
                 <th>Frequency Max [MHz]</th>
-                <th>Description</th>
+                <th>Label</th>
                 <th>Other</th>
               </tr>
             </thead>

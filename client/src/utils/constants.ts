@@ -33,6 +33,6 @@ export const INITIAL_ANNOTATIONS_SNIPPET = `{
         "core:sample_count": 200000,
         "core:freq_lower_edge": 883275000,
         "core:freq_upper_edge": 884625000,
-        "core:description": "LTE"
+        "core:label": "LTE"
     }]
 }`;

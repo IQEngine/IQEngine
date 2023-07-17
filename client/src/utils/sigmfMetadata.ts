@@ -222,7 +222,6 @@ export class Annotation {
   'core:freq_lower_edge'?: number;
   'core:freq_upper_edge'?: number;
   'core:uuid'?: string;
-  'core:description'?: string;
   capture_details?: string;
 
   getAnnotationPosition(
@@ -269,8 +268,8 @@ export class Annotation {
     return result;
   }
 
-  getDescription() {
-    return this['core:description'] ?? this['core:comment'] ?? this['core:label'] ?? '';
+  getLabel() {
+    return this['core:label'] ?? this['core:description'] ?? '';
   }
 
   [key: string]: any;
