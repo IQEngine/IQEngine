@@ -11,7 +11,7 @@ import RepositoryAPITile from './RepositoryAPITile';
 import SiggenTile from './SiggenTile';
 import ValidatorTile from './ValidatorTile';
 import { useConfigQuery } from '@/api/config/queries';
-import { getDataSources } from '@/api/datasource/Queries';
+import { getDataSources } from '@/api/datasource/queries';
 import { CLIENT_TYPE_API, CLIENT_TYPE_BLOB, DataSource } from '@/api/Models';
 import { useQueryClient } from '@tanstack/react-query';
 import Feature from '@/features/feature/Feature';

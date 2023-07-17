@@ -97,7 +97,7 @@ class ConnectionInfo(BaseModel):
 
 class Configuration(BaseModel):
     connection_info: ConnectionInfo = Field({}, alias="connectionInfo")
-    feature_flags: FeatureFlags = Field({}, alias="featureFlags")
+    feature_flags: FeatureFlags = Field(None, alias="featureFlags")
     google_analytics_key: str = Field(None, alias="googleAnalyticsKey")
     internal_branding: str = Field(None, alias="internalBranding")
     app_id: str = Field(None, alias="appId")

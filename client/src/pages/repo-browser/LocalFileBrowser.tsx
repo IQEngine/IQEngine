@@ -7,10 +7,9 @@ import { useNavigate } from 'react-router-dom';
 
 import { directoryOpen, fileOpen, supported } from 'browser-fs-access';
 import { FileWithDirectoryAndFileHandle } from 'browser-fs-access';
-import { getDataSource } from '@/api/datasource/Queries';
+import { getDataSource } from '@/api/datasource/queries';
 import { CLIENT_TYPE_LOCAL } from '@/api/Models';
 import { useUserSettings } from '@/api/user-settings/use-user-settings';
-
 
 const LocalFileBrowser = () => {
   const navigate = useNavigate();

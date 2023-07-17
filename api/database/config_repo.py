@@ -9,7 +9,7 @@ def collection() -> AgnosticCollection:
 
 
 async def get() -> Configuration | None:
-    current = await collection().configuration.find_one()
+    current = await collection().find_one()
     if current is None:
         return None
     return Configuration(**current)

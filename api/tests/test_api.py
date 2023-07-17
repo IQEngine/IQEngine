@@ -23,7 +23,7 @@ async def test_api_get_config(client):
         assert response.json() == {
             "connectionInfo": {},
             "googleAnalyticsKey": "google_analytics_key",
-            "featureFlags": {},
+            "featureFlags": None,
             "internalBranding": "internal_branding_string",
             "appId": "app_id",
             "appAuthority": "app_authority",
