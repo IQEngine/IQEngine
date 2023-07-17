@@ -2,24 +2,10 @@ import { test, describe } from 'vitest';
 import { useGetImage } from '../use-get-image';
 import { renderHook, waitFor } from '@testing-library/react';
 import { TILE_SIZE_IN_IQ_SAMPLES, COLORMAP_DEFAULT } from '@/utils/constants';
-import { imageToBlob } from 'browser-fs-access';
 
 const fftSize = 1024;
 const magnitudeMin = -10.0;
 const magnitudeMax = -40.0;
-
-async function imageToUint8ClampedArray(image: ImageBitmap): Promise<Uint8ClampedArray> {
-  // add the image to the DOM so we can get the image data
-  const canvas = document.createElement('canvas');
-  canvas.width = image.width;
-  canvas.height = image.height;
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(image, 0, 0);
-
-  // get the image data
-  const imageData = ctx.getImageData(0, 0, image.width, image.height);
-  return imageData.data;
-}
 
 describe('DevTest Spectrogram Tests', () => {
   test('useGetImage fftToRGB white box', async ({ expect }) => {
@@ -31,24 +17,24 @@ describe('DevTest Spectrogram Tests', () => {
     const height = (7 * TILE_SIZE_IN_IQ_SAMPLES) / fftSize;
     expectedData.fill(255);
     const expectedImageData = new ImageData(expectedData, fftSize, height);
-
     // run the code-under-test
     const { result } = renderHook(() =>
       useGetImage(totalFftData, fftSize, magnitudeMin, magnitudeMax, COLORMAP_DEFAULT)
     );
+
     await waitFor(() => {
       expect(result.current.image).not.toBeNull();
     });
 
-    const resultImageData = await imageToUint8ClampedArray(result.current.image);
-
+    const lastCall = createImageBitmap.mock.lastCall;
+    const imageDataCalled = lastCall[0];
     // compare the ImageData objects - looking for a better way...
     let imagesAreTheSame = true;
-    if (expectedImageData.data.length != resultImageData.length) {
+    if (expectedImageData.data.length != imageDataCalled.data.length) {
       imagesAreTheSame = false;
     } else {
       for (var i = 0; i < expectedImageData.data.length; ++i) {
-        if (expectedImageData.data[i] != resultImageData[i]) {
+        if (expectedImageData.data[i] != imageDataCalled.data[i]) {
           imagesAreTheSame = false;
           break;
         }
