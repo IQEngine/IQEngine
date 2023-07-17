@@ -1,20 +1,38 @@
+import Feature from '@/features/feature/Feature';
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
+export type FeatureFlagName = keyof typeof FeatureFlag;
+
 type Flags = {
-    [key in FeatureFlag]: boolean;
+  [key in FeatureFlagName]: boolean;
 };
 
-
-export enum FeatureFlag {
-    useIQEngineOutReach = "useIQEngineOutReach",
-    displayIQEngineGitHub = "displayIQEngineGitHub",
-    displayInternalBranding = "displayInternalBranding",
-    useAPIDatasources = "useAPIDatasources",
-}
+export const FeatureFlag = {
+  useIQEngineOutReach: {
+    name: 'useIQEngineOutReach',
+    description: 'Use IQEngine Outreach',
+    default: true,
+  },
+  displayIQEngineGitHub: {
+    name: 'displayIQEngineGitHub',
+    description: 'Display IQEngine GitHub',
+    default: true,
+  },
+  displayInternalBranding: {
+    name: 'displayInternalBranding',
+    description: 'Display Internal Branding',
+    default: false,
+  },
+  useAPIDatasources: {
+    name: 'useAPIDatasources',
+    description: 'Use API Datasources',
+    default: true,
+  },
+};
 
 interface ContextProps {
   featureFlags: Flags;
-  getFeatureFlag: (flag: FeatureFlag) => boolean;
+  getFeatureFlag: (flag: FeatureFlagName) => boolean;
   setFeatureFlags: React.Dispatch<React.SetStateAction<Flags>>;
 }
 
@@ -25,26 +43,12 @@ interface Props {
   flags: Flags;
 }
 
-function getFeatureFlagDefault(featureFlag: FeatureFlag): boolean {
-    switch (featureFlag) {
-        case FeatureFlag.useIQEngineOutReach:
-        case FeatureFlag.displayIQEngineGitHub:
-        case FeatureFlag.useAPIDatasources:
-            return true
-        case FeatureFlag.displayInternalBranding:
-            return false
-        default:
-            return true
-    }
-}
-
 export const FeatureFlagsProvider = ({ children, flags }: Props) => {
   const [featureFlags, setFeatureFlags] = useState<Flags>(flags);
-  const getFeatureFlag = (flag: FeatureFlag) => {
+  const getFeatureFlag = (flag: FeatureFlagName) => {
     if (!featureFlags || !(flag in featureFlags)) {
-      return getFeatureFlagDefault(flag);
+      return FeatureFlag[flag]?.default ?? true;
     }
-    const result = featureFlags[flag]
     return featureFlags[flag];
   };
   return (
