@@ -6,6 +6,7 @@ import React from 'react';
 import { AllProviders, queryClient } from '@/mocks/setup-tests';
 import nock from 'nock';
 import userEvent from '@testing-library/user-event';
+import { Toaster } from 'react-hot-toast';
 
 describe('Test Configuration', () => {
   beforeEach(() => {
@@ -112,5 +113,92 @@ describe('Test Configuration', () => {
     const useAPIDatasources = await screen.findByRole('checkbox', { name: 'useAPIDatasources', checked: true });
     await userEvent.click(useAPIDatasources);
     expect(useAPIDatasources).not.toBeChecked();
+  });
+
+  test('Save Button Disabled When No Changes', async () => {
+    nock('http://localhost:3000')
+      .get('/api/config')
+      .reply(200, {
+        featureFlags: {
+          useIQEngineOutReach: true,
+          displayIQEngineGitHub: true,
+          displayInternalBranding: true,
+          useAPIDatasources: true,
+        },
+      });
+    render(<Configuration></Configuration>, { wrapper: AllProviders });
+
+    const saveButton = screen.getByRole('button', { name: 'Save Configuration Button' });
+    expect(saveButton).toBeDisabled();
+  });
+
+  test('Displays save successful message when successful update', async () => {
+    nock('http://localhost:3000')
+      .get('/api/config')
+      .reply(200, {
+        featureFlags: {
+          useIQEngineOutReach: true,
+          displayIQEngineGitHub: true,
+          displayInternalBranding: true,
+          useAPIDatasources: true,
+        },
+      });
+
+    nock('http://localhost:3000').put(`/api/config`).reply(200);
+
+    render(
+      <>
+        <Toaster />
+        <Configuration />
+      </>,
+      { wrapper: AllProviders }
+    );
+
+    const displayInternalBranding = await screen.findByRole('checkbox', {
+      name: 'displayInternalBranding',
+      checked: true,
+    });
+    await userEvent.click(displayInternalBranding);
+    expect(displayInternalBranding).not.toBeChecked();
+
+    const saveButton = screen.getByRole('button', { name: 'Save Configuration Button' });
+    await userEvent.click(saveButton);
+
+    expect(await screen.findByText('Successfully updated configuration')).toBeInTheDocument();
+  });
+
+  test('Displays save unsuccessful message when error on update', async () => {
+    nock('http://localhost:3000')
+      .get('/api/config')
+      .reply(200, {
+        featureFlags: {
+          useIQEngineOutReach: true,
+          displayIQEngineGitHub: true,
+          displayInternalBranding: true,
+          useAPIDatasources: true,
+        },
+      });
+
+    nock('http://localhost:3000').put(`/api/config`).reply(404);
+
+    render(
+      <>
+        <Toaster />
+        <Configuration />
+      </>,
+      { wrapper: AllProviders }
+    );
+
+    const displayInternalBranding = await screen.findByRole('checkbox', {
+      name: 'displayInternalBranding',
+      checked: true,
+    });
+    await userEvent.click(displayInternalBranding);
+    expect(displayInternalBranding).not.toBeChecked();
+
+    const saveButton = screen.getByRole('button', { name: 'Save Configuration Button' });
+    await userEvent.click(saveButton);
+
+    expect(await screen.findByText('Something went wrong updating configuration')).toBeInTheDocument();
   });
 });

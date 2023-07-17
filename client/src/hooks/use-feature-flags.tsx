@@ -1,7 +1,7 @@
 import Feature from '@/features/feature/Feature';
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-type FeatureFlagName = keyof typeof FeatureFlag;
+export type FeatureFlagName = keyof typeof FeatureFlag;
 
 type Flags = {
   [key in FeatureFlagName]: boolean;
