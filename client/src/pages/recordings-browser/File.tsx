@@ -64,25 +64,6 @@ export default function FileRow({ filepath }: FileRowProps) {
     return getUrlWithAuth(item.getMetadataUrl());
   };
 
-  const annotationsData = item?.annotations?.map((item, index) => {
-    const deepItemCopy = JSON.parse(JSON.stringify(item));
-    delete deepItemCopy['core:sample_start'];
-    delete deepItemCopy['core:sample_count'];
-    delete deepItemCopy['core:freq_lower_edge'];
-    delete deepItemCopy['core:freq_upper_edge'];
-    delete deepItemCopy['core:description'];
-    return (
-      <tr key={index} className="h-12">
-        <td>{item['core:sample_start']}</td>
-        <td>{item['core:sample_count']}</td>
-        <td>{item['core:freq_lower_edge'] / 1e6}</td>
-        <td>{item['core:freq_upper_edge'] / 1e6}</td>
-        <td>{item['core:description']}</td>
-        <td>{JSON.stringify(deepItemCopy, null, 4).replaceAll('{', '').replaceAll('}', '').replaceAll('"', '')}</td>
-      </tr>
-    );
-  });
-
   function NewlineText(props) {
     const text = props.text;
     return <div className="datatypetext">{text}</div>;
@@ -153,7 +134,7 @@ export default function FileRow({ filepath }: FileRowProps) {
           {showModal && (
             <AnnotationModal
               setShowModal={setShowModal}
-              annotationsData={annotationsData}
+              annotations={item?.annotations}
               fileName={item.getFileName()}
             />
           )}
