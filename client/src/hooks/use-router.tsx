@@ -27,6 +27,13 @@ export function useRouter() {
             return { Component: SigMF };
           },
         },
+        {
+          path: 'query',
+          async lazy() {
+            let { MetadataQuery } = await import('@/pages/metadata-query/metadata-query');
+            return { Component: MetadataQuery };
+          },
+        },
         { path: 'siggen', element: <SignalGenerator /> },
         {
           path: 'plugins',
@@ -67,6 +74,13 @@ export function useRouter() {
               async lazy() {
                 let { Configuration } = await import('@/pages/admin/pages/configuration');
                 return { Component: Configuration };
+              },
+            },
+            {
+              path: 'query',
+              async lazy() {
+                let { MetadataQuery } = await import('@/pages/metadata-query/metadata-query');
+                return { Component: MetadataQuery };
               },
             },
             {
