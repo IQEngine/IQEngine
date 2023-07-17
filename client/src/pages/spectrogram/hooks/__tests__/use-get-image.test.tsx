@@ -8,6 +8,19 @@ const fftSize = 1024;
 const magnitudeMin = -10.0;
 const magnitudeMax = -40.0;
 
+async function imageToUint8ClampedArray(image: ImageBitmap): Promise<Uint8ClampedArray> {
+  // add the image to the DOM so we can get the image data
+  const canvas = document.createElement('canvas');
+  canvas.width = image.width;
+  canvas.height = image.height;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(image, 0, 0);
+
+  // get the image data
+  const imageData = ctx.getImageData(0, 0, image.width, image.height);
+  return imageData.data;
+}
+
 describe('DevTest Spectrogram Tests', () => {
   test('useGetImage fftToRGB white box', async ({ expect }) => {
     const totalFftData = new Float32Array(7 * TILE_SIZE_IN_IQ_SAMPLES);
@@ -27,13 +40,15 @@ describe('DevTest Spectrogram Tests', () => {
       expect(result.current.image).not.toBeNull();
     });
 
+    const resultImageData = await imageToUint8ClampedArray(result.current.image);
+
     // compare the ImageData objects - looking for a better way...
     let imagesAreTheSame = true;
-    if (expectedImageData.data.length != result.current.imageData.data.length) {
+    if (expectedImageData.data.length != resultImageData.length) {
       imagesAreTheSame = false;
     } else {
       for (var i = 0; i < expectedImageData.data.length; ++i) {
-        if (expectedImageData.data[i] != result.current.imageData.data[i]) {
+        if (expectedImageData.data[i] != resultImageData[i]) {
           imagesAreTheSame = false;
           break;
         }
