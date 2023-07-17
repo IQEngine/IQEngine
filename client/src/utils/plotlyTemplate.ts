@@ -449,8 +449,8 @@ export const template = {
     mapbox: {
       style: 'dark',
     },
-    paper_bgcolor: '#222222',
-    plot_bgcolor: '#222222',
+    paper_bgcolor: '#05041C',
+    plot_bgcolor: '#05041C',
     polar: {
       angularaxis: {
         gridcolor: '#506784',

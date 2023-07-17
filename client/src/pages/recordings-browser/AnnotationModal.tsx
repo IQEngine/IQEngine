@@ -4,38 +4,59 @@
 
 import Plot from 'react-plotly.js';
 import React, { useEffect, useState } from 'react';
+import { Annotation } from '@/utils/sigmfMetadata';
+import { template } from '@/utils/plotlyTemplate';
 
-export const AnnotationModal = (props) => {
-  let { setShowModal, fileName, annotations } = props;
+interface Props {
+  setShowModal: any;
+  fileName: String;
+  annotations: Annotation[];
+}
+
+export const AnnotationModal = ({ setShowModal, fileName, annotations }: Props) => {
+  const [pieChartValues, setPieChartValues] = useState([]); // so that it can be directly used in the pie chart https://plotly.com/javascript/pie-charts/
+  const [pieChartLabels, setPieChartLabels] = useState([]);
 
   console.log(annotations);
 
-  // Pie chart data
-  const counts = {};
-  for (let item in annotations) {
-    const label = item['core:label'];
-    if (label in counts) {
-      counts[label] = counts[label] + 1;
-    } else {
-      counts[label] = 1;
-    }
-  }
-  console.log(counts);
+  // Calc Pie chart data
+  useEffect(() => {
+    const counts = {};
+    annotations.forEach((item) => {
+      const label = item.getLabel();
+      if (label in counts) {
+        counts[label] = counts[label] + 1;
+      } else {
+        counts[label] = 1;
+      }
+    });
+    const vals = [];
+    const labels = [];
+    Object.entries(counts).forEach(([k, v]) => {
+      labels.push(k);
+      vals.push(v);
+    });
+    console.log(vals, labels);
+    setPieChartValues(vals);
+    setPieChartLabels(labels);
+  }, [annotations]); // TODO make sure this isnt going to be sluggish when currentSamples is huge
 
   const annotationsData = annotations?.map((item, index) => {
     const deepItemCopy = JSON.parse(JSON.stringify(item));
+    // remove the main feilds so that everything left is shown in "other"
     delete deepItemCopy['core:sample_start'];
     delete deepItemCopy['core:sample_count'];
     delete deepItemCopy['core:freq_lower_edge'];
     delete deepItemCopy['core:freq_upper_edge'];
     delete deepItemCopy['core:label'];
+    delete deepItemCopy['core:description'];
     return (
       <tr key={index} className="h-12">
         <td>{item['core:sample_start']}</td>
         <td>{item['core:sample_count']}</td>
         <td>{item['core:freq_lower_edge'] / 1e6}</td>
         <td>{item['core:freq_upper_edge'] / 1e6}</td>
-        <td>{item['core:label']}</td>
+        <td>{item.getLabel()}</td>
         <td>{JSON.stringify(deepItemCopy, null, 4).replaceAll('{', '').replaceAll('}', '').replaceAll('"', '')}</td>
       </tr>
     );
@@ -53,6 +74,30 @@ export const AnnotationModal = (props) => {
         >
           ✕
         </button>
+
+        <div>
+          <Plot
+            data={[
+              {
+                values: pieChartValues,
+                labels: pieChartLabels,
+                type: 'pie',
+                hole: 0.4,
+                automargin: true,
+                textposition: 'outside',
+                textinfo: 'label+percent+value',
+              },
+            ]}
+            layout={{
+              showlegend: false,
+              width: 250,
+              height: 250,
+              template: template,
+              margin: { t: 0, b: 0, l: 0, r: 0 },
+            }}
+          />
+        </div>
+
         <div className="grid justify-items-stretch">
           <table className="text-base-content">
             <thead className="text-primary border-b-2 h-12 border-accent">
