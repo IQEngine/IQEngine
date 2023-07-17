@@ -420,9 +420,9 @@ export const template = {
       ],
     },
     colorway: [
-      '#0baf81',
-      '#FFA15A',
-      '#00cc96',
+      '#4CE091',
+      '#84cae7',
+      '#136f63',
       '#ab63fa',
       '#FFA15A',
       '#19d3f3',
