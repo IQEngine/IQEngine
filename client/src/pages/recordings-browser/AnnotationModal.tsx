@@ -22,11 +22,7 @@ export const AnnotationModal = ({ setShowModal, fileName, annotations }: Props) 
     const counts = {};
     annotations.forEach((item) => {
       const label = item.getLabel();
-      if (label in counts) {
-        counts[label] = counts[label] + 1;
-      } else {
-        counts[label] = 1;
-      }
+      counts[label] = (counts[label] ?? 0) + 1;
     });
     const vals = [];
     const labels = [];
@@ -36,7 +32,7 @@ export const AnnotationModal = ({ setShowModal, fileName, annotations }: Props) 
     });
     setPieChartValues(vals);
     setPieChartLabels(labels);
-  }, [annotations]); // TODO make sure this isnt going to be sluggish when currentSamples is huge
+  }, [annotations]);
 
   const annotationsData = annotations?.map((item, index) => {
     const deepItemCopy = JSON.parse(JSON.stringify(item));
