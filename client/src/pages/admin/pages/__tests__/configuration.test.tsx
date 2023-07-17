@@ -25,15 +25,20 @@ describe('Test Configuration', () => {
     expect(await screen.findByRole('checkbox', { name: 'displayIQEngineGitHub' })).toBeInTheDocument();
     expect(await screen.findByRole('checkbox', { name: 'displayInternalBranding' })).toBeInTheDocument();
     expect(await screen.findByRole('checkbox', { name: 'useAPIDatasources' })).toBeInTheDocument();
+
+    expect(await screen.findByText('Use IQEngine Outreach')).toBeInTheDocument();
+    expect(await screen.findByText('Display IQEngine GitHub')).toBeInTheDocument();
+    expect(await screen.findByText('Display Internal Branding')).toBeInTheDocument();
+    expect(await screen.findByText('Use API Datasources')).toBeInTheDocument();
   });
 
   test('Feature Flags Default', async () => {
     nock('http://localhost:3000').get('/api/config').reply(404, {});
     render(<Configuration></Configuration>, { wrapper: AllProviders });
-    expect(await screen.findByRole('checkbox', { name: 'useIQEngineOutReach' })).not.toBeChecked();
-    expect(await screen.findByRole('checkbox', { name: 'displayIQEngineGitHub' })).not.toBeChecked();
+    expect(await screen.findByRole('checkbox', { name: 'useIQEngineOutReach' })).toBeChecked();
+    expect(await screen.findByRole('checkbox', { name: 'displayIQEngineGitHub' })).toBeChecked();
     expect(await screen.findByRole('checkbox', { name: 'displayInternalBranding' })).not.toBeChecked();
-    expect(await screen.findByRole('checkbox', { name: 'useAPIDatasources' })).not.toBeChecked();
+    expect(await screen.findByRole('checkbox', { name: 'useAPIDatasources' })).toBeChecked();
   });
 
   test('Feature Flags Displays Returned Values', async () => {
@@ -69,7 +74,7 @@ describe('Test Configuration', () => {
     render(<Configuration></Configuration>, { wrapper: AllProviders });
 
     expect(await screen.findByRole('checkbox', { name: 'useIQEngineOutReach', checked: true })).toBeChecked();
-    expect(await screen.findByRole('checkbox', { name: 'displayIQEngineGitHub', checked: false })).not.toBeChecked();
+    expect(await screen.findByRole('checkbox', { name: 'displayIQEngineGitHub', checked: true })).toBeChecked();
     expect(await screen.findByRole('checkbox', { name: 'displayInternalBranding', checked: true })).toBeChecked();
     expect(await screen.findByRole('checkbox', { name: 'useAPIDatasources', checked: true })).toBeChecked();
     expect(screen.queryByRole('checkbox', { name: 'invalidFlag' })).not.toBeInTheDocument();

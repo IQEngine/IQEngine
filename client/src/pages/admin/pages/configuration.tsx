@@ -5,13 +5,18 @@ import { FeatureFlag } from '@/hooks/use-feature-flags';
 export const Configuration = () => {
   const config = useConfigQuery();
   const [featureFlags, setFeatureFlags] = React.useState(
-    Object.fromEntries(Object.keys(FeatureFlag).map((key) => [FeatureFlag[key], false]))
+    Object.fromEntries(
+      Object.keys(FeatureFlag).map((key) => [FeatureFlag[key]?.name, FeatureFlag[key]?.default ?? false])
+    )
   );
 
   useEffect(() => {
     if (config?.data?.featureFlags) {
       const newFeatureFlags = Object.fromEntries(
-        Object.keys(FeatureFlag).map((key) => [FeatureFlag[key], config.data.featureFlags[key]])
+        Object.keys(FeatureFlag).map((key) => [
+          FeatureFlag[key]?.name,
+          config.data.featureFlags[FeatureFlag[key]?.name],
+        ])
       );
       setFeatureFlags(newFeatureFlags);
     }
@@ -33,7 +38,7 @@ export const Configuration = () => {
         {Object.keys(featureFlags).map((key) => (
           <div key={key}>
             <label htmlFor={key} className="label">
-              <span className="text-md">{key}</span>
+              <span className="text-md">{FeatureFlag[key]?.description}</span>
               {featureFlags && (
                 <input
                   type="checkbox"

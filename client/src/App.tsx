@@ -149,7 +149,7 @@ export const App = () => {
           </div>
           <Link to="/" onClick={() => {}}>
             <div id="IQEngineLogo" className="absolute mt-4 pt-2 top-0 left-1/2 transform -translate-x-1/2 flex">
-              <Feature flag={FeatureFlag.displayInternalBranding}>
+              <Feature flag={FeatureFlag.displayInternalBranding.name}>
                 {config.data && config.data.internalBranding && (
                   <img
                     src={config.data.internalBranding}
@@ -199,7 +199,7 @@ export const App = () => {
                   </a>
                 </li>
               )}
-              <Feature flag={FeatureFlag.useIQEngineOutReach}>
+              <Feature flag={FeatureFlag.useIQEngineOutReach.name}>
                 <li className="hidden md:block">
                   <a href="https://discord.gg/k7C8kp3b76" target="_blank" rel="noreferrer" className="text-lg">
                     <div className="flex">
@@ -227,7 +227,7 @@ export const App = () => {
                   </svg>
                 </a>
               </Feature>
-              <Feature flag={FeatureFlag.displayIQEngineGitHub}>
+              <Feature flag={FeatureFlag.displayIQEngineGitHub.name}>
                 <li className="hidden md:block">
                   <a href="https://github.com/iqengine/iqengine" target="_blank" rel="noreferrer" className="text-lg ">
                     <div className="flex">
@@ -267,7 +267,7 @@ export const App = () => {
           rel="noreferrer"
           href="https://dashboard.mailerlite.com/forms/299501/77960409531811734/share"
         >
-          <Feature flag={FeatureFlag.useIQEngineOutReach}>
+          <Feature flag={FeatureFlag.useIQEngineOutReach.name}>
             <h2 className="text-center py-2">
               Sign up for a once-a-month email update on IQEngine, such as new features, demos, and more!
             </h2>
