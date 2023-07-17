@@ -275,6 +275,7 @@ export class Annotation {
   [key: string]: any;
 }
 
+/* Unused?
 export const SigMFFields = {
   antenna_gain: 'antenna:gain',
   antenna_type: 'antenna:type',
@@ -311,3 +312,4 @@ export const SigMFFields = {
   uuid: 'core:uuid',
   capture_details: 'capture_details',
 };
+*/
