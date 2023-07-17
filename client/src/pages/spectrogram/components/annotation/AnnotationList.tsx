@@ -121,7 +121,7 @@ export const AnnotationList = ({
         : centerFrequency + sampleRate / 2;
 
       // Get label
-      const label = annotation['core:label'];
+      const label = annotation.getLabel();
 
       // Get start frequency range
       const startFrequency = getFrequency(lowerEdge);
