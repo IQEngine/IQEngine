@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { useQuery } from '@tanstack/react-query';
-import { FeatureFlag } from '@/hooks/use-feature-flags';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { FeatureFlagName } from '@/hooks/use-feature-flags';
 
 const fetchConfig = async () => {
   try {
@@ -62,6 +62,38 @@ const fetchConfig = async () => {
   }
 };
 
+const updateConfig = async (config: AppConfig) => {
+  return await axios
+    .put(`/api/config`, config)
+    .then((response) => {
+      return Promise.resolve(config as AppConfig);
+    })
+    .catch((error) => {
+      console.error(error);
+      throw new Error('Failed to update metadata.');
+    });
+};
+
+export const useUpdateConfig = (config: AppConfig) => {
+  let client = useQueryClient();
+
+  return useMutation({
+    mutationFn: (config: AppConfig) => {
+      return updateConfig(config);
+    },
+    onMutate: async () => {
+      await client.cancelQueries(['config']);
+      const previousConfig = client.getQueryData(['config']);
+      client.setQueryData(['config'], config);
+      return { previousConfig };
+    },
+    onError: (err, newMeta, context) => {
+      console.error('onError', err);
+      client.setQueryData(['config'], context.previousConfig);
+    },
+  });
+};
+
 interface ConnectionInfo {
   settings: Array<{
     name: string;
@@ -77,7 +109,7 @@ export type AppConfig = {
   connectionInfo: ConnectionInfo;
   googleAnalyticsKey: string;
   uploadPageBlobSasUrl: string;
-  featureFlags: { [key in FeatureFlag]: boolean };
+  featureFlags: { [key in FeatureFlagName]: boolean };
   internalBranding: string;
   appId: string;
   appAuthority: string;

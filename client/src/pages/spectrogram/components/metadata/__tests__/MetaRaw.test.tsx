@@ -33,7 +33,7 @@ describe('MetaRaw ', () => {
   ];
   meta.annotations = [
     Object.assign(new Annotation(), {
-      'core:description': 'test',
+      'core:label': 'test',
       'core:sample_start': 1000,
       'core:sample_count': 100,
     }),

@@ -31,7 +31,7 @@ class Plugin:
         an['core:freq_upper_edge'] = 2 # Hz
         an['core:sample_start'] = 3
         an['core:sample_count'] = 4
-        an["core:description"] = "Unknown"
+        an["core:label"] = "Unknown"
         annotations.append(an)
         return {
             "status" : "SUCCESS",

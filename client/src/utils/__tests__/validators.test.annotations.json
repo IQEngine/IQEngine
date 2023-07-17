@@ -5,14 +5,14 @@
       "core:sample_count": 200000,
       "core:freq_upper_edge": 884625000,
       "core:freq_lower_edge": 883275000,
-      "core:description": "LTE"
+      "core:label": "LTE"
     },
     {
       "core:sample_start": 100000,
       "core:sample_count": 200000,
       "core:freq_lower_edge": 884630000,
       "core:freq_upper_edge": 893520000,
-      "core:description": "Bluetooth"
+      "core:label": "Bluetooth"
     }
   ]
 }
