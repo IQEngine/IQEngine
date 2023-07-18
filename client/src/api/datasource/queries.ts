@@ -52,24 +52,18 @@ export const getFeatures = (type: string) => {
 
 
 
-export const useAddDataSource = (dataSource: DataSource) => {
+export const useAddDataSource = () => {
   const { dataSourcesQuery, filesQuery } = useUserSettings();
   const dataSourceClient = DataSourceClientFactory(ClientType.API, filesQuery.data, dataSourcesQuery.data);
   let client = useQueryClient();
 
   return useMutation({
     mutationFn: (dataSource: DataSource) => {
-      return dataSourceClient.create(dataSource);
-    }
-    // onMutate: async (dataSource: DataSource) => {
-    //   await client.cancelQueries(['config']);
-    //   const previousConfig = client.getQueryData(['config']);
-    //   client.setQueryData(['config'], config);
-    //   return { previousConfig };
-    // },
-    // onError: (err, newMeta, context) => {
-    //   console.error('onError', err);
-    //   client.setQueryData(['config'], context.previousConfig);
-    // },
+      let response = dataSourceClient.create(dataSource)
+      return response;
+    },
+    onError: (err, newMeta, context) => {
+      console.error('onError', err);
+    },
   });
 };

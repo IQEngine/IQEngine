@@ -25,9 +25,12 @@ async def create_datasource(
         raise HTTPException(status_code=409, detail="Datasource Already Exists")
 
     if datasource.sasToken:
-        datasource.sasToken = encrypt(datasource.sasToken)
+        encrypted_sas_token = encrypt(datasource.sasToken.get_secret_value())
 
-    await datasources.insert_one(datasource.dict(by_alias=True, exclude_unset=True))
+    datasource_dict = datasource.dict(by_alias=True, exclude_unset=True)
+    datasource_dict["sasToken"] = encrypted_sas_token if datasource.sasToken else None
+
+    await datasources.insert_one(datasource_dict)
     return datasource
 
 

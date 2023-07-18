@@ -1,17 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useRef  } from 'react';
 import { DataSource } from '@/api/Models';
 import { useAddDataSource } from '@/api/datasource/queries';
 import { ClientType } from '@/api/Models';
 
 
 export const Form = () => {
-
-
-      const addDataSource = useAddDataSource(null)
+      const addDataSource = useAddDataSource()
+      const formRef = useRef<HTMLFormElement>(null);
 
       const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault();
-        console.log(event.target.elements.name.value)
+        const form = formRef.current;
+
         const formData: DataSource = {
           type: ClientType.API,
           name: event.target.elements.name.value,
@@ -22,12 +22,14 @@ export const Form = () => {
           sasToken: event.target.elements.sasToken.value
         }
         addDataSource.mutate(formData)
+        form.reset();
+      
       };
 
       return (
         <div>
         <h1>Add data source</h1>
-        <form onSubmit={handleSubmit}>
+        <form ref={formRef} onSubmit={handleSubmit}>
         <input
             type="text"
             name="name"
