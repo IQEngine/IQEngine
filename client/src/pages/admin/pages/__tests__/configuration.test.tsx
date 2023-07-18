@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import Configuration from '@/pages/admin/pages/configuration';
 import '@testing-library/jest-dom';
 import React from 'react';
@@ -7,6 +7,7 @@ import { AllProviders, queryClient } from '@/mocks/setup-tests';
 import nock from 'nock';
 import userEvent from '@testing-library/user-event';
 import { Toaster } from 'react-hot-toast';
+import { wait } from '@testing-library/user-event/dist/types/utils';
 
 describe('Test Configuration', () => {
   beforeEach(() => {
@@ -96,23 +97,22 @@ describe('Test Configuration', () => {
 
     const useIQEngineOutReach = await screen.findByRole('checkbox', { name: 'useIQEngineOutReach', checked: true });
     await userEvent.click(useIQEngineOutReach);
-    expect(useIQEngineOutReach).not.toBeChecked();
+    await waitFor(() => expect(useIQEngineOutReach).not.toBeChecked());
 
     const displayIQEngineGitHub = await screen.findByRole('checkbox', { name: 'displayIQEngineGitHub', checked: true });
     await userEvent.click(displayIQEngineGitHub);
-
-    expect(displayIQEngineGitHub).not.toBeChecked();
+    await waitFor(() => expect(displayIQEngineGitHub).not.toBeChecked());
 
     const displayInternalBranding = await screen.findByRole('checkbox', {
       name: 'displayInternalBranding',
       checked: true,
     });
     await userEvent.click(displayInternalBranding);
-    expect(displayInternalBranding).not.toBeChecked();
+    await waitFor(() => expect(displayInternalBranding).not.toBeChecked());
 
     const useAPIDatasources = await screen.findByRole('checkbox', { name: 'useAPIDatasources', checked: true });
     await userEvent.click(useAPIDatasources);
-    expect(useAPIDatasources).not.toBeChecked();
+    await waitFor(() => expect(useAPIDatasources).not.toBeChecked());
   });
 
   test('Save Button Disabled When No Changes', async () => {
@@ -159,7 +159,7 @@ describe('Test Configuration', () => {
       checked: true,
     });
     await userEvent.click(displayInternalBranding);
-    expect(displayInternalBranding).not.toBeChecked();
+    await waitFor(() => expect(displayInternalBranding).not.toBeChecked());
 
     const saveButton = screen.getByRole('button', { name: 'Save Configuration Button' });
     await userEvent.click(saveButton);
@@ -194,7 +194,7 @@ describe('Test Configuration', () => {
       checked: true,
     });
     await userEvent.click(displayInternalBranding);
-    expect(displayInternalBranding).not.toBeChecked();
+    await waitFor(() => expect(displayInternalBranding).not.toBeChecked());
 
     const saveButton = screen.getByRole('button', { name: 'Save Configuration Button' });
     await userEvent.click(saveButton);
