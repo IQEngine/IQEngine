@@ -2,9 +2,9 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from cachetools import TTLCache, cached
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
-from typing import Any, Tuple
+from typing import Any, Tuple, cast
 import jwt
-from jwt import algorithms 
+from jwt import algorithms
 import os
 import time
 import requests
@@ -37,7 +37,7 @@ class JWKSHandler:
 jwks_handler = JWKSHandler()
 
 
-def validate_issuer_and_get_public_key(token: str) -> Tuple[RSAPublicKey,str]:
+def validate_issuer_and_get_public_key(token: str) -> Tuple[RSAPublicKey, str]:
     # Decode the token without verification to access the header
     unverified_header = jwt.get_unverified_header(token)
     unverified_payload = jwt.decode(token, options={"verify_signature": False})
@@ -53,7 +53,7 @@ def validate_issuer_and_get_public_key(token: str) -> Tuple[RSAPublicKey,str]:
 
     # Look up the public key in the JWKS using the `kid` from the JWT header
     key = [k for k in jwks_handler.get_jwks()["keys"] if k["kid"] == unverified_header["kid"]][0]
-    public_key = algorithms.RSAAlgorithm.from_jwk(json.dumps(key))
+    public_key = cast(RSAPublicKey,algorithms.RSAAlgorithm.from_jwk(json.dumps(key)))
 
     return public_key, algorithm
 
@@ -62,7 +62,7 @@ def validate_and_decode_jwt(token: str) -> dict:
     try:
         public_key, algorithm = validate_issuer_and_get_public_key(token)
         payload = jwt.decode(
-            token, public_key, algorithms=algorithm, audience=CLIENT_ID
+            token, public_key, algorithms=[algorithm], audience=CLIENT_ID
         )  # Checks expiration, audience, and signature
         return payload
     except jwt.PyJWTError:
