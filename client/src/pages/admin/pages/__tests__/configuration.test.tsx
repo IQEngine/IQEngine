@@ -7,7 +7,6 @@ import { AllProviders, queryClient } from '@/mocks/setup-tests';
 import nock from 'nock';
 import userEvent from '@testing-library/user-event';
 import { Toaster } from 'react-hot-toast';
-import { wait } from '@testing-library/user-event/dist/types/utils';
 
 describe('Test Configuration', () => {
   beforeEach(() => {
@@ -95,23 +94,24 @@ describe('Test Configuration', () => {
       });
     render(<Configuration></Configuration>, { wrapper: AllProviders });
 
+    screen.debug();
+
     const useIQEngineOutReach = await screen.findByRole('checkbox', { name: 'useIQEngineOutReach', checked: true });
-    await userEvent.click(useIQEngineOutReach);
-    await waitFor(() => expect(useIQEngineOutReach).not.toBeChecked());
-
     const displayIQEngineGitHub = await screen.findByRole('checkbox', { name: 'displayIQEngineGitHub', checked: true });
-    await userEvent.click(displayIQEngineGitHub);
-    await waitFor(() => expect(displayIQEngineGitHub).not.toBeChecked());
-
     const displayInternalBranding = await screen.findByRole('checkbox', {
       name: 'displayInternalBranding',
       checked: true,
     });
-    await userEvent.click(displayInternalBranding);
-    await waitFor(() => expect(displayInternalBranding).not.toBeChecked());
-
     const useAPIDatasources = await screen.findByRole('checkbox', { name: 'useAPIDatasources', checked: true });
+
+    await userEvent.click(useIQEngineOutReach);
+    await userEvent.click(displayIQEngineGitHub);
+    await userEvent.click(displayInternalBranding);
     await userEvent.click(useAPIDatasources);
+
+    await waitFor(() => expect(useIQEngineOutReach).not.toBeChecked());
+    await waitFor(() => expect(displayIQEngineGitHub).not.toBeChecked());
+    await waitFor(() => expect(displayInternalBranding).not.toBeChecked());
     await waitFor(() => expect(useAPIDatasources).not.toBeChecked());
   });
 
