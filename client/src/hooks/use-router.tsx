@@ -70,6 +70,13 @@ export function useRouter() {
               },
             },
             {
+              path: 'add-data-source',
+              async lazy() {
+                let { Form } = await import('@/pages/admin/pages/add-data-source')
+                return { Component: Form };
+              }
+            },
+            {
               path: 'configuration',
               async lazy() {
                 let { Configuration } = await import('@/pages/admin/pages/configuration');

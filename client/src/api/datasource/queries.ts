@@ -1,7 +1,10 @@
-import { useQuery } from '@tanstack/react-query';
 import { DataSourceClientFactory } from './datasource-client-factory';
 import { DataSourceClient } from './datasource-client';
+import { DataSource } from '@/api/Models';
 import { useUserSettings } from '@/api/user-settings/use-user-settings';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { ClientType } from '@/api/Models';
+
 
 const fetchDataSources = async (client: DataSourceClient) => {
   let response;
@@ -45,4 +48,28 @@ export const getFeatures = (type: string) => {
   const { dataSourcesQuery, filesQuery } = useUserSettings();
   const client = DataSourceClientFactory(type, filesQuery.data, dataSourcesQuery.data);
   return client.features();
+};
+
+
+
+export const useAddDataSource = (dataSource: DataSource) => {
+  const { dataSourcesQuery, filesQuery } = useUserSettings();
+  const dataSourceClient = DataSourceClientFactory(ClientType.API, filesQuery.data, dataSourcesQuery.data);
+  let client = useQueryClient();
+
+  return useMutation({
+    mutationFn: (dataSource: DataSource) => {
+      return dataSourceClient.create(dataSource);
+    }
+    // onMutate: async (dataSource: DataSource) => {
+    //   await client.cancelQueries(['config']);
+    //   const previousConfig = client.getQueryData(['config']);
+    //   client.setQueryData(['config'], config);
+    //   return { previousConfig };
+    // },
+    // onError: (err, newMeta, context) => {
+    //   console.error('onError', err);
+    //   client.setQueryData(['config'], context.previousConfig);
+    // },
+  });
 };
