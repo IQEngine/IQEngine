@@ -27,6 +27,13 @@ export function useRouter() {
             return { Component: SigMF };
           },
         },
+        {
+          path: 'upload',
+          async lazy() {
+            let { UploadPage } = await import('@/pages/UploadPage');
+            return { Component: UploadPage };
+          },
+        },
         { path: 'siggen', element: <SignalGenerator /> },
         {
           path: 'plugins',
