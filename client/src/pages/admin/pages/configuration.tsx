@@ -4,8 +4,8 @@ import { FeatureFlag } from '@/hooks/use-feature-flags';
 import toast from 'react-hot-toast';
 
 export const Configuration = () => {
-  const config = useConfigQuery();
-  const updateConfig = useUpdateConfig(config.data);
+  const { data } = useConfigQuery();
+  const updateConfig = useUpdateConfig();
   const [featureFlags, setFeatureFlags] = React.useState(
     Object.fromEntries(
       Object.keys(FeatureFlag).map((key) => [FeatureFlag[key]?.name, FeatureFlag[key]?.default ?? false])
@@ -14,16 +14,13 @@ export const Configuration = () => {
   const [isDirty, setIsDirty] = React.useState(false);
 
   useEffect(() => {
-    if (config?.data?.featureFlags) {
+    if (data?.featureFlags) {
       const newFeatureFlags = Object.fromEntries(
-        Object.keys(FeatureFlag).map((key) => [
-          FeatureFlag[key]?.name,
-          config.data.featureFlags[FeatureFlag[key]?.name],
-        ])
+        Object.keys(FeatureFlag).map((key) => [FeatureFlag[key]?.name, data.featureFlags[FeatureFlag[key]?.name]])
       );
       setFeatureFlags(newFeatureFlags);
     }
-  }, [config?.data?.featureFlags]);
+  }, [data?.featureFlags]);
 
   const onChangeHandler = useCallback(
     (event) => {
@@ -38,22 +35,25 @@ export const Configuration = () => {
     const newFeatureFlags = Object.fromEntries(
       Object.keys(FeatureFlag).map((key) => [FeatureFlag[key]?.name, featureFlags[FeatureFlag[key]?.name]])
     );
-    config.data.featureFlags = newFeatureFlags;
-    updateConfig.mutate(config.data, {
-      onSuccess: () => {
-        toast('Successfully updated configuration', {
-          icon: '👍',
-          className: 'bg-green-100 font-bold',
-        });
-      },
-      onError: (response) => {
-        toast('Something went wrong updating configuration', {
-          icon: '😖',
-          className: 'bg-red-100 font-bold',
-        });
-      },
-    });
-  }, [config, featureFlags, updateConfig]);
+
+    updateConfig.mutate(
+      { ...data, featureFlags: newFeatureFlags },
+      {
+        onSuccess: () => {
+          toast('Successfully updated configuration', {
+            icon: '👍',
+            className: 'bg-green-100 font-bold',
+          });
+        },
+        onError: (response) => {
+          toast('Something went wrong updating configuration', {
+            icon: '😖',
+            className: 'bg-red-100 font-bold',
+          });
+        },
+      }
+    );
+  }, [data, featureFlags, updateConfig]);
 
   return (
     <div className="card shadow-lg compact side bg-base-100">
