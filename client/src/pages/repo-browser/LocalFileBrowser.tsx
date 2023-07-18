@@ -38,9 +38,9 @@ const LocalFileBrowser = () => {
       multiple: true,
     });
     console.log('files', files);
-    let fileWithoutExtrension = files[0].name.replace('.sigmf-meta', '').replace('.sigmf-data', '');
+    let fileWithoutExtension = files[0].name.replace('.sigmf-meta', '').replace('.sigmf-data', '');
     setFiles(files);
-    setFilePath(fileWithoutExtrension);
+    setFilePath(fileWithoutExtension);
   };
 
   const openDir = async () => {

@@ -3,41 +3,53 @@
 // Licensed under the MIT License
 
 import React, { useState, useEffect } from 'react';
-import { Layer, Rect } from 'react-konva';
+import { Layer, Rect, Text } from 'react-konva';
 import { useEffectOnce } from 'usehooks-ts';
+import { TILE_SIZE_IN_IQ_SAMPLES } from '@/utils/constants';
+import { getSamples, getSeconds } from '@/utils/rfFunctions';
+
 const TimeSelector = (props) => {
   const {
     spectrogramHeight,
     spectrogramWidth,
     upperTile,
     lowerTile,
-    handleTimeSelectionStart,
-    handleTimeSelectionEnd,
+    timeSelectionStart,
+    timeSelectionEnd,
+    setTimeSelectionStart,
+    setTimeSelectionEnd,
+    sampleRate,
   } = props;
-  const tileDiff = upperTile - lowerTile; // amount of samples displayed on the spectrogram in units of tiles
 
-  const [startTileNum, setStartTileNum] = useState(lowerTile + 0.25 * tileDiff || 2);
-  const [endTileNum, setEndTileNum] = useState(lowerTile + 0.75 * tileDiff || 7);
-  const [width, setWidth] = useState(spectrogramWidth);
+  const [diffSamples, setDiffSamples] = useState('');
+  const [diffSeconds, setDiffSeconds] = useState('');
 
-  useEffect(() => {
-    setWidth(props.spectrogramWidth);
-  }, [props.spectrogramWidth]);
+  const scalingFactor = spectrogramHeight / (upperTile - lowerTile); // this will auto update as the 3 params update
 
   // Run once at beginning to set value in SpectrogramPage
   useEffectOnce(() => {
-    handleTimeSelectionStart(startTileNum);
-    handleTimeSelectionEnd(endTileNum);
-  }, []); // dont put dep here
+    setTimeSelectionStart(lowerTile + 0.25 * (upperTile - lowerTile) || 2);
+    setTimeSelectionEnd(lowerTile + 0.75 * (upperTile - lowerTile) || 7);
+  });
+
+  // update diff
+  useEffect(() => {
+    const diffSamples = Math.round(Math.abs(timeSelectionEnd - timeSelectionStart) * TILE_SIZE_IN_IQ_SAMPLES);
+    const diffSeconds = diffSamples / sampleRate;
+    const formatted = getSamples(diffSamples);
+    setDiffSamples('Δ ' + formatted.samples + formatted.unit + ' samples');
+    const formattedSeconds = getSeconds(diffSeconds);
+    setDiffSeconds('Δ ' + formattedSeconds.time + ' ' + formattedSeconds.unit);
+  }, [timeSelectionStart, timeSelectionEnd]);
 
   // Sample-start bar
   const handleDragMoveStart = (e) => {
-    setStartTileNum(handleMovement(e));
+    setTimeSelectionStart(handleMovement(e));
   };
 
   // Sample-end bar
   const handleDragMoveEnd = (e) => {
-    setEndTileNum(handleMovement(e));
+    setTimeSelectionEnd(handleMovement(e));
   };
 
   const handleMovement = (e) => {
@@ -46,12 +58,13 @@ const TimeSelector = (props) => {
     if (newY > spectrogramHeight - 2) newY = spectrogramHeight - 2;
     e.target.y(newY);
     e.target.x(0); // keep line in the same x location
-    return (newY / spectrogramHeight) * tileDiff + lowerTile;
+    return (newY / spectrogramHeight) * (upperTile - lowerTile) + lowerTile;
   };
 
+  // at drag end is when we'll swap the two if they changed sides, so that Start < End
   const updateTimeSelection = (e) => {
-    handleTimeSelectionStart(Math.min(startTileNum, endTileNum));
-    handleTimeSelectionEnd(Math.max(startTileNum, endTileNum));
+    setTimeSelectionStart(Math.min(timeSelectionStart, timeSelectionEnd));
+    setTimeSelectionEnd(Math.max(timeSelectionStart, timeSelectionEnd));
   };
 
   return (
@@ -60,35 +73,64 @@ const TimeSelector = (props) => {
         <>
           <Rect
             x={0}
-            y={((startTileNum - lowerTile) / tileDiff) * spectrogramHeight}
-            width={width}
-            height={((endTileNum - startTileNum) / tileDiff) * spectrogramHeight}
+            y={(timeSelectionStart - lowerTile) * scalingFactor}
+            width={spectrogramWidth}
+            height={(timeSelectionEnd - timeSelectionStart) * scalingFactor}
             fill="black"
             opacity={0.4}
+            listening={false}
           />
+
           <Rect
             x={0}
-            y={((startTileNum - lowerTile) / tileDiff) * spectrogramHeight}
-            width={width}
+            y={(timeSelectionStart - lowerTile) * scalingFactor}
+            width={spectrogramWidth}
             height={0}
             draggable={true}
             onDragMove={handleDragMoveStart}
             onDragEnd={updateTimeSelection}
             strokeEnabled={true}
             strokeWidth={5}
-            stroke="white"
+            stroke="red"
+            opacity={0.75}
+            shadowColor="red"
+            shadowOffsetY={-3}
+            shadowBlur={5}
           ></Rect>
+
           <Rect
             x={0}
-            y={((endTileNum - lowerTile) / tileDiff) * spectrogramHeight}
-            width={width}
+            y={(timeSelectionEnd - lowerTile) * scalingFactor}
+            width={spectrogramWidth}
             height={0}
             draggable={true}
             onDragMove={handleDragMoveEnd}
             onDragEnd={updateTimeSelection}
             strokeEnabled={true}
             strokeWidth={5}
-            stroke="white"
+            stroke="red"
+            opacity={0.75}
+            shadowColor="red"
+            shadowOffsetY={3}
+            shadowBlur={5}
+          />
+
+          <Text
+            text={diffSamples}
+            fontFamily="serif"
+            fontSize={24}
+            x={0}
+            y={(timeSelectionStart - lowerTile) * scalingFactor + 5}
+            fill={'white'}
+          />
+
+          <Text
+            text={diffSeconds}
+            fontFamily="serif"
+            fontSize={24}
+            x={0}
+            y={(timeSelectionStart - lowerTile) * scalingFactor + 35}
+            fill={'white'}
           />
         </>
       </Layer>
