@@ -9,7 +9,10 @@ import requests
 import logging
 
 
-CLIENT_ID = os.getenv("AAD_Client_ID") # Client ID of the application registered in Azure AD
+CLIENT_ID = os.getenv(
+    "AAD_Client_ID"
+)  # Client ID of the application registered in Azure AD
+TENANT_ID = os.getenv("AAD_Tenant_ID")  # Tenant ID of the Azure AD tenant
 
 http_bearer = HTTPBearer()
 jwks_uri = "https://login.microsoftonline.com/common/discovery/keys"
@@ -53,7 +56,7 @@ def validate_issuer_and_get_public_key(token: str) -> str:
 
     # Check issuer
     issuer = unverified_payload["iss"]
-    if issuer != "https://login.microsoftonline.com/{your_tenant_id}/v2.0":
+    if issuer != "https://login.microsoftonline.com/{TENANT_ID}/v2.0":
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid issuer",
@@ -69,7 +72,9 @@ def validate_issuer_and_get_public_key(token: str) -> str:
 def validate_and_decode_jwt(token: str, retry: bool = True) -> dict:
     try:
         public_key, algorithm = validate_issuer_and_get_public_key(token)
-        payload = jwt.decode(token, public_key, algorithms=algorithm, audience=CLIENT_ID) # Checks expiration, audience, and signature
+        payload = jwt.decode(
+            token, public_key, algorithms=algorithm, audience=CLIENT_ID
+        )  # Checks expiration, audience, and signature
         return payload
     except jwt.PyJWTError:
         if retry:
@@ -83,7 +88,9 @@ def validate_and_decode_jwt(token: str, retry: bool = True) -> dict:
             )
 
 
-def get_current_user(token: HTTPAuthorizationCredentials = Depends(http_bearer)) -> dict:
+def get_current_user(
+    token: HTTPAuthorizationCredentials = Depends(http_bearer),
+) -> dict:
     try:
         payload = validate_and_decode_jwt(token.credentials)
         return payload
@@ -104,9 +111,13 @@ def get_current_active_user(current_user: dict = Depends(get_current_user)) -> d
     )
 
 
-def get_current_active_admin_user(current_user: dict = Depends(get_current_user)) -> dict:
+def get_current_active_admin_user(
+    current_user: dict = Depends(get_current_user),
+) -> dict:
     if current_user["is_active"]:
-        if "roles" in current_user and "admin" in current_user["roles"]: # change to appropriate admin role
+        if (
+            "roles" in current_user and "admin" in current_user["roles"]
+        ):  # change to appropriate admin role
             return current_user
         else:
             raise HTTPException(
@@ -118,7 +129,6 @@ def get_current_active_admin_user(current_user: dict = Depends(get_current_user)
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Inactive user",
         )
-
 
 
 # Example usage
