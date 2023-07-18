@@ -36,7 +36,7 @@ const baseMetadataFile = {
       'core:sample_count': 285354,
       'core:freq_lower_edge': 8486138750,
       'core:freq_upper_edge': 8486243700,
-      'core:description': 'first',
+      'core:label': 'first',
     },
   ],
   dataFileHandle: {

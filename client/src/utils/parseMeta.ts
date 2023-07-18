@@ -4,6 +4,7 @@
 
 import { dataTypeToBytesPerSample } from './selector';
 
+/* NOT USED?
 export default function parseMeta(
   json_string: any,
   baseUrl: any,
@@ -37,6 +38,15 @@ export default function parseMeta(
     shortDescription += '...';
   }
 
+  // Go through annotations and replace description with label if only description is provided, for legacy sake
+  const editedAnnotations = JSON.parse(JSON.stringify(obj['annotations'])); // js' way of doing deepcopy
+  editedAnnotations.forEach((x, i) => {
+    if ('description' in editedAnnotations[i] && !('label' in editedAnnotations[i])) {
+      editedAnnotations[i]['label'] = editedAnnotations[i]['description'];
+      delete editedAnnotations[i]['description'];
+    }
+  });
+
   return {
     name: fName,
     sampleRate: (obj['global']['core:sample_rate'] ?? 1e6) / 1e6, // in MHz
@@ -53,7 +63,7 @@ export default function parseMeta(
       .replace('_le', ''),
     coreDataType: obj['global']['core:datatype'],
     frequency: (obj['captures'][0]['core:frequency'] ?? 1e6) / 1e6, // in MHz
-    annotations: obj['annotations'],
+    annotations: editedAnnotations,
     numberOfAnnotation: obj['annotations'].length,
     numberOfCaptures: obj['captures'].length,
     author: author,
@@ -69,3 +79,4 @@ export default function parseMeta(
     shortDescription: shortDescription,
   };
 }
+*/

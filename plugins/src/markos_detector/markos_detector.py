@@ -182,7 +182,7 @@ def highlight_energy(samples, samp_rate, fft_size, window_size, noise_power, pwr
         an['core:freq_upper_edge'] = (samp_rate / fft_size) * (x + w) - (samp_rate / 2.0) + center_freq
         an['core:sample_start'] = y * fft_size
         an['core:sample_count'] = h * fft_size
-        an["core:description"] = "Unknown"
+        an["core:label"] = "Unknown"
         annotations.append(an)
 
     if False:

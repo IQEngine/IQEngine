@@ -143,7 +143,7 @@ describe('getSigMFRaw', () => {
       Object.assign(new Annotation(), {
         'core:sample_start': 0,
         'core:sample_count': 100,
-        'core:description': 'test',
+        'core:label': 'test',
       }),
     ];
 
