@@ -14,6 +14,8 @@ import { RulerTop } from './RulerTop';
 import { RulerSide } from './RulerSide';
 import { INITIAL_PYTHON_SNIPPET, TILE_SIZE_IN_IQ_SAMPLES, COLORMAP_DEFAULT, MINIMAP_FFT_SIZE } from '@/utils/constants';
 import TimeSelector from './TimeSelector';
+import TimeSelectorMinimap from './TimeSelectorMinimap';
+import FreqSelector from './FreqSelector';
 import AnnotationList from '@/pages/spectrogram/components/annotation/AnnotationList';
 import { GlobalProperties } from '@/pages/spectrogram/components/global-properties/GlobalProperties';
 import { MetaViewer } from '@/pages/spectrogram/components/metadata/MetaViewer';
@@ -59,9 +61,12 @@ export const SpectrogramPage = () => {
   const [currentSamples, setCurrentSamples] = useState<Float32Array>(Float32Array.from([]));
   const [spectrogramHeight, setSpectrogramHeight] = useState(800);
   const [spectrogramWidth, setSpectrogramWidth] = useState(1000);
-  const [timeSelectionStart, setTimeSelectionStart] = useState(0);
-  const [timeSelectionEnd, setTimeSelectionEnd] = useState(10);
-  const [cursorsEnabled, setCursorsEnabled] = useState(false);
+  const [timeSelectionStart, setTimeSelectionStart] = useState(0); // in units of tiles
+  const [timeSelectionEnd, setTimeSelectionEnd] = useState(10); // in units of tiles
+  const [freqSelectionLower, setFreqSelectionLower] = useState(-0.1); // between -0.5 and 0.5
+  const [freqSelectionUpper, setFreqSelectionUpper] = useState(0.1); // between -0.5 and 0.5
+  const [timeCursorsEnabled, setTimeCursorsEnabled] = useState(false);
+  const [freqCursorsEnabled, setFreqCursorsEnabled] = useState(false);
   const [currentTab, setCurrentTab] = useState('spectrogram');
   const [pyodide, setPyodide] = useState(null);
   const [handleTop, setHandleTop] = useState(0);
@@ -315,11 +320,13 @@ export const SpectrogramPage = () => {
             updateWindowChange={setFFTWindow}
             magnitudeMax={magnitudeMax}
             magnitudeMin={magnitudeMin}
-            cursorsEnabled={cursorsEnabled}
-            handleProcessTime={handleProcessTime}
-            toggleCursors={(e) => {
-              setCursorsEnabled(e.target.checked);
+            toggleTimeCursors={(e) => {
+              setTimeCursorsEnabled(e.target.checked);
             }}
+            toggleFreqCursors={(e) => {
+              setFreqCursorsEnabled(e.target.checked);
+            }}
+            handleProcessTime={handleProcessTime}
             toggleIncludeRfFreq={toggleIncludeRfFreq}
             updateZoomLevel={setZoomLevel}
             zoomLevel={zoomLevel}
@@ -417,14 +424,28 @@ export const SpectrogramPage = () => {
                         selectedAnnotation={selectedAnnotation}
                         setSelectedAnnotation={setSelectedAnnotation}
                       />
-                      {cursorsEnabled && (
+                      {timeCursorsEnabled && (
                         <TimeSelector
                           spectrogramWidth={spectrogramWidth}
                           spectrogramHeight={spectrogramHeight}
                           upperTile={upperTile}
                           lowerTile={lowerTile}
-                          handleTimeSelectionStart={setTimeSelectionStart}
-                          handleTimeSelectionEnd={setTimeSelectionEnd}
+                          timeSelectionStart={timeSelectionStart}
+                          timeSelectionEnd={timeSelectionEnd}
+                          setTimeSelectionStart={setTimeSelectionStart}
+                          setTimeSelectionEnd={setTimeSelectionEnd}
+                          sampleRate={meta?.getSampleRate()}
+                        />
+                      )}
+                      {freqCursorsEnabled && (
+                        <FreqSelector
+                          spectrogramWidth={spectrogramWidth}
+                          spectrogramHeight={spectrogramHeight}
+                          freqSelectionLower={freqSelectionLower}
+                          freqSelectionUpper={freqSelectionUpper}
+                          setFreqSelectionLower={setFreqSelectionLower}
+                          setFreqSelectionUpper={setFreqSelectionUpper}
+                          sampleRate={meta?.getSampleRate()}
                         />
                       )}
                     </Stage>
@@ -453,6 +474,20 @@ export const SpectrogramPage = () => {
                         setMagnitudeMin={setMagnitudeMin}
                         colorMap={colorMap}
                       />
+
+                      {timeCursorsEnabled && (
+                        <TimeSelectorMinimap
+                          width={MINIMAP_FFT_SIZE}
+                          spectrogramHeight={spectrogramHeight}
+                          upperTile={upperTile}
+                          lowerTile={lowerTile}
+                          timeSelectionStart={timeSelectionStart}
+                          timeSelectionEnd={timeSelectionEnd}
+                          setTimeSelectionStart={setTimeSelectionStart}
+                          setTimeSelectionEnd={setTimeSelectionEnd}
+                          totalSamples={meta?.getTotalSamples()}
+                        />
+                      )}
                     </Stage>
                   </div>
                 </div>
@@ -462,7 +497,7 @@ export const SpectrogramPage = () => {
                 {currentTab === 'time' && (
                   <TimePlot
                     currentSamples={currentSamples}
-                    cursorsEnabled={cursorsEnabled}
+                    cursorsEnabled={timeCursorsEnabled}
                     plotWidth={plotWidth}
                     plotHeight={plotHeight}
                   />
@@ -472,7 +507,7 @@ export const SpectrogramPage = () => {
                 {currentTab === 'frequency' && (
                   <FrequencyPlot
                     currentSamples={currentSamples}
-                    cursorsEnabled={cursorsEnabled}
+                    cursorsEnabled={timeCursorsEnabled}
                     plotWidth={plotWidth}
                     plotHeight={plotHeight}
                   />
@@ -482,7 +517,7 @@ export const SpectrogramPage = () => {
                 {currentTab === 'iq' && (
                   <IQPlot
                     currentSamples={currentSamples}
-                    cursorsEnabled={cursorsEnabled}
+                    cursorsEnabled={timeCursorsEnabled}
                     plotWidth={plotWidth}
                     plotHeight={plotHeight}
                   />
