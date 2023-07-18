@@ -94,8 +94,6 @@ describe('Test Configuration', () => {
       });
     render(<Configuration></Configuration>, { wrapper: AllProviders });
 
-    screen.debug();
-
     const useIQEngineOutReach = await screen.findByRole('checkbox', { name: 'useIQEngineOutReach', checked: true });
     const displayIQEngineGitHub = await screen.findByRole('checkbox', { name: 'displayIQEngineGitHub', checked: true });
     const displayInternalBranding = await screen.findByRole('checkbox', {
