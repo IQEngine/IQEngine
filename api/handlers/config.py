@@ -28,6 +28,9 @@ async def get_config():
     configuration.google_analytics_key = os.getenv(
         "IQENGINE_GOOGLE_ANALYTICS_KEY", configuration.google_analytics_key
     )
+    configuration.UPLOAD_PAGE_BLOB_SAS_URL = os.getenv(
+        "IQENGINE_UPLOAD_PAGE_BLOB_SAS_URL", configuration.UPLOAD_PAGE_BLOB_SAS_URL
+    )
     configuration.internal_branding = os.getenv(
         "IQENGINE_INTERNAL_BRANDING", configuration.internal_branding
     )

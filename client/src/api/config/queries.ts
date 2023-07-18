@@ -10,6 +10,7 @@ const fetchConfig = async () => {
         data: {
           connectionInfo: JSON.parse(import.meta.env.IQENGINE_CONNECTION_INFO ?? null),
           googleAnalyticsKey: import.meta.env.IQENGINE_GOOGLE_ANALYTICS_KEY,
+          uploadPageBlobSasUrl: import.meta.env.IQENGINE_UPLOAD_PAGE_BLOB_SAS_URL,
           featureFlags: JSON.parse(import.meta.env.IQENGINE_FEATURE_FLAGS ?? null),
           internalBranding: import.meta.env.IQENGINE_INTERNAL_BRANDING,
           appId: import.meta.env.IQENGINE_APP_ID,
@@ -22,6 +23,9 @@ const fetchConfig = async () => {
     }
     if (!response.data.googleAnalyticsKey) {
       response.data.googleAnalyticsKey = import.meta.env.IQENGINE_GOOGLE_ANALYTICS_KEY;
+    }
+    if (!response.data.uploadPageBlobSasUrl) {
+      response.data.uploadPageBlobSasUrl = import.meta.env.IQENGINE_UPLOAD_PAGE_BLOB_SAS_URL;
     }
     if (!response.data.featureFlags) {
       response.data.featureFlags = JSON.parse(import.meta.env.IQENGINE_FEATURE_FLAGS ?? null);
@@ -51,6 +55,7 @@ const fetchConfig = async () => {
     return {
       connectionInfo: JSON.parse(import.meta.env.IQENGINE_CONNECTION_INFO ?? null),
       googleAnalyticsKey: import.meta.env.IQENGINE_GOOGLE_ANALYTICS_KEY,
+      uploadPageBlobSasUrl: import.meta.env.IQENGINE_UPLOAD_PAGE_BLOB_SAS_URL,
       featureFlags: JSON.parse(import.meta.env.IQENGINE_FEATURE_FLAGS ?? null),
       internalBranding: import.meta.env.IQENGINE_INTERNAL_BRANDING,
     } as AppConfig;
@@ -103,6 +108,7 @@ interface ConnectionInfo {
 export type AppConfig = {
   connectionInfo: ConnectionInfo;
   googleAnalyticsKey: string;
+  uploadPageBlobSasUrl: string;
   featureFlags: { [key in FeatureFlagName]: boolean };
   internalBranding: string;
   appId: string;

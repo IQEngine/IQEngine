@@ -99,6 +99,7 @@ export function convertToFloat32(buffer, dataType) {
   }
 }
 
+/* possibly unused?
 export function readFileAsync(file) {
   return new Promise((resolve, reject) => {
     let reader = new FileReader();
@@ -109,3 +110,4 @@ export function readFileAsync(file) {
     reader.readAsArrayBuffer(file);
   });
 }
+*/
