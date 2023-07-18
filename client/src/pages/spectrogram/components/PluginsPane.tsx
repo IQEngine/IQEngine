@@ -13,7 +13,7 @@ import { colMaps } from '@/utils/colormap';
 import { fftshift } from 'fftshift';
 import { FFT } from '@/utils/fft';
 import { useGetPluginsComponents } from '@/pages/spectrogram/hooks/use-get-plugins-components';
-import { useGetPlugins } from '@/api/plugin/Queries';
+import { useGetPlugins } from '@/api/plugin/queries';
 import { toast } from 'react-hot-toast';
 import { dataTypeToBytesPerSample } from '@/utils/selector';
 import { useParams } from 'react-router-dom';
