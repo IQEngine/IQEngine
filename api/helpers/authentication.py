@@ -5,13 +5,14 @@ import os
 
 
 SECRET_KEY = os.getenv("AAD_Auth_Key") # Secret key used for JWT. Should be in a Key Vault
-ALGORITHM = "HS256"  # Hashing algorithm used for JWT
+ALGORITHM = "RS256"  # Hashing algorithm used for JWT
+CLIENT_ID = os.getenv("AAD_Client_ID") # Client ID of the application registered in Azure AD
 
 http_bearer = HTTPBearer()
 
 def get_current_user(token: HTTPAuthorizationCredentials = Depends(http_bearer)) -> dict:
     try:
-        payload = jwt.decode(token.credentials, SECRET_KEY, algorithms=ALGORITHM)
+        payload = jwt.decode(token.credentials, SECRET_KEY, algorithms=ALGORITHM, audience="CLIENT_ID")
         return payload
     except jwt.PyJWTError:
         raise HTTPException(
