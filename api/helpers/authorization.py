@@ -3,15 +3,13 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from cachetools import TTLCache, cached
 import jwt
 import os
-import schedule
 import time
-import threading
 import requests
 import logging
 
 
-CLIENT_ID = os.getenv("AAD_Client_ID")  # Client ID of the app registered in AAD
-TENANT_ID = os.getenv("AAD_Tenant_ID")  # Tenant ID of the Azure AD tenant
+CLIENT_ID = os.getenv("AAD_Client_ID")
+TENANT_ID = os.getenv("AAD_Tenant_ID")
 
 http_bearer = HTTPBearer()
 jwks_uri = "https://login.microsoftonline.com/common/discovery/keys"
@@ -71,8 +69,7 @@ def validate_and_decode_jwt(token: str) -> dict:
 
 
 def get_current_user(
-    token: HTTPAuthorizationCredentials = Depends(http_bearer),
-) -> dict:
+    token: HTTPAuthorizationCredentials = Depends(http_bearer),) -> dict:
     try:
         payload = validate_and_decode_jwt(token.credentials)
         return payload
@@ -83,7 +80,6 @@ def get_current_user(
         )
 
 
-# Validate that a user account is not deactivated or suspended while still having a valid JWT
 def get_current_active_user(current_user: dict = Depends(get_current_user)) -> dict:
     if current_user["is_active"]:
         return current_user
@@ -94,8 +90,7 @@ def get_current_active_user(current_user: dict = Depends(get_current_user)) -> d
 
 
 def get_current_active_admin_user(
-    current_user: dict = Depends(get_current_user),
-) -> dict:
+    current_user: dict = Depends(get_current_user),) -> dict:
     if current_user["is_active"]:
         if (
             "roles" in current_user and "IQEngine-Admin" in current_user["roles"]
