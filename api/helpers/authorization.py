@@ -1,6 +1,7 @@
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from cachetools import TTLCache, cached
+from typing import Any, Tuple
 import jwt
 import os
 import time
@@ -16,7 +17,7 @@ jwks_uri = "https://login.microsoftonline.com/common/discovery/keys"
 
 
 class JWKSHandler:
-    jwks_cache: TTLCache[str,any] = TTLCache(maxsize=1, ttl=600)  # cache the JWKS for 10 minutes
+    jwks_cache: TTLCache[str, Any] = TTLCache(maxsize=1, ttl=600)  # cache the JWKS for 10 minutes
 
     @classmethod
     @cached(cache=jwks_cache)
@@ -33,7 +34,7 @@ class JWKSHandler:
 jwks_handler = JWKSHandler()
 
 
-def validate_issuer_and_get_public_key(token: str) -> str:
+def validate_issuer_and_get_public_key(token: str) -> Tuple[str,str]:
     # Decode the token without verification to access the header
     unverified_header = jwt.get_unverified_header(token)
     unverified_payload = jwt.decode(token, options={"verify_signature": False})
@@ -69,7 +70,7 @@ def validate_and_decode_jwt(token: str) -> dict:
 
 
 def get_current_user(
-    token: HTTPAuthorizationCredentials = Depends(http_bearer),) -> dict:
+      token: HTTPAuthorizationCredentials = Depends(http_bearer),) -> dict:
     try:
         payload = validate_and_decode_jwt(token.credentials)
         return payload
@@ -89,12 +90,11 @@ def get_current_active_user(current_user: dict = Depends(get_current_user)) -> d
     )
 
 
-def get_current_active_admin_user(
-    current_user: dict = Depends(get_current_user),) -> dict:
+def get_current_active_admin_user(current_user: dict = Depends(get_current_user),) -> dict:
     if current_user["is_active"]:
         if (
             "roles" in current_user and "IQEngine-Admin" in current_user["roles"]
-        ): 
+        ):
             return current_user
         else:
             raise HTTPException(

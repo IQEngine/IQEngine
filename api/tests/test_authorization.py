@@ -1,13 +1,20 @@
 import jwt
 from fastapi import HTTPException
 from fastapi.security import HTTPAuthorizationCredentials
-from unittest.mock import patch
-from helpers.authorization import JWKSHandler, validate_and_decode_jwt, get_current_user, get_current_active_user, get_current_active_admin_user
+from helpers.authorization import (
+    JWKSHandler,
+    validate_and_decode_jwt,
+    get_current_user,
+    get_current_active_user,
+    get_current_active_admin_user,
+)
 
 
 def test_get_jwks(mocker):
     # Mock the requests.get to return a response with the desired JWKS
-    mocker.patch('requests.get', return_value=mocker.Mock(json=lambda: {"keys": "mock_jwks"}))
+    mocker.patch(
+        "requests.get", return_value=mocker.Mock(json=lambda: {"keys": "mock_jwks"})
+    )
     jwks_handler = JWKSHandler()
     jwks_handler.get_jwks()
     jwks_cache = jwks_handler.jwks_cache.get((JWKSHandler,))
@@ -17,8 +24,8 @@ def test_get_jwks(mocker):
 
 def test_get_jwks_failure(mocker):
     # Mock the requests.get to raise an exception
-    mocker.patch('requests.get', side_effect=Exception("Mock exception"))
-    mocker.patch('time.sleep', return_value=None)
+    mocker.patch("requests.get", side_effect=Exception("Mock exception"))
+    mocker.patch("time.sleep", return_value=None)
     jwks_handler = JWKSHandler()
 
     try:
@@ -29,8 +36,11 @@ def test_get_jwks_failure(mocker):
 
 def test_validate_and_decode_jwt(mocker):
     # Mock the validate_issuer_and_get_public_key function to return a public key and algorithm
-    mocker.patch('helpers.authorization.validate_issuer_and_get_public_key', return_value=("mock_public_key", "HS256"))
-    mocker.patch('jwt.decode', return_value={"payload": "mock_payload"})
+    mocker.patch(
+        "helpers.authorization.validate_issuer_and_get_public_key",
+        return_value=("mock_public_key", "HS256"),
+    )
+    mocker.patch("jwt.decode", return_value={"payload": "mock_payload"})
     result = validate_and_decode_jwt("mock_token")
 
     # Assert that the function returned the expected payload
@@ -39,8 +49,11 @@ def test_validate_and_decode_jwt(mocker):
 
 def test_validate_and_decode_jwt_failure(mocker):
     # Mock the validate_issuer_and_get_public_key function to return a public key and algorithm
-    mocker.patch('helpers.authorization.validate_issuer_and_get_public_key', return_value=("mock_public_key", "HS256"))
-    mocker.patch('jwt.decode', side_effect=jwt.PyJWTError)
+    mocker.patch(
+        "helpers.authorization.validate_issuer_and_get_public_key",
+        return_value=("mock_public_key", "HS256"),
+    )
+    mocker.patch("jwt.decode", side_effect=jwt.PyJWTError)
 
     try:
         validate_and_decode_jwt("mock_token")
@@ -50,7 +63,10 @@ def test_validate_and_decode_jwt_failure(mocker):
 
 def test_get_current_user(mocker):
     # Mock the validate_and_decode_jwt function to return a payload
-    mocker.patch('helpers.authorization.validate_and_decode_jwt', return_value={"sub": "test_user"})
+    mocker.patch(
+        "helpers.authorization.validate_and_decode_jwt",
+        return_value={"sub": "test_user"},
+    )
     mock_token = HTTPAuthorizationCredentials(scheme="Bearer", credentials="mock_token")
 
     # Call the function and assert that it returns the expected payload
@@ -66,25 +82,41 @@ def test_get_current_active_user():
 
 def test_get_current_active_admin_user():
     # Create a mock user dictionary that includes the "IQEngine-Admin" role
-    mock_admin_user = {"is_active": True, "name": "Test Admin User", "roles": ["IQEngine-Admin"]}
+    mock_admin_user = {
+        "is_active": True,
+        "name": "Test Admin User",
+        "roles": ["IQEngine-Admin"],
+    }
 
     result = get_current_active_admin_user(mock_admin_user)
-    assert result == {"is_active": True, "name": "Test Admin User", "roles": ["IQEngine-Admin"]}
+    assert result == {
+        "is_active": True,
+        "name": "Test Admin User",
+        "roles": ["IQEngine-Admin"],
+    }
 
 
 def test_get_current_active_admin_user_no_permission():
     # Create a mock user dictionary without the "IQEngine-Admin" role
-    mock_admin_user = {"is_active": True, "name": "Test Admin User", "roles": ["Some-Other-Role"]}
+    mock_admin_user = {
+        "is_active": True,
+        "name": "Test Admin User",
+        "roles": ["Some-Other-Role"],
+    }
 
     try:
         get_current_active_admin_user(mock_admin_user)
     except HTTPException as e:
         assert e.detail == "User does not have the necessary permissions"
-        
+
 
 def test_get_current_active_admin_user_inactive():
     # Create a mock user dictionary that is inactive
-    mock_admin_user = {"is_active": False, "name": "Test Admin User", "roles": ["IQEngine-Admin"]}
+    mock_admin_user = {
+        "is_active": False,
+        "name": "Test Admin User",
+        "roles": ["IQEngine-Admin"],
+    }
 
     try:
         get_current_active_admin_user(mock_admin_user)
