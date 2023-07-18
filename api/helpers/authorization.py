@@ -1,5 +1,6 @@
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from cachetools import TTLCache, cached
 import jwt
 import os
 import schedule
@@ -9,43 +10,29 @@ import requests
 import logging
 
 
-CLIENT_ID = os.getenv(
-    "AAD_Client_ID"
-)  # Client ID of the application registered in Azure AD
+CLIENT_ID = os.getenv("AAD_Client_ID")  # Client ID of the app registered in AAD
 TENANT_ID = os.getenv("AAD_Tenant_ID")  # Tenant ID of the Azure AD tenant
 
 http_bearer = HTTPBearer()
 jwks_uri = "https://login.microsoftonline.com/common/discovery/keys"
-jwks_cache = {}
 
 
-def update_jwks(retries: int = 5, delay: int = 5):
-    global jwks_cache
-    for i in range(retries):
-        try:
-            jwks_cache = requests.get(jwks_uri).json()
-            break
-        except Exception as e:
-            logging.error(f"Failed to update JWKS: {e}")
-            if i < retries - 1:  # Don't delay after the last retry
-                time.sleep(delay)
-            else:
-                raise
+class JWKSHandler:
+    jwks_cache: TTLCache[str,any] = TTLCache(maxsize=1, ttl=600)  # cache the JWKS for 10 minutes
+
+    @classmethod
+    @cached(cache=jwks_cache)
+    def get_jwks(cls):
+        for _ in range(5):  # retry up to 5 times
+            try:
+                return requests.get(jwks_uri).json()
+            except Exception as e:
+                logging.error(f"Failed to update JWKS: {e}")
+                time.sleep(5)
+        raise Exception("Failed to update JWKS after 5 retries")
 
 
-# Update the JWKS immediately and then every 10 minutes
-update_jwks()
-schedule.every(10).minutes.do(update_jwks)
-
-
-def run_scheduler():
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
-
-
-scheduler_thread = threading.Thread(target=run_scheduler, daemon=True)
-scheduler_thread.start()
+jwks_handler = JWKSHandler()
 
 
 def validate_issuer_and_get_public_key(token: str) -> str:
@@ -63,13 +50,13 @@ def validate_issuer_and_get_public_key(token: str) -> str:
         )
 
     # Look up the public key in the JWKS using the `kid` from the JWT header
-    key = [k for k in jwks_cache["keys"] if k["kid"] == unverified_header["kid"]][0]
+    key = [k for k in jwks_handler.get_jwks()["keys"] if k["kid"] == unverified_header["kid"]][0]
     public_key = jwt.algorithms.RSAAlgorithm.from_jwk(key)
 
     return public_key, algorithm
 
 
-def validate_and_decode_jwt(token: str, retry: bool = True) -> dict:
+def validate_and_decode_jwt(token: str) -> dict:
     try:
         public_key, algorithm = validate_issuer_and_get_public_key(token)
         payload = jwt.decode(
@@ -77,15 +64,10 @@ def validate_and_decode_jwt(token: str, retry: bool = True) -> dict:
         )  # Checks expiration, audience, and signature
         return payload
     except jwt.PyJWTError:
-        if retry:
-            # The validation failed, possibly due to key rotation. Refresh the JWKS and retry once.
-            update_jwks()
-            return validate_and_decode_jwt(token, retry=False)
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid JWT",
-            )
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid JWT",
+        )
 
 
 def get_current_user(
@@ -116,8 +98,8 @@ def get_current_active_admin_user(
 ) -> dict:
     if current_user["is_active"]:
         if (
-            "roles" in current_user and "admin" in current_user["roles"]
-        ):  # change to appropriate admin role
+            "roles" in current_user and "IQEngine-Admin" in current_user["roles"]
+        ): 
             return current_user
         else:
             raise HTTPException(
