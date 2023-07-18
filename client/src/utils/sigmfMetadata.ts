@@ -222,7 +222,6 @@ export class Annotation {
   'core:freq_lower_edge'?: number;
   'core:freq_upper_edge'?: number;
   'core:uuid'?: string;
-  'core:description'?: string;
   capture_details?: string;
 
   getAnnotationPosition(
@@ -269,13 +268,14 @@ export class Annotation {
     return result;
   }
 
-  getDescription() {
-    return this['core:description'] ?? this['core:comment'] ?? this['core:label'] ?? '';
+  getLabel() {
+    return this['core:label'] ?? this['core:description'] ?? '';
   }
 
   [key: string]: any;
 }
 
+/* Unused?
 export const SigMFFields = {
   antenna_gain: 'antenna:gain',
   antenna_type: 'antenna:type',
@@ -312,3 +312,4 @@ export const SigMFFields = {
   uuid: 'core:uuid',
   capture_details: 'capture_details',
 };
+*/

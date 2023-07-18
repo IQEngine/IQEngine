@@ -108,7 +108,7 @@ export const AnnotationList = ({
     if (!meta?.annotations) return;
 
     for (let i = 0; i < meta.annotations?.length; i++) {
-      const annotation = meta.annotations[i];
+      const annotation = Object.assign(new Annotation(), meta.annotations[i]);
       const sampleRate = Number(meta.global['core:sample_rate']);
       const startSampleCount = Number(annotation['core:sample_start']);
       const sampleCount = Number(annotation['core:sample_count']);
@@ -120,8 +120,8 @@ export const AnnotationList = ({
         ? annotation['core:freq_upper_edge']
         : centerFrequency + sampleRate / 2;
 
-      // Get description
-      const description = annotation['core:description'];
+      // Get label
+      const label = annotation.getLabel();
 
       // Get start frequency range
       const startFrequency = getFrequency(lowerEdge);
@@ -136,12 +136,12 @@ export const AnnotationList = ({
       const duration = getSeconds(sampleCount / sampleRate);
 
       currentParents[i] = {
-        description: {
+        label: {
           index: i,
           annotation: annotation,
-          object: description,
-          name: 'core:description',
-          error: currentParents[i]?.description?.error,
+          object: label,
+          name: 'core:label',
+          error: currentParents[i]?.label?.error,
         },
         startFrequency: {
           index: i,
@@ -207,8 +207,8 @@ export const AnnotationList = ({
         label: (
           <AutoSizeInput
             label={`Annotation ${i} - Label`}
-            parent={currentParents[i].description}
-            value={description}
+            parent={currentParents[i].label}
+            value={label}
             onBlur={updateAnnotation}
           />
         ),

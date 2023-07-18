@@ -2,26 +2,27 @@
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
 
-import React, { useRef } from 'react';
+import React, { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-
-import { SigMFMetadata } from '@/utils/sigmfMetadata';
 import { CLIENT_TYPE_BLOB } from '@/api/Models';
 import { getMeta } from '@/api/metadata/Queries';
+import { AnnotationModal } from './AnnotationModal';
 
 interface FileRowProps {
   filepath: string;
 }
+
 export default function FileRow({ filepath }: FileRowProps) {
+  const [showModal, setShowModal] = useState(false);
+
   const { type, account, container, sasToken } = useParams();
   const { data: item } = getMeta(type, account, container, filepath);
-  console.log('FILE', 'type: ', type, 'account: ', account, 'container: ', container, 'sasToken: ', sasToken);
+
   const spectogramLink = `/spectrogram/${item?.getOrigin().type}/${item?.getOrigin().account}/${
     item?.getOrigin().container
   }/${encodeURIComponent(item?.getFilePath())}`;
 
   const getUrlWithAuth = (url) => {
-    console.log('getUrlWithAuth', 'type: ', type, 'sasToken: ', sasToken);
     if (type == CLIENT_TYPE_BLOB && sasToken) {
       // get the value of sig in the sas token
       const sig = sasToken
@@ -32,57 +33,32 @@ export default function FileRow({ filepath }: FileRowProps) {
       const encodedSig = encodeURIComponent(sig);
       // replace the sig in the sas token with the encoded sig
       const encodedSasToken = sasToken.replace(sig, encodedSig);
-      console.log('getUrlWithAuth', 'encodedSasToken: ', encodedSasToken);
+      //console.log('getUrlWithAuth', 'encodedSasToken: ', encodedSasToken);
       url += `?${encodedSasToken}`;
     }
-    console.log('getUrlWithAuth', 'url: ', url);
     return url;
   };
+
   const getThumbnailUrl = () => {
     if (!item) {
       return '';
     }
     return getUrlWithAuth(item.getThumbnailUrl());
   };
+
   const getDataUrl = () => {
     if (!item) {
       return '';
     }
     return getUrlWithAuth(item.getDataUrl());
   };
+
   const getMetadataUrl = () => {
     if (!item) {
       return '';
     }
     return getUrlWithAuth(item.getMetadataUrl());
   };
-  const modal = useRef(null);
-  const toggle = () => {
-    if (modal.current.className === 'modal w-full h-full') {
-      modal.current.className = 'modal modal-open w-full h-full';
-    } else {
-      modal.current.className = 'modal w-full h-full';
-    }
-  };
-  const annotationsData = item?.annotations?.map((item, index) => {
-    const deepItemCopy = JSON.parse(JSON.stringify(item));
-    delete deepItemCopy['core:sample_start'];
-    delete deepItemCopy['core:sample_count'];
-    delete deepItemCopy['core:freq_lower_edge'];
-    delete deepItemCopy['core:freq_upper_edge'];
-    delete deepItemCopy['core:description'];
-
-    return (
-      <tr key={index} className="h-12">
-        <td>{item['core:sample_start']}</td>
-        <td>{item['core:sample_count']}</td>
-        <td>{item['core:freq_lower_edge'] / 1e6}</td>
-        <td>{item['core:freq_upper_edge'] / 1e6}</td>
-        <td>{item['core:description']}</td>
-        <td>{JSON.stringify(deepItemCopy, null, 4).replaceAll('{', '').replaceAll('}', '').replaceAll('"', '')}</td>
-      </tr>
-    );
-  });
 
   function NewlineText(props) {
     const text = props.text;
@@ -105,6 +81,7 @@ export default function FileRow({ filepath }: FileRowProps) {
       </tr>
     );
   }
+
   return (
     <tr className="hover:bg-info/10 text-center py-2 h-32">
       {
@@ -144,33 +121,19 @@ export default function FileRow({ filepath }: FileRowProps) {
         <div>
           <button
             className="mb-2 rounded border-2 border-secondary p-1 hover:bg-secondary hover:text-base-100"
-            onClick={toggle}
+            onClick={() => {
+              setShowModal(true);
+            }}
           >
             {item.annotations?.length ?? 0}
           </button>
-          <dialog ref={modal} className="modal w-full h-full">
-            <form method="dialog" className="modal-box  max-w-full">
-              <h3 className="font-bold text-lg text-primary">{item.getFileName()}</h3>
-              <button className="absolute right-2 top-2 text-secondary font-bold" onClick={toggle}>
-                ✕
-              </button>
-              <div className="grid justify-items-stretch">
-                <table className="text-base-content">
-                  <thead className="text-primary border-b-2 h-12 border-accent">
-                    <tr>
-                      <th>Sample Start</th>
-                      <th>Sample Count</th>
-                      <th>Frequency Min [MHz]</th>
-                      <th>Frequency Max [MHz]</th>
-                      <th>Description</th>
-                      <th>Other</th>
-                    </tr>
-                  </thead>
-                  <tbody>{annotationsData}</tbody>
-                </table>
-              </div>
-            </form>
-          </dialog>
+          {showModal && (
+            <AnnotationModal
+              setShowModal={setShowModal}
+              annotations={item?.annotations}
+              fileName={item.getFileName()}
+            />
+          )}
           <br></br>({item.captures?.length ?? 0} Capture{item.captures?.length > 1 && 's'})
         </div>
       </td>

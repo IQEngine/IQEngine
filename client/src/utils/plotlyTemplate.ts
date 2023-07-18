@@ -420,9 +420,9 @@ export const template = {
       ],
     },
     colorway: [
-      '#0baf81',
-      '#FFA15A',
-      '#00cc96',
+      '#4CE091',
+      '#84cae7',
+      '#136f63',
       '#ab63fa',
       '#FFA15A',
       '#19d3f3',
@@ -449,8 +449,8 @@ export const template = {
     mapbox: {
       style: 'dark',
     },
-    paper_bgcolor: '#222222',
-    plot_bgcolor: '#222222',
+    paper_bgcolor: '#05041C',
+    plot_bgcolor: '#05041C',
     polar: {
       angularaxis: {
         gridcolor: '#506784',

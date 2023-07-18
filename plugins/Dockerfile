@@ -6,10 +6,21 @@ WORKDIR /src
 # Leave gnuradio as its own line, and have it be first, because it takes forever to build
 RUN apt-get update && apt-get install gnuradio -y
 RUN apt-get update && apt-get install ffmpeg libsm6 libxext6 -y
-# Note that GNU Radio has a bunch of python3-xyz deps so we'll install the rest of the python
-#    packages with apt instead of pip
-RUN apt-get update && apt-get install python3-full -y
-RUN apt-get install python3-pip -y
+# Note that GNU Radio has a bunch of python3-xyz deps
+
+# Satdump
+RUN apt install git cmake libpng-dev libluajit-5.1-dev libnng-dev libzstd-dev libomp-dev -y
+RUN git clone --depth 1 --branch 1.0.3 https://github.com/altillimity/satdump.git
+WORKDIR /src/satdump
+RUN mkdir build
+WORKDIR /src/satdump/build
+RUN cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_GUI=OFF -DCMAKE_INSTALL_PREFIX=/usr ..
+RUN make -j`nproc`
+RUN make install
+WORKDIR /src
+
+# Python stuff
+RUN apt-get install python3-full python3-pip -y
 COPY src/requirements.txt .
 RUN pip3 install -r requirements.txt --break-system-packages
 

@@ -68,7 +68,7 @@ def main(myblob: func.InputStream):
                 meta_data["filename"] = BLOBNAME
                 db.iqenginemetadata.update_one({"filename": BLOBNAME}, {"$set": meta_data}, upsert=True)
                 """
-                query = {"annotations.core:description": "Bluetooth"}
+                query = {"annotations.core:label": "Bluetooth"}
                 newvalues = [{"$set": list_of_dicts}]
                 db.collection2.update_many(query, newvalues)
                 """
