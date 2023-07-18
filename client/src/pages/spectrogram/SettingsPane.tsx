@@ -22,7 +22,8 @@ export class SettingsPaneProps {
   updateMagnitudeMin: any;
   updateFftsize: any;
   toggleIncludeRfFreq: any;
-  toggleCursors: any;
+  toggleTimeCursors: any;
+  toggleFreqCursors: any;
   updateZoomLevel: any;
   windowFunction: string;
   zoomLevel: number;
@@ -112,9 +113,13 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
     props.updateZoomLevel(e.target.value);
   };
 
-  const onToggleCursors = (e) => {
+  const onToggleTimeCursors = (e) => {
     setState({ ...state, saveButtonEnabled: !state.saveButtonEnabled });
-    props.toggleCursors(e);
+    props.toggleTimeCursors(e);
+  };
+
+  const onToggleFreqCursors = (e) => {
+    props.toggleFreqCursors(e);
   };
 
   const onPressSaveButton = (e) => {
@@ -160,9 +165,14 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
         />
       </label>
 
+      <label className="mb-1" id="toggle">
+        <span className="label-text text-base">Toggle Time Cursors</span>
+        <input type="checkbox" className="toggle toggle-primary float-right" onChange={onToggleTimeCursors} />
+      </label>
+
       <label className="mb-3" id="toggle">
-        <span className="label-text text-base">Toggle Cursors</span>
-        <input type="checkbox" className="toggle toggle-primary float-right" onChange={onToggleCursors} />
+        <span className="label-text text-base">Toggle Freq. Cursors</span>
+        <input type="checkbox" className="toggle toggle-primary float-right" onChange={onToggleFreqCursors} />
       </label>
 
       <button
@@ -171,7 +181,7 @@ print("Time elapsed:", (time.time() - start_t)*1e3, "ms")`,
         style={{ width: '100%', marginTop: '5px' }}
         disabled={!state.saveButtonEnabled}
       >
-        Save Selection
+        Download Selected Samples
       </button>
 
       <div className="mb-3" id="formMagMax">
