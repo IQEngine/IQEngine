@@ -1,12 +1,15 @@
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from cachetools import TTLCache, cached
+from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
 from typing import Any, Tuple
 import jwt
+from jwt import algorithms 
 import os
 import time
 import requests
 import logging
+import json
 
 
 CLIENT_ID = os.getenv("AAD_Client_ID")
@@ -34,7 +37,7 @@ class JWKSHandler:
 jwks_handler = JWKSHandler()
 
 
-def validate_issuer_and_get_public_key(token: str) -> Tuple[str,str]:
+def validate_issuer_and_get_public_key(token: str) -> Tuple[RSAPublicKey,str]:
     # Decode the token without verification to access the header
     unverified_header = jwt.get_unverified_header(token)
     unverified_payload = jwt.decode(token, options={"verify_signature": False})
@@ -50,7 +53,7 @@ def validate_issuer_and_get_public_key(token: str) -> Tuple[str,str]:
 
     # Look up the public key in the JWKS using the `kid` from the JWT header
     key = [k for k in jwks_handler.get_jwks()["keys"] if k["kid"] == unverified_header["kid"]][0]
-    public_key = jwt.algorithms.RSAAlgorithm.from_jwk(key)
+    public_key = algorithms.RSAAlgorithm.from_jwk(json.dumps(key))
 
     return public_key, algorithm
 
