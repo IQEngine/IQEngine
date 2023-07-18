@@ -69,14 +69,14 @@ const updateConfig = async (config: AppConfig) => {
     });
 };
 
-export const useUpdateConfig = (config: AppConfig) => {
+export const useUpdateConfig = () => {
   let client = useQueryClient();
 
   return useMutation({
     mutationFn: (config: AppConfig) => {
       return updateConfig(config);
     },
-    onMutate: async () => {
+    onMutate: async (config: AppConfig) => {
       await client.cancelQueries(['config']);
       const previousConfig = client.getQueryData(['config']);
       client.setQueryData(['config'], config);
