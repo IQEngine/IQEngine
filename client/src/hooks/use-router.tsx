@@ -4,7 +4,7 @@ import React from 'react';
 import SwaggerUI from 'swagger-ui-react';
 import { useProtectedRoute } from '@/auth/hooks/use-protected-route';
 import DocIndex from '@/pages/docs/index.mdx';
-import ExamplePage from '@/pages/docs/example-page.mdx';
+import PluginDocs from '@/pages/docs/plugins.mdx';
 
 export function useRouter() {
   const router = createBrowserRouter([
@@ -43,9 +43,9 @@ export function useRouter() {
           },
         },
         {
-          path: 'docs/example-page',
+          path: 'docs/plugins',
           async lazy() {
-            return { Component: ExamplePage };
+            return { Component: PluginDocs };
           },
         },
         { path: 'siggen', element: <SignalGenerator /> },

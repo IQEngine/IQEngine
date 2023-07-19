@@ -35,7 +35,7 @@ export function DocsLayout({ meta, children }) {
               <TableHeader>Header Label 1</TableHeader>
               <TableItem href="/docs">Index page</TableItem>
               <TableHeader>Header Label 2</TableHeader>
-              <TableItem href="/docs/example-page">Example Page</TableItem>
+              <TableItem href="/docs/plugins">Plugins</TableItem>
             </div>
           </nav>
 
