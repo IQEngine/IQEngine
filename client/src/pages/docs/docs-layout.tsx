@@ -24,6 +24,7 @@ export function DocsLayout({ meta, children }) {
               <TableHeader>User Docs</TableHeader>
               <TableItem href="/docs">Overview</TableItem>
               <TableItem href="/docs/plugins">Plugins</TableItem>
+              <TableItem href="#">Backend</TableItem>
               <TableItem href="#">Admin Page</TableItem>
 
               <TableHeader>Developer Docs</TableHeader>
