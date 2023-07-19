@@ -1,7 +1,5 @@
-import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import React from 'react';
 import { queryMeta } from '@/api/metadata/Queries';
-import { SigMFMetadata, Annotation, CaptureSegment } from '@/utils/sigmfMetadata';
 import FileRow from '@/pages/recordings-browser/File';
 
 export const Results = ({ queryString }) => {
@@ -11,7 +9,16 @@ export const Results = ({ queryString }) => {
   const renderResults = () => {
     if (!data) return;
     return data.map((item, i) => {
-      return <FileRow key={i} item={item} />;
+      const origin = item.getOrigin();
+      return (
+        <FileRow
+          key={i}
+          filepath={origin.file_path}
+          account={origin.account}
+          container={origin.container}
+          type={origin.type}
+        />
+      );
     });
   };
   return (

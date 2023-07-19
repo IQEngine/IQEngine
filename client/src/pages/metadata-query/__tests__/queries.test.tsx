@@ -6,13 +6,13 @@ describe('Test query validation objects', () => {
   test('date validation returns correct query string', () => {
     const { validator } = queries.date;
     const expected = 'min_datetime=2022-01-02T00%3A00%3A00%2B00%3A00&max_datetime=2023-01-01T00%3A00%3A00%2B00%3A00';
-    const result = validator({to: '2023-01-01', from: '2022-01-02'});
+    const result = validator({ to: '2023-01-01', from: '2022-01-02' });
     expect(result).toBe(expected);
   });
   test('date validation fails on incorrect dates', () => {
     const { validator } = queries.date;
     const expected = false;
-    const result = validator({to: '2022-01-01', from: '2023-01-02'});
+    const result = validator({ to: '2022-01-01', from: '2023-01-02' });
     expect(result).toBe(expected);
   });
   test('geo validation returns correct query string', () => {
@@ -21,7 +21,7 @@ describe('Test query validation objects', () => {
     const lon = 2;
     const radius = 3;
     const expected = `captures_geo=${lon},${lat},${radius}`;
-    const result = validator({lat, lon, radius, queryType: 'captures'});
+    const result = validator({ lat, lon, radius, queryType: 'captures' });
     expect(result).toBe(expected);
   });
   test('author validation returns correct query string', () => {
@@ -36,7 +36,7 @@ describe('Test query validation objects', () => {
     const from = 1;
     const to = 2;
     const expected = `min_frequency=${from}&max_frequency=${to}`;
-    const result = validator({from, to});
+    const result = validator({ from, to });
     expect(result).toBe(expected);
   });
   test('frequency validation fails on incorrect frequencies', () => {
@@ -44,7 +44,7 @@ describe('Test query validation objects', () => {
     const from = 2;
     const to = 1;
     const expected = false;
-    const result = validator({from, to});
+    const result = validator({ from, to });
     expect(result).toBe(expected);
   });
   test('comment validation returns correct query string', () => {
@@ -75,5 +75,4 @@ describe('Test query validation objects', () => {
     const result = validator(label);
     expect(result).toBe(expected);
   });
-
 });
