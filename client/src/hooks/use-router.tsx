@@ -3,6 +3,8 @@ import { createBrowserRouter } from 'react-router-dom';
 import React from 'react';
 import SwaggerUI from 'swagger-ui-react';
 import { useProtectedRoute } from '@/auth/hooks/use-protected-route';
+import DocIndex from '@/pages/docs/index.mdx';
+import ExamplePage from '@/pages/docs/example-page.mdx';
 
 export function useRouter() {
   const router = createBrowserRouter([
@@ -32,6 +34,18 @@ export function useRouter() {
           async lazy() {
             let { UploadPage } = await import('@/pages/UploadPage');
             return { Component: UploadPage };
+          },
+        },
+        {
+          path: 'docs',
+          async lazy() {
+            return { Component: DocIndex };
+          },
+        },
+        {
+          path: 'docs/example-page',
+          async lazy() {
+            return { Component: ExamplePage };
           },
         },
         { path: 'siggen', element: <SignalGenerator /> },

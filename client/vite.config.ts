@@ -9,39 +9,45 @@ import svgrPlugin from 'vite-plugin-svgr';
 import envCompatible from 'vite-plugin-env-compatible';
 
 // https://vitejs.dev/config/
-export default defineConfig({
-  define: {
-    'process.env': {},
-  },
-  envPrefix: "IQENGINE_",
-  server: {
-    port: 3000,
-    open: true,
-    proxy: {
-      '/api': {
-        target: 'http://127.0.0.1:5000',
+export default defineConfig(async () => {
+  const mdx = await import('@mdx-js/rollup');
+  return {
+    define: {
+      'process.env': {},
+    },
+    envPrefix: 'IQENGINE_',
+    server: {
+      port: 3000,
+      open: true,
+      proxy: {
+        '/api': {
+          target: 'http://127.0.0.1:5000',
+        },
       },
     },
-  },
-  preview: {
-    port: 3001,
-    open: true,
-  },
-  resolve: {
-    alias: {
-      '@': resolve(__dirname, 'src'),
-      './runtimeConfig': './runtimeConfig.browser',
+    preview: {
+      port: 3001,
+      open: true,
     },
-  },
-  build: {
-    outDir: 'build',
-    // if tou change the sourcemap to true you need to also increate the max heap size
-    // export NODE_OPTIONS=--max-old-space-size=32768
-    sourcemap: false,
-  },
-  plugins: [react(), viteTsconfigPaths(), svgrPlugin(), envCompatible()],
-  test: {
-    globals: true,
-    environment: 'jsdom',
-  },
+    resolve: {
+      alias: {
+        '@': resolve(__dirname, 'src'),
+        './runtimeConfig': './runtimeConfig.browser',
+      },
+    },
+    build: {
+      outDir: 'build',
+      // if tou change the sourcemap to true you need to also increate the max heap size
+      // export NODE_OPTIONS=--max-old-space-size=32768
+      sourcemap: false,
+    },
+    optimizeDeps: {
+      include: ['react/jsx-runtime'],
+    },
+    plugins: [react(), viteTsconfigPaths(), svgrPlugin(), envCompatible(), mdx.default({ remarkPlugins: [] })],
+    test: {
+      globals: true,
+      environment: 'jsdom',
+    },
+  };
 });
