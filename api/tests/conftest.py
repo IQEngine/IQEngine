@@ -17,7 +17,8 @@ async def env_setup():
 @pytest_asyncio.fixture(scope="function")
 def client():
     os.environ["IQENGINE_PLUGINS"] = "[]"
-    with mock.patch("importer.all.import_all_from_env") as mock_i:
+    with mock.patch("importer.all.import_all_from_env") as mock_i, \
+            mock.patch("helpers.authorization.requires", return_value=lambda x: x):
         mock_i.return_value = None
         from main import app
 

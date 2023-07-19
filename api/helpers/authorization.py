@@ -18,8 +18,12 @@ http_bearer = HTTPBearer()
 
 
 class JWKSHandler:
-    openid_config_uri = "https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration"
-    jwks_cache: TTLCache[str, Any] = TTLCache(maxsize=1, ttl=600)  # cache the JWKS for 10 minutes
+    openid_config_uri = (
+        "https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration"
+    )
+    jwks_cache: TTLCache[str, Any] = TTLCache(
+        maxsize=1, ttl=600
+    )  # cache the JWKS for 10 minutes
 
     @classmethod
     def get_openid_config(cls):
@@ -33,8 +37,8 @@ class JWKSHandler:
     @cached(cache=jwks_cache)
     def get_jwks(cls):
         openid_config = cls.get_openid_config()
-        jwks_uri = openid_config['jwks_uri']
-        issuer = openid_config['issuer']
+        jwks_uri = openid_config["jwks_uri"]
+        issuer = openid_config["issuer"]
 
         for _ in range(5):  # retry up to 5 times
             try:
@@ -86,7 +90,8 @@ def validate_and_decode_jwt(token: str) -> dict:
 
 
 def get_current_user(
-      token: HTTPAuthorizationCredentials = Depends(http_bearer),) -> dict:
+    token: HTTPAuthorizationCredentials = Depends(http_bearer),
+) -> dict:
     try:
         payload = validate_and_decode_jwt(token.credentials)
         return payload
@@ -106,11 +111,11 @@ def get_current_active_user(current_user: dict = Depends(get_current_user)) -> d
     )
 
 
-def get_current_active_admin_user(current_user: dict = Depends(get_current_user),) -> dict:
+def get_current_active_admin_user(
+    current_user: dict = Depends(get_current_user),
+) -> dict:
     if current_user["is_active"]:
-        if (
-            "roles" in current_user and "IQEngine-Admin" in current_user["roles"]
-        ):
+        if "roles" in current_user and "IQEngine-Admin" in current_user["roles"]:
             return current_user
         else:
             raise HTTPException(
@@ -127,14 +132,18 @@ def get_current_active_admin_user(current_user: dict = Depends(get_current_user)
 def requires(role: str):
     def decorator(f):
         async def decorated_function(*args, **kwargs):
-            current_user = await get_current_active_user()
+            current_user = get_current_active_user()
             if role not in current_user["roles"]:
-                logging.info(f"User {current_user['email']} attempted to access {f.__name__} without sufficient privileges")
-                raise HTTPException(
-                    status_code=status.HTTP_403_FORBIDDEN, 
-                    detail="Not enough privileges"
+                logging.info(
+                    f"User {current_user['email']} attempted to access {f.__name__} without sufficient privileges"
                 )
-            logging.info(f"User {current_user['email']} accessed {f.__name__} successfully")
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Not enough privileges",
+                )
+            logging.info(
+                f"User {current_user['email']} accessed {f.__name__} successfully"
+            )
             return await f(*args, **kwargs)
         return decorated_function
     return decorator

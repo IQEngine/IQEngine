@@ -2,6 +2,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
+from helpers.authorization import get_current_user
 from database import metadata_repo
 from main import app
 
@@ -18,6 +19,10 @@ def override_metadata_collection():
     return mock_collection
 
 
+async def mock_get_current_user():
+    return {"roles": ["role1", "role2"], "is_active": True, "email": "emailaddress"}
+
+
 @pytest.mark.asyncio
 async def test_query_meta_success(client):
     account = "test_account"
@@ -26,6 +31,7 @@ async def test_query_meta_success(client):
 
     # Override the dependency
     app.dependency_overrides[metadata_repo.collection] = override_metadata_collection
+    app.dependency_overrides[get_current_user] = mock_get_current_user
 
     response = client.get(
         f"/api/datasources/query?account={account}&container={container}&{query_condition}"
