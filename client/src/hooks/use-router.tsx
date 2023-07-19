@@ -34,6 +34,13 @@ export function useRouter() {
             return { Component: MetadataQuery };
           },
         },
+        {
+          path: 'upload',
+          async lazy() {
+            let { UploadPage } = await import('@/pages/UploadPage');
+            return { Component: UploadPage };
+          },
+        },
         { path: 'siggen', element: <SignalGenerator /> },
         {
           path: 'plugins',
