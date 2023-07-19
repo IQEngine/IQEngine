@@ -15,10 +15,10 @@ export const useGetImage = (
     if (
       !totalFftData ||
       !fftSize ||
+      isNaN(magnitudeMin) ||
+      isNaN(magnitudeMax) ||
       magnitudeMin >= magnitudeMax ||
-      !colmap ||
-      magnitudeMin < -100.0 ||
-      magnitudeMax > 50
+      !colmap
     ) {
       setImage(null);
     } else {
