@@ -27,10 +27,7 @@ IQEngine is rapidly evolving, so [sign up](https://dashboard.mailerlite.com/form
 
 ## Plugins
 
-Through the optional backend API, IQEngine supports three different classes of plugins (signal generation is not yet released).
-The signal detector (with optional classifier) can be triggered in the main spectrogram page, which will display the output annotations as soon as it finishes, convenient for testing new detection/classification algorithms.
-The DSP module runs prior to the FFT calculations, letting you perform a variety of signal processing functions and other sample manipulation.
-It currently only supports Python snippets, where the samples out must be the same length as samples in (for now).
+IQEngine supports a plugin system, allowing DSP and other functions to run at the backend and process IQ samples.  Running a plugin occurs on the spectrogram page, after selecting the portion of the recording you want to process.  One example use-case is running a signal detector (with optional classifier), which will display the output annotations as soon as it finishes, convenient for testing new detection/classification algorithms.  It is also possible to wrap a GNU Radio flowgraph into a plugin; it must run in no-GUI mode and use ZMQ PUB/SUB for the input and output streams.
 
 <p align="center">
   <img width=450 src="client/public/plugins_concept.svg" />
