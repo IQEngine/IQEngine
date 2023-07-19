@@ -19,7 +19,7 @@ Try IQEngine now using the canonical instance at [www.iqengine.org](http://iqeng
 
 IQEngine is rapidly evolving, so [sign up](https://dashboard.mailerlite.com/forms/299501/77960409531811734/share) for a once-a-month email update, including new features, demos, and more!  There is also an IQEngine [Discord](https://discord.gg/k7C8kp3b76) chat channel if you want to get involved in the development or have questions.
 
-<p align="center"><h1>IQEngine is Supported By:</h1></p>
+<p align="center"><h2>IQEngine is Supported By:</h2></p>
 
 <p align="center"><img width=250 src="client/public/microsoft-logo.svg" /></p>
 
