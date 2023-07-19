@@ -120,8 +120,8 @@ export const App = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/plugins" onClick={() => {}}>
-                    Plugins
+                  <Link to="/docs" onClick={() => {}}>
+                    Docs
                   </Link>
                 </li>
                 {activeAccount ? (
@@ -174,8 +174,8 @@ export const App = () => {
                 </Link>
               </li>
               <li className="hidden md:block">
-                <Link to="/plugins" onClick={() => {}}>
-                  <div className="text-lg">Plugins</div>
+                <Link to="/docs" onClick={() => {}}>
+                  <div className="text-lg">Docs</div>
                 </Link>
               </li>
 

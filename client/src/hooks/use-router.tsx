@@ -3,7 +3,7 @@ import { createBrowserRouter } from 'react-router-dom';
 import React from 'react';
 import SwaggerUI from 'swagger-ui-react';
 import { useProtectedRoute } from '@/auth/hooks/use-protected-route';
-import DocIndex from '@/pages/docs/index.mdx';
+import OverviewDocs from '@/pages/docs/overview.mdx';
 import PluginDocs from '@/pages/docs/plugins.mdx';
 
 export function useRouter() {
@@ -39,7 +39,7 @@ export function useRouter() {
         {
           path: 'docs',
           async lazy() {
-            return { Component: DocIndex };
+            return { Component: OverviewDocs };
           },
         },
         {
@@ -49,13 +49,6 @@ export function useRouter() {
           },
         },
         { path: 'siggen', element: <SignalGenerator /> },
-        {
-          path: 'plugins',
-          async lazy() {
-            let { Plugins } = await import('@/pages/Plugins');
-            return { Component: Plugins };
-          },
-        },
         {
           path: 'admin',
           async lazy() {
