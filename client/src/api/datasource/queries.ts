@@ -50,8 +50,6 @@ export const getFeatures = (type: string) => {
   return client.features();
 };
 
-
-
 export const useAddDataSource = () => {
   const { dataSourcesQuery, filesQuery } = useUserSettings();
   const dataSourceClient = DataSourceClientFactory(ClientType.API, filesQuery.data, dataSourcesQuery.data);

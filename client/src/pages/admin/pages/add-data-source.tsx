@@ -23,7 +23,7 @@ export const Form = () => {
         }
         addDataSource.mutate(formData)
         form.reset();
-      
+
       };
 
       return (
@@ -72,7 +72,7 @@ export const Form = () => {
             className="input input-bordered input-success w-full max-w-xs"
           />
           <br />
-          <button 
+          <button
             type="submit"
             className="bg-white text-black px-4 py-2 rounded-md mt-3"
             >Submit</button>
@@ -80,6 +80,6 @@ export const Form = () => {
         </div>
       );
     };
-    
+
     export default Form;
 
