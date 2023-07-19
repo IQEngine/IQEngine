@@ -27,7 +27,6 @@ async def create_datasource(
     if datasource.sasToken:
         datasource.sasToken = encrypt(datasource.sasToken)
 
-    #await datasources.insert_one(datasource.dict(by_alias=True, exclude_unset=True))
     datasource_dict = datasource.dict(by_alias=True, exclude_unset=True)
     datasource_dict["sasToken"] = datasource.sasToken if datasource.sasToken else None
 
