@@ -173,11 +173,6 @@ export const App = () => {
                   <div className="text-base">SigMF</div>
                 </Link>
               </li>
-              <li className="hidden md:block">
-                <Link to="/docs" onClick={() => {}}>
-                  <div className="text-base">Docs</div>
-                </Link>
-              </li>
 
               {activeAccount ? (
                 <>
@@ -199,6 +194,13 @@ export const App = () => {
                   </a>
                 </li>
               )}
+
+              <li className="hidden md:block">
+                <Link to="/docs" onClick={() => {}}>
+                  <div className="text-base">Docs</div>
+                </Link>
+              </li>
+
               <Feature flag={FeatureFlag.useIQEngineOutReach.name}>
                 <li className="hidden md:block">
                   <a href="https://discord.gg/k7C8kp3b76" target="_blank" rel="noreferrer" className="text-base">
