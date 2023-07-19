@@ -11,23 +11,34 @@ import requests
 import logging
 import json
 
-
-CLIENT_ID = os.getenv("AAD_Client_ID")
+CLIENT_ID = os.getenv("IQENGINE_APP_ID")
 TENANT_ID = os.getenv("AAD_Tenant_ID")
 
 http_bearer = HTTPBearer()
-jwks_uri = "https://login.microsoftonline.com/common/discovery/keys"
 
 
 class JWKSHandler:
+    openid_config_uri = "https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration"
     jwks_cache: TTLCache[str, Any] = TTLCache(maxsize=1, ttl=600)  # cache the JWKS for 10 minutes
+
+    @classmethod
+    def get_openid_config(cls):
+        try:
+            return requests.get(cls.openid_config_uri).json()
+        except Exception as e:
+            logging.error(f"Failed to fetch OpenID configuration: {e}")
+            raise
 
     @classmethod
     @cached(cache=jwks_cache)
     def get_jwks(cls):
+        openid_config = cls.get_openid_config()
+        jwks_uri = openid_config['jwks_uri']
+        issuer = openid_config['issuer']
+
         for _ in range(5):  # retry up to 5 times
             try:
-                return requests.get(jwks_uri).json()
+                return requests.get(jwks_uri).json(), issuer
             except Exception as e:
                 logging.error(f"Failed to update JWKS: {e}")
                 time.sleep(5)
@@ -43,18 +54,20 @@ def validate_issuer_and_get_public_key(token: str) -> Tuple[RSAPublicKey, Any]:
     unverified_payload = jwt.decode(token, options={"verify_signature": False})
     algorithm = unverified_header.get("alg")
 
+    # Look up the public key in the JWKS using the `kid` from the JWT header
+    jwks, issuer = jwks_handler.get_jwks()
+    issuer = issuer.replace("{tenantid}", TENANT_ID)
+    key = [k for k in jwks["keys"] if k["kid"] == unverified_header["kid"]][0]
+    public_key = cast(RSAPublicKey, algorithms.RSAAlgorithm.from_jwk(json.dumps(key)))
+
     # Check issuer
     issuer = unverified_payload["iss"]
-    if issuer != "https://login.microsoftonline.com/{TENANT_ID}/v2.0":
+    if unverified_payload["iss"] != issuer:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid issuer",
         )
-
-    # Look up the public key in the JWKS using the `kid` from the JWT header
-    key = [k for k in jwks_handler.get_jwks()["keys"] if k["kid"] == unverified_header["kid"]][0]
-    public_key = cast(RSAPublicKey, algorithms.RSAAlgorithm.from_jwk(json.dumps(key)))
-
+    
     return public_key, algorithm
 
 

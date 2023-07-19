@@ -11,21 +11,35 @@ from helpers.authorization import (
 
 
 def test_get_jwks(mocker):
-    # Mock the requests.get to return a response with the desired JWKS
+    # Mock the requests.get to return a response with the desired OpenID Config and JWKS
+    openid_config_response = {
+        "jwks_uri": "mock_jwks_uri",
+        "issuer": "mock_issuer"
+    }
+    jwks_response = {"keys": "mock_jwks"}
+    
     mocker.patch(
-        "requests.get", return_value=mocker.Mock(json=lambda: {"keys": "mock_jwks"})
+        "requests.get",
+        side_effect=[
+            mocker.Mock(json=lambda: openid_config_response),
+            mocker.Mock(json=lambda: jwks_response)
+        ]
     )
+    
     jwks_handler = JWKSHandler()
-    jwks_handler.get_jwks()
-    jwks_cache = jwks_handler.jwks_cache.get((JWKSHandler,))
-
-    assert jwks_cache.get("keys") == "mock_jwks"
+    jwks, issuer = jwks_handler.get_jwks()
+    
+    assert jwks.get("keys") == "mock_jwks"
+    assert issuer == "mock_issuer"
 
 
 def test_get_jwks_failure(mocker):
     # Mock the requests.get to raise an exception
-    mocker.patch("requests.get", side_effect=Exception("Mock exception"))
-    mocker.patch("time.sleep", return_value=None)
+    mocker.patch("requests.get", side_effect=[
+            mocker.Mock(json=lambda: {"jwks_uri": "mock_jwks_uri", "issuer": "mock_issuer"}),
+            Exception("Mock exception"),
+        ],
+    )
     jwks_handler = JWKSHandler()
 
     try:
