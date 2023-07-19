@@ -124,8 +124,25 @@ def get_current_active_admin_user(current_user: dict = Depends(get_current_user)
         )
 
 
+def requires(role: str):
+    def decorator(f):
+        async def decorated_function(*args, **kwargs):
+            current_user = await get_current_active_user()
+            if role not in current_user["roles"]:
+                logging.info(f"User {current_user['email']} attempted to access {f.__name__} without sufficient privileges")
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN, 
+                    detail="Not enough privileges"
+                )
+            logging.info(f"User {current_user['email']} accessed {f.__name__} successfully")
+            return await f(*args, **kwargs)
+        return decorated_function
+    return decorator
+
+
 # Example usage
 # @app.get("/some-endpoint")
-# def read_items(user: dict = Depends(get_current_active_user)):
+# @requires("IQEngine-User")
+# def read_items():
 #     # business logic here
 #     return {"message": "You have access!"}

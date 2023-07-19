@@ -2,11 +2,13 @@ from database import plugin_repo
 from database.models import Plugin
 from fastapi import APIRouter, Depends, HTTPException
 from motor.core import AgnosticCollection
+from helpers.authorization import requires
 
 router = APIRouter()
 
 
 @router.post("/api/plugins", status_code=201, response_model=Plugin)
+@requires("IQEngine-User")
 async def create_plugin(
     plugin: Plugin,
     plugins: AgnosticCollection = Depends(plugin_repo.collection),
@@ -23,6 +25,7 @@ async def create_plugin(
 
 
 @router.get("/api/plugins", response_model=list[Plugin])
+@requires("IQEngine-User")
 async def get_plugins(
     plugins: AgnosticCollection = Depends(plugin_repo.collection),
 ):
@@ -33,6 +36,7 @@ async def get_plugins(
 
 
 @router.get("/api/plugins/{plugin_name}", response_model=Plugin)
+@requires("IQEngine-User")
 async def get_plugin(
     plugin_name: str,
     plugins: AgnosticCollection = Depends(plugin_repo.collection),
@@ -47,6 +51,7 @@ async def get_plugin(
 
 
 @router.put("/api/plugins/{plugin_name}", response_model=Plugin)
+@requires("IQEngine-User")
 async def update_plugin(
     plugin_name: str,
     plugin: Plugin,
@@ -66,6 +71,7 @@ async def update_plugin(
 
 
 @router.delete("/api/plugins/{plugin_name}")
+@requires("IQEngine-User")
 async def delete_plugin(
     plugin_name: str,
     plugins: AgnosticCollection = Depends(plugin_repo.collection),

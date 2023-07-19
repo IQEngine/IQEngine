@@ -9,6 +9,7 @@ from fastapi.responses import StreamingResponse
 from helpers.cipher import decrypt
 from helpers.urlmapping import ApiType, get_content_type, get_file_name
 from motor.core import AgnosticCollection
+from helpers.authorization import requires
 
 router = APIRouter()
 
@@ -18,6 +19,7 @@ router = APIRouter()
     status_code=200,
     response_model=list[Metadata],
 )
+@requires("IQEngine-User")
 async def get_all_meta(
     account,
     container,
@@ -44,6 +46,7 @@ async def get_all_meta(
     status_code=200,
     response_model=list[str],
 )
+@requires("IQEngine-User")
 async def get_all_meta_name(
     account,
     container,
@@ -69,6 +72,7 @@ async def get_all_meta_name(
     "/api/datasources/{account}/{container}/{filepath:path}/meta",
     response_model=Metadata,
 )
+@requires("IQEngine-User")
 async def get_meta(
     metadata: Metadata = Depends(metadata_repo.get),
 ):
@@ -81,6 +85,7 @@ async def get_meta(
     "/api/datasources/{account}/{container}/{filepath:path}/iqdata",
     response_class=StreamingResponse,
 )
+@requires("IQEngine-User")
 async def get_metadata_iqdata(
     filepath: str,
     datasource: DataSource = Depends(datasource_repo.get),
@@ -104,6 +109,7 @@ async def get_metadata_iqdata(
     "/api/datasources/{account}/{container}/{filepath:path}/thumbnail",
     response_class=StreamingResponse,
 )
+@requires("IQEngine-User")
 async def get_meta_thumbnail(
     filepath: str,
     background_tasks: BackgroundTasks,
@@ -173,6 +179,7 @@ async def process_geolocation(target: str, geolocation: str):
     status_code=200,
     response_model=list[Metadata],
 )
+@requires("IQEngine-User")
 async def query_meta(
     account: Optional[List[str]] = Query([]),
     container: Optional[List[str]] = Query([]),
@@ -278,6 +285,7 @@ async def query_meta(
     status_code=201,
     response_model=Metadata,
 )
+@requires("IQEngine-User")
 async def create_meta(
     account: str,
     container: str,
@@ -327,6 +335,7 @@ async def create_meta(
     "/api/datasources/{account}/{container}/{filepath:path}/meta",
     status_code=204,
 )
+@requires("IQEngine-User")
 async def update_meta(
     account,
     container,

@@ -8,11 +8,13 @@ from helpers.cipher import encrypt
 from helpers.urlmapping import ApiType, add_URL_sasToken
 from motor.core import AgnosticCollection
 from pydantic import SecretStr
+from helpers.authorization import requires
 
 router = APIRouter()
 
 
 @router.post("/api/datasources", status_code=201, response_model=DataSource)
+@requires("IQEngine-Admin")
 async def create_datasource(
     datasource: DataSource,
     datasources: AgnosticCollection = Depends(datasource_repo.collection),
@@ -32,6 +34,7 @@ async def create_datasource(
 
 
 @router.get("/api/datasources", response_model=list[DataSource])
+@requires("IQEngine-User")
 async def get_datasources(
     datasources_collection: AgnosticCollection = Depends(
         datasource_repo.collection
@@ -47,6 +50,7 @@ async def get_datasources(
 @router.get(
     "/api/datasources/{account}/{container}/image", response_class=StreamingResponse
 )
+@requires("IQEngine-User")
 async def get_datasource_image(
     account: str,
     container: str,
@@ -84,6 +88,7 @@ async def get_datasource_image(
 @router.get(
     "/api/datasources/{account}/{container}/datasource", response_model=DataSource
 )
+@requires("IQEngine-User")
 async def get_datasource(
     datasource: DataSource = Depends(datasource_repo.get),
 ):
@@ -94,6 +99,7 @@ async def get_datasource(
 
 
 @router.put("/api/datasources/{account}/{container}/datasource", status_code=204)
+@requires("IQEngine-Admin")
 async def update_datasource(
     account: str,
     container: str,
