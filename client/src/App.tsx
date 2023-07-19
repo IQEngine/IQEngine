@@ -175,7 +175,7 @@ export const App = () => {
               </li>
               <li className="hidden md:block">
                 <Link to="/docs" onClick={() => {}}>
-                  <div className="text-base">Plugins</div>
+                  <div className="text-base">Docs</div>
                 </Link>
               </li>
 
