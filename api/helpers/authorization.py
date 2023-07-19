@@ -67,7 +67,7 @@ def validate_issuer_and_get_public_key(token: str) -> Tuple[RSAPublicKey, Any]:
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid issuer",
         )
-    
+
     return public_key, algorithm
 
 

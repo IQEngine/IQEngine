@@ -17,7 +17,7 @@ def test_get_jwks(mocker):
         "issuer": "mock_issuer"
     }
     jwks_response = {"keys": "mock_jwks"}
-    
+
     mocker.patch(
         "requests.get",
         side_effect=[
@@ -25,10 +25,10 @@ def test_get_jwks(mocker):
             mocker.Mock(json=lambda: jwks_response)
         ]
     )
-    
+
     jwks_handler = JWKSHandler()
     jwks, issuer = jwks_handler.get_jwks()
-    
+
     assert jwks.get("keys") == "mock_jwks"
     assert issuer == "mock_issuer"
 
