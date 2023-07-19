@@ -66,7 +66,7 @@ export const PluginRow = ({ plugin }: PluginRowProps) => {
     const name = target.name.value;
     const url = target.url.value;
     updatePlugin.mutate({ name, url });
-    setOpenEdit(false);
+    setOpenEdit((prev) => !prev);
   }
 
   return (
@@ -110,7 +110,7 @@ export const PluginRow = ({ plugin }: PluginRowProps) => {
           )}
           <hr className="border-secondary" />
           <div className="modal-action">
-            <button className="btn btn-primary" onClick={handleToggleDetails}>
+            <button className="h-9" onClick={handleToggleDetails}>
               Close
             </button>
           </div>
@@ -146,7 +146,7 @@ export const PluginRow = ({ plugin }: PluginRowProps) => {
             </div>
             <div className="modal-action">
               <button
-                className="btn btn-primary"
+                className="h-9"
                 onClick={(e) => {
                   e.preventDefault();
                   setOpenEdit(false);
@@ -154,7 +154,7 @@ export const PluginRow = ({ plugin }: PluginRowProps) => {
               >
                 Cancel
               </button>
-              <button className="btn btn-primary" type="submit">
+              <button className="h-9" type="submit">
                 Save
               </button>
             </div>
@@ -190,7 +190,7 @@ export const Plugins = () => {
   return (
     <>
       <h1 className="text-3xl font-bold">Plugins</h1>
-      <button className="btn btn-primary" aria-label="add plugin" onClick={handleToggle}>
+      <button className="h-9" aria-label="add plugin" onClick={handleToggle}>
         Add Plugin
       </button>
       <Modal open={open} onClose={handleToggle} disableClickOutside={!open}>

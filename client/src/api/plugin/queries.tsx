@@ -93,11 +93,18 @@ export const useUpdatePlugin = () => {
       await client.cancelQueries(['plugin', definition.name]);
       const previousPlugin = client.getQueryData<PluginDefinition>(['plugin', definition.name]);
       client.setQueryData<PluginDefinition>(['plugin', definition.name], definition);
-      return { previousPlugin };
+      await client.cancelQueries(['plugins']);
+      const previousPlugins = client.getQueryData<PluginDefinition[]>(['plugins']);
+      client.setQueryData<PluginDefinition[]>(
+        ['plugins'],
+        (old) => old.map((item) => (item.name === definition.name ? definition : item)) || []
+      );
+      return { previousPlugins, previousPlugin };
     },
     onError: (err, newDefinition, context) => {
       console.error('onError', err);
       client.setQueryData(['plugin', newDefinition.name], context.previousPlugin);
+      client.setQueryData(['plugins'], context.previousPlugins);
     },
   });
 };
