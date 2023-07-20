@@ -45,14 +45,61 @@ const Modal = ({ children, open, disableClickOutside, onClose }: Props) => {
   );
 };
 
-export const PluginRow = ({ plugin }: PluginRowProps) => {
-  const updatePlugin = useUpdatePlugin();
-  const deletePlugin = useDeletePlugin();
+export const PluginDetail = ({ plugin }: PluginRowProps) => {
   const [openDetails, setOpenDetails] = useState(false);
   const { data } = useGetPluginDetailed(plugin, openDetails);
   const handleToggleDetails = () => {
     setOpenDetails((prev) => !prev);
   };
+  return (
+    <>
+      <button aria-label={`plugin ${plugin.name} detail`} onClick={handleToggleDetails}>
+        <ArrowTopRightOnSquareIcon className="h-4 w-4" />
+      </button>
+      <Modal open={openDetails} onClose={handleToggleDetails} disableClickOutside={!openDetails}>
+        <p>
+          <span className="font-bold">Name:</span> {plugin.name}
+        </p>
+        <p>
+          <span className="font-bold">URL:</span> {plugin.url}
+        </p>
+        {data && (
+          <>
+            {Object.keys(data.plugins).map((key, i) => (
+              <div className="collapse collapse-arrow join-item border border-primary">
+                <input type="radio" name={key} />
+                <div className="collapse-title font-medium">{key}</div>
+                <div className="collapse-content">
+                  {/* List all parameters of the plugin */}
+                  <ul>
+                    {Object.keys(data.plugins[key]).map((parameter, j) => (
+                      <li key={j}>
+                        <span className="">{data.plugins[key][parameter].title}</span>:{' '}
+                        {data.plugins[key][parameter].type}
+                        <br />
+                        Default: {data.plugins[key][parameter].default}
+                        <hr className="border-secondary" />
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            ))}
+          </>
+        )}
+        <hr className="border-secondary" />
+        <div className="modal-action">
+          <button className="h-9" onClick={handleToggleDetails}>
+            Close
+          </button>
+        </div>
+      </Modal>
+    </>
+  );
+};
+
+export const PluginEdit = ({ plugin }: PluginRowProps) => {
+  const updatePlugin = useUpdatePlugin();
   const [openEdit, setOpenEdit] = useState(false);
   const handleToggleEdit = () => {
     setOpenEdit((prev) => !prev);
@@ -70,106 +117,81 @@ export const PluginRow = ({ plugin }: PluginRowProps) => {
   }
 
   return (
+    <>
+      <button aria-label={`plugin ${plugin.name} edit`} onClick={handleToggleEdit}>
+        <PencilIcon className="h-4 w-4" />
+      </button>
+      <Modal open={openEdit} onClose={handleToggleEdit} disableClickOutside={!openEdit}>
+        <form onSubmit={handleUpdate}>
+          <div className="form-control">
+            <label className="label">
+              <span className="label-text">Name</span>
+            </label>
+            <input
+              type="text"
+              name="name"
+              placeholder="Name"
+              className="input input-bordered"
+              defaultValue={plugin.name}
+            />
+          </div>
+          <div className="form-control">
+            <label className="label">
+              <span className="label-text">URL</span>
+            </label>
+            <input
+              type="text"
+              name="url"
+              placeholder="URL"
+              className="input input-bordered"
+              defaultValue={plugin.url}
+            />
+          </div>
+          <div className="modal-action">
+            <button
+              className="h-9"
+              onClick={(e) => {
+                e.preventDefault();
+                setOpenEdit(false);
+              }}
+            >
+              Cancel
+            </button>
+            <button className="h-9" type="submit">
+              Save
+            </button>
+          </div>
+        </form>
+      </Modal>
+    </>
+  );
+};
+
+export const PluginDelete = ({ plugin }: PluginRowProps) => {
+  const deletePlugin = useDeletePlugin();
+  return (
+    <button
+      aria-label={`plugin ${plugin.name} delete`}
+      onClick={() => {
+        if (confirm(`Are you sure you want to delete ${plugin.name}?`)) {
+          deletePlugin.mutate({ name: plugin.name, url: plugin.url });
+        }
+      }}
+    >
+      <TrashIcon className="h-4 w-4" />
+    </button>
+  );
+};
+
+export const PluginRow = ({ plugin }: PluginRowProps) => {
+  return (
     <tr>
       <td>{plugin.name}</td>
       <td>{plugin.url}</td>
       <td>
-        <button aria-label={`plugin ${plugin.name} detail`} onClick={handleToggleDetails}>
-          <ArrowTopRightOnSquareIcon className="h-4 w-4" />
-        </button>
-        <Modal open={openDetails} onClose={handleToggleDetails} disableClickOutside={!openDetails}>
-          <p>
-            <span className="font-bold">Name:</span> {plugin.name}
-          </p>
-          <p>
-            <span className="font-bold">URL:</span> {plugin.url}
-          </p>
-          {data && (
-            <>
-              {Object.keys(data.plugins).map((key, i) => (
-                <div className="collapse collapse-arrow join-item border border-primary">
-                  <input type="radio" name={key} />
-                  <div className="collapse-title font-medium">{key}</div>
-                  <div className="collapse-content">
-                    {/* List all parameters of the plugin */}
-                    <ul>
-                      {Object.keys(data.plugins[key]).map((parameter, j) => (
-                        <li key={j}>
-                          <span className="">{data.plugins[key][parameter].title}</span>:{' '}
-                          {data.plugins[key][parameter].type}
-                          <br />
-                          Default: {data.plugins[key][parameter].default}
-                          <hr className="border-secondary" />
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              ))}
-            </>
-          )}
-          <hr className="border-secondary" />
-          <div className="modal-action">
-            <button className="h-9" onClick={handleToggleDetails}>
-              Close
-            </button>
-          </div>
-        </Modal>
-        <button aria-label={`plugin ${plugin.name} edit`} onClick={handleToggleEdit}>
-          <PencilIcon className="h-4 w-4" />
-        </button>
-        <Modal open={openEdit} onClose={handleToggleEdit} disableClickOutside={!openEdit}>
-          <form onSubmit={handleUpdate}>
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text">Name</span>
-              </label>
-              <input
-                type="text"
-                name="name"
-                placeholder="Name"
-                className="input input-bordered"
-                defaultValue={plugin.name}
-              />
-            </div>
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text">URL</span>
-              </label>
-              <input
-                type="text"
-                name="url"
-                placeholder="URL"
-                className="input input-bordered"
-                defaultValue={plugin.url}
-              />
-            </div>
-            <div className="modal-action">
-              <button
-                className="h-9"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setOpenEdit(false);
-                }}
-              >
-                Cancel
-              </button>
-              <button className="h-9" type="submit">
-                Save
-              </button>
-            </div>
-          </form>
-        </Modal>
-        <button
-          aria-label={`plugin ${plugin.name} delete`}
-          onClick={() => {
-            if (confirm(`Are you sure you want to delete ${plugin.name}?`)) {
-              deletePlugin.mutate({ name: plugin.name, url: plugin.url });
-            }
-          }}
-        >
-          <TrashIcon className="h-4 w-4" />
-        </button>
+        <PluginDetail plugin={plugin} />
+        <PluginEdit plugin={plugin} />
+        <PluginDelete plugin={plugin} />
       </td>
     </tr>
   );
