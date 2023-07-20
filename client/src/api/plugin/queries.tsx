@@ -51,7 +51,7 @@ export function useGetPluginParameters(pluginUrl: string) {
   );
 }
 
-export function useGetPluginDetailed(plugin: PluginDefinition) {
+export function useGetPluginDetailed(plugin: PluginDefinition, enabled = true) {
   return useQuery<PluginEndpoint>(
     ['plugin', plugin.name, 'detailed'],
     async () => {
@@ -77,7 +77,7 @@ export function useGetPluginDetailed(plugin: PluginDefinition) {
       return result;
     },
     {
-      enabled: !!plugin,
+      enabled: enabled && !!plugin,
     }
   );
 }

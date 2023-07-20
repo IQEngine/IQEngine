@@ -46,10 +46,10 @@ const Modal = ({ children, open, disableClickOutside, onClose }: Props) => {
 };
 
 export const PluginRow = ({ plugin }: PluginRowProps) => {
-  const { data } = useGetPluginDetailed(plugin);
   const updatePlugin = useUpdatePlugin();
   const deletePlugin = useDeletePlugin();
   const [openDetails, setOpenDetails] = useState(false);
+  const { data } = useGetPluginDetailed(plugin, openDetails);
   const handleToggleDetails = () => {
     setOpenDetails((prev) => !prev);
   };
