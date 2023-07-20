@@ -74,6 +74,7 @@ export const DataSourceForm = () => {
           <br />
           <button
             type="submit"
+            aria-label="Submit Data Source Button"
             className="bg-white text-black px-4 py-2 rounded-md mt-3"
             >Submit</button>
         </form>

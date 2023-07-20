@@ -74,10 +74,10 @@ export const useAddDataSource = () => {
           className: 'bg-red-100 font-bold',
         });
       } else {
-        toast('Something went wrong adding the data source', {
-          icon: '😖',
-          className: 'bg-red-100 font-bold',
-        });
+              toast('Something went wrong adding the data source', {
+        icon: '😖',
+        className: 'bg-red-100 font-bold',
+      });
       }
       console.error('onError', err);
     },
