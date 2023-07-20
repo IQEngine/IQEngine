@@ -18,7 +18,8 @@ async def env_setup():
 def client():
     os.environ["IQENGINE_PLUGINS"] = "[]"
     with mock.patch("importer.all.import_all_from_env") as mock_i, \
-            mock.patch("helpers.authorization.requires", return_value=lambda x: x):
+            mock.patch("helpers.authorization.requires", return_value=lambda x: x), \
+                mock.patch("helpers.authorization.get_current_active_user", return_value={"roles": ["IQEngine-Admin", "IQEngine-User"], "is_active": True, "email": "emailaddress"}):
         mock_i.return_value = None
         from main import app
 

@@ -3,6 +3,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from cachetools import TTLCache, cached
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
 from typing import Any, Tuple, cast
+from functools import wraps
 import jwt
 from jwt import algorithms
 import os
@@ -131,6 +132,7 @@ def get_current_active_admin_user(
 
 def requires(role: str):
     def decorator(f):
+        @wraps(f)
         async def decorated_function(*args, **kwargs):
             current_user = get_current_active_user()
             if role not in current_user["roles"]:
