@@ -1,20 +1,21 @@
 import * as React from 'react';
+import { useParams } from 'react-router-dom';
+import OverviewPage from './overview.mdx';
+import PluginsPage from './plugins.mdx';
 import { Link } from 'react-router-dom';
 
-const TableItem: React.FC<{
-  href: string;
-  children?: React.ReactNode;
-}> = ({ children, href }) => (
-  <Link to={href}>
-    <a className="rounded px-3 py-1.5 duration-200 relative block text-primary hover:text-secondary">{children}</a>
-  </Link>
-);
+export const DocsPages = () => {
+  let { page } = useParams();
 
-const TableHeader: React.FC<{
-  children?: React.ReactNode;
-}> = ({ children }) => <span className="px-3 mt-3 mb-1 text-sm font-semibold tracking-wide uppercase">{children}</span>;
+  let currentPage;
+  switch (page) {
+    case 'plugins':
+      currentPage = <PluginsPage />;
+      break;
+    default:
+      currentPage = <OverviewPage />;
+  }
 
-export function DocsLayout({ meta, children }) {
   return (
     <div className="min-h-screen flex flex-col">
       <div className="flex-1 mx-auto px-2 w-full">
@@ -34,9 +35,22 @@ export function DocsLayout({ meta, children }) {
             </div>
           </nav>
 
-          <main className="col-span-4 w-1/2 flex-1">{children}</main>
+          <main className="col-span-4 w-1/2 flex-1">{currentPage}</main>
         </div>
       </div>
     </div>
   );
-}
+};
+
+const TableItem: React.FC<{
+  href: string;
+  children?: React.ReactNode;
+}> = ({ children, href }) => (
+  <Link to={href}>
+    <a className="rounded px-3 py-1.5 duration-200 relative block text-primary hover:text-secondary">{children}</a>
+  </Link>
+);
+
+const TableHeader: React.FC<{
+  children?: React.ReactNode;
+}> = ({ children }) => <span className="px-3 mt-3 mb-1 text-sm font-semibold tracking-wide uppercase">{children}</span>;

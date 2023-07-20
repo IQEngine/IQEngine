@@ -3,8 +3,7 @@ import { createBrowserRouter } from 'react-router-dom';
 import React from 'react';
 import SwaggerUI from 'swagger-ui-react';
 import { useProtectedRoute } from '@/auth/hooks/use-protected-route';
-import OverviewDocs from '@/pages/docs/overview.mdx';
-import PluginDocs from '@/pages/docs/plugins.mdx';
+import { DocsPages } from '@/pages/docs/docs-pages';
 
 export function useRouter() {
   const router = createBrowserRouter([
@@ -39,13 +38,14 @@ export function useRouter() {
         {
           path: 'docs',
           async lazy() {
-            return { Component: OverviewDocs };
+            return { Component: DocsPages };
           },
         },
+        // because there are so many docs pages, we have one component that takes in the page name as a param
         {
-          path: 'docs/plugins',
+          path: 'docs/:page',
           async lazy() {
-            return { Component: PluginDocs };
+            return { Component: DocsPages };
           },
         },
         { path: 'siggen', element: <SignalGenerator /> },
