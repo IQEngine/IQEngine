@@ -108,14 +108,11 @@ export const PluginEdit = ({ plugin }: PluginRowProps) => {
   };
   function handleUpdate(event: React.SyntheticEvent) {
     event.preventDefault();
-    const target = event.target as typeof event.target & {
-      name: { value: string };
-      url: { value: string };
-    };
-    const name = target.name.value;
-    const url = target.url.value;
+
+    const formData = new FormData(event.target as HTMLFormElement);
+    const url = formData.get('url') as string;
     updatePlugin.mutate(
-      { name, url },
+      { name: plugin.name, url },
       {
         onSuccess: () => {
           toast('Successfully updated plugin', {
@@ -136,7 +133,7 @@ export const PluginEdit = ({ plugin }: PluginRowProps) => {
 
   return (
     <>
-      <button aria-label={`plugin ${plugin.name} edit`} onClick={handleToggleEdit}>
+      <button aria-label={`edit ${plugin.name} plugin`} onClick={handleToggleEdit}>
         <PencilIcon className="h-4 w-4" />
       </button>
       <Modal open={openEdit} onClose={handleToggleEdit} disableClickOutside={!openEdit}>
@@ -145,13 +142,7 @@ export const PluginEdit = ({ plugin }: PluginRowProps) => {
             <label className="label">
               <span className="label-text">Name</span>
             </label>
-            <input
-              type="text"
-              name="name"
-              placeholder="Name"
-              className="input input-bordered"
-              defaultValue={plugin.name}
-            />
+            <span>{plugin.name}</span>
           </div>
           <div className="form-control">
             <label className="label">
@@ -162,6 +153,7 @@ export const PluginEdit = ({ plugin }: PluginRowProps) => {
               name="url"
               placeholder="URL"
               className="input input-bordered"
+              aria-label={`edit ${plugin.name} plugin url`}
               defaultValue={plugin.url}
             />
           </div>
@@ -175,7 +167,7 @@ export const PluginEdit = ({ plugin }: PluginRowProps) => {
             >
               Cancel
             </button>
-            <button className="h-9" type="submit">
+            <button className="h-9" aria-label={`save ${plugin.name} plugin`}>
               Save
             </button>
           </div>
@@ -212,7 +204,7 @@ export const PluginAdd = () => {
           });
         },
         onError: (response) => {
-          toast('Something went wrong addin a plugin', {
+          toast('Something went wrong adding a plugin', {
             icon: '😖',
             className: 'bg-red-100 font-bold',
           });
@@ -233,7 +225,7 @@ export const PluginAdd = () => {
             </label>
             <input
               type="text"
-              aria-label="plugin name"
+              aria-label="add plugin name"
               name="name"
               placeholder="Name"
               className="input input-bordered"
@@ -243,7 +235,13 @@ export const PluginAdd = () => {
             <label className="label">
               <span className="label-text">URL</span>
             </label>
-            <input type="text" aria-label="plugin url" name="url" placeholder="URL" className="input input-bordered" />
+            <input
+              type="text"
+              aria-label="add plugin url"
+              name="url"
+              placeholder="URL"
+              className="input input-bordered"
+            />
           </div>
           <div className="modal-action">
             <button
@@ -255,7 +253,7 @@ export const PluginAdd = () => {
             >
               Close
             </button>
-            <button className="btn btn-primary" type="submit" aria-label="save plugin">
+            <button className="btn btn-primary" type="submit" aria-label="create plugin">
               Save
             </button>
           </div>
