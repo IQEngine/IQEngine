@@ -36,7 +36,8 @@ describe('Test StringQuery', () => {
     const inputElement = screen.getByTestId('string-input');
     await userEvent.type(inputElement, 'testing');
     expect(validatorMock).toHaveBeenCalledWith('testing');
-    expect(handleQueryValidMock).toHaveBeenCalledTimes(1);
+    // it should have been called one time for each character typed
+    expect(handleQueryValidMock).toHaveBeenCalledTimes(7);
   });
 
   test('Typing invalid text into the input calls the validator function and handleQueryInValid', async () => {
@@ -55,6 +56,7 @@ describe('Test StringQuery', () => {
     const inputElement = screen.getByTestId('string-input');
     await userEvent.type(inputElement, 'testing');
     expect(validatorMock).toHaveBeenCalledWith('testing');
-    expect(handleQueryInvalidMock).toHaveBeenCalledTimes(1);
+    // it should have been called one time for each character typed
+    expect(handleQueryInvalidMock).toHaveBeenCalledTimes(7);
   });
 });
