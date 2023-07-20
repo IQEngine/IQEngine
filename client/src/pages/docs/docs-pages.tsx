@@ -9,6 +9,9 @@ export const DocsPages = () => {
 
   let currentPage;
   switch (page) {
+    case 'overview':
+      currentPage = <OverviewPage />;
+      break;
     case 'plugins':
       currentPage = <PluginsPage />;
       break;
