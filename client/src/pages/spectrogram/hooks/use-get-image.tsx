@@ -64,19 +64,30 @@ function calcFftOfSamples(samples: Float32Array, fftSize: number, spectrogramHei
   return fftsConcatenated;
 }
 
-export const useTransformData = (fftSize: number, spectrogramHeight: number) => {
-  const iqData = new Float32Array(spectrogramHeight * fftSize);
+export const useGetData = (fftSize: number, spectrogramHeight: number) => {
+  const rawIqData = new Float32Array(spectrogramHeight * fftSize);
 
-  const transformDataQuery = useQuery<Float32Array>(['iqdata'], () => iqData);
+  const getDataQuery = useQuery<Float32Array>(['rawiqdata'], () => {
+    return rawIqData;
+  });
+
+  return { getDataQuery };
+};
+
+export const useTransformData = (fftSize: number, spectrogramHeight: number) => {
+  const { getDataQuery } = useGetData(fftSize, spectrogramHeight);
+
+  const transformDataQuery = useQuery<Float32Array>(['iqdata'], () => {
+    return getDataQuery.data;
+  });
 
   return { transformDataQuery };
 };
 
-export const useGenerateFFTs = (fftSize: number, spectrogramHeight: number) => {
+export const useGenerateFFTs = (fftSize: number, spectrogramHeight: number, windowFunction: string) => {
   const { transformDataQuery } = useTransformData(fftSize, spectrogramHeight);
 
   let samples = transformDataQuery.data;
-  const windowFunction = 'hamming';
 
   const fftQuery = useQuery<Float32Array>(['fftdata'], () =>
     calcFftOfSamples(samples, fftSize, spectrogramHeight, windowFunction)
@@ -90,11 +101,12 @@ export const useGetImage = (
   spectrogramHeight: number,
   magnitudeMin: number,
   magnitudeMax: number,
-  colmap: string
+  colmap: string,
+  windowFunction: string
 ) => {
   const [image, setImage] = useState<ImageBitmap>(null);
 
-  const { fftQuery } = useGenerateFFTs(fftSize, spectrogramHeight);
+  const { fftQuery } = useGenerateFFTs(fftSize, spectrogramHeight, windowFunction);
 
   useEffect(() => {
     if (

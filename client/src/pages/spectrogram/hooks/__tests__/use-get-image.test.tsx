@@ -8,9 +8,9 @@ import React from 'react';
 
 describe('DevTest Spectrogram Tests', () => {
   //template test.each([[], []])('test', async () => {});
-  test.each([['first', tilesize, 1024, -40.0, -10.0, 'jet']])(
+  test.each([['first', tilesize, 1024, -40.0, -10.0, 'jet', 'hamming']])(
     'test',
-    async (comment, tile_size, fftSize, magnitudeMin, magnitudeMax, colorMap) => {
+    async (comment, tile_size, fftSize, magnitudeMin, magnitudeMax, colorMap, windowFunction) => {
       const queryClient = new QueryClient({
         defaultOptions: {
           queries: {
@@ -26,7 +26,7 @@ describe('DevTest Spectrogram Tests', () => {
 
       // run the code-under-test
       const { result } = renderHook(
-        () => useGetImage(fftSize, spectrogramHeight, magnitudeMin, magnitudeMax, colorMap),
+        () => useGetImage(fftSize, spectrogramHeight, magnitudeMin, magnitudeMax, colorMap, windowFunction),
         {
           wrapper,
         }
@@ -92,9 +92,12 @@ describe('DevTest Spectrogram Tests', () => {
     const spectrogramHeight = tile_size / (fftSize == 0 ? 1024 : fftSize);
 
     // run the code-under-test
-    const { result } = renderHook(() => useGetImage(fftSize, spectrogramHeight, magnitudeMin, magnitudeMax, colorMap), {
-      wrapper,
-    });
+    const { result } = renderHook(
+      () => useGetImage(fftSize, spectrogramHeight, magnitudeMin, magnitudeMax, colorMap, 'hamming'),
+      {
+        wrapper,
+      }
+    );
     await waitFor(() => {
       expect(result.current.image).toBeNull();
     });
@@ -144,9 +147,12 @@ describe('DevTest Spectrogram Tests', () => {
     const spectrogramHeight = tile_size / (fftSize == 0 ? 1024 : fftSize);
 
     // run the code-under-test
-    const { result } = renderHook(() => useGetImage(fftSize, spectrogramHeight, magnitudeMin, magnitudeMax, colorMap), {
-      wrapper,
-    });
+    const { result } = renderHook(
+      () => useGetImage(fftSize, spectrogramHeight, magnitudeMin, magnitudeMax, colorMap, 'hamming'),
+      {
+        wrapper,
+      }
+    );
     await waitFor(() => {
       expect(result.current.image).not.toBeNull();
     });
@@ -190,9 +196,12 @@ describe('DevTest Spectrogram Tests', () => {
         },
       });
       const wrapper = ({ children }) => <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
-      const { result } = renderHook(() => useGetImage(fftsConcatenated, fftSize, magnitudeMin, magnitudeMax, colmap), {
-        wrapper,
-      });
+      const { result } = renderHook(
+        () => useGetImage(fftsConcatenated, fftSize, magnitudeMin, magnitudeMax, colmap, 'hamming'),
+        {
+          wrapper,
+        }
+      );
       await waitFor(() => {
         expect(result.current.image).toBeNull();
       });
