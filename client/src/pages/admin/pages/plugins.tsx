@@ -11,10 +11,12 @@ import React, { useRef, useState } from 'react';
 
 interface PluginRowProps {
   plugin: PluginDefinition;
+  removePlugin: (plugin: PluginDefinition) => void;
 }
 
 import cn from 'classnames';
 import { useOnClickOutside } from 'usehooks-ts';
+import toast from 'react-hot-toast';
 type Props = {
   children: React.ReactNode;
   open: boolean;
@@ -112,7 +114,23 @@ export const PluginEdit = ({ plugin }: PluginRowProps) => {
     };
     const name = target.name.value;
     const url = target.url.value;
-    updatePlugin.mutate({ name, url });
+    updatePlugin.mutate(
+      { name, url },
+      {
+        onSuccess: () => {
+          toast('Successfully updated plugin', {
+            icon: '👍',
+            className: 'bg-green-100 font-bold',
+          });
+        },
+        onError: (response) => {
+          toast('Something went wrong updating the plugin', {
+            icon: '😖',
+            className: 'bg-red-100 font-bold',
+          });
+        },
+      }
+    );
     setOpenEdit((prev) => !prev);
   }
 
@@ -167,17 +185,9 @@ export const PluginEdit = ({ plugin }: PluginRowProps) => {
   );
 };
 
-export const PluginDelete = ({ plugin }: PluginRowProps) => {
-  const deletePlugin = useDeletePlugin();
+export const PluginDelete = ({ plugin, removePlugin }: PluginRowProps) => {
   return (
-    <button
-      aria-label={`plugin ${plugin.name} delete`}
-      onClick={() => {
-        if (confirm(`Are you sure you want to delete ${plugin.name}?`)) {
-          deletePlugin.mutate({ name: plugin.name, url: plugin.url });
-        }
-      }}
-    >
+    <button aria-label={`delete ${plugin.name} plugin`} onClick={() => removePlugin(plugin)}>
       <TrashIcon className="h-4 w-4" />
     </button>
   );
@@ -192,11 +202,27 @@ export const PluginAdd = () => {
     const formData = new FormData(event.target as HTMLFormElement);
     const name = formData.get('name') as string;
     const url = formData.get('url') as string;
-    createPlugin.mutate({ name, url });
+    createPlugin.mutate(
+      { name, url },
+      {
+        onSuccess: () => {
+          toast('Successfully added plugin', {
+            icon: '👍',
+            className: 'bg-green-100 font-bold',
+          });
+        },
+        onError: (response) => {
+          toast('Something went wrong addin a plugin', {
+            icon: '😖',
+            className: 'bg-red-100 font-bold',
+          });
+        },
+      }
+    );
   }
   return (
     <>
-      <button className="h-9" aria-label="add plugin" onClick={handleToggle}>
+      <button className="h-9" name="Add Plugin" aria-label="add plugin" onClick={handleToggle}>
         Add Plugin
       </button>
       <Modal open={open} onClose={handleToggle} disableClickOutside={!open}>
@@ -205,13 +231,19 @@ export const PluginAdd = () => {
             <label className="label">
               <span className="label-text">Name</span>
             </label>
-            <input type="text" name="name" placeholder="Name" className="input input-bordered" />
+            <input
+              type="text"
+              aria-label="plugin name"
+              name="name"
+              placeholder="Name"
+              className="input input-bordered"
+            />
           </div>
           <div className="form-control">
             <label className="label">
               <span className="label-text">URL</span>
             </label>
-            <input type="text" name="url" placeholder="URL" className="input input-bordered" />
+            <input type="text" aria-label="plugin url" name="url" placeholder="URL" className="input input-bordered" />
           </div>
           <div className="modal-action">
             <button
@@ -223,7 +255,7 @@ export const PluginAdd = () => {
             >
               Close
             </button>
-            <button className="btn btn-primary" type="submit">
+            <button className="btn btn-primary" type="submit" aria-label="save plugin">
               Save
             </button>
           </div>
@@ -233,15 +265,15 @@ export const PluginAdd = () => {
   );
 };
 
-export const PluginRow = ({ plugin }: PluginRowProps) => {
+export const PluginRow = ({ plugin, removePlugin }: PluginRowProps) => {
   return (
     <tr>
       <td>{plugin.name}</td>
       <td>{plugin.url}</td>
       <td>
-        <PluginDetail plugin={plugin} />
-        <PluginEdit plugin={plugin} />
-        <PluginDelete plugin={plugin} />
+        <PluginDetail plugin={plugin} removePlugin={removePlugin} />
+        <PluginEdit plugin={plugin} removePlugin={removePlugin} />
+        <PluginDelete plugin={plugin} removePlugin={removePlugin} />
       </td>
     </tr>
   );
@@ -249,10 +281,32 @@ export const PluginRow = ({ plugin }: PluginRowProps) => {
 
 export const Plugins = () => {
   const { data } = useGetPlugins();
+  const deletePlugin = useDeletePlugin();
+  function removePlugin(plugin: PluginDefinition) {
+    if (confirm(`Are you sure you want to delete ${plugin.name}?`)) {
+      deletePlugin.mutate(
+        { name: plugin.name, url: plugin.url },
+        {
+          onSuccess: () => {
+            toast('Successfully deleted plugin', {
+              icon: '👍',
+              className: 'bg-green-100 font-bold',
+            });
+          },
+          onError: (response) => {
+            toast('Something went wrong deleting the plugin', {
+              icon: '😖',
+              className: 'bg-red-100 font-bold',
+            });
+          },
+        }
+      );
+    }
+  }
   return (
     <>
       <h1 className="text-3xl font-bold">Plugins</h1>
-
+      <PluginAdd />
       {data && data?.length > 0 ? (
         <table className="table w-full">
           <thead>
@@ -264,7 +318,7 @@ export const Plugins = () => {
           </thead>
           <tbody>
             {data?.map((item, i) => (
-              <PluginRow key={i} plugin={item} />
+              <PluginRow key={i} plugin={item} removePlugin={removePlugin} />
             ))}
           </tbody>
         </table>

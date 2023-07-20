@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test } from 'vitest';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import Plugins from '@/pages/admin/pages/plugins';
 import '@testing-library/jest-dom';
@@ -113,5 +113,79 @@ describe('Test Plugins Get', () => {
     expect(
       await screen.findByText('http://my.plugin.com/hello/plugins/', { exact: true, selector: 'td' })
     ).toBeInTheDocument();
+  });
+});
+
+describe('Test Plugins Post', () => {
+  beforeEach(() => {
+    nock.cleanAll();
+    const { queryClient } = useAllProviders();
+    queryClient.clear();
+  });
+  test('Should try to save a new plugin correctly and display the result in the screen', async () => {
+    nock('http://localhost:3000').get('/api/plugins/').reply(200, []);
+    nock('http://localhost:3000')
+      .post('/api/plugins/', {
+        name: 'Test Plugin',
+        url: 'http://my.plugin.com/hello/plugins/',
+      })
+      .reply(200, {
+        name: 'Test Plugin',
+        url: 'http://my.plugin.com/hello/plugins/',
+      });
+    const { wrapper } = useAllProviders();
+    render(<Plugins></Plugins>, {
+      wrapper: wrapper,
+    });
+    expect(await screen.findByRole('heading', { name: 'Plugins' })).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByText('Test Plugin', { selector: 'td' })).not.toBeInTheDocument();
+    });
+    await userEvent.click(await screen.findByRole('button', { name: 'add plugin' }));
+    await userEvent.type(await screen.findByLabelText('plugin name'), 'Test Plugin');
+    await userEvent.type(await screen.findByLabelText('plugin url'), 'http://my.plugin.com/hello/plugins/');
+    await userEvent.click(await screen.findByRole('button', { name: 'save plugin' }));
+    expect(await screen.findByText('Test Plugin', { selector: 'td' })).toBeInTheDocument();
+    expect(await screen.findByText('http://my.plugin.com/hello/plugins/', { selector: 'td' })).toBeInTheDocument();
+  });
+});
+
+describe('Test Plugins Delete', () => {
+  beforeEach(() => {
+    nock.cleanAll();
+    const { queryClient } = useAllProviders();
+    queryClient.clear();
+  });
+  test('Should try to delete a plugin correctly and display the result in the screen', async () => {
+    const currrent_confirm = window.confirm;
+    window.confirm = vi.fn(() => true);
+    nock('http://localhost:3000')
+      .get('/api/plugins/')
+      .reply(200, [
+        {
+          name: 'TestPlugin',
+          url: 'http://my.plugin.com/hello/plugins/',
+        },
+      ]);
+    nock('http://localhost:3000').delete('/api/plugins/TestPlugin').reply(200, {
+      name: 'TestPlugin',
+      url: 'http://my.plugin.com/hello/plugins/',
+    });
+    const { wrapper } = useAllProviders();
+    render(<Plugins></Plugins>, {
+      wrapper: wrapper,
+    });
+    expect(await screen.findByRole('heading', { name: 'Plugins' })).toBeInTheDocument();
+    expect(await screen.findByText('TestPlugin', { selector: 'td' })).toBeInTheDocument();
+    expect(await screen.findByText('http://my.plugin.com/hello/plugins/', { selector: 'td' })).toBeInTheDocument();
+    await userEvent.click(await screen.findByRole('button', { name: 'delete TestPlugin plugin' }));
+
+    expect(await screen.findByText('Successfully deleted plugin')).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(screen.queryByText('TestPlugin', { selector: 'td' })).not.toBeInTheDocument();
+    });
+
+    window.confirm = currrent_confirm;
   });
 });

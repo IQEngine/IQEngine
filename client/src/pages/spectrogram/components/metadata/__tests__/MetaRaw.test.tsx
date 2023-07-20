@@ -7,7 +7,6 @@ import { Annotation, CaptureSegment, SigMFMetadata } from '@/utils/sigmfMetadata
 import { MetaRaw } from '@/pages/spectrogram/components/metadata/MetaRaw';
 import { AllProviders } from '@/mocks/setup-tests';
 import userEvent from '@testing-library/user-event';
-import { Toaster } from 'react-hot-toast';
 import nock from 'nock';
 
 describe('MetaRaw ', () => {
@@ -66,13 +65,7 @@ describe('MetaRaw ', () => {
 
     nock('http://localhost:3000').put(`/api/datasources/gnuradio/iqengine/bluetooth/meta`).reply(204);
 
-    render(
-      <>
-        <Toaster />
-        <MetaRaw meta={meta} />
-      </>,
-      { wrapper: AllProviders }
-    );
+    render(<MetaRaw meta={meta} />, { wrapper: AllProviders });
 
     const saveButton = screen.getByRole('button', { name: 'Save Metadata Button' });
     await userEvent.click(saveButton);
@@ -85,13 +78,7 @@ describe('MetaRaw ', () => {
 
     nock('http://localhost:3000').put(`/api/datasources/gnuradio/iqengine/bluetooth/meta`).reply(404);
 
-    render(
-      <>
-        <Toaster />
-        <MetaRaw meta={meta} />
-      </>,
-      { wrapper: AllProviders }
-    );
+    render(<MetaRaw meta={meta} />, { wrapper: AllProviders });
 
     const saveButton = screen.getByRole('button', { name: 'Save Metadata Button' });
     await userEvent.click(saveButton);
