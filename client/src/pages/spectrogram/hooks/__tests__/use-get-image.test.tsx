@@ -125,59 +125,62 @@ describe('DevTest Spectrogram Tests', () => {
     ['4096,-20/20,white box', tilesize, 4096, -20.0, 20.0, 'plasma', SampleType.MultipleBuckets],
     ['8192,-60/50,inferno,white box', tilesize, 8192, -60.0, 50.0, 'inferno', SampleType.MultipleBuckets],
     ['16384,-100/50,white box', tilesize, 16384, -100.0, 50.0, 'inferno', SampleType.MultipleBuckets],
-  ])('Passing test: %s', async (comment, tile_size, fftSize, magnitudeMin, magnitudeMax, colorMap, sampleType) => {
-    const { sampleRecording, num_ffts, expectedImageData } = generateSampleRecording(
-      tile_size,
-      fftSize,
-      sampleType,
-      magnitudeMin,
-      magnitudeMax,
-      colorMap
-    );
-    const queryClient = new QueryClient({
-      defaultOptions: {
-        queries: {
-          staleTime: Infinity,
+  ])(
+    'RGB is generated correctly from the following fftdata: %s',
+    async (comment, tile_size, fftSize, magnitudeMin, magnitudeMax, colorMap, sampleType) => {
+      const { sampleRecording, num_ffts, expectedImageData } = generateSampleRecording(
+        tile_size,
+        fftSize,
+        sampleType,
+        magnitudeMin,
+        magnitudeMax,
+        colorMap
+      );
+      const queryClient = new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: Infinity,
+          },
         },
-      },
-    });
-    const wrapper = ({ children }) => <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
-    queryClient.setQueryData(['fftdata'], sampleRecording);
+      });
+      const wrapper = ({ children }) => <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+      queryClient.setQueryData(['fftdata'], sampleRecording);
 
-    const spectrogramHeight = tile_size / (fftSize == 0 ? 1024 : fftSize);
+      const spectrogramHeight = tile_size / (fftSize == 0 ? 1024 : fftSize);
 
-    // run the code-under-test
-    const { result } = renderHook(
-      () => useGetImage(fftSize, spectrogramHeight, magnitudeMin, magnitudeMax, colorMap, 'hamming'),
-      {
-        wrapper,
+      // run the code-under-test
+      const { result } = renderHook(
+        () => useGetImage(fftSize, spectrogramHeight, magnitudeMin, magnitudeMax, colorMap, 'hamming'),
+        {
+          wrapper,
+        }
+      );
+      await waitFor(() => {
+        expect(result.current.image).not.toBeNull();
+      });
+
+      // get the ImageData of the code-under-test ImageBitmap
+      const lastCall = createImageBitmap.mock.lastCall;
+      const imageDataCalled = lastCall[0];
+
+      // code-under-test should generate an image of the same height and width
+      expect(result.current.image.width).toEqual(fftSize);
+      expect(result.current.image.height).toEqual(num_ffts);
+
+      // the expectedImageData and code-under-test ImageData should be the same
+      expect(expectedImageData.data.length).toEqual(imageDataCalled.data.length);
+
+      // generate random test indices
+      let testIndices = [];
+      for (let i = 0; i < 100; i++) {
+        testIndices[i] = Math.floor(Math.random() * expectedImageData.data.length);
       }
-    );
-    await waitFor(() => {
-      expect(result.current.image).not.toBeNull();
-    });
 
-    // get the ImageData of the code-under-test ImageBitmap
-    const lastCall = createImageBitmap.mock.lastCall;
-    const imageDataCalled = lastCall[0];
-
-    // code-under-test should generate an image of the same height and width
-    expect(result.current.image.width).toEqual(fftSize);
-    expect(result.current.image.height).toEqual(num_ffts);
-
-    // the expectedImageData and code-under-test ImageData should be the same
-    expect(expectedImageData.data.length).toEqual(imageDataCalled.data.length);
-
-    // generate random test indices
-    let testIndices = [];
-    for (let i = 0; i < 100; i++) {
-      testIndices[i] = Math.floor(Math.random() * expectedImageData.data.length);
+      for (let i = 0; i < 100; i++) {
+        expect(expectedImageData.data[testIndices[i]]).toEqual(imageDataCalled.data[testIndices[i]]);
+      }
     }
-
-    for (let i = 0; i < 100; i++) {
-      expect(expectedImageData.data[testIndices[i]]).toEqual(imageDataCalled.data[testIndices[i]]);
-    }
-  });
+  );
 
   test.each([
     [null, 1024, -40.0, -10.0, COLORMAP_DEFAULT],
