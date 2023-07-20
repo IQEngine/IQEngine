@@ -3,8 +3,40 @@ import { useGetImage } from '../use-get-image';
 import { renderHook, waitFor } from '@testing-library/react';
 import { TILE_SIZE_IN_IQ_SAMPLES as tilesize, COLORMAP_DEFAULT } from '@/utils/constants';
 import { SampleType, generateSampleRecording, normalizeMagnitude } from '@/utils/testFunctions';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import React from 'react';
 
 describe('DevTest Spectrogram Tests', () => {
+  //template test.each([[], []])('test', async () => {});
+  test.each([['first', tilesize, 1024, -40.0, -10.0, 'jet']])(
+    'test',
+    async (comment, tile_size, fftSize, magnitudeMin, magnitudeMax, colorMap) => {
+      const queryClient = new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: Infinity,
+          },
+        },
+      });
+      const wrapper = ({ children }) => <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+
+      const spectrogramHeight = tile_size / fftSize;
+      const iqData = new Float32Array(tile_size);
+      queryClient.setQueryData(['iqdata'], iqData);
+
+      // run the code-under-test
+      const { result } = renderHook(
+        () => useGetImage(fftSize, spectrogramHeight, magnitudeMin, magnitudeMax, colorMap),
+        {
+          wrapper,
+        }
+      );
+      await waitFor(() => {
+        expect(result.current.image).not.toBeNull();
+      });
+    }
+  );
+
   test.each([
     [-40, -40, -10, 0],
     [-10, -40, -10, 255],
@@ -47,9 +79,22 @@ describe('DevTest Spectrogram Tests', () => {
       magnitudeMax,
       colorMap
     );
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          staleTime: Infinity,
+        },
+      },
+    });
+    const wrapper = ({ children }) => <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+    queryClient.setQueryData(['fftdata'], sampleRecording);
+
+    const spectrogramHeight = tile_size / (fftSize == 0 ? 1024 : fftSize);
 
     // run the code-under-test
-    const { result } = renderHook(() => useGetImage(sampleRecording, fftSize, magnitudeMin, magnitudeMax, colorMap));
+    const { result } = renderHook(() => useGetImage(fftSize, spectrogramHeight, magnitudeMin, magnitudeMax, colorMap), {
+      wrapper,
+    });
     await waitFor(() => {
       expect(result.current.image).toBeNull();
     });
@@ -86,9 +131,22 @@ describe('DevTest Spectrogram Tests', () => {
       magnitudeMax,
       colorMap
     );
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          staleTime: Infinity,
+        },
+      },
+    });
+    const wrapper = ({ children }) => <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+    queryClient.setQueryData(['fftdata'], sampleRecording);
+
+    const spectrogramHeight = tile_size / (fftSize == 0 ? 1024 : fftSize);
 
     // run the code-under-test
-    const { result } = renderHook(() => useGetImage(sampleRecording, fftSize, magnitudeMin, magnitudeMax, colorMap));
+    const { result } = renderHook(() => useGetImage(fftSize, spectrogramHeight, magnitudeMin, magnitudeMax, colorMap), {
+      wrapper,
+    });
     await waitFor(() => {
       expect(result.current.image).not.toBeNull();
     });
@@ -124,7 +182,17 @@ describe('DevTest Spectrogram Tests', () => {
   ])(
     'Image doesnt throw when gettings %s values',
     async (fftsConcatenated, fftSize, magnitudeMin, magnitudeMax, colmap) => {
-      const { result } = renderHook(() => useGetImage(fftsConcatenated, fftSize, magnitudeMin, magnitudeMax, colmap));
+      const queryClient = new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: Infinity,
+          },
+        },
+      });
+      const wrapper = ({ children }) => <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+      const { result } = renderHook(() => useGetImage(fftsConcatenated, fftSize, magnitudeMin, magnitudeMax, colmap), {
+        wrapper,
+      });
       await waitFor(() => {
         expect(result.current.image).toBeNull();
       });
