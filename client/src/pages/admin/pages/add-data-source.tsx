@@ -2,6 +2,7 @@ import React, { useRef  } from 'react';
 import { DataSource } from '@/api/Models';
 import { useAddDataSource } from '@/api/datasource/queries';
 import { ClientType } from '@/api/Models';
+import toast from 'react-hot-toast';
 
 
 export const DataSourceForm = () => {
@@ -21,7 +22,29 @@ export const DataSourceForm = () => {
           imageURL: event.target.elements.imageURL.value,
           sasToken: event.target.elements.sasToken.value
         }
-        addDataSource.mutate(formData)
+        addDataSource.mutate(formData, {
+          onSuccess: () => {
+            toast('Successfully added data source', {
+              icon: '👍',
+              className: 'bg-green-100 font-bold',
+            });
+          },
+          onError: (err, newMeta, context) => {
+            if(err.response.status == 409) {
+              toast('You have already added this data source', {
+                icon: '💾',
+                className: 'bg-red-100 font-bold',
+              });
+            } else {
+                    toast('Something went wrong adding the data source', {
+              icon: '😖',
+              className: 'bg-red-100 font-bold',
+            });
+            }
+            console.error('onError', err);
+          }
+        })
+
         form.reset();
 
       };

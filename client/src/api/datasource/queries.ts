@@ -4,8 +4,6 @@ import { DataSource } from '@/api/Models';
 import { useUserSettings } from '@/api/user-settings/use-user-settings';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ClientType } from '@/api/Models';
-import toast from 'react-hot-toast';
-
 
 const fetchDataSources = async (client: DataSourceClient) => {
   let response;
@@ -61,24 +59,7 @@ export const useAddDataSource = () => {
       let response = dataSourceClient.create(dataSource)
       return response;
     },
-    onSuccess: () => {
-      toast('Successfully added data source', {
-        icon: '👍',
-        className: 'bg-green-100 font-bold',
-      });
-    },
     onError: (err, newMeta, context) => {
-      if(err.response.status == 409) {
-        toast('You have already added this data source', {
-          icon: '💾',
-          className: 'bg-red-100 font-bold',
-        });
-      } else {
-              toast('Something went wrong adding the data source', {
-        icon: '😖',
-        className: 'bg-red-100 font-bold',
-      });
-      }
       console.error('onError', err);
     },
   });

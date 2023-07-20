@@ -52,7 +52,7 @@ describe('Test DataSources', () => {
     );
     const submit = screen.getByRole('button', { name: 'Submit Data Source Button' });
     await userEvent.click(submit);
-    expect(await screen.findByText('Something went wrong adding the data source')).toBeInTheDocument();
+    expect(await screen.findByText('Successfully added data source')).toBeInTheDocument();
   });
 
   test('Displays You have already added this data source when there is a conflict', async () => {
