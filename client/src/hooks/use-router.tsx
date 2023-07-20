@@ -84,13 +84,6 @@ export function useRouter() {
               },
             },
             {
-              path: 'query',
-              async lazy() {
-                let { MetadataQuery } = await import('@/pages/metadata-query/metadata-query');
-                return { Component: MetadataQuery };
-              },
-            },
-            {
               path: 'plugins',
               async lazy() {
                 let { Plugins } = await import('@/pages/admin/pages/plugins');
