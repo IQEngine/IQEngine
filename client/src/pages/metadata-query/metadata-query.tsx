@@ -100,7 +100,7 @@ export const MetadataQuery = () => {
         </div>
         <div className="col-span-9 ml-10 ">
           {renderQueryComponents()}
-          <button onClick={handleQuery} disabled={!showQueryButton()} className="btn btn-secondary w-full">
+          <button onClick={handleQuery} disabled={!showQueryButton()}>
             QUERY
           </button>
         </div>
