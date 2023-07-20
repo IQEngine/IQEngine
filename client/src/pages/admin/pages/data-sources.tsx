@@ -1,6 +1,7 @@
 import { DataSource } from '@/api/Models';
 import { useGetDatasources } from '@/api/datasource/hooks/use-get-datasources';
 import React from 'react';
+import { Link } from 'react-router-dom';
 interface DataSourceRowProps {
   dataSource: DataSource;
 }
@@ -28,7 +29,10 @@ export const DataSources = () => {
   return (
     <>
       <h1 className="text-3xl font-bold">Data Sources</h1>
-      <div className="flex flex-wrap gap-4">
+      <Link to="/admin/add-data-source">
+        <h3 className="text-l font-bold ml-2">+ Add data source</h3>
+      </Link>
+      <div className="flex flex-wrap gap-4 pt-4 mt-2">
         {apiQuery.data?.map((item, i) => (
           <DataSourceRow key={i} dataSource={item} />
         ))}
