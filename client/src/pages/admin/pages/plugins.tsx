@@ -11,7 +11,7 @@ import React, { useRef, useState } from 'react';
 
 interface PluginRowProps {
   plugin: PluginDefinition;
-  removePlugin: (plugin: PluginDefinition) => void;
+  removePlugin?: (plugin: PluginDefinition) => void;
 }
 
 import cn from 'classnames';
@@ -271,8 +271,8 @@ export const PluginRow = ({ plugin, removePlugin }: PluginRowProps) => {
       <td>{plugin.name}</td>
       <td>{plugin.url}</td>
       <td>
-        <PluginDetail plugin={plugin} removePlugin={removePlugin} />
-        <PluginEdit plugin={plugin} removePlugin={removePlugin} />
+        <PluginDetail plugin={plugin} />
+        <PluginEdit plugin={plugin} />
         <PluginDelete plugin={plugin} removePlugin={removePlugin} />
       </td>
     </tr>
