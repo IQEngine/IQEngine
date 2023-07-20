@@ -42,7 +42,7 @@ describe('Test DataSources', () => {
 
 
   test('Displays add data source successful when successful', async () => {
-    nock('http://localhost:3000').post('/api/datasources').reply(200);
+    nock('http://localhost:3000').post('/api/datasources').reply(201);
     render(
       <>
         <Toaster />
