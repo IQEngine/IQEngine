@@ -77,6 +77,13 @@ export function useRouter() {
               },
             },
             {
+              path: 'add-data-source',
+              async lazy() {
+                let { DataSourceForm } = await import('@/pages/admin/pages/add-data-source')
+                return { Component: DataSourceForm };
+              }
+            },
+            {
               path: 'configuration',
               async lazy() {
                 let { Configuration } = await import('@/pages/admin/pages/configuration');
