@@ -1,9 +1,10 @@
 import { describe, expect, test, vi } from 'vitest';
-import { render, screen, fireEvent} from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 
 import React from 'react';
 
 import DateQuery from '@/pages/metadata-query/date-query';
+import userEvent from '@testing-library/user-event';
 
 describe('Test DateQuery', () => {
   const mockName = 'date name';
@@ -25,7 +26,7 @@ describe('Test DateQuery', () => {
     expect(screen.getByText('date name')).exist;
   });
 
-  test('Changing to and from to valid dates, calls handleQueryValid function', () => {
+  test('Changing to and from to valid dates, calls handleQueryValid function', async () => {
     const validatorMock = vi.fn(() => 'this is valid');
     const handleQueryValidMock = vi.fn();
     const handleQueryInvalidMock = vi.fn();
@@ -41,13 +42,13 @@ describe('Test DateQuery', () => {
     const dateFrom = screen.getByTestId('date-from');
     const dateTo = screen.getByTestId('date-to');
 
-    fireEvent.change(dateFrom, { target: { value: '2023-01-01' } });
-    fireEvent.change(dateTo, { target: { value: '2023-01-02' } });
+    await userEvent.type(dateFrom, '2023-01-01');
+    await userEvent.type(dateTo, '2023-01-02');
 
-    expect(handleQueryValidMock).toHaveBeenCalledTimes(2);
+    expect(handleQueryValidMock).toHaveBeenCalledWith(mockName, 'this is valid');
   });
 
-  test('Changing to and from to invalid dates, calls handleQueryInValid function', () => {
+  test('Changing to and from to invalid dates, calls handleQueryInValid function', async () => {
     const validatorMock = vi.fn(() => false);
     const handleQueryValidMock = vi.fn();
     const handleQueryInvalidMock = vi.fn();
@@ -63,9 +64,10 @@ describe('Test DateQuery', () => {
     const dateFrom = screen.getByTestId('date-from');
     const dateTo = screen.getByTestId('date-to');
 
-    fireEvent.change(dateFrom, { target: { value: '2023-01-01' } });
-    fireEvent.change(dateTo, { target: { value: '2022-01-02' } });
+    await userEvent.type(dateFrom, '2023-01-01');
+    await userEvent.type(dateTo, '2022-01-02');
 
-    expect(handleQueryInvalidMock).toHaveBeenCalledTimes(2);
+    expect(handleQueryInvalidMock).toHaveBeenCalledWith(mockName);
+    expect(handleQueryValidMock).not.toHaveBeenCalled();
   });
 });
