@@ -183,22 +183,7 @@ export const PluginDelete = ({ plugin }: PluginRowProps) => {
   );
 };
 
-export const PluginRow = ({ plugin }: PluginRowProps) => {
-  return (
-    <tr>
-      <td>{plugin.name}</td>
-      <td>{plugin.url}</td>
-      <td>
-        <PluginDetail plugin={plugin} />
-        <PluginEdit plugin={plugin} />
-        <PluginDelete plugin={plugin} />
-      </td>
-    </tr>
-  );
-};
-
-export const Plugins = () => {
-  const { data } = useGetPlugins();
+export const PluginAdd = () => {
   const createPlugin = useCreatePlugin();
   const [open, setOpen] = useState(false);
   const handleToggle = () => setOpen((prev) => !prev);
@@ -211,7 +196,6 @@ export const Plugins = () => {
   }
   return (
     <>
-      <h1 className="text-3xl font-bold">Plugins</h1>
       <button className="h-9" aria-label="add plugin" onClick={handleToggle}>
         Add Plugin
       </button>
@@ -245,6 +229,30 @@ export const Plugins = () => {
           </div>
         </form>
       </Modal>
+    </>
+  );
+};
+
+export const PluginRow = ({ plugin }: PluginRowProps) => {
+  return (
+    <tr>
+      <td>{plugin.name}</td>
+      <td>{plugin.url}</td>
+      <td>
+        <PluginDetail plugin={plugin} />
+        <PluginEdit plugin={plugin} />
+        <PluginDelete plugin={plugin} />
+      </td>
+    </tr>
+  );
+};
+
+export const Plugins = () => {
+  const { data } = useGetPlugins();
+  return (
+    <>
+      <h1 className="text-3xl font-bold">Plugins</h1>
+
       {data && data?.length > 0 ? (
         <table className="table w-full">
           <thead>
