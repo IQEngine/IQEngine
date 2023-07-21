@@ -2,7 +2,7 @@ import { fftToRGB } from '@/utils/selector';
 import { colMaps } from '@/utils/colormap';
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { generateSampleIQData } from '@/utils/testFunctions';
+import { generateSampleIQData } from '@/utils/test-functions';
 import { calcFftOfSamples } from '@/utils/selector';
 
 export const useGetData = (fftSize: number, spectrogramHeight: number) => {

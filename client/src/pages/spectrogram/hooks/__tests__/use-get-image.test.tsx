@@ -2,7 +2,7 @@ import { test, describe } from 'vitest';
 import { useGetImage } from '../use-get-image';
 import { renderHook, waitFor } from '@testing-library/react';
 import { TILE_SIZE_IN_IQ_SAMPLES as tilesize, COLORMAP_DEFAULT } from '@/utils/constants';
-import { SampleType, generateSampleImageData, normalizeMagnitude, generateSampleIQData } from '@/utils/testFunctions';
+import { SampleType, generateSampleImageData, normalizeMagnitude, generateSampleIQData } from '@/utils/test-functions';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import { useGenerateFFTs } from '../use-get-image';
