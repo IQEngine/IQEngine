@@ -18,7 +18,15 @@ export interface PluginDefinition {
   url: string;
 }
 
-export interface PluginParameters {
+export class PluginEndpoint {
+  name: string;
+  url: string;
+  plugins: {
+    [key: string]: PluginParameters;
+  };
+}
+
+export class PluginParameters {
   [key: string]: {
     title: string;
     type: string;
