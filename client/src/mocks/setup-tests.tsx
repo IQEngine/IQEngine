@@ -20,6 +20,12 @@ Object.defineProperty(window, 'matchMedia', {
   })),
 });
 
+vi.mock('react-plotly.js', () => {
+  return {
+    default: vi.fn(),
+  };
+});
+
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {

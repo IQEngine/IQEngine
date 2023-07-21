@@ -10,12 +10,20 @@ import { AnnotationModal } from './AnnotationModal';
 
 interface FileRowProps {
   filepath: string;
+  type?: string;
+  account?: string;
+  container?: string;
+  sasToken?: string;
 }
 
-export default function FileRow({ filepath }: FileRowProps) {
+export default function FileRow({ filepath, type, account, container, sasToken }: FileRowProps) {
   const [showModal, setShowModal] = useState(false);
 
-  const { type, account, container, sasToken } = useParams();
+  const { type: paramType, account: paramAccount, container: paramContainer, sasToken: paramSASToken } = useParams();
+  type = type ?? paramType;
+  account = account ?? paramAccount;
+  container = container ?? paramContainer;
+  sasToken = sasToken ?? paramSASToken;
   const { data: item } = getMeta(type, account, container, filepath);
 
   const spectogramLink = `/spectrogram/${item?.getOrigin().type}/${item?.getOrigin().account}/${
