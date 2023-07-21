@@ -3,7 +3,7 @@
 // Licensed under the MIT License
 
 import React from 'react';
-import SettingsPane from './SettingsPane';
+import SettingsPane from './settings-pane';
 import { PluginsPane } from './components/PluginsPane';
 import { SigMFMetadata } from '@/utils/sigmfMetadata';
 

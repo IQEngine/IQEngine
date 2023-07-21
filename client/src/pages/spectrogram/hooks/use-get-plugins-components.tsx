@@ -1,6 +1,6 @@
 import { PluginDefinition, PluginParameters } from '@/api/Models';
 import React, { useState, SetStateAction, Dispatch, useEffect } from 'react';
-import { useGetPlugin, useGetPluginParameters } from '@/api/plugin/Queries';
+import { useGetPlugin, useGetPluginParameters } from '@/api/plugin/queries';
 
 interface PluginOptionProps {
   plugin: PluginDefinition;

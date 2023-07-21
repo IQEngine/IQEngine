@@ -2,20 +2,20 @@
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
 
-import { Sidebar } from './Sidebar';
-import ScrollBar from './ScrollBar';
+import { Sidebar } from './sidebar';
+import ScrollBar from './scroll-bar';
 import { TimePlot } from './components/TimePlot';
 import { FrequencyPlot } from './components/FrequencyPlot';
 import { IQPlot } from './components/IQPlot';
 import { Layer, Image, Stage } from 'react-konva';
 import { selectFft, calculateTileNumbers, range, SelectFftReturn } from '@/utils/selector';
 import { AnnotationViewer } from '@/pages/spectrogram/components/annotation/AnnotationViewer';
-import { RulerTop } from './RulerTop';
-import { RulerSide } from './RulerSide';
+import { RulerTop } from './ruler-top';
+import { RulerSide } from './ruler-side';
 import { INITIAL_PYTHON_SNIPPET, TILE_SIZE_IN_IQ_SAMPLES, COLORMAP_DEFAULT, MINIMAP_FFT_SIZE } from '@/utils/constants';
-import TimeSelector from './TimeSelector';
-import TimeSelectorMinimap from './TimeSelectorMinimap';
-import FreqSelector from './FreqSelector';
+import TimeSelector from './time-selector';
+import TimeSelectorMinimap from './time-selector-minimap';
+import FreqSelector from './freq-selector';
 import AnnotationList from '@/pages/spectrogram/components/annotation/AnnotationList';
 import { GlobalProperties } from '@/pages/spectrogram/components/global-properties/GlobalProperties';
 import { MetaViewer } from '@/pages/spectrogram/components/metadata/MetaViewer';

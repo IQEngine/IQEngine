@@ -27,15 +27,16 @@ async def create_datasource(
     if datasource.sasToken:
         datasource.sasToken = encrypt(datasource.sasToken)
 
-    await datasources.insert_one(datasource.dict(by_alias=True, exclude_unset=True))
+    datasource_dict = datasource.dict(by_alias=True, exclude_unset=True)
+    datasource_dict["sasToken"] = datasource.sasToken if datasource.sasToken else None
+
+    await datasources.insert_one(datasource_dict)
     return datasource
 
 
 @router.get("/api/datasources", response_model=list[DataSource])
 async def get_datasources(
-    datasources_collection: AgnosticCollection = Depends(
-        datasource_repo.collection
-    ),
+    datasources_collection: AgnosticCollection = Depends(datasource_repo.collection),
 ):
     datasources = datasources_collection.find()
     result = []
@@ -50,9 +51,7 @@ async def get_datasources(
 async def get_datasource_image(
     account: str,
     container: str,
-    datasources_collection: AgnosticCollection = Depends(
-        datasource_repo.collection
-    ),
+    datasources_collection: AgnosticCollection = Depends(datasource_repo.collection),
 ):
     # Create the imageURL with sasToken
     datasource = await datasources_collection.find_one(
@@ -98,9 +97,7 @@ async def update_datasource(
     account: str,
     container: str,
     datasource: DataSource,
-    datasources_collection: AgnosticCollection = Depends(
-        datasource_repo.collection
-    ),
+    datasources_collection: AgnosticCollection = Depends(datasource_repo.collection),
 ):
     existingDatasource = await datasources_collection.find_one(
         {
