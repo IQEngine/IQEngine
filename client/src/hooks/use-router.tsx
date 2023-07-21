@@ -23,7 +23,7 @@ export function useRouter() {
         {
           path: 'sigmf',
           async lazy() {
-            let { SigMF } = await import('@/pages/SigMF');
+            let { SigMF } = await import('@/pages/sigmf');
             return { Component: SigMF };
           },
         },
@@ -37,7 +37,7 @@ export function useRouter() {
         {
           path: 'upload',
           async lazy() {
-            let { UploadPage } = await import('@/pages/UploadPage');
+            let { UploadPage } = await import('@/pages/upload-page');
             return { Component: UploadPage };
           },
         },
@@ -123,7 +123,7 @@ export function useRouter() {
         {
           path: 'spectrogram/:type/:account/:container/:filePath/:sasToken?',
           async lazy() {
-            let { SpectrogramPage } = await import('@/pages/spectrogram/SpectrogramPage');
+            let { SpectrogramPage } = await import('@/pages/spectrogram/spectrogram-page');
             return { Component: SpectrogramPage };
           },
         },
