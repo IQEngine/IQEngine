@@ -25,7 +25,7 @@ export function calcFftOfTile(
 ) {
   //let startTime = performance.now();
 
-  let fftsConcatenated = null;
+  let fftsConcatenated = new Float32Array(1);
   if (numberOfFfts) {
     fftsConcatenated = new Float32Array(numberOfFfts * fftSize);
   } else {
