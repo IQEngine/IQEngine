@@ -50,49 +50,47 @@ export const DataSourceForm = () => {
       };
 
       return (
-        <div>
-        <h1>Add data source</h1>
         <form ref={formRef} onSubmit={handleSubmit}>
         <input
             type="text"
             name="name"
             placeholder="Data Source Name"
-            className="input input-bordered input-success w-full max-w-xs"
+            className="input input-bordered input-success w-full max-w-xs text-white"
           />
         <br/>
         <input
             type="text"
             name="account"
             placeholder="Storage Account name"
-            className="input input-bordered input-success w-full max-w-xs"
+            className="input input-bordered input-success w-full max-w-xs text-white"
           />
         <br />
         <input
             type="text"
             name="container"
             placeholder="Container Name"
-            className="input input-bordered input-success w-full max-w-xs"
+            className="input input-bordered input-success w-full max-w-xs text-white"
           />
         <br />
         <input
             type="text"
             name="description"
             placeholder="Description (optional)"
-            className="input input-bordered input-success w-full max-w-xs"
+            className="input input-bordered input-success w-full max-w-xs text-white"
           />
           <br />
           <input
             type="text"
             name="imageURL"
             placeholder="Image URL (optional)"
-            className="input input-bordered input-success w-full max-w-xs"
+            className="input input-bordered input-success w-full max-w-xs text-white"
           />
           <br />
           <input
             type="text"
             name="sasToken"
             placeholder="SAS Token (optional)"
-            className="input input-bordered input-success w-full max-w-xs"
+            className="input input-bordered input-success w-full max-w-xs text-white"
           />
           <br />
           <button
@@ -101,7 +99,6 @@ export const DataSourceForm = () => {
             className="bg-white text-black px-4 py-2 rounded-md mt-3"
             >Submit</button>
         </form>
-        </div>
       );
     };
 
