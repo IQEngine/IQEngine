@@ -2,15 +2,30 @@ import { test, describe } from 'vitest';
 import { useGetImage } from '../use-get-image';
 import { renderHook, waitFor } from '@testing-library/react';
 import { TILE_SIZE_IN_IQ_SAMPLES as tilesize, COLORMAP_DEFAULT } from '@/utils/constants';
-import { SampleType, generateSampleRecording, normalizeMagnitude } from '@/utils/testFunctions';
+import { SampleType, generateSampleImageData, normalizeMagnitude, generateSampleIQData } from '@/utils/testFunctions';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
+import { useGenerateFFTs } from '../use-get-image';
 
 describe('DevTest Spectrogram Tests', () => {
   //template test.each([[], []])('test', async () => {});
-  test.each([['first', tilesize, 1024, -40.0, -10.0, 'jet', 'hamming']])(
-    'test',
-    async (comment, tile_size, fftSize, magnitudeMin, magnitudeMax, colorMap, windowFunction) => {
+  // want fftsize to be at most sample_rate/2 so there's at least one pixel for each sample
+  // frequency should be a few less than 1/2 of sample rate so peak isn't shoved off the frame
+  // making sample_rate a power of 2 avoids rounding errors when locating peak pixel
+  test.each([
+    ['10 hz', 100, 1024, 10, 2048, 'hamming'],
+    ['20 hz', 100, 1024, 20, 2048, 'hanning'],
+    ['30 hz', 100, 1024, 30, 2048, 'bartlett'],
+    ['100 hz', 100, 1024, 100, 2048, 'blackman'],
+    ['1000 hz', 100, 1024, 1000, 2048, 'hamming'],
+    ['10 hz', 100, 512, 10, 1024, 'hamming'],
+    ['20 hz', 100, 512, 20, 1024, 'hamming'],
+    ['30 hz', 100, 512, 30, 1024, 'bartlett'],
+    ['100 hz', 100, 512, 100, 1024, 'blackman'],
+    ['500 hz', 100, 512, 500, 1024, 'hamming'],
+  ])(
+    'Test that generated IQ produces correct FFTs, %s',
+    async (comment, spectrogramHeight, fftSize, frequency, sampleRate, windowFunction) => {
       const queryClient = new QueryClient({
         defaultOptions: {
           queries: {
@@ -20,20 +35,39 @@ describe('DevTest Spectrogram Tests', () => {
       });
       const wrapper = ({ children }) => <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
 
-      const spectrogramHeight = tile_size / fftSize;
-      const iqData = new Float32Array(tile_size);
-      queryClient.setQueryData(['iqdata'], iqData);
+      const { sampleIQData } = generateSampleIQData(fftSize, spectrogramHeight, frequency, sampleRate);
+      queryClient.setQueryData(['rawiqdata'], sampleIQData);
 
       // run the code-under-test
-      const { result } = renderHook(
-        () => useGetImage(fftSize, spectrogramHeight, magnitudeMin, magnitudeMax, colorMap, windowFunction),
-        {
-          wrapper,
-        }
-      );
-      await waitFor(() => {
-        expect(result.current.image).not.toBeNull();
+      const { result } = renderHook(() => useGenerateFFTs(fftSize, spectrogramHeight, windowFunction), {
+        wrapper,
       });
+      await waitFor(
+        () => {
+          expect(result.current.generateFFTQuery.data).toBeDefined();
+        },
+        { timeout: 5000 }
+      );
+      expect(result.current.generateFFTQuery.data.length).toEqual(fftSize * spectrogramHeight);
+      for (let i = 1; i < 10; i++) {
+        const centerPoint = fftSize / 2 + i * fftSize;
+
+        // expect the magnitude at fftSize/2-frequency to be peak
+        const leftPeak = result.current.generateFFTQuery.data[centerPoint - frequency];
+        const rightOfLeftPeak = result.current.generateFFTQuery.data[centerPoint - (frequency + 1)];
+        const leftOfLeftPeak = result.current.generateFFTQuery.data[centerPoint - (frequency - 1)];
+
+        expect(leftPeak).toBeGreaterThan(rightOfLeftPeak);
+        expect(leftPeak).toBeGreaterThan(leftOfLeftPeak);
+
+        // expect the magnitude at fftSize/2+frequency to be peak
+        const rightPeak = result.current.generateFFTQuery.data[centerPoint + frequency];
+        const rightOfRightPeak = result.current.generateFFTQuery.data[centerPoint + (frequency + 1)];
+        const leftOfRightPeak = result.current.generateFFTQuery.data[centerPoint + (frequency - 1)];
+
+        expect(rightPeak).toBeGreaterThan(rightOfRightPeak);
+        expect(rightPeak).toBeGreaterThan(leftOfRightPeak);
+      }
     }
   );
 
@@ -70,38 +104,41 @@ describe('DevTest Spectrogram Tests', () => {
     ['min>max', tilesize, 256, -20.0, -30.0, 'jet', SampleType.WhiteBox],
     ['min==max', tilesize, 512, -60.0, -60.0, 'plasma', SampleType.WhiteBox],
     ['fftSize==0', tilesize, 0, -40.0, -10.0, 'jet', SampleType.WhiteBox],
-  ])('Failing test: %s', async (comment, tile_size, fftSize, magnitudeMin, magnitudeMax, colorMap, sampleType) => {
-    const { sampleRecording } = generateSampleRecording(
-      tile_size,
-      fftSize,
-      sampleType,
-      magnitudeMin,
-      magnitudeMax,
-      colorMap
-    );
-    const queryClient = new QueryClient({
-      defaultOptions: {
-        queries: {
-          staleTime: Infinity,
+  ])(
+    'Unacceptable parameters should be rejected: %s',
+    async (comment, tile_size, fftSize, magnitudeMin, magnitudeMax, colorMap, sampleType) => {
+      const { sampleImageData } = generateSampleImageData(
+        tile_size,
+        fftSize,
+        sampleType,
+        magnitudeMin,
+        magnitudeMax,
+        colorMap
+      );
+      const queryClient = new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: Infinity,
+          },
         },
-      },
-    });
-    const wrapper = ({ children }) => <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
-    queryClient.setQueryData(['fftdata'], sampleRecording);
+      });
+      const wrapper = ({ children }) => <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+      queryClient.setQueryData(['fftdata'], sampleImageData);
 
-    const spectrogramHeight = tile_size / (fftSize == 0 ? 1024 : fftSize);
+      const spectrogramHeight = tile_size / (fftSize == 0 ? 1024 : fftSize);
 
-    // run the code-under-test
-    const { result } = renderHook(
-      () => useGetImage(fftSize, spectrogramHeight, magnitudeMin, magnitudeMax, colorMap, 'hamming'),
-      {
-        wrapper,
-      }
-    );
-    await waitFor(() => {
-      expect(result.current.image).toBeNull();
-    });
-  });
+      // run the code-under-test
+      const { result } = renderHook(
+        () => useGetImage(fftSize, spectrogramHeight, magnitudeMin, magnitudeMax, colorMap, 'hamming'),
+        {
+          wrapper,
+        }
+      );
+      await waitFor(() => {
+        expect(result.current.image).toBeNull();
+      });
+    }
+  );
 
   test.each([
     ['128,multi-dB', tilesize, 128, -40.0, 0.0, COLORMAP_DEFAULT, SampleType.MultipleBuckets],
@@ -128,7 +165,7 @@ describe('DevTest Spectrogram Tests', () => {
   ])(
     'RGB is generated correctly from the following fftdata: %s',
     async (comment, tile_size, fftSize, magnitudeMin, magnitudeMax, colorMap, sampleType) => {
-      const { sampleRecording, num_ffts, expectedImageData } = generateSampleRecording(
+      const { sampleImageData, num_ffts, expectedImageData } = generateSampleImageData(
         tile_size,
         fftSize,
         sampleType,
@@ -144,7 +181,7 @@ describe('DevTest Spectrogram Tests', () => {
         },
       });
       const wrapper = ({ children }) => <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
-      queryClient.setQueryData(['fftdata'], sampleRecording);
+      queryClient.setQueryData(['fftdata'], sampleImageData);
 
       const spectrogramHeight = tile_size / (fftSize == 0 ? 1024 : fftSize);
 

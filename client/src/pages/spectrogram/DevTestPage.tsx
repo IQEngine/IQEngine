@@ -1,9 +1,7 @@
 import { Layer, Image, Stage } from 'react-konva';
 import React, { useState } from 'react';
 import { useGetImage } from '@/pages/spectrogram/hooks/use-get-image';
-import { TILE_SIZE_IN_IQ_SAMPLES, COLORMAP_DEFAULT } from '@/utils/constants';
-
-const totalFftData = new Float32Array(7 * TILE_SIZE_IN_IQ_SAMPLES);
+import { COLORMAP_DEFAULT } from '@/utils/constants';
 
 export const DevTestPage = () => {
   const [spectrogramHeight, setSpectrogramHeight] = useState(800);
@@ -11,9 +9,8 @@ export const DevTestPage = () => {
   const fftSize = 1024;
   const magnitudeMin = -40.0;
   const magnitudeMax = -10.0;
-  totalFftData[0] = Number.NEGATIVE_INFINITY;
 
-  let { image } = useGetImage(fftSize, spectrogramHeight, magnitudeMin, magnitudeMax, COLORMAP_DEFAULT);
+  let { image } = useGetImage(fftSize, spectrogramHeight, magnitudeMin, magnitudeMax, COLORMAP_DEFAULT, 'hamming');
   return (
     <div className="block">
       <div className="flex flex-col pl-3">

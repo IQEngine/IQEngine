@@ -4,8 +4,14 @@ import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { FFT } from '@/utils/fft';
 import { fftshift } from 'fftshift';
+import { generateSampleIQData } from '@/utils/testFunctions';
 
-function calcFftOfSamples(samples: Float32Array, fftSize: number, spectrogramHeight: number, windowFunction: string) {
+const calcFftOfSamples = async (
+  samples: Float32Array,
+  fftSize: number,
+  spectrogramHeight: number,
+  windowFunction: string
+) => {
   //let startTime = performance.now();
   const sampleBlockSize = fftSize * spectrogramHeight;
   let fftsConcatenated = new Float32Array(sampleBlockSize);
@@ -62,14 +68,18 @@ function calcFftOfSamples(samples: Float32Array, fftSize: number, spectrogramHei
   //let endTime = performance.now();
   //console.debug('Calculating FFTs took', endTime - startTime, 'milliseconds'); // first cut of our code processed+rendered 0.5M samples in 760ms on marcs computer
   return fftsConcatenated;
-}
+};
 
 export const useGetData = (fftSize: number, spectrogramHeight: number) => {
-  const rawIqData = new Float32Array(spectrogramHeight * fftSize);
+  const { sampleIQData } = generateSampleIQData(fftSize, spectrogramHeight, 100, 256);
 
-  const getDataQuery = useQuery<Float32Array>(['rawiqdata'], () => {
-    return rawIqData;
-  });
+  const getDataQuery = useQuery<Float32Array>(
+    ['rawiqdata'],
+    () => {
+      return sampleIQData;
+    },
+    { enabled: !!sampleIQData }
+  );
 
   return { getDataQuery };
 };
@@ -77,9 +87,13 @@ export const useGetData = (fftSize: number, spectrogramHeight: number) => {
 export const useTransformData = (fftSize: number, spectrogramHeight: number) => {
   const { getDataQuery } = useGetData(fftSize, spectrogramHeight);
 
-  const transformDataQuery = useQuery<Float32Array>(['iqdata'], () => {
-    return getDataQuery.data;
-  });
+  const transformDataQuery = useQuery<Float32Array>(
+    ['iqdata'],
+    () => {
+      return getDataQuery.data;
+    },
+    { enabled: !!getDataQuery.data }
+  );
 
   return { transformDataQuery };
 };
@@ -87,13 +101,15 @@ export const useTransformData = (fftSize: number, spectrogramHeight: number) => 
 export const useGenerateFFTs = (fftSize: number, spectrogramHeight: number, windowFunction: string) => {
   const { transformDataQuery } = useTransformData(fftSize, spectrogramHeight);
 
-  let samples = transformDataQuery.data;
-
-  const fftQuery = useQuery<Float32Array>(['fftdata'], () =>
-    calcFftOfSamples(samples, fftSize, spectrogramHeight, windowFunction)
+  const generateFFTQuery = useQuery<Float32Array>(
+    ['fftdata'],
+    () => {
+      return calcFftOfSamples(transformDataQuery.data, fftSize, spectrogramHeight, windowFunction);
+    },
+    { enabled: !!transformDataQuery.data }
   );
 
-  return { fftQuery };
+  return { generateFFTQuery };
 };
 
 export const useGetImage = (
@@ -106,11 +122,11 @@ export const useGetImage = (
 ) => {
   const [image, setImage] = useState<ImageBitmap>(null);
 
-  const { fftQuery } = useGenerateFFTs(fftSize, spectrogramHeight, windowFunction);
+  const { generateFFTQuery } = useGenerateFFTs(fftSize, spectrogramHeight, windowFunction);
 
   useEffect(() => {
     if (
-      !fftQuery.data ||
+      !generateFFTQuery.data ||
       !fftSize ||
       isNaN(magnitudeMin) ||
       isNaN(magnitudeMax) ||
@@ -119,15 +135,15 @@ export const useGetImage = (
     ) {
       setImage(null);
     } else {
-      const rgbData = fftToRGB(fftQuery.data, fftSize, magnitudeMin, magnitudeMax, colMaps[colmap]);
-      let num_final_ffts = fftQuery.data.length / fftSize;
+      const rgbData = fftToRGB(generateFFTQuery.data, fftSize, magnitudeMin, magnitudeMax, colMaps[colmap]);
+      let num_final_ffts = generateFFTQuery.data.length / fftSize;
       const newImageData = new ImageData(rgbData, fftSize, num_final_ffts);
 
       createImageBitmap(newImageData).then((imageBitmap) => {
         setImage(imageBitmap);
       });
     }
-  }, [fftQuery.data, fftSize, spectrogramHeight, magnitudeMin, magnitudeMax, colmap]);
+  }, [generateFFTQuery.data, fftSize, spectrogramHeight, magnitudeMin, magnitudeMax, colmap]);
 
   return { image };
 };
