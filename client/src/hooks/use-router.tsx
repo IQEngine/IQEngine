@@ -16,14 +16,14 @@ export function useRouter() {
         {
           path: 'about',
           async lazy() {
-            let { About } = await import('@/pages/about');
+            let { About } = await import('@/pages/About');
             return { Component: About };
           },
         },
         {
           path: 'sigmf',
           async lazy() {
-            let { SigMF } = await import('@/pages/sigMF');
+            let { SigMF } = await import('@/pages/sigmf');
             return { Component: SigMF };
           },
         },
@@ -45,7 +45,7 @@ export function useRouter() {
         {
           path: 'plugins',
           async lazy() {
-            let { Plugins } = await import('@/pages/plugins');
+            let { Plugins } = await import('@/pages/Plugins');
             return { Component: Plugins };
           },
         },
