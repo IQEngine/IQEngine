@@ -23,7 +23,7 @@ export function useRouter() {
         {
           path: 'sigmf',
           async lazy() {
-            let { SigMF } = await import('@/pages/SigMF');
+            let { SigMF } = await import('@/pages/sigmf');
             return { Component: SigMF };
           },
         },
@@ -37,7 +37,7 @@ export function useRouter() {
         {
           path: 'upload',
           async lazy() {
-            let { UploadPage } = await import('@/pages/UploadPage');
+            let { UploadPage } = await import('@/pages/upload-page');
             return { Component: UploadPage };
           },
         },
@@ -79,9 +79,9 @@ export function useRouter() {
             {
               path: 'add-data-source',
               async lazy() {
-                let { DataSourceForm } = await import('@/pages/admin/pages/add-data-source')
+                let { DataSourceForm } = await import('@/pages/admin/pages/add-data-source');
                 return { Component: DataSourceForm };
-              }
+              },
             },
             {
               path: 'configuration',
@@ -130,7 +130,7 @@ export function useRouter() {
         {
           path: 'spectrogram/:type/:account/:container/:filePath/:sasToken?',
           async lazy() {
-            let { SpectrogramPage } = await import('@/pages/spectrogram/SpectrogramPage');
+            let { SpectrogramPage } = await import('@/pages/spectrogram/spectrogram-page');
             return { Component: SpectrogramPage };
           },
         },
