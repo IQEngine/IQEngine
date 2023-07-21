@@ -2,7 +2,7 @@ import React from 'react';
 
 interface ModalProps {
   heading: string;
-  setShowModal: (showModal: boolean) => boolean;
+  setShowModal: any;
   children: any;
 }
 export const ModalDialog = ({
@@ -12,7 +12,7 @@ export const ModalDialog = ({
 
       return (
         <dialog aria-label={'Modal Dialog'} className="modal modal-open w-full h-full">
-            <form method="dialog" className="modal-box">
+            <div className="modal-box">
                 <h3 className="font-bold text-lg text-primary">{heading}</h3>
                 <button
                     aria-label={'Close Button'}
@@ -24,7 +24,7 @@ export const ModalDialog = ({
                 ✕
                 </button>
                 {children}
-            </form>
+            </div>
         </dialog>
       );
 }
