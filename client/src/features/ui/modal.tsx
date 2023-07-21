@@ -10,7 +10,6 @@ export const ModalDialog = ({
     setShowModal,
     children}: ModalProps) => {
 
-
       return (
         <dialog aria-label={'Modal Dialog'} className="modal modal-open w-full h-full">
             <form method="dialog" className="modal-box">
