@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { ArrowRightIcon, ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
 import { Annotation, SigMFMetadata } from '@/utils/sigmfMetadata';
 import { metadataValidator } from '@/utils/validators';
+import { ModalDialog } from '@/features/ui/modal';
 
 interface ActionsProps {
   meta: SigMFMetadata;
@@ -25,14 +26,9 @@ export const Actions = ({
   const modal = useRef(null);
   const [currentAnnotation, setCurrentAnnotation] = useState(JSON.stringify(meta.annotations[index], undefined, 4));
   const [errors, setErrors] = useState([]);
+  const [showModal, setShowModal] = useState(false);
 
-  const toggle = () => {
-    if (modal.current.className === 'modal w-full h-full') {
-      modal.current.className = 'modal modal-open w-full h-full';
-    } else {
-      modal.current.className = 'modal w-full h-full';
-    }
-  };
+
 
   useEffect(() => {
     setCurrentAnnotation(JSON.stringify(meta.annotations[index], undefined, 4));
@@ -53,16 +49,17 @@ export const Actions = ({
       meta.annotations[index] = Object.assign(new Annotation(), JSON.parse(currentAnnotation));
       let new_meta = Object.assign(new SigMFMetadata(), meta);
       setMeta(new_meta);
-      toggle();
+      setShowModal(!showModal);
     } catch (e) {
       console.error(e.message);
       return;
     }
   };
 
+
   return (
     <div>
-      <button
+       <button
         onClick={() => {
           const fractionIntoFile = startSampleCount / meta.getLengthInIQSamples();
           const handleTop = fractionIntoFile * spectrogramHeight;
@@ -72,19 +69,15 @@ export const Actions = ({
       >
         <ArrowRightIcon className="h-4 w-4" />
       </button>
-      <button aria-label={'Annotation ' + index + ' Modal Open Button'} onClick={toggle}>
+
+      <button aria-label={'Annotation ' + index + ' Modal Open Button'} onClick={() => {
+              setShowModal(true);
+            }}>
         <ArrowTopRightOnSquareIcon className="h-4 w-4" />
       </button>
-      <dialog aria-label={'Annotation ' + index + ' Modal'} ref={modal} className="modal w-full h-full">
-        <form method="dialog" className="modal-box">
-          <h3 className="font-bold text-lg text-primary">Annotation {index}</h3>
-          <button
-            aria-label={'Annotation ' + index + ' Modal Close Button'}
-            className="absolute right-2 top-2 bg-base-100 text-primary font-bold"
-            onClick={toggle}
-          >
-            ✕
-          </button>
+
+      {showModal && <ModalDialog heading={'Annotation ' + index} setShowModal={setShowModal}>
+      <div>
           <div>
             <textarea
               aria-label={'Annotation ' + index + ' Modal Text Area'}
@@ -122,9 +115,10 @@ export const Actions = ({
           >
             Update
           </button>
-        </form>
-      </dialog>
+          </div>
+        </ModalDialog>}
     </div>
+
   );
 };
 
