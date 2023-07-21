@@ -54,7 +54,6 @@ export const App = () => {
 
   useEffect(() => {
     if (!config.data) return;
-
     const analytics_key = config.data.googleAnalyticsKey;
     if (analytics_key) {
       ReactGA.initialize(analytics_key);
@@ -124,6 +123,11 @@ export const App = () => {
                     Plugins
                   </Link>
                 </li>
+                <li>
+                  <Link to="/query" onClick={() => {}}>
+                    Query
+                  </Link>
+                </li>
                 {activeAccount ? (
                   <>
                     <li>
@@ -171,6 +175,11 @@ export const App = () => {
               <li className="hidden md:block">
                 <Link to="/sigmf" onClick={() => {}}>
                   <div className="text-lg">SigMF</div>
+                </Link>
+              </li>
+              <li className="hidden md:block">
+                <Link to="/query" onClick={() => {}}>
+                  <div className="text-lg">Query</div>
                 </Link>
               </li>
               <li className="hidden md:block">

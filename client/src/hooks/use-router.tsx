@@ -28,6 +28,13 @@ export function useRouter() {
           },
         },
         {
+          path: 'query',
+          async lazy() {
+            let { MetadataQuery } = await import('@/pages/metadata-query/metadata-query');
+            return { Component: MetadataQuery };
+          },
+        },
+        {
           path: 'upload',
           async lazy() {
             let { UploadPage } = await import('@/pages/UploadPage');

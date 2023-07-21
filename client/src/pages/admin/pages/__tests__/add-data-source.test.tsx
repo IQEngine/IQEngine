@@ -8,8 +8,6 @@ import DataSourceForm from '@/pages/admin/pages/add-data-source';
 import nock from 'nock';
 import { Toaster } from 'react-hot-toast';
 
-
-
 describe('Test DataSources', () => {
   afterEach(() => {
     nock.cleanAll();
@@ -40,16 +38,9 @@ describe('Test DataSources', () => {
     expect(nock.isDone()).toBe(true);
   });
 
-
   test('Displays add data source successful when successful', async () => {
     nock('http://localhost:3000').post('/api/datasources').reply(201);
-    render(
-      <>
-        <Toaster />
-        <DataSourceForm />
-      </>,
-      { wrapper: AllProviders }
-    );
+    render(<DataSourceForm />, { wrapper: AllProviders });
     const submit = screen.getByRole('button', { name: 'Submit Data Source Button' });
     await userEvent.click(submit);
     expect(await screen.findByText('Successfully added data source')).toBeInTheDocument();
@@ -57,13 +48,7 @@ describe('Test DataSources', () => {
 
   test('Displays You have already added this data source when there is a conflict', async () => {
     nock('http://localhost:3000').post('/api/datasources').reply(409);
-    render(
-      <>
-        <Toaster />
-        <DataSourceForm />
-      </>,
-      { wrapper: AllProviders }
-    );
+    render(<DataSourceForm />, { wrapper: AllProviders });
     const submit = screen.getByRole('button', { name: 'Submit Data Source Button' });
     await userEvent.click(submit);
     expect(await screen.findByText('You have already added this data source')).toBeInTheDocument();
@@ -71,13 +56,7 @@ describe('Test DataSources', () => {
 
   test('Displays error when unsuccessful', async () => {
     nock('http://localhost:3000').post('/api/datasources').reply(500);
-    render(
-      <>
-        <Toaster />
-        <DataSourceForm />
-      </>,
-      { wrapper: AllProviders }
-    );
+    render(<DataSourceForm />, { wrapper: AllProviders });
     const submit = screen.getByRole('button', { name: 'Submit Data Source Button' });
     await userEvent.click(submit);
     expect(await screen.findByText('Something went wrong adding the data source')).toBeInTheDocument();

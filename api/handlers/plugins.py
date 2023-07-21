@@ -6,6 +6,7 @@ from motor.core import AgnosticCollection
 router = APIRouter()
 
 
+@router.post("/api/plugins/", status_code=201, response_model=Plugin)
 @router.post("/api/plugins", status_code=201, response_model=Plugin)
 async def create_plugin(
     plugin: Plugin,
@@ -22,6 +23,7 @@ async def create_plugin(
     return plugin
 
 
+@router.get("/api/plugins/", response_model=list[Plugin])
 @router.get("/api/plugins", response_model=list[Plugin])
 async def get_plugins(
     plugins: AgnosticCollection = Depends(plugin_repo.collection),

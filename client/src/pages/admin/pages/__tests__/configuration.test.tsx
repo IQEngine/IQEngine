@@ -6,7 +6,6 @@ import React from 'react';
 import { AllProviders, queryClient } from '@/mocks/setup-tests';
 import nock from 'nock';
 import userEvent from '@testing-library/user-event';
-import { Toaster } from 'react-hot-toast';
 
 describe('Test Configuration', () => {
   beforeEach(() => {
@@ -144,13 +143,7 @@ describe('Test Configuration', () => {
 
     nock('http://localhost:3000').put(`/api/config`).reply(200);
 
-    render(
-      <>
-        <Toaster />
-        <Configuration />
-      </>,
-      { wrapper: AllProviders }
-    );
+    render(<Configuration />, { wrapper: AllProviders });
 
     const displayInternalBranding = await screen.findByRole('checkbox', {
       name: 'displayInternalBranding',
@@ -179,13 +172,7 @@ describe('Test Configuration', () => {
 
     nock('http://localhost:3000').put(`/api/config`).reply(404);
 
-    render(
-      <>
-        <Toaster />
-        <Configuration />
-      </>,
-      { wrapper: AllProviders }
-    );
+    render(<Configuration />, { wrapper: AllProviders });
 
     const displayInternalBranding = await screen.findByRole('checkbox', {
       name: 'displayInternalBranding',
