@@ -49,9 +49,9 @@ export default defineConfig(async () => {
       globals: true,
       setupFiles: ['./vitest.setup.ts'],
       environment: 'jsdom',
-    deps: {
-      inline: ['vitest-canvas-mock'],
-    },
+      deps: {
+        inline: ['vitest-canvas-mock'],
+      },
     },
   };
 });
