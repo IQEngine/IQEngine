@@ -1,9 +1,8 @@
-from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi import Depends, HTTPException, status, Security
+from fastapi.security import HTTPBearer
 from cachetools import TTLCache, cached
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
 from typing import Any, Tuple, cast
-from functools import wraps
 import jwt
 from jwt import algorithms
 import os
@@ -11,12 +10,12 @@ import time
 import requests
 import logging
 import json
+from typing import Optional, Union, List
 
 CLIENT_ID = os.getenv("IQENGINE_APP_ID")
 TENANT_ID = os.getenv("AAD_Tenant_ID")
 
 http_bearer = HTTPBearer()
-
 
 class JWKSHandler:
     openid_config_uri = (
@@ -90,70 +89,52 @@ def validate_and_decode_jwt(token: str) -> dict:
         )
 
 
-def get_current_user(
-    token: HTTPAuthorizationCredentials = Depends(http_bearer),
-) -> dict:
+async def get_current_user(
+    token: Optional[str] = Depends(http_bearer),
+) -> Optional[dict]:
+    if not token:
+        return None
     try:
-        payload = validate_and_decode_jwt(token.credentials)
-        return payload
+        current_user = validate_and_decode_jwt(token.credentials)
+        logging.info(f"User {current_user['preferred_username']} access token validated")
+        return current_user
     except jwt.PyJWTError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Unable to validate credentials",
         )
-
-
-def get_current_active_user(current_user: dict = Depends(get_current_user)) -> dict:
-    if current_user["is_active"]:
-        return current_user
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Inactive user",
-    )
-
-
-def get_current_active_admin_user(
-    current_user: dict = Depends(get_current_user),
-) -> dict:
-    if current_user["is_active"]:
-        if "roles" in current_user and "IQEngine-Admin" in current_user["roles"]:
-            return current_user
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="User does not have the necessary permissions",
-            )
-    else:
+    except AttributeError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Inactive user",
+            detail="No Authorization token provided",
         )
 
 
-def requires(role: str):
-    def decorator(f):
-        @wraps(f)
-        async def decorated_function(*args, **kwargs):
-            current_user = get_current_active_user()
-            if role not in current_user["roles"]:
+def requires(roles: Optional[Union[str, List[str]]] = None):
+    async def wrapper(current_user: Optional[dict] = Security(get_current_user)):
+        if not current_user: 
+            return None
+
+        if roles:
+            if isinstance(roles, str):
+                roles = [roles]
+            if not any(role in current_user["roles"] for role in roles):
                 logging.info(
-                    f"User {current_user['email']} attempted to access {f.__name__} without sufficient privileges"
+                    f"User {current_user['preferred_username']} attempted to access without sufficient privileges"
                 )
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
                     detail="Not enough privileges",
                 )
-            logging.info(
-                f"User {current_user['email']} accessed {f.__name__} successfully"
-            )
-            return await f(*args, **kwargs)
-        return decorated_function
-    return decorator
+        logging.info(
+            f"User {current_user['preferred_username']} accessed successfully"
+        )
+        return current_user
+    return wrapper
 
 
 # Example usage
 # @app.get("/some-endpoint")
-# @requires("IQEngine-User")
-# def read_items():
+# def read_items(test:str, dependencies=[Depends(requires("IQEngine-User"))]):
 #     # business logic here
 #     return {"message": "You have access!"}

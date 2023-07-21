@@ -1,27 +1,30 @@
 import pytest
 from unittest.mock import patch
-from fastapi import HTTPException
+from fastapi import Depends
 from helpers.authorization import requires
+from main import app
+
 
 @pytest.mark.asyncio
-async def test_requires():
+async def test_requires(client):
     # Tests the decorator function `requires` which is used to restrict access to certain endpoints
-    def mock_get_current_active_user():
-        return {"roles": ["role1", "role2"], "is_active": True, "email": "emailaddress"}
+    async def mock_get_current_user():
+        return {"roles": ["role1", "role2"], "preferred_username": "emailaddress"}
 
-    def mock_get_current_active_user_no_roles():
-        return {"roles": [], "is_active": False, "email": "emailaddress"}
+    async def mock_get_current_user_no_roles():
+        return {"roles": [], "preferred_username": "emailaddress"}
 
-    @requires("role1")
+    @app.get("/test-function", dependencies=[Depends(requires("role1"))])
     async def test_function():
         return "Hello, World!"
 
-    with patch('helpers.authorization.get_current_active_user', new=mock_get_current_active_user):
-        result = await test_function()
-        assert result == "Hello, World!"
+    with patch('helpers.authorization.get_current_user', return_value=mock_get_current_user):
+        response = client.get("/test-function")
+        assert response.status_code == 200
+        assert response.text == "Hello, World!"
 
-    with patch('helpers.authorization.get_current_active_user', new=mock_get_current_active_user_no_roles):
-        with pytest.raises(HTTPException) as e:
-            await test_function()
-        assert e.value.status_code == 403
-        assert e.value.detail == "Not enough privileges"
+    with patch('helpers.authorization.get_current_user', return_value=mock_get_current_user_no_roles):
+        response = client.get("/test-function")
+        assert response.status_code == 403
+        assert response.json() == {"detail": "Not enough privileges"}
+

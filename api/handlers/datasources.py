@@ -13,8 +13,12 @@ from helpers.authorization import requires
 router = APIRouter()
 
 
-@router.post("/api/datasources", status_code=201, response_model=DataSource)
-@requires("IQEngine-Admin")
+@router.post(
+    "/api/datasources",
+    status_code=201,
+    response_model=DataSource,
+    dependencies=[Depends(requires("IQEngine-Admin"))],
+)
 async def create_datasource(
     datasource: DataSource,
     datasources: AgnosticCollection = Depends(datasource_repo.collection),
@@ -33,12 +37,13 @@ async def create_datasource(
     return datasource
 
 
-@router.get("/api/datasources", response_model=list[DataSource])
-@requires("IQEngine-User")
+@router.get(
+    "/api/datasources",
+    response_model=list[DataSource],
+    dependencies=[Depends(requires("IQEngine-User"))],
+)
 async def get_datasources(
-    datasources_collection: AgnosticCollection = Depends(
-        datasource_repo.collection
-    ),
+    datasources_collection: AgnosticCollection = Depends(datasource_repo.collection),
 ):
     datasources = datasources_collection.find()
     result = []
@@ -48,15 +53,14 @@ async def get_datasources(
 
 
 @router.get(
-    "/api/datasources/{account}/{container}/image", response_class=StreamingResponse
+    "/api/datasources/{account}/{container}/image",
+    response_class=StreamingResponse,
+    dependencies=[Depends(requires("IQEngine-User"))],
 )
-@requires("IQEngine-User")
 async def get_datasource_image(
     account: str,
     container: str,
-    datasources_collection: AgnosticCollection = Depends(
-        datasource_repo.collection
-    ),
+    datasources_collection: AgnosticCollection = Depends(datasource_repo.collection),
 ):
     # Create the imageURL with sasToken
     datasource = await datasources_collection.find_one(
@@ -86,9 +90,10 @@ async def get_datasource_image(
 
 
 @router.get(
-    "/api/datasources/{account}/{container}/datasource", response_model=DataSource
+    "/api/datasources/{account}/{container}/datasource",
+    response_model=DataSource,
+    dependencies=[Depends(requires("IQEngine-User"))],
 )
-@requires("IQEngine-User")
 async def get_datasource(
     datasource: DataSource = Depends(datasource_repo.get),
 ):
@@ -98,15 +103,16 @@ async def get_datasource(
     return datasource
 
 
-@router.put("/api/datasources/{account}/{container}/datasource", status_code=204)
-@requires("IQEngine-Admin")
+@router.put(
+    "/api/datasources/{account}/{container}/datasource",
+    status_code=204,
+    dependencies=[Depends(requires("IQEngine-Admin"))],
+)
 async def update_datasource(
     account: str,
     container: str,
     datasource: DataSource,
-    datasources_collection: AgnosticCollection = Depends(
-        datasource_repo.collection
-    ),
+    datasources_collection: AgnosticCollection = Depends(datasource_repo.collection),
 ):
     existingDatasource = await datasources_collection.find_one(
         {

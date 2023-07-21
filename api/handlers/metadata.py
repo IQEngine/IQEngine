@@ -18,8 +18,8 @@ router = APIRouter()
     "/api/datasources/{account}/{container}/meta",
     status_code=200,
     response_model=list[Metadata],
+    dependencies=[Depends(requires())],
 )
-@requires("IQEngine-User")
 async def get_all_meta(
     account,
     container,
@@ -45,8 +45,8 @@ async def get_all_meta(
     "/api/datasources/{account}/{container}/meta/paths",
     status_code=200,
     response_model=list[str],
+    dependencies=[Depends(requires())],
 )
-@requires("IQEngine-User")
 async def get_all_meta_name(
     account,
     container,
@@ -71,8 +71,8 @@ async def get_all_meta_name(
 @router.get(
     "/api/datasources/{account}/{container}/{filepath:path}/meta",
     response_model=Metadata,
+    dependencies=[Depends(requires())],
 )
-@requires("IQEngine-User")
 async def get_meta(
     metadata: Metadata = Depends(metadata_repo.get),
 ):
@@ -84,8 +84,8 @@ async def get_meta(
 @router.get(
     "/api/datasources/{account}/{container}/{filepath:path}/iqdata",
     response_class=StreamingResponse,
+    dependencies=[Depends(requires())],
 )
-@requires("IQEngine-User")
 async def get_metadata_iqdata(
     filepath: str,
     datasource: DataSource = Depends(datasource_repo.get),
@@ -108,8 +108,8 @@ async def get_metadata_iqdata(
 @router.get(
     "/api/datasources/{account}/{container}/{filepath:path}/thumbnail",
     response_class=StreamingResponse,
+    dependencies=[Depends(requires())],
 )
-@requires("IQEngine-User")
 async def get_meta_thumbnail(
     filepath: str,
     background_tasks: BackgroundTasks,
@@ -178,8 +178,8 @@ async def process_geolocation(target: str, geolocation: str):
     "/api/datasources/query",
     status_code=200,
     response_model=list[Metadata],
+    dependencies=[Depends(requires())],
 )
-@requires("IQEngine-User")
 async def query_meta(
     account: Optional[List[str]] = Query([]),
     container: Optional[List[str]] = Query([]),
@@ -188,7 +188,7 @@ async def query_meta(
     author: Optional[str] = Query(None),
     label: Optional[str] = Query(None),
     comment: Optional[str] = Query(None),
-    description: Optional[str] = Query(None), # global description
+    description: Optional[str] = Query(None),  # global description
     min_datetime: Optional[datetime] = Query(None),
     max_datetime: Optional[datetime] = Query(None),
     text: Optional[str] = Query(None),
@@ -284,8 +284,8 @@ async def query_meta(
     "/api/datasources/{account}/{container}/{filepath:path}/meta",
     status_code=201,
     response_model=Metadata,
+    dependencies=[Depends(requires("IQEngine-User"))],
 )
-@requires("IQEngine-User")
 async def create_meta(
     account: str,
     container: str,
@@ -334,8 +334,8 @@ async def create_meta(
 @router.put(
     "/api/datasources/{account}/{container}/{filepath:path}/meta",
     status_code=204,
+    dependencies=[Depends(requires("IQEngine-User"))],
 )
-@requires("IQEngine-User")
 async def update_meta(
     account,
     container,

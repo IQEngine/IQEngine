@@ -7,8 +7,12 @@ from helpers.authorization import requires
 router = APIRouter()
 
 
-@router.post("/api/plugins", status_code=201, response_model=Plugin)
-@requires("IQEngine-User")
+@router.post(
+    "/api/plugins",
+    status_code=201,
+    response_model=Plugin,
+    dependencies=[Depends(requires("IQEngine-User"))],
+)
 async def create_plugin(
     plugin: Plugin,
     plugins: AgnosticCollection = Depends(plugin_repo.collection),
@@ -24,8 +28,11 @@ async def create_plugin(
     return plugin
 
 
-@router.get("/api/plugins", response_model=list[Plugin])
-@requires("IQEngine-User")
+@router.get(
+    "/api/plugins",
+    response_model=list[Plugin],
+    dependencies=[Depends(requires("IQEngine-User"))],
+)
 async def get_plugins(
     plugins: AgnosticCollection = Depends(plugin_repo.collection),
 ):
@@ -35,8 +42,11 @@ async def get_plugins(
     return list(await plugins.find({}).to_list(1_000_000))
 
 
-@router.get("/api/plugins/{plugin_name}", response_model=Plugin)
-@requires("IQEngine-User")
+@router.get(
+    "/api/plugins/{plugin_name}",
+    response_model=Plugin,
+    dependencies=[Depends(requires("IQEngine-User"))],
+)
 async def get_plugin(
     plugin_name: str,
     plugins: AgnosticCollection = Depends(plugin_repo.collection),
@@ -50,8 +60,11 @@ async def get_plugin(
     return plugin
 
 
-@router.put("/api/plugins/{plugin_name}", response_model=Plugin)
-@requires("IQEngine-User")
+@router.put(
+    "/api/plugins/{plugin_name}",
+    response_model=Plugin,
+    dependencies=[Depends(requires("IQEngine-User"))],
+)
 async def update_plugin(
     plugin_name: str,
     plugin: Plugin,
@@ -70,8 +83,9 @@ async def update_plugin(
     return plugin
 
 
-@router.delete("/api/plugins/{plugin_name}")
-@requires("IQEngine-User")
+@router.delete(
+    "/api/plugins/{plugin_name}", dependencies=[Depends(requires("IQEngine-User"))]
+)
 async def delete_plugin(
     plugin_name: str,
     plugins: AgnosticCollection = Depends(plugin_repo.collection),

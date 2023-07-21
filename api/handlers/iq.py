@@ -36,9 +36,10 @@ async def get_sas_token(
 
 
 @router.get(
-    "/api/datasources/{account}/{container}/{filepath:path}/iqslice", status_code=200
+    "/api/datasources/{account}/{container}/{filepath:path}/iqslice",
+    status_code=200,
+    dependencies=[Depends(requires("IQEngine-User"))],
 )
-@requires("IQEngine-User")
 async def get_iq(
     filepath: str,
     offsetBytes: int,
@@ -83,9 +84,10 @@ async def download_blob(
 
 
 @router.post(
-    "/api/datasources/{account}/{container}/{filepath:path}/iqslices", status_code=200
+    "/api/datasources/{account}/{container}/{filepath:path}/iqslices",
+    status_code=200,
+    dependencies=[Depends(requires("IQEngine-User"))],
 )
-@requires("IQEngine-User")
 async def get_iq_data_slices(
     iq_data: IQData,
     filepath: str,

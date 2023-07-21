@@ -1,12 +1,11 @@
 import jwt
+import pytest
 from fastapi import HTTPException
 from fastapi.security import HTTPAuthorizationCredentials
 from helpers.authorization import (
     JWKSHandler,
     validate_and_decode_jwt,
     get_current_user,
-    get_current_active_user,
-    get_current_active_admin_user,
 )
 
 
@@ -74,65 +73,15 @@ def test_validate_and_decode_jwt_failure(mocker):
     except HTTPException as e:
         assert e.detail == "Invalid JWT"
 
-
-def test_get_current_user(mocker):
+@pytest.mark.asyncio
+async def test_get_current_user(mocker):
     # Mock the validate_and_decode_jwt function to return a payload
     mocker.patch(
         "helpers.authorization.validate_and_decode_jwt",
-        return_value={"sub": "test_user"},
+        return_value={"preferred_username": "test_user", "roles": ["role1"]},
     )
     mock_token = HTTPAuthorizationCredentials(scheme="Bearer", credentials="mock_token")
 
     # Call the function and assert that it returns the expected payload
-    assert get_current_user(mock_token) == {"sub": "test_user"}
-
-
-def test_get_current_active_user():
-    # Create a mock user dictionary
-    mock_user = {"is_active": True, "name": "Test User"}
-    result = get_current_active_user(mock_user)
-    assert result == {"is_active": True, "name": "Test User"}
-
-
-def test_get_current_active_admin_user():
-    # Create a mock user dictionary that includes the "IQEngine-Admin" role
-    mock_admin_user = {
-        "is_active": True,
-        "name": "Test Admin User",
-        "roles": ["IQEngine-Admin"],
-    }
-
-    result = get_current_active_admin_user(mock_admin_user)
-    assert result == {
-        "is_active": True,
-        "name": "Test Admin User",
-        "roles": ["IQEngine-Admin"],
-    }
-
-
-def test_get_current_active_admin_user_no_permission():
-    # Create a mock user dictionary without the "IQEngine-Admin" role
-    mock_admin_user = {
-        "is_active": True,
-        "name": "Test Admin User",
-        "roles": ["Some-Other-Role"],
-    }
-
-    try:
-        get_current_active_admin_user(mock_admin_user)
-    except HTTPException as e:
-        assert e.detail == "User does not have the necessary permissions"
-
-
-def test_get_current_active_admin_user_inactive():
-    # Create a mock user dictionary that is inactive
-    mock_admin_user = {
-        "is_active": False,
-        "name": "Test Admin User",
-        "roles": ["IQEngine-Admin"],
-    }
-
-    try:
-        get_current_active_admin_user(mock_admin_user)
-    except HTTPException as e:
-        assert e.detail == "Inactive user"
+    user = await get_current_user(mock_token)
+    assert user == {"preferred_username": "test_user", "roles": ["role1"]}

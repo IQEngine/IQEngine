@@ -5,6 +5,7 @@ from unittest import mock
 import database.database as db
 import pytest_asyncio
 from fastapi.testclient import TestClient
+from typing import Optional, Union, List
 
 
 @pytest_asyncio.fixture(autouse=True, scope="function")
@@ -14,12 +15,18 @@ async def env_setup():
     db._db = None
 
 
+def requires_mock(role: Optional[Union[str, List[str]]] = None):
+    async def wrapper():
+        return {"roles": ["IQEngine-Admin", "IQEngine-User"], "preferred_username": "emailaddress"}
+    return wrapper
+
+
 @pytest_asyncio.fixture(scope="function")
 def client():
     os.environ["IQENGINE_PLUGINS"] = "[]"
     with mock.patch("importer.all.import_all_from_env") as mock_i, \
-            mock.patch("helpers.authorization.requires", return_value=lambda x: x), \
-                mock.patch("helpers.authorization.get_current_active_user", return_value={"roles": ["IQEngine-Admin", "IQEngine-User"], "is_active": True, "email": "emailaddress"}):
+            mock.patch("helpers.authorization.requires", new=requires_mock), \
+                mock.patch("helpers.authorization.get_current_user", return_value={"roles": ["IQEngine-Admin", "IQEngine-User"], "preferred_username": "emailaddress"}):
         mock_i.return_value = None
         from main import app
 
