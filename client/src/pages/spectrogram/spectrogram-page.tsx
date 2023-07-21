@@ -320,6 +320,7 @@ export const SpectrogramPage = () => {
             updateWindowChange={setFFTWindow}
             magnitudeMax={magnitudeMax}
             magnitudeMin={magnitudeMin}
+            timeCursorsEnabled={timeCursorsEnabled}
             toggleTimeCursors={(e) => {
               setTimeCursorsEnabled(e.target.checked);
             }}
