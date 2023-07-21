@@ -17,7 +17,24 @@ export const normalizeMagnitude = (magnitude_in_db: number, magnitudeMin: number
   return magnitude;
 };
 
-export const generateSampleRecording = (
+export const generateSampleIQData = (
+  fftSize: number,
+  num_ffts: number,
+  frequency: number = 1000,
+  sampleRate: number = 2000
+) => {
+  const num_samples = num_ffts * fftSize * 2;
+  const sampleIQData = new Float32Array(num_samples);
+  const increment = (2 * Math.PI * frequency) / sampleRate;
+  let angle = 0;
+  for (let i = 0; i < num_samples; i++) {
+    sampleIQData[i] = Math.sin(angle);
+    angle += increment;
+  }
+  return { sampleIQData };
+};
+
+export const generateSampleImageData = (
   tile_size: number,
   fftSize: number,
   recordingType: SampleType,
@@ -26,11 +43,11 @@ export const generateSampleRecording = (
   colorMap: string
 ) => {
   if (fftSize == 0) {
-    return { sampleRecording: null, num_ffts: 0, expectedImageData: null };
+    return { sampleImageData: null, num_ffts: 0, expectedImageData: null };
   }
 
-  const sampleRecording = new Float32Array(tile_size);
-  let num_ffts = sampleRecording.length / fftSize;
+  const sampleImageData = new Float32Array(tile_size);
+  let num_ffts = sampleImageData.length / fftSize;
   let expectedImageData = new ImageData(1, 1);
 
   if (recordingType == SampleType.MultipleBuckets) {
@@ -39,23 +56,23 @@ export const generateSampleRecording = (
       for (let bucket = 0; bucket < BucketsOfDb.length; bucket++) {
         for (let j = 0; j < fftSize / BucketsOfDb.length; j++) {
           const index = line_offset + (bucket * fftSize) / BucketsOfDb.length + j;
-          sampleRecording[index] = BucketsOfDb[bucket];
+          sampleImageData[index] = BucketsOfDb[bucket];
         }
       }
     }
   } else if (recordingType == SampleType.WhiteBox) {
-    sampleRecording.fill(255);
+    sampleImageData.fill(255);
   }
 
   // normalize to 0-255
   const fftsNormalized = new Float32Array(tile_size);
-  for (let i = 0; i < sampleRecording.length; i++) {
-    fftsNormalized[i] = normalizeMagnitude(sampleRecording[i], magnitudeMin, magnitudeMax);
+  for (let i = 0; i < sampleImageData.length; i++) {
+    fftsNormalized[i] = normalizeMagnitude(sampleImageData[i], magnitudeMin, magnitudeMax);
   }
   let ipBuf8 = Uint8ClampedArray.from(fftsNormalized);
   // colorized
-  let newFftData = new Uint8ClampedArray(sampleRecording.length * 4); // 4 because RGBA
-  for (let sigVal, opIdx = 0, ipIdx = 0; ipIdx < sampleRecording.length; opIdx += 4, ipIdx++) {
+  let newFftData = new Uint8ClampedArray(sampleImageData.length * 4); // 4 because RGBA
+  for (let sigVal, opIdx = 0, ipIdx = 0; ipIdx < sampleImageData.length; opIdx += 4, ipIdx++) {
     sigVal = ipBuf8[ipIdx];
     newFftData[opIdx] = colMaps[colorMap][sigVal][0]; // red
     newFftData[opIdx + 1] = colMaps[colorMap][sigVal][1]; // green
@@ -64,5 +81,5 @@ export const generateSampleRecording = (
   }
   expectedImageData = new ImageData(newFftData, fftSize, num_ffts);
 
-  return { sampleRecording, num_ffts, expectedImageData };
+  return { sampleImageData, num_ffts, expectedImageData };
 };
