@@ -3,7 +3,7 @@
 // Licensed under the MIT License
 
 import React from 'react';
-import SettingsPane from './SettingsPane';
+import SettingsPane from './settings-pane';
 import { PluginsPane } from './components/PluginsPane';
 import { SigMFMetadata } from '@/utils/sigmfMetadata';
 
@@ -14,6 +14,7 @@ export interface SidebarProps {
   updateWindowChange: (fftWindow: string) => void;
   magnitudeMax: number;
   magnitudeMin: number;
+  timeCursorsEnabled: boolean;
   toggleTimeCursors: (e: React.ChangeEvent<HTMLInputElement>) => void;
   toggleFreqCursors: (e: React.ChangeEvent<HTMLInputElement>) => void;
   toggleIncludeRfFreq: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -71,7 +72,7 @@ const Sidebar = (props) => {
         <div className="outline outline-1 outline-primary p-2">
           {props.meta && (
             <PluginsPane
-              cursorsEnabled={props.cursorsEnabled}
+              timeCursorsEnabled={props.timeCursorsEnabled}
               handleProcessTime={props.handleProcessTime}
               meta={props.meta}
               setMeta={props.setMeta}
