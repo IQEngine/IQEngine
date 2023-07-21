@@ -6,7 +6,8 @@ import React, { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { CLIENT_TYPE_BLOB } from '@/api/Models';
 import { getMeta } from '@/api/metadata/Queries';
-import { AnnotationModal } from './AnnotationModal';
+import { FileAnnotationData } from './FileAnnotationData';
+import { ModalDialog } from '@/features/ui/modal';
 
 interface FileRowProps {
   filepath: string;
@@ -136,11 +137,11 @@ export default function FileRow({ filepath, type, account, container, sasToken }
             {item.annotations?.length ?? 0}
           </button>
           {showModal && (
-            <AnnotationModal
-              setShowModal={setShowModal}
+            <ModalDialog setShowModal={setShowModal} heading={item.getFileName()}>
+            <FileAnnotationData
               annotations={item?.annotations}
-              fileName={item.getFileName()}
             />
+            </ModalDialog>
           )}
           <br></br>({item.captures?.length ?? 0} Capture{item.captures?.length > 1 && 's'})
         </div>
