@@ -34,7 +34,7 @@ export const FileAnnotationData = ({ annotations }: Props) => {
 
   const annotationsData = annotations?.map((item, index) => {
     const deepItemCopy = JSON.parse(JSON.stringify(item));
-    // remove the main feilds so that everything left is shown in "other"
+    // remove the main fields so that everything left is shown in "other"
     delete deepItemCopy['core:sample_start'];
     delete deepItemCopy['core:sample_count'];
     delete deepItemCopy['core:freq_lower_edge'];

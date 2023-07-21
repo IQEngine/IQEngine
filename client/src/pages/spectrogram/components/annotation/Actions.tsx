@@ -59,7 +59,7 @@ export const Actions = ({
 
   return (
     <div>
-       <button
+      <button
         onClick={() => {
           const fractionIntoFile = startSampleCount / meta.getLengthInIQSamples();
           const handleTop = fractionIntoFile * spectrogramHeight;

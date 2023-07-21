@@ -8,6 +8,7 @@ import metadataJson from './AnnotationList.test.meta.json';
 import { SigMFMetadata } from '@/utils/sigmfMetadata';
 
 describe('Annotation list component', () => {
+
   test('Annotations modal is not visible on initial render', async () => {
     //Arrange
     const meta = Object.assign(new SigMFMetadata(), JSON.parse(JSON.stringify(metadataJson)));
@@ -23,16 +24,15 @@ describe('Annotation list component', () => {
     );
 
     // Act
-    const modal = await screen.findByLabelText('Annotation 0 Modal');
+    const modal = screen.queryByLabelText('Annotation 0 Modal');
 
-    // Assert
-    expect(modal).not.toHaveClass('modal-open');
+    //Assert
+    expect(modal).not.toBeInTheDocument();
   });
 
   test('Annotations modal is visible on toggle', async () => {
     //Arrange
     const meta = Object.assign(new SigMFMetadata(), JSON.parse(JSON.stringify(metadataJson)));
-
     render(
       <Actions
         meta={meta}
@@ -49,7 +49,7 @@ describe('Annotation list component', () => {
     await userEvent.click(openButton);
 
     // Assert
-    const modal = await screen.findByLabelText('Annotation 0 Modal');
+    const modal = await screen.findByLabelText('Modal Dialog');
     expect(modal).toHaveClass('modal-open');
   });
 
@@ -68,6 +68,9 @@ describe('Annotation list component', () => {
         setMeta={() => {}}
       ></Actions>
     );
+
+    const openButton = await screen.findByLabelText('Annotation 0 Modal Open Button');
+    await userEvent.click(openButton);
 
     // Assert
     const textarea = await screen.findByLabelText('Annotation 0 Modal Text Area');
@@ -97,12 +100,12 @@ describe('Annotation list component', () => {
     const openButton = await screen.findByLabelText('Annotation 0 Modal Open Button');
     await userEvent.click(openButton);
 
-    const closeButton = await screen.findByLabelText('Annotation 0 Modal Close Button');
+    const closeButton = await screen.findByLabelText('Close Button');
     await userEvent.click(closeButton);
+    const modal = screen.queryByLabelText('Modal Dialog');
 
-    // Assert
-    const modal = await screen.findByLabelText('Annotation 0 Modal');
-    expect(modal).not.toHaveClass('modal-open');
+    //Assert
+    expect(modal).not.toBeInTheDocument();
   });
 
   test('Annotations modal closes when updated', async () => {
@@ -126,10 +129,10 @@ describe('Annotation list component', () => {
 
     const updateButton = await screen.findByLabelText('Annotation 0 Modal Update Button');
     await userEvent.click(updateButton);
+    const modal = screen.queryByLabelText('Modal Dialog');
 
-    // Assert
-    const modal = await screen.findByLabelText('Annotation 0 Modal');
-    expect(modal).not.toHaveClass('modal-open');
+    //Assert
+    expect(modal).not.toBeInTheDocument();
   });
 
   test('Annotations modal does not close, displays errors and update is disabled when json not valid', async () => {
@@ -159,8 +162,8 @@ describe('Annotation list component', () => {
     await userEvent.click(updateButton);
 
     // Assert
-    const modal = await screen.findByLabelText('Annotation 0 Modal');
-    expect(modal).toHaveClass('modal-open');
+    const modal = await screen.queryByLabelText('Modal Dialog');
+    expect(modal).toBeInTheDocument();
     expect(updateButton).toBeDisabled();
     expect(screen.getByText('Syntax Error: Unexpected token o in JSON at position 17')).toBeInTheDocument();
   });
@@ -196,8 +199,8 @@ describe('Annotation list component', () => {
     await userEvent.click(updateButton);
 
     // Assert
-    const modal = await screen.findByLabelText('Annotation 0 Modal');
-    expect(modal).toHaveClass('modal-open');
+    const modal = await screen.queryByLabelText('Modal Dialog');
+    expect(modal).toBeInTheDocument();
     expect(updateButton).toBeDisabled();
     expect(
       screen.getByText("must have required property 'core:sample_start' inside /annotations/0")

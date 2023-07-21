@@ -27,7 +27,7 @@ export default function FileRow({ filepath, type, account, container, sasToken }
   sasToken = sasToken ?? paramSASToken;
   const { data: item } = getMeta(type, account, container, filepath);
 
-  const spectogramLink = `/spectrogram/${item?.getOrigin().type}/${item?.getOrigin().account}/${
+  const spectrogramLink = `/spectrogram/${item?.getOrigin().type}/${item?.getOrigin().account}/${
     item?.getOrigin().container
   }/${encodeURIComponent(item?.getFilePath())}`;
 
@@ -97,14 +97,14 @@ export default function FileRow({ filepath, type, account, container, sasToken }
         <>
           {/* If we are looking at a recording from blob storage */}
           <td className="px-4 min-w-fit">
-            <Link to={spectogramLink} onClick={() => {}}>
+            <Link to={spectrogramLink} onClick={() => {}}>
               <div className="zoom">
                 <img src={getThumbnailUrl()} alt="Spectrogram Thumbnail" style={{ width: '200px', height: '100px' }} />
               </div>
             </Link>
           </td>
           <td className="align-middle text-left">
-            <Link to={spectogramLink} onClick={() => {}}>
+            <Link to={spectrogramLink} onClick={() => {}}>
               <h2>{item.getFileName()}</h2>
             </Link>
             <div title={item.getDescription()}>{item.getShortDescription()}</div>

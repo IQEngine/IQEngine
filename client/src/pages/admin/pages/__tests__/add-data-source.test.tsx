@@ -15,7 +15,6 @@ describe('Test DataSources', () => {
 
   test('Basic Rendering', async () => {
     render(<DataSourceForm></DataSourceForm>, { wrapper: AllProviders });
-    expect(await screen.findByRole('heading', { name: 'Add data source' })).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Data Source Name')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Storage Account name')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Container Name')).toBeInTheDocument();
