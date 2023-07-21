@@ -47,7 +47,11 @@ export default defineConfig(async () => {
     plugins: [react(), viteTsconfigPaths(), svgrPlugin(), envCompatible(), mdx.default({ remarkPlugins: [] })],
     test: {
       globals: true,
+      setupFiles: ['./vitest.setup.ts'],
       environment: 'jsdom',
+    deps: {
+      inline: ['vitest-canvas-mock'],
+    },
     },
   };
 });
