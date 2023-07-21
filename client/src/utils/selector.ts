@@ -15,13 +15,26 @@ import { fftshift } from 'fftshift';
 import { TILE_SIZE_IN_IQ_SAMPLES } from './constants';
 import { FFT } from '@/utils/fft';
 import { SigMFMetadata } from './sigmfMetadata';
+import { number } from 'prop-types';
 
-export function calcFftOfTile(samples: Float32Array, fftSize: number, windowFunction: string) {
+export function calcFftOfTile(
+  samples: Float32Array,
+  fftSize: number,
+  windowFunction: string,
+  numberOfFfts: number = 0
+) {
   //let startTime = performance.now();
-  let fftsConcatenated = new Float32Array(TILE_SIZE_IN_IQ_SAMPLES);
+
+  let fftsConcatenated = null;
+  if (numberOfFfts) {
+    fftsConcatenated = new Float32Array(numberOfFfts * fftSize);
+  } else {
+    numberOfFfts = TILE_SIZE_IN_IQ_SAMPLES / fftSize;
+    fftsConcatenated = new Float32Array(TILE_SIZE_IN_IQ_SAMPLES);
+  }
 
   // loop through each row
-  for (let i = 0; i < TILE_SIZE_IN_IQ_SAMPLES / fftSize; i++) {
+  for (let i = 0; i < numberOfFfts; i++) {
     let samples_slice = samples.slice(i * fftSize * 2, (i + 1) * fftSize * 2); // mult by 2 because this is int/floats not IQ samples
 
     // Apply a hamming window and hanning window
@@ -73,70 +86,6 @@ export function calcFftOfTile(samples: Float32Array, fftSize: number, windowFunc
   //console.debug('Calculating FFTs took', endTime - startTime, 'milliseconds'); // first cut of our code processed+rendered 0.5M samples in 760ms on marcs computer
   return fftsConcatenated;
 }
-
-export const calcFftOfSamples = async (
-  samples: Float32Array,
-  fftSize: number,
-  spectrogramHeight: number,
-  windowFunction: string
-) => {
-  //let startTime = performance.now();
-  const sampleBlockSize = fftSize * spectrogramHeight;
-  let fftsConcatenated = new Float32Array(sampleBlockSize);
-
-  // loop through each row
-  for (let i = 0; i < spectrogramHeight; i++) {
-    let samples_slice = samples.slice(i * fftSize * 2, (i + 1) * fftSize * 2); // mult by 2 because this is int/floats not IQ samples
-
-    // Apply a hamming window and hanning window
-    if (windowFunction === 'hamming') {
-      for (let window_i = 0; window_i < fftSize; window_i++) {
-        samples_slice[window_i] =
-          samples_slice[window_i] * (0.54 - 0.46 * Math.cos((2 * Math.PI * window_i) / (fftSize - 1)));
-      }
-    } else if (windowFunction === 'hanning') {
-      for (let window_i = 0; window_i < fftSize; window_i++) {
-        samples_slice[window_i] =
-          samples_slice[window_i] * (0.5 - 0.5 * Math.cos((2 * Math.PI * window_i) / (fftSize - 1)));
-      }
-    } else if (windowFunction === 'bartlett') {
-      for (let window_i = 0; window_i < fftSize; window_i++) {
-        samples_slice[window_i] =
-          samples_slice[window_i] *
-          ((2 / (fftSize - 1)) * ((fftSize - 1) / 2) - Math.abs(window_i - (fftSize - 1) / 2));
-      }
-    } else if (windowFunction === 'blackman') {
-      for (let window_i = 0; window_i < fftSize; window_i++) {
-        samples_slice[window_i] =
-          samples_slice[window_i] *
-          (0.42 -
-            0.5 * Math.cos((2 * Math.PI * window_i) / fftSize) +
-            0.08 * Math.cos((4 * Math.PI * window_i) / fftSize));
-      }
-    }
-
-    const f = new FFT(fftSize);
-    let out = f.createComplexArray(); // creates an empty array the length of fft.size*2
-    f.transform(out, samples_slice); // assumes input (2nd arg) is in form IQIQIQIQ and twice the length of fft.size
-
-    out = out.map((x) => x / fftSize); // divide by fftsize
-
-    // convert to magnitude
-    let magnitudes = new Array(out.length / 2);
-    for (let j = 0; j < out.length / 2; j++) {
-      magnitudes[j] = Math.sqrt(Math.pow(out[j * 2], 2) + Math.pow(out[j * 2 + 1], 2)); // take magnitude
-    }
-
-    fftshift(magnitudes); // in-place
-    magnitudes = magnitudes.map((x) => 10.0 * Math.log10(x)); // convert to dB
-    magnitudes = magnitudes.map((x) => (isFinite(x) ? x : 0)); // get rid of -infinity which happens when the input is all 0s
-
-    fftsConcatenated.set(magnitudes, i * fftSize);
-  }
-  //let endTime = performance.now();
-  //console.debug('Calculating FFTs took', endTime - startTime, 'milliseconds'); // first cut of our code processed+rendered 0.5M samples in 760ms on marcs computer
-  return fftsConcatenated;
-};
 
 export function fftToRGB(
   fftsConcatenated: Float32Array,

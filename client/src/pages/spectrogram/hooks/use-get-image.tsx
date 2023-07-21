@@ -3,7 +3,7 @@ import { colMaps } from '@/utils/colormap';
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { generateSampleIQData } from '@/utils/test-functions';
-import { calcFftOfSamples } from '@/utils/selector';
+import { calcFftOfTile } from '@/utils/selector';
 
 export const useGetData = (fftSize: number, spectrogramHeight: number) => {
   const { sampleIQData } = generateSampleIQData(fftSize, spectrogramHeight, 100, 256);
@@ -39,7 +39,7 @@ export const useGenerateFFTs = (fftSize: number, spectrogramHeight: number, wind
   const generateFFTQuery = useQuery<Float32Array>(
     ['fftdata'],
     () => {
-      return calcFftOfSamples(transformDataQuery.data, fftSize, spectrogramHeight, windowFunction);
+      return calcFftOfTile(transformDataQuery.data, fftSize, windowFunction, spectrogramHeight);
     },
     { enabled: !!transformDataQuery.data }
   );
