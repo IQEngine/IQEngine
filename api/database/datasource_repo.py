@@ -1,4 +1,4 @@
-import metadata_repo
+import database.metadata_repo
 from blob.azure_client import AzureBlobClient
 from database.database import db
 from database.models import DataSource, DataSourceReference
@@ -75,6 +75,6 @@ async def sync(account: str, container: str):
             }
         )
         metadata.globalMetadata.traceability_revision = 0
-        if await metadata_repo.exists(account, container, filepath):
+        if await database.metadata_repo.exists(account, container, filepath):
             continue
-        await metadata_repo.create(account, container, filepath)
+        await database.metadata_repo.create(account, container, filepath)
