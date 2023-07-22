@@ -1,6 +1,6 @@
 import httpx
 from database import datasource_repo
-from database.datasource_repo import datasource_exists, create
+from database.datasource_repo import create, datasource_exists
 from database.models import DataSource
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse

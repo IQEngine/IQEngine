@@ -33,7 +33,9 @@ async def test_import_plugins_from_env(mock_datasources, mock_plugins, mock_coll
 @mock.patch("importer.all.import_plugins_from_env", return_value=None)
 @mock.patch("importer.all.import_datasources_from_env", return_value=None)
 @pytest.mark.asyncio
-async def test_import_feature_flags_from_env(mock_datasources, mock_plugins, mock_get, mock_collection):
+async def test_import_feature_flags_from_env(
+    mock_datasources, mock_plugins, mock_get, mock_collection
+):
     os.environ["IQENGINE_FEATURE_FLAGS"] = '{"test": true}'
 
     mock_collection.return_value.insert_one = AsyncMock()
@@ -118,7 +120,21 @@ async def test_import_feature_flags_from_env_no_insert_or_update(
 async def test_import_datasources_from_env(mock_plugins, mock_config, mock_datasource):
     os.environ[
         "IQENGINE_CONNECTION_INFO"
-    ] = '{"settings": [{"accountName": "test_account", "containerName": "test_container", "sasToken": "test_sas_token", "name": "test_name", "description": "test_description", "imageURL": "test_image_url"}]}'
+    ] = """
+        {
+            "settings":
+            [
+                {
+                    "accountName": "test_account",
+                    "containerName": "test_container",
+                    "sasToken": "test_sas_token",
+                    "name": "test_name",
+                    "description": "test_description",
+                    "imageURL": "test_image_url"
+                }
+            ]
+        }
+    """
 
     mock_datasource.datasource_exists = AsyncMock()
     mock_datasource.datasource_exists.return_value = False
@@ -129,6 +145,3 @@ async def test_import_datasources_from_env(mock_plugins, mock_config, mock_datas
 
     mock_datasource.datasource_exists.assert_called_once()
     mock_datasource.create.assert_called_once()
-
-
-

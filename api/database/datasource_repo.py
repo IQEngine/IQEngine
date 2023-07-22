@@ -1,6 +1,6 @@
-from helpers.cipher import encrypt
 from database.database import db
 from database.models import DataSource
+from helpers.cipher import encrypt
 from motor.core import AgnosticCollection
 
 
@@ -75,6 +75,8 @@ async def create(datasource: DataSource) -> DataSource:
         raise Exception("Datasource Already Exists")
     if datasource.sasToken:
         datasource.sasToken = encrypt(datasource.sasToken)
+    else:
+        datasource.sasToken = ""
     datasource_dict = datasource.dict(by_alias=True, exclude_unset=True)
     await datasource_collection.insert_one(datasource_dict)
     return datasource
