@@ -125,3 +125,20 @@ async def update_datasource(
     )
 
     return
+
+
+@router.put("/api/datasources/{account}/{container}/sync", status_code=204)
+async def sync_datasource(
+    account: str,
+    container: str,
+    datasources_collection: AgnosticCollection = Depends(datasource_repo.collection),
+):
+    existingDatasource = await datasources_collection.find_one(
+        {
+            "account": account,
+            "container": container,
+        }
+    )
+    if not existingDatasource:
+        raise HTTPException(status_code=404, detail="Datasource not found")
+    datasource_repo.sync(account, container)

@@ -1,5 +1,8 @@
+import metadata_repo
+from blob.azure_client import AzureBlobClient
 from database.database import db
-from database.models import DataSource
+from database.models import DataSource, DataSourceReference
+from helpers.cipher import decrypt
 from motor.core import AgnosticCollection
 
 
@@ -51,3 +54,27 @@ async def datasource_exists(account, container) -> bool:
         True if the datasource exists, False otherwise.
     """
     return await get(account, container) is not None
+
+
+async def sync(account: str, container: str):
+    azure_blob_client = AzureBlobClient(account, container)
+    datasource = await get(account, container)
+    if datasource is None:
+        raise Exception(f"Datasource {account}/{container} does not exist")
+    azure_blob_client.set_sas_token(decrypt(datasource.sasToken))
+    metadatas = azure_blob_client.get_medatada_files()
+    async for metadata in metadatas:
+        filepath = metadata[0].replace(".sigmf-meta", "")
+        metadata = metadata[1]
+        metadata.globalMetadata.traceability_origin = DataSourceReference(
+            **{
+                "type": "api",
+                "account": account,
+                "container": container,
+                "file_path": filepath,
+            }
+        )
+        metadata.globalMetadata.traceability_revision = 0
+        if await metadata_repo.exists(account, container, filepath):
+            continue
+        await metadata_repo.create(account, container, filepath)
