@@ -2,7 +2,7 @@ import httpx
 from database import datasource_repo
 from database.datasource_repo import datasource_exists
 from database.models import DataSource
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from helpers.cipher import encrypt
 from helpers.urlmapping import ApiType, add_URL_sasToken
@@ -132,6 +132,7 @@ async def sync_datasource(
     account: str,
     container: str,
     datasources_collection: AgnosticCollection = Depends(datasource_repo.collection),
+    backgound_tasks = BackgroundTasks
 ):
     existingDatasource = await datasources_collection.find_one(
         {
@@ -141,4 +142,5 @@ async def sync_datasource(
     )
     if not existingDatasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
-    datasource_repo.sync(account, container)
+    backgound_tasks.add_task(datasource_repo.sync, account, container)
+    return {"message": "Syncing"}
