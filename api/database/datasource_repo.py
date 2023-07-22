@@ -1,3 +1,4 @@
+from helpers.cipher import encrypt
 from database.database import db
 from database.models import DataSource
 from motor.core import AgnosticCollection
@@ -51,3 +52,29 @@ async def datasource_exists(account, container) -> bool:
         True if the datasource exists, False otherwise.
     """
     return await get(account, container) is not None
+
+
+async def create(datasource: DataSource) -> DataSource:
+    """
+    Create a new datasource. The datasource will be henceforth identified by account/container which
+    must be unique or this function will return a 400.
+    This will encrypt the sasToken if it is provided.
+
+    Parameters
+    ----------
+    datasource : DataSource
+        The datasource to create.
+
+    Returns
+    -------
+    DataSource
+        The datasource.
+    """
+    datasource_collection: AgnosticCollection = collection()
+    if await datasource_exists(datasource.account, datasource.container):
+        raise Exception("Datasource Already Exists")
+    if datasource.sasToken:
+        datasource.sasToken = encrypt(datasource.sasToken)
+    datasource_dict = datasource.dict(by_alias=True, exclude_unset=True)
+    await datasource_collection.insert_one(datasource_dict)
+    return datasource

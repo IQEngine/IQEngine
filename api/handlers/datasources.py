@@ -1,6 +1,6 @@
 import httpx
 from database import datasource_repo
-from database.datasource_repo import datasource_exists
+from database.datasource_repo import datasource_exists, create
 from database.models import DataSource
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
@@ -15,7 +15,6 @@ router = APIRouter()
 @router.post("/api/datasources", status_code=201, response_model=DataSource)
 async def create_datasource(
     datasource: DataSource,
-    datasources: AgnosticCollection = Depends(datasource_repo.collection),
 ):
     """
     Create a new datasource. The datasource will be henceforth identified by account/container which
@@ -24,13 +23,7 @@ async def create_datasource(
     if await datasource_exists(datasource.account, datasource.container):
         raise HTTPException(status_code=409, detail="Datasource Already Exists")
 
-    if datasource.sasToken:
-        datasource.sasToken = encrypt(datasource.sasToken)
-
-    datasource_dict = datasource.dict(by_alias=True, exclude_unset=True)
-    datasource_dict["sasToken"] = datasource.sasToken if datasource.sasToken else None
-
-    await datasources.insert_one(datasource_dict)
+    datasource = await create(datasource=datasource)
     return datasource
 
 
