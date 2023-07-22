@@ -94,11 +94,9 @@ async def create(metadata: Metadata):
         raise Exception("Metadata Already Exists")
 
     metadata_collection: AgnosticCollection = collection()
-    versions_collection: AgnosticCollection = versions_collection()
+    versions: AgnosticCollection = versions_collection()
 
     await metadata_collection.insert_one(
         metadata.dict(by_alias=True, exclude_unset=True)
     )
-    await versions_collection.insert_one(
-        metadata.dict(by_alias=True, exclude_unset=True)
-    )
+    await versions.insert_one(metadata.dict(by_alias=True, exclude_unset=True))

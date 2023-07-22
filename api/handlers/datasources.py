@@ -132,7 +132,7 @@ async def sync_datasource(
     account: str,
     container: str,
     datasources_collection: AgnosticCollection = Depends(datasource_repo.collection),
-    backgound_tasks = BackgroundTasks
+    backgound_tasks=BackgroundTasks,
 ):
     existingDatasource = await datasources_collection.find_one(
         {

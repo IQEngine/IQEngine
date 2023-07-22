@@ -53,7 +53,7 @@ class AzureBlobClient:
     def get_container_client(self):
         return ContainerClient.from_connection_string(
             f"https://{self.account}.blob.core.windows.net/",
-            container_name=self.container_name,
+            container_name=self.container,
             credential=self.sas_token.get_secret_value(),
         )
 
