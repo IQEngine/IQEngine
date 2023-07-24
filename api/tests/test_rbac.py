@@ -45,7 +45,7 @@ def load_json_from_file(file_name: str):
         return json.load(file)
 
 
-json_data = load_json_from_file(".\\test_keys.json")
+json_data = load_json_from_file("test_keys.json")
 TEST_PUBLIC_KEY = json_data["TEST_PUBLIC_KEY"]
 VALID_TEST_TOKEN = json_data["VALID_TEST_TOKEN"]
 
