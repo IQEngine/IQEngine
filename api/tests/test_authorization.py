@@ -1,5 +1,4 @@
 import jwt
-import pytest
 from fastapi import HTTPException
 from fastapi.security import HTTPAuthorizationCredentials
 from helpers.authorization import JWKSHandler, get_current_user, validate_and_decode_jwt
