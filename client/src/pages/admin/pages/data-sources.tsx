@@ -1,7 +1,7 @@
 import { DataSource } from '@/api/Models';
 import { useGetDatasources } from '@/api/datasource/hooks/use-get-datasources';
 import React,{ useState } from 'react';
-import { ModalDialog } from '@/features/ui/modal';
+import { ModalDialog } from '@/features/ui/modal/Modal';
 import DataSourceForm from './add-data-source';
 
 interface DataSourceRowProps {

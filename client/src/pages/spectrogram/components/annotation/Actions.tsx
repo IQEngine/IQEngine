@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { ArrowRightIcon, ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
 import { Annotation, SigMFMetadata } from '@/utils/sigmfMetadata';
 import { metadataValidator } from '@/utils/validators';
-import { ModalDialog } from '@/features/ui/modal';
+import { ModalDialog } from '@/features/ui/modal/Modal';
 
 interface ActionsProps {
   meta: SigMFMetadata;

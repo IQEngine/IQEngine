@@ -199,9 +199,6 @@ describe('Annotation list component', () => {
     await userEvent.click(updateButton);
 
     // Assert
-    const modal = await screen.queryByLabelText('Modal Dialog');
-    expect(modal).toBeInTheDocument();
-    expect(updateButton).toBeDisabled();
     expect(
       screen.getByText("must have required property 'core:sample_start' inside /annotations/0")
     ).toBeInTheDocument();

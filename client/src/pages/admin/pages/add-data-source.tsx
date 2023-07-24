@@ -55,42 +55,42 @@ export const DataSourceForm = () => {
             type="text"
             name="name"
             placeholder="Data Source Name"
-            className="input input-bordered input-success w-full max-w-xs text-white"
+            className="input input-bordered input-success w-full max-w-xs"
           />
         <br/>
         <input
             type="text"
             name="account"
             placeholder="Storage Account name"
-            className="input input-bordered input-success w-full max-w-xs text-white"
+            className="input input-bordered input-success w-full max-w-xs"
           />
         <br />
         <input
             type="text"
             name="container"
             placeholder="Container Name"
-            className="input input-bordered input-success w-full max-w-xs text-white"
+            className="input input-bordered input-success w-full max-w-xs"
           />
         <br />
         <input
             type="text"
             name="description"
             placeholder="Description (optional)"
-            className="input input-bordered input-success w-full max-w-xs text-white"
+            className="input input-bordered input-success w-full max-w-xs"
           />
           <br />
           <input
             type="text"
             name="imageURL"
             placeholder="Image URL (optional)"
-            className="input input-bordered input-success w-full max-w-xs text-white"
+            className="input input-bordered input-success w-full max-w-xs"
           />
           <br />
           <input
             type="text"
             name="sasToken"
             placeholder="SAS Token (optional)"
-            className="input input-bordered input-success w-full max-w-xs text-white"
+            className="input input-bordered input-success w-full max-w-xs"
           />
           <br />
           <button

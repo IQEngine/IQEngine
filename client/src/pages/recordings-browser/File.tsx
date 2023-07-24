@@ -7,7 +7,7 @@ import { Link, useParams } from 'react-router-dom';
 import { CLIENT_TYPE_BLOB } from '@/api/Models';
 import { getMeta } from '@/api/metadata/Queries';
 import { FileAnnotationData } from './FileAnnotationData';
-import { ModalDialog } from '@/features/ui/modal';
+import { ModalDialog } from '@/features/ui/modal/Modal';
 
 interface FileRowProps {
   filepath: string;

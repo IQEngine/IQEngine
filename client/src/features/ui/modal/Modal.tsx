@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useRef } from 'react';
+import { useOnClickOutside } from 'usehooks-ts';
+
 
 interface ModalProps {
   heading: string;
@@ -9,6 +11,11 @@ export const ModalDialog = ({
     heading,
     setShowModal,
     children}: ModalProps) => {
+
+      const ref = useRef(null);
+      useOnClickOutside(ref, () => {
+        setShowModal(false)
+      });
 
       return (
         <dialog aria-label={'Modal Dialog'} className="modal modal-open w-full h-full">
