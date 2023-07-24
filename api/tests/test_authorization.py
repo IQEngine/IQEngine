@@ -71,7 +71,6 @@ def test_validate_and_decode_jwt_failure(mocker):
         assert e.detail == "Invalid JWT"
 
 
-@pytest.mark.asyncio
 def test_get_current_user(mocker):
     # Mock the validate_and_decode_jwt function to return a payload
     mocker.patch(

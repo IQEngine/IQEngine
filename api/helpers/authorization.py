@@ -92,7 +92,7 @@ def validate_and_decode_jwt(token: str) -> dict:
 
 
 def get_current_user(
-    token: Optional[str] = Depends(http_bearer),
+    token: Optional[Depends] = Depends(http_bearer),
 ) -> Optional[dict]:
     if not token:
         return None
