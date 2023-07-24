@@ -8,11 +8,8 @@ from typing import Optional
 router = APIRouter()
 
 
-@router.post(
-    "/api/plugins",
-    status_code=201,
-    response_model=Plugin
-)
+@router.post("/api/plugins/", status_code=201, response_model=Plugin)
+@router.post("/api/plugins", status_code=201, response_model=Plugin)
 async def create_plugin(
     plugin: Plugin,
     plugins: AgnosticCollection = Depends(plugin_repo.collection),
@@ -29,10 +26,8 @@ async def create_plugin(
     return plugin
 
 
-@router.get(
-    "/api/plugins",
-    response_model=list[Plugin]
-)
+@router.get("/api/plugins/", response_model=list[Plugin])
+@router.get("/api/plugins", response_model=list[Plugin])
 async def get_plugins(
     plugins: AgnosticCollection = Depends(plugin_repo.collection),
     current_user: Optional[dict] = Depends(requires("IQEngine-User")),

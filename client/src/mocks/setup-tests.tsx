@@ -4,6 +4,7 @@ import React from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { FeatureFlagsProvider } from '@/hooks/use-feature-flags';
 import { vi } from 'vitest';
+import { Toaster } from 'react-hot-toast';
 
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
@@ -19,6 +20,12 @@ Object.defineProperty(window, 'matchMedia', {
   })),
 });
 
+vi.mock('react-plotly.js', () => {
+  return {
+    default: vi.fn(),
+  };
+});
+
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -31,7 +38,10 @@ export const queryClient = new QueryClient({
 export const AllProviders = ({ children }) => (
   <QueryClientProvider client={queryClient}>
     <FeatureFlagsProvider flags={null}>
-      <Router>{children}</Router>
+      <Router>
+        <Toaster />
+        {children}
+      </Router>
     </FeatureFlagsProvider>
   </QueryClientProvider>
 );

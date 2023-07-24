@@ -15,13 +15,26 @@ import { fftshift } from 'fftshift';
 import { TILE_SIZE_IN_IQ_SAMPLES } from './constants';
 import { FFT } from '@/utils/fft';
 import { SigMFMetadata } from './sigmfMetadata';
+import { number } from 'prop-types';
 
-export function calcFftOfTile(samples: Float32Array, fftSize: number, windowFunction: string) {
+export function calcFftOfTile(
+  samples: Float32Array,
+  fftSize: number,
+  windowFunction: string,
+  numberOfFfts: number = 0
+) {
   //let startTime = performance.now();
-  let fftsConcatenated = new Float32Array(TILE_SIZE_IN_IQ_SAMPLES);
+
+  let fftsConcatenated = null;
+  if (numberOfFfts) {
+    fftsConcatenated = new Float32Array(numberOfFfts * fftSize);
+  } else {
+    numberOfFfts = TILE_SIZE_IN_IQ_SAMPLES / fftSize;
+    fftsConcatenated = new Float32Array(TILE_SIZE_IN_IQ_SAMPLES);
+  }
 
   // loop through each row
-  for (let i = 0; i < TILE_SIZE_IN_IQ_SAMPLES / fftSize; i++) {
+  for (let i = 0; i < numberOfFfts; i++) {
     let samples_slice = samples.slice(i * fftSize * 2, (i + 1) * fftSize * 2); // mult by 2 because this is int/floats not IQ samples
 
     // Apply a hamming window and hanning window

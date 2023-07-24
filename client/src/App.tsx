@@ -54,7 +54,6 @@ export const App = () => {
 
   useEffect(() => {
     if (!config.data) return;
-
     const analytics_key = config.data.googleAnalyticsKey;
     if (analytics_key) {
       ReactGA.initialize(analytics_key);
@@ -120,8 +119,13 @@ export const App = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/plugins" onClick={() => {}}>
-                    Plugins
+                  <Link to="/docs" onClick={() => {}}>
+                    Docs
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/query" onClick={() => {}}>
+                    Query
                   </Link>
                 </li>
                 {activeAccount ? (
@@ -165,17 +169,17 @@ export const App = () => {
             <ul className="flex-row flex mb-4 mt-0 space-x-5 text-sm font-medium">
               <li className="hidden md:block">
                 <Link to="/about" onClick={() => {}}>
-                  <div className="text-lg">About</div>
+                  <div className="text-base">About</div>
                 </Link>
               </li>
               <li className="hidden md:block">
                 <Link to="/sigmf" onClick={() => {}}>
-                  <div className="text-lg">SigMF</div>
+                  <div className="text-base">SigMF</div>
                 </Link>
               </li>
               <li className="hidden md:block">
-                <Link to="/plugins" onClick={() => {}}>
-                  <div className="text-lg">Plugins</div>
+                <Link to="/query" onClick={() => {}}>
+                  <div className="text-base">Query</div>
                 </Link>
               </li>
 
@@ -183,25 +187,32 @@ export const App = () => {
                 <>
                   <li className="hidden md:block">
                     <Link to="/admin" onClick={() => {}}>
-                      <div className="text-lg">Admin</div>
+                      <div className="text-base">Admin</div>
                     </Link>
                   </li>
                   <li className="hidden md:block">
-                    <a className="text-lg cursor-pointer" onClick={handleLogoutPopup}>
+                    <a className="text-base cursor-pointer" onClick={handleLogoutPopup}>
                       Logout
                     </a>
                   </li>
                 </>
               ) : (
                 <li className="hidden md:block">
-                  <a className="text-lg cursor-pointer" onClick={handleLoginPopup}>
+                  <a className="text-base cursor-pointer" onClick={handleLoginPopup}>
                     Login
                   </a>
                 </li>
               )}
+
+              <li className="hidden md:block">
+                <Link to="/docs" onClick={() => {}}>
+                  <div className="text-base">Docs</div>
+                </Link>
+              </li>
+
               <Feature flag={FeatureFlag.useIQEngineOutReach.name}>
                 <li className="hidden md:block">
-                  <a href="https://discord.gg/k7C8kp3b76" target="_blank" rel="noreferrer" className="text-lg">
+                  <a href="https://discord.gg/k7C8kp3b76" target="_blank" rel="noreferrer" className="text-base">
                     <div className="flex">
                       <img src="/discord.svg" className="w-6 pr-1" alt="Discord" />
                       Discord
@@ -229,7 +240,12 @@ export const App = () => {
               </Feature>
               <Feature flag={FeatureFlag.displayIQEngineGitHub.name}>
                 <li className="hidden md:block">
-                  <a href="https://github.com/iqengine/iqengine" target="_blank" rel="noreferrer" className="text-lg ">
+                  <a
+                    href="https://github.com/iqengine/iqengine"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-base "
+                  >
                     <div className="flex">
                       <img src="/github.svg" className="w-6 h-6 pr-1 pt-1" alt="GitHub" />
                       GitHub

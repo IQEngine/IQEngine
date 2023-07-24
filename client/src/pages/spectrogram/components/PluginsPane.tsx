@@ -13,14 +13,14 @@ import { colMaps } from '@/utils/colormap';
 import { fftshift } from 'fftshift';
 import { FFT } from '@/utils/fft';
 import { useGetPluginsComponents } from '@/pages/spectrogram/hooks/use-get-plugins-components';
-import { useGetPlugins } from '@/api/plugin/Queries';
+import { useGetPlugins } from '@/api/plugin/queries';
 import { toast } from 'react-hot-toast';
 import { dataTypeToBytesPerSample } from '@/utils/selector';
 import { useParams } from 'react-router-dom';
 import { useUserSettings } from '@/api/user-settings/use-user-settings';
 
 export interface PluginsPaneProps {
-  cursorsEnabled: boolean;
+  timeCursorsEnabled: boolean;
   handleProcessTime: () => { trimmedSamples: number[]; startSampleOffset: number };
   meta: SigMFMetadata;
   setMeta: (meta: SigMFMetadata) => void;
@@ -33,7 +33,7 @@ export enum MimeTypes {
   audio_wav = 'audio/wav',
 }
 
-export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }: PluginsPaneProps) => {
+export const PluginsPane = ({ timeCursorsEnabled, handleProcessTime, meta, setMeta }: PluginsPaneProps) => {
   const { account, container, filename } = useParams();
   const { data: plugins, isError } = useGetPlugins();
   const { PluginOption, EditPluginParameters, pluginParameters, setPluginParameters } = useGetPluginsComponents();
@@ -53,7 +53,7 @@ export const PluginsPane = ({ cursorsEnabled, handleProcessTime, meta, setMeta }
     console.log('Plugin Params:', pluginParameters);
     e.preventDefault();
 
-    if (!cursorsEnabled) {
+    if (!timeCursorsEnabled) {
       toast.error('First enable cursors and choose a region of time to run the plugin on');
       return;
     }

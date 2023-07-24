@@ -30,6 +30,7 @@ def requires_mock(role: Optional[Union[str, List[str]]] = None):
 @pytest_asyncio.fixture(scope="function")
 def client():
     os.environ["IQENGINE_PLUGINS"] = "[]"
+    os.environ["IQENGINE_CONNECTION_INFO"] = '{"settings": []}'
     with mock.patch("importer.all.import_all_from_env") as mock_i, mock.patch(
         "helpers.authorization.requires", return_value=requires_mock()
     ):

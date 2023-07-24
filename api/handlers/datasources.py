@@ -1,6 +1,6 @@
 import httpx
 from database import datasource_repo
-from database.datasource_repo import datasource_exists
+from database.datasource_repo import create, datasource_exists
 from database.models import DataSource
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
@@ -31,10 +31,7 @@ async def create_datasource(
     if await datasource_exists(datasource.account, datasource.container):
         raise HTTPException(status_code=409, detail="Datasource Already Exists")
 
-    if datasource.sasToken:
-        datasource.sasToken = encrypt(datasource.sasToken)
-
-    await datasources.insert_one(datasource.dict(by_alias=True, exclude_unset=True))
+    datasource = await create(datasource=datasource)
     return datasource
 
 
