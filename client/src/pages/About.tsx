@@ -11,14 +11,14 @@ export const About = () => {
         <h1 className="text-center p-4">Great For...</h1>
         <div className="columns-2 pl-48 pr-24 pb-4">
           <ul className="text-lg">
-            <li className="list-group-item">- RFML</li>
-            <li className="list-group-item">- Wireless CTFs</li>
-            <li className="list-group-item">- SIGINT</li>
+            <li className="list-group-item">RFML</li>
+            <li className="list-group-item">Wireless CTFs</li>
+            <li className="list-group-item">SIGINT</li>
           </ul>
           <ul className="text-lg">
-            <li className="list-group-item">- Spectrum Awareness</li>
-            <li className="list-group-item">- Debugging</li>
-            <li className="list-group-item">- SDR/DSP/Wireless Students</li>
+            <li className="list-group-item">Spectrum Awareness</li>
+            <li className="list-group-item">Debugging</li>
+            <li className="list-group-item">SDR/DSP/Wireless Students</li>
           </ul>
         </div>
       </div>
@@ -26,14 +26,18 @@ export const About = () => {
       <h1 className="text-center">Example Use-Cases</h1>
       <div className="columns-2 pl-32 pr-24 pb-4">
         <ul className="text-lg">
-          <li className="list-group-item">- Analyze one RF recording</li>
-          <li className="list-group-item">- Organize and query millions of RF recordings</li>
-          <li className="list-group-item">- Evaluate signal detection/classification algorithms on a variety of recordings</li>
+          <li className="list-group-item">Analyze one RF recording</li>
+          <li className="list-group-item">Organize and query millions of RF recordings</li>
+          <li className="list-group-item">
+            Evaluate signal detection/classification algorithms on a variety of recordings
+          </li>
         </ul>
         <ul className="text-lg">
-          <li className="list-group-item">- Share your RF recordings or non-realtime RF functions with the world</li>
-          <li className="list-group-item">- Learn DSP basics (e.g., FFTs, filtering, wavelets)</li>
-          <li className="list-group-item">- Share RF recordings/datasets within your team or organization using a local instance of IQEngine</li>
+          <li className="list-group-item">Share your RF recordings or non-realtime RF functions with the world</li>
+          <li className="list-group-item">Learn DSP basics (e.g., FFTs, filtering, wavelets)</li>
+          <li className="list-group-item">
+            Share RF recordings/datasets within your team or organization using a local instance of IQEngine
+          </li>
         </ul>
       </div>
 
@@ -149,11 +153,11 @@ export const About = () => {
         recordings or visually edit annotations.
         <br></br>
         <br></br>
-        Implementation of IQEngine began during a 1-week internal hackathon at Microsoft, where Marc and SDR coworkers 
-        Luke, Craig, Johanna, Ani, Marko, and Tensae built a proof-of-concept prototype.
-        It was open sourced and <a href="https://youtu.be/hZy0lIsBlkg">shown off at GNU Radio Conference '22</a>.
-        The first full version was completed in January '23 with help from a group of undergraduate "sprinterns" at
-        Microsoft, consisting of students from UMD and GMU that were part of the{' '}
+        Implementation of IQEngine began during a 1-week internal hackathon at Microsoft, where Marc and SDR coworkers
+        Luke, Craig, Johanna, Ani, Marko, and Tensae built a proof-of-concept prototype. It was open sourced and{' '}
+        <a href="https://youtu.be/hZy0lIsBlkg">shown off at GNU Radio Conference '22</a>. The first full version was
+        completed in January '23 with help from a group of undergraduate "sprinterns" at Microsoft, consisting of
+        students from UMD and GMU that were part of the{' '}
         <a href="https://www.breakthroughtech.org/" target="_blank">
           Break Through Tech
         </a>{' '}
