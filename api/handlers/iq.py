@@ -8,10 +8,11 @@ from blob.azure_client import AzureBlobClient
 from database import datasource_repo
 from database.models import DataSource
 from fastapi import APIRouter, Depends, HTTPException
+from helpers.authorization import requires
 from helpers.cipher import decrypt
 from helpers.urlmapping import ApiType, get_file_name
 from pydantic import BaseModel, SecretStr
-from helpers.authorization import requires
+from typing import Optional
 
 router = APIRouter()
 
@@ -38,7 +39,6 @@ async def get_sas_token(
 @router.get(
     "/api/datasources/{account}/{container}/{filepath:path}/iqslice",
     status_code=200,
-    dependencies=[Depends(requires("IQEngine-User"))],
 )
 async def get_iq(
     filepath: str,
@@ -46,6 +46,7 @@ async def get_iq(
     countBytes: int,
     datasource: DataSource = Depends(datasource_repo.get),
     azure_client: AzureBlobClient = Depends(AzureBlobClient),
+    current_user: Optional[dict] = Depends(requires("IQEngine-User")),
 ):
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
@@ -85,14 +86,14 @@ async def download_blob(
 
 @router.post(
     "/api/datasources/{account}/{container}/{filepath:path}/iqslices",
-    status_code=200,
-    dependencies=[Depends(requires("IQEngine-User"))],
+    status_code=200
 )
 async def get_iq_data_slices(
     iq_data: IQData,
     filepath: str,
     datasource: DataSource = Depends(datasource_repo.get),
     azure_client: AzureBlobClient = Depends(AzureBlobClient),
+    current_user: Optional[dict] = Depends(requires("IQEngine-User")),
 ):
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")

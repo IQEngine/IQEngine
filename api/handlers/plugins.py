@@ -1,8 +1,9 @@
 from database import plugin_repo
 from database.models import Plugin
 from fastapi import APIRouter, Depends, HTTPException
-from motor.core import AgnosticCollection
 from helpers.authorization import requires
+from motor.core import AgnosticCollection
+from typing import Optional
 
 router = APIRouter()
 
@@ -10,12 +11,12 @@ router = APIRouter()
 @router.post(
     "/api/plugins",
     status_code=201,
-    response_model=Plugin,
-    dependencies=[Depends(requires("IQEngine-User"))],
+    response_model=Plugin
 )
 async def create_plugin(
     plugin: Plugin,
     plugins: AgnosticCollection = Depends(plugin_repo.collection),
+    current_user: Optional[dict] = Depends(requires("IQEngine-User")),
 ):
     """
     Create a new plugin. The plugin will be henceforth identified by name which
@@ -30,11 +31,11 @@ async def create_plugin(
 
 @router.get(
     "/api/plugins",
-    response_model=list[Plugin],
-    dependencies=[Depends(requires("IQEngine-User"))],
+    response_model=list[Plugin]
 )
 async def get_plugins(
     plugins: AgnosticCollection = Depends(plugin_repo.collection),
+    current_user: Optional[dict] = Depends(requires("IQEngine-User")),
 ):
     """
     Get a list of all plugins.
@@ -44,12 +45,12 @@ async def get_plugins(
 
 @router.get(
     "/api/plugins/{plugin_name}",
-    response_model=Plugin,
-    dependencies=[Depends(requires("IQEngine-User"))],
+    response_model=Plugin
 )
 async def get_plugin(
     plugin_name: str,
     plugins: AgnosticCollection = Depends(plugin_repo.collection),
+    current_user: Optional[dict] = Depends(requires("IQEngine-User")),
 ):
     """
     Get a plugin by name.
@@ -62,13 +63,13 @@ async def get_plugin(
 
 @router.put(
     "/api/plugins/{plugin_name}",
-    response_model=Plugin,
-    dependencies=[Depends(requires("IQEngine-User"))],
+    response_model=Plugin
 )
 async def update_plugin(
     plugin_name: str,
     plugin: Plugin,
     plugins: AgnosticCollection = Depends(plugin_repo.collection),
+    current_user: Optional[dict] = Depends(requires("IQEngine-User")),
 ):
     """
     Update a plugin by name.
@@ -84,11 +85,12 @@ async def update_plugin(
 
 
 @router.delete(
-    "/api/plugins/{plugin_name}", dependencies=[Depends(requires("IQEngine-User"))]
+    "/api/plugins/{plugin_name}"
 )
 async def delete_plugin(
     plugin_name: str,
     plugins: AgnosticCollection = Depends(plugin_repo.collection),
+    current_user: Optional[dict] = Depends(requires("IQEngine-User")),
 ):
     """
     Delete a plugin by name.

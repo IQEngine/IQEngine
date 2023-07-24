@@ -2,27 +2,20 @@ import jwt
 import pytest
 from fastapi import HTTPException
 from fastapi.security import HTTPAuthorizationCredentials
-from helpers.authorization import (
-    JWKSHandler,
-    validate_and_decode_jwt,
-    get_current_user,
-)
+from helpers.authorization import JWKSHandler, get_current_user, validate_and_decode_jwt
 
 
 def test_get_jwks(mocker):
     # Mock the requests.get to return a response with the desired OpenID Config and JWKS
-    openid_config_response = {
-        "jwks_uri": "mock_jwks_uri",
-        "issuer": "mock_issuer"
-    }
+    openid_config_response = {"jwks_uri": "mock_jwks_uri", "issuer": "mock_issuer"}
     jwks_response = {"keys": "mock_jwks"}
 
     mocker.patch(
         "requests.get",
         side_effect=[
             mocker.Mock(json=lambda: openid_config_response),
-            mocker.Mock(json=lambda: jwks_response)
-        ]
+            mocker.Mock(json=lambda: jwks_response),
+        ],
     )
 
     jwks_handler = JWKSHandler()
@@ -34,8 +27,12 @@ def test_get_jwks(mocker):
 
 def test_get_jwks_failure(mocker):
     # Mock the requests.get to raise an exception
-    mocker.patch("requests.get", side_effect=[
-            mocker.Mock(json=lambda: {"jwks_uri": "mock_jwks_uri", "issuer": "mock_issuer"}),
+    mocker.patch(
+        "requests.get",
+        side_effect=[
+            mocker.Mock(
+                json=lambda: {"jwks_uri": "mock_jwks_uri", "issuer": "mock_issuer"}
+            ),
             Exception("Mock exception"),
         ],
     )
@@ -73,8 +70,9 @@ def test_validate_and_decode_jwt_failure(mocker):
     except HTTPException as e:
         assert e.detail == "Invalid JWT"
 
+
 @pytest.mark.asyncio
-async def test_get_current_user(mocker):
+def test_get_current_user(mocker):
     # Mock the validate_and_decode_jwt function to return a payload
     mocker.patch(
         "helpers.authorization.validate_and_decode_jwt",
@@ -83,5 +81,5 @@ async def test_get_current_user(mocker):
     mock_token = HTTPAuthorizationCredentials(scheme="Bearer", credentials="mock_token")
 
     # Call the function and assert that it returns the expected payload
-    user = await get_current_user(mock_token)
+    user = get_current_user(mock_token)
     assert user == {"preferred_username": "test_user", "roles": ["role1"]}

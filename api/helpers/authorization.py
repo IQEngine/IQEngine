@@ -1,21 +1,21 @@
-from fastapi import Depends, HTTPException, status, Security
-from fastapi.security import HTTPBearer
-from cachetools import TTLCache, cached
-from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
-from typing import Any, Tuple, cast
-import jwt
-from jwt import algorithms
+import json
+import logging
 import os
 import time
-import requests
-import logging
-import json
-from typing import Optional, Union, List
+from typing import Any, List, Optional, Tuple, Union, cast
 
-CLIENT_ID = os.getenv("IQENGINE_APP_ID")
+import jwt
+import requests
+from cachetools import TTLCache, cached
+from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
+from fastapi import Depends, HTTPException, status
+from fastapi.security import HTTPBearer
+from jwt import algorithms
+
 TENANT_ID = os.getenv("AAD_Tenant_ID")
 
 http_bearer = HTTPBearer()
+
 
 class JWKSHandler:
     openid_config_uri = (
@@ -65,7 +65,7 @@ def validate_issuer_and_get_public_key(token: str) -> Tuple[RSAPublicKey, Any]:
     public_key = cast(RSAPublicKey, algorithms.RSAAlgorithm.from_jwk(json.dumps(key)))
 
     # Check issuer
-    issuer = unverified_payload["iss"]
+    # issuer = unverified_payload["iss"]
     if unverified_payload["iss"] != issuer:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -77,26 +77,30 @@ def validate_issuer_and_get_public_key(token: str) -> Tuple[RSAPublicKey, Any]:
 
 def validate_and_decode_jwt(token: str) -> dict:
     try:
+        CLIENT_ID = os.getenv("IQENGINE_APP_ID")
         public_key, algorithm = validate_issuer_and_get_public_key(token)
         payload = jwt.decode(
             token, public_key, algorithms=[algorithm], audience=CLIENT_ID
         )  # Checks expiration, audience, and signature
         return payload
-    except jwt.PyJWTError:
+    except jwt.PyJWTError as e:
+        print(e)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid JWT",
         )
 
 
-async def get_current_user(
+def get_current_user(
     token: Optional[str] = Depends(http_bearer),
 ) -> Optional[dict]:
     if not token:
         return None
     try:
         current_user = validate_and_decode_jwt(token.credentials)
-        logging.info(f"User {current_user['preferred_username']} access token validated")
+        logging.info(
+            f"User {current_user['preferred_username']} access token validated"
+        )
         return current_user
     except jwt.PyJWTError:
         raise HTTPException(
@@ -110,27 +114,26 @@ async def get_current_user(
         )
 
 
-def requires(roles: Optional[Union[str, List[str]]] = None):
-    async def wrapper(current_user: Optional[dict] = Security(get_current_user)):
-        if not current_user: 
-            return None
+def requires(
+    roles: Optional[Union[str, List[str]]] = None,
+    current_user: Optional[dict] = Depends(get_current_user),
+):
+    if not current_user:
+        return None
 
-        if roles:
-            if isinstance(roles, str):
-                roles = [roles]
-            if not any(role in current_user["roles"] for role in roles):
-                logging.info(
-                    f"User {current_user['preferred_username']} attempted to access without sufficient privileges"
-                )
-                raise HTTPException(
-                    status_code=status.HTTP_403_FORBIDDEN,
-                    detail="Not enough privileges",
-                )
-        logging.info(
-            f"User {current_user['preferred_username']} accessed successfully"
-        )
-        return current_user
-    return wrapper
+    if roles:
+        if isinstance(roles, str):
+            roles = [roles]
+        if not any(role in current_user["roles"] for role in roles):
+            logging.info(
+                f"User {current_user['preferred_username']} attempted to access without sufficient privileges"
+            )
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Not enough privileges",
+            )
+    logging.info(f"User {current_user['preferred_username']} accessed successfully")
+    return current_user
 
 
 # Example usage
