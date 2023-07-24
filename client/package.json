@@ -13,6 +13,7 @@
     "@fortawesome/react-fontawesome": "^0.2.0",
     "@heroicons/react": "^2.0.18",
     "@js-temporal/polyfill": "^0.4.4",
+    "@mdx-js/rollup": "^2.3.0",
     "@monaco-editor/react": "^4.5.0",
     "@mui/icons-material": "^5.11.16",
     "@rjsf/core": "^5.6.2",
