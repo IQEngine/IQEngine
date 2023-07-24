@@ -11,11 +11,9 @@ describe('Modal component', () => {
     const [showModal, setShowModal] = useState(true);
     return (
       <>
-        {/* Render the ModalDialog component with the state */}
         <ModalDialog heading="Test Modal" setShowModal={setShowModal}>
           <div>Modal content</div>
         </ModalDialog>
-        {/* Check if the Close Button is present */}
         {showModal && (
           <button
             aria-label="Close Button"
@@ -32,7 +30,7 @@ describe('Modal component', () => {
   };
 
   test('Basic rendering', async () => {
-    render(<ModalComponent />); // Render the test component
+    render(<ModalComponent />);
 
     expect(screen.getByRole('button', { name: 'Close Button' }));
   });

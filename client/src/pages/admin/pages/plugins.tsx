@@ -160,7 +160,7 @@ export const PluginAdd = () => {
           });
         },
         onError: (response) => {
-          toast('Something went wrong adding a plugin ', {
+          toast('Something went wrong adding a plugin', {
             icon: '😖',
             className: 'bg-red-100 font-bold',
           });
