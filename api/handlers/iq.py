@@ -1,8 +1,12 @@
 import asyncio
 import base64
 import io
+import json
 import logging
 from typing import List
+
+import numpy as np
+from rf.samples import get_dtype, get_multiplier, get_samples
 
 from blob.azure_client import AzureBlobClient
 from database import datasource_repo
@@ -32,7 +36,41 @@ async def get_sas_token(
         return decrypted_sas_token
     else:
         return SecretStr("")
+    
 
+@router.get(
+    "/api/datasources/{account}/{container}/{filepath:path}/iq-data",
+    status_code=200
+)
+async def get_iq_data(
+    filepath: str,
+    fft_start: int,
+    fft_step: int,
+    fft_size: int,
+    num_ffts: int,
+    format: str,
+    datasource: DataSource = Depends(datasource_repo.get),
+    azure_client: AzureBlobClient = Depends(AzureBlobClient),
+):
+    
+    if not datasource:
+        raise HTTPException(status_code=404, detail="Datasource not found")
+    try:
+        multiplier = get_multiplier(format)
+        float_arrays = np.zeros((num_ffts, fft_size*multiplier), dtype=get_dtype(format))
+        for i in range(num_ffts):
+            offsetBytes = (fft_start + i * fft_step * fft_size) * multiplier
+            countBytes = fft_size * multiplier
+
+            iq_file = get_file_name(filepath, ApiType.IQDATA)
+
+            float_arrays[i] = await azure_client.get_blob_content(
+                filepath=iq_file, offset=offsetBytes, length=countBytes
+            )
+        return json.dumps(float_arrays.tolist())
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+            
 
 @router.get(
     "/api/datasources/{account}/{container}/{filepath:path}/iqslice", status_code=200

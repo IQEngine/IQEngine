@@ -61,6 +61,11 @@ class AzureBlobClient:
         self, filepath: str, offset: Optional[int] = None, length: Optional[int] = None
     ) -> bytes:
         blob_client = self.get_blob_client(filepath)
+        blob_properties = await blob_client.get_blob_properties()
+        if(blob_properties.size < offset):
+            return b''
+        if(blob_properties.size < offset + length):
+            length = blob_properties.size - offset
         blob = await blob_client.download_blob(offset=offset, length=length)
         content = await blob.readall()
         return content
