@@ -4,6 +4,7 @@ import io
 import json
 import logging
 from typing import List
+from fastapi.responses import StreamingResponse
 
 import numpy as np
 from rf.samples import get_dtype, get_multiplier, get_samples
@@ -52,25 +53,25 @@ async def get_iq_data(
     datasource: DataSource = Depends(datasource_repo.get),
     azure_client: AzureBlobClient = Depends(AzureBlobClient),
 ):
-    
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
     try:
-        multiplier = get_multiplier(format)
-        float_arrays = np.zeros((num_ffts, fft_size*multiplier), dtype=get_dtype(format))
-        for i in range(num_ffts):
-            offsetBytes = (fft_start + i * fft_step * fft_size) * multiplier
-            countBytes = fft_size * multiplier
-
-            iq_file = get_file_name(filepath, ApiType.IQDATA)
-
-            float_arrays[i] = await azure_client.get_blob_content(
-                filepath=iq_file, offset=offsetBytes, length=countBytes
-            )
-        return json.dumps(float_arrays.tolist())
+        return StreamingResponse(
+            get_byte_stream(num_ffts, fft_start, fft_step, fft_size, get_multiplier(format), get_file_name(filepath, ApiType.IQDATA), azure_client)
+        )
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
-            
+
+async def get_byte_stream(num_ffts, fft_start, fft_step, fft_size, multiplier, iq_file, azure_client):
+    for i in range(num_ffts):
+        offsetBytes = (fft_start + i * fft_step * fft_size) * multiplier
+        countBytes = fft_size * multiplier
+
+        content = await azure_client.get_blob_content(
+            filepath=iq_file, offset=offsetBytes, length=countBytes
+        )
+
+        yield content
 
 @router.get(
     "/api/datasources/{account}/{container}/{filepath:path}/iqslice", status_code=200

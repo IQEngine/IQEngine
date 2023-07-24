@@ -92,17 +92,17 @@ async def mock_get_test_datasource():
 @pytest.mark.asyncio
 async def test_get_iq_data_with_ci16_le(mock_get_blob_properties, mock_set_sas_token, client):
     """ Get IQ data with iq16_le. Returns populated float of float array. """
-
     client.app.dependency_overrides[datasource_repo.get] = mock_get_test_datasource
-    float_array = numpy.array([1, 2, 3, 4], dtype=numpy.int16)
-    with mock.patch("blob.azure_client.AzureBlobClient.get_blob_content", return_value=float_array):
+    arr = numpy.array([1,2,3,4,5,6,7,8], dtype=numpy.int16) 
+    res = arr.tobytes()
+    with mock.patch("blob.azure_client.AzureBlobClient.get_blob_content", return_value=res):
         response = client.get(
             f"/api/datasources/"
             f'{test_datasource["account"]}/{test_datasource["container"]}'
             f"/file_path/iq-data?format=ci16_le&fft_start=1&fft_size=1&fft_step=1&num_ffts=1&filepath=test"
         )
         assert response.status_code == 200
-        assert response.json() == json.dumps([float_array.tolist()])
+        assert response.content == res
 
 @pytest.mark.asyncio
 async def test_get_iq_data_with_iq16():
