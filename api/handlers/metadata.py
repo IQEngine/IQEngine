@@ -6,7 +6,7 @@ from database import datasource_repo, metadata_repo
 from database.models import DataSource, DataSourceReference, Metadata
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Response
 from fastapi.responses import StreamingResponse
-from helpers.authorization import requires
+from helpers.authorization import required_roles
 from helpers.cipher import decrypt
 from helpers.urlmapping import ApiType, get_content_type, get_file_name
 from motor.core import AgnosticCollection
@@ -23,7 +23,7 @@ async def get_all_meta(
     account,
     container,
     metadatas: AgnosticCollection = Depends(metadata_repo.collection),
-    current_user: Optional[dict] = Depends(requires()),
+    current_user: Optional[dict] = Depends(required_roles()),
 ):
     # TODO: Should we validate datasource_id?
 
@@ -50,7 +50,7 @@ async def get_all_meta_name(
     account,
     container,
     metadatas: AgnosticCollection = Depends(metadata_repo.collection),
-    current_user: Optional[dict] = Depends(requires()),
+    current_user: Optional[dict] = Depends(required_roles()),
 ):
     metadata = metadatas.find(
         {
@@ -74,7 +74,7 @@ async def get_all_meta_name(
 )
 async def get_meta(
     metadata: Metadata = Depends(metadata_repo.get),
-    current_user: Optional[dict] = Depends(requires()),
+    current_user: Optional[dict] = Depends(required_roles()),
 ):
     if not metadata:
         raise HTTPException(status_code=404, detail="Metadata not found")
@@ -89,7 +89,7 @@ async def get_metadata_iqdata(
     filepath: str,
     datasource: DataSource = Depends(datasource_repo.get),
     azure_client: AzureBlobClient = Depends(AzureBlobClient),
-    current_user: Optional[dict] = Depends(requires()),
+    current_user: Optional[dict] = Depends(required_roles()),
 ):
     # Create the imageURL with sasToken
     if not datasource:
@@ -114,7 +114,7 @@ async def get_meta_thumbnail(
     background_tasks: BackgroundTasks,
     datasource: DataSource = Depends(datasource_repo.get),
     azure_client: AzureBlobClient = Depends(AzureBlobClient),
-    current_user: Optional[dict] = Depends(requires()),
+    current_user: Optional[dict] = Depends(required_roles()),
 ):
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
@@ -194,7 +194,7 @@ async def query_meta(
     captures_geo: Optional[str] = Query(None),
     annotations_geo: Optional[str] = Query(None),
     metadataSet: AgnosticCollection = Depends(metadata_repo.collection),
-    current_user: Optional[dict] = Depends(requires()),
+    current_user: Optional[dict] = Depends(required_roles()),
 ):
     query_condition: Dict[str, Any] = {}
     if account:
@@ -293,7 +293,7 @@ async def create_meta(
     datasources: AgnosticCollection = Depends(datasource_repo.collection),
     metadatas: AgnosticCollection = Depends(metadata_repo.collection),
     versions: AgnosticCollection = Depends(metadata_repo.versions_collection),
-    current_user: Optional[dict] = Depends(requires()),
+    current_user: Optional[dict] = Depends(required_roles()),
 ):
     # Check datasource id is valid
     datasource = await datasources.find_one(
@@ -342,7 +342,7 @@ async def update_meta(
     metadata: Metadata,
     metadatas: AgnosticCollection = Depends(metadata_repo.collection),
     versions: AgnosticCollection = Depends(metadata_repo.versions_collection),
-    current_user: Optional[dict] = Depends(requires()),
+    current_user: Optional[dict] = Depends(required_roles()),
 ):
     current = await metadatas.find_one(
         {

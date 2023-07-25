@@ -124,7 +124,7 @@ def get_current_user(
         )
 
 
-def requires(roles: Optional[Union[str, List[str]]] = None) -> Callable[..., dict]:
+def required_roles(roles: Optional[Union[str, List[str]]] = None) -> Callable[..., dict]:
     if roles is None:
         # If roles are None, return the original dependency function without any role check
         return get_current_user
@@ -158,6 +158,6 @@ def requires(roles: Optional[Union[str, List[str]]] = None) -> Callable[..., dic
 
 # Example usage
 # @app.get("/some-endpoint")
-# def read_items(test:str, dependencies=[Depends(requires("IQEngine-User"))]):
+# def read_items(test:str, dependencies=[Depends(required_roles("IQEngine-User"))]):
 #     # business logic here
 #     return {"message": "You have access!"}

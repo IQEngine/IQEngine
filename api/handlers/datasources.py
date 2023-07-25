@@ -4,7 +4,7 @@ from database.datasource_repo import create, datasource_exists
 from database.models import DataSource
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
-from helpers.authorization import requires
+from helpers.authorization import required_roles
 from helpers.cipher import encrypt
 from helpers.urlmapping import ApiType, add_URL_sasToken
 from motor.core import AgnosticCollection
@@ -22,7 +22,7 @@ router = APIRouter()
 async def create_datasource(
     datasource: DataSource,
     datasources: AgnosticCollection = Depends(datasource_repo.collection),
-    current_user: Optional[dict] = Depends(requires("IQEngine-Admin")),
+    current_user: Optional[dict] = Depends(required_roles()),
 ):
     """
     Create a new datasource. The datasource will be henceforth identified by account/container which
@@ -41,7 +41,7 @@ async def create_datasource(
 )
 async def get_datasources(
     datasources_collection: AgnosticCollection = Depends(datasource_repo.collection),
-    current_user: Optional[dict] = Depends(requires()),
+    current_user: Optional[dict] = Depends(required_roles()),
 ):
     datasources = datasources_collection.find()
     result = []
@@ -58,7 +58,7 @@ async def get_datasource_image(
     account: str,
     container: str,
     datasources_collection: AgnosticCollection = Depends(datasource_repo.collection),
-    current_user: Optional[dict] = Depends(requires()),
+    current_user: Optional[dict] = Depends(required_roles()),
 ):
     # Create the imageURL with sasToken
     datasource = await datasources_collection.find_one(
@@ -93,7 +93,7 @@ async def get_datasource_image(
 )
 async def get_datasource(
     datasource: DataSource = Depends(datasource_repo.get),
-    current_user: Optional[dict] = Depends(requires()),
+    current_user: Optional[dict] = Depends(required_roles()),
 ):
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
@@ -110,7 +110,7 @@ async def update_datasource(
     container: str,
     datasource: DataSource,
     datasources_collection: AgnosticCollection = Depends(datasource_repo.collection),
-    current_user: Optional[dict] = Depends(requires("IQEngine-User")),
+    current_user: Optional[dict] = Depends(required_roles()),
 ):
     existingDatasource = await datasources_collection.find_one(
         {

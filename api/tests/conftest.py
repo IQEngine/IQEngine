@@ -17,7 +17,7 @@ async def env_setup():
 
 
 @pytest.mark.asyncio
-def requires_mock(role: Optional[Union[str, List[str]]] = None):
+def required_roles_mock(role: Optional[Union[str, List[str]]] = None):
     async def wrapper():
         return {
             "roles": ["IQEngine-Admin", "IQEngine-User"],
@@ -32,7 +32,7 @@ def client():
     os.environ["IQENGINE_PLUGINS"] = "[]"
     os.environ["IQENGINE_CONNECTION_INFO"] = '{"settings": []}'
     with mock.patch("importer.all.import_all_from_env") as mock_i, mock.patch(
-        "helpers.authorization.requires", return_value=requires_mock()
+        "helpers.authorization.required_roles", return_value=required_roles_mock()
     ):
         mock_i.return_value = None
         from main import app

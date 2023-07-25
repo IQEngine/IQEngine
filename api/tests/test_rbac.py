@@ -3,20 +3,20 @@ import json
 import pytest
 from unittest.mock import Mock, patch
 from fastapi import HTTPException
-from helpers.authorization import get_current_user, requires
+from helpers.authorization import get_current_user, required_roles
 
 
-def test_requires_with_valid_role():
+def test_required_roles_with_valid_role():
     current_user = {"roles": ["IQEngine-User"], "preferred_username": "emailaddress"}
-    access_control = requires(roles="IQEngine-User")
+    access_control = required_roles(roles="IQEngine-User")
     result = access_control(current_user=current_user)
     assert result["preferred_username"] == "emailaddress"
 
 
-def test_requires_with_invalid_role():
-    # Tests the decorator function `requires` which is used to restrict access to certain endpoints
+def test_required_roles_with_invalid_role():
+    # Tests the decorator function `required_roles` which is used to restrict access to certain endpoints
     current_user = {"roles": ["IQEngine-User"], "preferred_username": "emailaddress"}
-    access_control = requires(roles="invalid-role")
+    access_control = required_roles(roles="invalid-role")
 
     try:
         _ = access_control(current_user=current_user)
@@ -25,11 +25,11 @@ def test_requires_with_invalid_role():
         assert e.detail == "Not enough privileges"
 
 @pytest.mark.asyncio
-async def test_requires_with_no_role():
-    # Tests the decorator function `requires` which is used to restrict access to certain endpoints
+async def test_required_roles_with_no_role():
+    # Tests the decorator function `required_roles` which is used to restrict access to certain endpoints
     with patch("helpers.authorization.get_current_user") as mock_get_current_user:
         mock_get_current_user.return_value = {}
-        access_control = requires(roles=None)
+        access_control = required_roles(roles=None)
         result = access_control()
         assert result == {}
 
