@@ -342,60 +342,52 @@ export const SpectrogramPage = () => {
             setColorMap={setColorMap}
           />
           <div className="flex flex-col">
-            <ul className="flex space-x-2 border-b border-primary w-full sm:pl-12 lg:pl-32" id="tabsbar">
-              <li>
-                <div
-                  onClick={() => {
-                    handleProcessTime();
-                    setCurrentTab('spectrogram');
-                  }}
-                  className={` ${
-                    currentTab === 'spectrogram' ? 'bg-primary !text-base-100' : ''
-                  } inline-block px-3 py-0 outline  outline-primary outline-1 text-lg text-primary hover:text-accent hover:shadow-lg hover:shadow-accent`}
-                >
-                  Spectrogram
-                </div>
-              </li>
-              <li>
-                <div
-                  onClick={() => {
-                    handleProcessTime();
-                    setCurrentTab('time');
-                  }}
-                  className={` ${
-                    currentTab === 'time' ? 'bg-primary !text-base-100' : ''
-                  } inline-block px-3 py-0 outline outline-primary outline-1 text-lg text-primary hover:text-accent hover:shadow-lg hover:shadow-accent`}
-                >
-                  Time
-                </div>
-              </li>
-              <li>
-                <div
-                  onClick={() => {
-                    handleProcessTime();
-                    setCurrentTab('frequency');
-                  }}
-                  className={` ${
-                    currentTab === 'frequency' ? 'bg-primary !text-base-100' : ''
-                  } inline-block px-3 py-0 outline  outline-primary outline-1 text-lg text-primary hover:text-accent hover:shadow-lg hover:shadow-accent`}
-                >
-                  Frequency
-                </div>
-              </li>
-              <li>
-                <div
-                  onClick={() => {
-                    handleProcessTime();
-                    setCurrentTab('iq');
-                  }}
-                  className={` ${
-                    currentTab === 'iq' ? 'bg-primary !text-base-100' : ''
-                  } inline-block px-3 py-0 outline  outline-primary outline-1 text-lg text-primary hover:text-accent hover:shadow-lg hover:shadow-accent`}
-                >
-                  IQ Plot
-                </div>
-              </li>
-            </ul>
+            <div className="flex space-x-2 border-b border-primary w-full sm:pl-12 lg:pl-32" id="tabsbar">
+              <div
+                onClick={() => {
+                  handleProcessTime();
+                  setCurrentTab('spectrogram');
+                }}
+                className={` ${
+                  currentTab === 'spectrogram' ? 'bg-primary !text-base-100' : ''
+                } inline-block px-3 py-0 outline  outline-primary outline-1 text-lg text-primary hover:text-accent hover:shadow-lg hover:shadow-accent`}
+              >
+                Spectrogram
+              </div>
+              <div
+                onClick={() => {
+                  handleProcessTime();
+                  setCurrentTab('time');
+                }}
+                className={` ${
+                  currentTab === 'time' ? 'bg-primary !text-base-100' : ''
+                } inline-block px-3 py-0 outline outline-primary outline-1 text-lg text-primary hover:text-accent hover:shadow-lg hover:shadow-accent`}
+              >
+                Time
+              </div>
+              <div
+                onClick={() => {
+                  handleProcessTime();
+                  setCurrentTab('frequency');
+                }}
+                className={` ${
+                  currentTab === 'frequency' ? 'bg-primary !text-base-100' : ''
+                } inline-block px-3 py-0 outline  outline-primary outline-1 text-lg text-primary hover:text-accent hover:shadow-lg hover:shadow-accent`}
+              >
+                Frequency
+              </div>
+              <div
+                onClick={() => {
+                  handleProcessTime();
+                  setCurrentTab('iq');
+                }}
+                className={` ${
+                  currentTab === 'iq' ? 'bg-primary !text-base-100' : ''
+                } inline-block px-3 py-0 outline  outline-primary outline-1 text-lg text-primary hover:text-accent hover:shadow-lg hover:shadow-accent`}
+              >
+                IQ Plot
+              </div>
+            </div>
             <div className="p-0 ml-0 mr-0 mb-0 mt-2">
               <div className={currentTab === 'spectrogram' ? 'block' : 'hidden'}>
                 <div className="flex flex-col pl-3">
