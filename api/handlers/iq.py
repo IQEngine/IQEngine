@@ -5,7 +5,7 @@ import logging
 from typing import List
 from fastapi.responses import StreamingResponse
 
-from api.helpers.conversions import find_smallest_and_largest_next_to_each_other
+from helpers.conversions import find_smallest_and_largest_next_to_each_other
 from rf.samples import get_dtype, get_multiplier, get_samples
 
 from blob.azure_client import AzureBlobClient
