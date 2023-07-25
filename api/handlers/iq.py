@@ -1,12 +1,11 @@
 import asyncio
 import base64
 import io
-import json
 import logging
 from typing import List
 from fastapi.responses import StreamingResponse
 
-import numpy as np
+from api.helpers.conversions import find_smallest_and_largest_next_to_each_other
 from rf.samples import get_dtype, get_multiplier, get_samples
 
 from blob.azure_client import AzureBlobClient
@@ -45,10 +44,8 @@ async def get_sas_token(
 )
 async def get_iq_data(
     filepath: str,
-    fft_start: int,
-    fft_step: int,
+    fft_arr_str: str,
     fft_size: int,
-    num_ffts: int,
     format: str,
     datasource: DataSource = Depends(datasource_repo.get),
     azure_client: AzureBlobClient = Depends(AzureBlobClient),
@@ -56,22 +53,34 @@ async def get_iq_data(
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
     try:
+        fft_arr = [int(num) for num in fft_arr_str.split(",")]
         return StreamingResponse(
-            get_byte_stream(num_ffts, fft_start, fft_step, fft_size, get_multiplier(format), get_file_name(filepath, ApiType.IQDATA), azure_client)
+            get_byte_stream(fft_arr, fft_size, get_multiplier(format), get_file_name(filepath, ApiType.IQDATA), azure_client)
         )
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-async def get_byte_stream(num_ffts, fft_start, fft_step, fft_size, multiplier, iq_file, azure_client):
-    for i in range(num_ffts):
-        offsetBytes = (fft_start + i * fft_step * fft_size) * multiplier
-        countBytes = fft_size * multiplier
+async def get_byte_stream(fft_arr, fft_size, multiplier, iq_file, azure_client):
+
+    arrs = find_smallest_and_largest_next_to_each_other(fft_arr)
+
+    for arr in arrs:
+        offsetBytes = arr[0] * fft_size * multiplier
+        countBytes = (arr[1]-arr[0]+1)* fft_size * multiplier
+
+        blob_size = await azure_client.get_blob_size(iq_file)
+        if(blob_size < offsetBytes):
+            yield b''
+            return
+        if(blob_size < offsetBytes + countBytes):
+            countBytes = blob_size - offsetBytes
 
         content = await azure_client.get_blob_content(
             filepath=iq_file, offset=offsetBytes, length=countBytes
         )
 
         yield content
+
 
 @router.get(
     "/api/datasources/{account}/{container}/{filepath:path}/iqslice", status_code=200

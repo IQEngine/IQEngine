@@ -56,16 +56,16 @@ class AzureBlobClient:
     async def get_blob_properties(self, filepath) -> BlobProperties:
         blob_client = self.get_blob_client(filepath)
         return await blob_client.get_blob_properties()
+    
+    async def get_blob_size(self, filepath) -> int:
+        blob_client = self.get_blob_client(filepath)
+        blob_properties = await blob_client.get_blob_properties()
+        return blob_properties.size
 
     async def get_blob_content(
         self, filepath: str, offset: Optional[int] = None, length: Optional[int] = None
     ) -> bytes:
         blob_client = self.get_blob_client(filepath)
-        blob_properties = await blob_client.get_blob_properties()
-        if(blob_properties.size < offset):
-            return b''
-        if(blob_properties.size < offset + length):
-            length = blob_properties.size - offset
         blob = await blob_client.download_blob(offset=offset, length=length)
         content = await blob.readall()
         return content
