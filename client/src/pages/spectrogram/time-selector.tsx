@@ -6,7 +6,7 @@ import React, { useState, useEffect } from 'react';
 import { Layer, Rect, Text } from 'react-konva';
 import { useEffectOnce } from 'usehooks-ts';
 import { TILE_SIZE_IN_IQ_SAMPLES } from '@/utils/constants';
-import { getSamples, getSeconds } from '@/utils/rfFunctions';
+import { unitPrefixSamples, unitPrefixSeconds } from '@/utils/rfFunctions';
 
 const TimeSelector = (props) => {
   const {
@@ -36,9 +36,9 @@ const TimeSelector = (props) => {
   useEffect(() => {
     const diffSamples = Math.round(Math.abs(timeSelectionEnd - timeSelectionStart) * TILE_SIZE_IN_IQ_SAMPLES);
     const diffSeconds = diffSamples / sampleRate;
-    const formatted = getSamples(diffSamples);
+    const formatted = unitPrefixSamples(diffSamples);
     setDiffSamples('Δ ' + formatted.samples + formatted.unit + ' samples');
-    const formattedSeconds = getSeconds(diffSeconds);
+    const formattedSeconds = unitPrefixSeconds(diffSeconds);
     setDiffSeconds('Δ ' + formattedSeconds.time + ' ' + formattedSeconds.unit);
   }, [timeSelectionStart, timeSelectionEnd]);
 
