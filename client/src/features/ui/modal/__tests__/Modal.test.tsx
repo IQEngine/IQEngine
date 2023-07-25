@@ -47,11 +47,11 @@ describe('Modal component', () => {
   });
 
   test('Modal close button removes modal from DOM', async () => {
+    render(<VisibleModalComponent />);
     const modal = await screen.findByLabelText('Modal')
     expect(modal).toBeInTheDocument();
     const closeButton = await screen.findByLabelText('Close');
     await userEvent.click(closeButton);
-    const modal2 = await screen.findByLabelText('Modal')
     expect(modal).not.toBeInTheDocument();
   })
 });
