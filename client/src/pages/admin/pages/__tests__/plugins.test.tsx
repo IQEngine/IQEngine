@@ -1,11 +1,12 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import Plugins from '@/pages/admin/pages/plugins';
+import { render, screen, waitFor } from '@testing-library/react';
+import Plugins, { PluginAdd, PluginEdit } from '@/pages/admin/pages/plugins';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { useAllProviders } from '@/mocks/setup-tests';
 import nock from 'nock';
+import { PluginDefinition } from '@/api/Models';
 
 describe('Test Plugins Get', () => {
   beforeEach(() => {
@@ -134,19 +135,13 @@ describe('Test Plugins Post', () => {
         url: 'http://my.plugin.com/hello/plugins/',
       });
     const { wrapper } = useAllProviders();
-    render(<Plugins></Plugins>, {
+    render(<PluginAdd></PluginAdd>, {
       wrapper: wrapper,
     });
-    expect(await screen.findByRole('heading', { name: 'Plugins' })).toBeInTheDocument();
-    await waitFor(() => {
-      expect(screen.queryByText('Test Plugin', { selector: 'td' })).not.toBeInTheDocument();
-    });
-    await userEvent.click(await screen.findByRole('button', { name: 'add plugin' }));
     await userEvent.type(await screen.findByLabelText('add plugin name'), 'Test Plugin');
     await userEvent.type(await screen.findByLabelText('add plugin url'), 'http://my.plugin.com/hello/plugins/');
     await userEvent.click(await screen.findByRole('button', { name: 'create plugin' }));
-    expect(await screen.findByText('Test Plugin', { selector: 'td' })).toBeInTheDocument();
-    expect(await screen.findByText('http://my.plugin.com/hello/plugins/', { selector: 'td' })).toBeInTheDocument();
+
     expect(await screen.findByText('Successfully added plugin')).toBeInTheDocument();
   });
 
@@ -159,21 +154,13 @@ describe('Test Plugins Post', () => {
       })
       .reply(500, '');
     const { wrapper } = useAllProviders();
-    render(<Plugins></Plugins>, {
+    render(<PluginAdd></PluginAdd>, {
       wrapper: wrapper,
     });
-    expect(await screen.findByRole('heading', { name: 'Plugins' })).toBeInTheDocument();
-    await waitFor(() => {
-      expect(screen.queryByText('Test Plugin', { selector: 'td' })).not.toBeInTheDocument();
-    });
-    await userEvent.click(await screen.findByRole('button', { name: 'add plugin' }));
     await userEvent.type(await screen.findByLabelText('add plugin name'), 'Test Plugin');
     await userEvent.type(await screen.findByLabelText('add plugin url'), 'http://my.plugin.com/hello/plugins/');
     await userEvent.click(await screen.findByRole('button', { name: 'create plugin' }));
     expect(await screen.findByText('Something went wrong adding a plugin')).toBeInTheDocument();
-    await waitFor(() => {
-      expect(screen.queryByText('Test Plugin', { selector: 'td' })).not.toBeInTheDocument();
-    });
   });
 });
 
@@ -270,22 +257,21 @@ describe('Test Plugins Edit', () => {
         name: 'TestPlugin',
         url: 'http://my.plugin.com/new/plugins/',
       });
+    const testPlugin: PluginDefinition = {
+      name: 'TestPlugin',
+      url: 'http://my.plugin.com/new/plugins/'
+    }
+
     const { wrapper } = useAllProviders();
-    render(<Plugins></Plugins>, {
+    render(<PluginEdit plugin={testPlugin}></PluginEdit>, {
       wrapper: wrapper,
     });
-    expect(await screen.findByRole('heading', { name: 'Plugins' })).toBeInTheDocument();
-    expect(await screen.findByText('TestPlugin', { selector: 'td' })).toBeInTheDocument();
-    expect(await screen.findByText('http://my.plugin.com/hello/plugins/', { selector: 'td' })).toBeInTheDocument();
-    await user.click(await screen.findByRole('button', { name: 'edit TestPlugin plugin' }));
     await user.clear(await screen.findByLabelText('edit TestPlugin plugin url'));
     await user.type(await screen.findByLabelText('edit TestPlugin plugin url'), 'http://my.plugin.com/new/plugins/');
     expect(await screen.findByDisplayValue('http://my.plugin.com/new/plugins/')).toBeInTheDocument();
 
     await user.click(await screen.findByRole('button', { name: 'save TestPlugin plugin' }));
-    expect(await screen.findByText('TestPlugin', { selector: 'td' })).toBeInTheDocument();
     expect(await screen.findByText('Successfully updated plugin')).toBeInTheDocument();
-    expect(await screen.findByText('http://my.plugin.com/new/plugins/', { selector: 'td' })).toBeInTheDocument();
   });
 
   test('Should try to edit a plugin fail and display the result in the screen', async () => {
@@ -298,14 +284,14 @@ describe('Test Plugins Edit', () => {
         },
       ]);
 
+    const testPlugin: PluginDefinition = {
+      name: 'TestPlugin',
+      url: 'http://my.plugin.com/new/plugins/'
+    }
     const { wrapper } = useAllProviders();
-    render(<Plugins></Plugins>, {
+    render(<PluginEdit plugin={testPlugin}></PluginEdit>, {
       wrapper: wrapper,
     });
-    expect(await screen.findByRole('heading', { name: 'Plugins' })).toBeInTheDocument();
-    expect(await screen.findByText('TestPlugin', { selector: 'td' })).toBeInTheDocument();
-    expect(await screen.findByText('http://my.plugin.com/hello/plugins/', { selector: 'td' })).toBeInTheDocument();
-    await userEvent.click(await screen.findByRole('button', { name: 'edit TestPlugin plugin' }));
     await userEvent.clear(await screen.findByLabelText('edit TestPlugin plugin url'));
     await userEvent.type(
       await screen.findByLabelText('edit TestPlugin plugin url'),
@@ -314,8 +300,6 @@ describe('Test Plugins Edit', () => {
     expect(await screen.findByDisplayValue('http://my.plugin.com/new/plugins/')).toBeInTheDocument();
 
     await userEvent.click(await screen.findByRole('button', { name: 'save TestPlugin plugin' }));
-    expect(await screen.findByText('TestPlugin', { selector: 'td' })).toBeInTheDocument();
     expect(await screen.findByText('Something went wrong updating the plugin')).toBeInTheDocument();
-    expect(await screen.findByText('http://my.plugin.com/hello/plugins/', { selector: 'td' })).toBeInTheDocument();
   });
 });

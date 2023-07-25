@@ -50,8 +50,6 @@ export const DataSourceForm = () => {
       };
 
       return (
-        <div>
-        <h1>Add data source</h1>
         <form ref={formRef} onSubmit={handleSubmit}>
         <input
             type="text"
@@ -101,7 +99,6 @@ export const DataSourceForm = () => {
             className="bg-white text-black px-4 py-2 rounded-md mt-3"
             >Submit</button>
         </form>
-        </div>
       );
     };
 
