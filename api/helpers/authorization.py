@@ -147,7 +147,8 @@ def required_roles(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="No Authorization token provided",
             )
-
+        if roles is None:
+            return current_user # repeated to solve linter error
         if not any(role in current_user.get("roles", []) for role in roles):
             logging.info(
                 f"User {current_user.get('preferred_username')} attempted to access without sufficient privileges"
