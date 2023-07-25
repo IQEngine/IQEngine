@@ -93,6 +93,11 @@
     "httpx",
     "fastapi",
     "pydantic",
-    "urlmapping"
+    "urlmapping",
+    "vals",
+    "automargin",
+    "textposition",
+    "textinfo",
+    "showlegend"
   ]
 }
