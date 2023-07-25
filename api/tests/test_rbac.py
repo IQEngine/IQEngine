@@ -24,6 +24,7 @@ def test_required_roles_with_invalid_role():
         assert e.status_code == 403
         assert e.detail == "Not enough privileges"
 
+
 @pytest.mark.asyncio
 async def test_required_roles_with_no_role():
     # Tests the decorator function `required_roles` which is used to restrict access to certain endpoints

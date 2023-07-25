@@ -14,7 +14,9 @@ from jwt import algorithms
 
 
 class OptionalHTTPBearer(HTTPBearer):
-    def __call__(self, request: Request, authorization: Optional[str] = Header(None)) -> Optional[HTTPAuthorizationCredentials]:
+    def __call__(
+        self, request: Request, authorization: Optional[str] = Header(None)
+    ) -> Optional[HTTPAuthorizationCredentials]:
         if authorization is None:
             # If no Authorization header is present, return None instead of raising an HTTPException
             return None
@@ -68,7 +70,7 @@ def validate_issuer_and_get_public_key(token: str) -> Tuple[RSAPublicKey, Any]:
 
     # Look up the public key in the JWKS using the `kid` from the JWT header
     jwks, issuer = jwks_handler.get_jwks()
-    IQENGINE_APP_AUTHORITY = os.getenv("IQENGINE_APP_AUTHORITY","")
+    IQENGINE_APP_AUTHORITY = os.getenv("IQENGINE_APP_AUTHORITY", "")
     issuer = IQENGINE_APP_AUTHORITY + "/v2.0"
 
     key = [k for k in jwks["keys"] if k["kid"] == unverified_header["kid"]][0]
@@ -124,7 +126,9 @@ def get_current_user(
         )
 
 
-def required_roles(roles: Optional[Union[str, List[str]]] = None) -> Callable[..., dict]:
+def required_roles(
+    roles: Optional[Union[str, List[str]]] = None
+) -> Callable[..., dict]:
     if roles is None:
         # If roles are None, return the original dependency function without any role check
         return get_current_user
@@ -132,9 +136,7 @@ def required_roles(roles: Optional[Union[str, List[str]]] = None) -> Callable[..
     if isinstance(roles, str):
         roles = [roles]
 
-    def _check_roles(
-        current_user: Optional[dict] = Depends(get_current_user)
-    ) -> dict:
+    def _check_roles(current_user: Optional[dict] = Depends(get_current_user)) -> dict:
         if current_user is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -150,7 +152,9 @@ def required_roles(roles: Optional[Union[str, List[str]]] = None) -> Callable[..
                 detail="Not enough privileges",
             )
 
-        logging.info(f"User {current_user.get('preferred_username')} accessed successfully")
+        logging.info(
+            f"User {current_user.get('preferred_username')} accessed successfully"
+        )
         return current_user
 
     return _check_roles
