@@ -2,7 +2,7 @@ import json
 import logging
 import os
 import time
-from typing import Any, List, Optional, Tuple, Callable, Union, cast, Dict
+from typing import Any, List, Optional, Tuple, Callable, Union, cast
 
 import jwt
 import requests
@@ -134,7 +134,12 @@ def required_roles(
         return get_current_user
 
     if isinstance(roles, str):
-        roles = [roles]
+        roles = [roles]  # Convert the optional str to a list with a single element
+    elif not isinstance(roles, list):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Invalid claims parameter",
+        )
 
     def _check_roles(current_user: Optional[dict] = Depends(get_current_user)) -> dict:
         if current_user is None:
@@ -143,9 +148,7 @@ def required_roles(
                 detail="No Authorization token provided",
             )
 
-        required_roles_list = roles if isinstance(roles, list) else [roles]
-
-        if not any(role in current_user.get("roles", []) for role in required_roles_list):
+        if not any(role in current_user.get("roles", []) for role in roles):
             logging.info(
                 f"User {current_user.get('preferred_username')} attempted to access without sufficient privileges"
             )
