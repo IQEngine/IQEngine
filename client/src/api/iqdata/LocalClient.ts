@@ -10,6 +10,9 @@ export class LocalClient implements IQDataClient {
   constructor(files: FileWithDirectoryAndFileHandle[]) {
     this.files = files;
   }
+  getIQDataBlocks(meta: SigMFMetadata, indexes: number[], blockSize: number): Promise<IQDataSlice[]> {
+    throw new Error('Method not implemented.');
+  }
   getIQDataSlices(meta: SigMFMetadata, indexes: number[], tileSize: number): Promise<IQDataSlice[]> {
     return Promise.all(indexes.map((index) => this.getIQDataSlice(meta, index, tileSize)));
   }

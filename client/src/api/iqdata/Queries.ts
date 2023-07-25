@@ -5,6 +5,8 @@ import { range } from '@/utils/selector';
 import { IQDataSlice } from '@/api/Models';
 import { TILE_SIZE_IN_IQ_SAMPLES } from '@/utils/constants';
 import { useUserSettings } from '@/api/user-settings/use-user-settings';
+import { useMemo, useState } from 'react';
+import { useMeta } from '@/api/metadata/Queries';
 
 export const getIQDataSlice = (
   meta: SigMFMetadata,
@@ -66,10 +68,7 @@ export const getIQDataFullIndexes = (
 ) => {
   const { filesQuery, dataSourcesQuery } = useUserSettings();
   if (!meta || !indexes || !indexes.length || !filesQuery.data || !dataSourcesQuery.data) {
-    return useQuery(
-      ["invalidQuery"],
-      () => null,
-    );
+    return useQuery(['invalidQuery'], () => null);
   }
   const { type, account, container, file_path } = meta.getOrigin();
 
@@ -104,7 +103,7 @@ export const getIQDataSlices = (
         queryKey: ['datasource', type, account, container, file_path, 'iq', { index: index, tileSize: tileSize }],
         queryFn: () => {
           const iqDataClient = IQDataClientFactory(type, filesQuery.data, dataSourcesQuery.data);
-          return iqDataClient.getIQDataSlice(meta, index, tileSize)
+          return iqDataClient.getIQDataSlice(meta, index, tileSize);
         },
         enabled: enabled && !!meta && index >= 0,
         staleTime: Infinity,
@@ -140,3 +139,57 @@ export const useCurrentCachedIQDataSlice = (meta: SigMFMetadata, tileSize: numbe
     downloadedTiles: downloadedTiles,
   };
 };
+
+export function useGetIQData(type: string, account: string, container: string, filePath: string) {
+  const { filesQuery, dataSourcesQuery } = useUserSettings();
+  const [fftSize, setFFTSize] = useState<number>(1024);
+  const [fftsRequired, setFFTsRequired] = useState<number[]>([]);
+
+  const { data: meta, isSuccess: hasMetadata } = useMeta(type, account, container, filePath);
+
+  const { data: iqData } = useQuery({
+    queryKey: ['iqData', type, account, container, filePath, fftSize, fftsRequired],
+    queryFn: async () => {
+      const iqDataClient = IQDataClientFactory(type, filesQuery.data, dataSourcesQuery.data);
+      const iqData = await iqDataClient.getIQDataBlocks(meta, fftsRequired, fftSize);
+      return iqData;
+    },
+    select: (data) => {
+      return data;
+    },
+  });
+
+  const queryClient = useQueryClient();
+  const currentData = useMemo(() => {
+    if (!hasMetadata) {
+      return null;
+    }
+    if (iqData) {
+    }
+    const origin = meta.getOrigin();
+    const content = queryClient.getQueriesData<number[]>([
+      'rawiqdata',
+      origin.type,
+      origin.account,
+      origin.container,
+      origin.file_path,
+      fftSize,
+    ]);
+    if (!content) {
+      return null;
+    }
+    const currentData = content.reduce((acc, val) => {
+      const index = val[0][val[0].length - 1] as number;
+      acc[index] = val[1];
+      return acc;
+    }, []);
+    return currentData;
+  }, [fftSize, meta, iqData]);
+  return {
+    fftSize,
+    setFFTSize,
+    currentData,
+    fftsRequired,
+    setFFTsRequired,
+  };
+}

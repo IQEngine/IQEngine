@@ -1,16 +1,16 @@
 import { useMeta } from '@/api/metadata/Queries';
-import { useCallback, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 interface SpectrogramProps {
-  fftSize: number;
   type: string;
   account: string;
   container: string;
   filePath: string;
 }
 
-export function useSpectrogram({ fftSize, type, account, container, filePath }: SpectrogramProps) {
+export function useSpectrogram({ type, account, container, filePath }: SpectrogramProps) {
   const { data: meta, isSuccess: hasMetadata } = useMeta(type, account, container, filePath);
+  const { fftSize, setFFTSize, currentData } = useGetIQData(type, account, container, filePath);
   const total_ffts = Math.ceil(meta?.getTotalSamples() / fftSize);
   const [currentFFT, setCurrentFFT] = useState<number>(0);
   // This is how many ffts we skip when decimating
@@ -37,5 +37,7 @@ export function useSpectrogram({ fftSize, type, account, container, filePath }: 
     spectrogramHeight,
     setSpectrogramHeight,
     displayedFFTs,
+    fftSize,
+    setFFTSize,
   };
 }

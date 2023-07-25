@@ -50,3 +50,4 @@ tiling/spectrogram.pmtiles
 
 # in case someone by mistake do npm i in the root do not check in package-lock.json
 /package-lock.json
+dev-page.tsx

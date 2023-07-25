@@ -8,6 +8,7 @@ describe('test metadata fetch and fft calculation', () => {
   beforeEach(() => {
     nock('http://localhost:3000').get('/api/config').reply(200, {
       uploadPageBlobSasUrl: 'NOT A VALID SAS URL',
+      internalBranding: false,
     });
   });
 
@@ -30,7 +31,6 @@ describe('test metadata fetch and fft calculation', () => {
     const { result } = renderHook(
       () =>
         useSpectrogram({
-          fftSize: fftSize,
           type: origin.type,
           account: origin.account,
           container: origin.container,
@@ -56,7 +56,6 @@ describe('test metadata fetch and fft calculation', () => {
     const { result } = renderHook(
       () =>
         useSpectrogram({
-          fftSize: fftSize,
           type: origin.type,
           account: origin.account,
           container: origin.container,
@@ -87,7 +86,6 @@ describe('test metadata fetch and fft calculation', () => {
     const { result } = renderHook(
       () =>
         useSpectrogram({
-          fftSize: fftSize,
           type: origin.type,
           account: origin.account,
           container: origin.container,
@@ -126,7 +124,6 @@ describe('test metadata fetch and fft calculation', () => {
     const { result } = renderHook(
       () =>
         useSpectrogram({
-          fftSize: fftSize,
           type: origin.type,
           account: origin.account,
           container: origin.container,

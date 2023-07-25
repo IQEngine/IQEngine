@@ -5,6 +5,9 @@ import { IQDataSlice } from '@/api/Models';
 import { convertToFloat32 } from '@/utils/FetchMoreDataSource';
 
 export class ApiClient implements IQDataClient {
+  getIQDataBlocks(meta: SigMFMetadata, indexes: number[], blockSize: number): Promise<IQDataSlice[]> {
+    throw new Error('Method not implemented.');
+  }
   async getIQDataSlices(meta: SigMFMetadata, indexes: number[], tileSize: number): Promise<IQDataSlice[]> {
     //return Promise.all(indexes.map((index) => this.getIQDataSlice(meta, index, tileSize)));
     let { account, container, file_path } = meta.getOrigin();
