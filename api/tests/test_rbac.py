@@ -5,11 +5,11 @@ from unittest.mock import Mock, patch
 from fastapi import HTTPException
 from helpers.authorization import get_current_user, required_roles
 
-
-def test_required_roles_with_valid_role():
+@pytest.mark.asyncio
+async def test_required_roles_with_valid_role():
     current_user = {"roles": ["IQEngine-User"], "preferred_username": "emailaddress"}
     access_control = required_roles(roles="IQEngine-User")
-    result = access_control(current_user=current_user)
+    result = await access_control(current_user=current_user)
     assert result["preferred_username"] == "emailaddress"
 
 

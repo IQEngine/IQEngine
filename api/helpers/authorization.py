@@ -14,14 +14,14 @@ from jwt import algorithms
 
 
 class OptionalHTTPBearer(HTTPBearer):
-    def __call__(
+    async def __call__(
         self, request: Request, authorization: Optional[str] = Header(None)
     ) -> Optional[HTTPAuthorizationCredentials]:
         if authorization is None:
             # If no Authorization header is present, return None instead of raising an HTTPException
             return None
 
-        return super().__call__(request)
+        return await super().__call__(request)
 
 
 http_bearer = OptionalHTTPBearer()
@@ -141,7 +141,7 @@ def required_roles(
             detail="Invalid claims parameter",
         )
 
-    def _check_roles(current_user: Optional[dict] = Depends(get_current_user)) -> dict:
+    async def _check_roles(current_user: Optional[dict] = Depends(get_current_user)) -> dict:
         if current_user is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
