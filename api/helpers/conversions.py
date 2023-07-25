@@ -1,6 +1,7 @@
 def find_smallest_and_largest_next_to_each_other(lst):
     result = []
     i = 0
+    list.sort(lst)
     while i < len(lst) - 1:
         if lst[i + 1] - lst[i] == 1:
             start = lst[i]

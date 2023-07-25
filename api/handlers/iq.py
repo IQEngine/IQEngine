@@ -70,7 +70,6 @@ async def get_byte_stream(fft_arr, fft_size, multiplier, iq_file, azure_client):
 
         blob_size = await azure_client.get_blob_size(iq_file)
         if(blob_size < offsetBytes):
-            yield b''
             return
         if(blob_size < offsetBytes + countBytes):
             countBytes = blob_size - offsetBytes
