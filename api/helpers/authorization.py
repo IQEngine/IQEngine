@@ -2,7 +2,7 @@ import json
 import logging
 import os
 import time
-from typing import Any, List, Optional, Tuple, Union, cast
+from typing import Any, List, Optional, Tuple, Callable, Union, cast
 
 import jwt
 import requests
@@ -12,7 +12,6 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer
 from jwt import algorithms
 
-TENANT_ID = os.getenv("AAD_Tenant_ID")
 
 http_bearer = HTTPBearer()
 
@@ -60,7 +59,9 @@ def validate_issuer_and_get_public_key(token: str) -> Tuple[RSAPublicKey, Any]:
 
     # Look up the public key in the JWKS using the `kid` from the JWT header
     jwks, issuer = jwks_handler.get_jwks()
-    issuer = issuer.replace("{tenantid}", TENANT_ID)
+    IQENGINE_APP_AUTHORITY = os.getenv("IQENGINE_APP_AUTHORITY","")
+    issuer = IQENGINE_APP_AUTHORITY + "/v2.0"
+
     key = [k for k in jwks["keys"] if k["kid"] == unverified_header["kid"]][0]
     public_key = cast(RSAPublicKey, algorithms.RSAAlgorithm.from_jwk(json.dumps(key)))
 
@@ -95,7 +96,7 @@ def get_current_user(
     token: Optional[Depends] = Depends(http_bearer),
 ) -> Optional[dict]:
     if not token:
-        return None
+        return {}
     try:
         current_user = validate_and_decode_jwt(token.credentials)
         logging.info(
@@ -114,26 +115,64 @@ def get_current_user(
         )
 
 
-def requires(
-    roles: Optional[Union[str, List[str]]] = None,
-    current_user: Optional[dict] = Depends(get_current_user),
-):
-    if not current_user:
-        return None
+# def requires(
+#     roles: Optional[Union[str, List[str]]] = None,
+#     current_user: Optional[dict] = Depends(get_current_user),
+# ):
 
-    if roles:
-        if isinstance(roles, str):
-            roles = [roles]
-        if not any(role in current_user["roles"] for role in roles):
+#     if not type(current_user) is dict:
+#         return None
+
+#     # try:
+#     #     current_user = current_user.dependency()
+#     # except AttributeError:
+#     #     pass
+
+#     if roles:
+#         if isinstance(roles, str):
+#             roles = [roles]
+#         print(current_user["roles"])
+#         if not any(role in current_user["roles"] for role in roles):
+#             logging.info(
+#                 f"User {current_user['preferred_username']} attempted to access without sufficient privileges"
+#             )
+#             raise HTTPException(
+#                 status_code=status.HTTP_403_FORBIDDEN,
+#                 detail="Not enough privileges",
+#             )
+#     logging.info(f"User {current_user['preferred_username']} accessed successfully")
+#     return current_user
+
+def requires(roles: Optional[Union[str, List[str]]] = None) -> Callable[..., dict]:
+    if roles is None:
+        # If roles are None, return the original dependency function without any role check
+        return get_current_user
+
+    if isinstance(roles, str):
+        roles = [roles]
+
+    def _check_roles(
+        current_user: Optional[dict] = Depends(get_current_user)
+    ) -> dict:
+        if current_user is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="No Authorization token provided",
+            )
+
+        if not any(role in current_user.get("roles", []) for role in roles):
             logging.info(
-                f"User {current_user['preferred_username']} attempted to access without sufficient privileges"
+                f"User {current_user.get('preferred_username')} attempted to access without sufficient privileges"
             )
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Not enough privileges",
             )
-    logging.info(f"User {current_user['preferred_username']} accessed successfully")
-    return current_user
+
+        logging.info(f"User {current_user.get('preferred_username')} accessed successfully")
+        return current_user
+
+    return _check_roles
 
 
 # Example usage

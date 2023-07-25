@@ -55,8 +55,9 @@ VALID_TEST_TOKEN = json_data["VALID_TEST_TOKEN"]
 )
 def test_get_current_user(mock_get_jwks):
     # Tests `get_current_user` which is used to get the current user from the JWT token
-    mock_get_jwks.return_value = ({"keys": [TEST_PUBLIC_KEY]}, "test")
+    mock_get_jwks.return_value = ({"keys": [TEST_PUBLIC_KEY]}, "test/v2.0")
     os.environ["IQENGINE_APP_ID"] = "test"
+    os.environ["IQENGINE_APP_AUTHORITY"] = "test"
     credentials = Mock(credentials=VALID_TEST_TOKEN)
     current_user = get_current_user(token=credentials)
-    assert current_user["preferred_username"] == "emailaddress"
+    assert current_user["preferred_username"] == "JohnDoe@test.com"
