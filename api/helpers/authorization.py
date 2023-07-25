@@ -2,7 +2,7 @@ import json
 import logging
 import os
 import time
-from typing import Any, List, Optional, Tuple, Callable, Union, cast
+from typing import Any, List, Optional, Tuple, Callable, Union, cast, Dict
 
 import jwt
 import requests
@@ -128,7 +128,7 @@ def get_current_user(
 
 def required_roles(
     roles: Optional[Union[str, List[str]]] = None
-) -> Callable[..., dict]:
+) -> Callable[..., Dict]:
     if roles is None:
         # If roles are None, return the original dependency function without any role check
         return get_current_user
@@ -143,7 +143,9 @@ def required_roles(
                 detail="No Authorization token provided",
             )
 
-        if not any(role in current_user.get("roles", []) for role in roles):
+        required_roles_list = roles if isinstance(roles, list) else [roles]
+
+        if not any(role in current_user.get("roles", []) for role in required_roles_list):
             logging.info(
                 f"User {current_user.get('preferred_username')} attempted to access without sufficient privileges"
             )
