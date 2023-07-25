@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { ModalDialog } from '../Modal';
 import React, { useState } from 'react';
@@ -44,4 +45,13 @@ describe('Modal component', () => {
     const modal = await screen.queryByLabelText('Modal')
     expect(modal).not.toBeInTheDocument();
   });
+
+  test('Modal close button removes modal from DOM', async () => {
+    const modal = await screen.findByLabelText('Modal')
+    expect(modal).toBeInTheDocument();
+    const closeButton = await screen.findByLabelText('Close');
+    await userEvent.click(closeButton);
+    const modal2 = await screen.findByLabelText('Modal')
+    expect(modal).not.toBeInTheDocument();
+  })
 });
