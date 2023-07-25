@@ -141,7 +141,7 @@ def required_roles(
             detail="Invalid claims parameter",
         )
 
-    async def _check_roles(current_user: Optional[dict] = Depends(get_current_user)) -> dict:
+    async def _check_roles(current_user: Optional[dict] = Depends(get_current_user)) -> Optional[dict]:
         if current_user is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
