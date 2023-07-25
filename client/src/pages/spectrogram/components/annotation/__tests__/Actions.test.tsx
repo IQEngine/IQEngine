@@ -24,7 +24,7 @@ describe('Annotation list component', () => {
     );
 
     // Act
-    const modal = screen.queryByLabelText('Annotation 0 Modal');
+    const modal = screen.queryByLabelText('Annotation 0');
 
     //Assert
     expect(modal).not.toBeInTheDocument();
@@ -45,11 +45,11 @@ describe('Annotation list component', () => {
     );
 
     // Act
-    const openButton = await screen.findByLabelText('Annotation 0 Modal Open Button');
+    const openButton = await screen.findByLabelText('Annotation 0 Modal Open');
     await userEvent.click(openButton);
 
     // Assert
-    const modal = await screen.findByLabelText('Modal Dialog');
+    const modal = await screen.findByLabelText('Modal');
     expect(modal).toHaveClass('modal-open');
   });
 
@@ -69,11 +69,11 @@ describe('Annotation list component', () => {
       ></Actions>
     );
 
-    const openButton = await screen.findByLabelText('Annotation 0 Modal Open Button');
+    const openButton = await screen.findByLabelText('Annotation 0 Modal Open');
     await userEvent.click(openButton);
 
     // Assert
-    const textarea = await screen.findByLabelText('Annotation 0 Modal Text Area');
+    const textarea = await screen.findByLabelText('Annotation 0 Modal');
     const annotation = meta.annotations[0];
     for (const key in annotation) {
       expect(textarea).toHaveTextContent(key);
@@ -97,12 +97,12 @@ describe('Annotation list component', () => {
     );
 
     // Act
-    const openButton = await screen.findByLabelText('Annotation 0 Modal Open Button');
+    const openButton = await screen.findByLabelText('Annotation 0 Modal Open');
     await userEvent.click(openButton);
 
-    const closeButton = await screen.findByLabelText('Close Button');
+    const closeButton = await screen.findByLabelText('Close');
     await userEvent.click(closeButton);
-    const modal = screen.queryByLabelText('Modal Dialog');
+    const modal = screen.queryByLabelText('Modal');
 
     //Assert
     expect(modal).not.toBeInTheDocument();
@@ -124,12 +124,12 @@ describe('Annotation list component', () => {
     );
 
     // Act
-    const openButton = await screen.findByLabelText('Annotation 0 Modal Open Button');
+    const openButton = await screen.findByLabelText('Annotation 0 Modal Open');
     await userEvent.click(openButton);
 
-    const updateButton = await screen.findByLabelText('Annotation 0 Modal Update Button');
+    const updateButton = await screen.findByLabelText('Annotation 0 Modal Update');
     await userEvent.click(updateButton);
-    const modal = screen.queryByLabelText('Modal Dialog');
+    const modal = screen.queryByLabelText('Modal');
 
     //Assert
     expect(modal).not.toBeInTheDocument();
@@ -151,18 +151,18 @@ describe('Annotation list component', () => {
     );
 
     // Act
-    const openButton = await screen.findByLabelText('Annotation 0 Modal Open Button');
+    const openButton = await screen.findByLabelText('Annotation 0 Modal Open');
     await userEvent.click(openButton);
 
-    const textarea = await screen.findByLabelText('Annotation 0 Modal Text Area');
+    const textarea = await screen.findByLabelText('Annotation 0 Modal');
     await userEvent.clear(textarea);
     await userEvent.type(textarea, 'not valid json');
 
-    const updateButton = await screen.findByLabelText('Annotation 0 Modal Update Button');
+    const updateButton = await screen.findByLabelText('Annotation 0 Modal Update');
     await userEvent.click(updateButton);
 
     // Assert
-    const modal = await screen.queryByLabelText('Modal Dialog');
+    const modal = await screen.queryByLabelText('Modal');
     expect(modal).toBeInTheDocument();
     expect(updateButton).toBeDisabled();
     expect(screen.getByText('Syntax Error: Unexpected token o in JSON at position 17')).toBeInTheDocument();
@@ -187,16 +187,17 @@ describe('Annotation list component', () => {
     );
 
     // Act
-    const openButton = await screen.findByLabelText('Annotation 0 Modal Open Button');
+    const openButton = await screen.findByLabelText('Annotation 0 Modal Open');
     await userEvent.click(openButton);
 
-    const textarea = await screen.findByLabelText('Annotation 0 Modal Text Area');
+    const textarea = await screen.findByLabelText('Annotation 0 Modal');
     await userEvent.clear(textarea);
     var json = JSON.stringify(annotation);
     await userEvent.paste(json);
 
-    const updateButton = await screen.findByLabelText('Annotation 0 Modal Update Button');
+    const updateButton = await screen.findByLabelText('Annotation 0 Modal Update');
     await userEvent.click(updateButton);
+    expect(updateButton).toBeDisabled();
 
     // Assert
     expect(

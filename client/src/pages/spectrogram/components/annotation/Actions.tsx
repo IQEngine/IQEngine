@@ -23,12 +23,9 @@ export const Actions = ({
   setMeta,
   setSelectedAnnotation,
 }: ActionsProps) => {
-  const modal = useRef(null);
   const [currentAnnotation, setCurrentAnnotation] = useState(JSON.stringify(meta.annotations[index], undefined, 4));
   const [errors, setErrors] = useState([]);
   const [showModal, setShowModal] = useState(false);
-
-
 
   useEffect(() => {
     setCurrentAnnotation(JSON.stringify(meta.annotations[index], undefined, 4));
@@ -70,7 +67,7 @@ export const Actions = ({
         <ArrowRightIcon className="h-4 w-4" />
       </button>
 
-      <button aria-label={'Annotation ' + index + ' Modal Open Button'} onClick={() => {
+      <button aria-label={'Annotation ' + index + ' Modal Open'} onClick={() => {
               setShowModal(true);
             }}>
         <ArrowTopRightOnSquareIcon className="h-4 w-4" />
@@ -80,7 +77,7 @@ export const Actions = ({
       <div>
           <div>
             <textarea
-              aria-label={'Annotation ' + index + ' Modal Text Area'}
+              aria-label={'Annotation ' + index + ' Modal'}
               className="w-full textarea bg-base-100 text-base-content overflow-hidden hover:overflow-auto"
               rows={8}
               onChange={onChangeHandler}
@@ -109,7 +106,7 @@ export const Actions = ({
             </ul>
           </div>
           <button
-            aria-label={'Annotation ' + index + ' Modal Update Button'}
+            aria-label={'Annotation ' + index + ' Modal Update'}
             onClick={onUpdateHandler}
             disabled={errors?.length > 0}
           >

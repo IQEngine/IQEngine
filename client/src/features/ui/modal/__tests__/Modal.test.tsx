@@ -3,43 +3,45 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ModalDialog } from '../Modal';
 import React, { useState } from 'react';
-import userEvent from '@testing-library/user-event';
 
 describe('Modal component', () => {
-
-  const ModalComponent = () => {
+  const VisibleModalComponent = () => {
     const [showModal, setShowModal] = useState(true);
     return (
+      <p>
       <>
+      {showModal &&
         <ModalDialog heading="Test Modal" setShowModal={setShowModal}>
           <div>Modal content</div>
-        </ModalDialog>
-        {showModal && (
-          <button
-            aria-label="Close Button"
-            className="absolute right-2 top-2 bg-base-100 text-primary font-bold"
-            onClick={() => {
-              setShowModal(false);
-            }}
-          >
-            ✕
-          </button>
-        )}
+        </ModalDialog>}
       </>
+      </p>
+    );
+  };
+
+  const InvisibleModalComponent = () => {
+    const [showModal, setShowModal] = useState(false);
+    return (
+      <p>
+      <>
+      {showModal &&
+        <ModalDialog heading="Test Modal" setShowModal={setShowModal}>
+          <div>Modal content</div>
+        </ModalDialog>}
+      </>
+      </p>
     );
   };
 
   test('Basic rendering', async () => {
-    render(<ModalComponent />);
-
-    expect(screen.getByRole('button', { name: 'Close Button' }));
+    render(<VisibleModalComponent />);
+    const modal = await screen.findByLabelText('Modal')
+    expect(modal).toBeInTheDocument();
   });
 
-  test('Close button closes modal', async () => {
-    render(<ModalComponent />);
-    const user = userEvent.setup();
-    expect(screen.getByRole('button', { name: 'Close Button' }));
-    await user.click(await screen.findByRole('button', { name: 'Close Button' }));
-    expect(screen.getByRole('button', { name: 'Close Button', hidden: true }));
+  test('Basic not rendering', async () => {
+    render(<InvisibleModalComponent />);
+    const modal = await screen.queryByLabelText('Modal')
+    expect(modal).not.toBeInTheDocument();
   });
 });

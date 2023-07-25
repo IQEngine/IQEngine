@@ -206,7 +206,7 @@ export const PluginAdd = () => {
 };
 
 export const PluginRow = ({ plugin, removePlugin }: PluginRowProps) => {
-  const [showModal, setShowModal] = useState(false);
+  const [showEditModal, setEditShowModal] = useState(false);
   return (
     <tr>
       <td>{plugin.name}</td>
@@ -214,11 +214,11 @@ export const PluginRow = ({ plugin, removePlugin }: PluginRowProps) => {
       <td>
         <PluginDetail plugin={plugin} />
         <button aria-label={`edit ${plugin.name} plugin`} onClick={() => {
-              setShowModal(true);
+              setEditShowModal(true);
             }}>
         <PencilIcon className="h-4 w-4" />
       </button>
-      {showModal && <ModalDialog heading={'Edit plugin'} setShowModal={setShowModal}><PluginEdit plugin={plugin} /></ModalDialog>}
+      {showEditModal && <ModalDialog heading={'Edit plugin'} setShowModal={setEditShowModal}><PluginEdit plugin={plugin} /></ModalDialog>}
 
         <PluginDelete plugin={plugin} removePlugin={removePlugin} />
       </td>
