@@ -8,12 +8,21 @@ import jwt
 import requests
 from cachetools import TTLCache, cached
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
-from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer
+from fastapi import Depends, HTTPException, status, Header, Request
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jwt import algorithms
 
 
-http_bearer = HTTPBearer()
+class OptionalHTTPBearer(HTTPBearer):
+    def __call__(self, request: Request, authorization: Optional[str] = Header(None)) -> Optional[HTTPAuthorizationCredentials]:
+        if authorization is None:
+            # If no Authorization header is present, return None instead of raising an HTTPException
+            return None
+
+        return super().__call__(request)
+
+
+http_bearer = OptionalHTTPBearer()
 
 
 class JWKSHandler:

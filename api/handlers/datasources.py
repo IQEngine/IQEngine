@@ -41,7 +41,7 @@ async def create_datasource(
 )
 async def get_datasources(
     datasources_collection: AgnosticCollection = Depends(datasource_repo.collection),
-    current_user: Optional[dict] = Depends(requires("IQEngine-User")),
+    current_user: Optional[dict] = Depends(requires()),
 ):
     datasources = datasources_collection.find()
     result = []
@@ -58,7 +58,7 @@ async def get_datasource_image(
     account: str,
     container: str,
     datasources_collection: AgnosticCollection = Depends(datasource_repo.collection),
-    current_user: Optional[dict] = Depends(requires("IQEngine-User")),
+    current_user: Optional[dict] = Depends(requires()),
 ):
     # Create the imageURL with sasToken
     datasource = await datasources_collection.find_one(
@@ -93,7 +93,7 @@ async def get_datasource_image(
 )
 async def get_datasource(
     datasource: DataSource = Depends(datasource_repo.get),
-    current_user: Optional[dict] = Depends(requires("IQEngine-User")),
+    current_user: Optional[dict] = Depends(requires()),
 ):
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
