@@ -124,34 +124,6 @@ def get_current_user(
         )
 
 
-# def requires(
-#     roles: Optional[Union[str, List[str]]] = None,
-#     current_user: Optional[dict] = Depends(get_current_user),
-# ):
-
-#     if not type(current_user) is dict:
-#         return None
-
-#     # try:
-#     #     current_user = current_user.dependency()
-#     # except AttributeError:
-#     #     pass
-
-#     if roles:
-#         if isinstance(roles, str):
-#             roles = [roles]
-#         print(current_user["roles"])
-#         if not any(role in current_user["roles"] for role in roles):
-#             logging.info(
-#                 f"User {current_user['preferred_username']} attempted to access without sufficient privileges"
-#             )
-#             raise HTTPException(
-#                 status_code=status.HTTP_403_FORBIDDEN,
-#                 detail="Not enough privileges",
-#             )
-#     logging.info(f"User {current_user['preferred_username']} accessed successfully")
-#     return current_user
-
 def requires(roles: Optional[Union[str, List[str]]] = None) -> Callable[..., dict]:
     if roles is None:
         # If roles are None, return the original dependency function without any role check

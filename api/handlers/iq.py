@@ -46,7 +46,7 @@ async def get_iq(
     countBytes: int,
     datasource: DataSource = Depends(datasource_repo.get),
     azure_client: AzureBlobClient = Depends(AzureBlobClient),
-    current_user: Optional[dict] = Depends(requires("IQEngine-User")),
+    current_user: Optional[dict] = Depends(requires()),
 ):
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
@@ -93,7 +93,7 @@ async def get_iq_data_slices(
     filepath: str,
     datasource: DataSource = Depends(datasource_repo.get),
     azure_client: AzureBlobClient = Depends(AzureBlobClient),
-    current_user: Optional[dict] = Depends(requires("IQEngine-User")),
+    current_user: Optional[dict] = Depends(requires()),
 ):
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")

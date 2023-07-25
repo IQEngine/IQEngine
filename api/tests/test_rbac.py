@@ -1,41 +1,37 @@
 import os
 import json
+import pytest
 from unittest.mock import Mock, patch
-
 from fastapi import HTTPException
 from helpers.authorization import get_current_user, requires
 
 
 def test_requires_with_valid_role():
-    # Tests the decorator function `requires` which is used to restrict access to certain endpoints
-    current_user = requires(
-        "IQEngine-User",
-        current_user={"roles": ["IQEngine-User"], "preferred_username": "emailaddress"},
-    )
-    assert current_user["preferred_username"] == "emailaddress"
+    current_user = {"roles": ["IQEngine-User"], "preferred_username": "emailaddress"}
+    access_control = requires(roles="IQEngine-User")
+    result = access_control(current_user=current_user)
+    assert result["preferred_username"] == "emailaddress"
 
 
 def test_requires_with_invalid_role():
     # Tests the decorator function `requires` which is used to restrict access to certain endpoints
+    current_user = {"roles": ["IQEngine-User"], "preferred_username": "emailaddress"}
+    access_control = requires(roles="invalid-role")
+
     try:
-        _ = requires(
-            "Invalid_role",
-            current_user={
-                "roles": ["IQEngine-User"],
-                "preferred_username": "emailaddress",
-            },
-        )
+        _ = access_control(current_user=current_user)
     except HTTPException as e:
         assert e.status_code == 403
         assert e.detail == "Not enough privileges"
 
-
-def test_requires_with_no_role():
+@pytest.mark.asyncio
+async def test_requires_with_no_role():
     # Tests the decorator function `requires` which is used to restrict access to certain endpoints
-    current_user = requires(
-        current_user={"roles": ["IQEngine-User"], "preferred_username": "emailaddress"}
-    )
-    assert current_user["preferred_username"] == "emailaddress"
+    with patch("helpers.authorization.get_current_user") as mock_get_current_user:
+        mock_get_current_user.return_value = {}
+        access_control = requires(roles=None)
+        result = access_control()
+        assert result == {}
 
 
 def load_json_from_file(file_name: str):

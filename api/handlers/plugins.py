@@ -30,7 +30,7 @@ async def create_plugin(
 @router.get("/api/plugins", response_model=list[Plugin])
 async def get_plugins(
     plugins: AgnosticCollection = Depends(plugin_repo.collection),
-    current_user: Optional[dict] = Depends(requires("IQEngine-User")),
+    current_user: Optional[dict] = Depends(requires()),
 ):
     """
     Get a list of all plugins.
@@ -45,7 +45,7 @@ async def get_plugins(
 async def get_plugin(
     plugin_name: str,
     plugins: AgnosticCollection = Depends(plugin_repo.collection),
-    current_user: Optional[dict] = Depends(requires("IQEngine-User")),
+    current_user: Optional[dict] = Depends(requires()),
 ):
     """
     Get a plugin by name.
