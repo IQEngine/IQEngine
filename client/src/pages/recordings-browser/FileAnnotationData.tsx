@@ -8,12 +8,10 @@ import { Annotation } from '@/utils/sigmfMetadata';
 import { template } from '@/utils/plotlyTemplate';
 
 interface Props {
-  setShowModal: any;
-  fileName: String;
   annotations: Annotation[];
 }
 
-export const AnnotationModal = ({ setShowModal, fileName, annotations }: Props) => {
+export const FileAnnotationData = ({ annotations }: Props) => {
   const [pieChartValues, setPieChartValues] = useState([]); // so that it can be directly used in the pie chart https://plotly.com/javascript/pie-charts/
   const [pieChartLabels, setPieChartLabels] = useState([]);
 
@@ -36,7 +34,7 @@ export const AnnotationModal = ({ setShowModal, fileName, annotations }: Props) 
 
   const annotationsData = annotations?.map((item, index) => {
     const deepItemCopy = JSON.parse(JSON.stringify(item));
-    // remove the main feilds so that everything left is shown in "other"
+    // remove the main fields so that everything left is shown in "other"
     delete deepItemCopy['core:sample_start'];
     delete deepItemCopy['core:sample_count'];
     delete deepItemCopy['core:freq_lower_edge'];
@@ -56,18 +54,7 @@ export const AnnotationModal = ({ setShowModal, fileName, annotations }: Props) 
   });
 
   return (
-    <dialog className="modal modal-open w-full h-full">
-      <form method="dialog" className="modal-box  max-w-full">
-        <h3 className="font-bold text-lg text-primary">{fileName}</h3>
-        <button
-          className="absolute right-2 top-2 text-secondary font-bold"
-          onClick={() => {
-            setShowModal(false);
-          }}
-        >
-          ✕
-        </button>
-
+    <div>
         <div>
           <Plot
             data={[
@@ -106,7 +93,6 @@ export const AnnotationModal = ({ setShowModal, fileName, annotations }: Props) 
             <tbody>{annotationsData}</tbody>
           </table>
         </div>
-      </form>
-    </dialog>
+        </div>
   );
 };
