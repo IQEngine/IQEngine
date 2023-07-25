@@ -44,11 +44,11 @@ export class SigMFMetadata {
   }
 
   getVersion() {
-    return this.global['core:version'];
+    return String(this.global['core:version']);
   }
 
   getOffset() {
-    return this.global['core:offset'] ?? 0;
+    return Number(this.global['core:offset'] ?? 0);
   }
 
   getOrigin() {
@@ -56,18 +56,18 @@ export class SigMFMetadata {
   }
 
   getSampleRate() {
-    return this.global['core:sample_rate'] ?? 1e6;
+    return Number(this.global['core:sample_rate'] ?? 1e6);
   }
 
   getTotalSamples() {
-    return this.global['traceability:sample_length'] ?? 0;
+    return Number(this.global['traceability:sample_length'] ?? 0);
   }
 
   getFrequency() {
-    return this.captures[0]['core:frequency'] ?? 1e6;
+    return Number(this.captures[0]['core:frequency'] ?? 1e6);
   }
   getAuthor() {
-    return this.global['core:author'] ?? '';
+    return String(this.global['core:author'] ?? '');
   }
   getFilePath() {
     return this.global['traceability:origin'].file_path;
@@ -156,25 +156,25 @@ export class SigMFMetadata {
       .replace('_le', '');
   }
   getDescription() {
-    return this.global['core:description'] ?? '';
+    return String(this.global['core:description'] ?? '');
   }
 
   getLengthInMillionIQSamples() {
-    return (this.global['traceability:sample_length'] ?? 0) / 1e6;
+    return Number((this.global['traceability:sample_length'] ?? 0) / 1e6);
   }
 
   getLengthInIQSamples() {
-    return this.global['traceability:sample_length'] ?? 0;
+    return Number(this.global['traceability:sample_length'] ?? 0);
   }
 
   getLengthInBytes() {
-    return this.getLengthInIQSamples() * this.getBytesPerSample();
+    return Number(this.getLengthInIQSamples() * this.getBytesPerSample());
   }
 
   getCenterFrequency() {
     for (let i = 0; i < this.captures.length; i++) {
       if (this.captures[i]['core:frequency']) {
-        return this.captures[i]['core:frequency'];
+        return Number(this.captures[i]['core:frequency']);
       }
     }
     return 0;
@@ -269,7 +269,7 @@ export class Annotation {
   }
 
   getLabel() {
-    return this['core:label'] ?? this['core:description'] ?? '';
+    return String(this['core:label'] ?? this['core:description'] ?? '');
   }
 
   [key: string]: any;
