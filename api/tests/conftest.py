@@ -17,6 +17,8 @@ async def env_setup():
 @pytest_asyncio.fixture(scope="function")
 def client():
     os.environ["IQENGINE_PLUGINS"] = "[]"
+    os.environ["IQENGINE_FEATURE_FLAGS"] = "{}"
+    os.environ["IQENGINE_CONNECTION_INFO"] = '{"settings": []}'
     with mock.patch("importer.all.import_all_from_env") as mock_i:
         mock_i.return_value = None
         from main import app
