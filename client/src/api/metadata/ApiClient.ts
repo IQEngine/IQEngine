@@ -33,6 +33,20 @@ export class ApiClient implements MetadataClient {
       });
   }
 
+  async queryMeta(queryString: string): Promise<SigMFMetadata[]> {
+    const response = await axios.get(`/api/datasources/query?${queryString}`)
+    return response.data.map((item, i) => {
+      item = Object.assign(new SigMFMetadata(), item);
+      item.annotations = item.annotations?.map((annotation) =>
+        Object.assign(new Annotation(), annotation)
+      );
+      item.captures = item.captures?.map((capture) =>
+        Object.assign(new CaptureSegment(), capture)
+      );
+      return item;
+    });
+  }
+
   features() {
     return {
       canUpdateMeta: true,

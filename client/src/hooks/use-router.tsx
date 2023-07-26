@@ -3,6 +3,7 @@ import { createBrowserRouter } from 'react-router-dom';
 import React from 'react';
 import SwaggerUI from 'swagger-ui-react';
 import { useProtectedRoute } from '@/auth/hooks/use-protected-route';
+import { DocsPages } from '@/pages/docs/docs-pages';
 
 export function useRouter() {
   const router = createBrowserRouter([
@@ -23,25 +24,38 @@ export function useRouter() {
         {
           path: 'sigmf',
           async lazy() {
-            let { SigMF } = await import('@/pages/SigMF');
+            let { SigMF } = await import('@/pages/sigmf');
             return { Component: SigMF };
+          },
+        },
+        {
+          path: 'query',
+          async lazy() {
+            let { MetadataQuery } = await import('@/pages/metadata-query/metadata-query');
+            return { Component: MetadataQuery };
           },
         },
         {
           path: 'upload',
           async lazy() {
-            let { UploadPage } = await import('@/pages/UploadPage');
+            let { UploadPage } = await import('@/pages/upload-page');
             return { Component: UploadPage };
           },
         },
-        { path: 'siggen', element: <SignalGenerator /> },
         {
-          path: 'plugins',
+          path: 'docs',
           async lazy() {
-            let { Plugins } = await import('@/pages/Plugins');
-            return { Component: Plugins };
+            return { Component: DocsPages };
           },
         },
+        // because there are so many docs pages, we have one component that takes in the page name as a param
+        {
+          path: 'docs/:page',
+          async lazy() {
+            return { Component: DocsPages };
+          },
+        },
+        { path: 'siggen', element: <SignalGenerator /> },
         {
           path: 'admin',
           async lazy() {
@@ -116,7 +130,7 @@ export function useRouter() {
         {
           path: 'spectrogram/:type/:account/:container/:filePath/:sasToken?',
           async lazy() {
-            let { SpectrogramPage } = await import('@/pages/spectrogram/SpectrogramPage');
+            let { SpectrogramPage } = await import('@/pages/spectrogram/spectrogram-page');
             return { Component: SpectrogramPage };
           },
         },

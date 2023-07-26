@@ -1,7 +1,8 @@
 from typing import Optional
 
 from azure.storage.blob import BlobProperties
-from azure.storage.blob.aio import BlobClient
+from azure.storage.blob.aio import BlobClient, ContainerClient
+from database.models import Metadata
 from helpers.urlmapping import ApiType, get_file_name
 from pydantic import SecretStr
 from rf.spectrogram import get_spectrogram_image
@@ -49,9 +50,12 @@ class AzureBlobClient:
         self.clients[filepath] = blob_client
         return blob_client
 
-    async def blob_exist(self, filepath):
-        blob_client = self.get_blob_client(filepath)
-        return await blob_client.exists()
+    def get_container_client(self):
+        return ContainerClient.from_connection_string(
+            f"https://{self.account}.blob.core.windows.net/",
+            container_name=self.container,
+            credential=self.sas_token.get_secret_value(),
+        )
 
     async def get_blob_properties(self, filepath) -> BlobProperties:
         blob_client = self.get_blob_client(filepath)
@@ -87,3 +91,28 @@ class AzureBlobClient:
         content = await self.get_blob_content(iq_path, 8000, fftSize * 512)
         image = get_spectrogram_image(content, data_type, fftSize)
         return image
+
+    async def get_metadata_files(self):
+        container_client = self.get_container_client()
+        # files that enf with .sigmf-meta
+        async for blob in container_client.list_blobs():
+            if blob.name.endswith(".sigmf-meta"):
+                metadata = await self.get_metadata_file(blob.name)
+                yield str(blob.name), metadata
+        return
+
+    async def get_metadata_file(self, filepath: str):
+        blob_client = self.get_blob_client(filepath)
+        blob = await blob_client.download_blob()
+        content = await blob.readall()
+        metadata = Metadata.parse_raw(content)
+        return metadata
+
+    async def blob_exist(self, filepath):
+        blob_client = self.get_blob_client(filepath)
+        return await blob_client.exists()
+
+    async def get_file_length(self, filepath):
+        blob_client = self.get_blob_client(filepath)
+        blob = await blob_client.get_blob_properties()
+        return int(blob.size)

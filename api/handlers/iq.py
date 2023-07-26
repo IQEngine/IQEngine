@@ -6,15 +6,17 @@ from typing import List
 from fastapi.responses import StreamingResponse
 
 from helpers.conversions import find_smallest_and_largest_next_to_each_other
-from rf.samples import get_multiplier
+from rf.samples import get_bytes_per_iq_sample
 
 from blob.azure_client import AzureBlobClient
 from database import datasource_repo
 from database.models import DataSource
 from fastapi import APIRouter, Depends, HTTPException
+from helpers.authorization import required_roles
 from helpers.cipher import decrypt
 from helpers.urlmapping import ApiType, get_file_name
 from pydantic import BaseModel, SecretStr
+from typing import Optional
 
 router = APIRouter()
 
@@ -55,18 +57,18 @@ async def get_iq_data(
     try:
         fft_arr = [int(num) for num in fft_arr_str.split(",")]
         return StreamingResponse(
-            get_byte_stream(fft_arr, fft_size, get_multiplier(format), get_file_name(filepath, ApiType.IQDATA), azure_client), media_type="application/octet-stream"
+            get_byte_stream(fft_arr, fft_size, get_bytes_per_iq_sample(format), get_file_name(filepath, ApiType.IQDATA), azure_client), media_type="application/octet-stream"
         )
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-async def get_byte_stream(fft_arr, fft_size, multiplier, iq_file, azure_client):
+async def get_byte_stream(fft_arr, fft_size, bytes_per_iq_sample, iq_file, azure_client):
 
     arrs = find_smallest_and_largest_next_to_each_other(fft_arr)
 
     for arr in arrs:
-        offsetBytes = arr[0] * fft_size * multiplier
-        countBytes = (arr[1]-arr[0]+1)* fft_size * multiplier
+        offsetBytes = arr[0] * fft_size * bytes_per_iq_sample
+        countBytes = (arr[1]-arr[0]+1)* fft_size * bytes_per_iq_sample
 
         blob_size = await azure_client.get_blob_size(iq_file)
         if(blob_size < offsetBytes):
@@ -82,7 +84,8 @@ async def get_byte_stream(fft_arr, fft_size, multiplier, iq_file, azure_client):
 
 
 @router.get(
-    "/api/datasources/{account}/{container}/{filepath:path}/iqslice", status_code=200
+    "/api/datasources/{account}/{container}/{filepath:path}/iqslice",
+    status_code=200,
 )
 async def get_iq(
     filepath: str,
@@ -90,6 +93,7 @@ async def get_iq(
     countBytes: int,
     datasource: DataSource = Depends(datasource_repo.get),
     azure_client: AzureBlobClient = Depends(AzureBlobClient),
+    current_user: Optional[dict] = Depends(required_roles()),
 ):
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
@@ -128,13 +132,15 @@ async def download_blob(
 
 
 @router.post(
-    "/api/datasources/{account}/{container}/{filepath:path}/iqslices", status_code=200
+    "/api/datasources/{account}/{container}/{filepath:path}/iqslices",
+    status_code=200
 )
 async def get_iq_data_slices(
     iq_data: IQData,
     filepath: str,
     datasource: DataSource = Depends(datasource_repo.get),
     azure_client: AzureBlobClient = Depends(AzureBlobClient),
+    current_user: Optional[dict] = Depends(required_roles()),
 ):
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")

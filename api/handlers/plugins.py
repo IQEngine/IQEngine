@@ -1,15 +1,19 @@
 from database import plugin_repo
 from database.models import Plugin
 from fastapi import APIRouter, Depends, HTTPException
+from helpers.authorization import required_roles
 from motor.core import AgnosticCollection
+from typing import Optional
 
 router = APIRouter()
 
 
+@router.post("/api/plugins/", status_code=201, response_model=Plugin)
 @router.post("/api/plugins", status_code=201, response_model=Plugin)
 async def create_plugin(
     plugin: Plugin,
     plugins: AgnosticCollection = Depends(plugin_repo.collection),
+    current_user: Optional[dict] = Depends(required_roles()),
 ):
     """
     Create a new plugin. The plugin will be henceforth identified by name which
@@ -22,9 +26,11 @@ async def create_plugin(
     return plugin
 
 
+@router.get("/api/plugins/", response_model=list[Plugin])
 @router.get("/api/plugins", response_model=list[Plugin])
 async def get_plugins(
     plugins: AgnosticCollection = Depends(plugin_repo.collection),
+    current_user: Optional[dict] = Depends(required_roles()),
 ):
     """
     Get a list of all plugins.
@@ -32,10 +38,14 @@ async def get_plugins(
     return list(await plugins.find({}).to_list(1_000_000))
 
 
-@router.get("/api/plugins/{plugin_name}", response_model=Plugin)
+@router.get(
+    "/api/plugins/{plugin_name}",
+    response_model=Plugin
+)
 async def get_plugin(
     plugin_name: str,
     plugins: AgnosticCollection = Depends(plugin_repo.collection),
+    current_user: Optional[dict] = Depends(required_roles()),
 ):
     """
     Get a plugin by name.
@@ -46,11 +56,15 @@ async def get_plugin(
     return plugin
 
 
-@router.put("/api/plugins/{plugin_name}", response_model=Plugin)
+@router.put(
+    "/api/plugins/{plugin_name}",
+    response_model=Plugin
+)
 async def update_plugin(
     plugin_name: str,
     plugin: Plugin,
     plugins: AgnosticCollection = Depends(plugin_repo.collection),
+    current_user: Optional[dict] = Depends(required_roles()),
 ):
     """
     Update a plugin by name.
@@ -65,10 +79,13 @@ async def update_plugin(
     return plugin
 
 
-@router.delete("/api/plugins/{plugin_name}")
+@router.delete(
+    "/api/plugins/{plugin_name}"
+)
 async def delete_plugin(
     plugin_name: str,
     plugins: AgnosticCollection = Depends(plugin_repo.collection),
+    current_user: Optional[dict] = Depends(required_roles()),
 ):
     """
     Delete a plugin by name.

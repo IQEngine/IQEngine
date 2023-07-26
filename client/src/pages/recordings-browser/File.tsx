@@ -6,19 +6,28 @@ import React, { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { CLIENT_TYPE_BLOB } from '@/api/Models';
 import { getMeta } from '@/api/metadata/Queries';
-import { AnnotationModal } from './AnnotationModal';
+import { FileAnnotationData } from './FileAnnotationData';
+import { ModalDialog } from '@/features/ui/modal/Modal';
 
 interface FileRowProps {
   filepath: string;
+  type?: string;
+  account?: string;
+  container?: string;
+  sasToken?: string;
 }
 
-export default function FileRow({ filepath }: FileRowProps) {
+export default function FileRow({ filepath, type, account, container, sasToken }: FileRowProps) {
   const [showModal, setShowModal] = useState(false);
 
-  const { type, account, container, sasToken } = useParams();
+  const { type: paramType, account: paramAccount, container: paramContainer, sasToken: paramSASToken } = useParams();
+  type = type ?? paramType;
+  account = account ?? paramAccount;
+  container = container ?? paramContainer;
+  sasToken = sasToken ?? paramSASToken;
   const { data: item } = getMeta(type, account, container, filepath);
 
-  const spectogramLink = `/spectrogram/${item?.getOrigin().type}/${item?.getOrigin().account}/${
+  const spectrogramLink = `/spectrogram/${item?.getOrigin().type}/${item?.getOrigin().account}/${
     item?.getOrigin().container
   }/${encodeURIComponent(item?.getFilePath())}`;
 
@@ -88,14 +97,14 @@ export default function FileRow({ filepath }: FileRowProps) {
         <>
           {/* If we are looking at a recording from blob storage */}
           <td className="px-4 min-w-fit">
-            <Link to={spectogramLink} onClick={() => {}}>
+            <Link to={spectrogramLink} onClick={() => {}}>
               <div className="zoom">
                 <img src={getThumbnailUrl()} alt="Spectrogram Thumbnail" style={{ width: '200px', height: '100px' }} />
               </div>
             </Link>
           </td>
           <td className="align-middle text-left">
-            <Link to={spectogramLink} onClick={() => {}}>
+            <Link to={spectrogramLink} onClick={() => {}}>
               <h2>{item.getFileName()}</h2>
             </Link>
             <div title={item.getDescription()}>{item.getShortDescription()}</div>
@@ -128,11 +137,11 @@ export default function FileRow({ filepath }: FileRowProps) {
             {item.annotations?.length ?? 0}
           </button>
           {showModal && (
-            <AnnotationModal
-              setShowModal={setShowModal}
+            <ModalDialog setShowModal={setShowModal} heading={item.getFileName()}>
+            <FileAnnotationData
               annotations={item?.annotations}
-              fileName={item.getFileName()}
             />
+            </ModalDialog>
           )}
           <br></br>({item.captures?.length ?? 0} Capture{item.captures?.length > 1 && 's'})
         </div>

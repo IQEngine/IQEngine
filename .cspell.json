@@ -89,6 +89,15 @@
     "AZUREAPPSERVICE",
     "clogo",
     "simd",
-    "PUBLISHPROFILE"
+    "PUBLISHPROFILE",
+    "httpx",
+    "fastapi",
+    "pydantic",
+    "urlmapping",
+    "vals",
+    "automargin",
+    "textposition",
+    "textinfo",
+    "showlegend"
   ]
 }

@@ -59,6 +59,7 @@ valid_metadata_array = [
             "core:version": "0.0.1",
             "traceability:origin": None,
             "traceability:revision": None,
+            "traceability:sample_length": None,
         },
         "captures": [
             {

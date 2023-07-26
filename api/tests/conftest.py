@@ -1,8 +1,10 @@
 # vim: tabstop=4 shiftwidth=4 expandtab
 import os
+from typing import List, Optional, Union
 from unittest import mock
 
 import database.database as db
+import pytest
 import pytest_asyncio
 from fastapi.testclient import TestClient
 
@@ -14,10 +16,24 @@ async def env_setup():
     db._db = None
 
 
+@pytest.mark.asyncio
+def required_roles_mock(role: Optional[Union[str, List[str]]] = None):
+    async def wrapper():
+        return {
+            "roles": ["IQEngine-Admin", "IQEngine-User"],
+            "preferred_username": "emailaddress",
+        }
+
+    return wrapper
+
+
 @pytest_asyncio.fixture(scope="function")
 def client():
     os.environ["IQENGINE_PLUGINS"] = "[]"
-    with mock.patch("importer.all.import_all_from_env") as mock_i:
+    os.environ["IQENGINE_CONNECTION_INFO"] = '{"settings": []}'
+    with mock.patch("importer.all.import_all_from_env") as mock_i, mock.patch(
+        "helpers.authorization.required_roles", return_value=required_roles_mock()
+    ):
         mock_i.return_value = None
         from main import app
 

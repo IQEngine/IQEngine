@@ -12,39 +12,38 @@
 * Share your RF recordings or RFML datasets with others, without them having to download files or install any software
 * IQEngine only fetches the portion of the samples you're viewing, allowing you to quickly browse very large RF recordings
 * Test signal detection algorithms and visualize results
-* Interactively learn about different Fourier and wavelet transforms and filters by applying them to interesting signals
+* Interactively learn about Fourier transforms and filters by applying them to interesting signals
 * Organize and search through millions of RF recordings via metadata queries
-
-
 
 Try IQEngine now using the canonical instance at [www.iqengine.org](http://iqengine.org/) hosted by [GNU Radio](https://www.gnuradio.org/) and connected to the official [SigMF](https://github.com/gnuradio/SigMF) examples repository.  You can use the same site to open local RF recordings, the processing is all done client-side.
 
-IQEngine is rapidly evolving, so [sign up](https://dashboard.mailerlite.com/forms/299501/77960409531811734/share) for a once-a-month email update, including new features, demos, and more!  There is also an IQEngine [Discord](https://discord.gg/k7C8kp3b76) chat channel if you want to get involved in the development.  You may also contact Marc at iqengine@vt.edu for questions/comments/suggestions.
+IQEngine is rapidly evolving, so [sign up](https://dashboard.mailerlite.com/forms/299501/77960409531811734/share) for a once-a-month email update, including new features, demos, and more!  There is also an IQEngine [Discord](https://discord.gg/k7C8kp3b76) chat channel if you want to get involved in the development or have questions.
+
+<p align="center"><h2>IQEngine is Supported By:</h2></p>
+
+<p align="center"><img width=250 src="client/public/microsoft-logo.svg" /></p>
+
+<p align="center"><a href="https://www.qoherent.ai/"><img width=250 src="client/public/clogo-black.png" /></a></p>
 
 ## Plugins
 
-Through the optional backend API, IQEngine supports three different classes of plugins (signal generation is not yet released).
-The signal detector (with optional classifier) can be triggered in the main spectrogram page, which will display the output annotations as soon as it finishes, convenient for testing new detection/classification algorithms.
-The DSP module runs prior to the FFT calculations, letting you perform a variety of signal processing functions and other sample manipulation.
-It currently only supports Python snippets, where the samples out must be the same length as samples in (for now).
+IQEngine supports a plugin system, allowing DSP and other functions to run at the backend and process IQ samples.  Running a plugin occurs on the spectrogram page, after selecting the portion of the recording you want to process.  One example use-case is running a signal detector (with optional classifier), which will display the output annotations as soon as it finishes, convenient for testing new detection/classification algorithms.  It is also possible to wrap a GNU Radio flowgraph into a plugin; it must run in no-GUI mode and use ZMQ PUB/SUB for the input and output streams.
 
 <p align="center">
   <img width=450 src="client/public/plugins_concept.svg" />
 </p>
 
-## Create your own instance
-Click the button below to deploy your own instance of IQEngine.
-You will need an Azure account, but you can get a free one [here](https://azure.microsoft.com/en-us/free/).  The deployment will take about 5 minutes.
+## Running IQEngine
+
+For 99% of users, there is no reason to run your own instance of IQEngine; the canonical instance at [www.iqengine.org](http://www.iqengine.org) can be used to view local files or access your private storage account.  Organizations who wish to run their own instance for internal use can click the button below to deploy an instance of IQEngine in Azure.  You will need an Azure account, but you can get a free one [here](https://azure.microsoft.com/en-us/free/).  The deployment will take about 5 minutes.
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FIQEngine%2FIQEngine%2Fmain%2Finfra%2Fiqengine.json)
 
-## Local Installation
-
-If you only need to work with local files or operate in a sensitive environment, you don't have to run your own instance of IQEngine. The primary instance at [www.iqengine.org](http://www.iqengine.org) can be used to view local files or access your private storage account. However, if you still want to run your own instance, follow these instructions:
+For developers, or anyone who wants to run their own instance locally, use one of the three methods below:
 
 ### Using the Public Docker Image
 
-You can run the latest Docker image from the GitHub repository by executing the following command:
+You can run the latest Docker image from the GitHub repository by executing the following command after [installing Docker](https://docs.docker.com/engine/install/ubuntu/):
 
 ```bash
 docker run -p 3000:3000 -d ghcr.io/iqengine/iqengine:latest
@@ -102,28 +101,6 @@ docker run -p 3000:3000 -d iqengine-local
 
 This will instantiate IQEngine using your locally built Docker image, and you can access it at [http://localhost:3000](http://localhost:3000).
 
-### Misc Tips
-
-To fix 99% of linting warnings automatically, try running:
-
-```bash
-docker run -d -v $(git rev-parse --show-toplevel):/tmp/lint ghcr.io/oxsecurity/megalinter:v6
-```
-
-Feature Flag usage.
-
-Feature flags are set up across the application. To use a feature flag add it to the environment .env and then use it to wrap UI elements as illustrated below, or use the getFeatureFlag(flagname) method to programmatically get a feature flag value.
-
-Each component needs to import the Feature component.
-
-```HTML
-      <Feature flag="useIQEngineOutReach">
-        <h2 className="text-center py-2">
-          Sign up for a once-a-month email update on IQEngine, such as new features, demos, and more!
-        </h2>
-      </Feature>
-```
-
 ## Project Configuration
 
 To configure the project, you need to set specific environment variables. The currently supported environment variables are as follows:
@@ -156,7 +133,6 @@ We have several feature flags currently in use. Their purposes are as follows:
 
 * `displayInternalBranding`: When true this flag displays an additional logo for customers using IQ Engine. This is false as default.
 
-
 ## Project Roadmap
 
 The following roadmap highlights the past, current, and future work items across multiple (simultaneous) focus areas.  Not included in this list are ongoing efforts to make IQEngine valuable for use in education, as well as user experience (UX) improvements.
@@ -165,23 +141,23 @@ The following roadmap highlights the past, current, and future work items across
   * [x] Spectrogram + time + freq + IQ plots with zooming and adjustable scales
   * [x] Filtering and arbitrary Python snippets prior to FFT
   * [x] Time domain cursors to select samples for other plots or to send to plugins
+  * [x] Configurable colormap
   * [ ] Frequency domain cursors and ability to extract region to a new file using tune-filter-decimate
   * [ ] Faster client-side FFTs (e.g., using a C webasm module + SIMD for the FFTs)
-  * [ ] Configurable colormap
   * [ ] PFB channelizer or wavelet in place of FFT
   * [ ] Time-domain plot utilities like demod, hex viewier, correlator, similar to Universal Radio Hacker
 * Becoming the ultimate SigMF visualization and editing tool
   * [x] Viewable/editable global params and annotations, including adding a new annotation
+  * [x] If you click an annotation in the table it jumps to that point in time in the spectrogram
   * [ ] Ability to save changes to annotations/captures/global to the file
-  * [ ] If you click an annotation in the table it jumps to that point in time in the spectrogram
   * [ ] Support for multiple captures
   * [ ] Zooming out in time with decimating to reduce data transferred to client
   * [ ] Ability to link to a specific point in time within a recording
   * [ ] Method of converting other common meta and data types to SigMF (e.g., recordings from test equipment)
 * Extendable with Plugins (detection, classification, demod/decode, generic DSP)
   * [x] Example proof of concept for running plugins within IQEngine
-  * [ ] Finalize and implement OpenAPI spec
-  * [ ] Include examples of functioning plugins and templates for authors to follow
+  * [x] Finalize and implement OpenAPI spec
+  * [x] Include examples of functioning plugins and templates for authors to follow
   * [ ] Ability for third-party hosted plugins to be made available to anyone
   * [ ] User/admin system for controlling access to certain plugins
 * Adding value to RFML research and development
@@ -191,23 +167,34 @@ The following roadmap highlights the past, current, and future work items across
 * Utility within spectrum awareness systems
   * [x] Table of all RF recordings available in a directory or blob storage account
   * [x] Spectrogram thumbnails
-  * [ ] Ability to search/query over millions of recordings by parsing metadata into database
+  * [x] Ability to search/query over millions of recordings by parsing metadata into database
+  * [x] User/admin system for controlling access to certain recordings
   * [ ] Maps based interface to show sensor location
   * [ ] Bandwidth stitching of multiple simultaneous recordings at different frequencies
-  * [ ] User/admin system for controlling access to certain recordings
 
 * [x] Indicates completed
 
-## Azure App Service Config Notes
+### Misc Developer Tips
 
-* Startup command needs to be `pm2 serve /home/site/wwwroot --spa --no-daemon`
-* Node 16
-* There needs to be a deployment slot called staging
-* within the GitHub repository settings under Secrets and vars > Actions, there needs to be a Repository secret with AZUREAPPSERVICE_PUBLISHPROFILE...
+To fix 99% of linting warnings automatically, try running:
+
+```bash
+docker run -d -v $(git rev-parse --show-toplevel):/tmp/lint ghcr.io/oxsecurity/megalinter:v6
+```
+
+Feature flags are set up across the application. To use a feature flag, add it to your .env file in the root of the repo and then use it to wrap UI elements as illustrated below, or use the getFeatureFlag(flagname) method to programmatically get a feature flag value.
+
+Each component needs to import the Feature component.
+
+```HTML
+      <Feature flag="useIQEngineOutReach">
+        <h2 className="text-center py-2">
+          Sign up for a once-a-month email update on IQEngine, such as new features, demos, and more!
+        </h2>
+      </Feature>
+```
+
+Azure Container App Config Notes:
+
+* Within the GitHub repository settings under Secrets and vars > Actions, there needs to be a Repository secret with AZUREAPPSERVICE_PUBLISHPROFILE...
 * Connection settings live in GitHub Secrets > Actions (not Azure App Service anymore), enter it in without the outer double quotes and don't escape any quotes.
-
-<p align="center"><h1>IQEngine is Supported By:</h1></p>
-
-<p align="center"><img width=250 src="client/public/microsoft-logo.svg" /></p>
-
-<p align="center"><a href="https://www.qoherent.ai/"><img width=250 src="client/public/clogo-black.png" /></a></p>
