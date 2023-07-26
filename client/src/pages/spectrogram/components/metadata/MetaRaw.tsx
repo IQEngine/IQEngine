@@ -51,7 +51,7 @@ export const MetaRaw = ({ meta }: MetaRawProps) => {
     <div className="outline outline-1 outline-primary p-2">
       <div className="flex flex-row">
         <button
-          aria-label="Download Metadata Button"
+          aria-label="Download Metadata"
           className="mb-1 text-right"
           onClick={() => {
             downloadInfo();
@@ -62,7 +62,7 @@ export const MetaRaw = ({ meta }: MetaRawProps) => {
         </button>
         {canUpdateMeta && (
           <button
-            aria-label="Save Metadata Button"
+            aria-label="Save Metadata"
             className="text-right mb-1 ml-1"
             onClick={() => {
               saveMeta();

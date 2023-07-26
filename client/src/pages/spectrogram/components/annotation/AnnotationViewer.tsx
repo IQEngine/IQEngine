@@ -185,7 +185,7 @@ const AnnotationViewer = ({
 
   return (
     <Layer>
-      {/* Button to add a new annotation */}
+      {/* to add a new annotation */}
       <Rect x={10} y={10} width={122} height={20} fill="black" opacity={0.6} onClick={newAnnotationClick} />
       <Text
         text="Add Annotation"
