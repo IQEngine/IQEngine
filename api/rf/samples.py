@@ -30,8 +30,9 @@ def get_samples(data_bytes, data_type) -> np.ndarray:
         raise ("Datatype " + data_type + " not implemented")
     return samples
 
+
 def get_bytes_per_iq_sample(data_type):
-    """ 
+    """
     Get the number of bytes per I+Q sample.
 
     Parameters
@@ -39,7 +40,7 @@ def get_bytes_per_iq_sample(data_type):
     data_type : str
         The data type of the bytes.
 
-    
+
     Returns
     -------
     int
@@ -53,6 +54,7 @@ def get_bytes_per_iq_sample(data_type):
         return 2
     else:
         raise ValueError("Datatype " + data_type + " not implemented")
+
 
 def get_sample_length_from_byte_length(byte_length: int, data_type: str):
     """

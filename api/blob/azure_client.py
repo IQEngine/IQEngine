@@ -60,7 +60,7 @@ class AzureBlobClient:
     async def get_blob_properties(self, filepath) -> BlobProperties:
         blob_client = self.get_blob_client(filepath)
         return await blob_client.get_blob_properties()
-    
+
     async def get_blob_size(self, filepath) -> int:
         blob_client = self.get_blob_client(filepath)
         blob_properties = await blob_client.get_blob_properties()

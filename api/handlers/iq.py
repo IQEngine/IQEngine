@@ -2,21 +2,19 @@ import asyncio
 import base64
 import io
 import logging
-from typing import List
-from fastapi.responses import StreamingResponse
-
-from helpers.conversions import find_smallest_and_largest_next_to_each_other
-from rf.samples import get_bytes_per_iq_sample
+from typing import List, Optional
 
 from blob.azure_client import AzureBlobClient
 from database import datasource_repo
 from database.models import DataSource
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import StreamingResponse
 from helpers.authorization import required_roles
 from helpers.cipher import decrypt
+from helpers.conversions import find_smallest_and_largest_next_to_each_other
 from helpers.urlmapping import ApiType, get_file_name
 from pydantic import BaseModel, SecretStr
-from typing import Optional
+from rf.samples import get_bytes_per_iq_sample
 
 router = APIRouter()
 
@@ -38,11 +36,10 @@ async def get_sas_token(
         return decrypted_sas_token
     else:
         return SecretStr("")
-    
+
 
 @router.get(
-    "/api/datasources/{account}/{container}/{filepath:path}/iq-data",
-    status_code=200
+    "/api/datasources/{account}/{container}/{filepath:path}/iq-data", status_code=200
 )
 async def get_iq_data(
     filepath: str,
@@ -57,23 +54,32 @@ async def get_iq_data(
     try:
         fft_arr = [int(num) for num in fft_arr_str.split(",")]
         return StreamingResponse(
-            get_byte_stream(fft_arr, fft_size, get_bytes_per_iq_sample(format), get_file_name(filepath, ApiType.IQDATA), azure_client), media_type="application/octet-stream"
+            get_byte_stream(
+                fft_arr,
+                fft_size,
+                get_bytes_per_iq_sample(format),
+                get_file_name(filepath, ApiType.IQDATA),
+                azure_client,
+            ),
+            media_type="application/octet-stream",
         )
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-async def get_byte_stream(fft_arr, fft_size, bytes_per_iq_sample, iq_file, azure_client):
 
+async def get_byte_stream(
+    fft_arr, fft_size, bytes_per_iq_sample, iq_file, azure_client
+):
     arrs = find_smallest_and_largest_next_to_each_other(fft_arr)
 
     for arr in arrs:
         offsetBytes = arr[0] * fft_size * bytes_per_iq_sample
-        countBytes = (arr[1]-arr[0]+1)* fft_size * bytes_per_iq_sample
+        countBytes = (arr[1] - arr[0] + 1) * fft_size * bytes_per_iq_sample
 
         blob_size = await azure_client.get_blob_size(iq_file)
-        if(blob_size < offsetBytes):
+        if blob_size < offsetBytes:
             return
-        if(blob_size < offsetBytes + countBytes):
+        if blob_size < offsetBytes + countBytes:
             countBytes = blob_size - offsetBytes
 
         content = await azure_client.get_blob_content(
@@ -132,8 +138,7 @@ async def download_blob(
 
 
 @router.post(
-    "/api/datasources/{account}/{container}/{filepath:path}/iqslices",
-    status_code=200
+    "/api/datasources/{account}/{container}/{filepath:path}/iqslices", status_code=200
 )
 async def get_iq_data_slices(
     iq_data: IQData,
