@@ -23,7 +23,7 @@ export function calculateSampleCount(start: string, current: string, sampleRate:
 }
 
 // Prints a number in Hz, using units most appropriate
-export function getFrequency(freq: number) {
+export function unitPrefixHz(freq: number) {
   if (!freq || isNaN(freq)) return { freq: 0, unit: 'Hz' };
 
   freq = Number(freq.toFixed(0));
@@ -43,7 +43,7 @@ export function getFrequency(freq: number) {
   return { freq: freq, unit: 'Hz' };
 }
 
-export function getOriginalFrequency(freq: number, unit: string) {
+export function unitPrefixHzInverse(freq: number, unit: string) {
   if (!freq || isNaN(freq)) return 0;
 
   if (unit === 'GHz') {
@@ -62,7 +62,7 @@ export function getOriginalFrequency(freq: number, unit: string) {
 }
 
 // Prints a number in seconds, using units most appropriate
-export function getSeconds(time: number) {
+export function unitPrefixSeconds(time: number) {
   const timePico = Number((time * 1e12).toFixed(0));
   if (timePico.toString().length >= 10) {
     return { time: timePico / 1e9, unit: 'ms' };
@@ -80,7 +80,7 @@ export function getSeconds(time: number) {
 }
 
 // Prints a number of samples, using units most appropriate
-export function getSamples(samples: number) {
+export function unitPrefixSamples(samples: number) {
   if (!samples || isNaN(samples)) return { samples: 0, unit: '' };
 
   samples = Number(samples.toFixed(0));
