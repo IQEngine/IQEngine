@@ -56,7 +56,12 @@ valid_metadata_array = [
             "core:sha512": None,
             "core:trailing_bytes": None,
             "core:version": "0.0.1",
-            "traceability:origin": None,
+            "traceability:origin": {
+                "type": "api",
+                "account": "test_account",
+                "container": "test_container",
+                "file_path": "test_file_path",
+            },
             "traceability:revision": None,
             "traceability:sample_length": None,
         },
@@ -81,5 +86,14 @@ valid_metadata_array = [
                 "core:uuid": None,
             }
         ],
+    }
+]
+
+valid_datasourcereference_array = [
+    {
+        "type": "api",
+        "account": "test_account",
+        "container": "test_container",
+        "file_path": "test_file_path",
     }
 ]
