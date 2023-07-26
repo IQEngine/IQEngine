@@ -6,11 +6,14 @@ interface ModalProps {
   heading: string;
   setShowModal: any;
   children: any;
+  classList?: string;
 }
 export const ModalDialog = ({
     heading,
     setShowModal,
-    children}: ModalProps) => {
+    children,
+    classList
+  }: ModalProps) => {
 
       const ref = useRef(null);
       useOnClickOutside(ref, () => {
@@ -19,7 +22,7 @@ export const ModalDialog = ({
 
       return (
         <dialog aria-label={'Modal'} className="modal modal-open w-full h-full">
-            <div className="modal-box">
+            <div className={`modal-box ${classList}`}>
                 <h3 className="font-bold text-lg text-primary">{heading}</h3>
                 <button
                     aria-label={'Close'}
