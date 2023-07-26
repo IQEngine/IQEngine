@@ -137,7 +137,7 @@ export default function FileRow({ filepath, type, account, container, sasToken }
             {item.annotations?.length ?? 0}
           </button>
           {showModal && (
-            <ModalDialog setShowModal={setShowModal} heading={item.getFileName()}>
+            <ModalDialog setShowModal={setShowModal} heading={item.getFileName()} isFullWidth={true}>
             <FileAnnotationData
               annotations={item?.annotations}
             />

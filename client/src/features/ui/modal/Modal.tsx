@@ -6,20 +6,25 @@ interface ModalProps {
   heading: string;
   setShowModal: any;
   children: any;
+  isFullWidth?: boolean;
 }
 export const ModalDialog = ({
     heading,
     setShowModal,
-    children}: ModalProps) => {
+    children,
+    isFullWidth
+  }: ModalProps) => {
 
       const ref = useRef(null);
       useOnClickOutside(ref, () => {
         setShowModal(false)
       });
 
+      const modalBoxStyling = isFullWidth ? "modal-box max-w-full" : "modal-box"
+
       return (
         <dialog aria-label={'Modal'} className="modal modal-open w-full h-full">
-            <div className="modal-box">
+            <div className={modalBoxStyling}>
                 <h3 className="font-bold text-lg text-primary">{heading}</h3>
                 <button
                     aria-label={'Close'}

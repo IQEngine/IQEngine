@@ -30,7 +30,7 @@ export const PluginDetail = ({ plugin }: PluginRowProps) => {
         <ArrowTopRightOnSquareIcon className="h-4 w-4" />
       </button>
 
-      {showModal && <ModalDialog heading={`Plugin detail`} setShowModal={setShowModal}>
+      {showModal && <ModalDialog heading={`Plugin detail`} setShowModal={setShowModal} isFullWidth={false}>
         <p>
           <span className="font-bold">Name:</span> {plugin.name}
         </p>
@@ -218,7 +218,7 @@ export const PluginRow = ({ plugin, removePlugin }: PluginRowProps) => {
             }}>
         <PencilIcon className="h-4 w-4" />
       </button>
-      {showEditModal && <ModalDialog heading={'Edit plugin'} setShowModal={setEditShowModal}><PluginEdit plugin={plugin} /></ModalDialog>}
+      {showEditModal && <ModalDialog heading={'Edit plugin'} setShowModal={setEditShowModal}  isFullWidth={false}><PluginEdit plugin={plugin} /></ModalDialog>}
 
         <PluginDelete plugin={plugin} removePlugin={removePlugin} />
       </td>
@@ -254,7 +254,7 @@ export const Plugins = () => {
   return (
     <>
       <h1 className="text-3xl font-bold">Plugins</h1>
-      {showModal && <ModalDialog heading={'Add plugin'} setShowModal={setShowModal}><PluginAdd /></ModalDialog>}
+      {showModal && <ModalDialog heading={'Add plugin'} setShowModal={setShowModal}  isFullWidth={false}><PluginAdd /></ModalDialog>}
       <button className="h-9" name="Add Plugin" aria-label="add plugin" onClick={() => {
               setShowModal(true);
             }}>
