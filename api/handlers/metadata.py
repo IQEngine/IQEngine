@@ -17,7 +17,7 @@ router = APIRouter()
 @router.get(
     "/api/datasources/{account}/{container}/meta",
     status_code=200,
-    response_model=list[Metadata]
+    response_model=list[Metadata],
 )
 async def get_all_meta(
     account,
@@ -44,7 +44,7 @@ async def get_all_meta(
 @router.get(
     "/api/datasources/{account}/{container}/meta/paths",
     status_code=200,
-    response_model=list[str]
+    response_model=list[str],
 )
 async def get_all_meta_name(
     account,
@@ -70,7 +70,7 @@ async def get_all_meta_name(
 
 @router.get(
     "/api/datasources/{account}/{container}/{filepath:path}/meta",
-    response_model=Metadata
+    response_model=Metadata,
 )
 async def get_meta(
     metadata: Metadata = Depends(metadata_repo.get),
@@ -82,32 +82,8 @@ async def get_meta(
 
 
 @router.get(
-    "/api/datasources/{account}/{container}/{filepath:path}/iqdata",
-    response_class=StreamingResponse
-)
-async def get_metadata_iqdata(
-    filepath: str,
-    datasource: DataSource = Depends(datasource_repo.get),
-    azure_client: AzureBlobClient = Depends(AzureBlobClient),
-    current_user: Optional[dict] = Depends(required_roles()),
-):
-    # Create the imageURL with sasToken
-    if not datasource:
-        raise HTTPException(status_code=404, detail="Datasource not found")
-
-    azure_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
-    content_type = get_content_type(ApiType.IQDATA)
-    iq_path = get_file_name(filepath, ApiType.IQDATA)
-    if not azure_client.blob_exist(iq_path):
-        raise HTTPException(status_code=404, detail="File not found")
-
-    response = await azure_client.get_blob_stream(iq_path)
-    return StreamingResponse(response.chunks(), media_type=content_type)
-
-
-@router.get(
-    "/api/datasources/{account}/{container}/{filepath:path}/thumbnail",
-    response_class=StreamingResponse
+    "/api/datasources/{account}/{container}/{filepath:path}.jpg",
+    response_class=StreamingResponse,
 )
 async def get_meta_thumbnail(
     filepath: str,
@@ -283,7 +259,7 @@ async def query_meta(
 @router.post(
     "/api/datasources/{account}/{container}/{filepath:path}/meta",
     status_code=201,
-    response_model=Metadata
+    response_model=Metadata,
 )
 async def create_meta(
     account: str,
@@ -332,8 +308,7 @@ async def create_meta(
 
 
 @router.put(
-    "/api/datasources/{account}/{container}/{filepath:path}/meta",
-    status_code=204
+    "/api/datasources/{account}/{container}/{filepath:path}/meta", status_code=204
 )
 async def update_meta(
     account,
