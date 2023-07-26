@@ -5,8 +5,9 @@ interface ModalProps {
   heading: string;
   setShowModal: any;
   children: any;
+  classList?: string;
 }
-export const ModalDialog = ({ heading, setShowModal, children }: ModalProps) => {
+export const ModalDialog = ({ heading, setShowModal, children, classList }: ModalProps) => {
   const ref = useRef(null);
   useOnClickOutside(ref, () => {
     setShowModal(false);
@@ -14,7 +15,7 @@ export const ModalDialog = ({ heading, setShowModal, children }: ModalProps) => 
 
   return (
     <dialog aria-labelledby={heading.replace(/ /g, '')} className="modal modal-open w-full h-full">
-      <div className="modal-box">
+      <div className={`modal-box ${classList}`}>
         <h3 id={heading.replace(/ /g, '')} className="font-bold text-lg text-primary">
           {heading}
         </h3>
