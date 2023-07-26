@@ -136,13 +136,13 @@ async def sync_datasource(
     datasources_collection: AgnosticCollection = Depends(datasource_repo.collection),
     backgound_tasks=BackgroundTasks,
 ):
-    existingDatasource = await datasources_collection.find_one(
+    existing_datasource = await datasources_collection.find_one(
         {
             "account": account,
             "container": container,
         }
     )
-    if not existingDatasource:
+    if not existing_datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
     backgound_tasks.add_task(datasource_repo.sync, account, container)
     return {"message": "Syncing"}
