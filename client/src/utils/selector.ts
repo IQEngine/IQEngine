@@ -258,20 +258,18 @@ export function range(start: number, end: number): number[] {
   return Array.apply(0, Array(end - start)).map((element, index) => index + start);
 }
 
-export function dataTypeToBytesPerIQSample(dataType: any): number {
+export function dataTypeToBytesPerIQSample(dataType: string): number {
   // remember there are 2 numbers per IQ sample
-  let bytesPerSample;
   if (dataType.includes('8')) {
-    bytesPerSample = 2;
+    return 2;
   } else if (dataType.includes('16')) {
-    bytesPerSample = 4;
+    return 4;
   } else if (dataType.includes('32')) {
-    bytesPerSample = 8;
+    return 8;
   } else if (dataType.includes('64')) {
-    bytesPerSample = 16;
+    return 16;
   } else {
     console.error('unsupported datatype');
-    bytesPerSample = 2;
+    return 2;
   }
-  return bytesPerSample;
 }
