@@ -40,7 +40,7 @@ export const DataSources = () => {
       </button>
 
 
-      {showModal && <ModalDialog heading={'Add data source'} setShowModal={setShowModal} isFullWidth={false}><DataSourceForm/></ModalDialog>}
+      {showModal && <ModalDialog heading={'Add data source'} setShowModal={setShowModal}><DataSourceForm/></ModalDialog>}
       <div className="flex flex-wrap gap-4 pt-4 mt-2">
         {apiQuery.data?.map((item, i) => (
           <DataSourceRow key={i} dataSource={item} />

@@ -73,7 +73,7 @@ export const Actions = ({
         <ArrowTopRightOnSquareIcon className="h-4 w-4" />
       </button>
 
-      {showModal && <ModalDialog heading={'Annotation ' + index} setShowModal={setShowModal}  isFullWidth={false}>
+      {showModal && <ModalDialog heading={'Annotation ' + index} setShowModal={setShowModal}>
       <div>
           <div>
             <textarea
