@@ -56,12 +56,12 @@ valid_metadata_array = [
             "core:sha512": None,
             "core:trailing_bytes": None,
             "core:version": "0.0.1",
-            "traceability:origin" : {
-                "type" : "api",
-                "account" : "test_account",
-                "container" : "test_container",
-                "file_path" : "test_file_path"
-		},
+            "traceability:origin": {
+                "type": "api",
+                "account": "test_account",
+                "container": "test_container",
+                "file_path": "test_file_path"
+        },
             "traceability:revision": None,
         },
         "captures": [
