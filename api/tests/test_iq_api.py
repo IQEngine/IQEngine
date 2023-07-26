@@ -60,17 +60,17 @@ async def test_get_iq_data_slices(
 
     response = client.post(
         f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path/iqslices',
-        json={"indexes": [0, 1, 2], "tile_size": 2, "bytes_per_sample": 4},
+        json={"indexes": [0, 1, 2], "tile_size": 2, "bytes_per_iq_sample": 4},
     )
     assert response.status_code == 200
     assert isinstance(response.json(), list)
     assert mock_get_blob_content.call_count == 3
     assert mock_get_blob_content.call_args_list[0][1]["offset"] == 0
-    assert mock_get_blob_content.call_args_list[0][1]["length"] == 16
-    assert mock_get_blob_content.call_args_list[1][1]["offset"] == 16
-    assert mock_get_blob_content.call_args_list[1][1]["length"] == 16
-    assert mock_get_blob_content.call_args_list[2][1]["offset"] == 32
-    assert mock_get_blob_content.call_args_list[2][1]["length"] == 16
+    assert mock_get_blob_content.call_args_list[0][1]["length"] == 8
+    assert mock_get_blob_content.call_args_list[1][1]["offset"] == 8
+    assert mock_get_blob_content.call_args_list[1][1]["length"] == 8
+    assert mock_get_blob_content.call_args_list[2][1]["offset"] == 16
+    assert mock_get_blob_content.call_args_list[2][1]["length"] == 8
     assert mock_set_sas_token.call_count == 1
     assert mock_get_blob_properties.call_count == 1
 

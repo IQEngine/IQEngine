@@ -26,9 +26,9 @@ export class LocalClient implements IQDataClient {
     if (!dataFile) {
       return Promise.reject('No data file found');
     }
-    const bytesPerSample = meta.getBytesPerSample();
-    const offsetBytes = index * tileSize * bytesPerSample * 2;
-    const countBytes = tileSize * bytesPerSample * 2;
+    const bytesPerIQSample = meta.getBytesPerIQSample();
+    const offsetBytes = index * tileSize * bytesPerIQSample;
+    const countBytes = tileSize * bytesPerIQSample;
     const slice = dataFile.slice(offsetBytes, offsetBytes + countBytes);
     const buffer = await slice.arrayBuffer();
     const iqArray = convertToFloat32(buffer, meta.getDataType());

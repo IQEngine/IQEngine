@@ -82,23 +82,23 @@ describe('getSampleRate', () => {
   });
 });
 
-describe('getBytesPerSample', () => {
+describe('getBytesPerIQSample', () => {
   test.each`
     datatype     | expected
-    ${'cf32'}    | ${4}
-    ${'cf32_le'} | ${4}
-    ${'cf32_be'} | ${4}
-    ${'cf64'}    | ${8}
-    ${'cf64_le'} | ${8}
-    ${'cf64_be'} | ${8}
-    ${'ci8'}     | ${1}
-    ${'ci8_le'}  | ${1}
-    ${'ci8_be'}  | ${1}
-    ${'ci16'}    | ${2}
-    ${'ci16_le'} | ${2}
+    ${'cf32'}    | ${8}
+    ${'cf32_le'} | ${8}
+    ${'cf32_be'} | ${8}
+    ${'cf64'}    | ${16}
+    ${'cf64_le'} | ${16}
+    ${'cf64_be'} | ${16}
+    ${'ci8'}     | ${2}
+    ${'ci8_le'}  | ${2}
+    ${'ci8_be'}  | ${2}
+    ${'ci16'}    | ${4}
+    ${'ci16_le'} | ${4}
   `('should have the number of bytes', ({ datatype, expected }) => {
     sampleSigmfMetadata.global['core:datatype'] = datatype;
-    expect(sampleSigmfMetadata.getBytesPerSample()).toBe(expected);
+    expect(sampleSigmfMetadata.getBytesPerIQSample()).toBe(expected);
   });
 });
 

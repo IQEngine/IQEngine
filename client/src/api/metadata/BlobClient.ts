@@ -43,7 +43,7 @@ async function blobNameToMetadata(blobName: string, containerClient: ContainerCl
   }
   if (!recording.global['traceability:sample_length']) {
     recording.global['traceability:sample_length'] = Math.round(
-      properties.contentLength / 2 / recording.getBytesPerSample()
+      properties.contentLength / recording.getBytesPerIQSample()
     );
   }
   if (!recording.global['traceability:origin']) {
