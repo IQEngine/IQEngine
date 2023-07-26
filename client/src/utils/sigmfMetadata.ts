@@ -119,7 +119,7 @@ export class SigMFMetadata {
   }
 
   getThumbnailUrl() {
-    this.getFullFilePath() + '.jpg';
+    return this.getFullFilePath() + '.jpg';
   }
   getDataUrl() {
     return this.getFullFilePath() + '.sigmf-data';
