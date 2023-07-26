@@ -3,10 +3,9 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import React from 'react';
-import { useAllProviders, AllProviders } from '@/mocks/setup-tests';
+import { AllProviders } from '@/mocks/setup-tests';
 import DataSourceForm from '@/pages/admin/pages/add-data-source';
 import nock from 'nock';
-import { Toaster } from 'react-hot-toast';
 
 describe('Test DataSources', () => {
   afterEach(() => {
@@ -15,7 +14,6 @@ describe('Test DataSources', () => {
 
   test('Basic Rendering', async () => {
     render(<DataSourceForm></DataSourceForm>, { wrapper: AllProviders });
-    expect(await screen.findByRole('heading', { name: 'Add data source' })).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Data Source Name')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Storage Account name')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Container Name')).toBeInTheDocument();

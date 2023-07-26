@@ -234,8 +234,11 @@ describe('Annotation list component', () => {
     await userEvent.type(start, input);
     await userEvent.tab();
 
+    const openButton = await screen.findByLabelText('Annotation 0 Modal Open');
+    await userEvent.click(openButton);
+
     // Assert
-    const textarea = await screen.findByLabelText('Annotation 0 Modal Text Area');
+    const textarea = await screen.findByLabelText('Annotation 0 Modal');
     expect(textarea.innerHTML).toContain(expected);
   });
 
