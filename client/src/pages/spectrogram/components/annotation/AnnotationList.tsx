@@ -1,11 +1,11 @@
 import DataTable from '@/features/ui/data-table/DataTable';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   calculateDate,
   calculateSampleCount,
-  getOriginalFrequency,
-  getFrequency,
-  getSeconds,
+  unitPrefixHzInverse,
+  unitPrefixHz,
+  unitPrefixSeconds,
   validateFrequency,
   validateDate,
 } from '@/utils/rfFunctions';
@@ -83,10 +83,10 @@ export const AnnotationList = ({
       }
 
       if (parent.name == 'core:freq_lower_edge') {
-        newAnnotationValue = getOriginalFrequency(Number(value), parent.object.unit);
+        newAnnotationValue = unitPrefixHzInverse(Number(value), parent.object.unit);
         parent.error = validateFrequency(newAnnotationValue, minFreq, maxFreq);
       } else if (parent.name == 'core:freq_upper_edge') {
-        newAnnotationValue = getOriginalFrequency(Number(value), parent.object.unit);
+        newAnnotationValue = unitPrefixHzInverse(Number(value), parent.object.unit);
         parent.error = validateFrequency(newAnnotationValue, minFreq, maxFreq);
       }
       let updatedAnnotation = { ...parent.annotation };
@@ -124,16 +124,16 @@ export const AnnotationList = ({
       const label = annotation.getLabel();
 
       // Get start frequency range
-      const startFrequency = getFrequency(lowerEdge);
+      const startFrequency = unitPrefixHz(lowerEdge);
 
       // Get end frequency range
-      const endFrequency = getFrequency(upperEdge);
+      const endFrequency = unitPrefixHz(upperEdge);
 
       // Get bandwidth
-      const bandwidthHz = getFrequency(upperEdge - lowerEdge);
+      const bandwidthHz = unitPrefixHz(upperEdge - lowerEdge);
 
       // Get duration
-      const duration = getSeconds(sampleCount / sampleRate);
+      const duration = unitPrefixSeconds(sampleCount / sampleRate);
 
       currentParents[i] = {
         label: {

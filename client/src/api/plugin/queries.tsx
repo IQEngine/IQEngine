@@ -95,10 +95,11 @@ export const useUpdatePlugin = () => {
       client.setQueryData<PluginDefinition>(['plugin', definition.name], definition);
       await client.cancelQueries(['plugins']);
       const previousPlugins = client.getQueryData<PluginDefinition[]>(['plugins']);
-      client.setQueryData<PluginDefinition[]>(
-        ['plugins'],
-        (old) => old.map((item) => (item.name === definition.name ? definition : item)) || []
-      );
+
+      const updatedPlugins = Array.isArray(previousPlugins)
+      ? previousPlugins.map((item) => (item.name === definition.name ? definition : item))
+      : [];
+      client.setQueryData<PluginDefinition[]>(['plugins'], updatedPlugins);
       return { previousPlugins, previousPlugin };
     },
     onError: (err, newDefinition, context) => {
@@ -139,8 +140,9 @@ export const useCreatePlugin = () => {
     onMutate: async (plugin: PluginDefinition) => {
       await client.cancelQueries(['plugins']);
       const previousPlugins = client.getQueryData<PluginDefinition[]>(['plugins']);
-      client.setQueryData<PluginDefinition[]>(['plugins'], (old) => [...old, plugin]);
-      return { previousPlugins };
+      const updatedPlugins = Array.isArray(previousPlugins) ? [...previousPlugins, plugin] : [plugin];
+      client.setQueryData<PluginDefinition[]>(['plugins'], updatedPlugins);
+            return { previousPlugins };
     },
     onError: (err, plugin, context) => {
       console.error('onError', err);

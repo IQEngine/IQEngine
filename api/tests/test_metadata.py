@@ -33,7 +33,7 @@ async def test_api_get_thumbnail_with_image(
     ] = override_dependency_datasource_repo_get
 
     response = client.get(
-        f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path/thumbnail'
+        f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path.jpg'
     )
     assert response.status_code == 200
     mock_get_metadata.assert_not_called()
@@ -66,7 +66,7 @@ async def test_api_get_thumbnail_with_no_image(
         datasource_repo.get
     ] = override_dependency_datasource_repo_get
     response = client.get(
-        f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path/thumbnail'
+        f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path.jpg'
     )
     assert response.status_code == 200
     mock_get_metadata.assert_called_once()

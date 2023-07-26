@@ -125,7 +125,7 @@ describe('Test Configuration', () => {
       });
     render(<Configuration></Configuration>, { wrapper: AllProviders });
 
-    const saveButton = screen.getByRole('button', { name: 'Save Configuration Button' });
+    const saveButton = screen.getByRole('button', { name: 'Save Configuration' });
     expect(saveButton).toBeDisabled();
   });
 
@@ -152,7 +152,7 @@ describe('Test Configuration', () => {
     await userEvent.click(displayInternalBranding);
     await waitFor(() => expect(displayInternalBranding).not.toBeChecked());
 
-    const saveButton = screen.getByRole('button', { name: 'Save Configuration Button' });
+    const saveButton = screen.getByRole('button', { name: 'Save Configuration' });
     await userEvent.click(saveButton);
 
     expect(await screen.findByText('Successfully updated configuration')).toBeInTheDocument();
@@ -181,7 +181,7 @@ describe('Test Configuration', () => {
     await userEvent.click(displayInternalBranding);
     await waitFor(() => expect(displayInternalBranding).not.toBeChecked());
 
-    const saveButton = screen.getByRole('button', { name: 'Save Configuration Button' });
+    const saveButton = screen.getByRole('button', { name: 'Save Configuration' });
     await userEvent.click(saveButton);
 
     expect(await screen.findByText('Something went wrong updating configuration')).toBeInTheDocument();
