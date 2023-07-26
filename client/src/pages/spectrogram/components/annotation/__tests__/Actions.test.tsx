@@ -48,7 +48,7 @@ describe('Annotation list component', () => {
     await userEvent.click(openButton);
 
     // Assert
-    const modal = await screen.findByLabelText('Annotation 0', { selector: 'textarea' });
+    const modal = await screen.findByLabelText('Annotation 0', { selector: 'dialog' });
     expect(modal).toHaveClass('modal-open');
   });
 
