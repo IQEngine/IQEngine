@@ -1,3 +1,5 @@
+from typing import Optional
+
 import httpx
 from database import datasource_repo
 from database.datasource_repo import create, datasource_exists
@@ -9,16 +11,11 @@ from helpers.cipher import encrypt
 from helpers.urlmapping import ApiType, add_URL_sasToken
 from motor.core import AgnosticCollection
 from pydantic import SecretStr
-from typing import Optional
 
 router = APIRouter()
 
 
-@router.post(
-    "/api/datasources",
-    status_code=201,
-    response_model=DataSource
-)
+@router.post("/api/datasources", status_code=201, response_model=DataSource)
 async def create_datasource(
     datasource: DataSource,
     datasources: AgnosticCollection = Depends(datasource_repo.collection),
@@ -35,10 +32,7 @@ async def create_datasource(
     return datasource
 
 
-@router.get(
-    "/api/datasources",
-    response_model=list[DataSource]
-)
+@router.get("/api/datasources", response_model=list[DataSource])
 async def get_datasources(
     datasources_collection: AgnosticCollection = Depends(datasource_repo.collection),
     current_user: Optional[dict] = Depends(required_roles()),
@@ -51,8 +45,7 @@ async def get_datasources(
 
 
 @router.get(
-    "/api/datasources/{account}/{container}/image",
-    response_class=StreamingResponse
+    "/api/datasources/{account}/{container}/image", response_class=StreamingResponse
 )
 async def get_datasource_image(
     account: str,
@@ -88,8 +81,7 @@ async def get_datasource_image(
 
 
 @router.get(
-    "/api/datasources/{account}/{container}/datasource",
-    response_model=DataSource
+    "/api/datasources/{account}/{container}/datasource", response_model=DataSource
 )
 async def get_datasource(
     datasource: DataSource = Depends(datasource_repo.get),
@@ -101,10 +93,7 @@ async def get_datasource(
     return datasource
 
 
-@router.put(
-    "/api/datasources/{account}/{container}/datasource",
-    status_code=204
-)
+@router.put("/api/datasources/{account}/{container}/datasource", status_code=204)
 async def update_datasource(
     account: str,
     container: str,

@@ -1,10 +1,10 @@
-from rf.samples import get_sample_length_from_byte_lenth
 import database.metadata_repo
 from blob.azure_client import AzureBlobClient
 from database.database import db
 from database.models import DataSource, DataSourceReference
 from helpers.cipher import decrypt, encrypt
 from motor.core import AgnosticCollection
+from rf.samples import get_sample_length_from_byte_lenth
 
 
 def collection() -> AgnosticCollection:
@@ -80,7 +80,11 @@ async def sync(account: str, container: str):
         )
         metadata.globalMetadata.traceability_revision = 0
         file_length = await azure_blob_client.get_file_length(filepath + ".sigmf-data")
-        metadata.globalMetadata.traceability_sample_length = get_sample_length_from_byte_lenth(file_length, metadata.globalMetadata.core_datatype)
+        metadata.globalMetadata.traceability_sample_length = (
+            get_sample_length_from_byte_lenth(
+                file_length, metadata.globalMetadata.core_datatype
+            )
+        )
         if await database.metadata_repo.exists(account, container, filepath):
             continue
         await database.metadata_repo.create(account, container, filepath)

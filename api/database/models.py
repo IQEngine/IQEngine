@@ -45,6 +45,7 @@ class MetadataGlobal(BaseModel):
     traceability_revision: int | None = Field(alias="traceability:revision")
     traceability_origin: DataSourceReference | None = Field(alias="traceability:origin")
     traceability_sample_length: int | None = Field(alias="traceability:sample_length")
+
     class Config:
         extra = Extra.allow
 
