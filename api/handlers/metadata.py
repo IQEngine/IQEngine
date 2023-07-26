@@ -114,7 +114,10 @@ async def get_meta_thumbnail(
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
 
-    azure_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
+    sas_token = datasource.sasToken.get_secret_value() if datasource.sasToken else None
+    if sas_token is not None:
+        azure_client.set_sas_token(decrypt(sas_token))
+
     thumbnail_path = get_file_name(filepath, ApiType.THUMB)
     content_type = get_content_type(ApiType.THUMB)
     if not await azure_client.blob_exist(thumbnail_path):
