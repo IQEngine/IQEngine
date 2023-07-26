@@ -7,6 +7,7 @@ import nock from 'nock';
 import '@testing-library/jest-dom';
 import { DataSource } from '@/api/Models';
 import { AllProviders, queryClient } from '@/mocks/setup-tests';
+import userEvent from '@testing-library/user-event';
 
 describe('Test RepoBrowser', () => {
   beforeAll(() => {
@@ -82,5 +83,40 @@ describe('Test RepositoryTile', () => {
     };
     render(<RepositoryTile item={data} />, { wrapper: AllProviders });
     expect(await screen.findByText('SAS Token is expired!')).toBeInTheDocument();
+  });
+});
+
+describe('Test query metadata tile', () => {
+  test('displays query metadata tile', async () => {
+    render(<RepoBrowser />, { wrapper: AllProviders });
+    expect(await screen.findByText('Metadata Query')).toBeInTheDocument();
+  });
+
+  test('displays query metadata tile description', async () => {
+    render(<RepoBrowser />, { wrapper: AllProviders });
+    expect(
+      await screen.findByText('Query across all of the metadata files within the repository.')
+    ).toBeInTheDocument();
+  });
+
+  test('displays query metadata tile image', async () => {
+    render(<RepoBrowser />, { wrapper: AllProviders });
+    expect(await screen.findByAltText('Metadata query tile')).toBeInTheDocument();
+  });
+
+  test('displays query metadata tile button', async () => {
+    render(<RepoBrowser />, { wrapper: AllProviders });
+    const queryButton = await screen.findByRole('button', { name: 'Metadata query browse' });
+
+    expect(queryButton).toBeInTheDocument();
+    expect(queryButton).toHaveTextContent('Browse');
+  });
+
+  test('metadata tile button navigates to query page', async () => {
+    render(<RepoBrowser />, { wrapper: AllProviders });
+    const queryButton = await screen.findByRole('button', { name: 'Metadata query browse' });
+    await userEvent.click(queryButton);
+
+    expect(window.location.pathname).toEqual('/query');
   });
 });
