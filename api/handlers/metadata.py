@@ -85,7 +85,7 @@ async def get_meta(
     "/api/datasources/{account}/{container}/{filepath:path}/track",
     response_model=TrackMetadata,
 )
-async def get_meta(
+async def get_track_meta(
     metadata: Metadata = Depends(metadata_repo.get),
     current_user: Optional[dict] = Depends(required_roles()),
 ):
