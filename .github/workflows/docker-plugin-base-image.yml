@@ -1,7 +1,7 @@
 ---
 name: Create New Plugin Base Image
 
-# trigget manually or when there is a merge to main with changes to /plugins/Dockerfile-base-image
+# trigger manually or when there is a merge to main with changes to /plugins/Dockerfile-base-image
 on:
   workflow_dispatch:
   push:
