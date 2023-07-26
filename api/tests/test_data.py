@@ -63,6 +63,7 @@ valid_metadata_array = [
                 "file_path": "test_file_path",
             },
             "traceability:revision": None,
+            "traceability:sample_length": None,
         },
         "captures": [
             {
