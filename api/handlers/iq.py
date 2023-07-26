@@ -2,7 +2,7 @@ import asyncio
 import base64
 import io
 import logging
-from typing import List
+from typing import List, Optional
 
 from blob.azure_client import AzureBlobClient
 from database import datasource_repo
@@ -12,7 +12,6 @@ from helpers.authorization import required_roles
 from helpers.cipher import decrypt
 from helpers.urlmapping import ApiType, get_file_name
 from pydantic import BaseModel, SecretStr
-from typing import Optional
 
 router = APIRouter()
 
@@ -85,8 +84,7 @@ async def download_blob(
 
 
 @router.post(
-    "/api/datasources/{account}/{container}/{filepath:path}/iqslices",
-    status_code=200
+    "/api/datasources/{account}/{container}/{filepath:path}/iqslices", status_code=200
 )
 async def get_iq_data_slices(
     iq_data: IQData,
