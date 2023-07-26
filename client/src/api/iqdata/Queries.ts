@@ -5,7 +5,7 @@ import { range } from '@/utils/selector';
 import { IQDataSlice } from '@/api/Models';
 import { TILE_SIZE_IN_IQ_SAMPLES } from '@/utils/constants';
 import { useUserSettings } from '@/api/user-settings/use-user-settings';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useMeta } from '@/api/metadata/Queries';
 
 export const getIQDataSlice = (
@@ -33,9 +33,9 @@ export const getIQDataSlice = (
         tileSize: tileSize,
       },
     ],
-    () => {
+    ({ signal }) => {
       const iqDataClient = IQDataClientFactory(type, filesQuery.data, dataSourcesQuery.data);
-      return iqDataClient.getIQDataSlice(meta, index, tileSize);
+      return iqDataClient.getIQDataSlice(meta, index, tileSize, signal);
     },
     {
       enabled: enabled && !!meta,
@@ -74,10 +74,10 @@ export const getIQDataFullIndexes = (
 
   return useQuery<IQDataSlice[]>({
     queryKey: ['datasource', type, account, container, file_path, 'iq', { indexes: indexes, tileSize: tileSize }],
-    queryFn: () => {
+    queryFn: ({ signal }) => {
       const iqDataClient = IQDataClientFactory(type, filesQuery.data, dataSourcesQuery.data);
       console.log('getIQDataFullIndexes', indexes, meta, filesQuery.data, dataSourcesQuery.data);
-      return iqDataClient.getIQDataSlices(meta, indexes, tileSize);
+      return iqDataClient.getIQDataSlices(meta, indexes, tileSize, signal);
     },
     enabled: enabled && !!meta && !!filesQuery.data && !!dataSourcesQuery.data,
     staleTime: Infinity,
@@ -101,9 +101,10 @@ export const getIQDataSlices = (
     queries: indexes.map((index) => {
       return {
         queryKey: ['datasource', type, account, container, file_path, 'iq', { index: index, tileSize: tileSize }],
-        queryFn: () => {
+        queryFn: async () => {
+          const signal = new AbortController().signal;
           const iqDataClient = IQDataClientFactory(type, filesQuery.data, dataSourcesQuery.data);
-          return iqDataClient.getIQDataSlice(meta, index, tileSize);
+          return iqDataClient.getIQDataSlice(meta, index, tileSize, signal);
         },
         enabled: enabled && !!meta && index >= 0,
         staleTime: Infinity,
@@ -140,31 +141,47 @@ export const useCurrentCachedIQDataSlice = (meta: SigMFMetadata, tileSize: numbe
   };
 };
 
-export function useGetIQData(type: string, account: string, container: string, filePath: string) {
+export function useGetIQData(
+  type: string,
+  account: string,
+  container: string,
+  filePath: string,
+  fftsRequired: number[]
+) {
   const { filesQuery, dataSourcesQuery } = useUserSettings();
   const [fftSize, setFFTSize] = useState<number>(1024);
-  const [fftsRequired, setFFTsRequired] = useState<number[]>([]);
 
   const { data: meta, isSuccess: hasMetadata } = useMeta(type, account, container, filePath);
 
-  const { data: iqData } = useQuery({
+  const {
+    data: iqData,
+    status,
+    error,
+  } = useQuery({
     queryKey: ['iqData', type, account, container, filePath, fftSize, fftsRequired],
-    queryFn: async () => {
+    queryFn: async ({ signal }) => {
+      console.debug('useGetIQData', type, account, container, filePath, fftSize, fftsRequired);
       const iqDataClient = IQDataClientFactory(type, filesQuery.data, dataSourcesQuery.data);
-      const iqData = await iqDataClient.getIQDataBlocks(meta, fftsRequired, fftSize);
+      const iqData = await iqDataClient.getIQDataBlocks(meta, fftsRequired, fftSize, signal);
+      console.debug('useGetIQData', iqData);
       return iqData;
     },
-    select: (data) => {
-      return data;
-    },
+    enabled: !!meta && !!filesQuery.data && !!dataSourcesQuery.data,
   });
+
+  useEffect(() => {
+    console.debug('iqQuery Status', status, error);
+  }, [status, error]);
 
   const queryClient = useQueryClient();
   const currentData = useMemo(() => {
-    if (!hasMetadata) {
+    if (!meta) {
       return null;
     }
     if (iqData) {
+      iqData.forEach((data, index) => {
+        queryClient.setQueryData(['rawiqdata', type, account, container, filePath, fftSize, fftsRequired[index]], data);
+      });
     }
     const origin = meta.getOrigin();
     const content = queryClient.getQueriesData<number[]>([
@@ -190,6 +207,5 @@ export function useGetIQData(type: string, account: string, container: string, f
     setFFTSize,
     currentData,
     fftsRequired,
-    setFFTsRequired,
   };
 }

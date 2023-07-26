@@ -5,10 +5,20 @@ import { IQDataSlice } from '@/api/Models';
 import { convertToFloat32 } from '@/utils/FetchMoreDataSource';
 
 export class ApiClient implements IQDataClient {
-  getIQDataBlocks(meta: SigMFMetadata, indexes: number[], blockSize: number): Promise<IQDataSlice[]> {
+  getIQDataBlocks(
+    meta: SigMFMetadata,
+    indexes: number[],
+    blockSize: number,
+    signal: AbortSignal
+  ): Promise<IQDataSlice[]> {
     throw new Error('Method not implemented.');
   }
-  async getIQDataSlices(meta: SigMFMetadata, indexes: number[], tileSize: number): Promise<IQDataSlice[]> {
+  async getIQDataSlices(
+    meta: SigMFMetadata,
+    indexes: number[],
+    tileSize: number,
+    signal: AbortSignal
+  ): Promise<IQDataSlice[]> {
     //return Promise.all(indexes.map((index) => this.getIQDataSlice(meta, index, tileSize)));
     let { account, container, file_path } = meta.getOrigin();
 
@@ -22,7 +32,9 @@ export class ApiClient implements IQDataClient {
 
     const queryURL = `/api/datasources/${account}/${container}/${file_path}/iqslices`;
 
-    const response = await axios.post(queryURL, body);
+    const response = await axios.post(queryURL, body, {
+      signal: signal,
+    });
     if (response.status !== 200) {
       throw new Error(`Unexpected status code: ${response.status}`);
     }
@@ -45,7 +57,12 @@ export class ApiClient implements IQDataClient {
     );
   }
 
-  async getIQDataSlice(meta: SigMFMetadata, index: number, tileSize: number): Promise<IQDataSlice> {
+  async getIQDataSlice(
+    meta: SigMFMetadata,
+    index: number,
+    tileSize: number,
+    signal: AbortSignal
+  ): Promise<IQDataSlice> {
     let { account, container, file_path } = meta.getOrigin();
 
     let startTime = performance.now();
@@ -53,7 +70,9 @@ export class ApiClient implements IQDataClient {
     const offsetBytes = index * tileSize * bytesPerSample * 2;
     const countBytes = tileSize * bytesPerSample * 2;
     const queryURL = `/api/datasources/${account}/${container}/${file_path}/iqslice?offsetBytes=${offsetBytes}&countBytes=${countBytes}`;
-    const response = await axios.get(queryURL);
+    const response = await axios.get(queryURL, {
+      signal: signal,
+    });
     if (response.status !== 200) {
       throw new Error(`Unexpected status code: ${response.status}`);
     }

@@ -141,6 +141,13 @@ export function useRouter() {
             return { Component: SpectrogramPage };
           },
         },
+        {
+          path: 'dev-test/:type/:account/:container/:filePath/:sasToken?',
+          async lazy() {
+            let { DevPage } = await import('@/pages/dev-test/dev-page');
+            return { Component: DevPage };
+          },
+        },
       ],
     },
     {

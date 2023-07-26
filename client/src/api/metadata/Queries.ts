@@ -111,5 +111,6 @@ export const useMeta = (type: string, account: string, container: string, filePa
       const metadataClient = MetadataClientFactory(type, filesQuery.data, dataSourcesQuery.data);
       return metadataClient.getMeta(account, container, filePath);
     },
+    enabled: !!filesQuery.data && !!dataSourcesQuery.data,
   });
 };
