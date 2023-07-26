@@ -112,7 +112,7 @@ describe('Test Configuration', () => {
     await waitFor(() => expect(useAPIDatasources).not.toBeChecked());
   });
 
-  test('Save Disabled When No Changes', async () => {
+  test('Save Button Disabled When No Changes', async () => {
     nock('http://localhost:3000')
       .get('/api/config')
       .reply(200, {
