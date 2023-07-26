@@ -161,7 +161,7 @@ describe('Annotation list component', () => {
     await userEvent.click(updateButton);
 
     // Assert
-    const modal = await screen.queryByLabelText('Annotation 0', { selector: 'textarea' });
+    const modal = await screen.queryByLabelText('Annotation 0', { selector: 'dialog' });
     expect(modal).toBeInTheDocument();
     expect(updateButton).toBeDisabled();
     expect(screen.getByText('Syntax Error: Unexpected token o in JSON at position 17')).toBeInTheDocument();
