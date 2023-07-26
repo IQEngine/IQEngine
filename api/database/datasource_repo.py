@@ -1,7 +1,10 @@
+import database.metadata_repo
+from blob.azure_client import AzureBlobClient
 from database.database import db
-from database.models import DataSource
-from helpers.cipher import encrypt
+from database.models import DataSource, DataSourceReference
+from helpers.cipher import decrypt, encrypt
 from motor.core import AgnosticCollection
+from rf.samples import get_sample_length_from_byte_lenth
 
 
 def collection() -> AgnosticCollection:
@@ -9,7 +12,7 @@ def collection() -> AgnosticCollection:
     return collection
 
 
-async def get(account, container) -> DataSource:
+async def get(account, container) -> DataSource | None:
     """
     Get a datasource by account and container
 
@@ -52,6 +55,39 @@ async def datasource_exists(account, container) -> bool:
         True if the datasource exists, False otherwise.
     """
     return await get(account, container) is not None
+
+
+async def sync(account: str, container: str):
+    azure_blob_client = AzureBlobClient(account, container)
+    datasource = await get(account, container)
+    if datasource is None:
+        raise Exception(f"Datasource {account}/{container} does not exist")
+    azure_blob_client.set_sas_token(decrypt(datasource.sasToken))
+    metadatas = azure_blob_client.get_metadata_files()
+    async for metadata in metadatas:
+        filepath = metadata[0].replace(".sigmf-meta", "")
+        if not azure_blob_client.blob_exist(filepath + ".sigmf-data"):
+            print(f"Data file {filepath} does not exist for metadata file")
+            continue
+        metadata = metadata[1]
+        metadata.globalMetadata.traceability_origin = DataSourceReference(
+            **{
+                "type": "api",
+                "account": account,
+                "container": container,
+                "file_path": filepath,
+            }
+        )
+        metadata.globalMetadata.traceability_revision = 0
+        file_length = await azure_blob_client.get_file_length(filepath + ".sigmf-data")
+        metadata.globalMetadata.traceability_sample_length = (
+            get_sample_length_from_byte_lenth(
+                file_length, metadata.globalMetadata.core_datatype
+            )
+        )
+        if await database.metadata_repo.exists(account, container, filepath):
+            continue
+        await database.metadata_repo.create(account, container, filepath)
 
 
 async def create(datasource: DataSource) -> DataSource:
