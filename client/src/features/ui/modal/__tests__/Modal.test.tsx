@@ -10,12 +10,13 @@ describe('Modal component', () => {
     const [showModal, setShowModal] = useState(true);
     return (
       <p>
-      <>
-      {showModal &&
-        <ModalDialog heading="Test Modal" setShowModal={setShowModal}>
-          <div>Modal content</div>
-        </ModalDialog>}
-      </>
+        <>
+          {showModal && (
+            <ModalDialog heading="Test Modal" setShowModal={setShowModal}>
+              <div>Modal content</div>
+            </ModalDialog>
+          )}
+        </>
       </p>
     );
   };
@@ -24,34 +25,35 @@ describe('Modal component', () => {
     const [showModal, setShowModal] = useState(false);
     return (
       <p>
-      <>
-      {showModal &&
-        <ModalDialog heading="Test Modal" setShowModal={setShowModal}>
-          <div>Modal content</div>
-        </ModalDialog>}
-      </>
+        <>
+          {showModal && (
+            <ModalDialog heading="Test Modal" setShowModal={setShowModal}>
+              <div>Modal content</div>
+            </ModalDialog>
+          )}
+        </>
       </p>
     );
   };
 
   test('Basic rendering', async () => {
     render(<VisibleModalComponent />);
-    const modal = await screen.findByLabelText('Modal')
+    const modal = await screen.findByLabelText('Test Modal', { selector: 'dialog' });
     expect(modal).toBeInTheDocument();
   });
 
   test('Basic not rendering', async () => {
     render(<InvisibleModalComponent />);
-    const modal = await screen.queryByLabelText('Modal')
+    const modal = await screen.queryByLabelText('Test Modal', { selector: 'dialog' });
     expect(modal).not.toBeInTheDocument();
   });
 
   test('Modal close button removes modal from DOM', async () => {
     render(<VisibleModalComponent />);
-    const modal = await screen.findByLabelText('Modal')
+    const modal = await screen.findByLabelText('Test Modal', { selector: 'dialog' });
     expect(modal).toBeInTheDocument();
     const closeButton = await screen.findByLabelText('Close');
     await userEvent.click(closeButton);
     expect(modal).not.toBeInTheDocument();
-  })
+  });
 });

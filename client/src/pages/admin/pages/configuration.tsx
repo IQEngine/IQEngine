@@ -77,7 +77,7 @@ export const Configuration = () => {
             </label>
           </div>
         ))}
-        <button aria-label="Save Configuration Button" onClick={onSaveHandler} disabled={!isDirty} className="h-9">
+        <button aria-label="Save Configuration" onClick={onSaveHandler} disabled={!isDirty} className="h-9">
           Save
         </button>
       </div>
