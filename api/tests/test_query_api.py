@@ -3,7 +3,7 @@ from unittest.mock import MagicMock
 import pytest
 from database import metadata_repo
 
-from .test_data import valid_metadata_array
+from .test_data import valid_metadata_array, valid_datasourcereference_array
 
 
 def override_metadata_collection():
@@ -32,7 +32,7 @@ async def test_query_meta_success(client):
     )
 
     assert response.status_code == 200
-    assert response.json() == valid_metadata_array
+    assert response.json() == valid_datasourcereference_array
 
     # Reset the dependency overrides after the test
     client.app.dependency_overrides = {}

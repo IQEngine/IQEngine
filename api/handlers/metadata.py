@@ -172,7 +172,7 @@ async def process_geolocation(target: str, geolocation: str):
 @router.get(
     "/api/datasources/query",
     status_code=200,
-    response_model=list[Metadata],
+    response_model=list[DataSourceReference],
 )
 async def query_meta(
     account: Optional[List[str]] = Query([]),
@@ -267,11 +267,27 @@ async def query_meta(
             datetime_query.update({"$lte": max_datetime_formatted})
         query_condition.update({"captures.core:datetime": datetime_query})
 
-    metadata = metadataSet.find(query_condition)
+    metadata = metadataSet.find(
+        query_condition,
+        {
+            "global.traceability:origin.type": 1,
+            "global.traceability:origin.account": 1,
+            "global.traceability:origin.container": 1,
+            "global.traceability:origin.file_path": 1,
+            "_id": 0,
+        },
+    )
 
     result = []
     async for datum in metadata:
-        result.append(datum)
+        traceability_origin = datum.get("global", {}).get("traceability:origin", {})
+        ds_reference = DataSourceReference(
+            type=traceability_origin.get("type"),
+            account=traceability_origin.get("account"),
+            container=traceability_origin.get("container"),
+            file_path=traceability_origin.get("file_path"),
+        )
+        result.append(ds_reference)
     return result
 
 
