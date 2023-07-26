@@ -63,10 +63,10 @@ async def test_get_iq_data_slices(
     assert isinstance(response.json(), list)
     assert mock_get_blob_content.call_count == 3
     assert mock_get_blob_content.call_args_list[0][1]["offset"] == 0
-    assert mock_get_blob_content.call_args_list[0][1]["length"] == 16
-    assert mock_get_blob_content.call_args_list[1][1]["offset"] == 16
-    assert mock_get_blob_content.call_args_list[1][1]["length"] == 16
-    assert mock_get_blob_content.call_args_list[2][1]["offset"] == 32
-    assert mock_get_blob_content.call_args_list[2][1]["length"] == 16
+    assert mock_get_blob_content.call_args_list[0][1]["length"] == 8
+    assert mock_get_blob_content.call_args_list[1][1]["offset"] == 8
+    assert mock_get_blob_content.call_args_list[1][1]["length"] == 8
+    assert mock_get_blob_content.call_args_list[2][1]["offset"] == 16
+    assert mock_get_blob_content.call_args_list[2][1]["length"] == 8
     assert mock_set_sas_token.call_count == 1
     assert mock_get_blob_properties.call_count == 1
