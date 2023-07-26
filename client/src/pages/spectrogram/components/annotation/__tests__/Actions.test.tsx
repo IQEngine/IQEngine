@@ -8,7 +8,6 @@ import metadataJson from './AnnotationList.test.meta.json';
 import { SigMFMetadata } from '@/utils/sigmfMetadata';
 
 describe('Annotation list component', () => {
-
   test('Annotations modal is not visible on initial render', async () => {
     //Arrange
     const meta = Object.assign(new SigMFMetadata(), JSON.parse(JSON.stringify(metadataJson)));
@@ -49,7 +48,7 @@ describe('Annotation list component', () => {
     await userEvent.click(openButton);
 
     // Assert
-    const modal = await screen.findByLabelText('Modal');
+    const modal = await screen.findByLabelText('Annotation 0', { selector: 'dialog' });
     expect(modal).toHaveClass('modal-open');
   });
 
@@ -73,7 +72,7 @@ describe('Annotation list component', () => {
     await userEvent.click(openButton);
 
     // Assert
-    const textarea = await screen.findByLabelText('Annotation 0 Modal');
+    const textarea = await screen.findByLabelText('Annotation 0', { selector: 'textarea' });
     const annotation = meta.annotations[0];
     for (const key in annotation) {
       expect(textarea).toHaveTextContent(key);
@@ -102,7 +101,7 @@ describe('Annotation list component', () => {
 
     const closeButton = await screen.findByLabelText('Close');
     await userEvent.click(closeButton);
-    const modal = screen.queryByLabelText('Modal');
+    const modal = screen.queryByLabelText('Annotation 0', { selector: 'textarea' });
 
     //Assert
     expect(modal).not.toBeInTheDocument();
@@ -129,7 +128,7 @@ describe('Annotation list component', () => {
 
     const updateButton = await screen.findByLabelText('Annotation 0 Modal Update');
     await userEvent.click(updateButton);
-    const modal = screen.queryByLabelText('Modal');
+    const modal = screen.queryByLabelText('Annotation 0', { selector: 'textarea' });
 
     //Assert
     expect(modal).not.toBeInTheDocument();
@@ -154,7 +153,7 @@ describe('Annotation list component', () => {
     const openButton = await screen.findByLabelText('Annotation 0 Modal Open');
     await userEvent.click(openButton);
 
-    const textarea = await screen.findByLabelText('Annotation 0 Modal');
+    const textarea = await screen.findByLabelText('Annotation 0', { selector: 'textarea' });
     await userEvent.clear(textarea);
     await userEvent.type(textarea, 'not valid json');
 
@@ -162,7 +161,7 @@ describe('Annotation list component', () => {
     await userEvent.click(updateButton);
 
     // Assert
-    const modal = await screen.queryByLabelText('Modal');
+    const modal = await screen.queryByLabelText('Annotation 0', { selector: 'dialog' });
     expect(modal).toBeInTheDocument();
     expect(updateButton).toBeDisabled();
     expect(screen.getByText('Syntax Error: Unexpected token o in JSON at position 17')).toBeInTheDocument();
@@ -190,7 +189,7 @@ describe('Annotation list component', () => {
     const openButton = await screen.findByLabelText('Annotation 0 Modal Open');
     await userEvent.click(openButton);
 
-    const textarea = await screen.findByLabelText('Annotation 0 Modal');
+    const textarea = await screen.findByLabelText('Annotation 0', { selector: 'textarea' });
     await userEvent.clear(textarea);
     var json = JSON.stringify(annotation);
     await userEvent.paste(json);

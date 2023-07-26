@@ -29,7 +29,7 @@ describe('Test DataSources', () => {
 
     render(<DataSourceForm />, { wrapper: AllProviders });
 
-    const submit = screen.getByRole('button', { name: 'Submit Data Source Button' });
+    const submit = screen.getByRole('button', { name: 'Submit Data Source' });
     fireEvent.click(submit);
 
     await new Promise((resolve) => setTimeout(resolve, 100));
@@ -39,7 +39,7 @@ describe('Test DataSources', () => {
   test('Displays add data source successful when successful', async () => {
     nock('http://localhost:3000').post('/api/datasources').reply(201);
     render(<DataSourceForm />, { wrapper: AllProviders });
-    const submit = screen.getByRole('button', { name: 'Submit Data Source Button' });
+    const submit = screen.getByRole('button', { name: 'Submit Data Source' });
     await userEvent.click(submit);
     expect(await screen.findByText('Successfully added data source')).toBeInTheDocument();
   });
@@ -47,7 +47,7 @@ describe('Test DataSources', () => {
   test('Displays You have already added this data source when there is a conflict', async () => {
     nock('http://localhost:3000').post('/api/datasources').reply(409);
     render(<DataSourceForm />, { wrapper: AllProviders });
-    const submit = screen.getByRole('button', { name: 'Submit Data Source Button' });
+    const submit = screen.getByRole('button', { name: 'Submit Data Source' });
     await userEvent.click(submit);
     expect(await screen.findByText('You have already added this data source')).toBeInTheDocument();
   });
@@ -55,7 +55,7 @@ describe('Test DataSources', () => {
   test('Displays error when unsuccessful', async () => {
     nock('http://localhost:3000').post('/api/datasources').reply(500);
     render(<DataSourceForm />, { wrapper: AllProviders });
-    const submit = screen.getByRole('button', { name: 'Submit Data Source Button' });
+    const submit = screen.getByRole('button', { name: 'Submit Data Source' });
     await userEvent.click(submit);
     expect(await screen.findByText('Something went wrong adding the data source')).toBeInTheDocument();
   });
