@@ -91,19 +91,27 @@ class AzureBlobClient:
         image = get_spectrogram_image(content, data_type, fftSize)
         return image
 
-    async def get_medatada_files(self):
+    async def get_metadata_files(self):
         container_client = self.get_container_client()
         # files that enf with .sigmf-meta
         async for blob in container_client.list_blobs():
             if blob.name.endswith(".sigmf-meta"):
-                blob_client = self.get_blob_client(blob.name)
-                blob = await blob_client.download_blob()
-                content = await blob.readall()
-                yield str(blob.name), Metadata.parse_raw(content)
+                metadata = await self.get_metadata_file(blob.name)
+                yield str(blob.name), metadata
         return
 
     async def get_metadata_file(self, filepath: str):
         blob_client = self.get_blob_client(filepath)
         blob = await blob_client.download_blob()
         content = await blob.readall()
-        return content
+        metadata = Metadata.parse_raw(content)
+        return metadata
+
+    async def blob_exist(self, filepath):
+        blob_client = self.get_blob_client(filepath)
+        return await blob_client.exists()
+    
+    async def get_file_length(self, filepath):
+        blob_client = self.get_blob_client(filepath)
+        blob = await blob_client.get_blob_properties()
+        return int(blob.size)

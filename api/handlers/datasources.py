@@ -112,13 +112,13 @@ async def update_datasource(
     datasources_collection: AgnosticCollection = Depends(datasource_repo.collection),
     current_user: Optional[dict] = Depends(required_roles()),
 ):
-    existingDatasource = await datasources_collection.find_one(
+    existing_datasource = await datasources_collection.find_one(
         {
             "account": account,
             "container": container,
         }
     )
-    if not existingDatasource:
+    if not existing_datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
 
     # If the incoming datasource has a sasToken, encrypt it and replace the existing one

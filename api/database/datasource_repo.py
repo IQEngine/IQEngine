@@ -1,3 +1,4 @@
+from rf.samples import get_sample_length_from_byte_lenth
 import database.metadata_repo
 from blob.azure_client import AzureBlobClient
 from database.database import db
@@ -62,9 +63,12 @@ async def sync(account: str, container: str):
     if datasource is None:
         raise Exception(f"Datasource {account}/{container} does not exist")
     azure_blob_client.set_sas_token(decrypt(datasource.sasToken))
-    metadatas = azure_blob_client.get_medatada_files()
+    metadatas = azure_blob_client.get_metadata_files()
     async for metadata in metadatas:
         filepath = metadata[0].replace(".sigmf-meta", "")
+        if not azure_blob_client.blob_exist(filepath + ".sigmf-data"):
+            print(f"Data file {filepath} does not exist for metadata file")
+            continue
         metadata = metadata[1]
         metadata.globalMetadata.traceability_origin = DataSourceReference(
             **{
@@ -75,6 +79,8 @@ async def sync(account: str, container: str):
             }
         )
         metadata.globalMetadata.traceability_revision = 0
+        file_length = await azure_blob_client.get_file_length(filepath + ".sigmf-data")
+        metadata.globalMetadata.traceability_sample_length = get_sample_length_from_byte_lenth(file_length, metadata.globalMetadata.core_datatype)
         if await database.metadata_repo.exists(account, container, filepath):
             continue
         await database.metadata_repo.create(account, container, filepath)
