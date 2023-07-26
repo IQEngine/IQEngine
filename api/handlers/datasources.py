@@ -1,24 +1,21 @@
+from typing import Optional
+
 import httpx
 from database import datasource_repo
 from database.datasource_repo import create, datasource_exists
 from database.models import DataSource
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from helpers.authorization import required_roles
 from helpers.cipher import encrypt
 from helpers.urlmapping import ApiType, add_URL_sasToken
 from motor.core import AgnosticCollection
 from pydantic import SecretStr
-from typing import Optional
 
 router = APIRouter()
 
 
-@router.post(
-    "/api/datasources",
-    status_code=201,
-    response_model=DataSource
-)
+@router.post("/api/datasources", status_code=201, response_model=DataSource)
 async def create_datasource(
     datasource: DataSource,
     datasources: AgnosticCollection = Depends(datasource_repo.collection),
@@ -35,10 +32,7 @@ async def create_datasource(
     return datasource
 
 
-@router.get(
-    "/api/datasources",
-    response_model=list[DataSource]
-)
+@router.get("/api/datasources", response_model=list[DataSource])
 async def get_datasources(
     datasources_collection: AgnosticCollection = Depends(datasource_repo.collection),
     current_user: Optional[dict] = Depends(required_roles()),
@@ -51,8 +45,7 @@ async def get_datasources(
 
 
 @router.get(
-    "/api/datasources/{account}/{container}/image",
-    response_class=StreamingResponse
+    "/api/datasources/{account}/{container}/image", response_class=StreamingResponse
 )
 async def get_datasource_image(
     account: str,
@@ -88,8 +81,7 @@ async def get_datasource_image(
 
 
 @router.get(
-    "/api/datasources/{account}/{container}/datasource",
-    response_model=DataSource
+    "/api/datasources/{account}/{container}/datasource", response_model=DataSource
 )
 async def get_datasource(
     datasource: DataSource = Depends(datasource_repo.get),
@@ -101,10 +93,7 @@ async def get_datasource(
     return datasource
 
 
-@router.put(
-    "/api/datasources/{account}/{container}/datasource",
-    status_code=204
-)
+@router.put("/api/datasources/{account}/{container}/datasource", status_code=204)
 async def update_datasource(
     account: str,
     container: str,
@@ -112,13 +101,13 @@ async def update_datasource(
     datasources_collection: AgnosticCollection = Depends(datasource_repo.collection),
     current_user: Optional[dict] = Depends(required_roles()),
 ):
-    existingDatasource = await datasources_collection.find_one(
+    existing_datasource = await datasources_collection.find_one(
         {
             "account": account,
             "container": container,
         }
     )
-    if not existingDatasource:
+    if not existing_datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
 
     # If the incoming datasource has a sasToken, encrypt it and replace the existing one
@@ -138,3 +127,22 @@ async def update_datasource(
     )
 
     return
+
+
+@router.put("/api/datasources/{account}/{container}/sync", status_code=204)
+async def sync_datasource(
+    account: str,
+    container: str,
+    datasources_collection: AgnosticCollection = Depends(datasource_repo.collection),
+    backgound_tasks=BackgroundTasks,
+):
+    existing_datasource = await datasources_collection.find_one(
+        {
+            "account": account,
+            "container": container,
+        }
+    )
+    if not existing_datasource:
+        raise HTTPException(status_code=404, detail="Datasource not found")
+    backgound_tasks.add_task(datasource_repo.sync, account, container)
+    return {"message": "Syncing"}
