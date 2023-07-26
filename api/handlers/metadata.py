@@ -17,7 +17,7 @@ router = APIRouter()
 @router.get(
     "/api/datasources/{account}/{container}/meta",
     status_code=200,
-    response_model=list[Metadata]
+    response_model=list[Metadata],
 )
 async def get_all_meta(
     account,
@@ -44,7 +44,7 @@ async def get_all_meta(
 @router.get(
     "/api/datasources/{account}/{container}/meta/paths",
     status_code=200,
-    response_model=list[str]
+    response_model=list[str],
 )
 async def get_all_meta_name(
     account,
@@ -70,7 +70,7 @@ async def get_all_meta_name(
 
 @router.get(
     "/api/datasources/{account}/{container}/{filepath:path}/meta",
-    response_model=Metadata
+    response_model=Metadata,
 )
 async def get_meta(
     metadata: Metadata = Depends(metadata_repo.get),
@@ -83,7 +83,7 @@ async def get_meta(
 
 @router.get(
     "/api/datasources/{account}/{container}/{filepath:path}/iqdata",
-    response_class=StreamingResponse
+    response_class=StreamingResponse,
 )
 async def get_metadata_iqdata(
     filepath: str,
@@ -107,7 +107,7 @@ async def get_metadata_iqdata(
 
 @router.get(
     "/api/datasources/{account}/{container}/{filepath:path}/thumbnail",
-    response_class=StreamingResponse
+    response_class=StreamingResponse,
 )
 async def get_meta_thumbnail(
     filepath: str,
@@ -177,7 +177,7 @@ async def process_geolocation(target: str, geolocation: str):
 @router.get(
     "/api/datasources/query",
     status_code=200,
-    response_model=list[Metadata],
+    response_model=list[DataSourceReference],
 )
 async def query_meta(
     account: Optional[List[str]] = Query([]),
@@ -272,18 +272,34 @@ async def query_meta(
             datetime_query.update({"$lte": max_datetime_formatted})
         query_condition.update({"captures.core:datetime": datetime_query})
 
-    metadata = metadataSet.find(query_condition)
+    metadata = metadataSet.find(
+        query_condition,
+        {
+            "global.traceability:origin.type": 1,
+            "global.traceability:origin.account": 1,
+            "global.traceability:origin.container": 1,
+            "global.traceability:origin.file_path": 1,
+            "_id": 0,
+        },
+    )
 
     result = []
     async for datum in metadata:
-        result.append(datum)
+        traceability_origin = datum.get("global", {}).get("traceability:origin", {})
+        ds_reference = DataSourceReference(
+            type=traceability_origin.get("type"),
+            account=traceability_origin.get("account"),
+            container=traceability_origin.get("container"),
+            file_path=traceability_origin.get("file_path"),
+        )
+        result.append(ds_reference)
     return result
 
 
 @router.post(
     "/api/datasources/{account}/{container}/{filepath:path}/meta",
     status_code=201,
-    response_model=Metadata
+    response_model=Metadata,
 )
 async def create_meta(
     account: str,
@@ -332,8 +348,7 @@ async def create_meta(
 
 
 @router.put(
-    "/api/datasources/{account}/{container}/{filepath:path}/meta",
-    status_code=204
+    "/api/datasources/{account}/{container}/{filepath:path}/meta", status_code=204
 )
 async def update_meta(
     account,
