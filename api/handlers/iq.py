@@ -6,7 +6,7 @@ from typing import List
 from fastapi.responses import StreamingResponse
 
 from helpers.conversions import find_smallest_and_largest_next_to_each_other
-from rf.samples import get_dtype, get_multiplier, get_samples
+from rf.samples import get_multiplier
 
 from blob.azure_client import AzureBlobClient
 from database import datasource_repo
@@ -55,7 +55,7 @@ async def get_iq_data(
     try:
         fft_arr = [int(num) for num in fft_arr_str.split(",")]
         return StreamingResponse(
-            get_byte_stream(fft_arr, fft_size, get_multiplier(format), get_file_name(filepath, ApiType.IQDATA), azure_client)
+            get_byte_stream(fft_arr, fft_size, get_multiplier(format), get_file_name(filepath, ApiType.IQDATA), azure_client), media_type="application/octet-stream"
         )
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))

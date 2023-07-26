@@ -39,14 +39,3 @@ def get_multiplier(data_type):
         return 2
     else:
         raise ValueError("Datatype " + data_type + " not implemented")
-
-
-def get_dtype(data_type):
-    if data_type == "cf32_le":
-        return np.float32
-    elif data_type == "ci16_le" or data_type == "ci16":
-        return np.int16
-    elif data_type == "ci8" or data_type == "i8":
-        return np.int8
-    else:
-        raise ValueError("Datatype " + data_type + " not implemented")
