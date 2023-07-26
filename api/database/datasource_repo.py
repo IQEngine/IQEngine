@@ -12,7 +12,7 @@ def collection() -> AgnosticCollection:
     return collection
 
 
-async def get(account, container) -> DataSource:
+async def get(account, container) -> DataSource | None:
     """
     Get a datasource by account and container
 

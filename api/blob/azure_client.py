@@ -57,10 +57,6 @@ class AzureBlobClient:
             credential=self.sas_token.get_secret_value(),
         )
 
-    async def blob_exist(self, filepath):
-        blob_client = self.get_blob_client(filepath)
-        return await blob_client.exists()
-
     async def get_blob_properties(self, filepath) -> BlobProperties:
         blob_client = self.get_blob_client(filepath)
         return await blob_client.get_blob_properties()

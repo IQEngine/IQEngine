@@ -13,7 +13,7 @@ def versions_collection() -> AgnosticCollection:
     return collection
 
 
-async def get(account, container, filepath) -> Metadata:
+async def get(account, container, filepath) -> Metadata | None:
     """
     Get a metadata by account, container and filepath
 

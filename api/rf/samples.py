@@ -56,4 +56,4 @@ def get_sample_length_from_byte_lenth(byte_length: int, data_type: str):
     elif data_type == "ci8" or data_type == "i8":
         return byte_length // 2
     else:
-        raise ("Datatype " + data_type + " not implemented")
+        raise BaseException("Datatype " + data_type + " not implemented")
