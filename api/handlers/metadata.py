@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Optional
 
 from blob.azure_client import AzureBlobClient
 from database import datasource_repo, metadata_repo
-from database.models import DataSource, DataSourceReference, Metadata
+from database.models import DataSource, DataSourceReference, Metadata, TrackMetadata
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Response
 from fastapi.responses import StreamingResponse
 from helpers.authorization import required_roles
@@ -17,7 +17,7 @@ router = APIRouter()
 @router.get(
     "/api/datasources/{account}/{container}/meta",
     status_code=200,
-    response_model=list[Metadata]
+    response_model=list[Metadata],
 )
 async def get_all_meta(
     account,
@@ -44,7 +44,7 @@ async def get_all_meta(
 @router.get(
     "/api/datasources/{account}/{container}/meta/paths",
     status_code=200,
-    response_model=list[str]
+    response_model=list[str],
 )
 async def get_all_meta_name(
     account,
@@ -70,7 +70,7 @@ async def get_all_meta_name(
 
 @router.get(
     "/api/datasources/{account}/{container}/{filepath:path}/meta",
-    response_model=Metadata
+    response_model=Metadata,
 )
 async def get_meta(
     metadata: Metadata = Depends(metadata_repo.get),
@@ -82,32 +82,27 @@ async def get_meta(
 
 
 @router.get(
-    "/api/datasources/{account}/{container}/{filepath:path}/iqdata",
-    response_class=StreamingResponse
+    "/api/datasources/{account}/{container}/{filepath:path}/track",
+    response_model=TrackMetadata,
 )
-async def get_metadata_iqdata(
-    filepath: str,
-    datasource: DataSource = Depends(datasource_repo.get),
-    azure_client: AzureBlobClient = Depends(AzureBlobClient),
+async def get_track_meta(
+    metadata: Metadata = Depends(metadata_repo.get),
     current_user: Optional[dict] = Depends(required_roles()),
 ):
-    # Create the imageURL with sasToken
-    if not datasource:
-        raise HTTPException(status_code=404, detail="Datasource not found")
+    if not metadata:
+        raise HTTPException(status_code=404, detail="Metadata not found")
 
-    azure_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
-    content_type = get_content_type(ApiType.IQDATA)
-    iq_path = get_file_name(filepath, ApiType.IQDATA)
-    if not azure_client.blob_exist(iq_path):
-        raise HTTPException(status_code=404, detail="File not found")
-
-    response = await azure_client.get_blob_stream(iq_path)
-    return StreamingResponse(response.chunks(), media_type=content_type)
+    return TrackMetadata(
+        iqengine_geotrack=metadata.globalMetadata.__dict__.get("iqengine:geotrack"),
+        description=metadata.globalMetadata.core_description,
+        account=metadata.globalMetadata.traceability_origin.account,
+        container=metadata.globalMetadata.traceability_origin.container,
+    )
 
 
 @router.get(
-    "/api/datasources/{account}/{container}/{filepath:path}/thumbnail",
-    response_class=StreamingResponse
+    "/api/datasources/{account}/{container}/{filepath:path}.jpg",
+    response_class=StreamingResponse,
 )
 async def get_meta_thumbnail(
     filepath: str,
@@ -119,7 +114,10 @@ async def get_meta_thumbnail(
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
 
-    azure_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
+    sas_token = datasource.sasToken.get_secret_value() if datasource.sasToken else None
+    if sas_token is not None:
+        azure_client.set_sas_token(decrypt(sas_token))
+
     thumbnail_path = get_file_name(filepath, ApiType.THUMB)
     content_type = get_content_type(ApiType.THUMB)
     if not await azure_client.blob_exist(thumbnail_path):
@@ -177,7 +175,7 @@ async def process_geolocation(target: str, geolocation: str):
 @router.get(
     "/api/datasources/query",
     status_code=200,
-    response_model=list[Metadata],
+    response_model=list[DataSourceReference],
 )
 async def query_meta(
     account: Optional[List[str]] = Query([]),
@@ -272,18 +270,34 @@ async def query_meta(
             datetime_query.update({"$lte": max_datetime_formatted})
         query_condition.update({"captures.core:datetime": datetime_query})
 
-    metadata = metadataSet.find(query_condition)
+    metadata = metadataSet.find(
+        query_condition,
+        {
+            "global.traceability:origin.type": 1,
+            "global.traceability:origin.account": 1,
+            "global.traceability:origin.container": 1,
+            "global.traceability:origin.file_path": 1,
+            "_id": 0,
+        },
+    )
 
     result = []
     async for datum in metadata:
-        result.append(datum)
+        traceability_origin = datum.get("global", {}).get("traceability:origin", {})
+        ds_reference = DataSourceReference(
+            type=traceability_origin.get("type"),
+            account=traceability_origin.get("account"),
+            container=traceability_origin.get("container"),
+            file_path=traceability_origin.get("file_path"),
+        )
+        result.append(ds_reference)
     return result
 
 
 @router.post(
     "/api/datasources/{account}/{container}/{filepath:path}/meta",
     status_code=201,
-    response_model=Metadata
+    response_model=Metadata,
 )
 async def create_meta(
     account: str,
@@ -332,8 +346,7 @@ async def create_meta(
 
 
 @router.put(
-    "/api/datasources/{account}/{container}/{filepath:path}/meta",
-    status_code=204
+    "/api/datasources/{account}/{container}/{filepath:path}/meta", status_code=204
 )
 async def update_meta(
     account,

@@ -31,29 +31,26 @@ def get_samples(data_bytes, data_type) -> np.ndarray:
     return samples
 
 
-def get_sample_length_from_byte_lenth(byte_length: int, data_type: str):
+def get_bytes_per_iq_sample(data_type):
     """
-    Get the number of samples from the number of bytes. those samples are in I+Q format.
-    so they actually use 2 numbers in the files.
+    Get the number of bytes per I+Q sample.
 
     Parameters
     ----------
-    byte_length : int
-        The number of bytes.
     data_type : str
         The data type of the bytes.
+
 
     Returns
     -------
     int
-        The number of samples.
+        The number of bytes per I+Q sample.
     """
-
-    if data_type == "ci16_le" or data_type == "ci16" or data_type == "ci16_be":
-        return byte_length // 4
-    elif data_type == "cf32_le" or data_type == "cf32" or data_type == "cf32_be":
-        return byte_length // 8
+    if data_type == "cf32_le" or data_type == "cf32" or data_type == "cf32_be":
+        return 8
+    elif data_type == "ci16_le" or data_type == "ci16" or data_type == "ci16_be":
+        return 4
     elif data_type == "ci8" or data_type == "i8":
-        return byte_length // 2
+        return 2
     else:
-        raise BaseException("Datatype " + data_type + " not implemented")
+        raise ValueError("Datatype " + data_type + " not implemented")

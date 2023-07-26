@@ -1,0 +1,53 @@
+---
+name: Create New Plugin Base Image
+
+# trigger manually or when there is a merge to main with changes to /plugins/Dockerfile-base-image
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - plugins/Dockerfile-base-image
+
+permissions:
+  contents: read
+
+jobs:
+  create_new_plugin_base_image:
+    permissions:
+      contents: write
+      pull-requests: write
+      packages: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - id: set_variables
+        run: |
+          # make the repository lowercase
+          echo "repository=${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
+          # truncate sha to 11 characters
+          echo "sha=${GITHUB_SHA::11}" >> "$GITHUB_OUTPUT"
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_SHA: ${{ github.sha }}
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN  }}
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v2
+        with:
+          context: plugins
+          file: plugins/Dockerfile-base-image
+          labels: |
+            org.opencontainers.image.source=https://github.com/IQEngine/IQEngine
+          push: true
+          tags: |
+            ghcr.io/${{ steps.set_variables.outputs.repository }}-plugins-base:${{ steps.set_variables.outputs.sha }}
+            ghcr.io/${{ steps.set_variables.outputs.repository }}-plugins-base:latest
