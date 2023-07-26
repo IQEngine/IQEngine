@@ -43,6 +43,8 @@ jobs:
           - name: Build and Push Docker Image
             uses: docker/build-push-action@v2
             with:
+                context: plugins
+                file: Dockerfile-base-image
                 labels: |
                   org.opencontainers.image.source=https://github.com/IQEngine/IQEngine
                 push: true
