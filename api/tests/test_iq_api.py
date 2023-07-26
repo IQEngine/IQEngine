@@ -118,14 +118,16 @@ async def test_get_iq_data_with_ci16_le(mock_get_blob_size, mock_get_blob_proper
         assert response.status_code == 200
         assert response.content == arr
 
+
+
 @mock.patch("handlers.iq.AzureBlobClient.set_sas_token", return_value=None)
 @mock.patch(
     "handlers.iq.AzureBlobClient.get_blob_properties", return_value=test_blob_properties
 )
 @mock.patch("handlers.iq.AzureBlobClient.get_blob_size", return_value=100)
 @pytest.mark.asyncio
-async def test_get_iq_data_with_iq16(mock_get_blob_size, mock_get_blob_properties, mock_set_sas_token, client):
-    """ Get IQ data with iq16. Returns populated float of float array. """
+async def test_get_iq_data_with_ci16(mock_get_blob_size, mock_get_blob_properties, mock_set_sas_token, client):
+    """ Get IQ data with ci16. Returns populated float of float array. """
     client.app.dependency_overrides[datasource_repo.get] = mock_get_test_datasource
     arr = numpy.array([1,2,3,4,5,6,7,8], dtype=numpy.int16).tobytes()
     format = "ci16"
@@ -144,11 +146,71 @@ async def test_get_iq_data_with_iq16(mock_get_blob_size, mock_get_blob_propertie
 )
 @mock.patch("handlers.iq.AzureBlobClient.get_blob_size", return_value=100)
 @pytest.mark.asyncio
+async def test_get_iq_data_with_ci16_be(mock_get_blob_size, mock_get_blob_properties, mock_set_sas_token, client):
+    """ Get IQ data with ci16_be. Returns populated float of float array. """
+    client.app.dependency_overrides[datasource_repo.get] = mock_get_test_datasource
+    arr = numpy.array([1,2,3,4,5,6,7,8], dtype=numpy.int16).tobytes()
+    format = "ci16_be"
+    with mock.patch("blob.azure_client.AzureBlobClient.get_blob_content", return_value=arr):
+        response = client.get(
+            f"/api/datasources/"
+            f'{test_datasource["account"]}/{test_datasource["container"]}'
+            f"/file_path/iq-data?format={format}&fft_size=1&fft_arr_str=1&filepath=test"
+        )
+        assert response.status_code == 200
+        assert response.content == arr
+
+@mock.patch("handlers.iq.AzureBlobClient.set_sas_token", return_value=None)
+@mock.patch(
+    "handlers.iq.AzureBlobClient.get_blob_properties", return_value=test_blob_properties
+)
+@mock.patch("handlers.iq.AzureBlobClient.get_blob_size", return_value=100)
+@pytest.mark.asyncio
 async def test_get_iq_data_with_cf32_le(mock_get_blob_size, mock_get_blob_properties, mock_set_sas_token, client):
-    """ Get IQ data with iq16. Returns populated float of float array. """
+    """ Get IQ data with cf32_le. Returns populated float of float array. """
     client.app.dependency_overrides[datasource_repo.get] = mock_get_test_datasource
     arr = numpy.array([1,2,3,4,5,6,7,8], dtype=numpy.float32).tobytes()
     format = "cf32_le"
+    with mock.patch("blob.azure_client.AzureBlobClient.get_blob_content", return_value=arr):
+        response = client.get(
+            f"/api/datasources/"
+            f'{test_datasource["account"]}/{test_datasource["container"]}'
+            f"/file_path/iq-data?format={format}&fft_size=1&fft_arr_str=1&filepath=test"
+        )
+        assert response.status_code == 200
+        assert response.content == arr
+
+@mock.patch("handlers.iq.AzureBlobClient.set_sas_token", return_value=None)
+@mock.patch(
+    "handlers.iq.AzureBlobClient.get_blob_properties", return_value=test_blob_properties
+)
+@mock.patch("handlers.iq.AzureBlobClient.get_blob_size", return_value=100)
+@pytest.mark.asyncio
+async def test_get_iq_data_with_cf32(mock_get_blob_size, mock_get_blob_properties, mock_set_sas_token, client):
+    """ Get IQ data with cf32. Returns populated float of float array. """
+    client.app.dependency_overrides[datasource_repo.get] = mock_get_test_datasource
+    arr = numpy.array([1,2,3,4,5,6,7,8], dtype=numpy.float32).tobytes()
+    format = "cf32"
+    with mock.patch("blob.azure_client.AzureBlobClient.get_blob_content", return_value=arr):
+        response = client.get(
+            f"/api/datasources/"
+            f'{test_datasource["account"]}/{test_datasource["container"]}'
+            f"/file_path/iq-data?format={format}&fft_size=1&fft_arr_str=1&filepath=test"
+        )
+        assert response.status_code == 200
+        assert response.content == arr
+
+@mock.patch("handlers.iq.AzureBlobClient.set_sas_token", return_value=None)
+@mock.patch(
+    "handlers.iq.AzureBlobClient.get_blob_properties", return_value=test_blob_properties
+)
+@mock.patch("handlers.iq.AzureBlobClient.get_blob_size", return_value=100)
+@pytest.mark.asyncio
+async def test_get_iq_data_with_cf32_be(mock_get_blob_size, mock_get_blob_properties, mock_set_sas_token, client):
+    """ Get IQ data with cf32_be. Returns populated float of float array. """
+    client.app.dependency_overrides[datasource_repo.get] = mock_get_test_datasource
+    arr = numpy.array([1,2,3,4,5,6,7,8], dtype=numpy.float32).tobytes()
+    format = "cf32_be"
     with mock.patch("blob.azure_client.AzureBlobClient.get_blob_content", return_value=arr):
         response = client.get(
             f"/api/datasources/"

@@ -45,9 +45,9 @@ def get_bytes_per_iq_sample(data_type):
     int
         The number of bytes per I+Q sample.
     """
-    if data_type == "cf32_le":
+    if data_type == "cf32_le" or data_type == "cf32" or data_type == "cf32_be":
         return 8
-    elif data_type == "ci16_le" or data_type == "ci16":
+    elif data_type == "ci16_le" or data_type == "ci16" or data_type == "ci16_be":
         return 4
     elif data_type == "ci8" or data_type == "i8":
         return 2
