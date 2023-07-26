@@ -22,9 +22,9 @@ export class BlobClient implements IQDataClient {
       file_path += '.sigmf-data';
     }
     let startTime = performance.now();
-    const bytesPerSample = meta.getBytesPerSample();
-    const offsetBytes = index * tileSize * bytesPerSample * 2;
-    const countBytes = tileSize * bytesPerSample * 2;
+    const bytesPerIQSample = meta.getBytesPerIQSample();
+    const offsetBytes = index * tileSize * bytesPerIQSample;
+    const countBytes = tileSize * bytesPerIQSample;
     const blobClient = getBlobClient(this.dataSources, account, container, file_path);
     // Thi is ugly but it is the only way to get the blob as an ArrayBuffer
     const download = await blobClient.download(offsetBytes, countBytes);

@@ -15,7 +15,7 @@ import { FFT } from '@/utils/fft';
 import { useGetPluginsComponents } from '@/pages/spectrogram/hooks/use-get-plugins-components';
 import { useGetPlugins } from '@/api/plugin/queries';
 import { toast } from 'react-hot-toast';
-import { dataTypeToBytesPerSample } from '@/utils/selector';
+import { dataTypeToBytesPerIQSample } from '@/utils/selector';
 import { useParams } from 'react-router-dom';
 import { useUserSettings } from '@/api/user-settings/use-user-settings';
 
@@ -70,7 +70,7 @@ export const PluginsPane = ({ timeCursorsEnabled, handleProcessTime, meta, setMe
       custom_params: {},
     };
 
-    const calculateMultiplier = dataTypeToBytesPerSample(MimeTypes[meta.getDataType()]);
+    const calculateMultiplier = dataTypeToBytesPerIQSample(MimeTypes[meta.getDataType()]);
     if (useCloudStorage && connectionInfo) {
       body = {
         samples_b64: [],
@@ -83,8 +83,8 @@ export const PluginsPane = ({ timeCursorsEnabled, handleProcessTime, meta, setMe
             sample_rate: sampleRate,
             center_freq: freq,
             data_type: MimeTypes[meta.getDataType()],
-            byte_offset: Math.floor(startSampleOffset) * calculateMultiplier * 2,
-            byte_length: trimmedSamples.length * calculateMultiplier,
+            byte_offset: Math.floor(startSampleOffset) * calculateMultiplier,
+            byte_length: (trimmedSamples.length / 2) * calculateMultiplier,
           },
         ],
         custom_params: {},

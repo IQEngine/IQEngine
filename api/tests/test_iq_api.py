@@ -57,7 +57,7 @@ async def test_get_iq_data_slices(
 
     response = client.post(
         f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path/iqslices',
-        json={"indexes": [0, 1, 2], "tile_size": 2, "bytes_per_sample": 4},
+        json={"indexes": [0, 1, 2], "tile_size": 2, "bytes_per_iq_sample": 4},
     )
     assert response.status_code == 200
     assert isinstance(response.json(), list)
