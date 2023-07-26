@@ -48,7 +48,7 @@ describe('Annotation list component', () => {
     await userEvent.click(openButton);
 
     // Assert
-    const modal = await screen.findByLabelText('Modal');
+    const modal = await screen.findByLabelText('Annotation 0', { selector: 'textarea' });
     expect(modal).toHaveClass('modal-open');
   });
 
@@ -101,7 +101,7 @@ describe('Annotation list component', () => {
 
     const closeButton = await screen.findByLabelText('Close');
     await userEvent.click(closeButton);
-    const modal = screen.queryByLabelText('Modal');
+    const modal = screen.queryByLabelText('Annotation 0', { selector: 'textarea' });
 
     //Assert
     expect(modal).not.toBeInTheDocument();
@@ -128,7 +128,7 @@ describe('Annotation list component', () => {
 
     const updateButton = await screen.findByLabelText('Annotation 0 Modal Update');
     await userEvent.click(updateButton);
-    const modal = screen.queryByLabelText('Modal');
+    const modal = screen.queryByLabelText('Annotation 0', { selector: 'textarea' });
 
     //Assert
     expect(modal).not.toBeInTheDocument();
@@ -161,7 +161,7 @@ describe('Annotation list component', () => {
     await userEvent.click(updateButton);
 
     // Assert
-    const modal = await screen.queryByLabelText('Modal');
+    const modal = await screen.queryByLabelText('Annotation 0', { selector: 'textarea' });
     expect(modal).toBeInTheDocument();
     expect(updateButton).toBeDisabled();
     expect(screen.getByText('Syntax Error: Unexpected token o in JSON at position 17')).toBeInTheDocument();
