@@ -173,6 +173,14 @@ async def test_api_get_track_meta(client):
 
 
 @pytest.mark.asyncio
+async def test_api_get_missing_track_meta(client):
+    response = client.get(
+        f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path/track'
+    )
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
 async def test_api_get_meta_not_existing(client):
     response = client.get(
         f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path/meta'
