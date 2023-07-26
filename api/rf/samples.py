@@ -54,23 +54,3 @@ def get_bytes_per_iq_sample(data_type):
         return 2
     else:
         raise ValueError("Datatype " + data_type + " not implemented")
-
-
-def get_sample_length_from_byte_length(byte_length: int, data_type: str):
-    """
-    Get the number of samples from the number of bytes. those samples are in I+Q format.
-    so they actually use 2 numbers in the files.
-
-    Parameters
-    ----------
-    byte_length : int
-        The number of bytes.
-    data_type : str
-        The data type of the bytes.
-
-    Returns
-    -------
-    int
-        The number of samples.
-    """
-    return byte_length // get_bytes_per_iq_sample(data_type)

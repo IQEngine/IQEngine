@@ -94,7 +94,7 @@ async def test_get_iq_data_invalid_format(
         response = client.get(
             f"/api/datasources/"
             f'{test_datasource["account"]}/{test_datasource["container"]}'
-            f"/file_path/iq-data?format={format}&fft_size=1&fft_arr_str=1&filepath=test"
+            f"/file_path/iq-data?format={format}&block_size=1&block_indexes_str=1&filepath=test"
         )
         assert response.status_code == 400
         assert b"Datatype invalid not implemented" in response.content
@@ -123,7 +123,7 @@ async def test_get_iq_data_with_ci16_le(
         response = client.get(
             f"/api/datasources/"
             f'{test_datasource["account"]}/{test_datasource["container"]}'
-            f"/file_path/iq-data?format={format}&fft_size=1&fft_arr_str=1&filepath=test"
+            f"/file_path/iq-data?format={format}&block_size=1&block_indexes_str=1&filepath=test"
         )
         assert response.status_code == 200
         assert response.content == arr
@@ -148,7 +148,7 @@ async def test_get_iq_data_with_ci16(
         response = client.get(
             f"/api/datasources/"
             f'{test_datasource["account"]}/{test_datasource["container"]}'
-            f"/file_path/iq-data?format={format}&fft_size=1&fft_arr_str=1&filepath=test"
+            f"/file_path/iq-data?format={format}&block_size=1&block_indexes_str=1&filepath=test"
         )
         assert response.status_code == 200
         assert response.content == arr
@@ -173,7 +173,7 @@ async def test_get_iq_data_with_ci16_be(
         response = client.get(
             f"/api/datasources/"
             f'{test_datasource["account"]}/{test_datasource["container"]}'
-            f"/file_path/iq-data?format={format}&fft_size=1&fft_arr_str=1&filepath=test"
+            f"/file_path/iq-data?format={format}&block_size=1&block_indexes_str=1&filepath=test"
         )
         assert response.status_code == 200
         assert response.content == arr
@@ -198,7 +198,7 @@ async def test_get_iq_data_with_cf32_le(
         response = client.get(
             f"/api/datasources/"
             f'{test_datasource["account"]}/{test_datasource["container"]}'
-            f"/file_path/iq-data?format={format}&fft_size=1&fft_arr_str=1&filepath=test"
+            f"/file_path/iq-data?format={format}&block_size=1&block_indexes_str=1&filepath=test"
         )
         assert response.status_code == 200
         assert response.content == arr
@@ -223,7 +223,7 @@ async def test_get_iq_data_with_cf32(
         response = client.get(
             f"/api/datasources/"
             f'{test_datasource["account"]}/{test_datasource["container"]}'
-            f"/file_path/iq-data?format={format}&fft_size=1&fft_arr_str=1&filepath=test"
+            f"/file_path/iq-data?format={format}&block_size=1&block_indexes_str=1&filepath=test"
         )
         assert response.status_code == 200
         assert response.content == arr
@@ -248,7 +248,7 @@ async def test_get_iq_data_with_cf32_be(
         response = client.get(
             f"/api/datasources/"
             f'{test_datasource["account"]}/{test_datasource["container"]}'
-            f"/file_path/iq-data?format={format}&fft_size=1&fft_arr_str=1&filepath=test"
+            f"/file_path/iq-data?format={format}&block_size=1&block_indexes_str=1&filepath=test"
         )
         assert response.status_code == 200
         assert response.content == arr
@@ -275,7 +275,7 @@ async def test_get_iq_data_with_ci8(
         response = client.get(
             f"/api/datasources/"
             f'{test_datasource["account"]}/{test_datasource["container"]}'
-            f"/file_path/iq-data?format={format}&fft_size=1&fft_arr_str=1&filepath=test"
+            f"/file_path/iq-data?format={format}&block_size=1&block_indexes_str=1&filepath=test"
         )
         assert response.status_code == 200
         assert response.content == arr
@@ -300,7 +300,7 @@ async def test_get_iq_data_with_i8(
         response = client.get(
             f"/api/datasources/"
             f'{test_datasource["account"]}/{test_datasource["container"]}'
-            f"/file_path/iq-data?format={format}&fft_size=1&fft_arr_str=1&filepath=test"
+            f"/file_path/iq-data?format={format}&block_size=1&block_indexes_str=1&filepath=test"
         )
         assert response.status_code == 200
         assert response.content == arr
@@ -325,7 +325,7 @@ async def test_get_iq_data_with_multiple_arr_elements_returns_data(
         response = client.get(
             f"/api/datasources/"
             f'{test_datasource["account"]}/{test_datasource["container"]}'
-            f"/file_path/iq-data?format=i8&fft_size=1&fft_arr_str={input_arr_str}&filepath=test"
+            f"/file_path/iq-data?format=i8&block_size=1&block_indexes_str={input_arr_str}&filepath=test"
         )
         assert response.status_code == 200
         assert response.content == arr + arr
@@ -350,7 +350,7 @@ async def test_get_iq_data_with_offset_larger_than_blob_size(
         response = client.get(
             f"/api/datasources/"
             f'{test_datasource["account"]}/{test_datasource["container"]}'
-            f"/file_path/iq-data?format=i8&fft_size=1&fft_arr_str={input_arr_str}&filepath=test"
+            f"/file_path/iq-data?format=i8&block_size=1&block_indexes_str={input_arr_str}&filepath=test"
         )
         assert response.status_code == 200
         assert response.content == b""
@@ -376,7 +376,7 @@ async def test_get_iq_data_with_offset_plus_count_larger_than_blob_size(
         response = client.get(
             f"/api/datasources/"
             f'{test_datasource["account"]}/{test_datasource["container"]}'
-            f"/file_path/iq-data?format=i8&fft_size=1&fft_arr_str={input_arr_str}&filepath=test"
+            f"/file_path/iq-data?format=i8&block_size=1&block_indexes_str={input_arr_str}&filepath=test"
         )
         assert response.status_code == 200
         assert response.content == arr

@@ -43,8 +43,8 @@ async def get_sas_token(
 )
 async def get_iq_data(
     filepath: str,
-    fft_arr_str: str,
-    fft_size: int,
+    block_indexes_str: str,
+    block_size: int,
     format: str,
     datasource: DataSource = Depends(datasource_repo.get),
     azure_client: AzureBlobClient = Depends(AzureBlobClient),
@@ -52,11 +52,11 @@ async def get_iq_data(
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
     try:
-        fft_arr = [int(num) for num in fft_arr_str.split(",")]
+        block_indexes = [int(num) for num in block_indexes_str.split(",")]
         return StreamingResponse(
             get_byte_stream(
-                fft_arr,
-                fft_size,
+                block_indexes,
+                block_size,
                 get_bytes_per_iq_sample(format),
                 get_file_name(filepath, ApiType.IQDATA),
                 azure_client,
@@ -68,13 +68,17 @@ async def get_iq_data(
 
 
 async def get_byte_stream(
-    fft_arr, fft_size, bytes_per_iq_sample, iq_file, azure_client
+    block_indexes, block_size, bytes_per_iq_sample, iq_file, azure_client
 ):
-    arrs = find_smallest_and_largest_next_to_each_other(fft_arr)
+    block_indexes_arrs = find_smallest_and_largest_next_to_each_other(block_indexes)
 
-    for arr in arrs:
-        offsetBytes = arr[0] * fft_size * bytes_per_iq_sample
-        countBytes = (arr[1] - arr[0] + 1) * fft_size * bytes_per_iq_sample
+    for block_index_arr in block_indexes_arrs:
+        offsetBytes = block_index_arr[0] * block_size * bytes_per_iq_sample
+        countBytes = (
+            (block_index_arr[1] - block_index_arr[0] + 1)
+            * block_size
+            * bytes_per_iq_sample
+        )
 
         blob_size = await azure_client.get_blob_size(iq_file)
         if blob_size < offsetBytes:
