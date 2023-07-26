@@ -160,6 +160,19 @@ async def test_api_get_meta(client):
 
 
 @pytest.mark.asyncio
+async def test_api_get_track_meta(client):
+    client.post("/api/datasources", json=test_datasource).json()
+    response = client.post(
+        f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path/meta',
+        json=valid_metadata,
+    )
+    response = client.get(
+        f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path/track'
+    )
+    assert response.status_code == 200
+
+
+@pytest.mark.asyncio
 async def test_api_get_meta_not_existing(client):
     response = client.get(
         f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path/meta'

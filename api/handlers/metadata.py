@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Optional
 
 from blob.azure_client import AzureBlobClient
 from database import datasource_repo, metadata_repo
-from database.models import DataSource, DataSourceReference, Metadata
+from database.models import DataSource, DataSourceReference, Metadata, TrackMetadata
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Response
 from fastapi.responses import StreamingResponse
 from helpers.authorization import required_roles
@@ -79,6 +79,25 @@ async def get_meta(
     if not metadata:
         raise HTTPException(status_code=404, detail="Metadata not found")
     return metadata
+
+
+@router.get(
+    "/api/datasources/{account}/{container}/{filepath:path}/track",
+    response_model=TrackMetadata,
+)
+async def get_meta(
+    metadata: Metadata = Depends(metadata_repo.get),
+    current_user: Optional[dict] = Depends(required_roles()),
+):
+    if not metadata:
+        raise HTTPException(status_code=404, detail="Metadata not found")
+
+    return TrackMetadata(
+        iqengine_geotrack=metadata.globalMetadata.__dict__.get("iqengine:geotrack"),
+        description=metadata.globalMetadata.core_description,
+        account=metadata.globalMetadata.traceability_origin.account,
+        container=metadata.globalMetadata.traceability_origin.container,
+    )
 
 
 @router.get(
