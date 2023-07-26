@@ -80,7 +80,7 @@ async def get_byte_stream(
             * bytes_per_iq_sample
         )
 
-        blob_size = await azure_client.get_blob_size(iq_file)
+        blob_size = await azure_client.get_file_length(iq_file)
         if blob_size < offsetBytes:
             return
         if blob_size < offsetBytes + countBytes:
