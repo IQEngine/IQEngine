@@ -60,8 +60,8 @@ valid_metadata_array = [
                 "type": "api",
                 "account": "test_account",
                 "container": "test_container",
-                "file_path": "test_file_path"
-        },
+                "file_path": "test_file_path",
+            },
             "traceability:revision": None,
         },
         "captures": [
