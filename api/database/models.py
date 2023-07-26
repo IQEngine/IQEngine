@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 
 from pydantic import BaseModel, Extra, Field, SecretStr
 
@@ -43,7 +43,7 @@ class MetadataGlobal(BaseModel):
     core_extensions: list[dict] | None = Field(alias="core:extensions")
     core_collection: str | None = Field(alias="core:collection")
     traceability_revision: int | None = Field(alias="traceability:revision")
-    traceability_origin: DataSourceReference | None = Field(alias="traceability:origin")
+    traceability_origin: DataSourceReference = Field(alias="traceability:origin")
     traceability_sample_length: int | None = Field(alias="traceability:sample_length")
 
     class Config:
@@ -104,3 +104,15 @@ class Configuration(BaseModel):
     internal_branding: str = Field(None, alias="internalBranding")
     app_id: str = Field(None, alias="appId")
     app_authority: str = Field(None, alias="appAuthority")
+
+
+class GeoTrack(BaseModel):
+    type: Optional[str]
+    coordinates: Optional[List[List[float]]]
+
+
+class TrackMetadata(BaseModel):
+    iqengine_geotrack: Optional[GeoTrack] | None
+    description: Optional[str] | None
+    account: str
+    container: str
