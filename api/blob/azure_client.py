@@ -51,11 +51,14 @@ class AzureBlobClient:
         return blob_client
 
     def get_container_client(self):
-        return ContainerClient.from_connection_string(
-            f"https://{self.account}.blob.core.windows.net/",
-            container_name=self.container,
+         if not self.sas_token:
+            return ContainerClient.from_container_url(
+                f"https://{self.account}.blob.core.windows.net/{self.container}"
+            )
+         return ContainerClient.from_container_url(
+            f"https://{self.account}.blob.core.windows.net/{self.container}",
             credential=self.sas_token.get_secret_value(),
-        )
+         )
 
     async def get_blob_properties(self, filepath) -> BlobProperties:
         blob_client = self.get_blob_client(filepath)

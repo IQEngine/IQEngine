@@ -43,7 +43,7 @@ class MetadataGlobal(BaseModel):
     core_extensions: list[dict] | None = Field(alias="core:extensions")
     core_collection: str | None = Field(alias="core:collection")
     traceability_revision: int | None = Field(alias="traceability:revision")
-    traceability_origin: DataSourceReference = Field(alias="traceability:origin")
+    traceability_origin: DataSourceReference | None = Field(alias="traceability:origin")
     traceability_sample_length: int | None = Field(alias="traceability:sample_length")
 
     class Config:
