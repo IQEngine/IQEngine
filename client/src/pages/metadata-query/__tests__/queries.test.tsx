@@ -75,4 +75,20 @@ describe('Test query validation objects', () => {
     const result = validator(label);
     expect(result).toBe(expected);
   });
+
+  test('source query validation returns correct query string', () => {
+    const { validator } = queries.datasource;
+    const datasourceName = ['iqengine/gnuradio'];
+    const expected = 'databaseid=iqengine%2Fgnuradio';
+    const result = validator(datasourceName);
+    expect(result).toBe(expected);
+  });
+
+  test('source query validation returns correct query string with multiple selections', () => {
+    const { validator } = queries.datasource;
+    const datasourceName = ['iqengine/gnuradio', 'example/anexample', 'account/container'];
+    const expected = 'databaseid=iqengine%2Fgnuradio&databaseid=example%2Fanexample&databaseid=account%2Fcontainer';
+    const result = validator(datasourceName);
+    expect(result).toBe(expected);
+  });
 });

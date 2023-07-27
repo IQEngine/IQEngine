@@ -109,13 +109,13 @@ export const queries = {
     component: SourceQuery,
     selected: false,
     description: 'The data source the document is from',
-    validator: (text: string) => {
-      if (!text) {
-        return false;
+    validator: (dataSource: string[]) => {
+      if (dataSource.length === 0) {
+        return '';
       }
-      return `text=${encodeURIComponent(text)}`;
+      let queryParts: string[] = dataSource.map((item) => `databaseid=${encodeURIComponent(item)}`);
+      return queryParts.join('&');
     },
     value: '',
   },
 };
-

@@ -181,7 +181,7 @@ async def query_meta(
     author: Optional[str] = Query(None),
     label: Optional[str] = Query(None),
     comment: Optional[str] = Query(None),
-    description: Optional[str] = Query(None), # global description
+    description: Optional[str] = Query(None),  # global description
     min_datetime: Optional[datetime] = Query(None),
     max_datetime: Optional[datetime] = Query(None),
     text: Optional[str] = Query(None),

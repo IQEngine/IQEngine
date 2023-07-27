@@ -27,7 +27,7 @@ async def test_api_get_config(client):
             "internalBranding": "internal_branding_string",
             "appId": "app_id",
             "appAuthority": "app_authority",
-            'uploadPageBlobSasUrl': None,
+            "uploadPageBlobSasUrl": None,
         }
 
 
@@ -52,7 +52,7 @@ async def test_api_get_config_feature_flags(client):
             "internalBranding": "internal_branding_string",
             "appId": "app_id",
             "appAuthority": "app_authority",
-            'uploadPageBlobSasUrl': None,
+            "uploadPageBlobSasUrl": None,
         }
 
 

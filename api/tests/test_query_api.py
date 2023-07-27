@@ -1,7 +1,6 @@
 from unittest.mock import MagicMock
 
 import pytest
-
 from database import metadata_repo
 from main import app
 
