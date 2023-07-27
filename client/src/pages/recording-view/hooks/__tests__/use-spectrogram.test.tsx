@@ -1,7 +1,7 @@
 import { useAllProviders } from '@/mocks/setup-tests';
 import { renderHook, waitFor } from '@testing-library/react';
 import nock from 'nock';
-import { useSpectrogram } from '@/pages/spectrogram/hooks/use-spectrogram';
+import { useSpectrogram } from '@/pages/recording-view/hooks/use-spectrogram';
 import { act } from 'react-dom/test-utils';
 
 describe('test metadata fetch and fft calculation', () => {
