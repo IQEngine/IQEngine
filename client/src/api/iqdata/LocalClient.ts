@@ -10,11 +10,29 @@ export class LocalClient implements IQDataClient {
   constructor(files: FileWithDirectoryAndFileHandle[]) {
     this.files = files;
   }
-  getIQDataSlices(meta: SigMFMetadata, indexes: number[], tileSize: number): Promise<IQDataSlice[]> {
-    return Promise.all(indexes.map((index) => this.getIQDataSlice(meta, index, tileSize)));
+  getIQDataBlocks(
+    meta: SigMFMetadata,
+    indexes: number[],
+    blockSize: number,
+    signal: AbortSignal
+  ): Promise<IQDataSlice[]> {
+    throw new Error('Method not implemented.');
+  }
+  getIQDataSlices(
+    meta: SigMFMetadata,
+    indexes: number[],
+    tileSize: number,
+    signal: AbortSignal
+  ): Promise<IQDataSlice[]> {
+    return Promise.all(indexes.map((index) => this.getIQDataSlice(meta, index, tileSize, signal)));
   }
 
-  async getIQDataSlice(meta: SigMFMetadata, index: number, tileSize: number): Promise<IQDataSlice> {
+  async getIQDataSlice(
+    meta: SigMFMetadata,
+    index: number,
+    tileSize: number,
+    signal: AbortSignal
+  ): Promise<IQDataSlice> {
     const localDirectory: FileWithDirectoryAndFileHandle[] = this.files;
     if (!localDirectory) {
       Promise.reject('No local directory found');
