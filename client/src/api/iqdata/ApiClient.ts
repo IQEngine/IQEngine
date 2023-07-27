@@ -2,7 +2,7 @@ import axios from 'axios';
 import { IQDataClient } from './IQDataClient';
 import { SigMFMetadata } from '@/utils/sigmfMetadata';
 import { IQDataSlice } from '@/api/Models';
-import { convertToFloat32 } from '@/utils/FetchMoreDataSource';
+import { convertToFloat32 } from '@/utils/fetch-more-data-source';
 
 export class ApiClient implements IQDataClient {
   async getIQDataBlocks(

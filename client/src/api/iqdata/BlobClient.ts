@@ -1,5 +1,5 @@
 import { IQDataClient } from './IQDataClient';
-import { convertToFloat32 } from '@/utils/FetchMoreDataSource';
+import { convertToFloat32 } from '@/utils/fetch-more-data-source';
 import { getBlobClient } from '@/api/utils/AzureBlob';
 import { SigMFMetadata } from '@/utils/sigmfMetadata';
 import { DataSource, IQDataSlice } from '@/api/Models';
