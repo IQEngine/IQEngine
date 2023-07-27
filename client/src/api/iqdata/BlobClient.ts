@@ -75,9 +75,9 @@ export class BlobClient implements IQDataClient {
   ): Promise<IQDataSlice[]> {
     console.log('getIQDataBlockFromBlob', blobClient.name, index, count, blockSize);
     let startTime = performance.now();
-    const bytesPerSample = meta.getBytesPerSample();
-    const offsetBytes = index * blockSize * bytesPerSample * 2;
-    const countBytes = blockSize * count * bytesPerSample * 2;
+    const bytesPerSample = meta.getBytesPerIQSample();
+    const offsetBytes = index * blockSize * bytesPerSample;
+    const countBytes = blockSize * count * bytesPerSample;
     // Thi is ugly but it is the only way to get the blob as an ArrayBuffer
     const download = await blobClient.download(offsetBytes, countBytes, {
       abortSignal: signal,

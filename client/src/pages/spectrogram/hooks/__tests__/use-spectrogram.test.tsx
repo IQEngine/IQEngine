@@ -40,7 +40,7 @@ describe('test metadata fetch and fft calculation', () => {
         wrapper: wrapper,
       }
     );
-    await waitFor(() => expect(result.current.total_ffts).toBe(total_ffts));
+    await waitFor(() => expect(result.current.totalFFTs).toBe(total_ffts));
   });
 
   test('should calculate the correct ffts thhat need to be displayed', async () => {

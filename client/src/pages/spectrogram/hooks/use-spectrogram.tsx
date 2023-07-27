@@ -15,16 +15,14 @@ export function useSpectrogram({ type, account, container, filePath }: Spectrogr
   const { fftSize, setFFTSize, currentData } = useGetIQData(type, account, container, filePath, fftsRequired);
   const totalFFTs = Math.ceil(meta?.getTotalSamples() / fftSize);
   const [currentFFT, setCurrentFFT] = useState<number>(0);
-  // This is how many ffts we skip when decimating
   const [fftStepSize, setFFTStepSize] = useState<number>(0);
-  // This is how many ffts we display
   const [spectrogramHeight, setSpectrogramHeight] = useState<number>(0);
-  console.log(
-    `useSpectrogram: ${type}, ${account}, ${container}, ${filePath} ${fftSize} ${currentFFT} ${totalFFTs}, ${spectrogramHeight}, ${fftStepSize}, ${meta}`
-  );
   // This is the list of ffts we display
   const displayedFFTs = useMemo<number[]>(() => {
-    const ffts = [currentFFT];
+    if (currentFFT === undefined || fftStepSize === undefined || totalFFTs === undefined || !spectrogramHeight) {
+      return [];
+    }
+    let ffts = [currentFFT];
     for (let i = 1; i < spectrogramHeight; i++) {
       ffts.push(currentFFT + i * (fftStepSize + 1));
     }
@@ -36,6 +34,7 @@ export function useSpectrogram({ type, account, container, filePath }: Spectrogr
       }
     }
 
+    ffts = ffts.filter((fft) => !currentData || currentData[fft] === undefined);
     setFFTsRequired(ffts);
 
     return ffts;

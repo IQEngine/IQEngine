@@ -163,7 +163,6 @@ export function useGetIQData(
       console.debug('useGetIQData', type, account, container, filePath, fftSize, fftsRequired);
       const iqDataClient = IQDataClientFactory(type, filesQuery.data, dataSourcesQuery.data);
       const iqData = await iqDataClient.getIQDataBlocks(meta, fftsRequired, fftSize, signal);
-      console.debug('useGetIQData', iqData);
       return iqData;
     },
     enabled: !!meta && !!filesQuery.data && !!dataSourcesQuery.data,
@@ -179,12 +178,27 @@ export function useGetIQData(
       return null;
     }
     if (iqData) {
-      iqData.forEach((data, index) => {
-        queryClient.setQueryData(['rawiqdata', type, account, container, filePath, fftSize, fftsRequired[index]], data);
+      performance.mark('iqData');
+      // change iqdata to be an sparce array of [data]
+      const tempArray = [];
+      iqData.forEach((data) => {
+        tempArray[data.index] = data.iqArray;
       });
+      const previousData = queryClient.getQueryData<Float32Array[]>([
+        'rawiqdata',
+        type,
+        account,
+        container,
+        filePath,
+        fftSize,
+      ]);
+      const content = Object.assign([], previousData, tempArray);
+      queryClient.setQueryData(['rawiqdata', type, account, container, filePath, fftSize], content);
+      let current = performance.measure('iqData', 'iqData');
+      console.debug('iqData', current);
     }
     const origin = meta.getOrigin();
-    const content = queryClient.getQueriesData<number[]>([
+    const content = queryClient.getQueryData<Float32Array[]>([
       'rawiqdata',
       origin.type,
       origin.account,
@@ -195,12 +209,8 @@ export function useGetIQData(
     if (!content) {
       return null;
     }
-    const currentData = content.reduce((acc, val) => {
-      const index = val[0][val[0].length - 1] as number;
-      acc[index] = val[1];
-      return acc;
-    }, []);
-    return currentData;
+    console.debug('currentData', content);
+    return content;
   }, [fftSize, meta, iqData]);
   return {
     fftSize,
