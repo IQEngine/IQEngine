@@ -3,7 +3,7 @@ from typing import List, Optional
 
 from blob.azure_client import AzureBlobClient
 from database import datasource_repo, metadata_repo
-from database.metadata_repo import query_metadata, InvalidGeolocationFormat
+from database.metadata_repo import InvalidGeolocationFormat, query_metadata
 from database.models import DataSource, DataSourceReference, Metadata, TrackMetadata
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Response
 from fastapi.responses import StreamingResponse
@@ -162,12 +162,10 @@ async def query_meta(
     text: Optional[str] = Query(None),
     captures_geo: Optional[str] = Query(None),
     annotations_geo: Optional[str] = Query(None),
-    metadataSet: AgnosticCollection = Depends(metadata_repo.collection),
     current_user: Optional[dict] = Depends(required_roles()),
 ):
     try:
         result = await query_metadata(
-            metadataSet=metadataSet,
             account=account,
             container=container,
             database_id=database_id,

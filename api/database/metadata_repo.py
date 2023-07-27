@@ -139,7 +139,6 @@ async def process_geolocation(target: str, geolocation: str):
 
 
 async def query_metadata(
-    metadataSet: AgnosticCollection = collection(),
     account: Optional[List[str]] = [],
     container: Optional[List[str]] = [],
     database_id: Optional[List[str]] = [],
@@ -198,7 +197,7 @@ async def query_metadata(
     This example queries the metadata with specified filter criteria and returns a list of data source
     references that match the search.
     """
-
+    metadataSet: AgnosticCollection = collection()
     query_condition: Dict[str, Any] = {}
     if database_id:
         database_id_conditions = []
