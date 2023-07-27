@@ -25,7 +25,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { getMeta } from '@/api/metadata/Queries';
 import { SigMFMetadata } from '@/utils/sigmfMetadata';
 import { getIQDataSlices, useCurrentCachedIQDataSlice } from '@/api/iqdata/Queries';
-import { applyProcessing } from '@/utils/FetchMoreDataSource';
+import { applyProcessing } from '@/utils/fetch-more-data-source';
 import { colMaps } from '@/utils/colormap';
 
 declare global {

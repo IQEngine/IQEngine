@@ -2,7 +2,7 @@ import { SigMFMetadata, TraceabilityOrigin } from '@/utils/sigmfMetadata';
 import { FileWithDirectoryAndFileHandle } from 'browser-fs-access';
 import { IQDataClient } from './IQDataClient';
 import { IQDataSlice } from '@/api/Models';
-import { convertToFloat32 } from '@/utils/FetchMoreDataSource';
+import { convertToFloat32 } from '@/utils/fetch-more-data-source';
 
 export class LocalClient implements IQDataClient {
   files: FileWithDirectoryAndFileHandle[];
