@@ -94,20 +94,7 @@ export function convertToFloat32(buffer, dataType) {
   } else if (dataType === 'cf64_le') {
     return Float32Array.from(new Float64Array(buffer));
   } else {
-    console.error('unsupported dataType');
-    //return new Float32Array(buffer);
+    console.error('Unknown data type: ' + dataType);
+    return new Float32Array(buffer);
   }
 }
-
-/* possibly unused?
-export function readFileAsync(file) {
-  return new Promise((resolve, reject) => {
-    let reader = new FileReader();
-    reader.onload = () => {
-      resolve(reader.result);
-    };
-    reader.onerror = reject;
-    reader.readAsArrayBuffer(file);
-  });
-}
-*/
