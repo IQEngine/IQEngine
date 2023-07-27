@@ -10,6 +10,7 @@ import RepositoryTile from './RepositoryTile';
 import RepositoryAPITile from './RepositoryAPITile';
 import SiggenTile from './SiggenTile';
 import ValidatorTile from './ValidatorTile';
+import MetadataQueryTile from './MetadataQueryTile';
 import { useConfigQuery } from '@/api/config/queries';
 import { getDataSources } from '@/api/datasource/queries';
 import { CLIENT_TYPE_API, CLIENT_TYPE_BLOB, DataSource } from '@/api/Models';
@@ -62,6 +63,7 @@ export const RepoBrowser = () => {
           </Feature>
           <LocalFileBrowser />
           <AzureBlobBrowser />
+          <MetadataQueryTile />
           <SiggenTile />
           <ValidatorTile />
         </div>

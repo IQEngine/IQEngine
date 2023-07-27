@@ -1,5 +1,5 @@
 import { BlobClient } from '@azure/storage-blob';
-import { dataTypeToBytesPerSample } from './selector';
+import { dataTypeToBytesPerIQSample } from './selector';
 import { FileWithDirectoryAndFileHandle } from 'browser-fs-access';
 import { TILE_SIZE_IN_IQ_SAMPLES } from './constants';
 import { metadataValidator } from './validators';
@@ -39,8 +39,8 @@ export class SigMFMetadata {
   dataFileHandle?: FileWithDirectoryAndFileHandle;
   dataClient?: BlobClient;
 
-  getBytesPerSample(): number {
-    return dataTypeToBytesPerSample(this.global['core:datatype']) ?? 1;
+  getBytesPerIQSample(): number {
+    return dataTypeToBytesPerIQSample(this.global['core:datatype']) ?? 2;
   }
 
   getVersion() {
@@ -160,7 +160,7 @@ export class SigMFMetadata {
   }
 
   getLengthInBytes() {
-    return Number(this.getLengthInIQSamples() * this.getBytesPerSample());
+    return Number(this.getLengthInIQSamples() * this.getBytesPerIQSample());
   }
 
   getCenterFrequency() {

@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Optional
 
 from blob.azure_client import AzureBlobClient
 from database import datasource_repo, metadata_repo
-from database.models import DataSource, DataSourceReference, Metadata
+from database.models import DataSource, DataSourceReference, Metadata, TrackMetadata
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Response
 from fastapi.responses import StreamingResponse
 from helpers.authorization import required_roles
@@ -82,6 +82,25 @@ async def get_meta(
 
 
 @router.get(
+    "/api/datasources/{account}/{container}/{filepath:path}/track",
+    response_model=TrackMetadata,
+)
+async def get_track_meta(
+    metadata: Metadata = Depends(metadata_repo.get),
+    current_user: Optional[dict] = Depends(required_roles()),
+):
+    if not metadata:
+        raise HTTPException(status_code=404, detail="Metadata not found")
+
+    return TrackMetadata(
+        iqengine_geotrack=metadata.globalMetadata.__dict__.get("iqengine:geotrack"),
+        description=metadata.globalMetadata.core_description,
+        account=metadata.globalMetadata.traceability_origin.account,
+        container=metadata.globalMetadata.traceability_origin.container,
+    )
+
+
+@router.get(
     "/api/datasources/{account}/{container}/{filepath:path}.jpg",
     response_class=StreamingResponse,
 )
@@ -95,7 +114,10 @@ async def get_meta_thumbnail(
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
 
-    azure_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
+    sas_token = datasource.sasToken.get_secret_value() if datasource.sasToken else None
+    if sas_token is not None:
+        azure_client.set_sas_token(decrypt(sas_token))
+
     thumbnail_path = get_file_name(filepath, ApiType.THUMB)
     content_type = get_content_type(ApiType.THUMB)
     if not await azure_client.blob_exist(thumbnail_path):

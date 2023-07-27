@@ -11,7 +11,6 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from helpers.authorization import required_roles
 from helpers.cipher import decrypt
-
 from helpers.conversions import find_smallest_and_largest_next_to_each_other
 from helpers.urlmapping import ApiType, get_content_type, get_file_name
 from pydantic import BaseModel, SecretStr
@@ -23,7 +22,7 @@ router = APIRouter()
 class IQData(BaseModel):
     indexes: List[int]
     tile_size: int
-    bytes_per_sample: int
+    bytes_per_iq_sample: int
 
 
 async def get_sas_token(
@@ -151,11 +150,11 @@ async def download_blob(
     filepath: str,
     index: int,
     tile_size: int,
-    bytes_per_sample: int,
+    bytes_per_iq_sample: int,
     blob_size: int,
 ):
-    offsetBytes = index * tile_size * bytes_per_sample * 2
-    countBytes = tile_size * bytes_per_sample * 2
+    offsetBytes = index * tile_size * bytes_per_iq_sample
+    countBytes = tile_size * bytes_per_iq_sample
     if (offsetBytes + countBytes) > blob_size:
         countBytes = blob_size - offsetBytes
     blob = await azure_client.get_blob_content(
@@ -195,7 +194,7 @@ async def get_iq_data_slices(
                 iq_file,
                 index,
                 iq_data.tile_size,
-                iq_data.bytes_per_sample,
+                iq_data.bytes_per_iq_sample,
                 blob_size,
             )
             for index in iq_data.indexes

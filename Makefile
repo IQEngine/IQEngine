@@ -56,6 +56,10 @@ test-pw:
 	@cd e2e && npx playwright test
 	@e2e/teardown.sh
 
+test-api:
+	@echo "Running pytest api tests"
+	@cd api && pytest
+
 lint:
 	@echo "Do you want to lint to correct the files? [y/N] " && read ans && if [ $${ans:-'N'} = 'y' ]; then make lint-corrections; else make lint-no-corrections;fi
 

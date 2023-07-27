@@ -23,11 +23,11 @@ export class ApiClient implements IQDataClient {
     let { account, container, file_path } = meta.getOrigin();
 
     let startTime = performance.now();
-    const bytesPerSample = meta.getBytesPerSample();
+    const bytesPerIQSample = meta.getBytesPerIQSample();
     const body = {
       indexes: indexes,
       tile_size: tileSize,
-      bytes_per_sample: bytesPerSample,
+      bytes_per_iq_sample: bytesPerIQSample,
     };
 
     const queryURL = `/api/datasources/${account}/${container}/${file_path}/iqslices`;
@@ -66,9 +66,9 @@ export class ApiClient implements IQDataClient {
     let { account, container, file_path } = meta.getOrigin();
 
     let startTime = performance.now();
-    const bytesPerSample = meta.getBytesPerSample();
-    const offsetBytes = index * tileSize * bytesPerSample * 2;
-    const countBytes = tileSize * bytesPerSample * 2;
+    const bytesPerIQSample = meta.getBytesPerIQSample();
+    const offsetBytes = index * tileSize * bytesPerIQSample;
+    const countBytes = tileSize * bytesPerIQSample;
     const queryURL = `/api/datasources/${account}/${container}/${file_path}/iqslice?offsetBytes=${offsetBytes}&countBytes=${countBytes}`;
     const response = await axios.get(queryURL, {
       signal: signal,
