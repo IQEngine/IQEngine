@@ -156,7 +156,6 @@ export function useGetIQData(
   const { data: iqData } = useQuery({
     queryKey: ['iqData', type, account, container, filePath, fftSize, fftsRequired],
     queryFn: async ({ signal }) => {
-      console.debug('useGetIQData', type, account, container, filePath, fftSize, fftsRequired);
       const iqDataClient = IQDataClientFactory(type, filesQuery.data, dataSourcesQuery.data);
       const iqData = await iqDataClient.getIQDataBlocks(meta, fftsRequired, fftSize, signal);
       return iqData;
@@ -170,8 +169,7 @@ export function useGetIQData(
       return null;
     }
     if (iqData) {
-      performance.mark('iqData');
-      // change iqdata to be an sparce array of [data]
+      // change iqdata to be an sparce array with the index as the key
       const tempArray = [];
       iqData.forEach((data) => {
         tempArray[data.index] = data.iqArray;
@@ -184,24 +182,21 @@ export function useGetIQData(
         filePath,
         fftSize,
       ]);
+      // This is the fastest way to merge the two sparce arrays keeping the indexes in order
       const content = Object.assign([], previousData, tempArray);
       queryClient.setQueryData(['rawiqdata', type, account, container, filePath, fftSize], content);
-      let current = performance.measure('iqData', 'iqData');
-      console.debug('iqData', current);
     }
-    const origin = meta.getOrigin();
     const content = queryClient.getQueryData<Float32Array[]>([
       'rawiqdata',
-      origin.type,
-      origin.account,
-      origin.container,
-      origin.file_path,
+      type,
+      account,
+      container,
+      filePath,
       fftSize,
     ]);
     if (!content) {
       return null;
     }
-    console.debug('currentData', content);
     return content;
   }, [fftSize, meta, iqData]);
   return {
