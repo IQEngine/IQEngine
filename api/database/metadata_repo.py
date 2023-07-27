@@ -201,7 +201,6 @@ async def query_metadata(
 
     query_condition: Dict[str, Any] = {}
     if database_id:
-        # database_id_list = database_id.split(",")
         database_id_conditions = []
         for entry in database_id:
             account_part, container_part = entry.split("/")
