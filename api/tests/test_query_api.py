@@ -1,9 +1,6 @@
-from unittest.mock import MagicMock
-
 import pytest
-from database import metadata_repo
 from tests.test_data import test_datasource, valid_metadata
-from .test_data import valid_metadata_array, valid_datasourcereference_array
+from .test_data import valid_datasourcereference_array
 
 
 @pytest.mark.asyncio
