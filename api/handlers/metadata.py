@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import List, Optional
 
 from blob.azure_client import AzureBlobClient
 from database import datasource_repo, metadata_repo
@@ -184,11 +184,11 @@ async def query_meta(
             text=text,
         )
         return result
-    
+
     except InvalidGeolocationFormat as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-    except Exception as e:
+    except Exception:
         raise HTTPException(status_code=500, detail="An unexpected error occurred.")
 
 

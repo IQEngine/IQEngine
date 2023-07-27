@@ -1,4 +1,4 @@
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from datetime import datetime
 from database.database import db
 from database.models import Metadata, DataSourceReference
@@ -140,29 +140,32 @@ async def process_geolocation(target: str, geolocation: str):
 
 async def query_metadata(
     metadataSet: AgnosticCollection = collection(),
-    account: List[str] = None,
-    container: List[str] = None,
-    database_id: List[str] = None,
-    min_frequency: float = None,
-    max_frequency: float = None,
-    author: str = None,
-    description: str = None,
-    label: str = None,
-    comment: str = None,
-    captures_geo: str = None,
-    annotations_geo: str = None,
-    min_datetime: datetime = None,
-    max_datetime: datetime = None,
-    text: str = None,
+    account: Optional[List[str]] = [],
+    container: Optional[List[str]] = [],
+    database_id: Optional[List[str]] = [],
+    min_frequency: Optional[float] = None,
+    max_frequency: Optional[float] = None,
+    author: Optional[str] = None,
+    description: Optional[str] = None,
+    label: Optional[str] = None,
+    comment: Optional[str] = None,
+    captures_geo: Optional[str] = None,
+    annotations_geo: Optional[str] = None,
+    min_datetime: Optional[datetime] = None,
+    max_datetime: Optional[datetime] = None,
+    text: Optional[str] = None,
 ) -> List[dict]:
     """
-    This function is responsible for querying metadata from the specified MongoDB collection based on various query parameters. It performs a database search using the provided criteria and returns a list of dictionaries containing relevant metadata information.
+    This function is responsible for querying metadata from the specified MongoDB collection based on various 
+    query parameters. It performs a database search using the provided criteria and returns a list of 
+    dictionaries containing relevant metadata information.
 
     Parameters:
     - metadataSet (Motor.core.AgnosticCollection): The MongoDB collection where the metadata is stored.
     - account (Optional[List[str]]): A list of account names to filter the metadata by.
     - container (Optional[List[str]]): A list of container names to filter the metadata by.
-    - database_id (Optional[List[str]]): A list of database IDs ({account}/{container}), where each entry is a combination of an account and a container, to filter the metadata by.
+    - database_id (Optional[List[str]]): A list of database IDs ({account}/{container}), where each entry is a 
+    combination of an account and a container, to filter the metadata by.
     - min_frequency (Optional[float]): The minimum frequency value to filter the metadata by.
     - max_frequency (Optional[float]): The maximum frequency value to filter the metadata by.
     - author (Optional[str]): The author's name to filter the metadata by.
@@ -176,7 +179,8 @@ async def query_metadata(
     - text (Optional[str]): A keyword to search for in various description fields to filter the metadata by.
 
     Returns:
-    - A list of dictionaries, each containing the metadata information for a specific data source. The dictionaries contain the following keys:
+    - A list of dictionaries, each containing the metadata information for a specific data source. 
+        The dictionaries contain the following keys:
         - "type": The type of data source (e.g., "file", "stream").
         - "account": The account associated with the data source.
         - "container": The container associated with the data source.
@@ -191,7 +195,8 @@ async def query_metadata(
         captures_geo="-175.8,4.4,500000",
         text="important data",
     )
-    This example queries the metadata with specified filter criteria and returns a list of data source references that match the search.
+    This example queries the metadata with specified filter criteria and returns a list of data source 
+    references that match the search.
     """
 
     query_condition: Dict[str, Any] = {}
