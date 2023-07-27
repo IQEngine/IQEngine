@@ -6,7 +6,7 @@ import React from 'react';
 
 import Results from '@/pages/metadata-query/results';
 import { SigMFMetadata, Annotation, CaptureSegment } from '@/utils/sigmfMetadata';
-import { queryMeta } from '@/api/metadata/Queries';
+import { useAllProviders } from '@/mocks/setup-tests';
 
 const createMetadata = () => {
   const raw = [
@@ -105,11 +105,8 @@ describe('Test Results', () => {
     render(<Results queryString="" />);
   });
   test('Basic Rendering', async () => {
-    render(
-      <BrowserRouter>
-        <Results queryString="test query string" />
-      </BrowserRouter>
-    );
+    var { wrapper } = useAllProviders();
+    render(<Results queryString="test query string" />, { wrapper });
     waitFor(() => expect(screen.findByText(/Sample Count/i)).toBeInTheDocument());
   });
 });
