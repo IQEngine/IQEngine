@@ -56,7 +56,6 @@ export class ApiClient implements IQDataClient {
     tileSize: number,
     signal: AbortSignal
   ): Promise<IQDataSlice[]> {
-    //return Promise.all(indexes.map((index) => this.getIQDataSlice(meta, index, tileSize)));
     let { account, container, file_path } = meta.getOrigin();
 
     let startTime = performance.now();

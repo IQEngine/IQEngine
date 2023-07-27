@@ -73,8 +73,6 @@ export class BlobClient implements IQDataClient {
     blockSize: number,
     signal: AbortSignal
   ): Promise<IQDataSlice[]> {
-    console.log('getIQDataBlockFromBlob', blobClient.name, index, count, blockSize);
-    let startTime = performance.now();
     const bytesPerSample = meta.getBytesPerIQSample();
     const offsetBytes = index * blockSize * bytesPerSample;
     const countBytes = blockSize * count * bytesPerSample;
@@ -86,16 +84,10 @@ export class BlobClient implements IQDataClient {
     const iqArray = convertToFloat32(blobBody, meta.getDataType());
     const iqBlocks: IQDataSlice[] = [];
     for (let i = 0; i < count; i++) {
-      const offset = i * blockSize;
-      const iqBlock = iqArray.slice(offset, offset + blockSize);
+      const offset = i * blockSize * 2;
+      const iqBlock = iqArray.slice(offset, offset + blockSize * 2);
       iqBlocks.push({ index: index + i, iqArray: iqBlock });
     }
-    console.debug(
-      `get blob block ${blobClient.name} ${index} ${count} took:`,
-      performance.now() - startTime,
-      'ms',
-      iqBlocks
-    );
     return iqBlocks;
   }
 }
