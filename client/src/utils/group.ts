@@ -1,15 +1,22 @@
 export function groupContingousIndexes(indexes: number[]) {
   const contigousIndexes: { start: number; count: number }[] = [];
-  for (let i = indexes[0]; i < indexes.length - 1; i++) {
-    if (indexes[i] + 1 === indexes[i + 1]) {
-      if (contigousIndexes.length === 0) {
-        contigousIndexes.push({ start: i, count: 2 });
-      } else {
-        contigousIndexes[contigousIndexes.length - 1].count++;
-      }
+  if (indexes.length === 0) {
+    return contigousIndexes;
+  }
+  indexes.sort((a, b) => a - b);
+  for (let i = 0; i < indexes.length; i++) {
+    const index = indexes[i];
+    if (i === 0) {
+      contigousIndexes.push({ start: index, count: 1 });
     } else {
-      contigousIndexes.push({ start: i + 1, count: 1 });
+      const lastContigousIndex = contigousIndexes[contigousIndexes.length - 1];
+      if (lastContigousIndex.start + lastContigousIndex.count === index) {
+        lastContigousIndex.count++;
+      } else {
+        contigousIndexes.push({ start: index, count: 1 });
+      }
     }
   }
+
   return contigousIndexes;
 }
