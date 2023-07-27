@@ -156,15 +156,15 @@ async def query_metadata(
     text: Optional[str] = None,
 ) -> List[dict]:
     """
-    This function is responsible for querying metadata from the specified MongoDB collection based on various 
-    query parameters. It performs a database search using the provided criteria and returns a list of 
+    This function is responsible for querying metadata from the specified MongoDB collection based on various
+    query parameters. It performs a database search using the provided criteria and returns a list of
     dictionaries containing relevant metadata information.
 
     Parameters:
     - metadataSet (Motor.core.AgnosticCollection): The MongoDB collection where the metadata is stored.
     - account (Optional[List[str]]): A list of account names to filter the metadata by.
     - container (Optional[List[str]]): A list of container names to filter the metadata by.
-    - database_id (Optional[List[str]]): A list of database IDs ({account}/{container}), where each entry is a 
+    - database_id (Optional[List[str]]): A list of database IDs ({account}/{container}), where each entry is a
     combination of an account and a container, to filter the metadata by.
     - min_frequency (Optional[float]): The minimum frequency value to filter the metadata by.
     - max_frequency (Optional[float]): The maximum frequency value to filter the metadata by.
@@ -179,7 +179,7 @@ async def query_metadata(
     - text (Optional[str]): A keyword to search for in various description fields to filter the metadata by.
 
     Returns:
-    - A list of dictionaries, each containing the metadata information for a specific data source. 
+    - A list of dictionaries, each containing the metadata information for a specific data source.
         The dictionaries contain the following keys:
         - "type": The type of data source (e.g., "file", "stream").
         - "account": The account associated with the data source.
@@ -195,7 +195,7 @@ async def query_metadata(
         captures_geo="-175.8,4.4,500000",
         text="important data",
     )
-    This example queries the metadata with specified filter criteria and returns a list of data source 
+    This example queries the metadata with specified filter criteria and returns a list of data source
     references that match the search.
     """
 
