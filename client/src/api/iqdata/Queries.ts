@@ -151,13 +151,9 @@ export function useGetIQData(
   const { filesQuery, dataSourcesQuery } = useUserSettings();
   const [fftSize, setFFTSize] = useState<number>(1024);
 
-  const { data: meta, isSuccess: hasMetadata } = useMeta(type, account, container, filePath);
+  const { data: meta } = useMeta(type, account, container, filePath);
 
-  const {
-    data: iqData,
-    status,
-    error,
-  } = useQuery({
+  const { data: iqData } = useQuery({
     queryKey: ['iqData', type, account, container, filePath, fftSize, fftsRequired],
     queryFn: async ({ signal }) => {
       console.debug('useGetIQData', type, account, container, filePath, fftSize, fftsRequired);
@@ -167,10 +163,6 @@ export function useGetIQData(
     },
     enabled: !!meta && !!filesQuery.data && !!dataSourcesQuery.data,
   });
-
-  useEffect(() => {
-    console.debug('iqQuery Status', status, error);
-  }, [status, error]);
 
   const queryClient = useQueryClient();
   const currentData = useMemo(() => {
