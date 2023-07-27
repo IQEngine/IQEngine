@@ -15,7 +15,6 @@ import { fftshift } from 'fftshift';
 import { TILE_SIZE_IN_IQ_SAMPLES } from './constants';
 import { FFT } from '@/utils/fft';
 import { SigMFMetadata } from './sigmfMetadata';
-import { number } from 'prop-types';
 
 export function calcFftOfTile(
   samples: Float32Array,
