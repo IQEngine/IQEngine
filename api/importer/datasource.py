@@ -43,7 +43,11 @@ async def import_datasources_from_env(
                 type="api",
             )
             await datasource_repo.create(datasource=datasource)
-            asyncio.create_task(datasource_repo.sync(connection["accountName"], connection["containerName"]))
+            asyncio.create_task(
+                datasource_repo.sync(
+                    connection["accountName"], connection["containerName"]
+                )
+            )
         except Exception as e:
             print(f"Failed to import datasource {connection['name']}", e)
             continue
