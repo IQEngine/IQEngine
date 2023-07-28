@@ -1,5 +1,5 @@
 import React from 'react';
-import { queryMeta } from '@/api/metadata/Queries';
+import { queryMeta } from '@/api/metadata/queries';
 import FileRow from '@/pages/recordings-browser/File';
 
 export const Results = ({ queryString }) => {

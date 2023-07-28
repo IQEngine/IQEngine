@@ -51,6 +51,7 @@ describe('Test DataSources', () => {
     expect(screen.getByText('Test API')).toBeInTheDocument();
     expect(screen.getByText('Test API Description')).toBeInTheDocument();
     expect(screen.getByText(ClientType.API)).toBeInTheDocument();
+    expect(screen.getByLabelText('sync Test API')).toBeInTheDocument();
     const imageAPI = screen.getByAltText('Test API Description');
     expect(imageAPI).toBeInTheDocument();
     expect(imageAPI).toHaveAttribute('src', 'https://test.blob.core.windows.net/api/test.png');

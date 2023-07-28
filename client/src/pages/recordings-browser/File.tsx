@@ -5,7 +5,7 @@
 import React, { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { CLIENT_TYPE_BLOB } from '@/api/Models';
-import { getMeta } from '@/api/metadata/Queries';
+import { getMeta } from '@/api/metadata/queries';
 import { FileAnnotationData } from './FileAnnotationData';
 import { ModalDialog } from '@/features/ui/modal/Modal';
 
@@ -137,10 +137,8 @@ export default function FileRow({ filepath, type, account, container, sasToken }
             {item.annotations?.length ?? 0}
           </button>
           {showModal && (
-            <ModalDialog setShowModal={setShowModal} heading={item.getFileName()} classList='max-w-full'>
-            <FileAnnotationData
-              annotations={item?.annotations}
-            />
+            <ModalDialog setShowModal={setShowModal} heading={item.getFileName()} classList="max-w-full">
+              <FileAnnotationData annotations={item?.annotations} />
             </ModalDialog>
           )}
           <br></br>({item.captures?.length ?? 0} Capture{item.captures?.length > 1 && 's'})

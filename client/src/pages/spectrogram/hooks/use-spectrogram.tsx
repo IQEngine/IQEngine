@@ -1,5 +1,5 @@
 import { useGetIQData } from '@/api/iqdata/Queries';
-import { useMeta } from '@/api/metadata/Queries';
+import { useMeta } from '@/api/metadata/queries';
 import { useMemo, useState } from 'react';
 
 interface SpectrogramProps {

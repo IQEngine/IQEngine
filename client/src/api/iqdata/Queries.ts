@@ -6,7 +6,7 @@ import { IQDataSlice } from '@/api/Models';
 import { TILE_SIZE_IN_IQ_SAMPLES } from '@/utils/constants';
 import { useUserSettings } from '@/api/user-settings/use-user-settings';
 import { useEffect, useMemo, useState } from 'react';
-import { useMeta } from '@/api/metadata/Queries';
+import { useMeta } from '@/api/metadata/queries';
 
 export const getIQDataSlice = (
   meta: SigMFMetadata,
