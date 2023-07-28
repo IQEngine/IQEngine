@@ -1,8 +1,9 @@
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import List, Optional
 
 from blob.azure_client import AzureBlobClient
 from database import datasource_repo, metadata_repo
+from database.metadata_repo import InvalidGeolocationFormat, query_metadata
 from database.models import DataSource, DataSourceReference, Metadata, TrackMetadata
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Response
 from fastapi.responses import StreamingResponse
@@ -141,37 +142,6 @@ async def get_meta_thumbnail(
     return Response(content=content, media_type=content_type)
 
 
-async def process_geolocation(target: str, geolocation: str):
-    try:
-        geo_long_str, geo_lat_str, geo_radius_str = geolocation.split(",")
-        geo_long = float(geo_long_str)
-        geo_lat = float(geo_lat_str)
-        geo_radius = float(geo_radius_str)
-        target_field = ""
-        if target == "captures":
-            target_field = "captures.core:geolocation"
-        if target == "annotations":
-            target_field = "annotations.core:geolocation"
-
-        return {
-            target_field: {
-                "$near": {
-                    "$geometry": {
-                        "type": "Point",
-                        "coordinates": [geo_long, geo_lat],
-                    },
-                    "$maxDistance": geo_radius,
-                }
-            }
-        }
-
-    except Exception:
-        raise HTTPException(
-            status_code=400,
-            detail="Invalid geolocation format, expected: long, lat, radius",
-        )
-
-
 @router.get(
     "/api/datasources/query",
     status_code=200,
@@ -180,6 +150,7 @@ async def process_geolocation(target: str, geolocation: str):
 async def query_meta(
     account: Optional[List[str]] = Query([]),
     container: Optional[List[str]] = Query([]),
+    database_id: Optional[List[str]] = Query([]),
     min_frequency: Optional[float] = Query(None),
     max_frequency: Optional[float] = Query(None),
     author: Optional[str] = Query(None),
@@ -191,107 +162,32 @@ async def query_meta(
     text: Optional[str] = Query(None),
     captures_geo: Optional[str] = Query(None),
     annotations_geo: Optional[str] = Query(None),
-    metadataSet: AgnosticCollection = Depends(metadata_repo.collection),
     current_user: Optional[dict] = Depends(required_roles()),
 ):
-    query_condition: Dict[str, Any] = {}
-    if account:
-        query_condition.update(
-            {
-                "$or": [
-                    {
-                        "global.traceability:origin.account": {
-                            "$regex": a,
-                            "$options": "i",
-                        }
-                    }
-                    for a in account
-                ]
-            }
+    try:
+        result = await query_metadata(
+            account=account,
+            container=container,
+            database_id=database_id,
+            min_frequency=min_frequency,
+            max_frequency=max_frequency,
+            author=author,
+            description=description,
+            label=label,
+            comment=comment,
+            captures_geo=captures_geo,
+            annotations_geo=annotations_geo,
+            min_datetime=min_datetime,
+            max_datetime=max_datetime,
+            text=text,
         )
-    if container:
-        query_condition.update(
-            {
-                "$or": [
-                    {
-                        "global.traceability:origin.container": {
-                            "$regex": c,
-                            "$options": "i",
-                        }
-                    }
-                    for c in container
-                ]
-            }
-        )
-    if min_frequency is not None:
-        query_condition.update({"captures.core:frequency": {"$gte": min_frequency}})
-    if max_frequency is not None:
-        query_condition.update({"captures.core:frequency": {"$lte": max_frequency}})
-    if author is not None:
-        query_condition.update(
-            {"global.core:author": {"$regex": author, "$options": "i"}}
-        )
-    # global description
-    if description is not None:
-        query_condition.update(
-            {"global.core:description": {"$regex": description, "$options": "i"}}
-        )
-    if label is not None:
-        query_condition.update(
-            {"annotations.core:label": {"$regex": label, "$options": "i"}}
-        )
-    if comment is not None:
-        query_condition.update(
-            {"annotations.core:description": {"$regex": comment, "$options": "i"}}
-        )
+        return result
 
-    if captures_geo:
-        query_condition.update(await process_geolocation("captures", captures_geo))
-    if annotations_geo:
-        query_condition.update(
-            await process_geolocation("annotations", annotations_geo)
-        )
+    except InvalidGeolocationFormat as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
-    if text is not None:
-        or_condition = [
-            {"global.core:description": {"$regex": text, "$options": "i"}},
-            {"annotations.core:label": {"$regex": text, "$options": "i"}},
-            {"annotations.core:description": {"$regex": text, "$options": "i"}},
-        ]
-        query_condition.update({"$or": or_condition})
-
-    if min_datetime is not None or max_datetime is not None:
-        datetime_query = {}
-        if min_datetime is not None:
-            min_datetime_formatted = min_datetime.strftime("%Y-%m-%dT%H:%M:%S")
-            datetime_query.update({"$gte": min_datetime_formatted})
-        if max_datetime is not None:
-            max_datetime_formatted = max_datetime.strftime("%Y-%m-%dT%H:%M:%S")
-            datetime_query.update({"$lte": max_datetime_formatted})
-        query_condition.update({"captures.core:datetime": datetime_query})
-
-    metadata = metadataSet.find(
-        query_condition,
-        {
-            "global.traceability:origin.type": 1,
-            "global.traceability:origin.account": 1,
-            "global.traceability:origin.container": 1,
-            "global.traceability:origin.file_path": 1,
-            "_id": 0,
-        },
-    )
-
-    result = []
-    async for datum in metadata:
-        traceability_origin = datum.get("global", {}).get("traceability:origin", {})
-        ds_reference = DataSourceReference(
-            type=traceability_origin.get("type"),
-            account=traceability_origin.get("account"),
-            container=traceability_origin.get("container"),
-            file_path=traceability_origin.get("file_path"),
-        )
-        result.append(ds_reference)
-    return result
+    except Exception:
+        raise HTTPException(status_code=500, detail="An unexpected error occurred.")
 
 
 @router.post(
