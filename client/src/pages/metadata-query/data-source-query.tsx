@@ -10,12 +10,12 @@ export const SourceQuery = ({ validator, queryName, handleQueryValid, handleQuer
       const dataSources = {};
 
       apiQuery.data?.forEach((item) => {
-        dataSources[item.name] = { name: item.name, account: item.account, container: item.container, selected: false };
+        dataSources[item.name] = { name: item.name, account: item.account, container: item.container, selected: true };
       });
 
       setSelections(dataSources);
     }
-  }, []);
+  }, [apiQuery.data]);
 
   useEffect(() => {
     let checkedSelections = Object.keys(selections).filter((item) => selections[item]?.selected);
@@ -27,6 +27,7 @@ export const SourceQuery = ({ validator, queryName, handleQueryValid, handleQuer
       const { account, container } = selections[value];
       return `${account}/${container}`;
     });
+    console.log(dataSource);
 
     const valid = validator(dataSourcePaths);
     if (valid) {
