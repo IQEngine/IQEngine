@@ -1,7 +1,6 @@
 import '@/mocks/setup-tests';
 import { describe, expect, test, vi } from 'vitest';
-import { BrowserRouter } from 'react-router-dom';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 
 import Results from '@/pages/metadata-query/results';
@@ -78,7 +77,7 @@ const createMetadata = () => {
   };
 };
 
-vi.mock('@/api/metadata/Queries', async () => {
+vi.mock('@/api/metadata/queries', async () => {
   return {
     queryMeta: vi.fn(() => ({
       data: createMetadata().parsed,

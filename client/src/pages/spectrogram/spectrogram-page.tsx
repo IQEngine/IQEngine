@@ -22,7 +22,7 @@ import { MetaViewer } from '@/pages/spectrogram/components/metadata/MetaViewer';
 import { MetaRaw } from '@/pages/spectrogram/components/metadata/MetaRaw';
 import { useParams } from 'react-router-dom';
 import React, { useState, useEffect, useRef } from 'react';
-import { getMeta } from '@/api/metadata/Queries';
+import { getMeta } from '@/api/metadata/queries';
 import { SigMFMetadata } from '@/utils/sigmfMetadata';
 import { getIQDataSlices, useCurrentCachedIQDataSlice } from '@/api/iqdata/Queries';
 import { applyProcessing } from '@/utils/fetch-more-data-source';

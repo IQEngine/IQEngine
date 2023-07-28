@@ -1,4 +1,4 @@
-import { MetadataClient } from './MetadataClient';
+import { MetadataClient } from './metadata-client';
 import { Annotation, CaptureSegment, SigMFMetadata, TraceabilityOrigin } from '@/utils/sigmfMetadata';
 import { FileWithDirectoryAndFileHandle } from 'browser-fs-access';
 

@@ -5,7 +5,7 @@
 import React, { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { CLIENT_TYPE_BLOB } from '@/api/Models';
-import { getMeta } from '@/api/metadata/Queries';
+import { getMeta } from '@/api/metadata/queries';
 import { FileAnnotationData } from './FileAnnotationData';
 import { ModalDialog } from '@/features/ui/modal/Modal';
 import { useFeatureFlags } from '@/hooks/use-feature-flags';

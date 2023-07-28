@@ -6,7 +6,7 @@ import React, { useEffect, useState } from 'react';
 import Directory from './Directory';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { useParams } from 'react-router-dom';
-import { useQueryDataSourceMetaPaths } from '@/api/metadata/Queries';
+import { useQueryDataSourceMetaPaths } from '@/api/metadata/queries';
 import { DirectoryNode, groupDataByDirectories } from './DirectoryNode';
 import { useFeatureFlags } from '@/hooks/use-feature-flags';
 

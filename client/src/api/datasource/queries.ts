@@ -2,7 +2,7 @@ import { DataSourceClientFactory } from './datasource-client-factory';
 import { DataSourceClient } from './datasource-client';
 import { DataSource } from '@/api/Models';
 import { useUserSettings } from '@/api/user-settings/use-user-settings';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { ClientType } from '@/api/Models';
 
 const fetchDataSources = async (client: DataSourceClient) => {
@@ -43,20 +43,25 @@ export const getDataSource = (type: string, account: string, container: string, 
   );
 };
 
-export const getFeatures = (type: string) => {
+export const useGetDatasourceFeatures = (type: string) => {
   const { dataSourcesQuery, filesQuery } = useUserSettings();
   const client = DataSourceClientFactory(type, filesQuery.data, dataSourcesQuery.data);
   return client.features();
 };
 
+export const useSyncDataSource = (type: string, account: string, container) => {
+  const { dataSourcesQuery, filesQuery } = useUserSettings();
+  const client = DataSourceClientFactory(type, filesQuery.data, dataSourcesQuery.data);
+  return () => client.sync(account, container);
+};
+
 export const useAddDataSource = () => {
   const { dataSourcesQuery, filesQuery } = useUserSettings();
   const dataSourceClient = DataSourceClientFactory(ClientType.API, filesQuery.data, dataSourcesQuery.data);
-  let client = useQueryClient();
 
   return useMutation({
     mutationFn: (dataSource: DataSource) => {
-      let response = dataSourceClient.create(dataSource)
+      let response = dataSourceClient.create(dataSource);
       return response;
     },
     onError: (err, newMeta, context) => {

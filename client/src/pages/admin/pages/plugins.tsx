@@ -24,45 +24,50 @@ export const PluginDetail = ({ plugin }: PluginRowProps) => {
 
   return (
     <>
-      <button aria-label={`plugin ${plugin.name} detail`} onClick={() => {
-              setShowModal(true);
-            }}>
+      <button
+        aria-label={`plugin ${plugin.name} detail`}
+        onClick={() => {
+          setShowModal(true);
+        }}
+      >
         <ArrowTopRightOnSquareIcon className="h-4 w-4" />
       </button>
 
-      {showModal && <ModalDialog heading={`Plugin detail`} setShowModal={setShowModal}>
-        <p>
-          <span className="font-bold">Name:</span> {plugin.name}
-        </p>
-        <p>
-          <span className="font-bold">URL:</span> {plugin.url}
-        </p>
-        {data && (
-          <>
-            {Object.keys(data.plugins).map((key, i) => (
-              <div className="collapse collapse-arrow join-item border border-primary">
-                <input type="radio" name={key} />
-                <div className="collapse-title font-medium">{key}</div>
-                <div className="collapse-content">
-                  {/* List all parameters of the plugin */}
-                  <ul>
-                    {Object.keys(data.plugins[key]).map((parameter, j) => (
-                      <li key={j}>
-                        <span className="">{data.plugins[key][parameter].title}</span>:{' '}
-                        {data.plugins[key][parameter].type}
-                        <br />
-                        Default: {data.plugins[key][parameter].default}
-                        <hr className="border-secondary" />
-                      </li>
-                    ))}
-                  </ul>
+      {showModal && (
+        <ModalDialog heading={`Plugin detail`} setShowModal={setShowModal}>
+          <p>
+            <span className="font-bold">Name:</span> {plugin.name}
+          </p>
+          <p>
+            <span className="font-bold">URL:</span> {plugin.url}
+          </p>
+          {data && (
+            <>
+              {Object.keys(data.plugins).map((key, i) => (
+                <div className="collapse collapse-arrow join-item border border-primary">
+                  <input type="radio" name={key} />
+                  <div className="collapse-title font-medium">{key}</div>
+                  <div className="collapse-content">
+                    {/* List all parameters of the plugin */}
+                    <ul>
+                      {Object.keys(data.plugins[key]).map((parameter, j) => (
+                        <li key={j}>
+                          <span className="">{data.plugins[key][parameter].title}</span>:{' '}
+                          {data.plugins[key][parameter].type}
+                          <br />
+                          Default: {data.plugins[key][parameter].default}
+                          <hr className="border-secondary" />
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </>
-        )}
-        <hr className="border-secondary" />
-        </ModalDialog>}
+              ))}
+            </>
+          )}
+          <hr className="border-secondary" />
+        </ModalDialog>
+      )}
     </>
   );
 };
@@ -97,40 +102,40 @@ export const PluginEdit = ({ plugin }: PluginRowProps) => {
 
   return (
     <>
-        <form onSubmit={handleUpdate}>
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text">Name</span>
-            </label>
-            <span>{plugin.name}</span>
-          </div>
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text">URL</span>
-            </label>
-            <input
-              type="text"
-              name="url"
-              placeholder="URL"
-              className="input input-bordered"
-              aria-label={`edit ${plugin.name} plugin url`}
-              defaultValue={plugin.url}
-            />
-          </div>
-          <div className="modal-action">
-            <button
-              className="h-9"
-              onClick={(e) => {
-                e.preventDefault();
-              }}
-            >
-              Cancel
-            </button>
-            <button className="h-9" aria-label={`save ${plugin.name} plugin`}>
-              Save
-            </button>
-          </div>
-        </form>
+      <form onSubmit={handleUpdate}>
+        <div className="form-control">
+          <label className="label">
+            <span className="label-text">Name</span>
+          </label>
+          <span>{plugin.name}</span>
+        </div>
+        <div className="form-control">
+          <label className="label">
+            <span className="label-text">URL</span>
+          </label>
+          <input
+            type="text"
+            name="url"
+            placeholder="URL"
+            className="input input-bordered"
+            aria-label={`edit ${plugin.name} plugin url`}
+            defaultValue={plugin.url}
+          />
+        </div>
+        <div className="modal-action">
+          <button
+            className="h-9"
+            onClick={(e) => {
+              e.preventDefault();
+            }}
+          >
+            Cancel
+          </button>
+          <button className="h-9" aria-label={`save ${plugin.name} plugin`}>
+            Save
+          </button>
+        </div>
+      </form>
     </>
   );
 };
@@ -170,37 +175,37 @@ export const PluginAdd = () => {
   }
   return (
     <>
-        <form onSubmit={handleSave}>
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text">Name</span>
-            </label>
-            <input
-              type="text"
-              aria-label="add plugin name"
-              name="name"
-              placeholder="Name"
-              className="input input-bordered"
-            />
-          </div>
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text">URL</span>
-            </label>
-            <input
-              type="text"
-              aria-label="add plugin url"
-              name="url"
-              placeholder="URL"
-              className="input input-bordered"
-            />
-          </div>
-          <div className="modal-action">
-            <button className="btn btn-primary" type="submit" aria-label="create plugin">
-              Save
-            </button>
-          </div>
-        </form>
+      <form onSubmit={handleSave}>
+        <div className="form-control">
+          <label className="label">
+            <span className="label-text">Name</span>
+          </label>
+          <input
+            type="text"
+            aria-label="add plugin name"
+            name="name"
+            placeholder="Name"
+            className="input input-bordered"
+          />
+        </div>
+        <div className="form-control">
+          <label className="label">
+            <span className="label-text">URL</span>
+          </label>
+          <input
+            type="text"
+            aria-label="add plugin url"
+            name="url"
+            placeholder="URL"
+            className="input input-bordered"
+          />
+        </div>
+        <div className="modal-action">
+          <button className="btn btn-primary" type="submit" aria-label="create plugin">
+            Save
+          </button>
+        </div>
+      </form>
     </>
   );
 };
@@ -213,12 +218,19 @@ export const PluginRow = ({ plugin, removePlugin }: PluginRowProps) => {
       <td>{plugin.url}</td>
       <td>
         <PluginDetail plugin={plugin} />
-        <button aria-label={`edit ${plugin.name} plugin`} onClick={() => {
-              setEditShowModal(true);
-            }}>
-        <PencilIcon className="h-4 w-4" />
-      </button>
-      {showEditModal && <ModalDialog heading={'Edit plugin'} setShowModal={setEditShowModal}><PluginEdit plugin={plugin} /></ModalDialog>}
+        <button
+          aria-label={`edit ${plugin.name} plugin`}
+          onClick={() => {
+            setEditShowModal(true);
+          }}
+        >
+          <PencilIcon className="h-4 w-4" />
+        </button>
+        {showEditModal && (
+          <ModalDialog heading={'Edit plugin'} setShowModal={setEditShowModal}>
+            <PluginEdit plugin={plugin} />
+          </ModalDialog>
+        )}
 
         <PluginDelete plugin={plugin} removePlugin={removePlugin} />
       </td>
@@ -254,11 +266,20 @@ export const Plugins = () => {
   return (
     <>
       <h1 className="text-3xl font-bold">Plugins</h1>
-      {showModal && <ModalDialog heading={'Add plugin'} setShowModal={setShowModal}><PluginAdd /></ModalDialog>}
-      <button className="h-9" name="Add Plugin" aria-label="add plugin" onClick={() => {
-              setShowModal(true);
-            }}>
-        Add Plugin
+      {showModal && (
+        <ModalDialog heading={'Add plugin'} setShowModal={setShowModal}>
+          <PluginAdd />
+        </ModalDialog>
+      )}
+      <button
+        className="text-l font-bold ml-2"
+        name="Add Plugin"
+        aria-label="add plugin"
+        onClick={() => {
+          setShowModal(true);
+        }}
+      >
+        + Add Plugin
       </button>
       {data && data?.length > 0 ? (
         <table className="table w-full">

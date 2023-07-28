@@ -1,3 +1,4 @@
+import asyncio
 import json
 import os
 
@@ -20,12 +21,12 @@ async def import_datasources_from_env(
     -------
     None
     """
-    try:
-        connection_info = os.getenv(environment_variable_name, None)
-        if not connection_info:
-            return None
-        connections = json.loads(connection_info)["settings"]
-        for connection in connections:
+    connection_info = os.getenv(environment_variable_name, None)
+    if not connection_info:
+        return None
+    connections = json.loads(connection_info)["settings"]
+    for connection in connections:
+        try:
             if await datasource_repo.datasource_exists(
                 connection["accountName"], connection["containerName"]
             ):
@@ -42,9 +43,11 @@ async def import_datasources_from_env(
                 type="api",
             )
             await datasource_repo.create(datasource=datasource)
-    except Exception as e:
-        # throw a custom plugin failed to load exception
-        raise Exception(
-            f"Failed to load plugins from environment variable {environment_variable_name}",
-            e,
-        )
+            asyncio.create_task(
+                datasource_repo.sync(
+                    connection["accountName"], connection["containerName"]
+                )
+            )
+        except Exception as e:
+            print(f"Failed to import datasource {connection['name']}", e)
+            continue
