@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import RepoBrowser from '@/pages/repo-browser/RepoBrowser';
-import { RepositoryTile } from '@/pages/repo-browser/RepositoryTile';
+import RepoBrowser from '@/pages/repo-browser/repo-browser';
+import { RepositoryTile } from '@/pages/repo-browser/repository-tile';
 import React from 'react';
 import nock from 'nock';
 import '@testing-library/jest-dom';
