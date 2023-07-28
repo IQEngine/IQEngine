@@ -1,9 +1,7 @@
-import SignalGenerator from '@/pages/signal-generator/SignalGenerator';
 import { createBrowserRouter } from 'react-router-dom';
 import React from 'react';
 import SwaggerUI from 'swagger-ui-react';
 import { useProtectedRoute } from '@/auth/hooks/use-protected-route';
-import { DocsPages } from '@/pages/docs/docs-pages';
 
 export function useRouter() {
   const router = createBrowserRouter([
@@ -45,6 +43,7 @@ export function useRouter() {
         {
           path: 'docs',
           async lazy() {
+            let { DocsPages } = await import('@/pages/docs/docs-pages');
             return { Component: DocsPages };
           },
         },
@@ -52,10 +51,17 @@ export function useRouter() {
         {
           path: 'docs/:page',
           async lazy() {
+            let { DocsPages } = await import('@/pages/docs/docs-pages');
             return { Component: DocsPages };
           },
         },
-        { path: 'siggen', element: <SignalGenerator /> },
+        {
+          path: 'siggen',
+          async lazy() {
+            let { SignalGenerator } = await import('@/pages/signal-generator/signal-generator');
+            return { Component: SignalGenerator };
+          },
+        },
         {
           path: 'admin',
           async lazy() {
