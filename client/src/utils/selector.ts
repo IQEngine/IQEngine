@@ -15,7 +15,6 @@ import { fftshift } from 'fftshift';
 import { TILE_SIZE_IN_IQ_SAMPLES } from './constants';
 import { FFT } from '@/utils/fft';
 import { SigMFMetadata } from './sigmfMetadata';
-import { number } from 'prop-types';
 
 export function calcFftOfTile(
   samples: Float32Array,
@@ -25,7 +24,7 @@ export function calcFftOfTile(
 ) {
   //let startTime = performance.now();
 
-  let fftsConcatenated = null;
+  let fftsConcatenated = new Float32Array(0);
   if (numberOfFfts) {
     fftsConcatenated = new Float32Array(numberOfFfts * fftSize);
   } else {
@@ -258,18 +257,18 @@ export function range(start: number, end: number): number[] {
   return Array.apply(0, Array(end - start)).map((element, index) => index + start);
 }
 
-export function dataTypeToBytesPerSample(dataType: any): number {
-  let bytesPerSample = 1;
+export function dataTypeToBytesPerIQSample(dataType: string): number {
+  // remember there are 2 numbers per IQ sample
   if (dataType.includes('8')) {
-    bytesPerSample = 1;
+    return 2;
   } else if (dataType.includes('16')) {
-    bytesPerSample = 2;
+    return 4;
   } else if (dataType.includes('32')) {
-    bytesPerSample = 4;
+    return 8;
   } else if (dataType.includes('64')) {
-    bytesPerSample = 8;
+    return 16;
   } else {
     console.error('unsupported datatype');
+    return 2;
   }
-  return bytesPerSample;
 }

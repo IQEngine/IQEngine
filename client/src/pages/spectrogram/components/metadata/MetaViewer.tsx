@@ -1,6 +1,6 @@
 import React from 'react';
 import { SigMFMetadata } from '@/utils/sigmfMetadata';
-import { getFrequency } from '@/utils/rfFunctions';
+import { unitPrefixHz } from '@/utils/rfFunctions';
 
 export interface MetaViewerProps {
   meta: SigMFMetadata;
@@ -22,7 +22,7 @@ export const MetaViewer = ({ meta }: MetaViewerProps) => {
         <div className="stat place-items-center">
           <div className="stat-title">sample rate</div>
           <div className="stat-value">
-            {getFrequency(meta.getSampleRate()).freq} {getFrequency(meta.getSampleRate()).unit}
+            {unitPrefixHz(meta.getSampleRate()).freq} {unitPrefixHz(meta.getSampleRate()).unit}
           </div>
         </div>
         <div className="stat place-items-center">

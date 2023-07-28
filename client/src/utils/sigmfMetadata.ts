@@ -1,5 +1,5 @@
 import { BlobClient } from '@azure/storage-blob';
-import { dataTypeToBytesPerSample } from './selector';
+import { dataTypeToBytesPerIQSample } from './selector';
 import { FileWithDirectoryAndFileHandle } from 'browser-fs-access';
 import { TILE_SIZE_IN_IQ_SAMPLES } from './constants';
 import { metadataValidator } from './validators';
@@ -39,16 +39,16 @@ export class SigMFMetadata {
   dataFileHandle?: FileWithDirectoryAndFileHandle;
   dataClient?: BlobClient;
 
-  getBytesPerSample(): number {
-    return dataTypeToBytesPerSample(this.global['core:datatype']) ?? 1;
+  getBytesPerIQSample(): number {
+    return dataTypeToBytesPerIQSample(this.global['core:datatype']) ?? 2;
   }
 
   getVersion() {
-    return this.global['core:version'];
+    return String(this.global['core:version']);
   }
 
   getOffset() {
-    return this.global['core:offset'] ?? 0;
+    return Number(this.global['core:offset'] ?? 0);
   }
 
   getOrigin() {
@@ -56,18 +56,18 @@ export class SigMFMetadata {
   }
 
   getSampleRate() {
-    return this.global['core:sample_rate'] ?? 1e6;
+    return Number(this.global['core:sample_rate'] ?? 1e6);
   }
 
   getTotalSamples() {
-    return this.global['traceability:sample_length'] ?? 0;
+    return Number(this.global['traceability:sample_length'] ?? 0);
   }
 
   getFrequency() {
-    return this.captures[0]['core:frequency'] ?? 1e6;
+    return Number(this.captures[0]['core:frequency'] ?? 1e6);
   }
   getAuthor() {
-    return this.global['core:author'] ?? '';
+    return String(this.global['core:author'] ?? '');
   }
   getFilePath() {
     return this.global['traceability:origin'].file_path;
@@ -119,18 +119,10 @@ export class SigMFMetadata {
   }
 
   getThumbnailUrl() {
-    const origin = this.global['traceability:origin'];
-    const type = origin?.type ?? 'local';
-    if (type === 'api') {
-      return this.getFullFilePath() + '/thumbnail';
-    } else return this.getFullFilePath() + '.jpg';
+    return this.getFullFilePath() + '.jpg';
   }
   getDataUrl() {
-    const origin = this.global['traceability:origin'];
-    const type = origin?.type ?? 'local';
-    if (type === 'api') {
-      return this.getFullFilePath() + '/iqdata';
-    } else return this.getFullFilePath() + '.sigmf-data';
+    return this.getFullFilePath() + '.sigmf-data';
   }
   getMetadataUrl() {
     const origin = this.global['traceability:origin'];
@@ -156,25 +148,25 @@ export class SigMFMetadata {
       .replace('_le', '');
   }
   getDescription() {
-    return this.global['core:description'] ?? '';
+    return String(this.global['core:description'] ?? '');
   }
 
   getLengthInMillionIQSamples() {
-    return (this.global['traceability:sample_length'] ?? 0) / 1e6;
+    return Number((this.global['traceability:sample_length'] ?? 0) / 1e6);
   }
 
   getLengthInIQSamples() {
-    return this.global['traceability:sample_length'] ?? 0;
+    return Number(this.global['traceability:sample_length'] ?? 0);
   }
 
   getLengthInBytes() {
-    return this.getLengthInIQSamples() * this.getBytesPerSample();
+    return Number(this.getLengthInIQSamples() * this.getBytesPerIQSample());
   }
 
   getCenterFrequency() {
     for (let i = 0; i < this.captures.length; i++) {
       if (this.captures[i]['core:frequency']) {
-        return this.captures[i]['core:frequency'];
+        return Number(this.captures[i]['core:frequency']);
       }
     }
     return 0;
@@ -269,47 +261,8 @@ export class Annotation {
   }
 
   getLabel() {
-    return this['core:label'] ?? this['core:description'] ?? '';
+    return String(this['core:label'] ?? this['core:description'] ?? '');
   }
 
   [key: string]: any;
 }
-
-/* Unused?
-export const SigMFFields = {
-  antenna_gain: 'antenna:gain',
-  antenna_type: 'antenna:type',
-  datatype: 'core:datatype',
-  sample_rate: 'core:sample_rate',
-  version: 'core:version',
-  num_channels: 'core:num_channels',
-  sha512: 'core:sha512',
-  offset: 'core:offset',
-  description: 'core:description',
-  author: 'core:author',
-  meta_doi: 'core:meta_doi',
-  data_doi: 'core:data_doi',
-  recorder: 'core:recorder',
-  license: 'core:license',
-  hw: 'core:hw',
-  dataset: 'core:dataset',
-  trailing_bytes: 'core:trailing_bytes',
-  metadata_only: 'core:metadata_only',
-  geolocation: 'core:geolocation',
-  extensions: 'core:extensions',
-  collection: 'core:collection',
-  sample_start: 'core:sample_start',
-  global_index: 'core:global_index',
-  header_bytes: 'core:header_bytes',
-  frequency: 'core:frequency',
-  datetime: 'core:datetime',
-  sample_count: 'core:sample_count',
-  generator: 'core:generator',
-  label: 'core:label',
-  comment: 'core:comment',
-  freq_lower_edge: 'core:freq_lower_edge',
-  freq_upper_edge: 'core:freq_upper_edge',
-  uuid: 'core:uuid',
-  capture_details: 'capture_details',
-};
-*/

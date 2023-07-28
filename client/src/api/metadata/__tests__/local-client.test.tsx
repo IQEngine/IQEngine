@@ -1,5 +1,5 @@
 import { test, describe } from 'vitest';
-import { LocalClient } from '@/api/metadata/LocalClient';
+import { LocalClient } from '@/api/metadata/local-client';
 import { FileWithDirectoryAndFileHandle } from 'browser-fs-access';
 const account = 'local';
 const container = 'local';

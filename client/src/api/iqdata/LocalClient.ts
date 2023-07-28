@@ -2,7 +2,7 @@ import { SigMFMetadata, TraceabilityOrigin } from '@/utils/sigmfMetadata';
 import { FileWithDirectoryAndFileHandle } from 'browser-fs-access';
 import { IQDataClient } from './IQDataClient';
 import { IQDataSlice } from '@/api/Models';
-import { convertToFloat32 } from '@/utils/FetchMoreDataSource';
+import { convertToFloat32 } from '@/utils/fetch-more-data-source';
 
 export class LocalClient implements IQDataClient {
   files: FileWithDirectoryAndFileHandle[];
@@ -10,11 +10,29 @@ export class LocalClient implements IQDataClient {
   constructor(files: FileWithDirectoryAndFileHandle[]) {
     this.files = files;
   }
-  getIQDataSlices(meta: SigMFMetadata, indexes: number[], tileSize: number): Promise<IQDataSlice[]> {
-    return Promise.all(indexes.map((index) => this.getIQDataSlice(meta, index, tileSize)));
+  getIQDataBlocks(
+    meta: SigMFMetadata,
+    indexes: number[],
+    blockSize: number,
+    signal: AbortSignal
+  ): Promise<IQDataSlice[]> {
+    throw new Error('Method not implemented.');
+  }
+  getIQDataSlices(
+    meta: SigMFMetadata,
+    indexes: number[],
+    tileSize: number,
+    signal: AbortSignal
+  ): Promise<IQDataSlice[]> {
+    return Promise.all(indexes.map((index) => this.getIQDataSlice(meta, index, tileSize, signal)));
   }
 
-  async getIQDataSlice(meta: SigMFMetadata, index: number, tileSize: number): Promise<IQDataSlice> {
+  async getIQDataSlice(
+    meta: SigMFMetadata,
+    index: number,
+    tileSize: number,
+    signal: AbortSignal
+  ): Promise<IQDataSlice> {
     const localDirectory: FileWithDirectoryAndFileHandle[] = this.files;
     if (!localDirectory) {
       Promise.reject('No local directory found');
@@ -26,9 +44,9 @@ export class LocalClient implements IQDataClient {
     if (!dataFile) {
       return Promise.reject('No data file found');
     }
-    const bytesPerSample = meta.getBytesPerSample();
-    const offsetBytes = index * tileSize * bytesPerSample * 2;
-    const countBytes = tileSize * bytesPerSample * 2;
+    const bytesPerIQSample = meta.getBytesPerIQSample();
+    const offsetBytes = index * tileSize * bytesPerIQSample;
+    const countBytes = tileSize * bytesPerIQSample;
     const slice = dataFile.slice(offsetBytes, offsetBytes + countBytes);
     const buffer = await slice.arrayBuffer();
     const iqArray = convertToFloat32(buffer, meta.getDataType());

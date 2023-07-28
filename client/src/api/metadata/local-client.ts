@@ -1,4 +1,4 @@
-import { MetadataClient } from './MetadataClient';
+import { MetadataClient } from './metadata-client';
 import { Annotation, CaptureSegment, SigMFMetadata, TraceabilityOrigin } from '@/utils/sigmfMetadata';
 import { FileWithDirectoryAndFileHandle } from 'browser-fs-access';
 
@@ -32,7 +32,7 @@ export class LocalClient implements MetadataClient {
     }
 
     if (!metadata.global['traceability:sample_length']) {
-      metadata.global['traceability:sample_length'] = Math.round(dataFile.size / 2 / metadata.getBytesPerSample());
+      metadata.global['traceability:sample_length'] = Math.round(dataFile.size / metadata.getBytesPerIQSample());
     }
     metadata.annotations = metadata.annotations.map((annotation) => Object.assign(new Annotation(), annotation));
     metadata.captures = metadata.captures.map((capture) => Object.assign(new CaptureSegment(), capture));

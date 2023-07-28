@@ -1,9 +1,9 @@
 import {
   calculateDate,
   calculateSampleCount,
-  getOriginalFrequency,
-  getFrequency,
-  getSeconds,
+  unitPrefixHzInverse,
+  unitPrefixHz,
+  unitPrefixSeconds,
   validateDate,
   validateFrequency,
   convertFloat32ArrayToBase64,
@@ -60,7 +60,7 @@ describe('Get frequency', () => {
     ${null}          | ${{ freq: 0, unit: 'Hz' }}
   `('should get frequency correctly', ({ freq, expected }) => {
     // Act
-    const result = getFrequency(freq);
+    const result = unitPrefixHz(freq);
 
     // Assert
     expect(result).toEqual(expected);
@@ -95,7 +95,7 @@ describe('Get original frequency', () => {
     ${null}          | ${'Hz'}  | ${0}
   `('should get original frequency correctly', ({ freq, unit, expected }) => {
     // Act
-    const result = getOriginalFrequency(freq, unit);
+    const result = unitPrefixHzInverse(freq, unit);
 
     // Assert
     expect(result).toEqual(expected);
@@ -121,7 +121,7 @@ describe('Get seconds', () => {
     ${0.000000000001} | ${{ unit: 'ps', time: 1 }}
   `('should get seconds correctly', ({ time, unit, expected }) => {
     // Act
-    const result = getSeconds(time);
+    const result = unitPrefixSeconds(time);
 
     // Assert
     expect(result).toEqual(expected);

@@ -1,7 +1,7 @@
 // Copyright (c) 2022 Microsoft Corporation
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useLocation, Outlet } from 'react-router-dom';
 import ReactGA from 'react-ga4';
 import ThemeSelector from '@/features/ui/styles/ThemeSelector';
@@ -36,21 +36,10 @@ export const App = () => {
     });
   };
 
-  const [width, setWidth] = useState(window.innerWidth);
-  const breakpoint = 700;
-
   const location = useLocation();
   const config = useConfigQuery();
   const { setFeatureFlags } = useFeatureFlags();
   const { addDataSource } = useUserSettings();
-
-  useEffect(() => {
-    const handleResizeWindow = () => setWidth(window.innerWidth);
-    window.addEventListener('resize', handleResizeWindow);
-    return () => {
-      window.removeEventListener('resize', handleResizeWindow);
-    };
-  }, []);
 
   useEffect(() => {
     if (!config.data) return;
@@ -123,11 +112,6 @@ export const App = () => {
                     Docs
                   </Link>
                 </li>
-                <li>
-                  <Link to="/query" onClick={() => {}}>
-                    Query
-                  </Link>
-                </li>
                 {activeAccount ? (
                   <>
                     <li>
@@ -175,11 +159,6 @@ export const App = () => {
               <li className="hidden md:block">
                 <Link to="/sigmf" onClick={() => {}}>
                   <div className="text-base">SigMF</div>
-                </Link>
-              </li>
-              <li className="hidden md:block">
-                <Link to="/query" onClick={() => {}}>
-                  <div className="text-base">Query</div>
                 </Link>
               </li>
 

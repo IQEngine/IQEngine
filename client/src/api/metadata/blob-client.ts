@@ -1,6 +1,6 @@
 import { Annotation, CaptureSegment, SigMFMetadata } from '@/utils/sigmfMetadata';
 import { ContainerClient } from '@azure/storage-blob';
-import { MetadataClient } from './MetadataClient';
+import { MetadataClient } from './metadata-client';
 import { getContainerClient } from '@/api/utils/AzureBlob';
 import { DataSource } from '../Models';
 
@@ -43,7 +43,7 @@ async function blobNameToMetadata(blobName: string, containerClient: ContainerCl
   }
   if (!recording.global['traceability:sample_length']) {
     recording.global['traceability:sample_length'] = Math.round(
-      properties.contentLength / 2 / recording.getBytesPerSample()
+      properties.contentLength / recording.getBytesPerIQSample()
     );
   }
   if (!recording.global['traceability:origin']) {

@@ -2,24 +2,75 @@ import axios from 'axios';
 import { IQDataClient } from './IQDataClient';
 import { SigMFMetadata } from '@/utils/sigmfMetadata';
 import { IQDataSlice } from '@/api/Models';
-import { convertToFloat32 } from '@/utils/FetchMoreDataSource';
+import { convertToFloat32 } from '@/utils/fetch-more-data-source';
 
 export class ApiClient implements IQDataClient {
-  async getIQDataSlices(meta: SigMFMetadata, indexes: number[], tileSize: number): Promise<IQDataSlice[]> {
-    //return Promise.all(indexes.map((index) => this.getIQDataSlice(meta, index, tileSize)));
+  async getIQDataBlocks(
+    meta: SigMFMetadata,
+    indexes: number[],
+    blockSize: number,
+    signal: AbortSignal
+  ): Promise<IQDataSlice[]> {
+    if (!meta || indexes.length === 0) {
+      return [];
+    }
+    const { account, container, file_path } = meta.getOrigin();
+    const format = meta.getDataType();
+
+    const dataUrl = `/api/datasources/${account}/${container}/${file_path}/iq-data`;
+    const queryParams = {
+      block_indexes_str: indexes.join(','),
+      block_size: blockSize,
+      format: format,
+    };
+    const binaryResponse = await axios.get(dataUrl, {
+      responseType: 'arraybuffer',
+      params: queryParams,
+      signal: signal,
+    });
+
+    if (binaryResponse.status !== 200) {
+      throw new Error(`Unexpected status code: ${binaryResponse.status}`);
+    }
+    if (!binaryResponse.data) {
+      return null;
+    }
+    console.log('getIQDataBlocks response', binaryResponse.data);
+    const intValue = new Int32Array(binaryResponse.data.slice(0, 4));
+    console.log(`getIQDataBlocks ${binaryResponse.data}`, intValue);
+    // convert to float32
+    const iqArray = convertToFloat32(binaryResponse.data, format);
+
+    const result = indexes.map((index, i) => {
+      return {
+        index,
+        iqArray: iqArray.slice(i * blockSize * 2, (i + 1) * blockSize * 2),
+      };
+    });
+    console.log('getIQDataBlocks', result);
+    return result;
+  }
+  async getIQDataSlices(
+    meta: SigMFMetadata,
+    indexes: number[],
+    tileSize: number,
+    signal: AbortSignal
+  ): Promise<IQDataSlice[]> {
     let { account, container, file_path } = meta.getOrigin();
 
     let startTime = performance.now();
-    const bytesPerSample = meta.getBytesPerSample();
+    const bytesPerIQSample = meta.getBytesPerIQSample();
     const body = {
       indexes: indexes,
       tile_size: tileSize,
-      bytes_per_sample: bytesPerSample,
+      bytes_per_iq_sample: bytesPerIQSample,
     };
 
     const queryURL = `/api/datasources/${account}/${container}/${file_path}/iqslices`;
 
-    const response = await axios.post(queryURL, body);
+    const response = await axios.post(queryURL, body, {
+      signal: signal,
+    });
     if (response.status !== 200) {
       throw new Error(`Unexpected status code: ${response.status}`);
     }
@@ -42,15 +93,22 @@ export class ApiClient implements IQDataClient {
     );
   }
 
-  async getIQDataSlice(meta: SigMFMetadata, index: number, tileSize: number): Promise<IQDataSlice> {
+  async getIQDataSlice(
+    meta: SigMFMetadata,
+    index: number,
+    tileSize: number,
+    signal: AbortSignal
+  ): Promise<IQDataSlice> {
     let { account, container, file_path } = meta.getOrigin();
 
     let startTime = performance.now();
-    const bytesPerSample = meta.getBytesPerSample();
-    const offsetBytes = index * tileSize * bytesPerSample * 2;
-    const countBytes = tileSize * bytesPerSample * 2;
+    const bytesPerIQSample = meta.getBytesPerIQSample();
+    const offsetBytes = index * tileSize * bytesPerIQSample;
+    const countBytes = tileSize * bytesPerIQSample;
     const queryURL = `/api/datasources/${account}/${container}/${file_path}/iqslice?offsetBytes=${offsetBytes}&countBytes=${countBytes}`;
-    const response = await axios.get(queryURL);
+    const response = await axios.get(queryURL, {
+      signal: signal,
+    });
     if (response.status !== 200) {
       throw new Error(`Unexpected status code: ${response.status}`);
     }

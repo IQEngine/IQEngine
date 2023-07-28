@@ -1,11 +1,13 @@
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import List, Optional
 
 from blob.azure_client import AzureBlobClient
 from database import datasource_repo, metadata_repo
-from database.models import DataSource, DataSourceReference, Metadata
+from database.metadata_repo import InvalidGeolocationFormat, query_metadata
+from database.models import DataSource, DataSourceReference, Metadata, TrackMetadata
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Response
 from fastapi.responses import StreamingResponse
+from helpers.authorization import required_roles
 from helpers.cipher import decrypt
 from helpers.urlmapping import ApiType, get_content_type, get_file_name
 from motor.core import AgnosticCollection
@@ -22,6 +24,7 @@ async def get_all_meta(
     account,
     container,
     metadatas: AgnosticCollection = Depends(metadata_repo.collection),
+    current_user: Optional[dict] = Depends(required_roles()),
 ):
     # TODO: Should we validate datasource_id?
 
@@ -48,6 +51,7 @@ async def get_all_meta_name(
     account,
     container,
     metadatas: AgnosticCollection = Depends(metadata_repo.collection),
+    current_user: Optional[dict] = Depends(required_roles()),
 ):
     metadata = metadatas.find(
         {
@@ -71,6 +75,7 @@ async def get_all_meta_name(
 )
 async def get_meta(
     metadata: Metadata = Depends(metadata_repo.get),
+    current_user: Optional[dict] = Depends(required_roles()),
 ):
     if not metadata:
         raise HTTPException(status_code=404, detail="Metadata not found")
@@ -78,30 +83,26 @@ async def get_meta(
 
 
 @router.get(
-    "/api/datasources/{account}/{container}/{filepath:path}/iqdata",
-    response_class=StreamingResponse,
+    "/api/datasources/{account}/{container}/{filepath:path}/track",
+    response_model=TrackMetadata,
 )
-async def get_metadata_iqdata(
-    filepath: str,
-    datasource: DataSource = Depends(datasource_repo.get),
-    azure_client: AzureBlobClient = Depends(AzureBlobClient),
+async def get_track_meta(
+    metadata: Metadata = Depends(metadata_repo.get),
+    current_user: Optional[dict] = Depends(required_roles()),
 ):
-    # Create the imageURL with sasToken
-    if not datasource:
-        raise HTTPException(status_code=404, detail="Datasource not found")
+    if not metadata:
+        raise HTTPException(status_code=404, detail="Metadata not found")
 
-    azure_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
-    content_type = get_content_type(ApiType.IQDATA)
-    iq_path = get_file_name(filepath, ApiType.IQDATA)
-    if not azure_client.blob_exist(iq_path):
-        raise HTTPException(status_code=404, detail="File not found")
-
-    response = await azure_client.get_blob_stream(iq_path)
-    return StreamingResponse(response.chunks(), media_type=content_type)
+    return TrackMetadata(
+        iqengine_geotrack=metadata.globalMetadata.__dict__.get("iqengine:geotrack"),
+        description=metadata.globalMetadata.core_description,
+        account=metadata.globalMetadata.traceability_origin.account,
+        container=metadata.globalMetadata.traceability_origin.container,
+    )
 
 
 @router.get(
-    "/api/datasources/{account}/{container}/{filepath:path}/thumbnail",
+    "/api/datasources/{account}/{container}/{filepath:path}.jpg",
     response_class=StreamingResponse,
 )
 async def get_meta_thumbnail(
@@ -109,11 +110,15 @@ async def get_meta_thumbnail(
     background_tasks: BackgroundTasks,
     datasource: DataSource = Depends(datasource_repo.get),
     azure_client: AzureBlobClient = Depends(AzureBlobClient),
+    current_user: Optional[dict] = Depends(required_roles()),
 ):
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
 
-    azure_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
+    sas_token = datasource.sasToken.get_secret_value() if datasource.sasToken else None
+    if sas_token is not None:
+        azure_client.set_sas_token(decrypt(sas_token))
+
     thumbnail_path = get_file_name(filepath, ApiType.THUMB)
     content_type = get_content_type(ApiType.THUMB)
     if not await azure_client.blob_exist(thumbnail_path):
@@ -137,45 +142,15 @@ async def get_meta_thumbnail(
     return Response(content=content, media_type=content_type)
 
 
-async def process_geolocation(target: str, geolocation: str):
-    try:
-        geo_long_str, geo_lat_str, geo_radius_str = geolocation.split(",")
-        geo_long = float(geo_long_str)
-        geo_lat = float(geo_lat_str)
-        geo_radius = float(geo_radius_str)
-        target_field = ""
-        if target == "captures":
-            target_field = "captures.core:geolocation"
-        if target == "annotations":
-            target_field = "annotations.core:geolocation"
-
-        return {
-            target_field: {
-                "$near": {
-                    "$geometry": {
-                        "type": "Point",
-                        "coordinates": [geo_long, geo_lat],
-                    },
-                    "$maxDistance": geo_radius,
-                }
-            }
-        }
-
-    except Exception:
-        raise HTTPException(
-            status_code=400,
-            detail="Invalid geolocation format, expected: long, lat, radius",
-        )
-
-
 @router.get(
     "/api/datasources/query",
     status_code=200,
-    response_model=list[Metadata],
+    response_model=list[DataSourceReference],
 )
 async def query_meta(
     account: Optional[List[str]] = Query([]),
     container: Optional[List[str]] = Query([]),
+    database_id: Optional[List[str]] = Query([]),
     min_frequency: Optional[float] = Query(None),
     max_frequency: Optional[float] = Query(None),
     author: Optional[str] = Query(None),
@@ -187,90 +162,32 @@ async def query_meta(
     text: Optional[str] = Query(None),
     captures_geo: Optional[str] = Query(None),
     annotations_geo: Optional[str] = Query(None),
-    metadataSet: AgnosticCollection = Depends(metadata_repo.collection),
+    current_user: Optional[dict] = Depends(required_roles()),
 ):
-    query_condition: Dict[str, Any] = {}
-    if account:
-        query_condition.update(
-            {
-                "$or": [
-                    {
-                        "global.traceability:origin.account": {
-                            "$regex": a,
-                            "$options": "i",
-                        }
-                    }
-                    for a in account
-                ]
-            }
+    try:
+        result = await query_metadata(
+            account=account,
+            container=container,
+            database_id=database_id,
+            min_frequency=min_frequency,
+            max_frequency=max_frequency,
+            author=author,
+            description=description,
+            label=label,
+            comment=comment,
+            captures_geo=captures_geo,
+            annotations_geo=annotations_geo,
+            min_datetime=min_datetime,
+            max_datetime=max_datetime,
+            text=text,
         )
-    if container:
-        query_condition.update(
-            {
-                "$or": [
-                    {
-                        "global.traceability:origin.container": {
-                            "$regex": c,
-                            "$options": "i",
-                        }
-                    }
-                    for c in container
-                ]
-            }
-        )
-    if min_frequency is not None:
-        query_condition.update({"captures.core:frequency": {"$gte": min_frequency}})
-    if max_frequency is not None:
-        query_condition.update({"captures.core:frequency": {"$lte": max_frequency}})
-    if author is not None:
-        query_condition.update(
-            {"global.core:author": {"$regex": author, "$options": "i"}}
-        )
-    # global description
-    if description is not None:
-        query_condition.update(
-            {"global.core:description": {"$regex": description, "$options": "i"}}
-        )
-    if label is not None:
-        query_condition.update(
-            {"annotations.core:label": {"$regex": label, "$options": "i"}}
-        )
-    if comment is not None:
-        query_condition.update(
-            {"annotations.core:description": {"$regex": comment, "$options": "i"}}
-        )
+        return result
 
-    if captures_geo:
-        query_condition.update(await process_geolocation("captures", captures_geo))
-    if annotations_geo:
-        query_condition.update(
-            await process_geolocation("annotations", annotations_geo)
-        )
+    except InvalidGeolocationFormat as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
-    if text is not None:
-        or_condition = [
-            {"global.core:description": {"$regex": text, "$options": "i"}},
-            {"annotations.core:label": {"$regex": text, "$options": "i"}},
-            {"annotations.core:description": {"$regex": text, "$options": "i"}},
-        ]
-        query_condition.update({"$or": or_condition})
-
-    if min_datetime is not None or max_datetime is not None:
-        datetime_query = {}
-        if min_datetime is not None:
-            min_datetime_formatted = min_datetime.strftime("%Y-%m-%dT%H:%M:%S")
-            datetime_query.update({"$gte": min_datetime_formatted})
-        if max_datetime is not None:
-            max_datetime_formatted = max_datetime.strftime("%Y-%m-%dT%H:%M:%S")
-            datetime_query.update({"$lte": max_datetime_formatted})
-        query_condition.update({"captures.core:datetime": datetime_query})
-
-    metadata = metadataSet.find(query_condition)
-
-    result = []
-    async for datum in metadata:
-        result.append(datum)
-    return result
+    except Exception:
+        raise HTTPException(status_code=500, detail="An unexpected error occurred.")
 
 
 @router.post(
@@ -286,6 +203,7 @@ async def create_meta(
     datasources: AgnosticCollection = Depends(datasource_repo.collection),
     metadatas: AgnosticCollection = Depends(metadata_repo.collection),
     versions: AgnosticCollection = Depends(metadata_repo.versions_collection),
+    current_user: Optional[dict] = Depends(required_roles()),
 ):
     # Check datasource id is valid
     datasource = await datasources.find_one(
@@ -324,8 +242,7 @@ async def create_meta(
 
 
 @router.put(
-    "/api/datasources/{account}/{container}/{filepath:path}/meta",
-    status_code=204,
+    "/api/datasources/{account}/{container}/{filepath:path}/meta", status_code=204
 )
 async def update_meta(
     account,
@@ -334,6 +251,7 @@ async def update_meta(
     metadata: Metadata,
     metadatas: AgnosticCollection = Depends(metadata_repo.collection),
     versions: AgnosticCollection = Depends(metadata_repo.versions_collection),
+    current_user: Optional[dict] = Depends(required_roles()),
 ):
     current = await metadatas.find_one(
         {

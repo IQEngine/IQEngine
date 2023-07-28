@@ -39,25 +39,25 @@ describe('MetaRaw ', () => {
   ];
   test('Renders correctly', async () => {
     render(<MetaRaw meta={meta} />, { wrapper: AllProviders });
-    expect(screen.queryByRole('button', { name: 'Download Metadata Button' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Download Metadata' })).toBeInTheDocument();
   });
 
   test('Displays save button when api origin', async () => {
     meta.global['traceability:origin'].type = 'api';
     render(<MetaRaw meta={meta} />, { wrapper: AllProviders });
-    expect(screen.queryByRole('button', { name: 'Save Metadata Button' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Save Metadata' })).toBeInTheDocument();
   });
 
   test('Does not display save button when blob origin', async () => {
     meta.global['traceability:origin'].type = 'azure_blob';
     render(<MetaRaw meta={meta} />, { wrapper: AllProviders });
-    expect(screen.queryByRole('button', { name: 'Save Metadata Button' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Save Metadata' })).not.toBeInTheDocument();
   });
 
   test('Does not display save button when local origin', async () => {
     meta.global['traceability:origin'].type = 'local';
     render(<MetaRaw meta={meta} />, { wrapper: AllProviders });
-    expect(screen.queryByRole('button', { name: 'Save Metadata Button' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Save Metadata' })).not.toBeInTheDocument();
   });
 
   test('Displays save successful message when successful update', async () => {
@@ -67,7 +67,7 @@ describe('MetaRaw ', () => {
 
     render(<MetaRaw meta={meta} />, { wrapper: AllProviders });
 
-    const saveButton = screen.getByRole('button', { name: 'Save Metadata Button' });
+    const saveButton = screen.getByRole('button', { name: 'Save Metadata' });
     await userEvent.click(saveButton);
 
     expect(await screen.findByText('Successfully updated metadata')).toBeInTheDocument();
@@ -80,7 +80,7 @@ describe('MetaRaw ', () => {
 
     render(<MetaRaw meta={meta} />, { wrapper: AllProviders });
 
-    const saveButton = screen.getByRole('button', { name: 'Save Metadata Button' });
+    const saveButton = screen.getByRole('button', { name: 'Save Metadata' });
     await userEvent.click(saveButton);
 
     expect(await screen.findByText('Something went wrong updating metadata')).toBeInTheDocument();

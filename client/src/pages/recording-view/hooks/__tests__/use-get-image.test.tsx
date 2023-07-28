@@ -6,9 +6,39 @@ import { SampleType, generateSampleImageData, normalizeMagnitude, generateSample
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import { useGenerateFFTs } from '../use-get-image';
+import { calcFftOfTile } from '@/utils/selector';
 
 describe('DevTest Spectrogram Tests', () => {
   //template test.each([[], []])('test', async () => {});
+  test.each([
+    ['500hz', 1024, 100, 500, 2048, 'hamming'],
+    ['50hz', 1024, 100, 50, 2048, 'hanning'],
+    ['10hz', 1024, 100, 10, 2048, 'bartlett'],
+    ['250hz', 512, 100, 250, 2048, 'hamming'],
+    ['50hz', 512, 100, 50, 2048, 'hanning'],
+    ['10hz', 512, 100, 10, 2048, 'bartlett'],
+    ['250hz', 2048, 100, 250, 4096, 'hamming'],
+    ['50hz', 2048, 100, 50, 4096, 'hanning'],
+    ['10hz', 2048, 100, 10, 4096, 'bartlett'],
+  ])(
+    'calcFftOfTile should return correct FFT for standard inputs: %s',
+    async (comment, fftSize, spectrogramHeight, frequency, sample_rate, windowFunction) => {
+      const { sampleIQData } = generateSampleIQData(fftSize, spectrogramHeight, frequency, sample_rate);
+      const fftsConcatenated = calcFftOfTile(sampleIQData, fftSize, windowFunction, spectrogramHeight);
+
+      expect(fftsConcatenated.length).toEqual(fftSize * spectrogramHeight);
+
+      const centerPoint = fftSize / 2 + fftSize;
+
+      // expect the magnitude at fftSize/2-frequency to be peak
+      const leftPeak = fftsConcatenated[centerPoint - frequency];
+      const rightOfLeftPeak = fftsConcatenated[centerPoint - (frequency + 1)];
+      const leftOfLeftPeak = fftsConcatenated[centerPoint - (frequency - 1)];
+
+      expect(leftPeak).toBeGreaterThan(rightOfLeftPeak);
+      expect(leftPeak).toBeGreaterThan(leftOfLeftPeak);
+    }
+  );
   // want fftsize to be at most sample_rate/2 so there's at least one pixel for each sample
   // frequency should be a few less than 1/2 of sample rate so peak isn't shoved off the frame
   // making sample_rate a power of 2 avoids rounding errors when locating peak pixel

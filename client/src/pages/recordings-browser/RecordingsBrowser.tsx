@@ -6,11 +6,12 @@ import React, { useEffect, useState } from 'react';
 import Directory from './Directory';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { useParams } from 'react-router-dom';
-import { useQueryDataSourceMetaPaths } from '@/api/metadata/Queries';
+import { useQueryDataSourceMetaPaths } from '@/api/metadata/queries';
 import { DirectoryNode, groupDataByDirectories } from './DirectoryNode';
-import { useQueryClient } from '@tanstack/react-query';
+import { useFeatureFlags } from '@/hooks/use-feature-flags';
 
 export function RecordingsBrowser() {
+  const { featureFlags } = useFeatureFlags();
   const { type, account, container, sasToken } = useParams();
   const metadata_collection = useQueryDataSourceMetaPaths(type, account, container);
   const [directoryNode, setDirectoryNode] = useState<DirectoryNode>(null);
@@ -60,6 +61,7 @@ export function RecordingsBrowser() {
                   <th className="p-2">Sample Rate</th>
                   <th className="p-2">Number of Annotations</th>
                   <th className="p-2">Author</th>
+                  {featureFlags?.useNewSpectrogramPage && <th className="p-2">Inspect</th>}
                 </tr>
               </thead>
               <tbody>

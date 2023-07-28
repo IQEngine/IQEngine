@@ -1,23 +1,21 @@
-import SignalGenerator from '@/pages/signal-generator/SignalGenerator';
 import { createBrowserRouter } from 'react-router-dom';
 import React from 'react';
 import SwaggerUI from 'swagger-ui-react';
 import { useProtectedRoute } from '@/auth/hooks/use-protected-route';
-import { DocsPages } from '@/pages/docs/docs-pages';
 
 export function useRouter() {
   const router = createBrowserRouter([
     {
       path: '/',
       async lazy() {
-        let { App } = await import('@/App');
+        let { App } = await import('@/app');
         return { Component: App };
       },
       children: [
         {
           path: 'about',
           async lazy() {
-            let { About } = await import('@/pages/About');
+            let { About } = await import('@/pages/about');
             return { Component: About };
           },
         },
@@ -45,6 +43,7 @@ export function useRouter() {
         {
           path: 'docs',
           async lazy() {
+            let { DocsPages } = await import('@/pages/docs/docs-pages');
             return { Component: DocsPages };
           },
         },
@@ -52,10 +51,17 @@ export function useRouter() {
         {
           path: 'docs/:page',
           async lazy() {
+            let { DocsPages } = await import('@/pages/docs/docs-pages');
             return { Component: DocsPages };
           },
         },
-        { path: 'siggen', element: <SignalGenerator /> },
+        {
+          path: 'siggen',
+          async lazy() {
+            let { SignalGenerator } = await import('@/pages/signal-generator/signal-generator');
+            return { Component: SignalGenerator };
+          },
+        },
         {
           path: 'admin',
           async lazy() {
@@ -132,6 +138,13 @@ export function useRouter() {
           async lazy() {
             let { SpectrogramPage } = await import('@/pages/spectrogram/spectrogram-page');
             return { Component: SpectrogramPage };
+          },
+        },
+        {
+          path: 'view/:type/:account/:container/:filePath/:sasToken?',
+          async lazy() {
+            let { RecordingViewPage } = await import('@/pages/recording-view/recording-view');
+            return { Component: RecordingViewPage };
           },
         },
       ],

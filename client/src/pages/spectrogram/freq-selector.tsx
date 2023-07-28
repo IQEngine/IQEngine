@@ -4,7 +4,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Layer, Rect, Text } from 'react-konva';
-import { getFrequency } from '@/utils/rfFunctions';
+import { unitPrefixHz } from '@/utils/rfFunctions';
 
 const FreqSelector = (props) => {
   const {
@@ -25,16 +25,16 @@ const FreqSelector = (props) => {
   const upperPosition = (freqSelectionUpper + 0.5) * spectrogramWidth;
 
   useEffect(() => {
-    const formatted = getFrequency((lowerPosition / spectrogramWidth - 0.5) * sampleRate);
+    const formatted = unitPrefixHz((lowerPosition / spectrogramWidth - 0.5) * sampleRate);
     setLowerText(formatted.freq + ' ' + formatted.unit);
-    const diffFormatted = getFrequency(Math.abs(((upperPosition - lowerPosition) / spectrogramWidth) * sampleRate));
+    const diffFormatted = unitPrefixHz(Math.abs(((upperPosition - lowerPosition) / spectrogramWidth) * sampleRate));
     setDiffText('Δ ' + diffFormatted.freq + ' ' + diffFormatted.unit);
   }, [lowerPosition]);
 
   useEffect(() => {
-    const formatted = getFrequency((upperPosition / spectrogramWidth - 0.5) * sampleRate);
+    const formatted = unitPrefixHz((upperPosition / spectrogramWidth - 0.5) * sampleRate);
     setUpperText(formatted.freq + ' ' + formatted.unit);
-    const diffFormatted = getFrequency(Math.abs(((upperPosition - lowerPosition) / spectrogramWidth) * sampleRate));
+    const diffFormatted = unitPrefixHz(Math.abs(((upperPosition - lowerPosition) / spectrogramWidth) * sampleRate));
     setDiffText('Δ ' + diffFormatted.freq + ' ' + diffFormatted.unit);
   }, [upperPosition]);
 

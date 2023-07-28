@@ -1,8 +1,8 @@
 import { SigMFMetadata } from '@/utils/sigmfMetadata';
-import { MetadataClientFactory } from './MetadataClientFactory';
+import { MetadataClientFactory } from './metadata-client-factory';
 import { QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { MetadataClient } from './MetadataClient';
-import { ApiClient } from './ApiClient';
+import { MetadataClient } from './metadata-client';
+import { ApiClient } from './api-client';
 import { useUserSettings } from '@/api/user-settings/use-user-settings';
 
 export const fetchMeta = async (
@@ -46,11 +46,11 @@ export const useQueryDataSourceMetaPaths = (type: string, account: string, conta
 };
 
 export const queryMeta = (queryString: string) => {
-  return  useQuery<SigMFMetadata[]>(['metadata-query', queryString], () => {
+  return useQuery<SigMFMetadata[]>(['metadata-query', queryString], () => {
     const apiClient = new ApiClient();
     return apiClient.queryMeta(queryString);
   });
-}
+};
 
 export const getMeta = (type: string, account: string, container: string, filePath: string, enabled = true) => {
   const { dataSourcesQuery, filesQuery } = useUserSettings();
@@ -101,4 +101,16 @@ export const useGetMetadataFeatures = (type: string) => {
   const { filesQuery, dataSourcesQuery } = useUserSettings();
   const metadataClient = MetadataClientFactory(type, filesQuery.data, dataSourcesQuery.data);
   return metadataClient.features();
+};
+
+export const useMeta = (type: string, account: string, container: string, filePath: string) => {
+  const { filesQuery, dataSourcesQuery } = useUserSettings();
+  return useQuery<SigMFMetadata>({
+    queryKey: ['datasource', type, account, container, filePath, 'meta'],
+    queryFn: () => {
+      const metadataClient = MetadataClientFactory(type, filesQuery.data, dataSourcesQuery.data);
+      return metadataClient.getMeta(account, container, filePath);
+    },
+    enabled: !!filesQuery.data && !!dataSourcesQuery.data,
+  });
 };

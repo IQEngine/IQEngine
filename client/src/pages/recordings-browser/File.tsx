@@ -5,9 +5,10 @@
 import React, { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { CLIENT_TYPE_BLOB } from '@/api/Models';
-import { getMeta } from '@/api/metadata/Queries';
+import { getMeta } from '@/api/metadata/queries';
 import { FileAnnotationData } from './FileAnnotationData';
 import { ModalDialog } from '@/features/ui/modal/Modal';
+import { useFeatureFlags } from '@/hooks/use-feature-flags';
 
 interface FileRowProps {
   filepath: string;
@@ -19,6 +20,7 @@ interface FileRowProps {
 
 export default function FileRow({ filepath, type, account, container, sasToken }: FileRowProps) {
   const [showModal, setShowModal] = useState(false);
+  const { featureFlags } = useFeatureFlags();
 
   const { type: paramType, account: paramAccount, container: paramContainer, sasToken: paramSASToken } = useParams();
   type = type ?? paramType;
@@ -28,6 +30,10 @@ export default function FileRow({ filepath, type, account, container, sasToken }
   const { data: item } = getMeta(type, account, container, filepath);
 
   const spectrogramLink = `/spectrogram/${item?.getOrigin().type}/${item?.getOrigin().account}/${
+    item?.getOrigin().container
+  }/${encodeURIComponent(item?.getFilePath())}`;
+
+  const recordInspectionLink = `/view/${item?.getOrigin().type}/${item?.getOrigin().account}/${
     item?.getOrigin().container
   }/${encodeURIComponent(item?.getFilePath())}`;
 
@@ -87,6 +93,7 @@ export default function FileRow({ filepath, type, account, container, sasToken }
         <td className="align-middle"></td>
         <td className="align-middle"></td>
         <td className="align-middle"></td>
+        {featureFlags?.useNewSpectrogramPage && <td className="align-middle"></td>}
       </tr>
     );
   }
@@ -137,10 +144,8 @@ export default function FileRow({ filepath, type, account, container, sasToken }
             {item.annotations?.length ?? 0}
           </button>
           {showModal && (
-            <ModalDialog setShowModal={setShowModal} heading={item.getFileName()}>
-            <FileAnnotationData
-              annotations={item?.annotations}
-            />
+            <ModalDialog setShowModal={setShowModal} heading={item.getFileName()} classList="max-w-full">
+              <FileAnnotationData annotations={item?.annotations} />
             </ModalDialog>
           )}
           <br></br>({item.captures?.length ?? 0} Capture{item.captures?.length > 1 && 's'})
@@ -151,6 +156,15 @@ export default function FileRow({ filepath, type, account, container, sasToken }
         <br></br>
         {item.getEmail()}
       </td>
+      {featureFlags?.useNewSpectrogramPage && (
+        <td className="align-middle">
+          <Link to={recordInspectionLink} onClick={() => {}}>
+            <button className="rounded border-2 border-secondary p-1 hover:bg-secondary hover:text-base-100">
+              Inspect
+            </button>
+          </Link>
+        </td>
+      )}
     </tr>
   );
 }
