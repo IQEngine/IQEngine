@@ -1,4 +1,3 @@
-import Feature from '@/features/feature/Feature';
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 export type FeatureFlagName = keyof typeof FeatureFlag;
@@ -27,6 +26,11 @@ export const FeatureFlag = {
     name: 'useAPIDatasources',
     description: 'Use API Datasources',
     default: true,
+  },
+  useNewSpectrogramPage: {
+    name: 'useNewSpectrogramPage',
+    description: 'Use New Spectrogram Page',
+    default: false,
   },
 };
 

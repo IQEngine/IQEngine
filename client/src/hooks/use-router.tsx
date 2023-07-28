@@ -134,6 +134,13 @@ export function useRouter() {
             return { Component: SpectrogramPage };
           },
         },
+        {
+          path: 'view/:type/:account/:container/:filePath/:sasToken?',
+          async lazy() {
+            let { RecordingViewPage } = await import('@/pages/recording-view/recording-view');
+            return { Component: RecordingViewPage };
+          },
+        },
       ],
     },
     {

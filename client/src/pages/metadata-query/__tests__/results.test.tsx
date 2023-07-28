@@ -1,12 +1,11 @@
 import '@/mocks/setup-tests';
 import { describe, expect, test, vi } from 'vitest';
-import { BrowserRouter } from 'react-router-dom';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 
 import Results from '@/pages/metadata-query/results';
 import { SigMFMetadata, Annotation, CaptureSegment } from '@/utils/sigmfMetadata';
-import { queryMeta } from '@/api/metadata/queries';
+import { useAllProviders } from '@/mocks/setup-tests';
 
 const createMetadata = () => {
   const raw = [
@@ -105,11 +104,8 @@ describe('Test Results', () => {
     render(<Results queryString="" />);
   });
   test('Basic Rendering', async () => {
-    render(
-      <BrowserRouter>
-        <Results queryString="test query string" />
-      </BrowserRouter>
-    );
+    var { wrapper } = useAllProviders();
+    render(<Results queryString="test query string" />, { wrapper });
     waitFor(() => expect(screen.findByText(/Sample Count/i)).toBeInTheDocument());
   });
 });
