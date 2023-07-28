@@ -90,6 +90,9 @@ async def create(metadata: Metadata):
     -------
     None
     """
+    if metadata.globalMetadata.traceability_origin is None:
+        raise Exception("Metadata must have origin")
+
     if await exists(
         metadata.globalMetadata.traceability_origin.account,
         metadata.globalMetadata.traceability_origin.container,
