@@ -38,9 +38,9 @@ valid_metadata = {
             "core:version": "0.0.1",
             "traceability:origin": {
                 "type": "api",
-                "account": "test_account",
-                "container": "test_container",
-                "file_path": "test_file_path",
+                "account": "account",
+                "container": "container",
+                "file_path": "file_path",
             },
             "traceability:revision": None,
             "traceability:sample_length": None,
@@ -95,9 +95,9 @@ valid_metadata_array = [
             "core:version": "0.0.1",
             "traceability:origin": {
                 "type": "api",
-                "account": "test_account",
-                "container": "test_container",
-                "file_path": "test_file_path",
+                "account": "account",
+                "container": "container",
+                "file_path": "file_path",
             },
             "traceability:revision": None,
             "traceability:sample_length": None,
@@ -129,8 +129,8 @@ valid_metadata_array = [
 valid_datasourcereference_array = [
     {
         "type": "api",
-        "account": "test_account",
-        "container": "test_container",
-        "file_path": "test_file_path",
+        "account": "account",
+        "container": "container",
+        "file_path": "file_path",
     }
 ]
