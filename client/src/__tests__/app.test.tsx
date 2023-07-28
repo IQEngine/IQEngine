@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import { render, screen, waitForElementToBeRemoved, waitFor } from '@testing-library/react';
-import App from '@/App';
+import App from '@/app';
 import React from 'react';
 import '@testing-library/jest-dom';
 import { AllProviders, queryClient } from '@/mocks/setup-tests';

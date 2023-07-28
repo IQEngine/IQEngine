@@ -10,14 +10,14 @@ export function useRouter() {
     {
       path: '/',
       async lazy() {
-        let { App } = await import('@/App');
+        let { App } = await import('@/app');
         return { Component: App };
       },
       children: [
         {
           path: 'about',
           async lazy() {
-            let { About } = await import('@/pages/About');
+            let { About } = await import('@/pages/about');
             return { Component: About };
           },
         },
