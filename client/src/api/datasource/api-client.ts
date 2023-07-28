@@ -3,6 +3,9 @@ import { DataSourceClient } from './datasource-client';
 import { DataSource } from '@/api/Models';
 
 export class ApiClient implements DataSourceClient {
+  async sync(account: string, container: string): Promise<void> {
+    await axios.put(`/api/datasources/${account}/${container}/sync`);
+  }
   async list(): Promise<DataSource[]> {
     const response = await axios.get('/api/datasources');
     if (response.status !== 200) {
@@ -35,7 +38,8 @@ export class ApiClient implements DataSourceClient {
   }
   features() {
     return {
-      save_files: true,
+      updateMeta: true,
+      sync: true,
     };
   }
 }

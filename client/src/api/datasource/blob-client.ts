@@ -8,6 +8,9 @@ export class BlobClient implements DataSourceClient {
   constructor(dataSources: Record<string, DataSource>) {
     this.dataSources = dataSources;
   }
+  sync(account: string, container: string): Promise<void> {
+    throw new Error('sync not supported for blob data sources');
+  }
 
   list(): Promise<DataSource[]> {
     if (!this.dataSources) {
@@ -30,7 +33,8 @@ export class BlobClient implements DataSourceClient {
 
   features() {
     return {
-      update_meta: false,
+      updateMeta: false,
+      sync: false,
     };
   }
 }

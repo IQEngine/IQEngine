@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect } from 'react';
 import { ArrowDownTrayIcon, DocumentCheckIcon } from '@heroicons/react/24/outline';
 import { SigMFMetadata } from '@/utils/sigmfMetadata';
-import { useGetMetadataFeatures, useUpdateMeta } from '@/api/metadata/Queries';
+import { useGetMetadataFeatures, useUpdateMeta } from '@/api/metadata/queries';
 import toast from 'react-hot-toast';
 import { vscodeDark } from '@uiw/codemirror-theme-vscode';
 import CodeMirror from '@uiw/react-codemirror';

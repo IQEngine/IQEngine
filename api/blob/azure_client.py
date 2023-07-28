@@ -95,8 +95,11 @@ class AzureBlobClient:
         # files that enf with .sigmf-meta
         async for blob in container_client.list_blobs():
             if blob.name.endswith(".sigmf-meta"):
-                metadata = await self.get_metadata_file(blob.name)
-                yield str(blob.name), metadata
+                try:
+                    metadata = await self.get_metadata_file(blob.name)
+                    yield str(blob.name), metadata
+                except Exception as e:
+                    print(f"Error while reading metadata file {blob.name}: {e}")
         return
 
     async def get_metadata_file(self, filepath: str):

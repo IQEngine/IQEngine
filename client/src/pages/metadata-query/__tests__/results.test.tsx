@@ -6,7 +6,7 @@ import React from 'react';
 
 import Results from '@/pages/metadata-query/results';
 import { SigMFMetadata, Annotation, CaptureSegment } from '@/utils/sigmfMetadata';
-import { queryMeta } from '@/api/metadata/Queries';
+import { queryMeta } from '@/api/metadata/queries';
 
 const createMetadata = () => {
   const raw = [
@@ -78,7 +78,7 @@ const createMetadata = () => {
   };
 };
 
-vi.mock('@/api/metadata/Queries', async () => {
+vi.mock('@/api/metadata/queries', async () => {
   return {
     queryMeta: vi.fn(() => ({
       data: createMetadata().parsed,
