@@ -1,6 +1,7 @@
 import { DataSourceClientFactory } from './datasource-client-factory';
 import { DataSourceClient } from './datasource-client';
 import { DataSource } from '@/api/Models';
+import { TraceabilityOrigin } from '@/utils/sigmfMetadata';
 import { useUserSettings } from '@/api/user-settings/use-user-settings';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { ClientType } from '@/api/Models';
@@ -36,6 +37,20 @@ export const getDataSource = (type: string, account: string, container: string, 
     () => {
       const client = DataSourceClientFactory(type, filesQuery.data, dataSourcesQuery.data);
       return fetchDataSource(client, account, container);
+    },
+    {
+      enabled: enabled,
+    }
+  );
+};
+
+export const useQueryMeta = (type: string, queryString: string, enabled = true) => {
+  const { dataSourcesQuery, filesQuery } = useUserSettings();
+  return useQuery<TraceabilityOrigin[]>(
+    ['metadata-query', queryString],
+    async ({ signal }) => {
+      const client = DataSourceClientFactory(type, filesQuery.data, dataSourcesQuery.data);
+      return await client.query(queryString, signal);
     },
     {
       enabled: enabled,
