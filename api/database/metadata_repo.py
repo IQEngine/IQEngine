@@ -92,7 +92,14 @@ async def create(metadata: Metadata):
     -------
     None
     """
-    if await exists(metadata.account, metadata.container, metadata.filepath):
+    if metadata.globalMetadata.traceability_origin is None:
+        raise Exception("Metadata must have origin")
+
+    if await exists(
+        metadata.globalMetadata.traceability_origin.account,
+        metadata.globalMetadata.traceability_origin.container,
+        metadata.globalMetadata.traceability_origin.file_path,
+    ):
         raise Exception("Metadata Already Exists")
 
     metadata_collection: AgnosticCollection = collection()

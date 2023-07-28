@@ -62,11 +62,12 @@ async def sync(account: str, container: str):
     datasource = await get(account, container)
     if datasource is None:
         raise Exception(f"Datasource {account}/{container} does not exist")
-    azure_blob_client.set_sas_token(decrypt(datasource.sasToken))
+    if datasource.sasToken:
+        azure_blob_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
     metadatas = azure_blob_client.get_metadata_files()
     async for metadata in metadatas:
         filepath = metadata[0].replace(".sigmf-meta", "")
-        if not azure_blob_client.blob_exist(filepath + ".sigmf-data"):
+        if not await azure_blob_client.blob_exist(filepath + ".sigmf-data"):
             print(f"Data file {filepath} does not exist for metadata file")
             continue
         metadata = metadata[1]
@@ -85,7 +86,11 @@ async def sync(account: str, container: str):
         )
         if await database.metadata_repo.exists(account, container, filepath):
             continue
-        await database.metadata_repo.create(account, container, filepath)
+        try:
+            await database.metadata_repo.create(metadata)
+            print(f"Created metadata for {filepath}")
+        except Exception as e:
+            print(f"Error creating metadata for {filepath}: {e}")
 
 
 async def create(datasource: DataSource) -> DataSource:
