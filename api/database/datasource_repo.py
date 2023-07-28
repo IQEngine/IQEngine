@@ -66,8 +66,8 @@ async def sync(account: str, container: str):
         azure_blob_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
     metadatas = azure_blob_client.get_metadata_files()
     async for metadata in metadatas:
+        filepath = metadata[0].replace(".sigmf-meta", "")
         try:
-            filepath = metadata[0].replace(".sigmf-meta", "")
             if await database.metadata_repo.exists(account, container, filepath):
                 print(f"[SYNC] Metadata already exists for {filepath}")
                 continue
@@ -84,10 +84,13 @@ async def sync(account: str, container: str):
                 }
             )
             metadata.globalMetadata.traceability_revision = 0
-            file_length = await azure_blob_client.get_file_length(filepath + ".sigmf-data")
+            file_length = await azure_blob_client.get_file_length(
+                filepath + ".sigmf-data"
+            )
             metadata.globalMetadata.traceability_sample_length = (
-                file_length / get_bytes_per_iq_sample(metadata.globalMetadata.core_datatype)
-            )            
+                file_length
+                / get_bytes_per_iq_sample(metadata.globalMetadata.core_datatype)
+            )
             await database.metadata_repo.create(metadata)
             print(f"[SYNC] Created metadata for {filepath}")
         except Exception as e:
