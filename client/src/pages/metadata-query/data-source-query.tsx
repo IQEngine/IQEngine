@@ -2,12 +2,18 @@ import { useGetDatasources } from '@/api/datasource/hooks/use-get-datasources';
 import React, { useEffect, useState } from 'react';
 
 export const SourceQuery = ({ validator, queryName, handleQueryValid, handleQueryInvalid }) => {
-  const { apiQuery, blobQuery } = useGetDatasources();
+  const { apiQuery } = useGetDatasources();
   const [selections, setSelections] = useState({});
 
   useEffect(() => {
-    if (apiQuery.data || blobQuery.data) {
-      setDataSources();
+    if (apiQuery.data) {
+      const dataSources = {};
+
+      apiQuery.data?.forEach((item) => {
+        dataSources[item.name] = { name: item.name, account: item.account, container: item.container, selected: false };
+      });
+
+      setSelections(dataSources);
     }
   }, []);
 
@@ -15,20 +21,6 @@ export const SourceQuery = ({ validator, queryName, handleQueryValid, handleQuer
     let checkedSelections = Object.keys(selections).filter((item) => selections[item]?.selected);
     handleSelection(checkedSelections);
   }, [selections]);
-
-  const setDataSources = () => {
-    const dataSources = {};
-
-    blobQuery.data?.forEach((item) => {
-      dataSources[item.name] = { name: item.name, account: item.account, container: item.container, selected: false };
-    });
-
-    apiQuery.data?.forEach((item) => {
-      dataSources[item.name] = { name: item.name, account: item.account, container: item.container, selected: false };
-    });
-
-    setSelections(dataSources);
-  };
 
   const handleSelection = (dataSource) => {
     let dataSourcePaths = dataSource.map((value) => {
