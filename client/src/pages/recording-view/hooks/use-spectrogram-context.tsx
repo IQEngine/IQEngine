@@ -1,3 +1,5 @@
+import { useMeta } from '@/api/metadata/queries';
+import { SigMFMetadata } from '@/utils/sigmfMetadata';
 import React, { createContext, useContext, useState } from 'react';
 
 interface SpectrogramContextProperties {
@@ -21,6 +23,9 @@ interface SpectrogramContextProperties {
   setSpectrogramWidth: (spectrogramWidth: number) => void;
   fftStepSize: number;
   setFFTStepSize: (fftStepSize: number) => void;
+  includeRfFreq: boolean;
+  setIncludeRfFreq: (includeRfFreq: boolean) => void;
+  meta: SigMFMetadata;
 }
 
 export const SpectrogramContext = createContext<SpectrogramContextProperties>(null);
@@ -50,6 +55,8 @@ export function SpectrogramContextProvider({
   const [spectrogramHeight, setSpectrogramHeight] = useState<number>(seedValues.spectrogramHeight);
   const [spectrogramWidth, setSpectrogramWidth] = useState<number>(seedValues.spectrogramWidth);
   const [fftStepSize, setFFTStepSize] = useState<number>(seedValues.fftStepSize);
+  const [includeRfFreq, setIncludeRfFreq] = useState<boolean>(false);
+  const { data: meta } = useMeta(type, account, container, filePath);
 
   return (
     <SpectrogramContext.Provider
@@ -74,6 +81,9 @@ export function SpectrogramContextProvider({
         setSpectrogramWidth,
         fftStepSize,
         setFFTStepSize,
+        includeRfFreq,
+        setIncludeRfFreq,
+        meta,
       }}
     >
       {children}

@@ -14,8 +14,8 @@ export function useSpectrogram() {
     fftStepSize,
     setFFTStepSize,
     setSpectrogramHeight,
+    meta,
   } = useSpectrogramContext();
-  const { data: meta } = useMeta(type, account, container, filePath);
   const { currentData, setFFTsRequired, fftsRequired } = useGetIQData(type, account, container, filePath, fftSize);
   const totalFFTs = Math.ceil(meta?.getTotalSamples() / fftSize);
   const [currentFFT, setCurrentFFT] = useState<number>(0);

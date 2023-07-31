@@ -51,13 +51,7 @@ export function DisplaySpectrogram() {
   return (
     <>
       <Stage width={spectrogramWidth + 110} height={30}>
-        <RulerTop
-          sampleRate={meta.getSampleRate()}
-          spectrogramWidth={spectrogramWidth}
-          spectrogramWidthScale={spectrogramWidth / fftSize}
-          includeRfFreq={false}
-          coreFrequency={meta.getCenterFrequency()}
-        />
+        <RulerTop />
       </Stage>
       <div className="flex flex-row">
         <Stage width={spectrogramWidth} height={spectrogramHeight}>
@@ -66,13 +60,7 @@ export function DisplaySpectrogram() {
           </Layer>
         </Stage>
         <Stage width={50} height={spectrogramHeight} className="mr-1">
-          <RulerSide
-            spectrogramWidth={spectrogramWidth}
-            fftSize={fftSize}
-            sampleRate={meta?.getSampleRate()}
-            currentRowAtTop={currentFFT / fftSize}
-            spectrogramHeight={spectrogramHeight}
-          />
+          <RulerSide currentRowAtTop={currentFFT} />
         </Stage>
       </div>
       {currentData && (
