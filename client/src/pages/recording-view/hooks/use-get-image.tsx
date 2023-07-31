@@ -15,7 +15,7 @@ export const useGetImage = (
   const [iqData, setIQData] = useState<Float32Array>(null);
 
   const ffts = useMemo(() => {
-    if (!iqData) return null;
+    if (!iqData || !fftSize) return null;
     performance.mark('calcFftOfTile');
     const ffts_calc = calcFftOfTile(iqData, fftSize, windowFunction, spectrogramHeight);
     console.debug(performance.measure('calcFftOfTile', 'calcFftOfTile'));

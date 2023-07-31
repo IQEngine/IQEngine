@@ -1,8 +1,53 @@
-import { useAllProviders } from '@/mocks/setup-tests';
+import { useAllProviders, AllProviders } from '@/mocks/setup-tests';
 import { renderHook, waitFor } from '@testing-library/react';
 import nock from 'nock';
 import { useSpectrogram } from '@/pages/recording-view/hooks/use-spectrogram';
 import { act } from 'react-dom/test-utils';
+import { SpectrogramContextProvider } from '@/pages/recording-view/hooks/use-spectrogram-context';
+import React from 'react';
+import { TraceabilityOrigin } from '@/utils/sigmfMetadata';
+
+function getDefaultSeedValues() {
+  return {
+    spectrogramWidth: 1024,
+    magnitudeMin: 0,
+    magnitudeMax: 100,
+    colmap: 'viridis',
+    windowFunction: 'hann',
+    fftSize: 1024,
+    spectrogramHeight: 800,
+    fftStepSize: 0,
+  };
+}
+
+function createTestWrapper(
+  origin: TraceabilityOrigin,
+  seed: {
+    spectrogramWidth: number;
+    magnitudeMin: number;
+    magnitudeMax: number;
+    colmap: string;
+    windowFunction: string;
+    fftSize: number;
+    spectrogramHeight: number;
+    fftStepSize: number;
+  },
+  children: React.ReactElement<any, string | React.JSXElementConstructor<any>>
+): React.ReactNode {
+  return (
+    <AllProviders>
+      <SpectrogramContextProvider
+        type={origin.type}
+        account={origin.account}
+        container={origin.container}
+        filePath={origin.file_path}
+        seedValues={seed}
+      >
+        {children}
+      </SpectrogramContextProvider>
+    </AllProviders>
+  );
+}
 
 describe('test metadata fetch and fft calculation', () => {
   beforeEach(() => {
@@ -18,7 +63,7 @@ describe('test metadata fetch and fft calculation', () => {
     queryClient.clear();
   });
   test('should calculate the right number of ffts', async () => {
-    const { wrapper, getValidMetadata } = useAllProviders();
+    const { getValidMetadata } = useAllProviders();
     const metadata = getValidMetadata();
     const fftSize = 1024;
     const total_ffts = 128;
@@ -27,24 +72,17 @@ describe('test metadata fetch and fft calculation', () => {
       .get('/api/datasources/testaccount/testcontainer/test_file_path/meta')
       .reply(200, metadata);
     const origin = metadata.getOrigin();
+    const seed = getDefaultSeedValues();
+    seed.fftSize = fftSize;
 
-    const { result } = renderHook(
-      () =>
-        useSpectrogram({
-          type: origin.type,
-          account: origin.account,
-          container: origin.container,
-          filePath: origin.file_path,
-        }),
-      {
-        wrapper: wrapper,
-      }
-    );
+    const { result } = renderHook(() => useSpectrogram(), {
+      wrapper: ({ children }) => createTestWrapper(origin, seed, children),
+    });
     await waitFor(() => expect(result.current.totalFFTs).toBe(total_ffts));
   });
 
   test('should calculate the correct iqs that need to be displayed', async () => {
-    const { wrapper, getValidMetadata } = useAllProviders();
+    const { getValidMetadata } = useAllProviders();
     const metadata = getValidMetadata();
     const fftSize = 1024;
     const total_ffts = 128;
@@ -53,20 +91,11 @@ describe('test metadata fetch and fft calculation', () => {
       .get('/api/datasources/testaccount/testcontainer/test_file_path/meta')
       .reply(200, metadata);
     const origin = metadata.getOrigin();
-    const { result } = renderHook(
-      () =>
-        useSpectrogram({
-          type: origin.type,
-          account: origin.account,
-          container: origin.container,
-          filePath: origin.file_path,
-        }),
-      {
-        wrapper: wrapper,
-      }
-    );
-    act(() => {
-      result.current.setSpectrogramHeight(10);
+    const seed = getDefaultSeedValues();
+    seed.fftSize = fftSize;
+    seed.spectrogramHeight = 10;
+    const { result } = renderHook(() => useSpectrogram(), {
+      wrapper: ({ children }) => createTestWrapper(origin, seed, children),
     });
 
     await waitFor(() => expect(result.current.fftsRequired.length).toBe(10));
@@ -74,7 +103,7 @@ describe('test metadata fetch and fft calculation', () => {
   });
 
   test('should calculate the correct ffts that need to be displayed when decimating', async () => {
-    const { wrapper, getValidMetadata } = useAllProviders();
+    const { getValidMetadata } = useAllProviders();
     const metadata = getValidMetadata();
     const fftSize = 1024;
     const total_ffts = 128;
@@ -83,21 +112,12 @@ describe('test metadata fetch and fft calculation', () => {
       .get('/api/datasources/testaccount/testcontainer/test_file_path/meta')
       .reply(200, metadata);
     const origin = metadata.getOrigin();
-    const { result } = renderHook(
-      () =>
-        useSpectrogram({
-          type: origin.type,
-          account: origin.account,
-          container: origin.container,
-          filePath: origin.file_path,
-        }),
-      {
-        wrapper: wrapper,
-      }
-    );
-    act(() => {
-      result.current.setSpectrogramHeight(10);
-      result.current.setFFTStepSize(1);
+    const seed = getDefaultSeedValues();
+    seed.fftSize = fftSize;
+    seed.spectrogramHeight = 10;
+    seed.fftStepSize = 1;
+    const { result } = renderHook(() => useSpectrogram(), {
+      wrapper: ({ children }) => createTestWrapper(origin, seed, children),
     });
 
     await waitFor(() => expect(result.current.fftsRequired.length).toBe(10));
@@ -112,7 +132,7 @@ describe('test metadata fetch and fft calculation', () => {
   });
 
   test('should calculate the correct ffts that need to be displayed when decimating and changing height', async () => {
-    const { wrapper, getValidMetadata } = useAllProviders();
+    const { getValidMetadata } = useAllProviders();
     const metadata = getValidMetadata();
     const fftSize = 1024;
     const total_ffts = 128;
@@ -121,21 +141,12 @@ describe('test metadata fetch and fft calculation', () => {
       .get('/api/datasources/testaccount/testcontainer/test_file_path/meta')
       .reply(200, metadata);
     const origin = metadata.getOrigin();
-    const { result } = renderHook(
-      () =>
-        useSpectrogram({
-          type: origin.type,
-          account: origin.account,
-          container: origin.container,
-          filePath: origin.file_path,
-        }),
-      {
-        wrapper: wrapper,
-      }
-    );
-    act(() => {
-      result.current.setSpectrogramHeight(10);
-      result.current.setFFTStepSize(1);
+    const seed = getDefaultSeedValues();
+    seed.fftSize = fftSize;
+    seed.spectrogramHeight = 10;
+    seed.fftStepSize = 1;
+    const { result } = renderHook(() => useSpectrogram(), {
+      wrapper: ({ children }) => createTestWrapper(origin, seed, children),
     });
 
     await waitFor(() => expect(result.current.fftsRequired.length).toBe(10));

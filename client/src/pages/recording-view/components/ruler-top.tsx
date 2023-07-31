@@ -4,20 +4,15 @@
 
 import React, { useState, useEffect } from 'react';
 import { Layer, Rect, Text } from 'react-konva';
+import { useSpectrogramContext } from '../hooks/use-spectrogram-context';
 
-interface RulerTopProps {
-  spectrogramWidth: number;
-  sampleRate: number;
-  spectrogramWidthScale: number;
-  includeRfFreq: boolean;
-  coreFrequency: number;
-}
-
-const RulerTop = (props: RulerTopProps) => {
-  let { spectrogramWidth, sampleRate, spectrogramWidthScale, includeRfFreq, coreFrequency } = props;
-
+const RulerTop = () => {
+  const { meta, fftSize, spectrogramWidth, includeRfFreq } = useSpectrogramContext();
+  const spectrogramWidthScale = spectrogramWidth / fftSize;
   const [ticks, setTicks] = useState([]);
   const [labels, setLabels] = useState([]);
+  const sampleRate = meta.getSampleRate();
+  const coreFrequency = meta.getCenterFrequency();
 
   useEffect(() => {
     const num_ticks = 16;
