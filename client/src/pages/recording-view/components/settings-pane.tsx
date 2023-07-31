@@ -31,21 +31,6 @@ const SettingsPane = () => {
     context.setWindowFunction(newWindowFunction);
   };
 
-  const onChangeFftsize = (event) => {
-    const newFFTSize = parseInt(event.target.text);
-    context.setFFTSize(newFFTSize);
-  };
-
-  const onChangeColorMap = (event) => {
-    const newColMap = event.target.text;
-    context.setColmap(newColMap);
-  };
-
-  const onChangePythonSnippet = (event) => {
-    const newPythonSnippet = event.target.value;
-    setLocalPythonSnippet(newPythonSnippet);
-  };
-
   const onSubmitPythonSnippet = () => {
     context.setPythonSnippet(localPythonSnippet);
   };
@@ -88,10 +73,6 @@ const SettingsPane = () => {
 
   const onToggleFreqCursors = (e) => {
     setCursorFreqEnabled(e.target.checked);
-  };
-
-  const toggleIncludeRfFreq = (e) => {
-    setIncludeRfFreq(e.target.checked);
   };
 
   const onPressSaveButton = (e) => {
@@ -183,7 +164,13 @@ const SettingsPane = () => {
           </button>
           <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
             {Object.entries(colMaps).map(([value, index]) => (
-              <li key={Math.random()} data-value={value} onClick={onChangeColorMap}>
+              <li
+                key={index[0][0]}
+                data-value={value}
+                onClick={(e) => {
+                  context.setColmap(e.currentTarget.dataset.value);
+                }}
+              >
                 {state.colorMapName === value ? <a className="bg-primary">{value}</a> : <a>{value}</a>}
               </li>
             ))}
@@ -198,7 +185,13 @@ const SettingsPane = () => {
           </button>
           <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
             {fftSizes.map((x, index) => (
-              <li key={index} data-value={String(x)} onClick={onChangeFftsize}>
+              <li
+                key={index}
+                data-value={String(x)}
+                onClick={(e) => {
+                  context.setFFTSize(parseInt(e.currentTarget.dataset.value));
+                }}
+              >
                 {context.fftSize === x ? <a className="bg-primary">{x}</a> : <a>{x}</a>}
               </li>
             ))}
@@ -314,7 +307,9 @@ const SettingsPane = () => {
             type="checkbox"
             className="toggle toggle-primary"
             checked={context.includeRfFreq}
-            onChange={toggleIncludeRfFreq}
+            onChange={(e) => {
+              context.setIncludeRfFreq(e.target.checked);
+            }}
           />
         </label>
       </div>
@@ -327,7 +322,9 @@ const SettingsPane = () => {
           rows={6}
           cols={28}
           wrap="off"
-          onChange={onChangePythonSnippet}
+          onChange={(e) => {
+            setLocalPythonSnippet(e.target.value);
+          }}
           value={context.pythonSnippet}
         />
         <button onClick={onSubmitPythonSnippet}>Run Python</button>
