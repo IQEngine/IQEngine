@@ -19,9 +19,6 @@ const SettingsPane = () => {
   const { cursorFreqEnabled, setCursorFreqEnabled, cursorTimeEnabled, setCursorTimeEnabled } = useCursorContext();
   const [localPythonSnippet, setLocalPythonSnippet] = useState(context.pythonSnippet);
   const [localTaps, setLocalTaps] = useState(JSON.stringify(context.taps));
-  const [state, setState] = useState({
-    saveButtonEnabled: false,
-  });
 
   const onChangeWindowFunction = (event) => {
     const newWindowFunction = event.currentTarget.dataset.value;
@@ -30,11 +27,6 @@ const SettingsPane = () => {
 
   const onSubmitPythonSnippet = () => {
     context.setPythonSnippet(localPythonSnippet);
-  };
-
-  const onChangeTaps = (event) => {
-    const newTaps = event.target.value;
-    setLocalTaps(newTaps);
   };
 
   const updateTaps = (taps_string: string) => {
@@ -59,19 +51,6 @@ const SettingsPane = () => {
     updateTaps(taps_string);
   };
 
-  const onChangeZoomLevel = (e) => {
-    const newZoomLevel = parseInt(e.target.value);
-    context.setFFTStepSize(newZoomLevel - 1);
-  };
-
-  const onToggleTimeCursors = (e) => {
-    setCursorTimeEnabled(e.target.checked);
-  };
-
-  const onToggleFreqCursors = (e) => {
-    setCursorFreqEnabled(e.target.checked);
-  };
-
   const onPressSaveButton = (e) => {
     console.log(context.meta);
 
@@ -80,6 +59,7 @@ const SettingsPane = () => {
     delete metaClone['dataClient'];
     const a = document.createElement('a');
 
+    // TODO: Return with the download of the blob
     // var blobUrl = window.URL.createObjectURL(blob);
     // var blob = new Blob([trimmedSamples], { type: 'octet/stream' });
     // a.href = blobUrl;
@@ -118,7 +98,9 @@ const SettingsPane = () => {
           type="checkbox"
           className="toggle toggle-primary float-right"
           checked={cursorTimeEnabled}
-          onChange={onToggleTimeCursors}
+          onChange={(e) => {
+            setCursorTimeEnabled(e.target.checked);
+          }}
         />
       </label>
 
@@ -128,7 +110,9 @@ const SettingsPane = () => {
           type="checkbox"
           className="toggle toggle-primary float-right"
           checked={cursorFreqEnabled}
-          onChange={onToggleFreqCursors}
+          onChange={(e) => {
+            setCursorFreqEnabled(e.target.checked);
+          }}
         />
       </label>
 
@@ -136,7 +120,7 @@ const SettingsPane = () => {
         className="mb-3"
         onClick={onPressSaveButton}
         style={{ width: '100%', marginTop: '5px' }}
-        disabled={!state.saveButtonEnabled}
+        disabled={!context.canDownload}
       >
         Download Selected Samples
       </button>
@@ -226,7 +210,9 @@ const SettingsPane = () => {
               type="text"
               className="h-8 w-54 rounded-l text-base-100 ml-1 pl-2"
               defaultValue={localTaps}
-              onChange={onChangeTaps}
+              onChange={(e) => {
+                setLocalTaps(e.target.value);
+              }}
             />
             <button className="rounded-none rounded-r" onClick={onSubmitTaps}>
               <FontAwesomeIcon icon={faArrowRight} />

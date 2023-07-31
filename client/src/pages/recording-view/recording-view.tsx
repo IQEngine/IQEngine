@@ -27,9 +27,8 @@ export function DisplaySpectrogram() {
     windowFunction,
     fftSize,
   } = useSpectrogramContext();
-  const { data: meta } = useMeta(type, account, container, filePath);
 
-  const { currentData, displayedIQ, spectrogramHeight, currentFFT, setCurrentFFT } = useSpectrogram();
+  const { displayedIQ, spectrogramHeight, currentFFT, setCurrentFFT } = useSpectrogram();
 
   const { image, setIQData } = useGetImage(
     fftSize,

@@ -32,6 +32,8 @@ interface SpectrogramContextProperties {
   setPythonSnippet: (pythonSnippet: string) => void;
   meta: SigMFMetadata;
   setMeta: (meta: SigMFMetadata) => void;
+  canDownload: boolean;
+  setCanDownload: (canDownload: boolean) => void;
 }
 
 export const SpectrogramContext = createContext<SpectrogramContextProperties>(null);
@@ -66,7 +68,7 @@ export function SpectrogramContextProvider({
   const [pythonSnippet, setPythonSnippet] = useState<string>(INITIAL_PYTHON_SNIPPET);
   const { data: originMeta } = useMeta(type, account, container, filePath);
   const [meta, setMeta] = useState<SigMFMetadata>(originMeta);
-
+  const [canDownload, setCanDownload] = useState<boolean>(false);
   return (
     <SpectrogramContext.Provider
       value={{
@@ -98,6 +100,8 @@ export function SpectrogramContextProvider({
         setPythonSnippet,
         meta,
         setMeta,
+        canDownload,
+        setCanDownload,
       }}
     >
       {children}
