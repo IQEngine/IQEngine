@@ -15,18 +15,7 @@ import { TimePlot } from './components/time-plot';
 import { Sidebar } from './components/sidebar';
 
 export function DisplaySpectrogram() {
-  const {
-    type,
-    account,
-    container,
-    filePath,
-    spectrogramWidth,
-    magnitudeMin,
-    magnitudeMax,
-    colmap,
-    windowFunction,
-    fftSize,
-  } = useSpectrogramContext();
+  const { spectrogramWidth, magnitudeMin, magnitudeMax, colmap, windowFunction, fftSize } = useSpectrogramContext();
 
   const { displayedIQ, spectrogramHeight, currentFFT, setCurrentFFT } = useSpectrogram();
 
