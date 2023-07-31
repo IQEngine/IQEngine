@@ -131,31 +131,30 @@ describe('DevTest Spectrogram Tests', () => {
   );
 
   test.each([
-    // ['128,multi-dB', tilesize, 128, -40.0, 0.0, COLORMAP_DEFAULT, SampleType.MultipleBuckets],
-    // ['256,multi-dB', tilesize, 256, -30.0, -20.0, 'jet', SampleType.MultipleBuckets],
-    // ['512,multi-dB', tilesize, 512, -60.0, 10.0, 'plasma', SampleType.MultipleBuckets],
-    // ['defaults,multi-dB', tilesize, 1024, -40.0, -10.0, COLORMAP_DEFAULT, SampleType.MultipleBuckets],
-    // ['defaults,jet,multi-dB', tilesize, 1024, -40.0, -10.0, 'jet', SampleType.MultipleBuckets],
-    // ['2048,jet,multi-dB', tilesize, 2048, -40.0, -10.0, 'jet', SampleType.MultipleBuckets],
-    // ['-80/0,plasma,multi-dB', tilesize, 1024, -80.0, 10.0, 'plasma', SampleType.MultipleBuckets],
-    // ['4096,-20/20,multi-dB', tilesize, 4096, -20.0, 20.0, 'plasma', SampleType.MultipleBuckets],
-    // ['8192,-60/50,inferno,multi-dB', tilesize, 8192, -60.0, 50.0, 'inferno', SampleType.MultipleBuckets],
-    // ['16384,-100/50,multi-dB', tilesize, 16384, -100.0, 50.0, 'inferno', SampleType.MultipleBuckets],
-
-    ['128,white box', tilesize, 128, -40.0, 0.0, COLORMAP_DEFAULT, SampleType.MultipleBuckets],
-    // ['256,white box', tilesize, 256, -30.0, -20.0, 'jet', SampleType.MultipleBuckets],
-    // ['512,white box', tilesize, 512, -60.0, 10.0, 'plasma', SampleType.MultipleBuckets],
-    // ['defaults,white box', tilesize, 1024, -40.0, -10.0, COLORMAP_DEFAULT, SampleType.MultipleBuckets],
-    // ['defaults,jet,white box', tilesize, 1024, -40.0, -10.0, 'jet', SampleType.MultipleBuckets],
-    // ['2048,jet,white box', tilesize, 2048, -40.0, -10.0, 'jet', SampleType.MultipleBuckets],
-    // ['-80/0,plasma,white box', tilesize, 1024, -80.0, 10.0, 'plasma', SampleType.MultipleBuckets],
-    // ['4096,-20/20,white box', tilesize, 4096, -20.0, 20.0, 'plasma', SampleType.MultipleBuckets],
-    // ['8192,-60/50,inferno,white box', tilesize, 8192, -60.0, 50.0, 'inferno', SampleType.MultipleBuckets],
-    // ['16384,-100/50,white box', tilesize, 16384, -100.0, 50.0, 'inferno', SampleType.MultipleBuckets],
+    ['128,multi-dB', tilesize, 128, -40.0, 0.0, COLORMAP_DEFAULT, SampleType.MultipleBuckets],
+    ['256,multi-dB', tilesize, 256, -30.0, -20.0, 'jet', SampleType.MultipleBuckets],
+    ['512,multi-dB', tilesize, 512, -60.0, 10.0, 'plasma', SampleType.MultipleBuckets],
+    ['defaults,multi-dB', tilesize, 1024, -40.0, -10.0, COLORMAP_DEFAULT, SampleType.MultipleBuckets],
+    ['defaults,jet,multi-dB', tilesize, 1024, -40.0, -10.0, 'jet', SampleType.MultipleBuckets],
+    ['2048,jet,multi-dB', tilesize, 2048, -40.0, -10.0, 'jet', SampleType.MultipleBuckets],
+    ['-80/0,plasma,multi-dB', tilesize, 1024, -80.0, 10.0, 'plasma', SampleType.MultipleBuckets],
+    ['4096,-20/20,multi-dB', tilesize, 4096, -20.0, 20.0, 'plasma', SampleType.MultipleBuckets],
+    ['8192,-60/50,inferno,multi-dB', tilesize, 8192, -60.0, 50.0, 'inferno', SampleType.MultipleBuckets],
+    ['16384,-100/50,multi-dB', tilesize, 16384, -100.0, 50.0, 'inferno', SampleType.MultipleBuckets],
+    ['128,white box', tilesize, 128, -40.0, 0.0, COLORMAP_DEFAULT, SampleType.WhiteBox],
+    ['256,white box', tilesize, 256, -30.0, -20.0, 'jet', SampleType.MultipleBuckets],
+    ['512,white box', tilesize, 512, -60.0, 10.0, 'plasma', SampleType.MultipleBuckets],
+    ['defaults,white box', tilesize, 1024, -40.0, -10.0, COLORMAP_DEFAULT, SampleType.MultipleBuckets],
+    ['defaults,jet,white box', tilesize, 1024, -40.0, -10.0, 'jet', SampleType.MultipleBuckets],
+    ['2048,jet,white box', tilesize, 2048, -40.0, -10.0, 'jet', SampleType.MultipleBuckets],
+    ['-80/0,plasma,white box', tilesize, 1024, -80.0, 10.0, 'plasma', SampleType.MultipleBuckets],
+    ['4096,-20/20,white box', tilesize, 4096, -20.0, 20.0, 'plasma', SampleType.MultipleBuckets],
+    ['8192,-60/50,inferno,white box', tilesize, 8192, -60.0, 50.0, 'inferno', SampleType.MultipleBuckets],
+    ['16384,-100/50,white box', tilesize, 16384, -100.0, 50.0, 'inferno', SampleType.MultipleBuckets],
   ])(
     'RGB is generated correctly from the following fftdata: %s',
     async (comment, tile_size, fftSize, magnitudeMin, magnitudeMax, colorMap, sampleType) => {
-      const { sampleImageData, num_ffts, expectedImageData } = generateSampleImageData(
+      const { sampleIQData, num_ffts, expectedImageData } = generateSampleImageData(
         tile_size,
         fftSize,
         sampleType,
@@ -169,7 +168,7 @@ describe('DevTest Spectrogram Tests', () => {
       const { result } = renderHook(() =>
         useGetImage(fftSize, spectrogramHeight, magnitudeMin, magnitudeMax, colorMap, 'hamming')
       );
-      result.current.setIQData(sampleImageData);
+      result.current.setIQData(sampleIQData);
       await waitFor(() => {
         expect(result.current.image).not.toBeNull();
       });
