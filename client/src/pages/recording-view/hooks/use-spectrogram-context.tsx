@@ -1,7 +1,7 @@
 import { useMeta } from '@/api/metadata/queries';
 import { INITIAL_PYTHON_SNIPPET } from '@/utils/constants';
 import { SigMFMetadata } from '@/utils/sigmfMetadata';
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 
 interface SpectrogramContextProperties {
   type: string;
@@ -69,6 +69,9 @@ export function SpectrogramContextProvider({
   const { data: originMeta } = useMeta(type, account, container, filePath);
   const [meta, setMeta] = useState<SigMFMetadata>(originMeta);
   const [canDownload, setCanDownload] = useState<boolean>(false);
+  useEffect(() => {
+    setMeta(originMeta);
+  }, [originMeta]);
   return (
     <SpectrogramContext.Provider
       value={{
