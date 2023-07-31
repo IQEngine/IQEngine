@@ -1,7 +1,7 @@
 import { DataSourceClientFactory } from './datasource-client-factory';
 import { DataSourceClient } from './datasource-client';
 import { DataSource } from '@/api/Models';
-import { TraceabilityOrigin, Track } from '@/utils/sigmfMetadata';
+import { TraceabilityOrigin } from '@/utils/sigmfMetadata';
 import { useUserSettings } from '@/api/user-settings/use-user-settings';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { ClientType } from '@/api/Models';
@@ -51,20 +51,6 @@ export const useQueryMeta = (type: string, queryString: string, enabled = true) 
     async ({ signal }) => {
       const client = DataSourceClientFactory(type, filesQuery.data, dataSourcesQuery.data);
       return await client.query(queryString, signal);
-    },
-    {
-      enabled: enabled,
-    }
-  );
-};
-
-export const useQueryTrack = (type: string, account: string, container: string, filepath: string, enabled = true) => {
-  const { dataSourcesQuery, filesQuery } = useUserSettings();
-  return useQuery<Track>(
-    ['track', account, container, filepath],
-    async ({ signal }) => {
-      const client = DataSourceClientFactory(type, filesQuery.data, dataSourcesQuery.data);
-      return await client.track(account, container, filepath);
     },
     {
       enabled: enabled,

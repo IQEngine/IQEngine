@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { CLIENT_TYPE_API } from '@/api/Models';
-import { useQueryTrack } from '@/api/datasource/queries';
-
+import { useQueryTrack } from '@/api/metadata/queries';
 
 import Results from './results';
 import { queries } from './queries';

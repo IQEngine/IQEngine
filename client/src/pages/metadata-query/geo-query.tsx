@@ -76,13 +76,6 @@ export const GeoQuery = ({ queryName, description, validator, handleQueryValid, 
     handleQueryValid(queryName, valid);
   };
 
-  const renderTrack = () => {
-    if (trackData.length === 0) return;
-    return (
-      <Polyline pathOptions={{color: 'red'}} positions={trackData} />
-    );
-  }
-
   return (
     <div className="mb-10">
       <div className="divider mb-8">

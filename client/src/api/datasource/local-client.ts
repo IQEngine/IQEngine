@@ -15,9 +15,6 @@ export class LocalClient implements DataSourceClient {
   query(querystring: string, signal: AbortSignal): Promise<TraceabilityOrigin[]> {
     throw new Error('query not supported for blob data sources');
   }
-  track(account: string, container: string, filepath: string): Promise<Track> {
-    throw new Error('track not supported for blob data sources');
-  }
 
   list(): Promise<DataSource[]> {
     const localDirectory: FileWithDirectoryAndFileHandle[] = this.files;
