@@ -3,6 +3,7 @@ import { DateQuery } from './date-query';
 import { StringQuery } from './string-query';
 import { FreqQuery } from './freq-query';
 import { GeoQuery } from './geo-query';
+import { SourceQuery } from './data-source-query';
 
 export const queries = {
   date: {
@@ -101,6 +102,19 @@ export const queries = {
         return false;
       }
       return `text=${encodeURIComponent(text)}`;
+    },
+    value: '',
+  },
+  datasource: {
+    component: SourceQuery,
+    selected: false,
+    description: 'The data source the document is from',
+    validator: (dataSource: string[]) => {
+      if (dataSource.length === 0) {
+        return '';
+      }
+      let queryParts: string[] = dataSource.map((item) => `databaseid=${encodeURIComponent(item)}`);
+      return queryParts.join('&');
     },
     value: '',
   },
