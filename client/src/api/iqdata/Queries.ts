@@ -146,10 +146,12 @@ export function useGetIQData(
   account: string,
   container: string,
   filePath: string,
-  fftsRequired: number[]
+  defaultFFTSize: number = 1024
 ) {
+  const queryClient = useQueryClient();
   const { filesQuery, dataSourcesQuery } = useUserSettings();
-  const [fftSize, setFFTSize] = useState<number>(1024);
+  const [fftSize, setFFTSize] = useState<number>(defaultFFTSize);
+  const [fftsRequired, setFFTsRequired] = useState<number[]>([]);
 
   const { data: meta } = useMeta(type, account, container, filePath);
 
@@ -163,7 +165,6 @@ export function useGetIQData(
     enabled: !!meta && !!filesQuery.data && !!dataSourcesQuery.data,
   });
 
-  const queryClient = useQueryClient();
   const currentData = useMemo(() => {
     if (!meta) {
       return null;
@@ -204,5 +205,6 @@ export function useGetIQData(
     setFFTSize,
     currentData,
     fftsRequired,
+    setFFTsRequired,
   };
 }
