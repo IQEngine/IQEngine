@@ -3,7 +3,7 @@ import { useQueryMeta } from '@/api/datasource/queries';
 import FileRow from '@/pages/recordings-browser/File';
 import { CLIENT_TYPE_API } from '@/api/Models';
 
-export const Results = ({ queryString }) => {
+export const Results = ({ queryString, geoSelected, handleToggleTrack }) => {
   if (!queryString) return null;
   const { isLoading, data } = useQueryMeta(CLIENT_TYPE_API, queryString);
 
@@ -11,7 +11,7 @@ export const Results = ({ queryString }) => {
     if (!data) return;
     return data.map((item, i) => {
       return (
-        <FileRow key={i} filepath={item.file_path} account={item.account} container={item.container} type={item.type} />
+        <FileRow key={i} trackToggle={handleToggleTrack} queryResult={true} geoSelected={geoSelected} filepath={item.file_path} account={item.account} container={item.container} type={item.type} />
       );
     });
   };
@@ -30,7 +30,7 @@ export const Results = ({ queryString }) => {
         </div>
       )}
       <div className="flex justify-center	mt-10">
-        <div className="grid grid-cols-1 gap-4">{renderResults()}</div>
+        <div className="grid grid-cols-1 gap-1">{renderResults()}</div>
       </div>
     </div>
   );

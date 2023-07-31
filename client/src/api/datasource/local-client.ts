@@ -1,7 +1,7 @@
 import { DataSourceClient } from './datasource-client';
 import { DataSource } from '@/api/Models';
 import { FileWithDirectoryAndFileHandle } from 'browser-fs-access';
-import { TraceabilityOrigin } from '@/utils/sigmfMetadata';
+import { TraceabilityOrigin, Track } from '@/utils/sigmfMetadata';
 
 export class LocalClient implements DataSourceClient {
   files: FileWithDirectoryAndFileHandle[];
@@ -14,6 +14,9 @@ export class LocalClient implements DataSourceClient {
   }
   query(querystring: string, signal: AbortSignal): Promise<TraceabilityOrigin[]> {
     throw new Error('query not supported for blob data sources');
+  }
+  track(account: string, container: string, filepath: string): Promise<Track> {
+    throw new Error('track not supported for blob data sources');
   }
 
   list(): Promise<DataSource[]> {

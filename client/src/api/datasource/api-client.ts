@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { DataSourceClient } from './datasource-client';
 import { DataSource } from '@/api/Models';
-import { TraceabilityOrigin } from '@/utils/sigmfMetadata';
+import { TraceabilityOrigin, Track } from '@/utils/sigmfMetadata';
 
 export class ApiClient implements DataSourceClient {
   async sync(account: string, container: string): Promise<void> {
@@ -38,6 +38,19 @@ export class ApiClient implements DataSourceClient {
     const response = await axios.post('/api/datasources', dataSource);
     if (response.status !== 201) {
       throw new Error(`Failed to create datasource: ${response.status}`);
+    }
+    if (!response.data) {
+      return null;
+    }
+    return response.data;
+  }
+  async track(account: string, container: string, filepath: string): Promise<Track> {
+    if(!account || !container || !filepath) {
+      return null;
+    }
+    const response = await axios.get(`/api/datasources/${account}/${container}/${filepath}/track`);
+    if (response.status !== 200) {
+      throw new Error(`Unexpected status code: ${response.status}`);
     }
     if (!response.data) {
       return null;
