@@ -50,10 +50,10 @@ async def get_all_meta(
 async def get_all_meta_name(
     account,
     container,
-    metadatas: AgnosticCollection = Depends(metadata_repo.collection),
+    metadata_source: AgnosticCollection = Depends(metadata_repo.collection),
     current_user: Optional[dict] = Depends(required_roles()),
 ):
-    metadata = metadatas.find(
+    metadata = metadata_source.find(
         {
             "global.traceability:origin.account": account,
             "global.traceability:origin.container": container,

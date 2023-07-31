@@ -1,23 +1,17 @@
 import React from 'react';
-import { queryMeta } from '@/api/metadata/queries';
+import { useQueryMeta } from '@/api/datasource/queries';
 import FileRow from '@/pages/recordings-browser/File';
+import { CLIENT_TYPE_API } from '@/api/Models';
 
 export const Results = ({ queryString }) => {
   if (!queryString) return null;
-  const { isLoading, data } = queryMeta(queryString);
+  const { isLoading, data } = useQueryMeta(CLIENT_TYPE_API, queryString);
 
   const renderResults = () => {
     if (!data) return;
     return data.map((item, i) => {
-      const origin = item.getOrigin();
       return (
-        <FileRow
-          key={i}
-          filepath={origin.file_path}
-          account={origin.account}
-          container={origin.container}
-          type={origin.type}
-        />
+        <FileRow key={i} filepath={item.file_path} account={item.account} container={item.container} type={item.type} />
       );
     });
   };

@@ -1,8 +1,7 @@
 import { SigMFMetadata } from '@/utils/sigmfMetadata';
 import { MetadataClientFactory } from './metadata-client-factory';
-import { QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { MetadataClient } from './metadata-client';
-import { ApiClient } from './api-client';
 import { useUserSettings } from '@/api/user-settings/use-user-settings';
 
 export const fetchMeta = async (
@@ -43,13 +42,6 @@ export const useQueryDataSourceMetaPaths = (type: string, account: string, conta
       staleTime: Infinity,
     }
   );
-};
-
-export const queryMeta = (queryString: string) => {
-  return useQuery<SigMFMetadata[]>(['metadata-query', queryString], () => {
-    const apiClient = new ApiClient();
-    return apiClient.queryMeta(queryString);
-  });
 };
 
 export const getMeta = (type: string, account: string, container: string, filePath: string, enabled = true) => {

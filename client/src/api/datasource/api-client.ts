@@ -1,10 +1,18 @@
 import axios from 'axios';
 import { DataSourceClient } from './datasource-client';
 import { DataSource } from '@/api/Models';
+import { TraceabilityOrigin } from '@/utils/sigmfMetadata';
 
 export class ApiClient implements DataSourceClient {
   async sync(account: string, container: string): Promise<void> {
     await axios.put(`/api/datasources/${account}/${container}/sync`);
+  }
+  async query(queryString: string, signal: AbortSignal): Promise<TraceabilityOrigin[]> {
+    const response = await axios.get(`/api/datasources/query?${queryString}`, { signal });
+    return response.data.map((item, i) => {
+      item = Object.assign(new TraceabilityOrigin(), item);
+      return item;
+    });
   }
   async list(): Promise<DataSource[]> {
     const response = await axios.get('/api/datasources');
@@ -40,6 +48,7 @@ export class ApiClient implements DataSourceClient {
     return {
       updateMeta: true,
       sync: true,
+      query: true,
     };
   }
 }
