@@ -13,6 +13,7 @@ import { IQPlot } from './components/iq-plot';
 import { FrequencyPlot } from './components/frequency-plot';
 import { TimePlot } from './components/time-plot';
 import { Sidebar } from './components/sidebar';
+import GlobalProperties from './components/global-properties';
 
 export function DisplaySpectrogram() {
   const { spectrogramWidth, magnitudeMin, magnitudeMax, colmap, windowFunction, fftSize } = useSpectrogramContext();
@@ -113,6 +114,16 @@ export function RecordingViewPage() {
               {currentTab === Tab.Frequency && <FrequencyPlot />}
               {currentTab === Tab.IQ && <IQPlot />}
             </div>
+          </div>
+          <div className="mt-3 mb-0 px-2 py-0" style={{ margin: '5px' }}>
+            <details>
+              <summary className="pl-2 mt-2 bg-primary outline outline-1 outline-primary text-lg text-base-100 hover:bg-green-800">
+                Global Properties
+              </summary>
+              <div className="outline outline-1 outline-primary p-2">
+                <GlobalProperties />
+              </div>
+            </details>
           </div>
         </div>
       </CursorContextProvider>
