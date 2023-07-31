@@ -4,9 +4,14 @@
 
 import React, { useState, useEffect } from 'react';
 import { Layer, Rect, Text } from 'react-konva';
+import { useSpectrogramContext } from '../hooks/use-spectrogram-context';
 
-const RulerSide = (props) => {
-  let { spectrogramWidth, fftSize, sampleRate, currentRowAtTop, spectrogramHeight } = props;
+interface RulerSideProps {
+  currentRowAtTop: number;
+}
+
+const RulerSide = ({ currentRowAtTop }: RulerSideProps) => {
+  const { meta, fftSize, spectrogramHeight, spectrogramWidth } = useSpectrogramContext();
 
   const [ticks, setTicks] = useState([]);
   const [labels, setLabels] = useState([]);
@@ -14,7 +19,7 @@ const RulerSide = (props) => {
   useEffect(() => {
     // Draw the vertical scales
     let num_ticks = spectrogramHeight / 10 + 1;
-    let time_per_row = fftSize / sampleRate;
+    let time_per_row = fftSize / meta.getSampleRate();
     const temp_ticks = [];
     const temp_labels = [];
     for (let i = 0; i < num_ticks; i++) {
@@ -38,7 +43,7 @@ const RulerSide = (props) => {
     }
     setTicks(temp_ticks);
     setLabels(temp_labels);
-  }, [fftSize, sampleRate, spectrogramWidth, currentRowAtTop]); // updates when currentRowAtTop changes
+  }, [fftSize, meta.getSampleRate(), spectrogramWidth, currentRowAtTop]); // updates when currentRowAtTop changes
 
   if (ticks.length > 1) {
     return (

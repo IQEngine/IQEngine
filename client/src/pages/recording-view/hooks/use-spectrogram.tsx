@@ -4,13 +4,19 @@ import { useMemo, useState } from 'react';
 import { useSpectrogramContext } from './use-spectrogram-context';
 
 export function useSpectrogram() {
-  const { type, account, container, filePath, fftSize, spectrogramHeight, fftStepSize } = useSpectrogramContext();
-  const { data: meta, isSuccess: hasMetadata } = useMeta(type, account, container, filePath);
+  const {
+    type,
+    account,
+    container,
+    filePath,
+    fftSize,
+    spectrogramHeight,
+    fftStepSize,
+    setFFTStepSize,
+    setSpectrogramHeight,
+    meta,
+  } = useSpectrogramContext();
   const { currentData, setFFTsRequired, fftsRequired } = useGetIQData(type, account, container, filePath, fftSize);
-  // useMemo(
-  //   () => useGetIQData(type, account, container, filePath, fftSize),
-  //   [type, account, container, filePath, fftSize]
-  // );
   const totalFFTs = Math.ceil(meta?.getTotalSamples() / fftSize);
   const [currentFFT, setCurrentFFT] = useState<number>(0);
   // This is the list of ffts we display
@@ -49,11 +55,11 @@ export function useSpectrogram() {
     totalFFTs,
     currentFFT,
     setCurrentFFT,
-    hasMetadata,
     spectrogramHeight,
     displayedIQ,
-    meta,
     currentData,
     fftsRequired,
+    setFFTStepSize,
+    setSpectrogramHeight,
   };
 }

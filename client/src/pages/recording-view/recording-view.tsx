@@ -10,9 +10,21 @@ import { SpectrogramContextProvider, useSpectrogramContext } from './hooks/use-s
 import { useMeta } from '@/api/metadata/queries';
 
 export function DisplaySpectrogram() {
-  const { spectrogramWidth, magnitudeMin, magnitudeMax, colmap, windowFunction, fftSize } = useSpectrogramContext();
+  const {
+    type,
+    account,
+    container,
+    filePath,
+    spectrogramWidth,
+    magnitudeMin,
+    magnitudeMax,
+    colmap,
+    windowFunction,
+    fftSize,
+  } = useSpectrogramContext();
+  const { data: meta } = useMeta(type, account, container, filePath);
 
-  const { currentData, displayedIQ, spectrogramHeight, meta, currentFFT, setCurrentFFT } = useSpectrogram();
+  const { currentData, displayedIQ, spectrogramHeight, currentFFT, setCurrentFFT } = useSpectrogram();
 
   const { image, setIQData } = useGetImage(
     fftSize,
@@ -39,13 +51,7 @@ export function DisplaySpectrogram() {
   return (
     <>
       <Stage width={spectrogramWidth + 110} height={30}>
-        <RulerTop
-          sampleRate={meta.getSampleRate()}
-          spectrogramWidth={spectrogramWidth}
-          spectrogramWidthScale={spectrogramWidth / fftSize}
-          includeRfFreq={false}
-          coreFrequency={meta.getCenterFrequency()}
-        />
+        <RulerTop />
       </Stage>
       <div className="flex flex-row">
         <Stage width={spectrogramWidth} height={spectrogramHeight}>
@@ -54,13 +60,7 @@ export function DisplaySpectrogram() {
           </Layer>
         </Stage>
         <Stage width={50} height={spectrogramHeight} className="mr-1">
-          <RulerSide
-            spectrogramWidth={spectrogramWidth}
-            fftSize={fftSize}
-            sampleRate={meta?.getSampleRate()}
-            currentRowAtTop={currentFFT / fftSize}
-            spectrogramHeight={spectrogramHeight}
-          />
+          <RulerSide currentRowAtTop={currentFFT} />
         </Stage>
       </div>
       {currentData && (
@@ -77,9 +77,17 @@ export function DisplaySpectrogram() {
   );
 }
 
+enum Tab {
+  Spectrogram,
+  Time,
+  Frequency,
+  IQ,
+}
+
 export function RecordingViewPage() {
   const { type, account, container, filePath } = useParams();
   const { data: meta } = useMeta(type, account, container, filePath);
+  const [currentTab, setCurrentTab] = useState<Tab>(Tab.Spectrogram);
 
   if (!meta) {
     return (
@@ -93,7 +101,27 @@ export function RecordingViewPage() {
       <div className="mb-0 ml-0 mr-0 p-0 pt-3">
         <div className="p-0 ml-0 mr-0 mb-0 mt-2">
           <div className="flex flex-col pl-3">
-            <DisplaySpectrogram />
+            <div className="flex space-x-2 border-b border-primary w-full sm:pl-12 lg:pl-32" id="tabsbar">
+              {Object.keys(Tab).map((key) => {
+                if (!isNaN(Number(key))) {
+                  return null;
+                }
+                return (
+                  <div
+                    key={key}
+                    onClick={() => {
+                      setCurrentTab(Tab[key as keyof typeof Tab]);
+                    }}
+                    className={` ${
+                      currentTab === Tab[key as keyof typeof Tab] ? 'bg-primary !text-base-100' : ''
+                    } inline-block px-3 py-0 outline outline-primary outline-1 text-lg text-primary hover:text-accent hover:shadow-lg hover:shadow-accent`}
+                  >
+                    {key}
+                  </div>
+                );
+              })}
+            </div>
+            {currentTab === Tab.Spectrogram && <DisplaySpectrogram />}
           </div>
         </div>
         <div className="flex">
