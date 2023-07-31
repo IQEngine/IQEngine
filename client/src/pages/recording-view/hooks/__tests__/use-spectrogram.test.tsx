@@ -43,7 +43,7 @@ describe('test metadata fetch and fft calculation', () => {
     await waitFor(() => expect(result.current.totalFFTs).toBe(total_ffts));
   });
 
-  test('should calculate the correct ffts thhat need to be displayed', async () => {
+  test('should calculate the correct iqs that need to be displayed', async () => {
     const { wrapper, getValidMetadata } = useAllProviders();
     const metadata = getValidMetadata();
     const fftSize = 1024;
@@ -69,8 +69,8 @@ describe('test metadata fetch and fft calculation', () => {
       result.current.setSpectrogramHeight(10);
     });
 
-    await waitFor(() => expect(result.current.displayedFFTs.length).toBe(10));
-    expect(result.current.displayedFFTs).toStrictEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+    await waitFor(() => expect(result.current.fftsRequired.length).toBe(10));
+    expect(result.current.fftsRequired).toStrictEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
   });
 
   test('should calculate the correct ffts that need to be displayed when decimating', async () => {
@@ -100,15 +100,15 @@ describe('test metadata fetch and fft calculation', () => {
       result.current.setFFTStepSize(1);
     });
 
-    await waitFor(() => expect(result.current.displayedFFTs.length).toBe(10));
-    expect(result.current.displayedFFTs).toStrictEqual([0, 2, 4, 6, 8, 10, 12, 14, 16, 18]);
+    await waitFor(() => expect(result.current.fftsRequired.length).toBe(10));
+    expect(result.current.fftsRequired).toStrictEqual([0, 2, 4, 6, 8, 10, 12, 14, 16, 18]);
 
     act(() => {
       result.current.setFFTStepSize(2);
     });
 
-    await waitFor(() => expect(result.current.displayedFFTs.length).toBe(10));
-    expect(result.current.displayedFFTs).toStrictEqual([0, 3, 6, 9, 12, 15, 18, 21, 24, 27]);
+    await waitFor(() => expect(result.current.fftsRequired.length).toBe(10));
+    expect(result.current.fftsRequired).toStrictEqual([0, 3, 6, 9, 12, 15, 18, 21, 24, 27]);
   });
 
   test('should calculate the correct ffts that need to be displayed when decimating and changing height', async () => {
@@ -138,15 +138,15 @@ describe('test metadata fetch and fft calculation', () => {
       result.current.setFFTStepSize(1);
     });
 
-    await waitFor(() => expect(result.current.displayedFFTs.length).toBe(10));
-    expect(result.current.displayedFFTs).toStrictEqual([0, 2, 4, 6, 8, 10, 12, 14, 16, 18]);
+    await waitFor(() => expect(result.current.fftsRequired.length).toBe(10));
+    expect(result.current.fftsRequired).toStrictEqual([0, 2, 4, 6, 8, 10, 12, 14, 16, 18]);
 
     act(() => {
       result.current.setFFTStepSize(2);
       result.current.setSpectrogramHeight(5);
     });
 
-    await waitFor(() => expect(result.current.displayedFFTs.length).toBe(5));
-    expect(result.current.displayedFFTs).toStrictEqual([0, 3, 6, 9, 12]);
+    await waitFor(() => expect(result.current.fftsRequired.length).toBe(5));
+    expect(result.current.fftsRequired).toStrictEqual([0, 3, 6, 9, 12]);
   });
 });
