@@ -45,13 +45,6 @@ export const useQueryDataSourceMetaPaths = (type: string, account: string, conta
   );
 };
 
-export const queryMeta = (queryString: string) => {
-  return useQuery<SigMFMetadata[]>(['metadata-query', queryString], () => {
-    const apiClient = new ApiClient();
-    return apiClient.queryMeta(queryString);
-  });
-};
-
 export const getMeta = (type: string, account: string, container: string, filePath: string, enabled = true) => {
   const { dataSourcesQuery, filesQuery } = useUserSettings();
   if (!dataSourcesQuery.data || !filesQuery.data) {
