@@ -20,10 +20,7 @@ const SettingsPane = () => {
   const [localPythonSnippet, setLocalPythonSnippet] = useState(context.pythonSnippet);
   const [localTaps, setLocalTaps] = useState(JSON.stringify(context.taps));
   const [state, setState] = useState({
-    // give users an example of how it works
-    zoomLevel: 1,
     saveButtonEnabled: false,
-    colorMapName: COLORMAP_DEFAULT,
   });
 
   const onChangeWindowFunction = (event) => {
@@ -104,11 +101,14 @@ const SettingsPane = () => {
         <input
           type="range"
           className="range range-xs range-primary"
-          value={state.zoomLevel}
+          value={context.fftStepSize + 1}
           min={1}
           max={10}
           step={1}
-          onChange={onChangeZoomLevel}
+          onChange={(e) => {
+            const newZoomLevel = parseInt(e.target.value);
+            context.setFFTStepSize(newZoomLevel - 1);
+          }}
         />
       </label>
 
@@ -171,7 +171,7 @@ const SettingsPane = () => {
                   context.setColmap(e.currentTarget.dataset.value);
                 }}
               >
-                {state.colorMapName === value ? <a className="bg-primary">{value}</a> : <a>{value}</a>}
+                {context.colmap === value ? <a className="bg-primary">{value}</a> : <a>{value}</a>}
               </li>
             ))}
           </ul>
