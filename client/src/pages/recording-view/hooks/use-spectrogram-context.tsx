@@ -1,6 +1,7 @@
 import { useMeta } from '@/api/metadata/queries';
+import { INITIAL_PYTHON_SNIPPET } from '@/utils/constants';
 import { SigMFMetadata } from '@/utils/sigmfMetadata';
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 
 interface SpectrogramContextProperties {
   type: string;
@@ -25,7 +26,14 @@ interface SpectrogramContextProperties {
   setFFTStepSize: (fftStepSize: number) => void;
   includeRfFreq: boolean;
   setIncludeRfFreq: (includeRfFreq: boolean) => void;
+  taps: number[];
+  setTaps: (taps: number[]) => void;
+  pythonSnippet: string;
+  setPythonSnippet: (pythonSnippet: string) => void;
   meta: SigMFMetadata;
+  setMeta: (meta: SigMFMetadata) => void;
+  canDownload: boolean;
+  setCanDownload: (canDownload: boolean) => void;
 }
 
 export const SpectrogramContext = createContext<SpectrogramContextProperties>(null);
@@ -56,8 +64,14 @@ export function SpectrogramContextProvider({
   const [spectrogramWidth, setSpectrogramWidth] = useState<number>(seedValues.spectrogramWidth);
   const [fftStepSize, setFFTStepSize] = useState<number>(seedValues.fftStepSize);
   const [includeRfFreq, setIncludeRfFreq] = useState<boolean>(false);
-  const { data: meta } = useMeta(type, account, container, filePath);
-
+  const [taps, setTaps] = useState<number[]>([1]);
+  const [pythonSnippet, setPythonSnippet] = useState<string>(INITIAL_PYTHON_SNIPPET);
+  const { data: originMeta } = useMeta(type, account, container, filePath);
+  const [meta, setMeta] = useState<SigMFMetadata>(originMeta);
+  const [canDownload, setCanDownload] = useState<boolean>(false);
+  useEffect(() => {
+    setMeta(originMeta);
+  }, [originMeta]);
   return (
     <SpectrogramContext.Provider
       value={{
@@ -83,7 +97,14 @@ export function SpectrogramContextProvider({
         setFFTStepSize,
         includeRfFreq,
         setIncludeRfFreq,
+        taps,
+        setTaps,
+        pythonSnippet,
+        setPythonSnippet,
         meta,
+        setMeta,
+        canDownload,
+        setCanDownload,
       }}
     >
       {children}
