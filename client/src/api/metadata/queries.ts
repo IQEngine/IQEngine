@@ -1,8 +1,7 @@
 import { SigMFMetadata } from '@/utils/sigmfMetadata';
 import { MetadataClientFactory } from './metadata-client-factory';
-import { QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { MetadataClient } from './metadata-client';
-import { ApiClient } from './api-client';
 import { useUserSettings } from '@/api/user-settings/use-user-settings';
 
 export const fetchMeta = async (
