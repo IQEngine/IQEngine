@@ -5,6 +5,7 @@ import { useSpectrogram } from '@/pages/recording-view/hooks/use-spectrogram';
 import { act } from 'react-dom/test-utils';
 import { SpectrogramContextProvider } from '@/pages/recording-view/hooks/use-spectrogram-context';
 import React from 'react';
+import { TraceabilityOrigin } from '@/utils/sigmfMetadata';
 
 function getDefaultSeedValues() {
   return {
@@ -17,6 +18,35 @@ function getDefaultSeedValues() {
     spectrogramHeight: 800,
     fftStepSize: 0,
   };
+}
+
+function createTestWrapper(
+  origin: TraceabilityOrigin,
+  seed: {
+    spectrogramWidth: number;
+    magnitudeMin: number;
+    magnitudeMax: number;
+    colmap: string;
+    windowFunction: string;
+    fftSize: number;
+    spectrogramHeight: number;
+    fftStepSize: number;
+  },
+  children: React.ReactElement<any, string | React.JSXElementConstructor<any>>
+): React.ReactNode {
+  return (
+    <AllProviders>
+      <SpectrogramContextProvider
+        type={origin.type}
+        account={origin.account}
+        container={origin.container}
+        filePath={origin.file_path}
+        seedValues={seed}
+      >
+        {children}
+      </SpectrogramContextProvider>
+    </AllProviders>
+  );
 }
 
 describe('test metadata fetch and fft calculation', () => {
@@ -46,19 +76,7 @@ describe('test metadata fetch and fft calculation', () => {
     seed.fftSize = fftSize;
 
     const { result } = renderHook(() => useSpectrogram(), {
-      wrapper: ({ children }) => (
-        <AllProviders>
-          <SpectrogramContextProvider
-            type={origin.type}
-            account={origin.account}
-            container={origin.container}
-            filePath={origin.file_path}
-            seedValues={seed}
-          >
-            {children}
-          </SpectrogramContextProvider>
-        </AllProviders>
-      ),
+      wrapper: ({ children }) => createTestWrapper(origin, seed, children),
     });
     await waitFor(() => expect(result.current.totalFFTs).toBe(total_ffts));
   });
@@ -77,19 +95,7 @@ describe('test metadata fetch and fft calculation', () => {
     seed.fftSize = fftSize;
     seed.spectrogramHeight = 10;
     const { result } = renderHook(() => useSpectrogram(), {
-      wrapper: ({ children }) => (
-        <AllProviders>
-          <SpectrogramContextProvider
-            type={origin.type}
-            account={origin.account}
-            container={origin.container}
-            filePath={origin.file_path}
-            seedValues={seed}
-          >
-            {children}
-          </SpectrogramContextProvider>
-        </AllProviders>
-      ),
+      wrapper: ({ children }) => createTestWrapper(origin, seed, children),
     });
 
     await waitFor(() => expect(result.current.fftsRequired.length).toBe(10));
@@ -111,19 +117,7 @@ describe('test metadata fetch and fft calculation', () => {
     seed.spectrogramHeight = 10;
     seed.fftStepSize = 1;
     const { result } = renderHook(() => useSpectrogram(), {
-      wrapper: ({ children }) => (
-        <AllProviders>
-          <SpectrogramContextProvider
-            type={origin.type}
-            account={origin.account}
-            container={origin.container}
-            filePath={origin.file_path}
-            seedValues={seed}
-          >
-            {children}
-          </SpectrogramContextProvider>
-        </AllProviders>
-      ),
+      wrapper: ({ children }) => createTestWrapper(origin, seed, children),
     });
 
     await waitFor(() => expect(result.current.fftsRequired.length).toBe(10));
@@ -152,19 +146,7 @@ describe('test metadata fetch and fft calculation', () => {
     seed.spectrogramHeight = 10;
     seed.fftStepSize = 1;
     const { result } = renderHook(() => useSpectrogram(), {
-      wrapper: ({ children }) => (
-        <AllProviders>
-          <SpectrogramContextProvider
-            type={origin.type}
-            account={origin.account}
-            container={origin.container}
-            filePath={origin.file_path}
-            seedValues={seed}
-          >
-            {children}
-          </SpectrogramContextProvider>
-        </AllProviders>
-      ),
+      wrapper: ({ children }) => createTestWrapper(origin, seed, children),
     });
 
     await waitFor(() => expect(result.current.fftsRequired.length).toBe(10));
