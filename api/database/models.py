@@ -11,6 +11,8 @@ class DataSource(BaseModel):
     description: Optional[str] = None
     imageURL: Optional[str] = None
     sasToken: Optional[SecretStr] = None
+    members: Optional[List[str]] = []
+    public: Optional[bool] = False
 
 
 class DataSourceReference(BaseModel):

@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import List, Optional
+from helpers.authorization import check_access
 
 from blob.azure_client import AzureBlobClient
 from database import datasource_repo, metadata_repo
@@ -74,9 +75,14 @@ async def get_all_meta_name(
     response_model=Metadata,
 )
 async def get_meta(
+    account: str,
+    container: str,
     metadata: Metadata = Depends(metadata_repo.get),
     current_user: Optional[dict] = Depends(required_roles()),
 ):
+    roles = current_user.get("roles", [])
+    if await check_access(account, container, roles) is False:
+        raise HTTPException(status_code=403, detail="Not enough privileges")
     if not metadata:
         raise HTTPException(status_code=404, detail="Metadata not found")
     return metadata

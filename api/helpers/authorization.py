@@ -12,6 +12,8 @@ from fastapi import Depends, HTTPException, status, Header, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jwt import algorithms
 
+from database import datasource_repo
+
 
 class OptionalHTTPBearer(HTTPBearer):
     async def __call__(
@@ -165,6 +167,12 @@ def required_roles(
 
     return _check_roles
 
+
+async def check_access(account: str, container: str, roles: list[str]=None) -> bool:
+    if not roles:
+        roles = []
+    access_granted = await datasource_repo.access_request(account, container, roles)
+    return access_granted
 
 # Example usage
 # @app.get("/some-endpoint")

@@ -124,3 +124,29 @@ async def create(datasource: DataSource) -> DataSource:
     datasource_dict = datasource.dict(by_alias=True, exclude_unset=True)
     await datasource_collection.insert_one(datasource_dict)
     return datasource
+
+
+async def access_request(account, container, roles) -> bool:
+    """
+    Access check for a datasource by account and container using roles from a JWT claim.
+
+    Parameters
+    ----------
+    account : str
+        The account name.
+    container : str
+        The container name.
+    roles : List[str]
+        The roles from the JWT claim.
+
+    Returns
+    -------
+    bool
+    """
+    if not roles:
+        roles = []
+    data_source = await get(account, container)
+    if data_source:
+        if data_source.public or any(role in data_source.members for role in roles):
+            return True
+    return False
