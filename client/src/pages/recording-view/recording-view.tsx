@@ -10,9 +10,21 @@ import { SpectrogramContextProvider, useSpectrogramContext } from './hooks/use-s
 import { useMeta } from '@/api/metadata/queries';
 
 export function DisplaySpectrogram() {
-  const { spectrogramWidth, magnitudeMin, magnitudeMax, colmap, windowFunction, fftSize } = useSpectrogramContext();
+  const {
+    type,
+    account,
+    container,
+    filePath,
+    spectrogramWidth,
+    magnitudeMin,
+    magnitudeMax,
+    colmap,
+    windowFunction,
+    fftSize,
+  } = useSpectrogramContext();
+  const { data: meta } = useMeta(type, account, container, filePath);
 
-  const { currentData, displayedIQ, spectrogramHeight, meta, currentFFT, setCurrentFFT } = useSpectrogram();
+  const { currentData, displayedIQ, spectrogramHeight, currentFFT, setCurrentFFT } = useSpectrogram();
 
   const { image, setIQData } = useGetImage(
     fftSize,

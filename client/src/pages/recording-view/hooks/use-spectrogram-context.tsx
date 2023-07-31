@@ -25,15 +25,31 @@ interface SpectrogramContextProperties {
 
 export const SpectrogramContext = createContext<SpectrogramContextProperties>(null);
 
-export function SpectrogramContextProvider({ children, type, account, container, filePath }) {
-  const [magnitudeMin, setMagnitudeMin] = useState<number>(-100);
-  const [magnitudeMax, setMagnitudeMax] = useState<number>(50);
-  const [colmap, setColmap] = useState<string>('viridis');
-  const [windowFunction, setWindowFunction] = useState<string>('hann');
-  const [fftSize, setFFTSize] = useState<number>(1024);
-  const [spectrogramHeight, setSpectrogramHeight] = useState<number>(800);
-  const [spectrogramWidth, setSpectrogramWidth] = useState<number>(1024);
-  const [fftStepSize, setFFTStepSize] = useState<number>(0);
+export function SpectrogramContextProvider({
+  children,
+  type,
+  account,
+  container,
+  filePath,
+  seedValues = {
+    magnitudeMin: -100,
+    magnitudeMax: 50,
+    colmap: 'viridis',
+    windowFunction: 'hann',
+    fftSize: 1024,
+    spectrogramHeight: 800,
+    spectrogramWidth: 1024,
+    fftStepSize: 0,
+  },
+}) {
+  const [magnitudeMin, setMagnitudeMin] = useState<number>(seedValues.magnitudeMin);
+  const [magnitudeMax, setMagnitudeMax] = useState<number>(seedValues.magnitudeMax);
+  const [colmap, setColmap] = useState<string>(seedValues.colmap);
+  const [windowFunction, setWindowFunction] = useState<string>(seedValues.windowFunction);
+  const [fftSize, setFFTSize] = useState<number>(seedValues.fftSize);
+  const [spectrogramHeight, setSpectrogramHeight] = useState<number>(seedValues.spectrogramHeight);
+  const [spectrogramWidth, setSpectrogramWidth] = useState<number>(seedValues.spectrogramWidth);
+  const [fftStepSize, setFFTStepSize] = useState<number>(seedValues.fftStepSize);
 
   return (
     <SpectrogramContext.Provider
