@@ -4,31 +4,32 @@
 
 import Plot from 'react-plotly.js';
 import React, { useEffect, useState } from 'react';
+import { fftshift } from 'fftshift';
 import { template } from '@/utils/plotlyTemplate';
+import { FFT } from '@/utils/fft';
 import { useCursorContext } from '../hooks/use-cursor-context';
 
-export const IQPlot = (props) => {
+export const FrequencyPlot = (props) => {
   let { plotWidth, plotHeight } = props;
   const { cursorData } = useCursorContext();
-  const [I, setI] = useState<Float32Array>();
-  const [Q, setQ] = useState<Float32Array>();
+  const [magnitudes, setMagnitudes] = useState();
 
   useEffect(() => {
+    console.log('cursorData', cursorData);
     if (cursorData && cursorData.length > 0) {
-      // For now just show the first 1000 IQ samples, else it's too busy
-      const tempCurrentSamples = cursorData.slice(0, 2000);
-
-      setI(
-        tempCurrentSamples.filter((element, index) => {
-          return index % 2 === 0;
-        })
-      );
-
-      setQ(
-        tempCurrentSamples.filter((element, index) => {
-          return index % 2 === 1;
-        })
-      );
+      // Calc PSD
+      const fftSize = Math.pow(2, Math.floor(Math.log2(cursorData.length / 2)));
+      const f = new FFT(fftSize);
+      let out = f.createComplexArray(); // creates an empty array the length of fft.size*2
+      f.transform(out, cursorData.slice(0, fftSize * 2)); // assumes input (2nd arg) is in form IQIQIQIQ and twice the length of fft.size
+      out = out.map((x) => x / fftSize);
+      let mags = new Array(out.length / 2);
+      for (let j = 0; j < out.length / 2; j++) {
+        mags[j] = Math.sqrt(Math.pow(out[j * 2], 2) + Math.pow(out[j * 2 + 1], 2)); // take magnitude
+      }
+      fftshift(mags); // in-place
+      mags = mags.map((x) => 10.0 * Math.log10(x));
+      setMagnitudes(mags);
     }
   }, [cursorData]); // TODO make sure this isnt going to be sluggish when currentSamples is huge
 
@@ -45,10 +46,8 @@ export const IQPlot = (props) => {
       <Plot
         data={[
           {
-            x: I,
-            y: Q,
+            y: magnitudes,
             type: 'scatter',
-            mode: 'markers',
           },
         ]}
         layout={{
@@ -57,10 +56,13 @@ export const IQPlot = (props) => {
           dragmode: 'pan',
           template: template,
           xaxis: {
-            title: 'I',
+            title: 'Frequency',
+            //range: [0, 100],
+            rangeslider: { range: [0, 100] },
           },
           yaxis: {
-            title: 'Q',
+            title: 'Magnitude',
+            fixedrange: false,
           },
         }}
         config={{

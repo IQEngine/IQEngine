@@ -7,7 +7,7 @@ import React, { useEffect, useState } from 'react';
 import { template } from '@/utils/plotlyTemplate';
 import { useCursorContext } from '../hooks/use-cursor-context';
 
-export const IQPlot = (props) => {
+export const TimePlot = (props) => {
   let { plotWidth, plotHeight } = props;
   const { cursorData } = useCursorContext();
   const [I, setI] = useState<Float32Array>();
@@ -15,17 +15,14 @@ export const IQPlot = (props) => {
 
   useEffect(() => {
     if (cursorData && cursorData.length > 0) {
-      // For now just show the first 1000 IQ samples, else it's too busy
-      const tempCurrentSamples = cursorData.slice(0, 2000);
-
       setI(
-        tempCurrentSamples.filter((element, index) => {
+        cursorData.filter((element, index) => {
           return index % 2 === 0;
         })
       );
 
       setQ(
-        tempCurrentSamples.filter((element, index) => {
+        cursorData.filter((element, index) => {
           return index % 2 === 1;
         })
       );
@@ -45,22 +42,29 @@ export const IQPlot = (props) => {
       <Plot
         data={[
           {
-            x: I,
+            y: I,
+            type: 'scatter',
+            name: 'I',
+          },
+          {
             y: Q,
             type: 'scatter',
-            mode: 'markers',
+            name: 'Q',
           },
         ]}
         layout={{
           width: plotWidth,
           height: plotHeight,
           dragmode: 'pan',
+          showlegend: true,
           template: template,
           xaxis: {
-            title: 'I',
+            title: 'Time',
+            rangeslider: { range: [0, 1000] },
           },
           yaxis: {
-            title: 'Q',
+            title: 'Samples',
+            fixedrange: true,
           },
         }}
         config={{

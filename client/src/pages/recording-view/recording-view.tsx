@@ -7,7 +7,11 @@ import { KonvaEventObject } from 'konva/lib/Node';
 import { RulerTop } from './components/ruler-top';
 import { RulerSide } from './components/ruler-side';
 import { SpectrogramContextProvider, useSpectrogramContext } from './hooks/use-spectrogram-context';
+import { CursorContextProvider } from './hooks/use-cursor-context';
 import { useMeta } from '@/api/metadata/queries';
+import { IQPlot } from './components/iq-plot';
+import { FrequencyPlot } from './components/frequency-plot';
+import { TimePlot } from './components/time-plot';
 
 export function DisplaySpectrogram() {
   const {
@@ -77,6 +81,10 @@ export function DisplaySpectrogram() {
   );
 }
 
+export function DisplayTime() {
+  return <div></div>;
+}
+
 enum Tab {
   Spectrogram,
   Time,
@@ -88,6 +96,7 @@ export function RecordingViewPage() {
   const { type, account, container, filePath } = useParams();
   const { data: meta } = useMeta(type, account, container, filePath);
   const [currentTab, setCurrentTab] = useState<Tab>(Tab.Spectrogram);
+  const Tabs = Object.keys(Tab).filter((key) => isNaN(Number(key)));
 
   if (!meta) {
     return (
@@ -98,42 +107,44 @@ export function RecordingViewPage() {
   }
   return (
     <SpectrogramContextProvider type={type} account={account} container={container} filePath={filePath}>
-      <div className="mb-0 ml-0 mr-0 p-0 pt-3">
-        <div className="p-0 ml-0 mr-0 mb-0 mt-2">
-          <div className="flex flex-col pl-3">
-            <div className="flex space-x-2 border-b border-primary w-full sm:pl-12 lg:pl-32" id="tabsbar">
-              {Object.keys(Tab).map((key) => {
-                if (!isNaN(Number(key))) {
-                  return null;
-                }
-                return (
-                  <div
-                    key={key}
-                    onClick={() => {
-                      setCurrentTab(Tab[key as keyof typeof Tab]);
-                    }}
-                    className={` ${
-                      currentTab === Tab[key as keyof typeof Tab] ? 'bg-primary !text-base-100' : ''
-                    } inline-block px-3 py-0 outline outline-primary outline-1 text-lg text-primary hover:text-accent hover:shadow-lg hover:shadow-accent`}
-                  >
-                    {key}
-                  </div>
-                );
-              })}
+      <CursorContextProvider>
+        <div className="mb-0 ml-0 mr-0 p-0 pt-3">
+          <div className="p-0 ml-0 mr-0 mb-0 mt-2">
+            <div className="flex flex-col pl-3">
+              <div className="flex space-x-2 border-b border-primary w-full sm:pl-12 lg:pl-32" id="tabsbar">
+                {Tabs.map((key) => {
+                  return (
+                    <div
+                      key={key}
+                      onClick={() => {
+                        setCurrentTab(Tab[key as keyof typeof Tab]);
+                      }}
+                      className={` ${
+                        currentTab === Tab[key as keyof typeof Tab] ? 'bg-primary !text-base-100' : ''
+                      } inline-block px-3 py-0 outline outline-primary outline-1 text-lg text-primary hover:text-accent hover:shadow-lg hover:shadow-accent`}
+                    >
+                      {key}
+                    </div>
+                  );
+                })}
+              </div>
+              {currentTab === Tab.Spectrogram && <DisplaySpectrogram />}
+              {currentTab === Tab.Time && <TimePlot />}
+              {currentTab === Tab.Frequency && <FrequencyPlot />}
+              {currentTab === Tab.IQ && <IQPlot />}
             </div>
-            {currentTab === Tab.Spectrogram && <DisplaySpectrogram />}
+          </div>
+          <div className="flex">
+            {meta && (
+              <div>
+                <h2>Metadata</h2>
+                <div>Sample Rate: {meta.getSampleRate()}</div>
+                <div>Number of Samples: {meta.getTotalSamples()}</div>
+              </div>
+            )}
           </div>
         </div>
-        <div className="flex">
-          {meta && (
-            <div>
-              <h2>Metadata</h2>
-              <div>Sample Rate: {meta.getSampleRate()}</div>
-              <div>Number of Samples: {meta.getTotalSamples()}</div>
-            </div>
-          )}
-        </div>
-      </div>
+      </CursorContextProvider>
     </SpectrogramContextProvider>
   );
 }
