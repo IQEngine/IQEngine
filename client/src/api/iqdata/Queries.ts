@@ -141,16 +141,9 @@ export const useCurrentCachedIQDataSlice = (meta: SigMFMetadata, tileSize: numbe
   };
 };
 
-export function useGetIQData(
-  type: string,
-  account: string,
-  container: string,
-  filePath: string,
-  defaultFFTSize: number = 1024
-) {
+export function useGetIQData(type: string, account: string, container: string, filePath: string, fftSize: number) {
   const queryClient = useQueryClient();
   const { filesQuery, dataSourcesQuery } = useUserSettings();
-  const [fftSize, setFFTSize] = useState<number>(defaultFFTSize);
   const [fftsRequired, setFFTsRequired] = useState<number[]>([]);
 
   const { data: meta } = useMeta(type, account, container, filePath);
@@ -202,7 +195,6 @@ export function useGetIQData(
   }, [fftSize, meta, iqData]);
   return {
     fftSize,
-    setFFTSize,
     currentData,
     fftsRequired,
     setFFTsRequired,
