@@ -110,7 +110,7 @@ export const GeoQuery = ({ queryName, description, validator, handleQueryValid, 
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
-            {renderTrack()}
+            {trackData.length > 0  &&  <Polyline pathOptions={{color: 'red'}} positions={trackData} />}
             <LayerGroup>
               <Circle center={position} pathOptions={fillBlueOptions} radius={radius} />
             </LayerGroup>
