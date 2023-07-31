@@ -20,7 +20,7 @@ test('Confirm api datasource @CICompatible', async ({ page }) => {
   await page.goto('/');
 
   // api data source
-  await page.locator('[id="(API)TestAPIDataSource"]').click();
+  await page.locator('[id="(API)TestAPIDataSource"]').first().click();
   await page.locator('[id="IQEngineLogo"]').click();
 });
 

@@ -122,7 +122,7 @@ export function useRouter() {
         {
           index: true,
           async lazy() {
-            let { RepoBrowser } = await import('@/pages/repo-browser/RepoBrowser');
+            let { RepoBrowser } = await import('@/pages/repo-browser/repo-browser');
             return { Component: RepoBrowser };
           },
         },

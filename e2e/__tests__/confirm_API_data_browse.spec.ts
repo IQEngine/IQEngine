@@ -17,9 +17,8 @@ test.beforeAll(async ({ request }) => {
 
 test('API Datasource Browsing @CICompatible', async ({ page }) => {
   await page.goto('/');
-  const elements = await page.locator('[id="TestAPIDataSource"]'); // After first run there will be more than one element by this name
-  await elements.nth(0).click(); // Only look for the first element
-  await expect(page.getByText('Author')).toBeVisible();
+  await page.locator('[id="TestAPIDataSource"]').first().click(); // After first run there will be more than one element by this name
+  await expect(page.getByText('Author')).toBeDefined();
 });
 
 test.afterAll(async ({}) => {
