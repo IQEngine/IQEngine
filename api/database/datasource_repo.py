@@ -1,3 +1,5 @@
+from fastapi import Depends
+from helpers.authorization import get_current_user
 import database.metadata_repo
 from blob.azure_client import AzureBlobClient
 from database.database import db
@@ -12,7 +14,34 @@ def collection() -> AgnosticCollection:
     return collection
 
 
-async def get(account, container) -> DataSource | None:
+async def check_access(account: str, container: str, user = Depends(get_current_user)) -> bool:
+    """
+    Access check for a datasource by account and container using roles from a JWT claim.
+
+    Parameters
+    ----------
+    account : str
+        The account name.
+    container : str
+        The container name.
+    roles : List[str]
+        The roles from the JWT claim.
+
+    Returns
+    -------
+    bool
+    """
+    roles = user.get("roles", [])
+    if isinstance(roles, str):
+        roles = [roles]
+    data_source = await get(account, container)
+    if data_source:
+        if data_source.public or any(role in data_source.members for role in roles):
+            return True
+    return False
+
+
+async def get(account, container, access_allowed=Depends(check_access)) -> DataSource | None:
     """
     Get a datasource by account and container
 
@@ -28,7 +57,9 @@ async def get(account, container) -> DataSource | None:
     DataSource
         The datasource.
     """
-
+    if access_allowed is False:
+        return None
+    
     datasource_collection: AgnosticCollection = collection()
     datasource = await datasource_collection.find_one(
         {"account": account, "container": container}
@@ -124,29 +155,3 @@ async def create(datasource: DataSource) -> DataSource:
     datasource_dict = datasource.dict(by_alias=True, exclude_unset=True)
     await datasource_collection.insert_one(datasource_dict)
     return datasource
-
-
-async def access_request(account, container, roles) -> bool:
-    """
-    Access check for a datasource by account and container using roles from a JWT claim.
-
-    Parameters
-    ----------
-    account : str
-        The account name.
-    container : str
-        The container name.
-    roles : List[str]
-        The roles from the JWT claim.
-
-    Returns
-    -------
-    bool
-    """
-    if not roles:
-        roles = []
-    data_source = await get(account, container)
-    if data_source:
-        if data_source.public or any(role in data_source.members for role in roles):
-            return True
-    return False

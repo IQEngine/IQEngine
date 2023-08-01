@@ -1,5 +1,8 @@
 from typing import List, Dict, Any, Optional
 from datetime import datetime
+
+from fastapi import Depends
+from database.datasource_repo import check_access
 from database.database import db
 from database.models import Metadata, DataSourceReference
 from motor.core import AgnosticCollection
@@ -15,7 +18,7 @@ def versions_collection() -> AgnosticCollection:
     return collection
 
 
-async def get(account, container, filepath) -> Metadata | None:
+async def get(account, container, filepath, access_allowed=Depends(check_access)) -> Metadata | None:
     """
     Get a metadata by account, container and filepath
 
@@ -33,6 +36,9 @@ async def get(account, container, filepath) -> Metadata | None:
     Metadata
         The Sigmf metadata.
     """
+    if access_allowed is False:
+        return None
+    
     metadata_collection: AgnosticCollection = collection()
     metadata = await metadata_collection.find_one(
         {
@@ -46,7 +52,7 @@ async def get(account, container, filepath) -> Metadata | None:
     return Metadata(**metadata)
 
 
-async def exists(account, container, filepath) -> bool:
+async def exists(account, container, filepath, access_allowed=Depends(check_access)) -> bool:
     """
     Check if a metadata exists by account, container and filepath
 
@@ -64,6 +70,9 @@ async def exists(account, container, filepath) -> bool:
     bool
         True if the metadata exists, False otherwise.
     """
+    if access_allowed is False:
+        return False
+
     metadata_collection: AgnosticCollection = collection()
     metadata = await metadata_collection.find_one(
         {

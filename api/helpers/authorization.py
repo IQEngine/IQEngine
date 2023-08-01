@@ -129,8 +129,9 @@ def get_current_user(
 
 
 def required_roles(
-    roles: Optional[Union[str, List[str]]] = None
+    roles: Optional[Union[str, List[str]]] = None,
 ) -> Callable[[Optional[dict]], Optional[dict]]:
+    
     if roles is None:
         # If roles are None, return the original dependency function without any role check
         return get_current_user
@@ -167,12 +168,6 @@ def required_roles(
 
     return _check_roles
 
-
-async def check_access(account: str, container: str, roles: list[str]=None) -> bool:
-    if not roles:
-        roles = []
-    access_granted = await datasource_repo.access_request(account, container, roles)
-    return access_granted
 
 # Example usage
 # @app.get("/some-endpoint")

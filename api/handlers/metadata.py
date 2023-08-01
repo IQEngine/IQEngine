@@ -1,10 +1,8 @@
 from datetime import datetime
 from typing import List, Optional
-from helpers.authorization import check_access
-
 from blob.azure_client import AzureBlobClient
 from database import datasource_repo, metadata_repo
-from database.metadata_repo import InvalidGeolocationFormat, query_metadata
+from database.metadata_repo import InvalidGeolocationFormat, query_metadata, check_access
 from database.models import DataSource, DataSourceReference, Metadata, TrackMetadata
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Response
 from fastapi.responses import StreamingResponse
@@ -26,9 +24,12 @@ async def get_all_meta(
     container,
     metadatas: AgnosticCollection = Depends(metadata_repo.collection),
     current_user: Optional[dict] = Depends(required_roles()),
+    access_allowed=Depends(check_access),
 ):
-    # TODO: Should we validate datasource_id?
 
+    if access_allowed is False:
+        return []
+    
     # Return all metadata for this datasource, could be an empty
     # list
     metadata = metadatas.find(
@@ -53,7 +54,11 @@ async def get_all_meta_name(
     container,
     metadata_source: AgnosticCollection = Depends(metadata_repo.collection),
     current_user: Optional[dict] = Depends(required_roles()),
+    access_allowed=Depends(check_access),
 ):
+    if access_allowed is False:
+        return []
+
     metadata = metadata_source.find(
         {
             "global.traceability:origin.account": account,
@@ -75,14 +80,10 @@ async def get_all_meta_name(
     response_model=Metadata,
 )
 async def get_meta(
-    account: str,
-    container: str,
     metadata: Metadata = Depends(metadata_repo.get),
     current_user: Optional[dict] = Depends(required_roles()),
 ):
-    roles = current_user.get("roles", [])
-    if await check_access(account, container, roles) is False:
-        raise HTTPException(status_code=403, detail="Not enough privileges")
+    
     if not metadata:
         raise HTTPException(status_code=404, detail="Metadata not found")
     return metadata
@@ -187,6 +188,11 @@ async def query_meta(
             max_datetime=max_datetime,
             text=text,
         )
+
+        # Process result to remove metadata from unauthorized datasources
+        for item in result:
+            if not check_access(item["account"], item["container"]):
+                result.remove(item)
         return result
 
     except InvalidGeolocationFormat as e:
@@ -258,7 +264,11 @@ async def update_meta(
     metadatas: AgnosticCollection = Depends(metadata_repo.collection),
     versions: AgnosticCollection = Depends(metadata_repo.versions_collection),
     current_user: Optional[dict] = Depends(required_roles()),
+    access_allowed=Depends(check_access),
 ):
+    if access_allowed is False:
+        raise HTTPException(status_code=403, detail="Not enough privileges")
+    
     current = await metadatas.find_one(
         {
             "global.traceability:origin.account": account,
