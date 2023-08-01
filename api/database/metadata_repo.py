@@ -2,7 +2,7 @@ from typing import List, Dict, Any, Optional
 from datetime import datetime
 
 from fastapi import Depends
-from database.datasource_repo import check_access
+from helpers.authorization import check_access
 from database.database import db
 from database.models import Metadata, DataSourceReference
 from motor.core import AgnosticCollection

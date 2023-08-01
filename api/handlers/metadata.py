@@ -2,11 +2,11 @@ from datetime import datetime
 from typing import List, Optional
 from blob.azure_client import AzureBlobClient
 from database import datasource_repo, metadata_repo
-from database.metadata_repo import InvalidGeolocationFormat, query_metadata, check_access
+from database.metadata_repo import InvalidGeolocationFormat, query_metadata
 from database.models import DataSource, DataSourceReference, Metadata, TrackMetadata
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Response
 from fastapi.responses import StreamingResponse
-from helpers.authorization import required_roles
+from helpers.authorization import required_roles, check_access
 from helpers.cipher import decrypt
 from helpers.urlmapping import ApiType, get_content_type, get_file_name
 from motor.core import AgnosticCollection

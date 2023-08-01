@@ -1,5 +1,5 @@
 from fastapi import Depends
-from helpers.authorization import get_current_user
+from helpers.authorization import check_access
 import database.metadata_repo
 from blob.azure_client import AzureBlobClient
 from database.database import db
@@ -12,33 +12,6 @@ from rf.samples import get_bytes_per_iq_sample
 def collection() -> AgnosticCollection:
     collection: AgnosticCollection = db().datasources
     return collection
-
-
-async def check_access(account: str, container: str, user = Depends(get_current_user)) -> bool:
-    """
-    Access check for a datasource by account and container using roles from a JWT claim.
-
-    Parameters
-    ----------
-    account : str
-        The account name.
-    container : str
-        The container name.
-    roles : List[str]
-        The roles from the JWT claim.
-
-    Returns
-    -------
-    bool
-    """
-    roles = user.get("roles", [])
-    if isinstance(roles, str):
-        roles = [roles]
-    data_source = await get(account, container)
-    if data_source:
-        if data_source.public or any(role in data_source.members for role in roles):
-            return True
-    return False
 
 
 async def get(account, container, access_allowed=Depends(check_access)) -> DataSource | None:

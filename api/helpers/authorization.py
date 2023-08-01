@@ -169,6 +169,33 @@ def required_roles(
     return _check_roles
 
 
+async def check_access(account: str, container: str, user = Depends(get_current_user)) -> bool:
+    """
+    Access check for a datasource by account and container using roles from a JWT claim.
+
+    Parameters
+    ----------
+    account : str
+        The account name.
+    container : str
+        The container name.
+    roles : List[str]
+        The roles from the JWT claim.
+
+    Returns
+    -------
+    bool
+    """
+    roles = user.get("roles", [])
+    if isinstance(roles, str):
+        roles = [roles]
+    data_source = await datasource_repo.get(account, container)
+    if data_source:
+        if data_source.public or any(role in data_source.members for role in roles):
+            return True
+    return False
+
+
 # Example usage
 # @app.get("/some-endpoint")
 # def read_items(test:str, dependencies=[Depends(required_roles("IQEngine-User"))]):
