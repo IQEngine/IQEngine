@@ -16,6 +16,7 @@ import { Sidebar } from './components/sidebar';
 import GlobalProperties from './components/global-properties';
 import MetaViewer from './components/meta-viewer';
 import MetaRaw from './components/meta-raw';
+import AnnotationList from './components/annotation/annotation-list';
 
 export function DisplaySpectrogram() {
   const { spectrogramWidth, magnitudeMin, magnitudeMax, colmap, windowFunction, fftSize } = useSpectrogramContext();
@@ -88,6 +89,7 @@ export function RecordingViewPage() {
   const { type, account, container, filePath } = useParams();
   const { data: meta } = useMeta(type, account, container, filePath);
   const [currentTab, setCurrentTab] = useState<Tab>(Tab.Spectrogram);
+  const [currentFFT, setCurrentFFT] = useState<number>(0);
   const Tabs = Object.keys(Tab).filter((key) => isNaN(Number(key)));
 
   if (!meta) {
@@ -129,6 +131,15 @@ export function RecordingViewPage() {
             </div>
           </div>
           <div className="mt-3 mb-0 px-2 py-0" style={{ margin: '5px' }}>
+            <details>
+              <summary className="pl-2 mt-2 bg-primary outline outline-1 outline-primary text-lg text-base-100 hover:bg-green-800">
+                Annotations
+              </summary>
+              <div className="outline outline-1 outline-primary p-2">
+                <AnnotationList setCurrentFFT={setCurrentFFT} currentFFT={currentFFT} />
+              </div>
+            </details>
+
             <details>
               <summary className="pl-2 mt-2 bg-primary outline outline-1 outline-primary text-lg text-base-100 hover:bg-green-800">
                 Global Properties
