@@ -13,6 +13,8 @@ describe('GlobalProperties component', () => {
   const { getValidMetadata, wrapper: Wrapper } = useAllProviders();
 
   beforeAll(() => {
+    nock.cleanAll();
+    
     nock('http://localhost:3000').get('/api/config').reply(200, {
       uploadPageBlobSasUrl: 'NOT A VALID SAS URL',
       internalBranding: false,

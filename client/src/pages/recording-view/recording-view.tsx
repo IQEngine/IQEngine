@@ -18,10 +18,15 @@ import MetaViewer from './components/meta-viewer';
 import MetaRaw from './components/meta-raw';
 import AnnotationList from './components/annotation/annotation-list';
 
-export function DisplaySpectrogram() {
+export function DisplaySpectrogram({ currentFFT, setCurrentFFT }) {
   const { spectrogramWidth, magnitudeMin, magnitudeMax, colmap, windowFunction, fftSize } = useSpectrogramContext();
 
-  const { displayedIQ, spectrogramHeight, currentFFT, setCurrentFFT } = useSpectrogram();
+  const { displayedIQ, spectrogramHeight } = useSpectrogram(currentFFT);
+
+  useEffect(() => {
+    console.log('currentFFT', currentFFT);
+    console.log('spectrogramHeight', spectrogramHeight);
+  }, [currentFFT, spectrogramHeight]);
 
   const { image, setIQData } = useGetImage(
     fftSize,
@@ -33,11 +38,8 @@ export function DisplaySpectrogram() {
   );
   function handleWheel(evt: KonvaEventObject<WheelEvent>): void {
     evt.evt.preventDefault();
-    if (evt.evt.wheelDeltaY > 0) {
-      setCurrentFFT((current) => Math.max(0, current + evt.evt.deltaY / 10));
-    } else {
-      setCurrentFFT((current) => Math.max(0, current - evt.evt.deltaY / 10));
-    }
+    console.log('wheel', evt.evt.deltaY);
+    setCurrentFFT(Math.max(0, currentFFT + evt.evt.deltaY));
   }
 
   useEffect(() => {
@@ -91,6 +93,7 @@ export function RecordingViewPage() {
   const [currentTab, setCurrentTab] = useState<Tab>(Tab.Spectrogram);
   const [currentFFT, setCurrentFFT] = useState<number>(0);
   const Tabs = Object.keys(Tab).filter((key) => isNaN(Number(key)));
+  const [currentFFT, setCurrentFFT] = useState<number>(0);
 
   if (!meta) {
     return (
@@ -123,7 +126,9 @@ export function RecordingViewPage() {
                   );
                 })}
               </div>
-              {currentTab === Tab.Spectrogram && <DisplaySpectrogram />}
+              {currentTab === Tab.Spectrogram && (
+                <DisplaySpectrogram currentFFT={currentFFT} setCurrentFFT={setCurrentFFT} />
+              )}
               {currentTab === Tab.Time && <TimePlot />}
               {currentTab === Tab.Frequency && <FrequencyPlot />}
               {currentTab === Tab.IQ && <IQPlot />}

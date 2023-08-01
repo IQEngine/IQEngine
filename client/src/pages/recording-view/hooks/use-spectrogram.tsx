@@ -1,9 +1,9 @@
 import { useGetIQData } from '@/api/iqdata/Queries';
 import { useMeta } from '@/api/metadata/queries';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSpectrogramContext } from './use-spectrogram-context';
 
-export function useSpectrogram() {
+export function useSpectrogram(currentFFT) {
   const {
     type,
     account,
@@ -18,7 +18,6 @@ export function useSpectrogram() {
   } = useSpectrogramContext();
   const { currentData, setFFTsRequired, fftsRequired } = useGetIQData(type, account, container, filePath, fftSize);
   const totalFFTs = Math.ceil(meta?.getTotalSamples() / fftSize);
-  const [currentFFT, setCurrentFFT] = useState<number>(0);
   // This is the list of ffts we display
   const displayedIQ = useMemo<Float32Array>(() => {
     if (!totalFFTs || !spectrogramHeight || !currentData) {
@@ -54,7 +53,6 @@ export function useSpectrogram() {
   return {
     totalFFTs,
     currentFFT,
-    setCurrentFFT,
     spectrogramHeight,
     displayedIQ,
     currentData,
