@@ -46,10 +46,10 @@ describe('Annotation list component', () => {
       wrapper: ({ children }) => (
         <AllProviders>
           <SpectrogramContextProvider
-            account={meta.getOrigin().account}
-            container={meta.getOrigin().container}
-            filePath={meta.getOrigin().file_path}
-            type={meta.getOrigin().type}
+            account={'testaccount'}
+            container={'testcontainer'}
+            filePath={'test_file_path'}
+            type={'api'}
           >
             {children}
           </SpectrogramContextProvider>

@@ -38,7 +38,7 @@ export const AnnotationList = ({ setCurrentFFT, currentFFT }: AnnotationListProp
   const [columns, setColumns] = useState(originalColumns);
 
   const calculateColumns = useCallback(() => {
-    if (data.length > 0) {
+    if (data?.length > 0) {
       const newColumns = originalColumns.filter((column) => {
         if (data.find((row) => row[column.dataIndex] !== undefined)) {
           return column;
