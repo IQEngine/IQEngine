@@ -1,7 +1,7 @@
 import { DataSourceClient } from './datasource-client';
 import { DataSource } from '@/api/Models';
 import { FileWithDirectoryAndFileHandle } from 'browser-fs-access';
-import { TraceabilityOrigin } from '@/utils/sigmfMetadata';
+import { TraceabilityOrigin, Track } from '@/utils/sigmfMetadata';
 
 export class LocalClient implements DataSourceClient {
   files: FileWithDirectoryAndFileHandle[];

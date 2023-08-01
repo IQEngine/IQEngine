@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useRef, useCallback } from 'react';
 import 'leaflet/dist/leaflet.css';
-import { MapContainer, TileLayer, Marker, Circle, LayerGroup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Circle, LayerGroup, Polyline } from 'react-leaflet';
 import { Icon } from 'leaflet';
 
 import GeoQueryTypes from './geo-query-types';
@@ -40,7 +40,7 @@ function DraggableMarker({ updatePosition, defaultPosition, radius }) {
   );
 }
 
-export const GeoQuery = ({ queryName, description, validator, handleQueryValid }) => {
+export const GeoQuery = ({ queryName, description, validator, handleQueryValid, trackData }) => {
   const defaultCenter = {
     lat: 51.505,
     lng: -0.09,
@@ -54,7 +54,6 @@ export const GeoQuery = ({ queryName, description, validator, handleQueryValid }
   const [show, setShow] = useState(true);
   const queryTypes = ['captures', 'annotations'];
   const [selectedQueryType, setSelectedQueryType] = useState('captures');
-
   const handleRadiusChange = (e) => {
     const value = parseInt(e.target.value);
     setRadius(value);
@@ -104,6 +103,7 @@ export const GeoQuery = ({ queryName, description, validator, handleQueryValid }
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
+            {trackData.length > 0  &&  <Polyline pathOptions={{color: 'red'}} positions={trackData} />}
             <LayerGroup>
               <Circle center={position} pathOptions={fillBlueOptions} radius={radius} />
             </LayerGroup>

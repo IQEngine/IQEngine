@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { MetadataClient } from './metadata-client';
-import { SigMFMetadata, Annotation, CaptureSegment } from '@/utils/sigmfMetadata';
+import { SigMFMetadata, Annotation, CaptureSegment, Track } from '@/utils/sigmfMetadata';
 
 export class ApiClient implements MetadataClient {
   async getMeta(account: string, container: string, filePath: string): Promise<SigMFMetadata> {
@@ -31,6 +31,20 @@ export class ApiClient implements MetadataClient {
         console.error(error);
         throw new Error('Failed to update metadata.');
       });
+  }
+
+  async track(account: string, container: string, filepath: string, signal: AbortSignal): Promise<Track> {
+    if(!account || !container || !filepath) {
+      return null;
+    }
+    const response = await axios.get(`/api/datasources/${account}/${container}/${filepath}/track`, { signal });
+    if (response.status !== 200) {
+      throw new Error(`Unexpected status code: ${response.status}`);
+    }
+    if (!response.data) {
+      return null;
+    }
+    return response.data;
   }
 
   async queryMeta(queryString: string): Promise<SigMFMetadata[]> {

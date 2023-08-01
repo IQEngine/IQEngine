@@ -1,7 +1,7 @@
 import { DataSourceClient } from './datasource-client';
 import { DataSource } from '@/api/Models';
 import { getDataSourceFromDatasources } from '@/api/utils/AzureBlob';
-import { TraceabilityOrigin } from '@/utils/sigmfMetadata';
+import { TraceabilityOrigin, Track } from '@/utils/sigmfMetadata';
 
 export class BlobClient implements DataSourceClient {
   dataSources: Record<string, DataSource>;

@@ -16,12 +16,14 @@ interface FileRowProps {
   account?: string;
   container?: string;
   sasToken?: string;
+  queryResult?: boolean;
+  geoSelected?: boolean;
+  trackToggle?: (account: string, container: string, filepath: string) => any;
 }
 
-export default function FileRow({ filepath, type, account, container, sasToken }: FileRowProps) {
+export default function FileRow({ filepath, type, account, container, sasToken, queryResult=false, geoSelected=false, trackToggle }: FileRowProps) {
   const [showModal, setShowModal] = useState(false);
   const { featureFlags } = useFeatureFlags();
-
   const { type: paramType, account: paramAccount, container: paramContainer, sasToken: paramSASToken } = useParams();
   type = type ?? paramType;
   account = account ?? paramAccount;
@@ -99,7 +101,7 @@ export default function FileRow({ filepath, type, account, container, sasToken }
   }
 
   return (
-    <tr className="hover:bg-info/10 text-center py-2 h-32">
+    <tr className={queryResult ? "hover:bg-info/10 grid grid-cols-10 text-center py-2 h-32 mb-5" : "hover:bg-info/10 text-center py-2 h-32"}>
       {
         <>
           {/* If we are looking at a recording from blob storage */}
@@ -110,7 +112,7 @@ export default function FileRow({ filepath, type, account, container, sasToken }
               </div>
             </Link>
           </td>
-          <td className="align-middle text-left">
+          <td className={queryResult ? "ml-10 align-middle col-span-2 text-left" : "align-middle text-left"}>
             <Link to={spectrogramLink} onClick={() => {}}>
               <h2>{item.getFileName()}</h2>
             </Link>
@@ -156,13 +158,20 @@ export default function FileRow({ filepath, type, account, container, sasToken }
         <br></br>
         {item.getEmail()}
       </td>
-      {featureFlags?.useNewSpectrogramPage && (
+      {featureFlags?.useNewSpectrogramPage && !geoSelected && (
         <td className="align-middle">
           <Link to={recordInspectionLink} onClick={() => {}}>
             <button className="rounded border-2 border-secondary p-1 hover:bg-secondary hover:text-base-100">
               Inspect
             </button>
           </Link>
+        </td>
+      )}
+      {geoSelected && (
+        <td className="align-middle">
+          <button onClick={() => trackToggle(account, container, filepath)} className="rounded ml-5 border-2 border-secondary p-1 hover:bg-secondary hover:text-base-100">
+            Track
+          </button>
         </td>
       )}
     </tr>
