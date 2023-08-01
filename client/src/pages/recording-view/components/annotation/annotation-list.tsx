@@ -87,7 +87,7 @@ export const AnnotationList = ({ setCurrentFFT, currentFFT }: AnnotationListProp
       updatedAnnotation[parent.name] = newAnnotationValue ? newAnnotationValue : updatedAnnotation[parent.name];
       meta.annotations[parent.index] = Object.assign(new Annotation(), updatedAnnotation);
 
-      setData(calculateAnnotationsData());
+      setData(calculateAnnotationsData() ?? []);
       let new_meta = Object.assign(new SigMFMetadata(), meta);
       setMeta(new_meta);
     },
@@ -284,13 +284,13 @@ export const AnnotationList = ({ setCurrentFFT, currentFFT }: AnnotationListProp
   }, [meta, parents, updateAnnotation]);
 
   useEffect(() => {
-    setData(calculateAnnotationsData());
+    setData(calculateAnnotationsData() ?? []);
   }, [calculateAnnotationsData]);
 
   useEffect(() => {
     calculateColumns();
   }, [data]);
-  if (!data) return null;
+
   return <DataTable dataColumns={columns} dataRows={data} />;
 };
 
