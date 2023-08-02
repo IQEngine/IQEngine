@@ -41,14 +41,14 @@ function DraggableMarker({ updatePosition, defaultPosition, radius }) {
   );
 }
 
-export const GeoQuery = ({ 
-  queryName, 
-  description, 
-  validator, 
-  handleQueryValid, 
-  trackData, 
-  geoPositionUpdate, 
-  setGeoPositionUpdate 
+export const GeoQuery = ({
+  queryName,
+  description,
+  validator,
+  handleQueryValid,
+  trackData,
+  geoPositionUpdate,
+  setGeoPositionUpdate
 }) => {
   const defaultCenter = {
     lat: 51.505,
