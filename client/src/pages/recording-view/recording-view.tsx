@@ -17,6 +17,8 @@ import GlobalProperties from './components/global-properties';
 import MetaViewer from './components/meta-viewer';
 import MetaRaw from './components/meta-raw';
 import AnnotationList from './components/annotation/annotation-list';
+import ScrollBar from './components/scroll-bar';
+import { MINIMAP_FFT_SIZE } from '@/utils/constants';
 
 export function DisplaySpectrogram({ currentFFT, setCurrentFFT }) {
   const { spectrogramWidth, magnitudeMin, magnitudeMax, colmap, windowFunction, fftSize } = useSpectrogramContext();
@@ -38,7 +40,6 @@ export function DisplaySpectrogram({ currentFFT, setCurrentFFT }) {
   );
   function handleWheel(evt: KonvaEventObject<WheelEvent>): void {
     evt.evt.preventDefault();
-    console.log('wheel', evt.evt.deltaY);
     setCurrentFFT(Math.max(0, currentFFT + evt.evt.deltaY));
   }
 
@@ -60,6 +61,9 @@ export function DisplaySpectrogram({ currentFFT, setCurrentFFT }) {
         </Stage>
         <Stage width={50} height={spectrogramHeight} className="mr-1">
           <RulerSide currentRowAtTop={currentFFT} />
+        </Stage>
+        <Stage width={MINIMAP_FFT_SIZE + 5} height={spectrogramHeight}>
+          <ScrollBar currentFFT={currentFFT} setCurrentFFT={setCurrentFFT} />
         </Stage>
       </div>
     </>
@@ -93,7 +97,6 @@ export function RecordingViewPage() {
   const [currentTab, setCurrentTab] = useState<Tab>(Tab.Spectrogram);
   const [currentFFT, setCurrentFFT] = useState<number>(0);
   const Tabs = Object.keys(Tab).filter((key) => isNaN(Number(key)));
-  const [currentFFT, setCurrentFFT] = useState<number>(0);
 
   if (!meta) {
     return (

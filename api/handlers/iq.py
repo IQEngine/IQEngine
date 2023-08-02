@@ -2,6 +2,7 @@ import asyncio
 import base64
 import io
 import logging
+import time
 from typing import List, Optional
 
 from blob.azure_client import AzureBlobClient
@@ -85,10 +86,11 @@ async def get_byte_stream(
             return
         if blob_size < offsetBytes + countBytes:
             countBytes = blob_size - offsetBytes
-
+        st = time.time()
         content = await azure_client.get_blob_content(
             filepath=iq_file, offset=offsetBytes, length=countBytes
         )
+        print(f"get_blob_content {iq_file}/{offsetBytes}/{countBytes} took {time.time() - st} seconds")
 
         yield content
 

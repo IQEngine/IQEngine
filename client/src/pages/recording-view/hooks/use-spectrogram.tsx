@@ -1,6 +1,5 @@
 import { useGetIQData } from '@/api/iqdata/Queries';
-import { useMeta } from '@/api/metadata/queries';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useSpectrogramContext } from './use-spectrogram-context';
 
 export function useSpectrogram(currentFFT) {
@@ -44,6 +43,8 @@ export function useSpectrogram(currentFFT) {
     for (let i = 0; i < spectrogramHeight; i++) {
       if (currentData[requiredBlocks[i]]) {
         iqData.set(currentData[requiredBlocks[i]], offset);
+      } else {
+        iqData.fill(-Infinity, offset, offset + fftSize * 2);
       }
       offset += fftSize * 2;
     }
