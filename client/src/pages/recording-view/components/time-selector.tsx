@@ -66,15 +66,6 @@ const TimeSelector = ({ currentFFT }: TimeSelectorProps) => {
       });
     }
   };
-  // // at drag end is when we'll swap the two if they changed sides, so that Start < End
-  const updateTimeSelection = (e) => {
-    setCursorTime({
-      start: cursorTime.start,
-      end: cursorTime.end,
-    });
-    // setTimeSelectionStart(Math.min(timeSelectionStart, timeSelectionEnd));
-    // setTimeSelectionEnd(Math.max(timeSelectionStart, timeSelectionEnd));
-  };
 
   if (!cursorTimeEnabled) return null;
 
@@ -99,7 +90,6 @@ const TimeSelector = ({ currentFFT }: TimeSelectorProps) => {
             height={0}
             draggable={true}
             onDragMove={handleDragMoveStart}
-            onDragEnd={updateTimeSelection}
             strokeEnabled={true}
             strokeWidth={5}
             stroke="red"
@@ -116,7 +106,6 @@ const TimeSelector = ({ currentFFT }: TimeSelectorProps) => {
             height={0}
             draggable={true}
             onDragMove={handleDragMoveEnd}
-            onDragEnd={updateTimeSelection}
             strokeEnabled={true}
             strokeWidth={5}
             stroke="red"
