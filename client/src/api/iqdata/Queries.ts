@@ -218,8 +218,8 @@ export function reshapeFFTs(currentFFTSize: number, currentData: Float32Array[],
     return currentData;
   }
   else if (multiplier > 1) {
-    // currentFFTSize > newFFTSize, each line in current array will  
-    // create multiple lines in new array 
+    // currentFFTSize > newFFTSize, each line in current array will
+    // create multiple lines in new array
     currentData.forEach((data, i) => {
       const j = Math.floor(i * multiplier);
 
@@ -231,7 +231,7 @@ export function reshapeFFTs(currentFFTSize: number, currentData: Float32Array[],
     });
   }
   else {
-    // currentFFTSize < newFFTSize, each line in new array will contain 
+    // currentFFTSize < newFFTSize, each line in new array will contain
     // multiple lines from current array
     currentData.forEach((data, i) => {
       const j = Math.floor(i * multiplier);

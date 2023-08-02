@@ -163,7 +163,7 @@ describe("Check reshape array works correctly", () => {
   test.only('Copes with sparse arrays', async ({ expect }) => {
     const fftSize = 128;
     const testArray = createTestArray(fftSize, 800);
-    
+
     for (let i = 0; i < testArray.length; i++) {
       // Remove every other line
       if (i % 2 == 1) {
@@ -178,6 +178,4 @@ describe("Check reshape array works correctly", () => {
     expect(newArray[0][fftSize]).toEqual(NaN);
     expect(newArray[0][2 * fftSize]).toEqual(testArray[2][0]);
   });
-
- 
 });
