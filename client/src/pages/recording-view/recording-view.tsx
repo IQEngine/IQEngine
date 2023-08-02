@@ -7,7 +7,7 @@ import { KonvaEventObject } from 'konva/lib/Node';
 import { RulerTop } from './components/ruler-top';
 import { RulerSide } from './components/ruler-side';
 import { SpectrogramContextProvider, useSpectrogramContext } from './hooks/use-spectrogram-context';
-import { CursorContextProvider } from './hooks/use-cursor-context';
+import { CursorContextProvider, useCursorContext } from './hooks/use-cursor-context';
 import { useMeta } from '@/api/metadata/queries';
 import { IQPlot } from './components/iq-plot';
 import { FrequencyPlot } from './components/frequency-plot';
@@ -19,6 +19,7 @@ import MetaRaw from './components/meta-raw';
 import AnnotationList from './components/annotation/annotation-list';
 import ScrollBar from './components/scroll-bar';
 import { MINIMAP_FFT_SIZE } from '@/utils/constants';
+import FreqSelector from './components/freq-selector';
 
 export function DisplaySpectrogram({ currentFFT, setCurrentFFT }) {
   const { spectrogramWidth, magnitudeMin, magnitudeMax, colmap, windowFunction, fftSize } = useSpectrogramContext();
@@ -58,6 +59,7 @@ export function DisplaySpectrogram({ currentFFT, setCurrentFFT }) {
           <Layer onWheel={handleWheel}>
             <Image image={image} x={0} y={0} width={1024} height={spectrogramHeight} />
           </Layer>
+          <FreqSelector />
         </Stage>
         <Stage width={50} height={spectrogramHeight} className="mr-1">
           <RulerSide currentRowAtTop={currentFFT} />
