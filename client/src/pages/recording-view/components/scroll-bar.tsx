@@ -32,7 +32,6 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
     setMagnitudeMax,
     windowFunction,
   } = useSpectrogramContext();
-  const colorMap = colMaps[colmap];
   const { currentData, setFFTsRequired, fftsRequired } = useGetIQData(
     type,
     account,
@@ -137,7 +136,6 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
       });
     });
     setTicks(t);
-    console.log('ticks', t);
   }, [meta, scalingFactor]); // dont add anymore here, so that this triggers ONLY at the start
 
   const handleClick = (e) => {
