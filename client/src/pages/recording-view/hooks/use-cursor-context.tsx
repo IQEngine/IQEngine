@@ -28,7 +28,7 @@ interface Cursor {
 export function CursorContextProvider({ children }) {
   const [cursorTime, setCursorTime] = useState<Cursor>({
     start: 0,
-    end: 1024 * 100,
+    end: 0,
   });
   const [cursorFreq, setCursorFreq] = useState<Cursor>({
     start: 0,
@@ -36,7 +36,7 @@ export function CursorContextProvider({ children }) {
   });
 
   const [cursorFreqEnabled, setCursorFreqEnabled] = useState<boolean>(false);
-  const [cursorTimeEnabled, setCursorTimeEnabled] = useState<boolean>(true);
+  const [cursorTimeEnabled, setCursorTimeEnabled] = useState<boolean>(false);
 
   const { type, account, container, filePath, fftSize } = useSpectrogramContext();
   const { currentData, setFFTsRequired, fftsRequired } = useGetIQData(type, account, container, filePath, fftSize);

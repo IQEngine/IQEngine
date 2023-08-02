@@ -114,7 +114,7 @@ export function RecordingViewPage() {
       <CursorContextProvider>
         <div className="mb-0 ml-0 mr-0 p-0 pt-3">
           <div className="flex flex-row w-full">
-            <Sidebar />
+            <Sidebar currentFFT={currentFFT} />
             <div className="flex flex-col pl-3">
               <div className="flex space-x-2 border-b border-primary w-full sm:pl-12 lg:pl-32" id="tabsbar">
                 {Tabs.map((key) => {
