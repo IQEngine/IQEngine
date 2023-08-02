@@ -24,6 +24,7 @@ export interface PluginsPaneProps {
   handleProcessTime: () => { trimmedSamples: number[]; startSampleOffset: number };
   meta: SigMFMetadata;
   setMeta: (meta: SigMFMetadata) => void;
+  selectedAnnotation: number;
 }
 
 export enum MimeTypes {
@@ -33,11 +34,18 @@ export enum MimeTypes {
   audio_wav = 'audio/wav',
 }
 
-export const PluginsPane = ({ timeCursorsEnabled, handleProcessTime, meta, setMeta }: PluginsPaneProps) => {
+export const PluginsPane = ({
+  timeCursorsEnabled,
+  handleProcessTime,
+  meta,
+  setMeta,
+  selectedAnnotation,
+}: PluginsPaneProps) => {
   const { account, container, filename } = useParams();
   const { data: plugins, isError } = useGetPlugins();
   const { PluginOption, EditPluginParameters, pluginParameters, setPluginParameters } = useGetPluginsComponents();
   const [selectedPlugin, setSelectedPlugin] = useState('');
+  const [selectedMethod, setSelectedMethod] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [modalSamples, setModalSamples] = useState([]);
   const [modalSpectrogram, setmodalSpectrogram] = useState(null);
@@ -48,6 +56,17 @@ export const PluginsPane = ({ timeCursorsEnabled, handleProcessTime, meta, setMe
   const handleChangePlugin = (e) => {
     setSelectedPlugin(e.target.value);
   };
+
+  const handleChangeMethod = (e) => {
+    setSelectedMethod(e.target.value);
+  };
+
+  const methodOptions = [
+    { value: 'Full', label: '' },
+    { value: 'Annotation', label: 'Annotation' },
+    { value: 'Cursor', label: 'Cursor' },
+    { value: 'Full', label: 'Full' },
+  ];
 
   const handleSubmit = (e) => {
     console.log('Plugin Params:', pluginParameters);
@@ -71,6 +90,20 @@ export const PluginsPane = ({ timeCursorsEnabled, handleProcessTime, meta, setMe
     };
 
     const calculateMultiplier = dataTypeToBytesPerIQSample(MimeTypes[meta.getDataType()]);
+    let byte_offset = Math.floor(startSampleOffset) * calculateMultiplier;
+    let byte_length = (trimmedSamples.length / 2) * calculateMultiplier;
+    const annotation = meta.annotations[selectedAnnotation];
+
+    if (selectedMethod == 'Annotation') {
+      if (selectedAnnotation == -1) {
+        toast.error('Please select the annotation you want to run a plugin on');
+        setSelectedMethod('');
+      } else {
+        byte_offset = Math.floor(annotation['core:sample_start']) * calculateMultiplier;
+        byte_length = annotation['core:sample_count'] * calculateMultiplier;
+      }
+    }
+
     if (useCloudStorage && connectionInfo) {
       body = {
         samples_b64: [],
@@ -83,8 +116,8 @@ export const PluginsPane = ({ timeCursorsEnabled, handleProcessTime, meta, setMe
             sample_rate: sampleRate,
             center_freq: freq,
             data_type: MimeTypes[meta.getDataType()],
-            byte_offset: Math.floor(startSampleOffset) * calculateMultiplier,
-            byte_length: (trimmedSamples.length / 2) * calculateMultiplier,
+            byte_offset: byte_offset,
+            byte_length: byte_length,
           },
         ],
         custom_params: {},
@@ -261,6 +294,20 @@ export const PluginsPane = ({ timeCursorsEnabled, handleProcessTime, meta, setMe
             plugins?.map((plugin, groupIndex) => (
               <PluginOption key={groupIndex} groupIndex={groupIndex} plugin={plugin} />
             ))}
+        </select>
+      </label>
+      <label className="label">
+        Method:
+        <select
+          className="rounded bg-base-content text-base-100 w-34"
+          value={selectedMethod}
+          onChange={handleChangeMethod}
+        >
+          {methodOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
         </select>
       </label>
       {connectionInfo && (

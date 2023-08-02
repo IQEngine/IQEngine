@@ -30,6 +30,7 @@ export interface SidebarProps {
   setMeta: (meta: SigMFMetadata) => void;
   colorMap: any;
   setColorMap: any;
+  selectedAnnotation: number;
 }
 
 const Sidebar = (props) => {
@@ -76,6 +77,7 @@ const Sidebar = (props) => {
               handleProcessTime={props.handleProcessTime}
               meta={props.meta}
               setMeta={props.setMeta}
+              selectedAnnotation={props.selectedAnnotation}
             />
           )}
         </div>
