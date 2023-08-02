@@ -20,6 +20,7 @@ import AnnotationList from './components/annotation/annotation-list';
 import ScrollBar from './components/scroll-bar';
 import { MINIMAP_FFT_SIZE } from '@/utils/constants';
 import FreqSelector from './components/freq-selector';
+import TimeSelector from './components/time-selector';
 
 export function DisplaySpectrogram({ currentFFT, setCurrentFFT }) {
   const { spectrogramWidth, magnitudeMin, magnitudeMax, colmap, windowFunction, fftSize } = useSpectrogramContext();
@@ -60,6 +61,7 @@ export function DisplaySpectrogram({ currentFFT, setCurrentFFT }) {
             <Image image={image} x={0} y={0} width={1024} height={spectrogramHeight} />
           </Layer>
           <FreqSelector />
+          <TimeSelector currentFFT={currentFFT} />
         </Stage>
         <Stage width={50} height={spectrogramHeight} className="mr-1">
           <RulerSide currentRowAtTop={currentFFT} />
