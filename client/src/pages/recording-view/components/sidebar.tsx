@@ -5,7 +5,12 @@
 import React from 'react';
 import SettingsPane from './settings-pane';
 import { PluginsPane } from './plugins-pane';
-const Sidebar = () => {
+
+interface SidebarProps {
+  currentFFT: number;
+}
+
+const Sidebar = ({ currentFFT }) => {
   return (
     <div className="flex flex-col w-64 ml-3">
       <details open>
@@ -13,7 +18,7 @@ const Sidebar = () => {
           Settings
         </summary>
         <div className="outline outline-1 outline-primary p-2">
-          <SettingsPane />
+          <SettingsPane currentFFT={currentFFT} />
         </div>
       </details>
 

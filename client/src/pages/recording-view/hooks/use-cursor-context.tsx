@@ -3,6 +3,7 @@ import { SigMFMetadata } from '@/utils/sigmfMetadata';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useSpectrogramContext } from './use-spectrogram-context';
 import { useGetIQData } from '@/api/iqdata/Queries';
+import { useDebounce } from 'usehooks-ts';
 
 interface CursorContextProperties {
   cursorTime: Cursor;
@@ -27,7 +28,7 @@ interface Cursor {
 export function CursorContextProvider({ children }) {
   const [cursorTime, setCursorTime] = useState<Cursor>({
     start: 0,
-    end: 40,
+    end: 0,
   });
   const [cursorFreq, setCursorFreq] = useState<Cursor>({
     start: 0,
@@ -35,21 +36,24 @@ export function CursorContextProvider({ children }) {
   });
 
   const [cursorFreqEnabled, setCursorFreqEnabled] = useState<boolean>(false);
-  const [cursorTimeEnabled, setCursorTimeEnabled] = useState<boolean>(true);
+  const [cursorTimeEnabled, setCursorTimeEnabled] = useState<boolean>(false);
 
   const { type, account, container, filePath, fftSize } = useSpectrogramContext();
   const { currentData, setFFTsRequired, fftsRequired } = useGetIQData(type, account, container, filePath, fftSize);
 
   const [cursorData, setCursorData] = useState<Float32Array>(new Float32Array(0));
+  const debouseCursorTime = useDebounce(cursorTime, 500);
 
   useEffect(() => {
     if (!currentData || !cursorTime || cursorTime.start === cursorTime.end || !cursorTimeEnabled) {
       return;
     }
-    const iqData = new Float32Array((cursorTime.end - cursorTime.start) * fftSize * 2);
+    const startingFFT = Math.floor(cursorTime.start / fftSize);
+    const endingFFT = Math.floor(cursorTime.end / fftSize);
+    const iqData = new Float32Array((endingFFT - startingFFT) * fftSize * 2);
     let offset = 0;
     let requiredBlocks: number[] = [];
-    for (let i = cursorTime.start; i < cursorTime.end; i++) {
+    for (let i = startingFFT; i < endingFFT; i++) {
       if (currentData[i]) {
         iqData.set(currentData[i], offset);
       } else {
@@ -59,7 +63,7 @@ export function CursorContextProvider({ children }) {
     }
     setCursorData(iqData);
     setFFTsRequired(requiredBlocks);
-  }, [cursorTime, currentData, fftSize]);
+  }, [debouseCursorTime, currentData, fftSize]);
 
   return (
     <CursorContext.Provider
