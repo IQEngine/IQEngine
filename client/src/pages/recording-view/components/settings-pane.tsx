@@ -147,9 +147,9 @@ const SettingsPane = () => {
             Colormap
           </button>
           <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
-            {Object.entries(colMaps).map(([value, index]) => (
+            {Object.entries(colMaps).map(([value]) => (
               <li
-                key={index[0][0]}
+                key={value}
                 data-value={value}
                 onClick={(e) => {
                   context.setColmap(e.currentTarget.dataset.value);

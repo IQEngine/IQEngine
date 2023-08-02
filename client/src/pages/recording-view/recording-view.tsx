@@ -17,11 +17,18 @@ import GlobalProperties from './components/global-properties';
 import MetaViewer from './components/meta-viewer';
 import MetaRaw from './components/meta-raw';
 import AnnotationList from './components/annotation/annotation-list';
+import ScrollBar from './components/scroll-bar';
+import { MINIMAP_FFT_SIZE } from '@/utils/constants';
 
-export function DisplaySpectrogram() {
+export function DisplaySpectrogram({ currentFFT, setCurrentFFT }) {
   const { spectrogramWidth, magnitudeMin, magnitudeMax, colmap, windowFunction, fftSize } = useSpectrogramContext();
 
-  const { displayedIQ, spectrogramHeight, currentFFT, setCurrentFFT } = useSpectrogram();
+  const { displayedIQ, spectrogramHeight } = useSpectrogram(currentFFT);
+
+  useEffect(() => {
+    console.log('currentFFT', currentFFT);
+    console.log('spectrogramHeight', spectrogramHeight);
+  }, [currentFFT, spectrogramHeight]);
 
   const { image, setIQData } = useGetImage(
     fftSize,
@@ -33,11 +40,7 @@ export function DisplaySpectrogram() {
   );
   function handleWheel(evt: KonvaEventObject<WheelEvent>): void {
     evt.evt.preventDefault();
-    if (evt.evt.wheelDeltaY > 0) {
-      setCurrentFFT((current) => Math.max(0, current + evt.evt.deltaY / 10));
-    } else {
-      setCurrentFFT((current) => Math.max(0, current - evt.evt.deltaY / 10));
-    }
+    setCurrentFFT(Math.max(0, currentFFT + evt.evt.deltaY));
   }
 
   useEffect(() => {
@@ -58,6 +61,9 @@ export function DisplaySpectrogram() {
         </Stage>
         <Stage width={50} height={spectrogramHeight} className="mr-1">
           <RulerSide currentRowAtTop={currentFFT} />
+        </Stage>
+        <Stage width={MINIMAP_FFT_SIZE + 5} height={spectrogramHeight}>
+          <ScrollBar currentFFT={currentFFT} setCurrentFFT={setCurrentFFT} />
         </Stage>
       </div>
     </>
@@ -123,7 +129,9 @@ export function RecordingViewPage() {
                   );
                 })}
               </div>
-              {currentTab === Tab.Spectrogram && <DisplaySpectrogram />}
+              {currentTab === Tab.Spectrogram && (
+                <DisplaySpectrogram currentFFT={currentFFT} setCurrentFFT={setCurrentFFT} />
+              )}
               {currentTab === Tab.Time && <TimePlot />}
               {currentTab === Tab.Frequency && <FrequencyPlot />}
               {currentTab === Tab.IQ && <IQPlot />}

@@ -12,7 +12,9 @@ import { act } from 'react-dom/test-utils';
 describe('GlobalProperties component', () => {
   const { getValidMetadata, wrapper: Wrapper } = useAllProviders();
 
-  beforeAll(() => {
+  beforeEach(() => {
+    nock.cleanAll();
+
     nock('http://localhost:3000').get('/api/config').reply(200, {
       uploadPageBlobSasUrl: 'NOT A VALID SAS URL',
       internalBranding: false,
