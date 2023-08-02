@@ -153,7 +153,7 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
   const handleWheel = (e) => {
     e.evt.preventDefault();
     let scrollAmount = Math.floor(e.evt.wheelDeltaY);
-    setCurrentFFT(Math.max(0, currentFFT + scrollAmount));
+    setCurrentFFT(Math.max(0, currentFFT - scrollAmount));
   };
 
   const handleDragMove = (e) => {
