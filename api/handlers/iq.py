@@ -90,7 +90,9 @@ async def get_byte_stream(
         content = await azure_client.get_blob_content(
             filepath=iq_file, offset=offsetBytes, length=countBytes
         )
-        print(f"get_blob_content {iq_file}/{offsetBytes}/{countBytes} took {time.time() - st} seconds")
+        print(
+            f"get_blob_content {iq_file}/{offsetBytes}/{countBytes} took {time.time() - st} seconds"
+        )
 
         yield content
 
