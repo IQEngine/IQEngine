@@ -13,10 +13,14 @@ import { colMaps } from '@/utils/colormap';
 import { useSpectrogramContext } from '../hooks/use-spectrogram-context';
 import { useCursorContext } from '../hooks/use-cursor-context';
 
-const SettingsPane = () => {
+interface SettingsPaneProps {
+  currentFFT: number;
+}
+
+const SettingsPane = ({ currentFFT }) => {
   const fftSizes = [128, 256, 512, 1024, 2048, 4096, 16384, 65536, TILE_SIZE_IN_IQ_SAMPLES];
   const context = useSpectrogramContext();
-  const { cursorFreqEnabled, setCursorFreqEnabled, cursorTimeEnabled, setCursorTimeEnabled } = useCursorContext();
+  const cursorContext = useCursorContext();
   const [localPythonSnippet, setLocalPythonSnippet] = useState(context.pythonSnippet);
   const [localTaps, setLocalTaps] = useState(JSON.stringify(context.taps));
 
@@ -97,9 +101,15 @@ const SettingsPane = () => {
         <input
           type="checkbox"
           className="toggle toggle-primary float-right"
-          checked={cursorTimeEnabled}
+          checked={cursorContext.cursorTimeEnabled}
           onChange={(e) => {
-            setCursorTimeEnabled(e.target.checked);
+            if (!cursorContext.cursorTimeEnabled && cursorContext.cursorTime.start == cursorContext.cursorTime.end) {
+              cursorContext.setCursorTime({
+                start: (currentFFT + context.spectrogramHeight / 4) * context.fftSize,
+                end: (currentFFT + context.spectrogramHeight / 2) * context.fftSize,
+              });
+            }
+            cursorContext.setCursorTimeEnabled(e.target.checked);
           }}
         />
       </label>
@@ -109,9 +119,15 @@ const SettingsPane = () => {
         <input
           type="checkbox"
           className="toggle toggle-primary float-right"
-          checked={cursorFreqEnabled}
+          checked={cursorContext.cursorFreqEnabled}
           onChange={(e) => {
-            setCursorFreqEnabled(e.target.checked);
+            if (!cursorContext.cursorFreqEnabled && cursorContext.cursorFreq.start == cursorContext.cursorFreq.end) {
+              cursorContext.setCursorFreq({
+                start: -0.2,
+                end: 0.2,
+              });
+            }
+            cursorContext.setCursorFreqEnabled(e.target.checked);
           }}
         />
       </label>
@@ -147,9 +163,9 @@ const SettingsPane = () => {
             Colormap
           </button>
           <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
-            {Object.entries(colMaps).map(([value, index]) => (
+            {Object.entries(colMaps).map(([value]) => (
               <li
-                key={index[0][0]}
+                key={value}
                 data-value={value}
                 onClick={(e) => {
                   context.setColmap(e.currentTarget.dataset.value);

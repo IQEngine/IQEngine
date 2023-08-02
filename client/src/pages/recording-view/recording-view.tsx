@@ -7,7 +7,7 @@ import { KonvaEventObject } from 'konva/lib/Node';
 import { RulerTop } from './components/ruler-top';
 import { RulerSide } from './components/ruler-side';
 import { SpectrogramContextProvider, useSpectrogramContext } from './hooks/use-spectrogram-context';
-import { CursorContextProvider } from './hooks/use-cursor-context';
+import { CursorContextProvider, useCursorContext } from './hooks/use-cursor-context';
 import { useMeta } from '@/api/metadata/queries';
 import { IQPlot } from './components/iq-plot';
 import { FrequencyPlot } from './components/frequency-plot';
@@ -17,11 +17,20 @@ import GlobalProperties from './components/global-properties';
 import MetaViewer from './components/meta-viewer';
 import MetaRaw from './components/meta-raw';
 import AnnotationList from './components/annotation/annotation-list';
+import ScrollBar from './components/scroll-bar';
+import { MINIMAP_FFT_SIZE } from '@/utils/constants';
+import FreqSelector from './components/freq-selector';
+import TimeSelector from './components/time-selector';
 
-export function DisplaySpectrogram() {
+export function DisplaySpectrogram({ currentFFT, setCurrentFFT }) {
   const { spectrogramWidth, magnitudeMin, magnitudeMax, colmap, windowFunction, fftSize } = useSpectrogramContext();
 
-  const { displayedIQ, spectrogramHeight, currentFFT, setCurrentFFT } = useSpectrogram();
+  const { displayedIQ, spectrogramHeight } = useSpectrogram(currentFFT);
+
+  useEffect(() => {
+    console.log('currentFFT', currentFFT);
+    console.log('spectrogramHeight', spectrogramHeight);
+  }, [currentFFT, spectrogramHeight]);
 
   const { image, setIQData } = useGetImage(
     fftSize,
@@ -33,11 +42,7 @@ export function DisplaySpectrogram() {
   );
   function handleWheel(evt: KonvaEventObject<WheelEvent>): void {
     evt.evt.preventDefault();
-    if (evt.evt.wheelDeltaY > 0) {
-      setCurrentFFT((current) => Math.max(0, current + evt.evt.deltaY / 10));
-    } else {
-      setCurrentFFT((current) => Math.max(0, current - evt.evt.deltaY / 10));
-    }
+    setCurrentFFT(Math.max(0, currentFFT + evt.evt.deltaY));
   }
 
   useEffect(() => {
@@ -55,9 +60,14 @@ export function DisplaySpectrogram() {
           <Layer onWheel={handleWheel}>
             <Image image={image} x={0} y={0} width={1024} height={spectrogramHeight} />
           </Layer>
+          <FreqSelector />
+          <TimeSelector currentFFT={currentFFT} />
         </Stage>
         <Stage width={50} height={spectrogramHeight} className="mr-1">
           <RulerSide currentRowAtTop={currentFFT} />
+        </Stage>
+        <Stage width={MINIMAP_FFT_SIZE + 5} height={spectrogramHeight}>
+          <ScrollBar currentFFT={currentFFT} setCurrentFFT={setCurrentFFT} />
         </Stage>
       </div>
     </>
@@ -104,7 +114,7 @@ export function RecordingViewPage() {
       <CursorContextProvider>
         <div className="mb-0 ml-0 mr-0 p-0 pt-3">
           <div className="flex flex-row w-full">
-            <Sidebar />
+            <Sidebar currentFFT={currentFFT} />
             <div className="flex flex-col pl-3">
               <div className="flex space-x-2 border-b border-primary w-full sm:pl-12 lg:pl-32" id="tabsbar">
                 {Tabs.map((key) => {
@@ -123,7 +133,9 @@ export function RecordingViewPage() {
                   );
                 })}
               </div>
-              {currentTab === Tab.Spectrogram && <DisplaySpectrogram />}
+              {currentTab === Tab.Spectrogram && (
+                <DisplaySpectrogram currentFFT={currentFFT} setCurrentFFT={setCurrentFFT} />
+              )}
               {currentTab === Tab.Time && <TimePlot />}
               {currentTab === Tab.Frequency && <FrequencyPlot />}
               {currentTab === Tab.IQ && <IQPlot />}
