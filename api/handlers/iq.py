@@ -67,15 +67,15 @@ async def calculate_iq_data(
                 iq_file,
                 azure_client,
             ):
-    task_list = await get_byte_streams(
+    iq_data_list = await get_byte_streams(
         block_indexes,
         block_size,
         format,
         iq_file,
         azure_client,
         )
-    for i in task_list:
-        yield i
+    for iq_data in iq_data_list:
+        yield iq_data
 
 
 async def get_byte_streams(
@@ -102,10 +102,7 @@ async def get_byte_streams(
     ]
     return await asyncio.gather(*tasks)
         
-async def get_byte_stream(block_indexes_chunk, block_size, bytes_per_iq_sample, iq_file, azure_client, blob_size):
-
-    st = time.time()
-    
+async def get_byte_stream(block_indexes_chunk, block_size, bytes_per_iq_sample, iq_file, azure_client, blob_size):    
     offsetBytes = block_indexes_chunk[0] * block_size * bytes_per_iq_sample
     countBytes = (
         (block_indexes_chunk[1] - block_indexes_chunk[0] + 1)
@@ -114,13 +111,16 @@ async def get_byte_stream(block_indexes_chunk, block_size, bytes_per_iq_sample, 
         )
 
     if blob_size < offsetBytes:
-        return
+        return b""
     if blob_size < offsetBytes + countBytes:
         countBytes = blob_size - offsetBytes
     content =  await azure_client.get_blob_content(
         filepath=iq_file, offset=offsetBytes, length=countBytes
     )
+
+    st = time.time()
     print(f"get_byte_stream: {time.time() - st}")
+
     return content
 
 @router.get(
