@@ -7,6 +7,7 @@ import { TILE_SIZE_IN_IQ_SAMPLES } from '@/utils/constants';
 import { useUserSettings } from '@/api/user-settings/use-user-settings';
 import { useEffect, useMemo, useState } from 'react';
 import { useMeta } from '@/api/metadata/queries';
+import { assert } from 'vitest';
 
 export const getIQDataSlice = (
   meta: SigMFMetadata,
@@ -163,7 +164,7 @@ export function useGetIQData(type: string, account: string, container: string, f
       return null;
     }
     if (iqData) {
-      // change iqdata to be an sparce array with the index as the key
+      // change iqdata to be a sparse array with the index as the key
       const tempArray = [];
       iqData.forEach((data) => {
         tempArray[data.index] = data.iqArray;
@@ -176,7 +177,7 @@ export function useGetIQData(type: string, account: string, container: string, f
         filePath,
         fftSize,
       ]);
-      // This is the fastest way to merge the two sparce arrays keeping the indexes in order
+      // This is the fastest way to merge the two sparse arrays keeping the indexes in order
       const content = Object.assign([], previousData, tempArray);
       queryClient.setQueryData(['rawiqdata', type, account, container, filePath, fftSize], content);
     }
@@ -199,4 +200,49 @@ export function useGetIQData(type: string, account: string, container: string, f
     fftsRequired,
     setFFTsRequired,
   };
+}
+
+export function reshapeFFTs(currentFFTSize: number, currentData: Float32Array[], newFFTSize: number): Float32Array[] {
+
+  const newData = [];
+
+  if (currentFFTSize % newFFTSize != 0 && newFFTSize % currentFFTSize != 0) {
+    // Don't attempt to deal with sizes that don't fit neatly into each other
+    // (We could do though, if needed)
+    throw new Error("FFT sizes must be integer multiples of each other");
+  }
+
+  const multiplier = currentFFTSize / newFFTSize;
+  if (multiplier == 1) {
+    // No change, return original data
+    return currentData;
+  }
+  else if (multiplier > 1) {
+    // currentFFTSize > newFFTSize, each line in current array will  
+    // create multiple lines in new array 
+    currentData.forEach((data, i) => {
+      const j = Math.floor(i * multiplier);
+
+      // Create 'multiplier' new lines in the new array
+      for (let slice = 0; slice < multiplier; slice++) {
+        assert(!newData[j + slice]);
+        newData[j + slice] = new Float32Array(data.slice(slice * newFFTSize * 2, (slice + 1) * newFFTSize * 2));
+      }
+    });
+  }
+  else {
+    // currentFFTSize < newFFTSize, each line in new array will contain 
+    // multiple lines from current array
+    currentData.forEach((data, i) => {
+      const j = Math.floor(i * multiplier);
+      if (!newData[j]) {
+        newData[j] = new Float32Array(newFFTSize * 2).fill(NaN);
+      }
+
+      // Copy data into right line in new array
+      newData[j].set(data, (i % (1/multiplier)) * currentFFTSize * 2);
+    });
+  }
+
+  return newData;
 }
