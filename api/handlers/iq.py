@@ -4,7 +4,6 @@ import io
 import logging
 import time
 from typing import List, Optional
-from multiprocessing import Pool
 
 from blob.azure_client import AzureBlobClient
 from database import datasource_repo
@@ -55,25 +54,34 @@ async def get_iq_data(
         raise HTTPException(status_code=404, detail="Datasource not found")
     try:
         block_indexes = [int(num) for num in block_indexes_str.split(",")]
-        return StreamingResponse(calculate_iq_data(block_indexes, block_size, get_bytes_per_iq_sample(format), get_file_name(filepath, ApiType.IQDATA), azure_client), media_type="application/octet-stream") 
+        return StreamingResponse(
+            calculate_iq_data(
+                block_indexes,
+                block_size,
+                get_bytes_per_iq_sample(format),
+                get_file_name(filepath, ApiType.IQDATA),
+                azure_client,
+            ),
+            media_type="application/octet-stream",
+        )
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 
 async def calculate_iq_data(
-                block_indexes,
-                block_size,
-                format,
-                iq_file,
-                azure_client,
-            ):
+    block_indexes,
+    block_size,
+    format,
+    iq_file,
+    azure_client,
+):
     iq_data_list = await get_byte_streams(
         block_indexes,
         block_size,
         format,
         iq_file,
         azure_client,
-        )
+    )
     for iq_data in iq_data_list:
         yield iq_data
 
@@ -81,40 +89,56 @@ async def calculate_iq_data(
 async def get_byte_streams(
     block_indexes, block_size, bytes_per_iq_sample, iq_file, azure_client
 ):
-    chunk_size = 200 * 1024//block_size
+    chunk_size = 200 * 1024 // block_size
     block_indexes_arrs = find_smallest_and_largest_next_to_each_other(block_indexes)
 
     block_indexes_chunks = []
     for i in block_indexes_arrs:
         if i[1] - i[0] > chunk_size:
-            indexes = [[j, min(j + chunk_size - 1, i[1])] for j in range(i[0], i[1] + 1, chunk_size)]
+            indexes = [
+                [j, min(j + chunk_size - 1, i[1])]
+                for j in range(i[0], i[1] + 1, chunk_size)
+            ]
             block_indexes_chunks.extend(indexes)
         else:
             block_indexes_chunks.append(i)
-            
+
     blob_size = await azure_client.get_file_length(iq_file)
 
     tasks = [
         get_byte_stream(
-            block_index_chunk, block_size, bytes_per_iq_sample, iq_file, azure_client, blob_size
+            block_index_chunk,
+            block_size,
+            bytes_per_iq_sample,
+            iq_file,
+            azure_client,
+            blob_size,
         )
         for block_index_chunk in block_indexes_chunks
     ]
     return await asyncio.gather(*tasks)
-        
-async def get_byte_stream(block_indexes_chunk, block_size, bytes_per_iq_sample, iq_file, azure_client, blob_size):    
+
+
+async def get_byte_stream(
+    block_indexes_chunk,
+    block_size,
+    bytes_per_iq_sample,
+    iq_file,
+    azure_client,
+    blob_size,
+):
     offsetBytes = block_indexes_chunk[0] * block_size * bytes_per_iq_sample
     countBytes = (
         (block_indexes_chunk[1] - block_indexes_chunk[0] + 1)
         * block_size
         * bytes_per_iq_sample
-        )
+    )
 
     if blob_size < offsetBytes:
         return b""
     if blob_size < offsetBytes + countBytes:
         countBytes = blob_size - offsetBytes
-    content =  await azure_client.get_blob_content(
+    content = await azure_client.get_blob_content(
         filepath=iq_file, offset=offsetBytes, length=countBytes
     )
 
@@ -122,6 +146,7 @@ async def get_byte_stream(block_indexes_chunk, block_size, bytes_per_iq_sample, 
     print(f"get_byte_stream: {time.time() - st}")
 
     return content
+
 
 @router.get(
     "/api/datasources/{account}/{container}/{filepath:path}.sigmf-data",
