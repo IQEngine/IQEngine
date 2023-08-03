@@ -4,12 +4,12 @@
 
 import React from 'react';
 import { Layer, Rect } from 'react-konva';
-import { MINIMAP_FFT_SIZE, TILE_SIZE_IN_IQ_SAMPLES } from '@/utils/constants';
+import { MINIMAP_FFT_SIZE } from '@/utils/constants';
 import { useSpectrogramContext } from '../hooks/use-spectrogram-context';
 import { useCursorContext } from '../hooks/use-cursor-context';
 
 const TimeSelectorMinimap = ({ currentFFT }) => {
-  const { spectrogramWidth, spectrogramHeight, meta, fftSize } = useSpectrogramContext();
+  const { spectrogramHeight, meta, fftSize } = useSpectrogramContext();
   const { cursorTime, cursorTimeEnabled, setCursorTime } = useCursorContext();
   const cursorStartFFT = Math.floor(cursorTime.start / fftSize);
   const cursorEndFFT = Math.floor(cursorTime.end / fftSize);
