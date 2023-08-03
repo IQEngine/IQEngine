@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { CLIENT_TYPE_API } from '@/api/Models';
+import { useQueryTrack } from '@/api/metadata/queries';
 
 import Results from './results';
 import { queries } from './queries';
@@ -6,6 +8,18 @@ import { queries } from './queries';
 export const MetadataQuery = () => {
   const [selections, setSelections] = useState(queries);
   const [queryString, setQueryString] = useState('');
+  const [geoPositionUpdate, setGeoPositionUpdate] = useState('manual');
+  const [selectedTrack, setSelectedTrack] = useState({
+    account: '',
+    container: '',
+    filepath: '',
+  });
+  const { status, data, error } = useQueryTrack(
+    CLIENT_TYPE_API,
+    selectedTrack.account,
+    selectedTrack.container,
+    selectedTrack.filepath
+  );
 
   const toggleSelected = (e) => {
     const name = e.target.name;
@@ -36,6 +50,21 @@ export const MetadataQuery = () => {
     return Object.keys(selections).map((item) => {
       if (selections[item].selected) {
         const Component = selections[item].component;
+        if(item === 'geo') {
+          return (
+            <Component
+            key={item}
+            queryName={item}
+            validator={selections[item].validator}
+            description={selections[item].description}
+            handleQueryValid={handleQueryValid}
+            handleQueryInvalid={handleQueryInvalid}
+            trackData={data?.iqengine_geotrack?.coordinates ?? []}
+            geoPositionUpdate={geoPositionUpdate}
+            setGeoPositionUpdate={setGeoPositionUpdate}
+          />
+          )
+        }
         return (
           <Component
             key={item}
@@ -62,6 +91,15 @@ export const MetadataQuery = () => {
     setSelections(newSelections);
   };
 
+  const handleSetSelectedTrack = (account: string, container: string, filepath: string) => {
+    setSelectedTrack({
+      account: encodeURIComponent(account),
+      container: encodeURIComponent(container),
+      filepath: encodeURIComponent(filepath),
+    });
+    setGeoPositionUpdate('track');
+  }
+
   const showQueryButton = () => {
     let empty = true;
     for (let item of Object.keys(selections)) {
@@ -77,7 +115,7 @@ export const MetadataQuery = () => {
   };
 
   const renderResults = () => {
-    return <Results queryString={queryString} />;
+    return <Results geoSelected={selections['geo'].selected} handleToggleTrack={(account, container, filepath) => handleSetSelectedTrack(account, container, filepath)} queryString={queryString}  />;
   };
 
   const handleQuery = async () => {

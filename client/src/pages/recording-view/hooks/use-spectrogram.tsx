@@ -1,40 +1,22 @@
 import { useGetIQData } from '@/api/iqdata/Queries';
-import { useMeta } from '@/api/metadata/queries';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
+import { useSpectrogramContext } from './use-spectrogram-context';
 
-interface SpectrogramProps {
-  type: string;
-  account: string;
-  container: string;
-  filePath: string;
-  currentFFT?: number;
-  fftStepSize?: number;
-  spectrogramHeight?: number;
-  fftSize?: number;
-}
-
-export function useSpectrogram({
-  type,
-  account,
-  container,
-  filePath,
-  currentFFT: defaultCurrentFFT = 0,
-  fftStepSize: defaultFFTStepSize = 0,
-  spectrogramHeight: defaultSpectrogramHeight = 800,
-  fftSize: defaultFFTSize = 1024,
-}: SpectrogramProps) {
-  const { data: meta, isSuccess: hasMetadata } = useMeta(type, account, container, filePath);
-  const { fftSize, setFFTSize, currentData, setFFTsRequired, fftsRequired } = useGetIQData(
+export function useSpectrogram(currentFFT) {
+  const {
     type,
     account,
     container,
     filePath,
-    defaultFFTSize
-  );
+    fftSize,
+    spectrogramHeight,
+    fftStepSize,
+    setFFTStepSize,
+    setSpectrogramHeight,
+    meta,
+  } = useSpectrogramContext();
+  const { currentData, setFFTsRequired, fftsRequired } = useGetIQData(type, account, container, filePath, fftSize);
   const totalFFTs = Math.ceil(meta?.getTotalSamples() / fftSize);
-  const [currentFFT, setCurrentFFT] = useState<number>(defaultCurrentFFT);
-  const [fftStepSize, setFFTStepSize] = useState<number>(defaultFFTStepSize);
-  const [spectrogramHeight, setSpectrogramHeight] = useState<number>(defaultSpectrogramHeight);
   // This is the list of ffts we display
   const displayedIQ = useMemo<Float32Array>(() => {
     if (!totalFFTs || !spectrogramHeight || !currentData) {
@@ -61,6 +43,8 @@ export function useSpectrogram({
     for (let i = 0; i < spectrogramHeight; i++) {
       if (currentData[requiredBlocks[i]]) {
         iqData.set(currentData[requiredBlocks[i]], offset);
+      } else {
+        iqData.fill(-Infinity, offset, offset + fftSize * 2);
       }
       offset += fftSize * 2;
     }
@@ -70,17 +54,11 @@ export function useSpectrogram({
   return {
     totalFFTs,
     currentFFT,
-    setCurrentFFT,
-    hasMetadata,
-    fftStepSize,
-    setFFTStepSize,
     spectrogramHeight,
-    setSpectrogramHeight,
     displayedIQ,
-    fftSize,
-    setFFTSize,
-    meta,
     currentData,
     fftsRequired,
+    setFFTStepSize,
+    setSpectrogramHeight,
   };
 }

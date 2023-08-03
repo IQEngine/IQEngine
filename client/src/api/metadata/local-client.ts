@@ -1,5 +1,5 @@
 import { MetadataClient } from './metadata-client';
-import { Annotation, CaptureSegment, SigMFMetadata, TraceabilityOrigin } from '@/utils/sigmfMetadata';
+import { Annotation, CaptureSegment, SigMFMetadata, TraceabilityOrigin, Track } from '@/utils/sigmfMetadata';
 import { FileWithDirectoryAndFileHandle } from 'browser-fs-access';
 
 export class LocalClient implements MetadataClient {
@@ -7,6 +7,10 @@ export class LocalClient implements MetadataClient {
 
   constructor(files: FileWithDirectoryAndFileHandle[]) {
     this.files = files;
+  }
+
+  track(account: string, container: string, filepath: string): Promise<Track> {
+    throw new Error('track not supported for blob data sources');
   }
 
   async getMetaFromFile(

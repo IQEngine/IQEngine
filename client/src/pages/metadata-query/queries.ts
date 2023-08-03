@@ -2,7 +2,7 @@ import moment from 'moment';
 import { DateQuery } from './date-query';
 import { StringQuery } from './string-query';
 import { FreqQuery } from './freq-query';
-import { GeoQuery } from './geo-query';
+import { GeoQuery } from './geo/geo-query';
 import { SourceQuery } from './data-source-query';
 
 export const queries = {
