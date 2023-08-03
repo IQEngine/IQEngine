@@ -62,7 +62,7 @@ export const PluginsPane = ({
   };
 
   const methodOptions = [
-    { value: 'Full', label: '' },
+    // { value: 'Full', label: '' },
     { value: 'Annotation', label: 'Annotation' },
     { value: 'Cursor', label: 'Cursor' },
   ];
@@ -119,7 +119,10 @@ export const PluginsPane = ({
             byte_length: byte_length,
           },
         ],
-        custom_params: {},
+        custom_params: {
+          start_freq: annotation['core:freq_lower_edge'],
+          end_freq: annotation['core:freq_upper_edge'],
+        },
       };
     } else {
       const newSamps = convertFloat32ArrayToBase64(trimmedSamples);
