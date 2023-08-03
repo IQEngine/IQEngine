@@ -239,7 +239,9 @@ export function reshapeFFTs(currentFFTSize: number, currentData: Float32Array[],
         newData[j] = new Float32Array(newFFTSize * 2).fill(NaN);
       }
 
-      // Copy data into right line in new array
+      // Copy data into right line in new array (RHS 
+      // maps line in original array to it's place in the new new, larger
+      // line)
       newData[j].set(data, (i % (1/multiplier)) * currentFFTSize * 2);
     });
   }

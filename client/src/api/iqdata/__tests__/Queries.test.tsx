@@ -160,7 +160,7 @@ describe("Check reshape array works correctly", () => {
     expect(() => reshapeFFTs(fftSize, testArray, 30)).toThrow();
   });
 
-  test.only('Copes with sparse arrays', async ({ expect }) => {
+  test('Copes with sparse arrays', async ({ expect }) => {
     const fftSize = 128;
     const testArray = createTestArray(fftSize, 800);
 
@@ -175,7 +175,7 @@ describe("Check reshape array works correctly", () => {
     console.log();
     expect(newArray).toHaveLength(testArray.length * (fftSize/512));
     expect(newArray[0][0]).toEqual(testArray[0][0]);
-    expect(newArray[0][fftSize]).toEqual(NaN);
-    expect(newArray[0][2 * fftSize]).toEqual(testArray[2][0]);
+    // NaN indicated the data was missing in original array
+    expect(newArray[0][fftSize * 2]).toEqual(NaN);
   });
 });
