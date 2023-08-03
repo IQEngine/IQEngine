@@ -119,10 +119,7 @@ async def get_byte_streams(
                 blob_size,
             )
 
-    tasks = [
-        get_byte_stream_wrapper(block_index_chunk)
-        for block_index_chunk in block_indexes_chunks
-    ]
+    tasks = [get_byte_stream_wrapper(block_index_chunk) for block_index_chunk in block_indexes_chunks]
     return await asyncio.gather(*tasks)
 
 
@@ -134,6 +131,8 @@ async def get_byte_stream(
     azure_client,
     blob_size,
 ):
+    st = time.time()
+
     offsetBytes = block_indexes_chunk[0] * block_size * bytes_per_iq_sample
     countBytes = (
         (block_indexes_chunk[1] - block_indexes_chunk[0] + 1)
@@ -149,7 +148,6 @@ async def get_byte_stream(
         filepath=iq_file, offset=offsetBytes, length=countBytes
     )
 
-    st = time.time()
     print(f"get_byte_stream: {time.time() - st}")
 
     return content
