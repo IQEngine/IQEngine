@@ -150,8 +150,14 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
 
   const handleWheel = (e) => {
     e.evt.preventDefault();
-    let scrollAmount = Math.floor(e.evt.wheelDeltaY);
-    setCurrentFFT(Math.max(0, currentFFT - scrollAmount));
+    const scrollAmount = Math.floor(e.evt.wheelDeltaY);
+
+    const nextPosition = currentFFT - scrollAmount + spectrogramHeight * (fftStepSize + 1);
+    const maxPosition = meta.getTotalSamples() / fftSize;
+
+    if (nextPosition <= maxPosition) {
+      setCurrentFFT(Math.max(0, currentFFT - scrollAmount));
+    }
   };
 
   const handleDragMove = (e) => {
