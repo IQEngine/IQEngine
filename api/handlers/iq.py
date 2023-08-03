@@ -89,6 +89,7 @@ async def calculate_iq_data(
 async def get_byte_streams(
     block_indexes, block_size, bytes_per_iq_sample, iq_file, azure_client
 ):
+    max_concurrent_requests = 100
     chunk_size = 200 * 1024 // block_size
     block_indexes_arrs = find_smallest_and_largest_next_to_each_other(block_indexes)
 
@@ -104,18 +105,21 @@ async def get_byte_streams(
             block_indexes_chunks.append(i)
 
     blob_size = await azure_client.get_file_length(iq_file)
+    
+    semaphore = asyncio.Semaphore(max_concurrent_requests)
+    
+    async def get_byte_stream_wrapper(block_index_chunk):
+        async with semaphore:
+            return await get_byte_stream(
+                block_index_chunk,
+                block_size,
+                bytes_per_iq_sample,
+                iq_file,
+                azure_client,
+                blob_size,
+            )
 
-    tasks = [
-        get_byte_stream(
-            block_index_chunk,
-            block_size,
-            bytes_per_iq_sample,
-            iq_file,
-            azure_client,
-            blob_size,
-        )
-        for block_index_chunk in block_indexes_chunks
-    ]
+    tasks = [get_byte_stream_wrapper(block_index_chunk) for block_index_chunk in block_indexes_chunks]
     return await asyncio.gather(*tasks)
 
 
