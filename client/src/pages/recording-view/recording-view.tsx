@@ -33,6 +33,8 @@ export function DisplaySpectrogram({ currentFFT, setCurrentFFT }) {
     colmap,
     windowFunction,
     fftSize,
+    fftStepSize,
+    meta,
     setSpectrogramWidth,
     setSpectrogramHeight,
   } = useSpectrogramContext();
@@ -58,7 +60,13 @@ export function DisplaySpectrogram({ currentFFT, setCurrentFFT }) {
   );
   function handleWheel(evt: KonvaEventObject<WheelEvent>): void {
     evt.evt.preventDefault();
-    setCurrentFFT(Math.max(0, currentFFT + evt.evt.deltaY));
+    const scrollAmount = Math.floor(evt.evt.deltaY);
+    const nextPosition = currentFFT + scrollAmount + spectrogramHeight * (fftStepSize + 1);
+    const maxPosition = meta.getTotalSamples() / fftSize;
+
+    if (nextPosition < maxPosition) {
+      setCurrentFFT(Math.max(0, currentFFT + scrollAmount));
+    }
   }
 
   useEffect(() => {
