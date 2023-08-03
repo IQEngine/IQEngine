@@ -65,7 +65,6 @@ export const PluginsPane = ({
     { value: 'Full', label: '' },
     { value: 'Annotation', label: 'Annotation' },
     { value: 'Cursor', label: 'Cursor' },
-    { value: 'Full', label: 'Full' },
   ];
 
   const handleSubmit = (e) => {
@@ -140,6 +139,7 @@ export const PluginsPane = ({
       };
     }
 
+    console.log('Body ', body);
     // Add custom params
     for (const [key, value] of Object.entries(pluginParameters)) {
       if (value.type === 'integer') {
