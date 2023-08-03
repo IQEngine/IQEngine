@@ -22,6 +22,7 @@ import { MINIMAP_FFT_SIZE } from '@/utils/constants';
 import FreqSelector from './components/freq-selector';
 import TimeSelector from './components/time-selector';
 import { AnnotationViewer } from './components/annotation/annotation-viewer';
+import TimeSelectorMinimap from './components/time-selector-minimap';
 
 export function DisplaySpectrogram({ currentFFT, setCurrentFFT }) {
   const { spectrogramWidth, magnitudeMin, magnitudeMax, colmap, windowFunction, fftSize } = useSpectrogramContext();
@@ -65,6 +66,7 @@ export function DisplaySpectrogram({ currentFFT, setCurrentFFT }) {
         </Stage>
         <Stage width={MINIMAP_FFT_SIZE + 5} height={spectrogramHeight}>
           <ScrollBar currentFFT={currentFFT} setCurrentFFT={setCurrentFFT} />
+          <TimeSelectorMinimap currentFFT={currentFFT} />
         </Stage>
       </div>
     </>

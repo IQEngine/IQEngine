@@ -13,7 +13,7 @@ export function useQueryClient() {
   queryClient.setQueryDefaults(['datasource', CLIENT_TYPE_BLOB], { staleTime: 1000 * 60 });
   queryClient.setQueryDefaults(['plugins'], { staleTime: 1000 * 60 * 5 });
   queryClient.setQueryDefaults(['rawiqdata'], { staleTime: Infinity });
-  queryClient.setQueryDefaults(['iqData'], { staleTime: Infinity });
+  queryClient.setQueryDefaults(['iqData'], { staleTime: 5, cacheTime: 10 });
   queryClient.setQueryDefaults(['user-settings'], { staleTime: Infinity });
 
   return {

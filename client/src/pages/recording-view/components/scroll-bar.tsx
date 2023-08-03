@@ -96,7 +96,6 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
       // get the length ot any of the iqData arrays
       const newScalingFactor = totalffts / spectrogramHeight;
       setScalingFactor(newScalingFactor);
-      console.log('newScalingFactor', newScalingFactor);
     }
   }, [spectrogramHeight, fftSize, fftStepSize, meta, fftsRequired]);
 
