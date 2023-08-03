@@ -105,9 +105,9 @@ async def get_byte_streams(
             block_indexes_chunks.append(i)
 
     blob_size = await azure_client.get_file_length(iq_file)
-    
+
     semaphore = asyncio.Semaphore(max_concurrent_requests)
-    
+
     async def get_byte_stream_wrapper(block_index_chunk):
         async with semaphore:
             return await get_byte_stream(
@@ -119,7 +119,10 @@ async def get_byte_streams(
                 blob_size,
             )
 
-    tasks = [get_byte_stream_wrapper(block_index_chunk) for block_index_chunk in block_indexes_chunks]
+    tasks = [
+        get_byte_stream_wrapper(block_index_chunk)
+        for block_index_chunk in block_indexes_chunks
+    ]
     return await asyncio.gather(*tasks)
 
 
