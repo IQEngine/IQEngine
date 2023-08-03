@@ -72,13 +72,12 @@ export const PluginsPane = () => {
     const sampleRate = meta.getSampleRate();
     const freq = meta.getCenterFrequency();
 
-    const annotation = meta.annotations[selectedAnnotation];
-
     if (selectedMethod == 'Annotation') {
       if (selectedAnnotation == -1) {
         toast.error('Please select the annotation you want to run a plugin on');
         setSelectedMethod('');
       } else {
+        const annotation = meta.annotations[selectedAnnotation];
         const calculateMultiplier = dataTypeToBytesPerIQSample(MimeTypes[meta.getDataType()]);
         byte_offset = Math.floor(annotation['core:sample_start']) * calculateMultiplier;
         byte_length = annotation['core:sample_count'] * calculateMultiplier;
