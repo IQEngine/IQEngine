@@ -90,7 +90,7 @@ async def get_byte_streams(
     block_indexes, block_size, bytes_per_iq_sample, iq_file, azure_client
 ):
     max_concurrent_requests = 100
-    chunk_size = 200 * 1024 // block_size
+    chunk_size = 100 * 1024 // block_size
     block_indexes_arrs = find_smallest_and_largest_next_to_each_other(block_indexes)
 
     block_indexes_chunks = []
