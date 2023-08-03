@@ -139,7 +139,6 @@ export const PluginsPane = ({
       };
     }
 
-    console.log('Body ', body);
     // Add custom params
     for (const [key, value] of Object.entries(pluginParameters)) {
       if (value.type === 'integer') {
