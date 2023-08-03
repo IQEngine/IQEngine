@@ -57,19 +57,19 @@ const SettingsPane = ({ currentFFT }) => {
 
   const onPressSaveButton = (e) => {
     console.log(context.meta);
-
     // Grab metadata and remove the parts that shouldn't be included in the metafile
     let metaClone = JSON.parse(JSON.stringify(context.meta));
     delete metaClone['dataClient'];
     const a = document.createElement('a');
 
-    // TODO: Return with the download of the blob
-    // var blobUrl = window.URL.createObjectURL(blob);
-    // var blob = new Blob([trimmedSamples], { type: 'octet/stream' });
-    // a.href = blobUrl;
-    // a.download = 'trimmedSamples.sigmf-data';
-    // a.click();
-    // window.URL.revokeObjectURL(blobUrl);
+    // Return with the download of the blob
+    const blobUrl = window.URL.createObjectURL(
+      new Blob([cursorContext.cursorData], { type: 'application/octet-stream' })
+    );
+    a.href = blobUrl;
+    a.download = 'trimmedSamples.sigmf-data';
+    a.click();
+    window.URL.revokeObjectURL(blobUrl);
 
     a.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent(JSON.stringify(metaClone, null, 2));
     a.download = 'trimmedSamples.sigmf-meta';
@@ -110,6 +110,7 @@ const SettingsPane = ({ currentFFT }) => {
               });
             }
             cursorContext.setCursorTimeEnabled(e.target.checked);
+            context.setCanDownload(e.target.checked);
           }}
         />
       </label>
