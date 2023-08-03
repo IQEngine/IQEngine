@@ -44,8 +44,7 @@ export function DisplaySpectrogram({ currentFFT, setCurrentFFT }) {
     const spectrogramHeight = height - 450; // hand-tuned for now
     console.log('spectrogramHeight: ', spectrogramHeight);
     setSpectrogramHeight(spectrogramHeight);
-    console.log('width: ', width, 'height: ', height);
-    const newSpectrogramWidth = window.innerWidth - 430; // hand-tuned for now
+    const newSpectrogramWidth = width - 430; // hand-tuned for now
     setSpectrogramWidth(newSpectrogramWidth);
   }, [width, height]);
 
