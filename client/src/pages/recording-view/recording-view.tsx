@@ -23,11 +23,31 @@ import FreqSelector from './components/freq-selector';
 import TimeSelector from './components/time-selector';
 import { AnnotationViewer } from './components/annotation/annotation-viewer';
 import TimeSelectorMinimap from './components/time-selector-minimap';
+import { useWindowSize } from 'usehooks-ts';
 
 export function DisplaySpectrogram({ currentFFT, setCurrentFFT }) {
-  const { spectrogramWidth, magnitudeMin, magnitudeMax, colmap, windowFunction, fftSize } = useSpectrogramContext();
+  const {
+    spectrogramWidth,
+    magnitudeMin,
+    magnitudeMax,
+    colmap,
+    windowFunction,
+    fftSize,
+    setSpectrogramWidth,
+    setSpectrogramHeight,
+  } = useSpectrogramContext();
 
   const { displayedIQ, spectrogramHeight } = useSpectrogram(currentFFT);
+  const { width, height } = useWindowSize();
+
+  useEffect(() => {
+    const spectrogramHeight = height - 450; // hand-tuned for now
+    console.log('spectrogramHeight: ', spectrogramHeight);
+    setSpectrogramHeight(spectrogramHeight);
+    console.log('width: ', width, 'height: ', height);
+    const newSpectrogramWidth = window.innerWidth - 430; // hand-tuned for now
+    setSpectrogramWidth(newSpectrogramWidth);
+  }, [width, height]);
 
   const { image, setIQData } = useGetImage(
     fftSize,
@@ -71,10 +91,6 @@ export function DisplaySpectrogram({ currentFFT, setCurrentFFT }) {
       </div>
     </>
   );
-}
-
-export function DisplayTime() {
-  return <div></div>;
 }
 
 export function DisplayMetadataRaw() {
