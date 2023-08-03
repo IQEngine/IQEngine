@@ -90,12 +90,12 @@ describe('Annotation list component', () => {
     waitFor(
       () => {
         // Assert values are in document
-        expect(screen.findByText('883.275')).toBeInTheDocument();
-        expect(screen.findByText('884.625')).toBeInTheDocument();
-        expect(screen.findByText('1.35MHz')).toBeInTheDocument();
-        expect(screen.findByText('LTE')).toBeInTheDocument();
-        expect(screen.findByText('5ms')).toBeInTheDocument();
-        expect(screen.findByText('Sample comment')).toBeInTheDocument();
+        expect(screen.queryByText('883.275')).toBeInTheDocument();
+        expect(screen.queryByText('884.625')).toBeInTheDocument();
+        expect(screen.queryByText('1.35MHz')).toBeInTheDocument();
+        expect(screen.queryByText('LTE')).toBeInTheDocument();
+        expect(screen.queryByText('5ms')).toBeInTheDocument();
+        expect(screen.queryByText('Sample comment')).toBeInTheDocument();
       },
       { timeout: 1000000 }
     );
