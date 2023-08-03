@@ -21,16 +21,13 @@ import ScrollBar from './components/scroll-bar';
 import { MINIMAP_FFT_SIZE } from '@/utils/constants';
 import FreqSelector from './components/freq-selector';
 import TimeSelector from './components/time-selector';
+import { AnnotationViewer } from './components/annotation/annotation-viewer';
+import TimeSelectorMinimap from './components/time-selector-minimap';
 
 export function DisplaySpectrogram({ currentFFT, setCurrentFFT }) {
   const { spectrogramWidth, magnitudeMin, magnitudeMax, colmap, windowFunction, fftSize } = useSpectrogramContext();
 
   const { displayedIQ, spectrogramHeight } = useSpectrogram(currentFFT);
-
-  useEffect(() => {
-    console.log('currentFFT', currentFFT);
-    console.log('spectrogramHeight', spectrogramHeight);
-  }, [currentFFT, spectrogramHeight]);
 
   const { image, setIQData } = useGetImage(
     fftSize,
@@ -58,8 +55,9 @@ export function DisplaySpectrogram({ currentFFT, setCurrentFFT }) {
       <div className="flex flex-row">
         <Stage width={spectrogramWidth} height={spectrogramHeight}>
           <Layer onWheel={handleWheel}>
-            <Image image={image} x={0} y={0} width={1024} height={spectrogramHeight} />
+            <Image image={image} x={0} y={0} width={spectrogramWidth} height={spectrogramHeight} />
           </Layer>
+          <AnnotationViewer currentFFT={currentFFT} />
           <FreqSelector />
           <TimeSelector currentFFT={currentFFT} />
         </Stage>
@@ -68,6 +66,7 @@ export function DisplaySpectrogram({ currentFFT, setCurrentFFT }) {
         </Stage>
         <Stage width={MINIMAP_FFT_SIZE + 5} height={spectrogramHeight}>
           <ScrollBar currentFFT={currentFFT} setCurrentFFT={setCurrentFFT} />
+          <TimeSelectorMinimap currentFFT={currentFFT} />
         </Stage>
       </div>
     </>
