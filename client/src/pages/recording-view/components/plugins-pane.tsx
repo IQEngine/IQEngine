@@ -53,8 +53,8 @@ export const PluginsPane = () => {
 
   const methodOptions = [
     // { value: 'Full', label: '' },
-    { value: 'Annotation', label: 'Annotation' },
     { value: 'Cursor', label: 'Cursor' },
+    { value: 'Annotation', label: 'Annotation' },
   ];
 
   const handleSubmit = (e) => {
