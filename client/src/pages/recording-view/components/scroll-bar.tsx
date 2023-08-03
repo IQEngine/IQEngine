@@ -102,7 +102,6 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
 
   useEffect(() => {
     if (!ffts) return;
-    console.log('Rendering minimap', ffts);
     const rgbData = fftToRGB(ffts, MINIMAP_FFT_SIZE, magnitudeMin, magnitudeMax, colMaps[colmap]);
     let num_final_ffts = ffts.length / MINIMAP_FFT_SIZE;
     const newImageData = new ImageData(rgbData, MINIMAP_FFT_SIZE, num_final_ffts);
