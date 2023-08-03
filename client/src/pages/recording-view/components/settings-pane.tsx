@@ -163,7 +163,7 @@ const SettingsPane = ({ currentFFT }) => {
           <button tabIndex={0} className="m-1 px-16 w-full">
             Colormap
           </button>
-          <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
+          <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 z-50">
             {Object.entries(colMaps).map(([value]) => (
               <li
                 key={value}
@@ -184,7 +184,7 @@ const SettingsPane = ({ currentFFT }) => {
           <button tabIndex={0} className="m-1 px-16 w-full">
             FFT Size
           </button>
-          <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
+          <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 z-50">
             {fftSizes.map((x, index) => (
               <li
                 key={index}
@@ -242,7 +242,7 @@ const SettingsPane = ({ currentFFT }) => {
             <button tabIndex={0} className="m-1 px-7 w-full">
               Example Filter Taps
             </button>
-            <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
+            <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 z-50">
               <li
                 key={0}
                 data-value="[0.021019600765633,0.05574786251380393,0.04504671465435009,-0.012858837474581268,-0.042883835223827396,0.013822126400016621,0.05882808073316635,-0.014316809227248763,-0.10299625870988743,0.015410773935742991,0.31701869995313076,0.48460819626209206,0.31701869995313076,0.015410773935742991,-0.10299625870988743,-0.014316809227248763,0.05882808073316635,0.013822126400016621,-0.042883835223827396,-0.012858837474581268,0.04504671465435009,0.05574786251380393,0.021019600765633]"
@@ -275,7 +275,7 @@ const SettingsPane = ({ currentFFT }) => {
           <button tabIndex={0} className="m-1 px-16 w-full">
             Window
           </button>
-          <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
+          <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 z-50">
             <li key={0} data-value="hamming" onClick={onChangeWindowFunction}>
               {context.windowFunction === 'hamming' ? <a className="active">Hamming</a> : <a>Hamming</a>}
             </li>
