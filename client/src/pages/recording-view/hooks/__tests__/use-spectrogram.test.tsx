@@ -75,7 +75,7 @@ describe('test metadata fetch and fft calculation', () => {
     const seed = getDefaultSeedValues();
     seed.fftSize = fftSize;
 
-    const { result } = renderHook(() => useSpectrogram(), {
+    const { result } = renderHook(() => useSpectrogram(0), {
       wrapper: ({ children }) => createTestWrapper(origin, seed, children),
     });
     await waitFor(() => expect(result.current.totalFFTs).toBe(total_ffts));
@@ -94,7 +94,7 @@ describe('test metadata fetch and fft calculation', () => {
     const seed = getDefaultSeedValues();
     seed.fftSize = fftSize;
     seed.spectrogramHeight = 10;
-    const { result } = renderHook(() => useSpectrogram(), {
+    const { result } = renderHook(() => useSpectrogram(0), {
       wrapper: ({ children }) => createTestWrapper(origin, seed, children),
     });
 
@@ -116,7 +116,7 @@ describe('test metadata fetch and fft calculation', () => {
     seed.fftSize = fftSize;
     seed.spectrogramHeight = 10;
     seed.fftStepSize = 1;
-    const { result } = renderHook(() => useSpectrogram(), {
+    const { result } = renderHook(() => useSpectrogram(0), {
       wrapper: ({ children }) => createTestWrapper(origin, seed, children),
     });
 
@@ -145,7 +145,7 @@ describe('test metadata fetch and fft calculation', () => {
     seed.fftSize = fftSize;
     seed.spectrogramHeight = 10;
     seed.fftStepSize = 1;
-    const { result } = renderHook(() => useSpectrogram(), {
+    const { result } = renderHook(() => useSpectrogram(0), {
       wrapper: ({ children }) => createTestWrapper(origin, seed, children),
     });
 

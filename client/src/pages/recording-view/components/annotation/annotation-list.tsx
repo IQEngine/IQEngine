@@ -20,10 +20,9 @@ interface AnnotationListProps {
 }
 
 export const AnnotationList = ({ setCurrentFFT, currentFFT }: AnnotationListProps) => {
-  const { meta, fftSize, setMeta } = useSpectrogramContext();
+  const { meta, fftSize, setMeta, setSelectedAnnotation } = useSpectrogramContext();
   const [parents, setParents] = useState([]);
   const [data, setData] = useState([]);
-  const [selectedAnnotation, setSelectedAnnotation] = useState<number>();
 
   const originalColumns = [
     { title: 'Annotation', dataIndex: 'annotation' },
