@@ -3,14 +3,13 @@ import base64
 import io
 import logging
 import time
-from typing import List, Optional
+from typing import List
 
 from blob.azure_client import AzureBlobClient
 from database import datasource_repo
 from database.models import DataSource
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
-from helpers.authorization import get_current_user
 from helpers.datasource_access import check_access
 from helpers.cipher import decrypt
 from helpers.conversions import find_smallest_and_largest_next_to_each_other

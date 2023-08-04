@@ -2,7 +2,7 @@ import json
 import logging
 import os
 import time
-from typing import Any, List, Optional, Tuple, Union, cast
+from typing import Any, Optional, Tuple, cast
 
 import jwt
 import requests
@@ -124,4 +124,3 @@ def get_current_user(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="No Authorization token provided",
         )
-

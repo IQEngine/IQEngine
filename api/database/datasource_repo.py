@@ -1,13 +1,10 @@
 from typing import Optional
-from fastapi import Depends
 from blob.azure_client import AzureBlobClient
 
 from database.models import DataSource, DataSourceReference
 from helpers.cipher import decrypt, encrypt
 from motor.core import AgnosticCollection
 from rf.samples import get_bytes_per_iq_sample
-
-from helpers.datasource_access import check_access
 
 
 def collection() -> AgnosticCollection:
