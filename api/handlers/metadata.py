@@ -99,14 +99,18 @@ async def get_track_meta(
     metadata: Metadata = Depends(metadata_repo.get),
     current_user: Optional[dict] = Depends(required_roles()),
 ):
-    if not metadata or not metadata.globalMetadata.traceability_origin.account or not metadata.globalMetadata.traceability_origin.container:
+    if not metadata:
         raise HTTPException(status_code=404, detail="Metadata not found")
 
     return TrackMetadata(
         iqengine_geotrack=metadata.globalMetadata.__dict__.get("iqengine:geotrack"),
         description=metadata.globalMetadata.core_description,
-        account=metadata.globalMetadata.traceability_origin.account,
-        container=metadata.globalMetadata.traceability_origin.container,
+        account=metadata.globalMetadata.traceability_origin.account
+        if metadata.globalMetadata.traceability_origin is not None
+        else None,
+        container=metadata.globalMetadata.traceability_origin.container
+        if metadata.globalMetadata.traceability_origin is not None
+        else None,
     )
 
 
@@ -222,9 +226,9 @@ async def create_meta(
     metadatas: AgnosticCollection = Depends(metadata_repo.collection),
     versions: AgnosticCollection = Depends(metadata_repo.versions_collection),
     current_user: Optional[dict] = Depends(required_roles()),
-    access_allowed=Depends(check_access)
+    access_allowed=Depends(check_access),
 ):
-    if access_allowed!="owner":
+    if access_allowed != "owner":
         raise HTTPException(status_code=403, detail="No Access")
     # Check datasource id is valid
     datasource = await datasources.find_one(
@@ -275,9 +279,9 @@ async def update_meta(
     current_user: Optional[dict] = Depends(required_roles()),
     access_allowed=Depends(check_access),
 ):
-    if access_allowed!="owner":
+    if access_allowed != "owner":
         raise HTTPException(status_code=403, detail="No Access")
-    
+
     current = await metadatas.find_one(
         {
             "global.traceability:origin.account": account,

@@ -129,7 +129,7 @@ async def create(datasource: DataSource) -> DataSource:
     else:
         datasource.sasToken = ""
     datasource_dict = datasource.dict(by_alias=True, exclude_unset=True)
-    user = get_current_user()
+    user = await get_current_user()
     if "owners" not in datasource_dict:
         datasource_dict["owners"] = []
     if user and user.get("preferred_username"):
