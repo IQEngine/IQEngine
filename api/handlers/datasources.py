@@ -6,7 +6,7 @@ from database.datasource_repo import create, datasource_exists
 from database.models import DataSource
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from fastapi.responses import StreamingResponse
-from helpers.authorization import required_roles
+from helpers.authorization import get_current_user
 from helpers.cipher import encrypt
 from helpers.urlmapping import ApiType, add_URL_sasToken
 from motor.core import AgnosticCollection
@@ -20,7 +20,7 @@ router = APIRouter()
 async def create_datasource(
     datasource: DataSource,
     datasources: AgnosticCollection = Depends(datasource_repo.collection),
-    current_user: Optional[dict] = Depends(required_roles()),
+    current_user: Optional[dict] = Depends(get_current_user),
 ):
     """
     Create a new datasource. The datasource will be henceforth identified by account/container which
@@ -29,19 +29,19 @@ async def create_datasource(
     if await datasource_exists(datasource.account, datasource.container):
         raise HTTPException(status_code=409, detail="Datasource Already Exists")
 
-    datasource = await create(datasource=datasource)
+    datasource = await create(datasource=datasource, user=current_user)
     return datasource
 
 
 @router.get("/api/datasources", response_model=list[DataSource])
 async def get_datasources(
     datasources_collection: AgnosticCollection = Depends(datasource_repo.collection),
-    current_user: Optional[dict] = Depends(required_roles()),
+    current_user: Optional[dict] = Depends(get_current_user),
 ):
     datasources = datasources_collection.find()
     result = []
     async for datasource_item in datasources:
-        if check_access(datasource_item["account"], datasource_item["container"], None) is not None:
+        if await check_access(datasource_item["account"], datasource_item["container"], current_user) is not None:
             result.append(datasource_item)
     return result
 
@@ -53,7 +53,6 @@ async def get_datasource_image(
     account: str,
     container: str,
     datasources_collection: AgnosticCollection = Depends(datasource_repo.collection),
-    current_user: Optional[dict] = Depends(required_roles()),
     access_allowed=Depends(check_access),
 ):
     if access_allowed is None:
@@ -91,7 +90,7 @@ async def get_datasource_image(
 )
 async def get_datasource(
     datasource: DataSource = Depends(datasource_repo.get),
-    current_user: Optional[dict] = Depends(required_roles()),
+    current_user: Optional[dict] = Depends(get_current_user),
 ):
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
@@ -105,7 +104,6 @@ async def update_datasource(
     container: str,
     datasource: DataSource,
     datasources_collection: AgnosticCollection = Depends(datasource_repo.collection),
-    current_user: Optional[dict] = Depends(required_roles()),
     access_allowed=Depends(check_access),
 ):
     if access_allowed is None:
@@ -145,7 +143,7 @@ async def sync_datasource(
     container: str,
     background_tasks: BackgroundTasks,
     datasources_collection: AgnosticCollection = Depends(datasource_repo.collection),
-    current_user: Optional[dict] = Depends(required_roles()),
+    current_user: Optional[dict] = Depends(get_current_user),
     access_allowed=Depends(check_access),
 ):
     if access_allowed is None:

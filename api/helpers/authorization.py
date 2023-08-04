@@ -2,7 +2,7 @@ import json
 import logging
 import os
 import time
-from typing import Any, Coroutine, List, Optional, Tuple, Callable, Union, cast
+from typing import Any, List, Optional, Tuple, Union, cast
 
 import jwt
 import requests
@@ -103,7 +103,7 @@ def validate_and_decode_jwt(token: str) -> dict:
         )
 
 
-async def get_current_user(
+def get_current_user(
     token: Optional[Depends] = Depends(http_bearer),
 ) -> Optional[dict]:
     if not token:
@@ -125,52 +125,3 @@ async def get_current_user(
             detail="No Authorization token provided",
         )
 
-
-def required_roles(
-    roles: Optional[Union[str, List[str]]] = None,
-) -> Callable[..., Coroutine[Any, Any, Optional[dict[Any, Any]]]]:
-
-    if roles is None:
-        # If roles are None, return the original dependency function without any role check
-        return get_current_user
-
-    if isinstance(roles, str):
-        roles = [roles]  # Convert the optional str to a list with a single element
-    elif not isinstance(roles, list):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Invalid claims parameter",
-        )
-
-    async def _check_roles(current_user: Optional[dict] = None) -> Optional[dict]:
-        if current_user is None:
-            current_user = await get_current_user()
-        if current_user is None:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="No Authorization token provided",
-            )
-        if roles is None:
-            return current_user # repeated to solve linter error
-        if not any(role in current_user.get("roles", []) for role in roles):
-            logging.info(
-                f"User {current_user.get('preferred_username')} attempted to access without sufficient privileges"
-            )
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="No Access",
-            )
-
-        logging.info(
-            f"User {current_user.get('preferred_username')} accessed successfully"
-        )
-        return current_user
-
-    return _check_roles
-
-
-# Example usage
-# @app.get("/some-endpoint")
-# def read_items(test:str, dependencies=[Depends(required_roles("IQEngine-User"))]):
-#     # business logic here
-#     return {"message": "You have access!"}

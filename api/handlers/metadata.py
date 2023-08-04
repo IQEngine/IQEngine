@@ -8,7 +8,7 @@ from database.metadata_repo import InvalidGeolocationFormat, query_metadata
 from database.models import DataSource, DataSourceReference, Metadata, TrackMetadata
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Response
 from fastapi.responses import StreamingResponse
-from helpers.authorization import required_roles
+from helpers.authorization import get_current_user
 from helpers.cipher import decrypt
 from helpers.urlmapping import ApiType, get_content_type, get_file_name
 from motor.core import AgnosticCollection
@@ -25,7 +25,6 @@ async def get_all_meta(
     account,
     container,
     metadatas: AgnosticCollection = Depends(metadata_repo.collection),
-    current_user: Optional[dict] = Depends(required_roles()),
     access_allowed=Depends(check_access),
 ):
 
@@ -55,7 +54,6 @@ async def get_all_meta_name(
     account,
     container,
     metadata_source: AgnosticCollection = Depends(metadata_repo.collection),
-    current_user: Optional[dict] = Depends(required_roles()),
     access_allowed=Depends(check_access),
 ):
     if access_allowed is None:
@@ -83,7 +81,7 @@ async def get_all_meta_name(
 )
 async def get_meta(
     metadata: Metadata = Depends(metadata_repo.get),
-    current_user: Optional[dict] = Depends(required_roles()),
+    access_allowed=Depends(check_access)
 ):
 
     if not metadata:
@@ -97,7 +95,7 @@ async def get_meta(
 )
 async def get_track_meta(
     metadata: Metadata = Depends(metadata_repo.get),
-    current_user: Optional[dict] = Depends(required_roles()),
+    access_allowed=Depends(check_access)
 ):
     if not metadata:
         raise HTTPException(status_code=404, detail="Metadata not found")
@@ -123,7 +121,7 @@ async def get_meta_thumbnail(
     background_tasks: BackgroundTasks,
     datasource: DataSource = Depends(datasource_repo.get),
     azure_client: AzureBlobClient = Depends(AzureBlobClient),
-    current_user: Optional[dict] = Depends(required_roles()),
+    access_allowed=Depends(check_access)
 ):
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
@@ -175,7 +173,7 @@ async def query_meta(
     text: Optional[str] = Query(None),
     captures_geo: Optional[str] = Query(None),
     annotations_geo: Optional[str] = Query(None),
-    current_user: Optional[dict] = Depends(required_roles()),
+    current_user: Optional[dict] = Depends(get_current_user),
 ):
     try:
         result = await query_metadata(
@@ -200,7 +198,7 @@ async def query_meta(
 
         # Process result to remove metadata from unauthorized datasources
         for item in result:
-            if check_access(item.account, item.container, current_user) is None:
+            if await check_access(item.account, item.container, current_user) is None:
                 result.remove(item)
         return result
 
@@ -225,7 +223,6 @@ async def create_meta(
     datasources: AgnosticCollection = Depends(datasource_repo.collection),
     metadatas: AgnosticCollection = Depends(metadata_repo.collection),
     versions: AgnosticCollection = Depends(metadata_repo.versions_collection),
-    current_user: Optional[dict] = Depends(required_roles()),
     access_allowed=Depends(check_access),
 ):
     if access_allowed != "owner":
@@ -276,7 +273,6 @@ async def update_meta(
     metadata: Metadata,
     metadatas: AgnosticCollection = Depends(metadata_repo.collection),
     versions: AgnosticCollection = Depends(metadata_repo.versions_collection),
-    current_user: Optional[dict] = Depends(required_roles()),
     access_allowed=Depends(check_access),
 ):
     if access_allowed != "owner":

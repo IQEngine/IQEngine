@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import Depends
 from blob.azure_client import AzureBlobClient
 
@@ -6,7 +7,6 @@ from helpers.cipher import decrypt, encrypt
 from motor.core import AgnosticCollection
 from rf.samples import get_bytes_per_iq_sample
 
-from helpers.authorization import get_current_user
 from helpers.datasource_access import check_access
 
 
@@ -16,7 +16,7 @@ def collection() -> AgnosticCollection:
     return collection
 
 
-async def get(account, container, access_allowed=Depends(check_access)) -> DataSource | None:
+async def get(account, container) -> DataSource | None:
     """
     Get a datasource by account and container
 
@@ -32,9 +32,6 @@ async def get(account, container, access_allowed=Depends(check_access)) -> DataS
     DataSource
         The datasource.
     """
-    if access_allowed is None:
-        return None
-
     datasource_collection: AgnosticCollection = collection()
     datasource = await datasource_collection.find_one(
         {"account": account, "container": container}
@@ -105,7 +102,7 @@ async def sync(account: str, container: str):
     print(f"[SYNC] Finished syncing {account}/{container}")
 
 
-async def create(datasource: DataSource) -> DataSource:
+async def create(datasource: DataSource, user: Optional[dict]) -> DataSource:
     """
     Create a new datasource. The datasource will be henceforth identified by account/container which
     must be unique or this function will return a 400.
@@ -129,11 +126,11 @@ async def create(datasource: DataSource) -> DataSource:
     else:
         datasource.sasToken = ""
     datasource_dict = datasource.dict(by_alias=True, exclude_unset=True)
-    user = await get_current_user()
+
     if "owners" not in datasource_dict:
         datasource_dict["owners"] = []
-    if user and user.get("preferred_username"):
-        datasource_dict["owners"].append(user.get("preferred_username"))
+    if user and user["preferred_username"]:
+        datasource_dict["owners"].append(user["preferred_username"])
     else:
         datasource_dict["owners"].append("IQEngine-User")
     datasource_dict["readers"] = []

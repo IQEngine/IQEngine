@@ -37,12 +37,12 @@ def check_access_mock(account: str, container: str, user=None):
 
 
 def get_current_user_mock():
-    return mock.AsyncMock(
-        return_value={
+    async def wrapper():
+        return {
             "roles": ["IQEngine-Admin", "IQEngine-User"],
             "preferred_username": "emailaddress",
         }
-    )
+    return wrapper
 
 
 @pytest_asyncio.fixture(scope="function")
@@ -54,17 +54,18 @@ def client():
         new=check_access_mock("account", "container", None),
     ):
         with mock.patch(
-            "helpers.authorization.required_roles", return_value=required_roles_mock()
+                "helpers.authorization.get_current_user",
+                new=get_current_user_mock(),
         ):
-            with mock.patch("importer.all.import_all_from_env") as mock_i:
+            with mock.patch(
+                "handlers.datasources.get_current_user",
+                new=get_current_user_mock(),
+            ):
                 with mock.patch(
                     "database.datasource_repo.check_access",
                     new=check_access_mock("account", "container", None),
                 ):
-                    with mock.patch(
-                        "database.datasource_repo.get_current_user",
-                        new=get_current_user_mock(),
-                    ):
+                    with mock.patch("importer.all.import_all_from_env") as mock_i:
                         mock_i.return_value = None
                         from main import app
                         import database.database as db

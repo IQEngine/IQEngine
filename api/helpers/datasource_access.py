@@ -30,10 +30,10 @@ async def check_access(account: str, container: str, user=Depends(get_current_us
     )
 
     if data_source:
-        if hasattr(data_source, 'public') and data_source.public:
-            return "public"
-        if hasattr(data_source, 'readers') and any(role in data_source.readers for role in roles):
-            return "reader"
-        if hasattr(data_source, 'owners') and any(role in data_source.owners for role in roles):
+        if 'owners' in data_source and any(role in data_source['owners'] for role in roles):
             return "owner"
+        if 'readers' in data_source and any(role in data_source['readers'] for role in roles):
+            return "reader"
+        if 'public' in data_source and data_source['public']:
+            return "public"
     return None

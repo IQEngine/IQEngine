@@ -1,7 +1,6 @@
 import jwt
 from fastapi import HTTPException
 from fastapi.security import HTTPAuthorizationCredentials
-import pytest
 from helpers.authorization import JWKSHandler, get_current_user, validate_and_decode_jwt
 
 
@@ -70,8 +69,8 @@ def test_validate_and_decode_jwt_failure(mocker):
     except HTTPException as e:
         assert e.detail == "Invalid JWT"
 
-@pytest.mark.asyncio
-async def test_get_current_user(mocker):
+
+def test_get_current_user(mocker):
     # Mock the validate_and_decode_jwt function to return a payload
     mocker.patch(
         "helpers.authorization.validate_and_decode_jwt",
@@ -80,5 +79,5 @@ async def test_get_current_user(mocker):
     mock_token = HTTPAuthorizationCredentials(scheme="Bearer", credentials="mock_token")
 
     # Call the function and assert that it returns the expected payload
-    user = await get_current_user(mock_token)
+    user = get_current_user(mock_token)
     assert user == {"preferred_username": "test_user", "roles": ["role1"]}
