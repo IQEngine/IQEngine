@@ -3,10 +3,11 @@ import { useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
 import { IQDataClientFactory } from './IQDataClientFactory';
 import { range } from '@/utils/selector';
 import { IQDataSlice } from '@/api/Models';
-import { TILE_SIZE_IN_IQ_SAMPLES } from '@/utils/constants';
+import { INITIAL_PYTHON_SNIPPET, TILE_SIZE_IN_IQ_SAMPLES } from '@/utils/constants';
 import { useUserSettings } from '@/api/user-settings/use-user-settings';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useMeta } from '@/api/metadata/queries';
+import { applyProcessing } from '@/utils/fetch-more-data-source';
 
 export const getIQDataSlice = (
   meta: SigMFMetadata,
@@ -141,7 +142,38 @@ export const useCurrentCachedIQDataSlice = (meta: SigMFMetadata, tileSize: numbe
   };
 };
 
-export function useGetIQData(type: string, account: string, container: string, filePath: string, fftSize: number) {
+declare global {
+  interface Window {
+    loadPyodide: any;
+  }
+}
+
+export function useGetIQData(
+  type: string,
+  account: string,
+  container: string,
+  filePath: string,
+  fftSize: number,
+  taps: number[] = [1],
+  pythonScript: string = INITIAL_PYTHON_SNIPPET
+) {
+  const [pyodide, setPyodide] = useState<any>(null);
+
+  async function initPyodide() {
+    const pyodide = await window.loadPyodide();
+    await pyodide.loadPackage('numpy');
+    await pyodide.loadPackage('matplotlib');
+    return pyodide;
+  }
+
+  useEffect(() => {
+    if (!pyodide) {
+      initPyodide().then((pyodide) => {
+        setPyodide(pyodide);
+      });
+    }
+  }, []);
+
   const queryClient = useQueryClient();
   const { filesQuery, dataSourcesQuery } = useUserSettings();
   const [fftsRequired, setFFTsRequired] = useState<number[]>([]);
@@ -158,16 +190,8 @@ export function useGetIQData(type: string, account: string, container: string, f
     enabled: !!meta && !!filesQuery.data && !!dataSourcesQuery.data,
   });
 
-  const currentData = useMemo(() => {
-    if (!meta) {
-      return null;
-    }
+  useEffect(() => {
     if (iqData) {
-      // change iqdata to be an sparce array with the index as the key
-      const tempArray = [];
-      iqData.forEach((data) => {
-        tempArray[data.index] = data.iqArray;
-      });
       const previousData = queryClient.getQueryData<Float32Array[]>([
         'rawiqdata',
         type,
@@ -176,23 +200,59 @@ export function useGetIQData(type: string, account: string, container: string, f
         filePath,
         fftSize,
       ]);
-      // This is the fastest way to merge the two sparce arrays keeping the indexes in order
-      const content = Object.assign([], previousData, tempArray);
+      const sparseIQReturnData = [];
+      iqData.forEach((data) => {
+        sparseIQReturnData[data.index] = data.iqArray;
+      });
+      const content = Object.assign([], previousData, sparseIQReturnData);
       queryClient.setQueryData(['rawiqdata', type, account, container, filePath, fftSize], content);
     }
-    const content = queryClient.getQueryData<Float32Array[]>([
-      'rawiqdata',
-      type,
-      account,
-      container,
-      filePath,
-      fftSize,
-    ]);
-    if (!content) {
+  }, [iqData, fftSize]);
+
+  const { data: processedIQData } = useQuery({
+    queryKey: ['rawiqdata', type, account, container, filePath, fftSize],
+    queryFn: async () => {
       return null;
-    }
-    return content;
-  }, [fftSize, meta, iqData]);
+    },
+    select: useCallback(
+      (data) => {
+        if (!data) {
+          return null;
+        }
+        performance.mark('start');
+        const currentProcessedData = queryClient.getQueryData<number[][]>([
+          'processedIQData',
+          type,
+          account,
+          container,
+          filePath,
+          fftSize,
+          taps,
+          pythonScript,
+          !!pyodide,
+        ]);
+        const processedData = data.map((iqData: Float32Array, i: number) => {
+          if (currentProcessedData && currentProcessedData[i]) {
+            return currentProcessedData[i];
+          }
+          return applyProcessing(iqData, taps, pythonScript, pyodide);
+        });
+        performance.mark('end');
+        const performanceMeasure = performance.measure('processing', 'start', 'end');
+        queryClient.setQueryData(
+          ['processedIQData', type, account, container, filePath, fftSize, taps, pythonScript, !!pyodide],
+          processedData
+        );
+
+        return processedData;
+      },
+      [!!pyodide, pythonScript, taps.join(',')]
+    ),
+    enabled: !!meta && !!filesQuery.data && !!dataSourcesQuery.data,
+  });
+
+  const currentData = processedIQData;
+
   return {
     fftSize,
     currentData,
