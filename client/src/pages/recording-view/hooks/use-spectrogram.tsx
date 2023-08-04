@@ -14,8 +14,18 @@ export function useSpectrogram(currentFFT) {
     setFFTStepSize,
     setSpectrogramHeight,
     meta,
+    taps,
+    pythonSnippet,
   } = useSpectrogramContext();
-  const { currentData, setFFTsRequired, fftsRequired } = useGetIQData(type, account, container, filePath, fftSize);
+  const { currentData, setFFTsRequired, fftsRequired } = useGetIQData(
+    type,
+    account,
+    container,
+    filePath,
+    fftSize,
+    taps,
+    pythonSnippet
+  );
   const totalFFTs = Math.ceil(meta?.getTotalSamples() / fftSize);
   // This is the list of ffts we display
   const displayedIQ = useMemo<Float32Array>(() => {

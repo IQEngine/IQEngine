@@ -328,7 +328,7 @@ const SettingsPane = ({ currentFFT }) => {
           onChange={(e) => {
             setLocalPythonSnippet(e.target.value);
           }}
-          value={context.pythonSnippet}
+          value={localPythonSnippet}
         />
         <button onClick={onSubmitPythonSnippet}>Run Python</button>
       </div>
