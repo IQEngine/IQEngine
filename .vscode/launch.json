@@ -92,7 +92,6 @@
       "justMyCode": true
     },
     {
-      //Run 'npm run start' in client folder via integrated terminal before launching this configuration
       "name": "[CLIENT]: Web Launcher Chrome",
       "type": "chrome",
       "request": "launch",
