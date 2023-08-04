@@ -5,7 +5,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Layer, Rect, Image } from 'react-konva';
 import { MINIMUM_SCROLL_HANDLE_HEIGHT_PIXELS, MINIMAP_FFT_SIZE } from '@/utils/constants';
-import { useGetIQData } from '@/api/iqdata/Queries';
+import { useGetIQData, useRawIQData } from '@/api/iqdata/Queries';
 import { useSpectrogramContext } from '../hooks/use-spectrogram-context';
 import { colMaps } from '@/utils/colormap';
 import { calcFftOfTile, fftToRGB } from '@/utils/selector';
@@ -40,11 +40,28 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
     MINIMAP_FFT_SIZE
   );
 
+  const { downloadedIndexes } = useRawIQData(type, account, container, filePath, fftSize);
+
   const [minimapImg, setMinimapImg] = useState(null);
   const [ticks, setTicks] = useState([]);
   const [handleHeightPixels, setHandleHeightPixels] = useState(1);
   const [scalingFactor, setScalingFactor] = useState(1);
 
+  const downloadedTiles = useMemo(() => {
+    if (!downloadedIndexes || !meta) return [];
+    // we will have a maximum of 100 tiles to show data that has been downloaded
+    const tiles = [];
+    const downloadScaling = meta.getTotalSamples() / fftSize / 100;
+    for (let i = 0; i < 100; i++) {
+      const exist = downloadedIndexes.find((x) => x >= i * downloadScaling && x < (i + 1) * downloadScaling);
+      if (exist) {
+        tiles.push(i);
+      }
+    }
+    return tiles;
+  }, [meta, fftSize, downloadedIndexes]);
+
+  // Changes in the spectrogram height require a recalculation of the ffts required
   useEffect(() => {
     // for minimap only. there's so much overhead with blob downloading that this might as well be a high value...
     const skipNFfts = Math.floor(meta.getTotalSamples() / (spectrogramHeight * MINIMAP_FFT_SIZE)); // sets the decimation rate (manually tweaked)
@@ -55,13 +72,11 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
     }
     setFFTsRequired(dataRange);
   }, [meta?.getTotalSamples(), spectrogramHeight]);
+
+  // filter the displayed iq as we receive new data
   const displayedIQ = useMemo<Float32Array>(() => {
     // join the current ffts
     if (!currentData) return;
-    console.log(
-      'currentData',
-      currentData.filter((x) => !!x)
-    );
     const iqData = new Float32Array(MINIMAP_FFT_SIZE * fftsRequired.length * 2);
     let offset = 0;
     for (let i = 0; i < fftsRequired.length; i++) {
@@ -99,6 +114,7 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
     }
   }, [spectrogramHeight, fftSize, fftStepSize, meta, fftsRequired]);
 
+  // Calc the minimap image from ffts to rgb
   useEffect(() => {
     if (!ffts) return;
     const rgbData = fftToRGB(ffts, MINIMAP_FFT_SIZE, magnitudeMin, magnitudeMax, colMaps[colmap]);
@@ -109,12 +125,12 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
       setMinimapImg(imageBitmap);
     });
   }, [ffts, magnitudeMin, magnitudeMax, colmap]);
+
   // Calc the annotation ticks
   useEffect(() => {
     if (!meta) {
       return;
     }
-    console.log('Rendering scrollbar ticks');
     // Add a tick wherever there are annotations
     let t = [];
     meta.annotations.forEach((annotation) => {
@@ -226,19 +242,18 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
         ))}
 
         {/* white boxes showing what has been downloaded */}
-        {/* {downloadedTiles.map((tile, index) => (
+        {downloadedTiles?.map((tile) => (
           <Rect
             x={MINIMAP_FFT_SIZE}
-            y={parseInt(tile) * TILE_SIZE_IN_IQ_SAMPLES * scalingFactor}
+            y={((tile - 1) * spectrogramHeight) / 100}
             width={5}
-            height={TILE_SIZE_IN_IQ_SAMPLES * scalingFactor}
+            height={spectrogramHeight / 100}
             fillEnabled={true}
             fill="grey"
-            //stroke="black"
             strokeWidth={0}
             key={Math.random() * 1000000 + Math.random()}
           />
-        ))} */}
+        ))}
       </Layer>
     </>
   );

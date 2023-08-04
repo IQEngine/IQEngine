@@ -200,3 +200,27 @@ export function useGetIQData(type: string, account: string, container: string, f
     setFFTsRequired,
   };
 }
+
+export function useRawIQData(type, account, container, filePath, fftSize) {
+  const rawIQQuery = useQuery<Float32Array[]>({
+    queryKey: ['rawiqdata', type, account, container, filePath, fftSize],
+    queryFn: async () => null,
+  });
+  const downloadedIndexes = useMemo<number[]>(() => {
+    if (!rawIQQuery.data) {
+      return [];
+    }
+    // get all the array positions that have any data without use of reduce
+    const downloadedIndexes = [];
+    rawIQQuery.data.forEach((data, index) => {
+      if (data) {
+        downloadedIndexes.push(index);
+      }
+    });
+    return downloadedIndexes;
+  }, [rawIQQuery.data]);
+  return {
+    downloadedIndexes,
+    rawIQQuery,
+  };
+}
