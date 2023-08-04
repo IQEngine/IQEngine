@@ -22,7 +22,7 @@ def test_required_roles_with_invalid_role():
         _ = access_control(current_user=current_user)
     except HTTPException as e:
         assert e.status_code == 403
-        assert e.detail == "Not enough privileges"
+        assert e.detail == "No Access"
 
 
 @pytest.mark.asyncio

@@ -1,10 +1,12 @@
 import httpx
 from database import datasource_repo
+from helpers.datasource_access import check_access
 from database.datasource_repo import create, datasource_exists
+
 from database.models import DataSource
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from fastapi.responses import StreamingResponse
-from helpers.authorization import required_roles, check_access
+from helpers.authorization import required_roles
 from helpers.cipher import encrypt
 from helpers.urlmapping import ApiType, add_URL_sasToken
 from motor.core import AgnosticCollection
@@ -39,7 +41,7 @@ async def get_datasources(
     datasources = datasources_collection.find()
     result = []
     async for datasource_item in datasources:
-        if check_access(datasource_item["account"], datasource_item["container"]):
+        if check_access(datasource_item["account"], datasource_item["container"], None) is not None:
             result.append(datasource_item)
     return result
 
@@ -54,8 +56,8 @@ async def get_datasource_image(
     current_user: Optional[dict] = Depends(required_roles()),
     access_allowed=Depends(check_access),
 ):
-    if access_allowed is False:
-        raise HTTPException(status_code=403, detail="Not enough privileges")
+    if access_allowed is None:
+        raise HTTPException(status_code=403, detail="No Access")
 
     # Create the imageURL with sasToken
     datasource = await datasources_collection.find_one(
@@ -106,8 +108,8 @@ async def update_datasource(
     current_user: Optional[dict] = Depends(required_roles()),
     access_allowed=Depends(check_access),
 ):
-    if access_allowed is False:
-        raise HTTPException(status_code=403, detail="Not enough privileges")
+    if access_allowed is None:
+        raise HTTPException(status_code=403, detail="No Access")
 
     existing_datasource = await datasources_collection.find_one(
         {
@@ -146,8 +148,8 @@ async def sync_datasource(
     current_user: Optional[dict] = Depends(required_roles()),
     access_allowed=Depends(check_access),
 ):
-    if access_allowed is False:
-        raise HTTPException(status_code=403, detail="Not enough privileges")
+    if access_allowed is None:
+        raise HTTPException(status_code=403, detail="No Access")
 
     existing_datasource = await datasources_collection.find_one(
         {

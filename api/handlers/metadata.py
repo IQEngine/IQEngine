@@ -1,12 +1,14 @@
 from datetime import datetime
 from typing import List, Optional
 from blob.azure_client import AzureBlobClient
+from helpers.datasource_access import check_access
 from database import datasource_repo, metadata_repo
 from database.metadata_repo import InvalidGeolocationFormat, query_metadata
+
 from database.models import DataSource, DataSourceReference, Metadata, TrackMetadata
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Response
 from fastapi.responses import StreamingResponse
-from helpers.authorization import required_roles, check_access
+from helpers.authorization import required_roles
 from helpers.cipher import decrypt
 from helpers.urlmapping import ApiType, get_content_type, get_file_name
 from motor.core import AgnosticCollection
@@ -27,7 +29,7 @@ async def get_all_meta(
     access_allowed=Depends(check_access),
 ):
 
-    if access_allowed is False:
+    if access_allowed is None:
         return []
     
     # Return all metadata for this datasource, could be an empty
@@ -56,7 +58,7 @@ async def get_all_meta_name(
     current_user: Optional[dict] = Depends(required_roles()),
     access_allowed=Depends(check_access),
 ):
-    if access_allowed is False:
+    if access_allowed is None:
         return []
 
     metadata = metadata_source.find(
@@ -191,14 +193,15 @@ async def query_meta(
 
         # Process result to remove metadata from unauthorized datasources
         for item in result:
-            if not check_access(item["account"], item["container"]):
+            if check_access(item.account, item.container, current_user) is None:
                 result.remove(item)
         return result
 
     except InvalidGeolocationFormat as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-    except Exception:
+    except Exception as e:
+        print(f"Error querying metadata: {e}")
         raise HTTPException(status_code=500, detail="An unexpected error occurred.")
 
 
@@ -216,7 +219,10 @@ async def create_meta(
     metadatas: AgnosticCollection = Depends(metadata_repo.collection),
     versions: AgnosticCollection = Depends(metadata_repo.versions_collection),
     current_user: Optional[dict] = Depends(required_roles()),
+    access_allowed=Depends(check_access)
 ):
+    if access_allowed!="owner":
+        raise HTTPException(status_code=403, detail="No Access")
     # Check datasource id is valid
     datasource = await datasources.find_one(
         {"account": account, "container": container}
@@ -266,8 +272,8 @@ async def update_meta(
     current_user: Optional[dict] = Depends(required_roles()),
     access_allowed=Depends(check_access),
 ):
-    if access_allowed is False:
-        raise HTTPException(status_code=403, detail="Not enough privileges")
+    if access_allowed!="owner":
+        raise HTTPException(status_code=403, detail="No Access")
     
     current = await metadatas.find_one(
         {

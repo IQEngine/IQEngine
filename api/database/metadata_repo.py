@@ -2,7 +2,7 @@ from typing import List, Dict, Any, Optional
 from datetime import datetime
 
 from fastapi import Depends
-from helpers.authorization import check_access
+from helpers.datasource_access import check_access
 from database.database import db
 from database.models import Metadata, DataSourceReference
 from motor.core import AgnosticCollection
@@ -36,7 +36,7 @@ async def get(account, container, filepath, access_allowed=Depends(check_access)
     Metadata
         The Sigmf metadata.
     """
-    if access_allowed is False:
+    if access_allowed is None:
         return None
     
     metadata_collection: AgnosticCollection = collection()
@@ -70,7 +70,7 @@ async def exists(account, container, filepath, access_allowed=Depends(check_acce
     bool
         True if the metadata exists, False otherwise.
     """
-    if access_allowed is False:
+    if access_allowed is None:
         return False
 
     metadata_collection: AgnosticCollection = collection()

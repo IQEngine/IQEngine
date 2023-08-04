@@ -1,15 +1,16 @@
 from fastapi import Depends
-from helpers.authorization import check_access
-import database.metadata_repo
 from blob.azure_client import AzureBlobClient
-from database.database import db
+
 from database.models import DataSource, DataSourceReference
 from helpers.cipher import decrypt, encrypt
 from motor.core import AgnosticCollection
 from rf.samples import get_bytes_per_iq_sample
 
+from helpers.authorization import get_current_user
+from helpers.datasource_access import check_access
 
 def collection() -> AgnosticCollection:
+    from database.database import db
     collection: AgnosticCollection = db().datasources
     return collection
 
@@ -30,7 +31,7 @@ async def get(account, container, access_allowed=Depends(check_access)) -> DataS
     DataSource
         The datasource.
     """
-    if access_allowed is False:
+    if access_allowed is None:
         return None
     
     datasource_collection: AgnosticCollection = collection()
@@ -62,6 +63,7 @@ async def datasource_exists(account, container) -> bool:
 
 
 async def sync(account: str, container: str):
+    import database.metadata_repo
     azure_blob_client = AzureBlobClient(account, container)
     datasource = await get(account, container)
     if datasource is None:
@@ -126,5 +128,15 @@ async def create(datasource: DataSource) -> DataSource:
     else:
         datasource.sasToken = ""
     datasource_dict = datasource.dict(by_alias=True, exclude_unset=True)
+    user = await get_current_user()
+    if "owners" not in datasource_dict:
+        datasource_dict["owners"] = []
+    if user and user.get("preferred_username"):
+        datasource_dict["owners"].append(user.get("preferred_username"))
+    else:
+        datasource_dict["owners"].append("IQEngine-User")
+    datasource_dict["readers"] = []
+    datasource_dict["public"] = False
     await datasource_collection.insert_one(datasource_dict)
     return datasource
+

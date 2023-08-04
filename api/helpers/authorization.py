@@ -12,8 +12,6 @@ from fastapi import Depends, HTTPException, status, Header, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jwt import algorithms
 
-from database import datasource_repo
-
 
 class OptionalHTTPBearer(HTTPBearer):
     async def __call__(
@@ -158,7 +156,7 @@ def required_roles(
             )
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Not enough privileges",
+                detail="No Access",
             )
 
         logging.info(
@@ -167,33 +165,6 @@ def required_roles(
         return current_user
 
     return _check_roles
-
-
-async def check_access(account: str, container: str, user = Depends(get_current_user)) -> bool:
-    """
-    Access check for a datasource by account and container using roles from a JWT claim.
-
-    Parameters
-    ----------
-    account : str
-        The account name.
-    container : str
-        The container name.
-    roles : List[str]
-        The roles from the JWT claim.
-
-    Returns
-    -------
-    bool
-    """
-    roles = user.get("roles", [])
-    if isinstance(roles, str):
-        roles = [roles]
-    data_source = await datasource_repo.get(account, container)
-    if data_source:
-        if data_source.public or any(role in data_source.members for role in roles):
-            return True
-    return False
 
 
 # Example usage
