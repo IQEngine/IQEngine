@@ -22,6 +22,13 @@ Object.defineProperty(window, 'matchMedia', {
   })),
 });
 
+Object.defineProperty(window, 'loadPyodide', {
+  writable: true,
+  value: vi.fn().mockImplementation(() => ({
+    loadPackage: vi.fn(),
+  })),
+});
+
 vi.mock('react-plotly.js', () => {
   return {
     default: vi.fn(),

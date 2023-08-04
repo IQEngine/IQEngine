@@ -2,11 +2,18 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Launch Edge",
+      "request": "launch",
+      "type": "msedge",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}/client"
+    },
+    {
       "name": "Debug Through Chrome",
       "type": "chrome",
       "request": "launch",
       "url": "http://localhost:3000",
-      "webRoot": "${workspaceFolder}/client",
+      "webRoot": "${workspaceFolder}/client"
     },
     {
       "name": "[LOADER] run pytest",
@@ -63,37 +70,28 @@
       "args": ["metadata", "list", "-accountName", "golivemisc", "-containerName", "sigmf-metadata"]
     },
     {
-        "name": "[API]: FastAPI",
-        "type": "python",
-        "request": "launch",
-        "cwd": "${workspaceFolder}/api",
-        "module": "uvicorn",
-        "args": [
-            "main:app",
-            "--reload",
-            "--port",
-            "5000"
-        ],
-        "jinja": true,
-        "justMyCode": true,
-        "env": {
-            "IQENGINE_PLUGINS": "[{\"name\": \"IQEngine\", \"url\":\"https://iqengine-detector.eastus2.cloudapp.azure.com:8000/plugins\"}]"
-        }
+      "name": "[API]: FastAPI",
+      "type": "python",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/api",
+      "module": "uvicorn",
+      "args": ["main:app", "--reload", "--port", "5000"],
+      "jinja": true,
+      "justMyCode": true,
+      "env": {
+        "IQENGINE_PLUGINS": "[{\"name\": \"IQEngine\", \"url\":\"https://iqengine-detector.eastus2.cloudapp.azure.com:8000/plugins\"}]"
+      }
     },
     {
-        "name": "[API]: Plugin API",
-        "type": "python",
-        "request": "launch",
-        "cwd": "${workspaceFolder}/plugins/src",
-        "module": "uvicorn",
-        "args": [
-            "plugins_api:app",
-            "--reload"
-        ],
-        "justMyCode": true
+      "name": "[API]: Plugin API",
+      "type": "python",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/plugins/src",
+      "module": "uvicorn",
+      "args": ["plugins_api:app", "--reload"],
+      "justMyCode": true
     },
     {
-      //Run 'npm run start' in client folder via integrated terminal before launching this configuration
       "name": "[CLIENT]: Web Launcher Chrome",
       "type": "chrome",
       "request": "launch",

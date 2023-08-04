@@ -1,6 +1,8 @@
 import { useGetIQData } from '@/api/iqdata/Queries';
 import { useMemo } from 'react';
 import { useSpectrogramContext } from './use-spectrogram-context';
+import { useDebounce } from 'usehooks-ts';
+import { FETCH_PADDING } from '@/utils/constants';
 
 export function useSpectrogram(currentFFT) {
   const {
@@ -14,9 +16,20 @@ export function useSpectrogram(currentFFT) {
     setFFTStepSize,
     setSpectrogramHeight,
     meta,
+    taps,
+    pythonSnippet,
   } = useSpectrogramContext();
-  const { currentData, setFFTsRequired, fftsRequired } = useGetIQData(type, account, container, filePath, fftSize);
+  const { currentData, setFFTsRequired, fftsRequired } = useGetIQData(
+    type,
+    account,
+    container,
+    filePath,
+    fftSize,
+    taps,
+    pythonSnippet
+  );
   const totalFFTs = Math.ceil(meta?.getTotalSamples() / fftSize);
+  const debouncedCurrentFFT = useDebounce<string>(currentFFT, 200);
   // This is the list of ffts we display
   const displayedIQ = useMemo<Float32Array>(() => {
     if (!totalFFTs || !spectrogramHeight || !currentData) {
@@ -24,8 +37,13 @@ export function useSpectrogram(currentFFT) {
     }
     // get the current required blocks
     const requiredBlocks: number[] = [];
-    for (let i = 0; i < spectrogramHeight; i++) {
-      requiredBlocks.push(currentFFT + i * (fftStepSize + 1));
+    // make the padding dependent on the size of fft so we avoid to fetch too much data for large ffts
+    const currentPadding = Math.floor(FETCH_PADDING / (fftSize / 1024));
+    for (let i = -currentPadding; i < spectrogramHeight + currentPadding; i++) {
+      const nextFFT = currentFFT + i * (fftStepSize + 1);
+      if (nextFFT <= totalFFTs && nextFFT >= 0) {
+        requiredBlocks.push(nextFFT);
+      }
     }
     if (!currentData) {
       setFFTsRequired(requiredBlocks);
