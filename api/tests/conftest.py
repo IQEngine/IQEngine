@@ -61,15 +61,11 @@ def client():
                 "handlers.datasources.get_current_user",
                 new=get_current_user_mock(),
             ):
-                with mock.patch(
-                    "database.datasource_repo.check_access",
-                    new=check_access_mock("account", "container", None),
-                ):
-                    with mock.patch("importer.all.import_all_from_env") as mock_i:
-                        mock_i.return_value = None
-                        from main import app
-                        import database.database as db
+                with mock.patch("importer.all.import_all_from_env") as mock_i:
+                    mock_i.return_value = None
+                    from main import app
+                    import database.database as db
 
-                        app.add_event_handler("shutdown", db.reset_db)
-                        with TestClient(app) as test_client:
-                            yield test_client
+                    app.add_event_handler("shutdown", db.reset_db)
+                    with TestClient(app) as test_client:
+                        yield test_client
