@@ -96,13 +96,11 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
       // get the length ot any of the iqData arrays
       const newScalingFactor = totalffts / spectrogramHeight;
       setScalingFactor(newScalingFactor);
-      console.log('newScalingFactor', newScalingFactor);
     }
   }, [spectrogramHeight, fftSize, fftStepSize, meta, fftsRequired]);
 
   useEffect(() => {
     if (!ffts) return;
-    console.log('Rendering minimap', ffts);
     const rgbData = fftToRGB(ffts, MINIMAP_FFT_SIZE, magnitudeMin, magnitudeMax, colMaps[colmap]);
     let num_final_ffts = ffts.length / MINIMAP_FFT_SIZE;
     const newImageData = new ImageData(rgbData, MINIMAP_FFT_SIZE, num_final_ffts);
@@ -152,8 +150,14 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
 
   const handleWheel = (e) => {
     e.evt.preventDefault();
-    let scrollAmount = Math.floor(e.evt.wheelDeltaY);
-    setCurrentFFT(Math.max(0, currentFFT - scrollAmount));
+    const scrollAmount = Math.floor(e.evt.wheelDeltaY);
+
+    const nextPosition = currentFFT - scrollAmount + spectrogramHeight * (fftStepSize + 1);
+    const maxPosition = meta.getTotalSamples() / fftSize;
+
+    if (nextPosition <= maxPosition) {
+      setCurrentFFT(Math.max(0, currentFFT - scrollAmount));
+    }
   };
 
   const handleDragMove = (e) => {

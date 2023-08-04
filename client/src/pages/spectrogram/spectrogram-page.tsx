@@ -340,6 +340,7 @@ export const SpectrogramPage = () => {
             setMeta={setMeta}
             colorMap={colorMap}
             setColorMap={setColorMap}
+            selectedAnnotation={selectedAnnotation}
           />
           <div className="flex flex-col">
             <div className="flex space-x-2 border-b border-primary w-full sm:pl-12 lg:pl-32" id="tabsbar">
