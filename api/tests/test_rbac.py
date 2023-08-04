@@ -6,20 +6,22 @@ from fastapi import HTTPException
 from helpers.authorization import get_current_user, required_roles
 
 
-def test_required_roles_with_valid_role():
+@pytest.mark.asyncio
+async def test_required_roles_with_valid_role():
     current_user = {"roles": ["IQEngine-User"], "preferred_username": "emailaddress"}
     access_control = required_roles(roles="IQEngine-User")
-    result = access_control(current_user=current_user)
+    result = await access_control(current_user=current_user)
     assert result["preferred_username"] == "emailaddress"
 
 
-def test_required_roles_with_invalid_role():
+@pytest.mark.asyncio
+async def test_required_roles_with_invalid_role():
     # Tests the decorator function `required_roles` which is used to restrict access to certain endpoints
     current_user = {"roles": ["IQEngine-User"], "preferred_username": "emailaddress"}
     access_control = required_roles(roles="invalid-role")
 
     try:
-        _ = access_control(current_user=current_user)
+        _ = await access_control(current_user=current_user)
     except HTTPException as e:
         assert e.status_code == 403
         assert e.detail == "No Access"
@@ -31,7 +33,7 @@ async def test_required_roles_with_no_role():
     with patch("helpers.authorization.get_current_user") as mock_get_current_user:
         mock_get_current_user.return_value = {}
         access_control = required_roles(roles=None)
-        result = access_control()
+        result = await access_control()
         assert result == {}
 
 
@@ -50,11 +52,12 @@ VALID_TEST_TOKEN = json_data["VALID_TEST_TOKEN"]
 @patch(
     "helpers.authorization.jwks_handler.get_jwks"
 )
-def test_get_current_user(mock_get_jwks):
+@pytest.mark.asyncio
+async def test_get_current_user(mock_get_jwks):
     # Tests `get_current_user` which is used to get the current user from the JWT token
     mock_get_jwks.return_value = ({"keys": [TEST_PUBLIC_KEY]}, "test/v2.0")
     os.environ["IQENGINE_APP_ID"] = "test"
     os.environ["IQENGINE_APP_AUTHORITY"] = "test"
     credentials = Mock(credentials=VALID_TEST_TOKEN)
-    current_user = get_current_user(token=credentials)
+    current_user = await get_current_user(token=credentials)
     assert current_user["preferred_username"] == "JohnDoe@test.com"

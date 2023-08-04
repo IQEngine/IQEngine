@@ -2,7 +2,7 @@ import json
 import logging
 import os
 import time
-from typing import Any, List, Optional, Tuple, Callable, Union, cast
+from typing import Any, Coroutine, List, Optional, Tuple, Callable, Union, cast
 
 import jwt
 import requests
@@ -128,7 +128,7 @@ async def get_current_user(
 
 def required_roles(
     roles: Optional[Union[str, List[str]]] = None,
-) -> Callable[[Optional[dict]], Optional[dict]]:
+) -> Callable[..., Coroutine[Any, Any, Optional[dict[Any, Any]]]]:
 
     if roles is None:
         # If roles are None, return the original dependency function without any role check
@@ -142,7 +142,9 @@ def required_roles(
             detail="Invalid claims parameter",
         )
 
-    def _check_roles(current_user: Optional[dict] = Depends(get_current_user)) -> Optional[dict]:
+    async def _check_roles(current_user: Optional[dict] = None) -> Optional[dict]:
+        if current_user is None:
+            current_user = await get_current_user()
         if current_user is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
