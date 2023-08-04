@@ -3,17 +3,19 @@ from datetime import datetime
 
 from fastapi import Depends
 from helpers.datasource_access import check_access
-from database.database import db
+
 from database.models import Metadata, DataSourceReference
 from motor.core import AgnosticCollection
 
 
 def collection() -> AgnosticCollection:
+    from database.database import db
     collection: AgnosticCollection = db().metadata
     return collection
 
 
 def versions_collection() -> AgnosticCollection:
+    from database.database import db
     collection: AgnosticCollection = db().versions
     return collection
 
@@ -38,7 +40,7 @@ async def get(account, container, filepath, access_allowed=Depends(check_access)
     """
     if access_allowed is None:
         return None
-    
+
     metadata_collection: AgnosticCollection = collection()
     metadata = await metadata_collection.find_one(
         {
@@ -169,7 +171,7 @@ async def query_metadata(
     min_datetime: Optional[datetime] = None,
     max_datetime: Optional[datetime] = None,
     text: Optional[str] = None,
-) -> List[dict]:
+) -> List[DataSourceReference]:
     """
     This function is responsible for querying metadata from the specified MongoDB collection based on various
     query parameters. It performs a database search using the provided criteria and returns a list of

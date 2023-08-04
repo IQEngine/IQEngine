@@ -31,7 +31,7 @@ async def get_all_meta(
 
     if access_allowed is None:
         return []
-    
+
     # Return all metadata for this datasource, could be an empty
     # list
     metadata = metadatas.find(
@@ -85,7 +85,7 @@ async def get_meta(
     metadata: Metadata = Depends(metadata_repo.get),
     current_user: Optional[dict] = Depends(required_roles()),
 ):
-    
+
     if not metadata:
         raise HTTPException(status_code=404, detail="Metadata not found")
     return metadata
@@ -99,7 +99,7 @@ async def get_track_meta(
     metadata: Metadata = Depends(metadata_repo.get),
     current_user: Optional[dict] = Depends(required_roles()),
 ):
-    if not metadata:
+    if not metadata or not metadata.globalMetadata.traceability_origin.account or not metadata.globalMetadata.traceability_origin.container:
         raise HTTPException(status_code=404, detail="Metadata not found")
 
     return TrackMetadata(
@@ -190,6 +190,9 @@ async def query_meta(
             max_datetime=max_datetime,
             text=text,
         )
+
+        if not result:
+            return []
 
         # Process result to remove metadata from unauthorized datasources
         for item in result:

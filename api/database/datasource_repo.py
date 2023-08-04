@@ -9,6 +9,7 @@ from rf.samples import get_bytes_per_iq_sample
 from helpers.authorization import get_current_user
 from helpers.datasource_access import check_access
 
+
 def collection() -> AgnosticCollection:
     from database.database import db
     collection: AgnosticCollection = db().datasources
@@ -33,7 +34,7 @@ async def get(account, container, access_allowed=Depends(check_access)) -> DataS
     """
     if access_allowed is None:
         return None
-    
+
     datasource_collection: AgnosticCollection = collection()
     datasource = await datasource_collection.find_one(
         {"account": account, "container": container}
@@ -128,7 +129,7 @@ async def create(datasource: DataSource) -> DataSource:
     else:
         datasource.sasToken = ""
     datasource_dict = datasource.dict(by_alias=True, exclude_unset=True)
-    user = await get_current_user()
+    user = get_current_user()
     if "owners" not in datasource_dict:
         datasource_dict["owners"] = []
     if user and user.get("preferred_username"):
@@ -139,4 +140,3 @@ async def create(datasource: DataSource) -> DataSource:
     datasource_dict["public"] = False
     await datasource_collection.insert_one(datasource_dict)
     return datasource
-

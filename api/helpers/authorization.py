@@ -129,7 +129,7 @@ def get_current_user(
 def required_roles(
     roles: Optional[Union[str, List[str]]] = None,
 ) -> Callable[[Optional[dict]], Optional[dict]]:
-    
+
     if roles is None:
         # If roles are None, return the original dependency function without any role check
         return get_current_user
