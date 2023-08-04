@@ -2,6 +2,7 @@ import { useGetIQData } from '@/api/iqdata/Queries';
 import { useMemo } from 'react';
 import { useSpectrogramContext } from './use-spectrogram-context';
 import { useDebounce } from 'usehooks-ts';
+import { FETCH_PADDING } from '@/utils/constants';
 
 export function useSpectrogram(currentFFT) {
   const {
@@ -26,7 +27,9 @@ export function useSpectrogram(currentFFT) {
     }
     // get the current required blocks
     const requiredBlocks: number[] = [];
-    for (let i = -100; i < spectrogramHeight + 100; i++) {
+    // make the padding dependent on the size of fft so we avoid to fetch too much data for large ffts
+    const currentPadding = Math.floor(FETCH_PADDING / (fftSize / 1024));
+    for (let i = -currentPadding; i < spectrogramHeight + currentPadding; i++) {
       const nextFFT = currentFFT + i * (fftStepSize + 1);
       if (nextFFT <= totalFFTs && nextFFT >= 0) {
         requiredBlocks.push(nextFFT);
@@ -54,7 +57,7 @@ export function useSpectrogram(currentFFT) {
       offset += fftSize * 2;
     }
     return iqData;
-  }, [currentData, fftSize, debouncedCurrentFFT, fftStepSize, totalFFTs, spectrogramHeight]);
+  }, [currentData, fftSize, currentFFT, fftStepSize, totalFFTs, spectrogramHeight]);
 
   return {
     totalFFTs,
