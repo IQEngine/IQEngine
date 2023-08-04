@@ -34,6 +34,8 @@ interface SpectrogramContextProperties {
   setMeta: (meta: SigMFMetadata) => void;
   canDownload: boolean;
   setCanDownload: (canDownload: boolean) => void;
+  selectedAnnotation?: number;
+  setSelectedAnnotation: (selectedAnnotation: number) => void;
 }
 
 export const SpectrogramContext = createContext<SpectrogramContextProperties>(null);
@@ -69,6 +71,7 @@ export function SpectrogramContextProvider({
   const { data: originMeta } = useMeta(type, account, container, filePath);
   const [meta, setMeta] = useState<SigMFMetadata>(originMeta);
   const [canDownload, setCanDownload] = useState<boolean>(false);
+  const [selectedAnnotation, setSelectedAnnotation] = useState<number>();
   useEffect(() => {
     setMeta(originMeta);
   }, [originMeta]);
@@ -105,6 +108,8 @@ export function SpectrogramContextProvider({
         setMeta,
         canDownload,
         setCanDownload,
+        selectedAnnotation,
+        setSelectedAnnotation,
       }}
     >
       {children}
