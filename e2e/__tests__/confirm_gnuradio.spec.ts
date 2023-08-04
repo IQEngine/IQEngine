@@ -6,7 +6,7 @@ test('GNURadio repocard displays without sas token @CICompatible', async ({ page
   await expect(locateText).toHaveCount(0);
 });
 
-test('GNURadio repocard displays spectrogram page @CICompatible', async ({ page }) => {
+test('GNURadio repocard displays spectrogram page', async ({ page }) => {
   await page.goto('/');
 
   await page.locator('#GNURadioSigMFRepo').last().click();

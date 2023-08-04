@@ -1,9 +1,10 @@
 import React, { useState, useMemo, useRef, useCallback } from 'react';
 import 'leaflet/dist/leaflet.css';
-import { MapContainer, TileLayer, Marker, Circle, LayerGroup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Circle, LayerGroup, Polyline } from 'react-leaflet';
 import { Icon } from 'leaflet';
 
 import GeoQueryTypes from './geo-query-types';
+import TrackView from './track-view';
 
 function DraggableMarker({ updatePosition, defaultPosition, radius }) {
   const customIcon = new Icon({
@@ -40,7 +41,15 @@ function DraggableMarker({ updatePosition, defaultPosition, radius }) {
   );
 }
 
-export const GeoQuery = ({ queryName, description, validator, handleQueryValid }) => {
+export const GeoQuery = ({
+  queryName,
+  description,
+  validator,
+  handleQueryValid,
+  trackData,
+  geoPositionUpdate,
+  setGeoPositionUpdate
+}) => {
   const defaultCenter = {
     lat: 51.505,
     lng: -0.09,
@@ -54,28 +63,36 @@ export const GeoQuery = ({ queryName, description, validator, handleQueryValid }
   const [show, setShow] = useState(true);
   const queryTypes = ['captures', 'annotations'];
   const [selectedQueryType, setSelectedQueryType] = useState('captures');
-
   const handleRadiusChange = (e) => {
     const value = parseInt(e.target.value);
     setRadius(value);
+    setGeoPositionUpdate('manual');
     const valid = validator({ lat: position.lat, lon: position.lng, radius: value, queryType: selectedQueryType });
     handleQueryValid(queryName, valid);
-  };
-
-  const getRadius = () => {
-    return radius;
   };
 
   const handlePositionChange = (updatedPosition) => {
     const valid = validator({
       lat: updatedPosition.lat,
       lon: updatedPosition.lng,
-      radius: getRadius(),
+      radius: radius,
       queryType: selectedQueryType,
     });
     setPosition(updatedPosition);
+    setGeoPositionUpdate('manual');
     handleQueryValid(queryName, valid);
   };
+
+  const getCenter = () => {
+    if(geoPositionUpdate === 'manual'){
+      return position;
+    }
+    if(trackData.length > 0){
+      const value = trackData[trackData.length / 2 | 0];
+      return [value[0], value[1]];
+    }
+    return position;
+  }
 
   return (
     <div className="mb-10">
@@ -100,10 +117,12 @@ export const GeoQuery = ({ queryName, description, validator, handleQueryValid }
           <div className="badge badge-lg mb-5">Radius: {radius}m</div>
           <GeoQueryTypes types={queryTypes} selected={selectedQueryType} handleSelection={setSelectedQueryType} />
           <MapContainer center={position} zoom={8} scrollWheelZoom={true}>
+            <TrackView center={getCenter()} />
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
+            {trackData.length > 0  &&  <Polyline pathOptions={{color: 'red'}} positions={trackData} />}
             <LayerGroup>
               <Circle center={position} pathOptions={fillBlueOptions} radius={radius} />
             </LayerGroup>

@@ -1,4 +1,4 @@
-import { SigMFMetadata } from '@/utils/sigmfMetadata';
+import { SigMFMetadata, Track } from '@/utils/sigmfMetadata';
 import { MetadataClientFactory } from './metadata-client-factory';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { MetadataClient } from './metadata-client';
@@ -40,6 +40,20 @@ export const useQueryDataSourceMetaPaths = (type: string, account: string, conta
     {
       enabled: enabled,
       staleTime: Infinity,
+    }
+  );
+};
+
+export const useQueryTrack = (type: string, account: string, container: string, filepath: string, enabled = true) => {
+  const { dataSourcesQuery, filesQuery } = useUserSettings();
+  return useQuery<Track>(
+    ['track', account, container, filepath],
+    async ({ signal }) => {
+      const client = MetadataClientFactory(type, filesQuery.data, dataSourcesQuery.data);
+      return await client.track(account, container, filepath, signal);
+    },
+    {
+      enabled: enabled,
     }
   );
 };

@@ -205,6 +205,18 @@ export class TraceabilityOrigin {
   file_path: string;
 }
 
+export class GeoTrack {
+  type: string;
+  coordinates: Array<Array<number>>;
+}
+
+export class Track {
+  iqengine_geotrack: GeoTrack;
+  description: string;
+  account: string;
+  container: string;
+}
+
 export class Annotation {
   'core:sample_start': number;
   'core:sample_count'?: number;
