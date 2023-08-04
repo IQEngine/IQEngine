@@ -179,3 +179,4 @@ describe("Check reshape array works correctly", () => {
     expect(newArray[0][fftSize * 2]).toEqual(NaN);
   });
 });
+
