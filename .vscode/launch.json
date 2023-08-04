@@ -13,7 +13,7 @@
       "type": "chrome",
       "request": "launch",
       "url": "http://localhost:3000",
-      "webRoot": "${workspaceFolder}/client",
+      "webRoot": "${workspaceFolder}/client"
     },
     {
       "name": "[LOADER] run pytest",
@@ -29,10 +29,7 @@
       "program": "${file}",
       "console": "integratedTerminal",
       "justMyCode": true,
-      "args": [
-        "datasource",
-        "list"
-      ]
+      "args": ["datasource", "list"]
     },
     {
       "name": "[LOADER] datasource create",
@@ -61,14 +58,7 @@
       "program": "${file}",
       "console": "integratedTerminal",
       "justMyCode": true,
-      "args": [
-        "metadata",
-        "addfolder",
-        "-accountName",
-        "golivemisc",
-        "-containerName",
-        "sigmf-metadata"
-      ]
+      "args": ["metadata", "addfolder", "-accountName", "golivemisc", "-containerName", "sigmf-metadata"]
     },
     {
       "name": "[LOADER] metadata list",
@@ -77,14 +67,7 @@
       "program": "${file}",
       "console": "integratedTerminal",
       "justMyCode": true,
-      "args": [
-        "metadata",
-        "list",
-        "-accountName",
-        "golivemisc",
-        "-containerName",
-        "sigmf-metadata"
-      ]
+      "args": ["metadata", "list", "-accountName", "golivemisc", "-containerName", "sigmf-metadata"]
     },
     {
       "name": "[API]: FastAPI",
@@ -92,12 +75,7 @@
       "request": "launch",
       "cwd": "${workspaceFolder}/api",
       "module": "uvicorn",
-      "args": [
-        "main:app",
-        "--reload",
-        "--port",
-        "5000"
-      ],
+      "args": ["main:app", "--reload", "--port", "5000"],
       "jinja": true,
       "justMyCode": true,
       "env": {
@@ -110,10 +88,7 @@
       "request": "launch",
       "cwd": "${workspaceFolder}/plugins/src",
       "module": "uvicorn",
-      "args": [
-        "plugins_api:app",
-        "--reload"
-      ],
+      "args": ["plugins_api:app", "--reload"],
       "justMyCode": true
     },
     {
