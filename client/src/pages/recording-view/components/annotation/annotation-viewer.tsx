@@ -125,12 +125,12 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
       document.body.appendChild(textarea);
 
       const element = document.getElementById('spectrogram');
-      const rect = element.getBoundingClientRect();
+      const spectrogram = element.getBoundingClientRect();
 
       textarea.value = e.target.text();
       textarea.style.position = 'absolute';
-      textarea.style.top = rect.top + e.target.attrs.y + 'px'; // middle of screen
-      textarea.style.left = rect.left + e.target.attrs.x + 'px'; // middle of screen
+      textarea.style.top = spectrogram.top + e.target.attrs.y + 'px'; // middle of screen
+      textarea.style.left = spectrogram.left + e.target.attrs.x + 'px'; // middle of screen
       textarea.style.width = '400px';
       textarea.style.fontSize = '25px';
       textarea.rows = 1;
@@ -143,8 +143,8 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
       document.body.appendChild(textarea2);
       textarea2.value = 'Hit Enter to Finish';
       textarea2.style.position = 'absolute';
-      textarea2.style.top = rect.top + e.target.attrs.y - 30 + 'px';
-      textarea2.style.left = rect.left + e.target.attrs.x + 100 + 'px';
+      textarea2.style.top = spectrogram.top + e.target.attrs.y - 30 + 'px';
+      textarea2.style.left = spectrogram.left + e.target.attrs.x + 100 + 'px';
       textarea2.style.width = '140px';
       textarea2.style.height = '30px';
       textarea2.rows = 1;
