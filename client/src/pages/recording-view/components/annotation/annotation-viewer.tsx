@@ -129,8 +129,8 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
 
       textarea.value = e.target.text();
       textarea.style.position = 'absolute';
-      textarea.style.top = spectrogram.top + e.target.attrs.y + 'px'; // middle of screen
-      textarea.style.left = spectrogram.left + e.target.attrs.x + 'px'; // middle of screen
+      textarea.style.top = spectrogram.top + e.target.attrs.y + 'px';
+      textarea.style.left = spectrogram.left + e.target.attrs.x + 'px';
       textarea.style.width = '400px';
       textarea.style.fontSize = '25px';
       textarea.rows = 1;
