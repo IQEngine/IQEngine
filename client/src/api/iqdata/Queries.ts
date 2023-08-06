@@ -5,6 +5,7 @@ import { INITIAL_PYTHON_SNIPPET, TILE_SIZE_IN_IQ_SAMPLES } from '@/utils/constan
 import { useUserSettings } from '@/api/user-settings/use-user-settings';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useMeta } from '@/api/metadata/queries';
+import { applyProcessing } from '@/utils/fetch-more-data-source';
 
 export const getIQDataSlices = (
   meta: SigMFMetadata,
