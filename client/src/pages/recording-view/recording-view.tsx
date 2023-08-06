@@ -18,7 +18,7 @@ import MetaViewer from './components/meta-viewer';
 import MetaRaw from './components/meta-raw';
 import AnnotationList from './components/annotation/annotation-list';
 import ScrollBar from './components/scroll-bar';
-import { MINIMAP_FFT_SIZE } from '@/utils/constants';
+import { MINIMAP_FFT_SIZE, MIN_SPECTROGRAM_HEIGHT } from '@/utils/constants';
 import FreqSelector from './components/freq-selector';
 import TimeSelector from './components/time-selector';
 import { AnnotationViewer } from './components/annotation/annotation-viewer';
@@ -45,7 +45,7 @@ export function DisplaySpectrogram({ currentFFT, setCurrentFFT }) {
   useEffect(() => {
     const spectrogramHeight = height - 450; // hand-tuned for now
     console.log('spectrogramHeight: ', spectrogramHeight);
-    setSpectrogramHeight(spectrogramHeight);
+    setSpectrogramHeight(Math.max(MIN_SPECTROGRAM_HEIGHT, spectrogramHeight));
     const newSpectrogramWidth = width - 430; // hand-tuned for now
     setSpectrogramWidth(newSpectrogramWidth);
   }, [width, height]);
