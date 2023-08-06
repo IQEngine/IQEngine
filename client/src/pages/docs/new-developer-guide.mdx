@@ -1,0 +1,13 @@
+# New Developer Guide
+
+## Installation
+
+1. Clone this repo
+1. Add the PPA to get the latest Node version using the following commands:
+    - `curl -sL https://deb.nodesource.com/setup_18.x -o nodesource_setup.sh`
+    - sudo bash nodesource_setup.sh
+1. Install NodeJs, NPM, and pip with `apt install nodejs npm python3-pip`
+1. From the root directory run the command ```make setup``` (ignore warnings)
+1. Within the root directory copy and paste the 'example.env' and rename to '.env'
+1. Open three concurrent terminals for frontend, backend, and plugins
+1. Run the command `make dev` in the frontend terminal to start the development server
