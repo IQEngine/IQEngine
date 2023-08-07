@@ -34,7 +34,7 @@ export class ApiClient implements MetadataClient {
   }
 
   async track(account: string, container: string, filepath: string, signal: AbortSignal): Promise<Track> {
-    if(!account || !container || !filepath) {
+    if (!account || !container || !filepath) {
       return null;
     }
     const response = await axios.get(`/api/datasources/${account}/${container}/${filepath}/track`, { signal });

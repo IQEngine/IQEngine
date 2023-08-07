@@ -1,5 +1,5 @@
 import { describe, expect, test, vi } from 'vitest';
-import { render, screen, fireEvent} from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 
 import React from 'react';
 
@@ -75,5 +75,5 @@ describe('Test FreqQuery', () => {
       to: '1',
     });
     expect(handleQueryInvalidMock).toHaveBeenCalledTimes(1);
-  })
+  });
 });
