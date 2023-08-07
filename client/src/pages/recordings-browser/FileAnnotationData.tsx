@@ -55,44 +55,44 @@ export const FileAnnotationData = ({ annotations }: Props) => {
 
   return (
     <div>
-        <div>
-          <Plot
-            data={[
-              {
-                values: pieChartValues,
-                labels: pieChartLabels,
-                type: 'pie',
-                hole: 0.4,
-                automargin: true,
-                textposition: 'outside',
-                textinfo: 'label+percent+value',
-              },
-            ]}
-            layout={{
-              showlegend: false,
-              width: 250,
-              height: 250,
-              template: template,
-              margin: { t: 0, b: 0, l: 0, r: 0 },
-            }}
-          />
-        </div>
+      <div>
+        <Plot
+          data={[
+            {
+              values: pieChartValues,
+              labels: pieChartLabels,
+              type: 'pie',
+              hole: 0.4,
+              automargin: true,
+              textposition: 'outside',
+              textinfo: 'label+percent+value',
+            },
+          ]}
+          layout={{
+            showlegend: false,
+            width: 250,
+            height: 250,
+            template: template,
+            margin: { t: 0, b: 0, l: 0, r: 0 },
+          }}
+        />
+      </div>
 
-        <div className="grid justify-items-stretch">
-          <table className="text-base-content">
-            <thead className="text-primary border-b-2 h-12 border-accent">
-              <tr>
-                <th>Sample Start</th>
-                <th>Sample Count</th>
-                <th>Frequency Min [MHz]</th>
-                <th>Frequency Max [MHz]</th>
-                <th>Label</th>
-                <th>Other</th>
-              </tr>
-            </thead>
-            <tbody>{annotationsData}</tbody>
-          </table>
-        </div>
-        </div>
+      <div className="grid justify-items-stretch">
+        <table className="text-base-content">
+          <thead className="text-primary border-b-2 h-12 border-accent">
+            <tr>
+              <th>Sample Start</th>
+              <th>Sample Count</th>
+              <th>Frequency Min [MHz]</th>
+              <th>Frequency Max [MHz]</th>
+              <th>Label</th>
+              <th>Other</th>
+            </tr>
+          </thead>
+          <tbody>{annotationsData}</tbody>
+        </table>
+      </div>
+    </div>
   );
 };

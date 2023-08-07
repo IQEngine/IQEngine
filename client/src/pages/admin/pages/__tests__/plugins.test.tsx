@@ -259,8 +259,8 @@ describe('Test Plugins Edit', () => {
       });
     const testPlugin: PluginDefinition = {
       name: 'TestPlugin',
-      url: 'http://my.plugin.com/new/plugins/'
-    }
+      url: 'http://my.plugin.com/new/plugins/',
+    };
 
     const { wrapper } = useAllProviders();
     render(<PluginEdit plugin={testPlugin}></PluginEdit>, {
@@ -286,8 +286,8 @@ describe('Test Plugins Edit', () => {
 
     const testPlugin: PluginDefinition = {
       name: 'TestPlugin',
-      url: 'http://my.plugin.com/new/plugins/'
-    }
+      url: 'http://my.plugin.com/new/plugins/',
+    };
     const { wrapper } = useAllProviders();
     render(<PluginEdit plugin={testPlugin}></PluginEdit>, {
       wrapper: wrapper,
