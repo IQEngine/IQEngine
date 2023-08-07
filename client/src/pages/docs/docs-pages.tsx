@@ -2,6 +2,10 @@ import * as React from 'react';
 import { useParams } from 'react-router-dom';
 import OverviewPage from './overview.mdx';
 import PluginsPage from './plugins.mdx';
+import Frontend from './frontend.mdx';
+import Backend from './backend.mdx';
+import AdminPage from './admin-page.mdx';
+import CodingStyle from './coding-style.mdx';
 import NewDevGuide from './new-developer-guide.mdx';
 import { Link } from 'react-router-dom';
 
@@ -15,6 +19,18 @@ export const DocsPages = () => {
       break;
     case 'plugins':
       currentPage = <PluginsPage />;
+      break;
+    case 'frontend':
+      currentPage = <Frontend />;
+      break;
+    case 'backend':
+      currentPage = <Backend />;
+      break;
+    case 'admin-page':
+      currentPage = <AdminPage />;
+      break;
+    case 'coding-style':
+      currentPage = <CodingStyle />;
       break;
     case 'new-developer-guide':
       currentPage = <NewDevGuide />;
@@ -32,13 +48,13 @@ export const DocsPages = () => {
               <TableHeader>User Docs</TableHeader>
               <TableItem href="/docs">Overview</TableItem>
               <TableItem href="/docs/plugins">Plugins</TableItem>
-              <TableItem href="#">Backend</TableItem>
-              <TableItem href="#">Admin Page</TableItem>
+              <TableItem href="/docs/frontend">Frontend</TableItem>
+              <TableItem href="/docs/backend">Backend</TableItem>
+              <TableItem href="/docs/admin-page">Admin Page</TableItem>
 
               <TableHeader>Developer Docs</TableHeader>
               <TableItem href="/docs/new-developer-guide">New Dev Guide</TableItem>
-              <TableItem href="#">Repo Organization</TableItem>
-              <TableItem href="#">Code Styling Guidelines</TableItem>
+              <TableItem href="/docs/coding-style">Code Styling Guidelines</TableItem>
             </div>
           </nav>
 
