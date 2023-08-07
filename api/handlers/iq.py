@@ -52,6 +52,9 @@ async def get_iq_data(
 ):
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
+    if hasattr(datasource, "sasToken"):
+        if datasource.sasToken:
+            azure_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
     try:
         block_indexes = [int(num) for num in block_indexes_str.split(",")]
         return StreamingResponse(
