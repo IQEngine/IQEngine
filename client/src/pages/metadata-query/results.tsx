@@ -11,7 +11,16 @@ export const Results = ({ queryString, geoSelected, handleToggleTrack }) => {
     if (!data) return;
     return data.map((item, i) => {
       return (
-        <FileRow key={i} trackToggle={handleToggleTrack} queryResult={true} geoSelected={geoSelected} filepath={item.file_path} account={item.account} container={item.container} type={item.type} />
+        <FileRow
+          key={i}
+          trackToggle={handleToggleTrack}
+          queryResult={true}
+          geoSelected={geoSelected}
+          filepath={item.file_path}
+          account={item.account}
+          container={item.container}
+          type={item.type}
+        />
       );
     });
   };
