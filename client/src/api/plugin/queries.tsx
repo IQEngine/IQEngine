@@ -97,8 +97,8 @@ export const useUpdatePlugin = () => {
       const previousPlugins = client.getQueryData<PluginDefinition[]>(['plugins']);
 
       const updatedPlugins = Array.isArray(previousPlugins)
-      ? previousPlugins.map((item) => (item.name === definition.name ? definition : item))
-      : [];
+        ? previousPlugins.map((item) => (item.name === definition.name ? definition : item))
+        : [];
       client.setQueryData<PluginDefinition[]>(['plugins'], updatedPlugins);
       return { previousPlugins, previousPlugin };
     },
@@ -142,7 +142,7 @@ export const useCreatePlugin = () => {
       const previousPlugins = client.getQueryData<PluginDefinition[]>(['plugins']);
       const updatedPlugins = Array.isArray(previousPlugins) ? [...previousPlugins, plugin] : [plugin];
       client.setQueryData<PluginDefinition[]>(['plugins'], updatedPlugins);
-            return { previousPlugins };
+      return { previousPlugins };
     },
     onError: (err, plugin, context) => {
       console.error('onError', err);

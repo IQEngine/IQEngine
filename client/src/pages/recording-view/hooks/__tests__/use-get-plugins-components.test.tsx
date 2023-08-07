@@ -1,7 +1,7 @@
 import { useAllProviders } from '@/mocks/setup-tests';
 import { render, renderHook } from '@testing-library/react';
 import nock from 'nock';
-import { useGetPluginsComponents } from '@/pages/spectrogram/hooks/use-get-plugins-components';
+import { useGetPluginsComponents } from '@/pages/recording-view/hooks/use-get-plugins-components';
 import React from 'react';
 
 describe('useGetPluginsComponents', () => {
