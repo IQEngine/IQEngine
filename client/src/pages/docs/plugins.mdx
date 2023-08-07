@@ -92,8 +92,10 @@ docker ps
 
 `docker ps` should return the following, if everything worked. You should then be able to run the client and set your .env file as discussed above.
 
-CONTAINER ID IMAGE COMMAND CREATED STATUS PORTS NAMES
+```bash
+CONTAINER ID IMAGE         COMMAND                CREATED        STATUS        PORTS                  NAMES
 12ed73ede6a0 plugins_image "uvicorn --host 0.0.…" 21 seconds ago Up 19 seconds 0.0.0.0:8000->8000/tcp plugins_container
+```
 
 Stop with `docker stop plugins_container` and delete with `docker rm plugins_container`.
 
