@@ -24,7 +24,6 @@ describe('Annotation list component', () => {
         internalBranding: false,
         featureFlags: {
           useAPIDatasources: true,
-          useNewSpectrogramPage: true,
         },
       });
   });

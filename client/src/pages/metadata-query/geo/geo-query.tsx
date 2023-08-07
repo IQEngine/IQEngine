@@ -48,7 +48,7 @@ export const GeoQuery = ({
   handleQueryValid,
   trackData,
   geoPositionUpdate,
-  setGeoPositionUpdate
+  setGeoPositionUpdate,
 }) => {
   const defaultCenter = {
     lat: 51.505,
@@ -84,15 +84,15 @@ export const GeoQuery = ({
   };
 
   const getCenter = () => {
-    if(geoPositionUpdate === 'manual'){
+    if (geoPositionUpdate === 'manual') {
       return position;
     }
-    if(trackData.length > 0){
-      const value = trackData[trackData.length / 2 | 0];
+    if (trackData.length > 0) {
+      const value = trackData[(trackData.length / 2) | 0];
       return [value[0], value[1]];
     }
     return position;
-  }
+  };
 
   return (
     <div className="mb-10">
@@ -122,7 +122,7 @@ export const GeoQuery = ({
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
-            {trackData.length > 0  &&  <Polyline pathOptions={{color: 'red'}} positions={trackData} />}
+            {trackData.length > 0 && <Polyline pathOptions={{ color: 'red' }} positions={trackData} />}
             <LayerGroup>
               <Circle center={position} pathOptions={fillBlueOptions} radius={radius} />
             </LayerGroup>

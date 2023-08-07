@@ -21,7 +21,16 @@ interface FileRowProps {
   trackToggle?: (account: string, container: string, filepath: string) => any;
 }
 
-export default function FileRow({ filepath, type, account, container, sasToken, queryResult=false, geoSelected=false, trackToggle }: FileRowProps) {
+export default function FileRow({
+  filepath,
+  type,
+  account,
+  container,
+  sasToken,
+  queryResult = false,
+  geoSelected = false,
+  trackToggle,
+}: FileRowProps) {
   const [showModal, setShowModal] = useState(false);
   const { featureFlags } = useFeatureFlags();
   const { type: paramType, account: paramAccount, container: paramContainer, sasToken: paramSASToken } = useParams();
@@ -31,7 +40,7 @@ export default function FileRow({ filepath, type, account, container, sasToken, 
   sasToken = sasToken ?? paramSASToken;
   const { data: item } = getMeta(type, account, container, filepath);
 
-  const spectrogramLink = `/spectrogram/${item?.getOrigin().type}/${item?.getOrigin().account}/${
+  const spectrogramLink = `/view/${item?.getOrigin().type}/${item?.getOrigin().account}/${
     item?.getOrigin().container
   }/${encodeURIComponent(item?.getFilePath())}`;
 
@@ -95,13 +104,18 @@ export default function FileRow({ filepath, type, account, container, sasToken, 
         <td className="align-middle"></td>
         <td className="align-middle"></td>
         <td className="align-middle"></td>
-        {featureFlags?.useNewSpectrogramPage && <td className="align-middle"></td>}
       </tr>
     );
   }
 
   return (
-    <tr className={queryResult ? "hover:bg-info/10 grid grid-cols-10 text-center py-2 h-32 mb-5" : "hover:bg-info/10 text-center py-2 h-32"}>
+    <tr
+      className={
+        queryResult
+          ? 'hover:bg-info/10 grid grid-cols-10 text-center py-2 h-32 mb-5'
+          : 'hover:bg-info/10 text-center py-2 h-32'
+      }
+    >
       {
         <>
           {/* If we are looking at a recording from blob storage */}
@@ -112,7 +126,7 @@ export default function FileRow({ filepath, type, account, container, sasToken, 
               </div>
             </Link>
           </td>
-          <td className={queryResult ? "ml-10 align-middle col-span-2 text-left" : "align-middle text-left"}>
+          <td className={queryResult ? 'ml-10 align-middle col-span-2 text-left' : 'align-middle text-left'}>
             <Link to={spectrogramLink} onClick={() => {}}>
               <h2>{item.getFileName()}</h2>
             </Link>
@@ -158,18 +172,12 @@ export default function FileRow({ filepath, type, account, container, sasToken, 
         <br></br>
         {item.getEmail()}
       </td>
-      {featureFlags?.useNewSpectrogramPage && !geoSelected && (
-        <td className="align-middle">
-          <Link to={recordInspectionLink} onClick={() => {}}>
-            <button className="rounded border-2 border-secondary p-1 hover:bg-secondary hover:text-base-100">
-              Inspect
-            </button>
-          </Link>
-        </td>
-      )}
       {geoSelected && (
         <td className="align-middle">
-          <button onClick={() => trackToggle(account, container, filepath)} className="rounded ml-5 border-2 border-secondary p-1 hover:bg-secondary hover:text-base-100">
+          <button
+            onClick={() => trackToggle(account, container, filepath)}
+            className="rounded ml-5 border-2 border-secondary p-1 hover:bg-secondary hover:text-base-100"
+          >
             Track
           </button>
         </td>
