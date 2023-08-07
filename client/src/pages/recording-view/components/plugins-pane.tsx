@@ -28,7 +28,7 @@ export enum MimeTypes {
 }
 
 export const PluginsPane = () => {
-  const { meta, account, container, spectrogramHeight, fftSize, selectedAnnotation } = useSpectrogramContext();
+  const { meta, account, container, spectrogramHeight, fftSize, selectedAnnotation, setMeta } = useSpectrogramContext();
   const { cursorTimeEnabled } = useCursorContext();
   const currentFFT = 0;
   const { data: plugins, isError } = useGetPlugins();
@@ -72,12 +72,13 @@ export const PluginsPane = () => {
     const sampleRate = meta.getSampleRate();
     const freq = meta.getCenterFrequency();
 
+    let annotation: Annotation = null;
     if (selectedMethod == 'Annotation') {
       if (selectedAnnotation == -1) {
         toast.error('Please select the annotation you want to run a plugin on');
         setSelectedMethod('');
       } else {
-        const annotation = meta.annotations[selectedAnnotation];
+        annotation = meta.annotations[selectedAnnotation];
         const calculateMultiplier = dataTypeToBytesPerIQSample(MimeTypes[meta.getDataType()]);
         byte_offset = Math.floor(annotation['core:sample_start']) * calculateMultiplier;
         byte_length = annotation['core:sample_count'] * calculateMultiplier;
@@ -107,8 +108,8 @@ export const PluginsPane = () => {
           },
         ],
         custom_params: {
-          start_freq: annotation['core:freq_lower_edge'],
-          end_freq: annotation['core:freq_upper_edge'],
+          start_freq: annotation ? annotation['core:freq_lower_edge'] : null,
+          end_freq: annotation ? annotation['core:freq_upper_edge'] : null,
         },
       };
     } else {
