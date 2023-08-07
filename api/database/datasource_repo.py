@@ -129,8 +129,10 @@ async def create(datasource: DataSource, user: Optional[dict]) -> DataSource:
     if user and user["preferred_username"]:
         datasource_dict["owners"].append(user["preferred_username"])
     else:
-        datasource_dict["owners"].append("IQEngine-User")
-    datasource_dict["readers"] = []
-    datasource_dict["public"] = False
+        datasource_dict["owners"].append("IQEngine-Admin")
+    if "readers" not in datasource_dict:
+        datasource_dict["readers"] = []
+    if "public" not in datasource_dict:
+        datasource_dict["public"] = False
     await datasource_collection.insert_one(datasource_dict)
     return datasource
