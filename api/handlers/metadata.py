@@ -197,10 +197,19 @@ async def query_meta(
             return []
 
         # Process result to remove metadata from unauthorized datasources
+        access_cache = {}
+        filtered_result = []
+
         for item in result:
-            if await check_access(item.account, item.container, current_user) is None:
-                result.remove(item)
-        return result
+            key = (item.account, item.container)
+            if key not in access_cache:
+                access_cache[key] = await check_access(item.account, item.container, current_user)
+                
+            if access_cache[key] is not None:
+                filtered_result.append(item)
+
+        return filtered_result
+
 
     except InvalidGeolocationFormat as e:
         raise HTTPException(status_code=400, detail=str(e))
