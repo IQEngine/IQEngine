@@ -2,6 +2,7 @@ import * as React from 'react';
 import { useParams } from 'react-router-dom';
 import OverviewPage from './overview.mdx';
 import PluginsPage from './plugins.mdx';
+import NewDevGuide from './new-developer-guide.mdx';
 import { Link } from 'react-router-dom';
 
 export const DocsPages = () => {
@@ -14,6 +15,9 @@ export const DocsPages = () => {
       break;
     case 'plugins':
       currentPage = <PluginsPage />;
+      break;
+    case 'new-developer-guide':
+      currentPage = <NewDevGuide />;
       break;
     default:
       currentPage = <OverviewPage />;
@@ -32,7 +36,7 @@ export const DocsPages = () => {
               <TableItem href="#">Admin Page</TableItem>
 
               <TableHeader>Developer Docs</TableHeader>
-              <TableItem href="#">New Dev Guide</TableItem>
+              <TableItem href="/docs/new-developer-guide">New Dev Guide</TableItem>
               <TableItem href="#">Repo Organization</TableItem>
               <TableItem href="#">Code Styling Guidelines</TableItem>
             </div>

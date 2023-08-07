@@ -1,13 +1,17 @@
 # New Developer Guide
 
-## Installation
+## Basic Setup
 
 1. Clone this repo
 1. Add the PPA to get the latest Node version using the following commands:
     - `curl -sL https://deb.nodesource.com/setup_18.x -o nodesource_setup.sh`
-    - sudo bash nodesource_setup.sh
-1. Install NodeJs, NPM, and pip with `apt install nodejs npm python3-pip`
+    - `sudo bash nodesource_setup.sh`
+1. Install NodeJs, npm, and pip with `apt install nodejs npm python3-pip`
 1. From the root directory run the command ```make setup``` (ignore warnings)
-1. Within the root directory copy and paste the 'example.env' and rename to '.env'
+1. Within the root directory copy and paste the 'example.env' and rename to '.env', this is where you can configure your deployment
 1. Open three concurrent terminals for frontend, backend, and plugins
-1. Run the command `make dev` in the frontend terminal to start the development server
+    1. In the **frontend** terminal, run `make dev` to start the development web server (uses port 3000)
+    1. In the **backend** terminal, run `make run-api` to start the backend (uses port 5000)
+    1. Optionally, in the **plugins** terminal, run `make run-plugins` to start the plugins server (uses port 8000)
+1. Open your browser to http://localhost:3000 to access the site
+1. Optionally- if you want to see the public "GNU Radio Repo" recordings, ask Marc for a SAS token which gets used in the .env within IQENGINE_CONNECTION_INFO
