@@ -29,8 +29,7 @@ export enum MimeTypes {
 
 export const PluginsPane = () => {
   const { meta, account, container, spectrogramHeight, fftSize, selectedAnnotation, setMeta } = useSpectrogramContext();
-  const { cursorTimeEnabled } = useCursorContext();
-  const currentFFT = 0;
+  const { cursorTimeEnabled, cursorTime, cursorData } = useCursorContext();
   const { data: plugins, isError } = useGetPlugins();
   const { PluginOption, EditPluginParameters, pluginParameters, setPluginParameters } = useGetPluginsComponents();
   const [selectedPlugin, setSelectedPlugin] = useState('');
@@ -41,8 +40,8 @@ export const PluginsPane = () => {
   const [useCloudStorage, setUseCloudStorage] = useState(true);
   const { dataSourcesQuery } = useUserSettings();
   const connectionInfo = dataSourcesQuery?.data[`${account}/${container}`];
-  let byte_offset = meta.getBytesPerIQSample() * fftSize * currentFFT;
-  let byte_length = meta.getBytesPerIQSample() * spectrogramHeight * fftSize;
+  let byte_offset = meta.getBytesPerIQSample() * cursorTime.start;
+  let byte_length = meta.getBytesPerIQSample() * (cursorTime.end - cursorTime.start);
   const handleChangePlugin = (e) => {
     setSelectedPlugin(e.target.value);
   };
@@ -113,7 +112,7 @@ export const PluginsPane = () => {
         },
       };
     } else {
-      const newSamps = convertFloat32ArrayToBase64(Float32Array.from(modalSamples));
+      const newSamps = convertFloat32ArrayToBase64(cursorData);
       console.log(newSamps);
 
       body = {
@@ -253,7 +252,7 @@ export const PluginsPane = () => {
 
         if (data.annotations) {
           for (let i = 0; i < data.annotations.length; i++) {
-            data.annotations[i]['core:sample_start'] += meta['core:sample_start'];
+            data.annotations[i]['core:sample_start'] += cursorTime.start;
           }
           let newAnnotations = data.annotations.map((annotation) => Object.assign(new Annotation(), annotation));
           console.log(newAnnotations);
