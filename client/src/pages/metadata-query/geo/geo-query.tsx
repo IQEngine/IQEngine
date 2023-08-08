@@ -54,6 +54,7 @@ export const GeoQuery = ({
     lat: 51.505,
     lng: -0.09,
   };
+
   const defaultRadius = 20000;
   const fillBlueOptions = { fillColor: 'blue' };
   const minRadius = 100;
@@ -70,7 +71,6 @@ export const GeoQuery = ({
     const valid = validator({ lat: position.lat, lon: position.lng, radius: value, queryType: selectedQueryType });
     handleQueryValid(queryName, valid);
   };
-
   const handlePositionChange = (updatedPosition) => {
     const valid = validator({
       lat: updatedPosition.lat,
@@ -88,8 +88,7 @@ export const GeoQuery = ({
       return position;
     }
     if (trackData.length > 0) {
-      const value = trackData[(trackData.length / 2) | 0];
-      return [value[0], value[1]];
+      return trackData[(trackData.length / 2) | 0];
     }
     return position;
   };
