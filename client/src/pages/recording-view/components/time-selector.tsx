@@ -24,6 +24,7 @@ const TimeSelector = ({ currentFFT }: TimeSelectorProps) => {
   const cursorEndFFT = Math.floor(cursorTime.end / fftSize);
   const cursorYStart = cursorStartFFT - currentFFT;
   const cursorYEnd = cursorEndFFT - currentFFT;
+
   // update diff
   useEffect(() => {
     if (!cursorTimeEnabled || !meta) return;
@@ -36,6 +37,7 @@ const TimeSelector = ({ currentFFT }: TimeSelectorProps) => {
 
   // Sample-start bar
   const handleDragMoveStart = (e) => {
+    e.target.x(0); // keep line in the same x location
     const newStartSample = Math.max(currentFFT * fftSize, (currentFFT + e.target.y()) * fftSize);
     // check if there is the need to reverse the two
     if (newStartSample > cursorTime.end) {
@@ -53,6 +55,7 @@ const TimeSelector = ({ currentFFT }: TimeSelectorProps) => {
 
   // Sample-end bar
   const handleDragMoveEnd = (e) => {
+    e.target.x(0); // keep line in the same x location
     const newStartSample = Math.max(currentFFT * fftSize, (currentFFT + e.target.y()) * fftSize);
     if (newStartSample > cursorTime.start) {
       setCursorTime({
