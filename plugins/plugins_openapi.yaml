@@ -78,7 +78,7 @@ paths:
         - in: path
           name: functionName
           schema:
-            type: string
+            type: string9
           required: true
           description: Name of RF Function
       requestBody:
@@ -90,14 +90,14 @@ paths:
               type: object
               # Provide either samples (IQ samples) or samples_pointer (pointer to blob storage)
               oneOf:
-                - required: [samples_b64]
-                - required: [samples_cloud]
+                - required: [samples_b64_array]
+                - required: [samples_cloud_array]
               properties:
-                samples_b64:
+                samples_b64_array:
                   type: array # list of IQ samples, most functions will just have 1
                   items:
                     $ref: '#/components/schemas/samples_b64'
-                samples_cloud:
+                samples_cloud_array:
                   type: array # list of IQ samples, most functions will just have 1
                   items:
                     $ref: '#/components/schemas/samples_cloud'
@@ -121,11 +121,11 @@ paths:
                 # The following is taken from SigMF's annotations schema (currently a subset of it)
                 type: object
                 properties:
-                  samples_b64:
+                  samples_b64_array:
                     type: array # list of IQ samples, most functions will just have 1
                     items:
                       $ref: '#/components/schemas/samples_b64'
-                  samples_cloud:
+                  samples_cloud_array:
                     type: array # list of IQ samples, most functions will just have 1
                     items:
                       $ref: '#/components/schemas/samples_cloud'
