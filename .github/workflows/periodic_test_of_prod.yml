@@ -1,5 +1,5 @@
 ---
-name: Periodic Test of Staging and Prod
+name: Periodic Test of Prod
 
 on:
   schedule:
@@ -25,11 +25,6 @@ jobs:
       - name: Install Playwright Browsers
         working-directory: e2e
         run: npx playwright install --with-deps
-
-      - name: Run Playwright tests on Staging
-        working-directory: e2e
-        run: |
-          npx playwright test --config playwright-staging.config.ts --grep @CICompatible
 
       - name: Run Playwright tests on Prod
         working-directory: e2e
