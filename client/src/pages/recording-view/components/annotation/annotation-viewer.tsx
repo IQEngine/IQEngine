@@ -10,10 +10,9 @@ import { useSpectrogramContext } from '../../hooks/use-spectrogram-context';
 
 interface AnnotationViewerProps {
   currentFFT: number;
-  setCurrentFFT: (current: number) => void;
 }
 
-const AnnotationViewer = ({ currentFFT, setCurrentFFT }: AnnotationViewerProps) => {
+const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
   const {
     meta,
     setMeta,
@@ -75,7 +74,7 @@ const AnnotationViewer = ({ currentFFT, setCurrentFFT }: AnnotationViewerProps) 
       };
     });
     return annotations;
-  }, [meta.annotations, currentFFT, fftStepSize, fftSize, spectrogramWidth]);
+  }, [meta, currentFFT, fftStepSize, fftSize, spectrogramWidth]);
 
   // add cursor styling
   function onMouseOver() {
@@ -116,7 +115,6 @@ const AnnotationViewer = ({ currentFFT, setCurrentFFT }: AnnotationViewerProps) 
     console.log('new_meta', new_meta);
     setMeta(new_meta);
     console.log('currentFFT: ', currentFFT);
-    setCurrentFFT(currentFFT + 1);
     // setSelectedAnnotation(annot_indx);
   }, [annotations, meta, currentFFT, fftSize, fftStepSize, setMeta]);
 
