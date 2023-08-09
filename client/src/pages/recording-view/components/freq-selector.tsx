@@ -34,27 +34,46 @@ const FreqSelector = () => {
   }, [upperPosition]);
 
   const handleDragMoveLower = (e) => {
-    setCursorFreq({
-      start: handleMovement(e),
-      end: cursorFreq.end,
-    });
-  };
-
-  const handleDragMoveUpper = (e) => {
-    setCursorFreq({
-      start: cursorFreq.start,
-      end: handleMovement(e),
-    });
-  };
-
-  const handleMovement = (e) => {
     let newX = e.target.x();
     if (newX <= 2) newX = 2;
     if (newX > spectrogramWidth - 2) newX = spectrogramWidth - 2;
     e.target.x(newX);
     e.target.y(0); // keep line in the same y location
-    return newX / spectrogramWidth - 0.5;
+    const newPos = newX / spectrogramWidth - 0.5;
+    if (newPos < cursorFreq.end) {
+      setCursorFreq({
+        start: newPos,
+        end: cursorFreq.end,
+      });
+    } else {
+      setCursorFreq({
+        start: cursorFreq.end,
+        end: newPos,
+      });
+    }
   };
+
+  const handleDragMoveUpper = (e) => {
+    let newX = e.target.x();
+    if (newX <= 2) newX = 2;
+    if (newX > spectrogramWidth - 2) newX = spectrogramWidth - 2;
+    e.target.x(newX);
+    e.target.y(0); // keep line in the same y location
+    const newPos = newX / spectrogramWidth - 0.5;
+    if (newPos > cursorFreq.start) {
+      setCursorFreq({
+        start: cursorFreq.start,
+        end: newPos,
+      });
+    } else {
+      setCursorFreq({
+        start: newPos,
+        end: cursorFreq.start,
+      });
+    }
+  };
+
+  const handleMovement = (e) => {};
 
   const handleDragEnd = (e) => {
     setCursorFreq({
