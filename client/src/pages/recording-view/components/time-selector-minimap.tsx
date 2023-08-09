@@ -19,6 +19,7 @@ const TimeSelectorMinimap = ({ currentFFT }) => {
   const scalingFactor = totalFFTs / spectrogramHeight;
   // Sample-start bar
   const handleDragMoveStart = (e) => {
+    e.target.x(0); // keep line in the same x location
     const newStartSample = Math.max(0, e.target.y() * fftSize * scalingFactor);
     // check if there is the need to reverse the two
     if (newStartSample > cursorTime.end) {
@@ -36,6 +37,7 @@ const TimeSelectorMinimap = ({ currentFFT }) => {
 
   // Sample-end bar
   const handleDragMoveEnd = (e) => {
+    e.target.x(0); // keep line in the same x location
     const newStartSample = Math.max(totalFFTs, e.target.y() * fftSize * scalingFactor);
     if (newStartSample > cursorTime.start) {
       setCursorTime({
