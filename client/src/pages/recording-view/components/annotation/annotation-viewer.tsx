@@ -10,9 +10,10 @@ import { useSpectrogramContext } from '../../hooks/use-spectrogram-context';
 
 interface AnnotationViewerProps {
   currentFFT: number;
+  setCurrentFFT: (current: number) => void;
 }
 
-const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
+const AnnotationViewer = ({ currentFFT, setCurrentFFT }: AnnotationViewerProps) => {
   const {
     meta,
     setMeta,
@@ -114,6 +115,8 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
     let new_meta = Object.assign(new SigMFMetadata(), meta);
     console.log('new_meta', new_meta);
     setMeta(new_meta);
+    console.log('currentFFT: ', currentFFT);
+    setCurrentFFT(currentFFT + 1);
     // setSelectedAnnotation(annot_indx);
   }, [annotations, meta, currentFFT, fftSize, fftStepSize, setMeta]);
 
