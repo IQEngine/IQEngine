@@ -7,7 +7,7 @@ export const MINIMUM_SCROLL_HANDLE_HEIGHT_PIXELS = 10;
 export const COLORMAP_DEFAULT = 'viridis';
 export const MINIMAP_FFT_SIZE = 64;
 export const FETCH_PADDING = 50; // how many extra ffts we fetch to smooth scrolling this si based on the fft size
-export const MIN_SPECTROGRAM_HEIGHT = 500;
+export const MIN_SPECTROGRAM_HEIGHT = 650;
 export const INITIAL_PYTHON_SNIPPET = `import numpy as np
 import time
 start_t = time.time()
