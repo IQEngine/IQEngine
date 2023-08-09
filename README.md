@@ -1,6 +1,7 @@
 ![GitHub release](https://img.shields.io/github/v/release/IQEngine/IQEngine)
 [![Discord](https://img.shields.io/discord/1063315697498853498?label=Discord)](https://discord.gg/k7C8kp3b76)
 [![AUR](https://img.shields.io/github/license/IQEngine/IQEngine)](https://github.com/IQEngine/IQEngine/blob/main/LICENSE)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/IQEngine/IQEngine/badge)](https://securityscorecards.dev/viewer/?uri=github.com/IQEngine/IQEngine)
 
 <p align="center">
   <img width=250 src="client/public/IQEngine_Black.svg" />
