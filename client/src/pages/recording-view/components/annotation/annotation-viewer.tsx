@@ -42,7 +42,7 @@ export const AnnotationLabelEditor = ({
           className={'text-base-100'}
           id={id}
           onKeyDown={onKeyDown}
-        ></textarea>
+        />
       </Html>
       <Text
         text="Hit Enter to Finish"
@@ -51,7 +51,7 @@ export const AnnotationLabelEditor = ({
         x={position.x}
         y={position.y - 30}
         fill={'black'}
-      ></Text>
+      />
     </Group>
   );
 };
