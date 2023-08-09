@@ -2,11 +2,12 @@
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
 
-import React, { Fragment, useCallback, useMemo } from 'react';
+import React, { Fragment, useEffect, useCallback, useMemo, useState } from 'react';
 import { Layer, Rect, Text } from 'react-konva';
 import { TILE_SIZE_IN_IQ_SAMPLES } from '@/utils/constants';
 import { Annotation, SigMFMetadata } from '@/utils/sigmfMetadata';
 import { useSpectrogramContext } from '../../hooks/use-spectrogram-context';
+import { AnnotationLabelEditor } from './annotation-label-editor';
 
 interface AnnotationViewerProps {
   currentFFT: number;
@@ -24,6 +25,9 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
     setSelectedAnnotation,
   } = useSpectrogramContext();
   const lower_freq = meta.getCenterFrequency() - meta.getSampleRate() / 2;
+  const [editAnnotationLabel, setEditAnnotationLabel] = useState(false);
+  let editAnnotationLabelTop = '';
+  let editAnnotationLabelLeft = '';
 
   function onDragEnd(e) {
     const x = e.target.x(); // coords of the corner box
@@ -117,53 +121,61 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
     // setSelectedAnnotation(annot_indx);
   }, [annotations, meta, currentFFT, fftSize, fftStepSize, setMeta]);
 
+  useEffect(() => {
+    // this runs when the component mounts
+    console.log('editAnnotationLabel: ', editAnnotationLabel);
+    return () => {
+      // This runs when the component unmounts (not useful for you right now)
+    };
+  }, [editAnnotationLabel]);
+
   // Ability to update annotation labels
-  const handleTextClick = useCallback(
-    (e) => {
-      // create textarea and style it
-      var textarea = document.createElement('textarea');
-      document.body.appendChild(textarea);
+  // const handleTextClick = useEffect(
+  //   (e) => {
+  // create textarea and style it
+  // var textarea = document.createElement('textarea');
+  // document.body.appendChild(textarea);
 
-      textarea.value = e.target.text();
-      textarea.style.position = 'absolute';
-      textarea.style.top = '300px'; // middle of screen
-      textarea.style.left = '500px'; // middle of screen
-      textarea.style.width = '400px';
-      textarea.style.fontSize = '25px';
-      textarea.rows = 1;
-      textarea.id = e.target.id();
-      textarea.focus();
-      textarea.classList.add('text-base-100');
+  // textarea.value = e.target.text();
+  // textarea.style.position = 'absolute';
+  // textarea.style.top = spectrogram.top + e.target.attrs.y + 'px';
+  // textarea.style.left = spectrogram.left + e.target.attrs.x + 'px';
+  // textarea.style.width = '400px';
+  // textarea.style.fontSize = '25px';
+  // textarea.rows = 1;
+  // textarea.id = e.target.id();
+  // textarea.focus();
+  // textarea.classList.add('text-base-100');
 
-      // Add a note about hitting enter to finish the edit
-      var textarea2 = document.createElement('textarea');
-      document.body.appendChild(textarea2);
-      textarea2.value = 'Hit Enter to Finish';
-      textarea2.style.position = 'absolute';
-      textarea2.style.top = '270px';
-      textarea2.style.left = '600px';
-      textarea2.style.width = '140px';
-      textarea2.style.height = '30px';
-      textarea2.rows = 1;
-      textarea2.disabled = true;
-      textarea2.style.resize = 'none';
-      textarea2.classList.add('text-base-100');
+  // Add a note about hitting enter to finish the edit
+  // var textarea2 = document.createElement('textarea');
+  // document.body.appendChild(textarea2);
+  // textarea2.value = 'Hit Enter to Finish';
+  // textarea2.style.position = 'absolute';
+  // textarea2.style.top = spectrogram.top + e.target.attrs.y - 30 + 'px';
+  // textarea2.style.left = spectrogram.left + e.target.attrs.x + 100 + 'px';
+  // textarea2.style.width = '140px';
+  // textarea2.style.height = '30px';
+  // textarea2.rows = 1;
+  // textarea2.disabled = true;
+  // textarea2.style.resize = 'none';
+  // textarea2.classList.add('text-base-100');
 
-      textarea.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter') {
-          console.debug(textarea.value, textarea.id);
-          annotations[textarea.id]['label'] = textarea.value; // update the local version first
-          // Now update the actual meta info
-          meta.annotations[annotations[textarea.id]['index']]['core:label'] = textarea.value;
-          let new_meta = Object.assign(new SigMFMetadata(), meta);
-          setMeta(new_meta);
-          document.body.removeChild(textarea);
-          document.body.removeChild(textarea2);
-        }
-      });
-    },
-    [annotations, meta, setMeta]
-  );
+  // textarea.addEventListener('keydown', function (e) {
+  //   if (e.key === 'Enter') {
+  //     console.debug(textarea.value, textarea.id);
+  //     annotations[textarea.id]['label'] = textarea.value; // update the local version first
+  //     // Now update the actual meta info
+  //     meta.annotations[annotations[textarea.id]['index']]['core:label'] = textarea.value;
+  //     let new_meta = Object.assign(new SigMFMetadata(), meta);
+  //     setMeta(new_meta);
+  //     document.body.removeChild(textarea);
+  //     document.body.removeChild(textarea2);
+  //   }
+  //});
+  //   },
+  //   [annotations, meta, setMeta]
+  // );
 
   const onBoxCornerClick = useCallback(
     (e) => {
@@ -180,6 +192,17 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
     },
     [setSelectedAnnotation]
   );
+
+  const onLabelClick = useCallback((e) => {
+    setEditAnnotationLabel(true);
+    const element = document.getElementById('spectrogram');
+    let spectrogram = new DOMRect();
+    if (!!element) {
+      spectrogram = element.getBoundingClientRect();
+      editAnnotationLabelTop = spectrogram.top + e.target.attrs.y + 'px';
+      editAnnotationLabelLeft = spectrogram.left + e.target.attrs.x + 'px';
+    }
+  }, []);
 
   return (
     <Layer>
@@ -296,8 +319,15 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
             fill={selectedAnnotation == index ? 'pink' : 'black'}
             fontStyle="bold"
             key={index + 1000000}
-            onClick={handleTextClick}
+            onClick={onLabelClick}
             id={index.toString()} // tells the event which annotation to update
+          />
+          <AnnotationLabelEditor
+            labelText={annotation.label}
+            top={editAnnotationLabelTop}
+            left={editAnnotationLabelLeft}
+            visible={editAnnotationLabel}
+            setEditAnnotationLabel={setEditAnnotationLabel}
           />
         </Fragment>
       ))}

@@ -41,6 +41,7 @@
     "react-ga4": "^2.0.0",
     "react-hot-toast": "^2.4.1",
     "react-konva": "18.2.8",
+    "react-konva-utils":"1.0.5",
     "react-leaflet": "^4.2.1",
     "react-plotly.js": "^2.6.0",
     "react-router-dom": "^6.11.1",
