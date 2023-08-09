@@ -78,7 +78,7 @@ paths:
         - in: path
           name: functionName
           schema:
-            type: string9
+            type: string
           required: true
           description: Name of RF Function
       requestBody:
