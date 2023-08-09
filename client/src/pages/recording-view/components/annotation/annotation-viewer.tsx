@@ -11,52 +11,47 @@ import { Html } from 'react-konva-utils';
 
 interface AnnotationLabelEditorProps {
   labelText: string;
-  y: number;
-  x: number;
+  position: { x: number; y: number };
   id: string;
-  setEditAnnotationLabelY: (y: number) => void;
-  setEditAnnotationLabelText: (text: string) => void;
-  setEditAnnotationLabelChanged: (flag: boolean) => void;
+  setEditAnnotationLabelPosition: (y: number) => void;
+  saveAnnotationLabelChange: (content: string) => void;
 }
 
 export const AnnotationLabelEditor = ({
   labelText,
-  y,
-  x,
+  position,
   id,
-  setEditAnnotationLabelY,
-  setEditAnnotationLabelText,
-  setEditAnnotationLabelChanged,
+  setEditAnnotationLabelPosition,
+  saveAnnotationLabelChange,
 }: AnnotationLabelEditorProps) => {
   const onKeyDown = (e) => {
     if (e.key === 'Enter') {
-      setEditAnnotationLabelY(null);
-      if (e.target.value == '') {
-        setEditAnnotationLabelText(labelText);
-      } else {
-        if (labelText !== e.target.value) {
-          setEditAnnotationLabelText(e.target.value);
-          setEditAnnotationLabelChanged(true);
-        }
+      setEditAnnotationLabelPosition(null);
+      if (e.target.value !== '') {
+        saveAnnotationLabelChange(e.target.value);
       }
     }
   };
-  const top = y + 'px';
-  const left = x + 'px';
-  const msgTop = (y - 30).toString() + 'px';
   return (
     <Group>
       <Html>
         <textarea
           placeholder={labelText}
-          style={{ top: top, left: left, width: '200px', fontSize: '16px', position: 'absolute' }}
+          style={{ top: position.y, left: position.x, width: '200px', fontSize: '16px', position: 'absolute' }}
           rows={1}
           className={'text-base-100'}
           id={id}
           onKeyDown={onKeyDown}
         ></textarea>
       </Html>
-      <Text text="Hit Enter to Finish" fontFamily="serif" fontSize={24} x={x} y={y - 30} fill={'black'}></Text>
+      <Text
+        text="Hit Enter to Finish"
+        fontFamily="serif"
+        fontSize={24}
+        x={position.x}
+        y={position.y - 30}
+        fill={'black'}
+      ></Text>
     </Group>
   );
 };
@@ -77,11 +72,9 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
     setSelectedAnnotation,
   } = useSpectrogramContext();
   const lower_freq = meta.getCenterFrequency() - meta.getSampleRate() / 2;
-  const [editAnnotationLabelY, setEditAnnotationLabelY] = useState(null);
-  const [editAnnotationLabelX, setEditAnnotationLabelX] = useState(null);
+  const [editAnnotationLabelPosition, setEditAnnotationLabelPosition] = useState(null);
   const [editAnnotationLabelId, setEditAnnotationLabelId] = useState(null);
   const [editAnnotationLabelText, setEditAnnotationLabelText] = useState(null);
-  const [editAnnotationLabelChanged, setEditAnnotationLabelChanged] = useState(false);
 
   function onDragEnd(e) {
     const x = e.target.x(); // coords of the corner box
@@ -191,24 +184,20 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
     [setSelectedAnnotation]
   );
 
-  useEffect(() => {
-    if (editAnnotationLabelId !== null && editAnnotationLabelChanged) {
-      // store the updates
-      annotations[editAnnotationLabelId]['label'] = editAnnotationLabelText;
-      meta.annotations[annotations[editAnnotationLabelId]['index']]['core:label'] = editAnnotationLabelText;
-      let new_meta = Object.assign(new SigMFMetadata(), meta);
-      setMeta(new_meta);
+  function saveAnnotationLabelChange(content) {
+    // save the changes in metadata
+    annotations[editAnnotationLabelId]['label'] = content;
+    meta.annotations[annotations[editAnnotationLabelId]['index']]['core:label'] = content;
+    let new_meta = Object.assign(new SigMFMetadata(), meta);
+    setMeta(new_meta);
 
-      // reset pointers for next one
-      setEditAnnotationLabelId(null);
-      setEditAnnotationLabelChanged(false);
-    }
-  }, [editAnnotationLabelText, editAnnotationLabelId, editAnnotationLabelChanged]);
+    // reset pointer for next one
+    setEditAnnotationLabelId(null);
+  }
 
   const onAnnotationLabelClick = useCallback((e) => {
     setEditAnnotationLabelText(e.target.attrs.text);
-    setEditAnnotationLabelY(e.target.attrs.y);
-    setEditAnnotationLabelX(e.target.attrs.x);
+    setEditAnnotationLabelPosition({ x: e.target.attrs.x, y: e.target.attrs.y });
     setEditAnnotationLabelId(e.target.attrs.id);
   }, []);
 
@@ -330,15 +319,13 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
             onClick={onAnnotationLabelClick}
             id={index.toString()} // tells the event which annotation to update
           />
-          {editAnnotationLabelY && editAnnotationLabelId !== null && (
+          {editAnnotationLabelPosition && editAnnotationLabelId !== null && (
             <AnnotationLabelEditor
-              labelText={annotation.label}
-              y={editAnnotationLabelY}
-              x={editAnnotationLabelX}
+              labelText={editAnnotationLabelText}
+              position={{ x: editAnnotationLabelPosition.x, y: editAnnotationLabelPosition.y }}
               id={editAnnotationLabelId}
-              setEditAnnotationLabelY={setEditAnnotationLabelY}
-              setEditAnnotationLabelText={setEditAnnotationLabelText}
-              setEditAnnotationLabelChanged={setEditAnnotationLabelChanged}
+              setEditAnnotationLabelPosition={setEditAnnotationLabelPosition}
+              saveAnnotationLabelChange={saveAnnotationLabelChange}
             />
           )}
         </Fragment>
