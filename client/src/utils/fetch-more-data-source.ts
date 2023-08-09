@@ -73,25 +73,25 @@ export function convertToFloat32(buffer, dataType) {
     let samples = Float32Array.from(new Uint8Array(buffer));
     for (let i = 0; i < samples.length; i++) samples[i] = (samples[i] - 255.0) / 255.0;
     return samples;
-  } else if (dataType === 'ci16_le') {
+  } else if (dataType === 'ci16_le' || dataType === 'ci16') {
     let samples = Float32Array.from(new Int16Array(buffer));
     for (let i = 0; i < samples.length; i++) samples[i] = samples[i] / 32768.0;
     return samples;
-  } else if (dataType === 'cu16_le') {
+  } else if (dataType === 'cu16_le' || dataType === 'cu16') {
     let samples = Float32Array.from(new Uint16Array(buffer));
     for (let i = 0; i < samples.length; i++) samples[i] = (samples[i] - 32768.0) / 32768.0;
     return samples;
-  } else if (dataType === 'ci32_le') {
+  } else if (dataType === 'ci32_le'  || dataType === 'ci32') {
     let samples = Float32Array.from(new Int32Array(buffer));
     for (let i = 0; i < samples.length; i++) samples[i] = samples[i] / 2147483647.0;
     return samples;
-  } else if (dataType === 'cu32_le') {
+  } else if (dataType === 'cu32_le' || dataType === 'cu32') {
     let samples = Float32Array.from(new Uint32Array(buffer));
     for (let i = 0; i < samples.length; i++) samples[i] = (samples[i] - 2147483647.0) / 2147483647.0;
     return samples;
-  } else if (dataType === 'cf32_le') {
+  } else if (dataType === 'cf32_le' || dataType === 'cf32') {
     return new Float32Array(buffer);
-  } else if (dataType === 'cf64_le') {
+  } else if (dataType === 'cf64_le' || dataType === 'cf64') {
     return Float32Array.from(new Float64Array(buffer));
   } else {
     console.error('Unknown data type: ' + dataType);
