@@ -3,11 +3,63 @@
 // Licensed under the MIT License
 
 import React, { Fragment, useEffect, useCallback, useMemo, useState } from 'react';
-import { Layer, Rect, Text } from 'react-konva';
+import { Layer, Rect, Text, Group } from 'react-konva';
 import { TILE_SIZE_IN_IQ_SAMPLES } from '@/utils/constants';
 import { Annotation, SigMFMetadata } from '@/utils/sigmfMetadata';
 import { useSpectrogramContext } from '../../hooks/use-spectrogram-context';
-import { AnnotationLabelEditor } from './annotation-label-editor';
+import { Html } from 'react-konva-utils';
+
+interface AnnotationLabelEditorProps {
+  labelText: string;
+  y: number;
+  x: number;
+  id: string;
+  setEditAnnotationLabelY: (y: number) => void;
+  setEditAnnotationLabelText: (text: string) => void;
+  setEditAnnotationLabelChanged: (flag: boolean) => void;
+}
+
+export const AnnotationLabelEditor = ({
+  labelText,
+  y,
+  x,
+  id,
+  setEditAnnotationLabelY,
+  setEditAnnotationLabelText,
+  setEditAnnotationLabelChanged,
+}: AnnotationLabelEditorProps) => {
+  const onKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      setEditAnnotationLabelY(null);
+      if (e.target.value == '') {
+        setEditAnnotationLabelText(labelText);
+      } else {
+        if (labelText !== e.target.value) {
+          setEditAnnotationLabelText(e.target.value);
+          setEditAnnotationLabelChanged(true);
+        }
+      }
+    }
+  };
+  const top = y + 'px';
+  const left = x + 'px';
+  const msgTop = (y - 30).toString() + 'px';
+  return (
+    <Group>
+      <Html>
+        <textarea
+          placeholder={labelText}
+          style={{ top: top, left: left, width: '200px', fontSize: '16px', position: 'absolute' }}
+          rows={1}
+          className={'text-base-100'}
+          id={id}
+          onKeyDown={onKeyDown}
+        ></textarea>
+      </Html>
+      <Text text="Hit Enter to Finish" fontFamily="serif" fontSize={24} x={x} y={y - 30} fill={'black'}></Text>
+    </Group>
+  );
+};
 
 interface AnnotationViewerProps {
   currentFFT: number;
@@ -25,9 +77,11 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
     setSelectedAnnotation,
   } = useSpectrogramContext();
   const lower_freq = meta.getCenterFrequency() - meta.getSampleRate() / 2;
-  const [editAnnotationLabel, setEditAnnotationLabel] = useState(false);
-  let editAnnotationLabelTop = '';
-  let editAnnotationLabelLeft = '';
+  const [editAnnotationLabelY, setEditAnnotationLabelY] = useState(null);
+  const [editAnnotationLabelX, setEditAnnotationLabelX] = useState(null);
+  const [editAnnotationLabelId, setEditAnnotationLabelId] = useState(null);
+  const [editAnnotationLabelText, setEditAnnotationLabelText] = useState(null);
+  const [editAnnotationLabelChanged, setEditAnnotationLabelChanged] = useState(false);
 
   function onDragEnd(e) {
     const x = e.target.x(); // coords of the corner box
@@ -121,62 +175,6 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
     // setSelectedAnnotation(annot_indx);
   }, [annotations, meta, currentFFT, fftSize, fftStepSize, setMeta]);
 
-  useEffect(() => {
-    // this runs when the component mounts
-    console.log('editAnnotationLabel: ', editAnnotationLabel);
-    return () => {
-      // This runs when the component unmounts (not useful for you right now)
-    };
-  }, [editAnnotationLabel]);
-
-  // Ability to update annotation labels
-  // const handleTextClick = useEffect(
-  //   (e) => {
-  // create textarea and style it
-  // var textarea = document.createElement('textarea');
-  // document.body.appendChild(textarea);
-
-  // textarea.value = e.target.text();
-  // textarea.style.position = 'absolute';
-  // textarea.style.top = spectrogram.top + e.target.attrs.y + 'px';
-  // textarea.style.left = spectrogram.left + e.target.attrs.x + 'px';
-  // textarea.style.width = '400px';
-  // textarea.style.fontSize = '25px';
-  // textarea.rows = 1;
-  // textarea.id = e.target.id();
-  // textarea.focus();
-  // textarea.classList.add('text-base-100');
-
-  // Add a note about hitting enter to finish the edit
-  // var textarea2 = document.createElement('textarea');
-  // document.body.appendChild(textarea2);
-  // textarea2.value = 'Hit Enter to Finish';
-  // textarea2.style.position = 'absolute';
-  // textarea2.style.top = spectrogram.top + e.target.attrs.y - 30 + 'px';
-  // textarea2.style.left = spectrogram.left + e.target.attrs.x + 100 + 'px';
-  // textarea2.style.width = '140px';
-  // textarea2.style.height = '30px';
-  // textarea2.rows = 1;
-  // textarea2.disabled = true;
-  // textarea2.style.resize = 'none';
-  // textarea2.classList.add('text-base-100');
-
-  // textarea.addEventListener('keydown', function (e) {
-  //   if (e.key === 'Enter') {
-  //     console.debug(textarea.value, textarea.id);
-  //     annotations[textarea.id]['label'] = textarea.value; // update the local version first
-  //     // Now update the actual meta info
-  //     meta.annotations[annotations[textarea.id]['index']]['core:label'] = textarea.value;
-  //     let new_meta = Object.assign(new SigMFMetadata(), meta);
-  //     setMeta(new_meta);
-  //     document.body.removeChild(textarea);
-  //     document.body.removeChild(textarea2);
-  //   }
-  //});
-  //   },
-  //   [annotations, meta, setMeta]
-  // );
-
   const onBoxCornerClick = useCallback(
     (e) => {
       const annot_indx = e.target.id().split('-')[0];
@@ -193,15 +191,25 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
     [setSelectedAnnotation]
   );
 
-  const onLabelClick = useCallback((e) => {
-    setEditAnnotationLabel(true);
-    const element = document.getElementById('spectrogram');
-    let spectrogram = new DOMRect();
-    if (!!element) {
-      spectrogram = element.getBoundingClientRect();
-      editAnnotationLabelTop = spectrogram.top + e.target.attrs.y + 'px';
-      editAnnotationLabelLeft = spectrogram.left + e.target.attrs.x + 'px';
+  useEffect(() => {
+    if (editAnnotationLabelId !== null && editAnnotationLabelChanged) {
+      // store the updates
+      annotations[editAnnotationLabelId]['label'] = editAnnotationLabelText;
+      meta.annotations[annotations[editAnnotationLabelId]['index']]['core:label'] = editAnnotationLabelText;
+      let new_meta = Object.assign(new SigMFMetadata(), meta);
+      setMeta(new_meta);
+
+      // reset pointers for next one
+      setEditAnnotationLabelId(null);
+      setEditAnnotationLabelChanged(false);
     }
+  }, [editAnnotationLabelText, editAnnotationLabelId, editAnnotationLabelChanged]);
+
+  const onAnnotationLabelClick = useCallback((e) => {
+    setEditAnnotationLabelText(e.target.attrs.text);
+    setEditAnnotationLabelY(e.target.attrs.y);
+    setEditAnnotationLabelX(e.target.attrs.x);
+    setEditAnnotationLabelId(e.target.attrs.id);
   }, []);
 
   return (
@@ -319,16 +327,20 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
             fill={selectedAnnotation == index ? 'pink' : 'black'}
             fontStyle="bold"
             key={index + 1000000}
-            onClick={onLabelClick}
+            onClick={onAnnotationLabelClick}
             id={index.toString()} // tells the event which annotation to update
           />
-          <AnnotationLabelEditor
-            labelText={annotation.label}
-            top={editAnnotationLabelTop}
-            left={editAnnotationLabelLeft}
-            visible={editAnnotationLabel}
-            setEditAnnotationLabel={setEditAnnotationLabel}
-          />
+          {editAnnotationLabelY && editAnnotationLabelId !== null && (
+            <AnnotationLabelEditor
+              labelText={annotation.label}
+              y={editAnnotationLabelY}
+              x={editAnnotationLabelX}
+              id={editAnnotationLabelId}
+              setEditAnnotationLabelY={setEditAnnotationLabelY}
+              setEditAnnotationLabelText={setEditAnnotationLabelText}
+              setEditAnnotationLabelChanged={setEditAnnotationLabelChanged}
+            />
+          )}
         </Fragment>
       ))}
     </Layer>
