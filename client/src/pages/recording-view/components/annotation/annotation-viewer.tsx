@@ -114,7 +114,6 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
     let new_meta = Object.assign(new SigMFMetadata(), meta);
     console.log('new_meta', new_meta);
     setMeta(new_meta);
-    console.log('currentFFT: ', currentFFT);
     // setSelectedAnnotation(annot_indx);
   }, [annotations, meta, currentFFT, fftSize, fftStepSize, setMeta]);
 
