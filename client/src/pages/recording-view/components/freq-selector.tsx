@@ -63,6 +63,14 @@ const FreqSelector = () => {
     });
   };
 
+  // add cursor styling
+  function onMouseOver() {
+    document.body.style.cursor = 'move';
+  }
+  function onMouseOut() {
+    document.body.style.cursor = 'default';
+  }
+
   if (!cursorFreqEnabled) return null;
 
   return (
@@ -87,6 +95,8 @@ const FreqSelector = () => {
             draggable={true}
             onDragMove={handleDragMoveLower}
             onDragEnd={handleDragEnd}
+            onMouseOver={onMouseOver}
+            onMouseOut={onMouseOut}
             strokeEnabled={true}
             strokeWidth={5}
             stroke="blue"
@@ -104,6 +114,8 @@ const FreqSelector = () => {
             draggable={true}
             onDragMove={handleDragMoveUpper}
             onDragEnd={handleDragEnd}
+            onMouseOver={onMouseOver}
+            onMouseOut={onMouseOut}
             strokeEnabled={true}
             strokeWidth={5}
             stroke="blue"
