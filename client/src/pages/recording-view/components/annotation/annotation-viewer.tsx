@@ -230,6 +230,8 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
             stroke={selectedAnnotation == index ? 'pink' : 'black'}
             strokeWidth={4}
             onClick={onBoxClick}
+            onMouseOver={onMouseOver}
+            onMouseOut={onMouseOut}
             key={index}
             id={index.toString()}
           />
