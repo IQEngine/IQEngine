@@ -1,6 +1,6 @@
 ![GitHub release](https://img.shields.io/github/v/release/IQEngine/IQEngine)
 [![Discord](https://img.shields.io/discord/1063315697498853498?label=Discord)](https://discord.gg/k7C8kp3b76)
-[![AUR](https://img.shields.io/github/license/IQEngine/IQEngine)](https://github.com/IQEngine/IQEngine/blob/main/COPYING)
+[![AUR](https://img.shields.io/github/license/IQEngine/IQEngine)](https://github.com/IQEngine/IQEngine/blob/main/LICENSE)
 
 <p align="center">
   <img width=250 src="client/public/IQEngine_Black.svg" />
