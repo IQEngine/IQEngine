@@ -132,7 +132,7 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
       };
     });
     return annotations;
-  }, [meta.annotations, currentFFT, fftStepSize, fftSize, spectrogramWidth]);
+  }, [meta, currentFFT, fftStepSize, fftSize, spectrogramWidth]);
 
   // add cursor styling
   function onMouseOver() {
