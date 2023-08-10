@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@ee0669bd1cc54295c223e0bb666b733df41de1c5 # v2.7.0
 
       - name: Set up Node.js version
-        uses: actions/setup-node@f1f314fca9dfce2769ece7d933488f076716723e # v1.4.6
+        uses: actions/setup-node@e33196f7422957bea03ed53f6fbb155025ffc7b8 # v3.7.0
         with:
           node-version: '18.x'
 
