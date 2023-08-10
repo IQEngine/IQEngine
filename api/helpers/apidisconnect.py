@@ -21,15 +21,17 @@ def cancel_on_disconnect(handler: Callable[[Request], Awaitable[Any]]):
     @wraps(handler)
     async def cancel_on_disconnect_decorator(request: Request, *args, **kwargs):
         sentinel = object()
-
+        print("in the disconnect thing")
         poller_task = asyncio.ensure_future(disconnect_poller(request, sentinel))
         handler_task = asyncio.ensure_future(handler(request, *args, **kwargs))
-
+        print("do we make it past the poller task?")
         done, pending = await asyncio.wait(
             [poller_task, handler_task], return_when=asyncio.FIRST_COMPLETED
         )
 
         for t in pending:
+            print("In the for loop")
+            print(t)
             t.cancel()
 
             try:
@@ -40,6 +42,7 @@ def cancel_on_disconnect(handler: Callable[[Request], Awaitable[Any]]):
                 print(f"{t} raised {exc} when being cancelled")
 
         if handler_task in done:
+            print("in if handler_task in done")
             return await handler_task
 
         print("Raising an HTTP error because I was disconnected!")
@@ -55,7 +58,7 @@ async def disconnect_poller(request: Request, result: Any):
             await asyncio.sleep(0.01)
 
         print("Request disconnected")
-
+        print(result)
         return result
     except asyncio.CancelledError:
         print("Stopping polling loop")

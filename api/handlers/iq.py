@@ -4,7 +4,6 @@ import io
 import logging
 import time
 from typing import List, Optional
-from pprint import pprint
 
 from blob.azure_client import AzureBlobClient
 from database import datasource_repo
@@ -61,7 +60,6 @@ async def get_iq_data(
     
     try:
         block_indexes = [int(num) for num in block_indexes_str.split(",")]
-        pprint(vars(request))
 
         return StreamingResponse(
             calculate_iq_data(
@@ -156,7 +154,6 @@ async def get_byte_stream(
         return b""
     if blob_size < offsetBytes + countBytes:
         countBytes = blob_size - offsetBytes
-    print("Getting byte stream")
     content = await azure_client.get_blob_content(
         filepath=iq_file, offset=offsetBytes, length=countBytes
     )
