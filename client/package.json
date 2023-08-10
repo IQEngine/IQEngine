@@ -23,7 +23,7 @@
     "@uiw/codemirror-extensions-langs": "^4.21.2",
     "@uiw/codemirror-theme-vscode": "^4.19.16",
     "@uiw/react-codemirror": "^4.19.14",
-    "@vitejs/plugin-react": "^4.0.0",
+    "@vitejs/plugin-react": "^4.0.4",
     "axios": "^1.4.0",
     "bootswatch": "^5.2.3",
     "browser-fs-access": "^0.34.1",
