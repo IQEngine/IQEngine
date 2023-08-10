@@ -12,6 +12,7 @@ export class BlobClient implements IQDataClient {
   constructor(dataSources: Record<string, DataSource>) {
     this.dataSources = dataSources;
   }
+
   async getIQDataBlocks(
     meta: SigMFMetadata,
     indexes: number[],
@@ -38,31 +39,6 @@ export class BlobClient implements IQDataClient {
       )
     );
     return content.flat();
-  }
-
-  getIQDataSlices(
-    meta: SigMFMetadata,
-    indexes: number[],
-    tileSize: number,
-    signal: AbortSignal
-  ): Promise<IQDataSlice[]> {
-    return Promise.all(indexes.map((index) => this.getIQDataSlice(meta, index, tileSize, signal)));
-  }
-
-  async getIQDataSlice(
-    meta: SigMFMetadata,
-    index: number,
-    tileSize: number,
-    signal: AbortSignal
-  ): Promise<IQDataSlice> {
-    let { account, container, file_path } = meta.getOrigin();
-    // if filePath does not finish in .sigmf-data, add it
-    if (!file_path.endsWith('.sigmf-data')) {
-      file_path += '.sigmf-data';
-    }
-    const blobClient = getBlobClient(this.dataSources, account, container, file_path);
-    // Thi is ugly but it is the only way to get the blob as an ArrayBuffer
-    return (await this.getIQDataBlockFromBlob(blobClient, meta, index, 1, tileSize, signal))[0];
   }
 
   async getIQDataBlockFromBlob(

@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test('confirm siggen operation  @CICompatible', async ({ page }) => {
-  await page.goto('http://localhost:3000/');
+  await page.goto('/');
   await page.locator('#Siggen').click();
 
   const locator = page.getByText('Run');

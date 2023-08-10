@@ -18,16 +18,33 @@ def get_samples(data_bytes, data_type) -> np.ndarray:
         The samples.
     """
 
-    if data_type == "ci16_le" or data_type == "ci16" or data_type == "ci16_be":
-        samples = np.frombuffer(data_bytes, dtype=np.int16)
-        samples = samples[::2] + 1j * samples[1::2]
-    elif data_type == "cf32_le" or data_type == "cf32" or data_type == "cf32_be":
-        samples = np.frombuffer(data_bytes, dtype=np.complex64)
-    elif data_type == "ci8" or data_type == "i8":
+    if data_type == "ci8" or data_type == "i8":
         samples = np.frombuffer(data_bytes, dtype=np.int8)
         samples = samples[::2] + 1j * samples[1::2]
+    elif data_type == "cu8" or data_type == "u8":
+        samples = np.frombuffer(data_bytes, dtype=np.uint8)
+        samples = samples[::2] + 1j * samples[1::2]
+    elif data_type == "ci16" or data_type == "ci16_le":
+        samples = np.frombuffer(data_bytes, dtype=np.int16)
+        samples = samples[::2] + 1j * samples[1::2]
+    elif data_type == "cu16" or data_type == "cu16_le":
+        samples = np.frombuffer(data_bytes, dtype=np.uint16)
+        samples = samples[::2] + 1j * samples[1::2]
+    elif data_type == "cu32" or data_type == "cu32_le":
+        samples = np.frombuffer(data_bytes, dtype=np.uint32)
+        samples = samples[::2] + 1j * samples[1::2]
+    elif data_type == "f16" or data_type == "f16_le":
+        samples = np.frombuffer(data_bytes, dtype=np.float16)
+        samples = samples[::2] + 1j * samples[1::2]
+    elif data_type == "f32" or data_bytes == "f32_le":
+        samples = np.frombuffer(data_bytes, dtype=np.float32)
+        samples = samples[::2] + 1j * samples[1::2]
+    elif data_type == "cf32_le" or data_type == "cf32":
+        samples = np.frombuffer(data_bytes, dtype=np.complex64)
+    elif data_type == "cf64_le" or data_type == "cf64":
+        samples = np.frombuffer(data_bytes, dtype=np.complex128)
     else:
-        raise ("Datatype " + data_type + " not implemented")
+        raise ValueError("Datatype " + data_type + " not implemented")
     return samples
 
 

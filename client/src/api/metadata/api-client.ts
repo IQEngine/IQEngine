@@ -34,7 +34,7 @@ export class ApiClient implements MetadataClient {
   }
 
   async track(account: string, container: string, filepath: string, signal: AbortSignal): Promise<Track> {
-    if(!account || !container || !filepath) {
+    if (!account || !container || !filepath) {
       return null;
     }
     const response = await axios.get(`/api/datasources/${account}/${container}/${filepath}/track`, { signal });
@@ -44,7 +44,13 @@ export class ApiClient implements MetadataClient {
     if (!response.data) {
       return null;
     }
-    return response.data;
+    return response.data.iqengine_geotrack.coordinates.map((coord) => {
+      if (coord.length < 3) {
+        return [];
+      }
+      return [coord[1], coord[0]];
+    });
+
   }
 
   async queryMeta(queryString: string): Promise<SigMFMetadata[]> {

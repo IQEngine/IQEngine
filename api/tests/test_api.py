@@ -1,6 +1,7 @@
 # vim: tabstop=4 shiftwidth=4 expandtab
 import os
 from unittest import mock
+from unittest.mock import Mock
 
 import pytest
 from database.models import Configuration, Metadata
@@ -352,3 +353,78 @@ async def test_api_update_file_version(client):
     )
     assert response_object["global"]["traceability:origin"]["file_path"] == "file/path"
     assert response_object["annotations"][0]["core:sample_start"] == 10000
+
+
+@mock.patch("graph.graph_client.requests.get", return_value=Mock())
+@mock.patch(
+    "graph.graph_client.msal.ConfidentialClientApplication", return_value=Mock()
+)
+@pytest.mark.asyncio
+async def test_api_get_users_successful_acquire_token_silent(
+    mock_confidential_client, mock_get, client
+):
+    mock_confidential_client.return_value.acquire_token_silent.return_value = {
+        "access_token": "123"
+    }
+
+    content = {
+        "value": [
+            {
+                "id": "123",
+                "displayName": "test",
+            },
+            {
+                "id": "456",
+                "displayName": "test2",
+            },
+        ]
+    }
+
+    mock_get.return_value.status_code = 200
+    mock_get.return_value.json.return_value = content
+
+    response = client.get("/api/users")
+    assert response.status_code == 200
+    assert len(response.json()) == 2
+    assert response.json()[0]["id"] == "123"
+    assert response.json()[0]["displayName"] == "test"
+    assert response.json()[1]["id"] == "456"
+    assert response.json()[1]["displayName"] == "test2"
+
+
+@mock.patch("graph.graph_client.requests.get", return_value=Mock())
+@mock.patch(
+    "graph.graph_client.msal.ConfidentialClientApplication", return_value=Mock()
+)
+@pytest.mark.asyncio
+async def test_api_get_users_successful_acquire_token_for_client(
+    mock_confidential_client, mock_get, client
+):
+    mock_confidential_client.return_value.acquire_token_silent.return_value = None
+    mock_confidential_client.return_value.acquire_token_for_client.return_value = {
+        "access_token": "123"
+    }
+
+    content = {
+        "value": [
+            {
+                "id": "123",
+                "displayName": "test",
+            },
+            {
+                "id": "456",
+                "displayName": "test2",
+            },
+        ]
+    }
+
+    mock_get.return_value.status_code = 200
+    mock_get.return_value.json.return_value = content
+
+    response = client.get("/api/users")
+    assert response.status_code == 200
+    assert len(response.json()) == 2
+    assert response.json()[0]["id"] == "123"
+    assert response.json()[0]["displayName"] == "test"
+    assert response.json()[1]["id"] == "456"
+    assert response.json()[1]["displayName"] == "test2"

@@ -50,20 +50,20 @@ export const MetadataQuery = () => {
     return Object.keys(selections).map((item) => {
       if (selections[item].selected) {
         const Component = selections[item].component;
-        if(item === 'geo') {
+        if (item === 'geo') {
           return (
             <Component
-            key={item}
-            queryName={item}
-            validator={selections[item].validator}
-            description={selections[item].description}
-            handleQueryValid={handleQueryValid}
-            handleQueryInvalid={handleQueryInvalid}
-            trackData={data?.iqengine_geotrack?.coordinates ?? []}
-            geoPositionUpdate={geoPositionUpdate}
-            setGeoPositionUpdate={setGeoPositionUpdate}
-          />
-          )
+              key={item}
+              queryName={item}
+              validator={selections[item].validator}
+              description={selections[item].description}
+              handleQueryValid={handleQueryValid}
+              handleQueryInvalid={handleQueryInvalid}
+              trackData={data ?? []}
+              geoPositionUpdate={geoPositionUpdate}
+              setGeoPositionUpdate={setGeoPositionUpdate}
+            />
+          );
         }
         return (
           <Component
@@ -98,7 +98,7 @@ export const MetadataQuery = () => {
       filepath: encodeURIComponent(filepath),
     });
     setGeoPositionUpdate('track');
-  }
+  };
 
   const showQueryButton = () => {
     let empty = true;
@@ -115,7 +115,13 @@ export const MetadataQuery = () => {
   };
 
   const renderResults = () => {
-    return <Results geoSelected={selections['geo'].selected} handleToggleTrack={(account, container, filepath) => handleSetSelectedTrack(account, container, filepath)} queryString={queryString}  />;
+    return (
+      <Results
+        geoSelected={selections['geo'].selected}
+        handleToggleTrack={(account, container, filepath) => handleSetSelectedTrack(account, container, filepath)}
+        queryString={queryString}
+      />
+    );
   };
 
   const handleQuery = async () => {

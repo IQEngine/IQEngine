@@ -1,6 +1,6 @@
 import React from 'react';
 import '@testing-library/jest-dom';
-import { describe, expect, test } from 'vitest';
+import { describe, expect, test, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
 import { Annotation, CaptureSegment, SigMFMetadata } from '@/utils/sigmfMetadata';
@@ -8,6 +8,7 @@ import { MetaRaw } from '../meta-raw';
 import { AllProviders } from '@/mocks/setup-tests';
 import userEvent from '@testing-library/user-event';
 import nock from 'nock';
+import '@azure/msal-react';
 
 describe('MetaRaw ', () => {
   const meta: SigMFMetadata = Object.assign(new SigMFMetadata(), {
@@ -37,6 +38,29 @@ describe('MetaRaw ', () => {
       'core:sample_count': 100,
     }),
   ];
+
+  beforeEach(() => {
+    vi.mock('@azure/msal-react', async () => {
+      return {
+        useMsal: () => {
+          return {
+            instance: {
+              getActiveAccount: () => {
+                return {
+                  name: 'test',
+                };
+              },
+            },
+          };
+        },
+      };
+    });
+  });
+
+  afterEach(() => {
+    vi.resetAllMocks();
+  });
+
   test('Renders correctly', async () => {
     render(<MetaRaw meta={meta} />, { wrapper: AllProviders });
     expect(screen.queryByRole('button', { name: 'Download Metadata' })).toBeInTheDocument();
