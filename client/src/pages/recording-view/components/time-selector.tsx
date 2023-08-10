@@ -70,6 +70,14 @@ const TimeSelector = ({ currentFFT }: TimeSelectorProps) => {
     }
   };
 
+  // add cursor styling
+  function onMouseOver() {
+    document.body.style.cursor = 'move';
+  }
+  function onMouseOut() {
+    document.body.style.cursor = 'default';
+  }
+
   if (!cursorTimeEnabled) return null;
 
   return (
@@ -93,6 +101,8 @@ const TimeSelector = ({ currentFFT }: TimeSelectorProps) => {
             height={0}
             draggable={true}
             onDragMove={handleDragMoveStart}
+            onMouseOver={onMouseOver}
+            onMouseOut={onMouseOut}
             strokeEnabled={true}
             strokeWidth={5}
             stroke="red"
@@ -109,6 +119,8 @@ const TimeSelector = ({ currentFFT }: TimeSelectorProps) => {
             height={0}
             draggable={true}
             onDragMove={handleDragMoveEnd}
+            onMouseOver={onMouseOver}
+            onMouseOut={onMouseOut}
             strokeEnabled={true}
             strokeWidth={5}
             stroke="red"
