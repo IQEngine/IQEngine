@@ -26,6 +26,7 @@ export const getIQDataSlices = (
         queryKey: ['datasource', type, account, container, file_path, 'iq', { index: index, tileSize: tileSize }],
         queryFn: async () => {
           const signal = new AbortController().signal;
+
           const iqDataClient = IQDataClientFactory(type, filesQuery.data, dataSourcesQuery.data);
           return iqDataClient.getIQDataSlice(meta, index, tileSize, signal);
         },
@@ -77,9 +78,11 @@ export function useGetIQData(
 
   const { data: iqData } = useQuery({
     queryKey: ['iqData', type, account, container, filePath, fftSize, fftsRequired],
+
     queryFn: async ({ signal }) => {
       const iqDataClient = IQDataClientFactory(type, filesQuery.data, dataSourcesQuery.data);
       const iqData = await iqDataClient.getIQDataBlocks(meta, fftsRequired, fftSize, signal);
+
       return iqData;
     },
     enabled: !!meta && !!filesQuery.data && !!dataSourcesQuery.data,

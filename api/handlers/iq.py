@@ -3,6 +3,7 @@ import base64
 import io
 import logging
 import time
+import asyncio
 from typing import List, Optional
 
 from blob.azure_client import AzureBlobClient
@@ -92,38 +93,41 @@ async def calculate_iq_data(
 async def get_byte_streams(
     block_indexes, block_size, bytes_per_iq_sample, iq_file, azure_client
 ):
-    max_concurrent_requests = 100
-    chunk_size = 100 * 1024 // block_size
-    block_indexes_arrs = find_smallest_and_largest_next_to_each_other(block_indexes)
+    try:
+        max_concurrent_requests = 100
+        chunk_size = 100 * 1024 // block_size
+        block_indexes_arrs = find_smallest_and_largest_next_to_each_other(block_indexes)
 
-    block_indexes_chunks = []
-    for i in block_indexes_arrs:
-        if i[1] - i[0] > chunk_size:
-            indexes = [
-                [j, min(j + chunk_size - 1, i[1])]
-                for j in range(i[0], i[1] + 1, chunk_size)
-            ]
-            block_indexes_chunks.extend(indexes)
-        else:
-            block_indexes_chunks.append(i)
+        block_indexes_chunks = []
+        for i in block_indexes_arrs:
+            if i[1] - i[0] > chunk_size:
+                indexes = [
+                    [j, min(j + chunk_size - 1, i[1])]
+                    for j in range(i[0], i[1] + 1, chunk_size)
+                ]
+                block_indexes_chunks.extend(indexes)
+            else:
+                block_indexes_chunks.append(i)
 
-    blob_size = await azure_client.get_file_length(iq_file)
+        blob_size = await azure_client.get_file_length(iq_file)
 
-    semaphore = asyncio.Semaphore(max_concurrent_requests)
+        semaphore = asyncio.Semaphore(max_concurrent_requests)
 
-    async def get_byte_stream_wrapper(block_index_chunk):
-        async with semaphore:
-            return await get_byte_stream(
-                block_index_chunk,
-                block_size,
-                bytes_per_iq_sample,
-                iq_file,
-                azure_client,
-                blob_size,
-            )
+        async def get_byte_stream_wrapper(block_index_chunk):
+            async with semaphore:
+                return await get_byte_stream(
+                    block_index_chunk,
+                    block_size,
+                    bytes_per_iq_sample,
+                    iq_file,
+                    azure_client,
+                    blob_size,
+                )
 
-    tasks = [get_byte_stream_wrapper(block_index_chunk) for block_index_chunk in block_indexes_chunks]
-    return await asyncio.gather(*tasks)
+        tasks = [get_byte_stream_wrapper(block_index_chunk) for block_index_chunk in block_indexes_chunks]
+        return await asyncio.gather(*tasks)
+    except asyncio.CancelledError:
+        raise HTTPException(status_code=499, detail=str("Client closed connection"))
 
 
 async def get_byte_stream(

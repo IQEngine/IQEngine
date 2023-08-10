@@ -32,9 +32,12 @@ export class ApiClient implements IQDataClient {
     if (binaryResponse.status !== 200) {
       throw new Error(`Unexpected status code: ${binaryResponse.status}`);
     }
+
+    console.log('responsesignal', signal);
     if (!binaryResponse.data) {
       return null;
     }
+
     console.log('getIQDataBlocks response', binaryResponse.data);
     const intValue = new Int32Array(binaryResponse.data.slice(0, 4));
     console.log(`getIQDataBlocks ${binaryResponse.data}`, intValue);
