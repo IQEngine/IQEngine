@@ -126,7 +126,7 @@ def get_current_user(
         )
 
 
-async def required_roles(roles: Optional[Union[str, List[str]]] = None, user=Depends(get_current_user)) -> str | None:
+def required_roles(roles: Optional[Union[str, List[str]]] = None, user=Depends(get_current_user)) -> str | None:
     if roles is None:
         return user
     if user is None:
