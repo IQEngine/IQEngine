@@ -8,7 +8,7 @@ import { TimePlot } from './time-plot';
 import { FrequencyPlot } from './frequency-plot';
 import { IQPlot } from './iq-plot';
 import { Layer, Image, Stage } from 'react-konva';
-import { convertFloat32ArrayToBase64, convertBase64ToFloat32Array } from '@/utils/rfFunctions';
+import { convertFloat32ArrayToBase64, convertBase64ToFloat32Array } from '@/utils/rf-functions';
 import { colMaps } from '@/utils/colormap';
 import { fftshift } from 'fftshift';
 import { FFT } from '@/utils/fft';

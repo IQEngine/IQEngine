@@ -8,7 +8,8 @@ import {
   validateFrequency,
   convertFloat32ArrayToBase64,
   convertBase64ToFloat32Array,
-} from '@/utils/rfFunctions';
+  reshapeFFT,
+} from '@/utils/rf-functions';
 
 describe('Calculate date', () => {
   // Arrange

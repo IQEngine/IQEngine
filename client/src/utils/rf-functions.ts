@@ -144,7 +144,7 @@ export function convertBase64ToFloat32Array(base64String: string): Float32Array 
 }
 
 export function reshapeFFTs(
-  currentFFTSize: number, currentData: Float32Array[], newFFTSize: number): Float32Array[] 
+  currentFFTSize: number, currentData: Float32Array[], newFFTSize: number): Float32Array[]
 {
   const newData = [];
 
