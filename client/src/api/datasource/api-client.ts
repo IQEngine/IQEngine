@@ -20,7 +20,7 @@ export class ApiClient implements DataSourceClient {
         account: this.account,
         scopes: [api_scope],
       });
-      return response.accessToken; //accessToken or idToken
+      return response.accessToken;
     } catch (error) {
       return null;
     }

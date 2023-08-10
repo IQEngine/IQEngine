@@ -204,7 +204,7 @@ async def query_meta(
             key = (item.account, item.container)
             if key not in access_cache:
                 access_cache[key] = await check_access(item.account, item.container, current_user)
-                
+
             if access_cache[key] is not None:
                 filtered_result.append(item)
 
