@@ -3,7 +3,7 @@ name: Periodic Test of Prod
 
 on:
   schedule:
-  - cron: "0 0 * * *"
+    - cron: "0 0 * * *"
 
 jobs:
   playwright:
