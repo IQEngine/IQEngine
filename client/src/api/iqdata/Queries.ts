@@ -104,7 +104,7 @@ export function useGetIQData(
     }
   }, [iqData, fftSize]);
 
-  const { data: processedIQData } = useQuery({
+  const { data: processedIQData, dataUpdatedAt: processedDataUpdated } = useQuery<Float32Array[]>({
     queryKey: ['rawiqdata', type, account, container, filePath, fftSize],
     queryFn: async () => {
       return null;
@@ -153,6 +153,7 @@ export function useGetIQData(
     currentData,
     fftsRequired,
     setFFTsRequired,
+    processedDataUpdated,
   };
 }
 

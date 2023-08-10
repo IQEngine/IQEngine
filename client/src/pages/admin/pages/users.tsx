@@ -39,9 +39,10 @@ export const Users = () => {
           console.log(error);
         });
     }
-  }, []);
+  }, [activeAccount, config.data?.appAuthority, instance]);
 
   useEffect(() => {
+    if (!accessToken) return;
     axios
       .get(`https://graph.microsoft.com/v1.0/users?$expand=memberOf`, {
         headers: {
