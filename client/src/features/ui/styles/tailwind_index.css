@@ -3,6 +3,13 @@
 @tailwind utilities;
 
 @layer base {
+  ul,
+  ol {
+    list-style: revert;
+    margin: revert;
+    padding: revert;
+  }
+
   button {
     @apply rounded-lg bg-primary text-base-100 px-2 py-1 hover:bg-accent
     transition-all hover:shadow-lg hover:shadow-accent/40 focus:opacity-[0.85]

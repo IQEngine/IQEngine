@@ -78,7 +78,6 @@ export const getMeta = (type: string, account: string, container: string, filePa
 
 export const useUpdateMeta = (meta: SigMFMetadata) => {
   let client = useQueryClient();
-  console.log('updateMeta', meta);
   if (!meta.getOrigin()) {
     throw new Error('Meta is missing origin');
   }

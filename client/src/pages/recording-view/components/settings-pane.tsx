@@ -323,12 +323,12 @@ const SettingsPane = ({ currentFFT }) => {
         <textarea
           className="bg-base-content text-base-100 p-1"
           rows={6}
-          cols={28}
+          cols={25}
           wrap="off"
           onChange={(e) => {
             setLocalPythonSnippet(e.target.value);
           }}
-          value={context.pythonSnippet}
+          value={localPythonSnippet}
         />
         <button onClick={onSubmitPythonSnippet}>Run Python</button>
       </div>

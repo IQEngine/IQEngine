@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest';
+import { describe, expect, test, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import Admin from '@/pages/admin/admin';
 import '@testing-library/jest-dom';
@@ -14,6 +14,30 @@ describe('Test Admin', () => {
     expect(await screen.findByLabelText('Data Sources Menu Item')).toHaveTextContent('Data Sources');
     expect(await screen.findByLabelText('Plugins Menu Item')).toHaveTextContent('Plugins');
     expect(await screen.findByLabelText('Configuration Menu Item')).toHaveTextContent('Configuration');
+  });
+
+  beforeEach(() => {
+    vi.mock('@azure/msal-react', async () => {
+      return {
+        useMsal: () => {
+          return {
+            instance: {
+              getActiveAccount: () => {
+                return {
+                  idTokenClaims: {
+                    roles: ['IQEngine-Admin'],
+                  },
+                };
+              },
+            },
+          };
+        },
+      };
+    });
+  });
+
+  afterEach(() => {
+    vi.resetAllMocks();
   });
 
   test('Users Menu Item Active', async () => {

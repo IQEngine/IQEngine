@@ -134,13 +134,6 @@ export function useRouter() {
           },
         },
         {
-          path: 'spectrogram/:type/:account/:container/:filePath/:sasToken?',
-          async lazy() {
-            let { SpectrogramPage } = await import('@/pages/spectrogram/spectrogram-page');
-            return { Component: SpectrogramPage };
-          },
-        },
-        {
           path: 'view/:type/:account/:container/:filePath/:sasToken?',
           async lazy() {
             let { RecordingViewPage } = await import('@/pages/recording-view/recording-view');

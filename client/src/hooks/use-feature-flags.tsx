@@ -27,11 +27,6 @@ export const FeatureFlag = {
     description: 'Use API Datasources',
     default: true,
   },
-  useNewSpectrogramPage: {
-    name: 'useNewSpectrogramPage',
-    description: 'Use New Spectrogram Page',
-    default: false,
-  },
 };
 
 interface ContextProps {

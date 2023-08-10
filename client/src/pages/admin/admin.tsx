@@ -1,9 +1,14 @@
+import { InteractionRequiredAuthError } from '@azure/msal-browser';
+import { useMsal } from '@azure/msal-react';
 import React, { useEffect } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 
 export const Admin = () => {
   const [active, setActive] = React.useState(null);
   let location = useLocation();
+
+  const { instance } = useMsal();
+  const activeAccount = instance.getActiveAccount();
 
   useEffect(() => {
     switch (location.pathname) {
@@ -23,6 +28,19 @@ export const Admin = () => {
         setActive(0);
     }
   }, [location.pathname]);
+
+  if (
+    activeAccount === null ||
+    activeAccount === undefined ||
+    activeAccount?.idTokenClaims?.roles?.includes('IQEngine-Admin') === false
+  ) {
+    return (
+      <div className="flex justify-center text-lg text-center">
+        <p>You are unauthorized to view this page.</p>
+        <p>Please contact your administrator.</p>
+      </div>
+    );
+  }
 
   return (
     <>
