@@ -5,12 +5,10 @@ import { useEffect, useState } from 'react';
 
 export const useAccessToken = () => {
   const { instance } = useMsal();
-  const activeAccount = instance.getActiveAccount();
   const config = useConfigQuery();
   const accessTokenRequest = {
     scopes: [`api://${config.data?.appId}/user`],
     authority: config.data?.appAuthority,
-    account: activeAccount,
   };
   const [accessToken, setAccessToken] = useState<string | undefined>(undefined);
 
@@ -27,7 +25,7 @@ export const useAccessToken = () => {
           });
         }
       });
-  }, [instance]);
+  }, [instance, accessTokenRequest]);
 
   return accessToken;
 };

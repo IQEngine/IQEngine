@@ -47,7 +47,7 @@ describe('useGetUsers', () => {
     await waitFor(() => expect(result.current.data).toEqual(expectedPlugins), { timeout: 1000 });
   });
 
-  test('should be able to get the list of plugins from the api', async () => {
+  test('should be able to get the list of users from the api', async () => {
     const { wrapper } = useAllProviders();
     let expectedUsers = [
       {
