@@ -20,19 +20,19 @@ async def check_access(account: str, container: str, user=Depends(get_current_us
     -------
     "public", "reader", "owner", or None
     """
-    roles = user.get("roles", [])
-    if isinstance(roles, str):
-        roles = [roles]
-    roles.append(user.get("preferred_username"))
+    groups = user.get("groups", [])
+    if isinstance(groups, str):
+        groups = [groups]
+    groups.append(user.get("preferred_username"))
 
     data_source = await db().datasources.find_one(
         {"account": account, "container": container}
     )
 
     if data_source:
-        if 'owners' in data_source and any(role in data_source['owners'] for role in roles):
+        if 'owners' in data_source and any(group in data_source['owners'] for group in groups):
             return "owner"
-        if 'readers' in data_source and any(role in data_source['readers'] for role in roles):
+        if 'readers' in data_source and any(group in data_source['readers'] for group in groups):
             return "reader"
         if 'public' in data_source and data_source['public']:
             return "public"

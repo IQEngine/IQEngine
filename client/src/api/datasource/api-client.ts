@@ -15,19 +15,26 @@ export class ApiClient implements DataSourceClient {
 
   private async getAccessToken() {
     const api_scope = 'api://' + import.meta.env.IQENGINE_APP_ID + '/api';
-    const response = await this.instance.acquireTokenSilent({
-      account: this.account,
-      scopes: [api_scope],
-    });
-    return response.accessToken; //accessToken or idToken
+    try {
+      const response = await this.instance.acquireTokenSilent({
+        account: this.account,
+        scopes: [api_scope],
+      });
+      return response.accessToken; //accessToken or idToken
+    } catch (error) {
+      return null;
+    }
   }
 
   private async requestWithAuth(config) {
     const token = await this.getAccessToken();
-    const headers = {
-      Authorization: `Bearer ${token}`,
-    };
-    return axios({ ...config, headers });
+    if (token != null) {
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
+      return axios({ ...config, headers });
+    }
+    return axios({ ...config, headers: {} });
   }
 
   async sync(account: string, container: string): Promise<void> {
