@@ -11,9 +11,6 @@ test.beforeAll(async ({ request }) => {
     container: 'test_container',
     description: 'test description',
     imageURL: 'https://i.etsystatic.com/20456772/r/il/a94e13/3604976065/il_1588xN.3604976065_dzyi.jpg',
-    owners: [],
-    readers: [],
-    public: true,
   };
   const response = await request.post('/api/datasources', { data: dataSource });
 });
