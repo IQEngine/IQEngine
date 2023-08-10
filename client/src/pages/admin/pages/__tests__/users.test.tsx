@@ -1,65 +1,72 @@
-import { describe, expect, test } from 'vitest';
+import { describe, expect, test, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import Users from '@/pages/admin/pages/users';
 import '@testing-library/jest-dom';
 import React from 'react';
-import { AllProviders } from '@/mocks/setup-tests';
+import { AllProviders, queryClient } from '@/mocks/setup-tests';
 import nock from 'nock';
 
+vi.mock('@/hooks/use-access-token', () => ({
+  useAccessToken: () => 'TestToken',
+}));
+
 describe('Test Users', () => {
+  afterEach(() => {
+    nock.cleanAll();
+    queryClient.clear();
+  });
+
   test('Basic Rendering', async () => {
     render(<Users></Users>, { wrapper: AllProviders });
     expect(await screen.findByRole('heading', { name: 'Users' })).toBeInTheDocument();
   });
 
   test('Users Table', async () => {
-    nock(`https://graph.microsoft.com`)
+    nock(`http://localhost:3000`)
       .defaultReplyHeaders({
         'access-control-allow-origin': '*',
         'access-control-allow-credentials': 'true',
         'access-control-allow-headers': 'Authorization',
       })
-      .options('/v1.0/users?$expand=memberOf')
+      .options('/api/users')
       .reply(204);
 
-    nock(`https://graph.microsoft.com`, {
+    nock(`http://localhost:3000`, {
       reqheaders: {
-        Authorization: 'Bearer',
+        Authorization: 'Bearer TestToken',
       },
     })
       .defaultReplyHeaders({
         'access-control-allow-origin': '*',
         'access-control-allow-credentials': 'true',
       })
-      .get('/v1.0/users?$expand=memberOf')
-      .reply(200, {
-        value: [
-          {
-            id: 'TestId1',
-            displayName: 'Test Name 1',
-            memberOf: [
-              {
-                displayName: 'Test Group 1',
-              },
-              {
-                displayName: 'Test Group 2',
-              },
-            ],
-          },
-          {
-            id: 'TestId2',
-            displayName: 'Test Name 2',
-            memberOf: [
-              {
-                displayName: 'Test Group 3',
-              },
-              {
-                displayName: 'Test Group 4',
-              },
-            ],
-          },
-        ],
-      });
+      .get('/api/users')
+      .reply(200, [
+        {
+          id: 'TestId1',
+          displayName: 'Test Name 1',
+          memberOf: [
+            {
+              displayName: 'Test Group 1',
+            },
+            {
+              displayName: 'Test Group 2',
+            },
+          ],
+        },
+        {
+          id: 'TestId2',
+          displayName: 'Test Name 2',
+          memberOf: [
+            {
+              displayName: 'Test Group 3',
+            },
+            {
+              displayName: 'Test Group 4',
+            },
+          ],
+        },
+      ]);
 
     render(<Users></Users>, { wrapper: AllProviders });
     expect(await screen.findByText('Id')).toBeInTheDocument();
