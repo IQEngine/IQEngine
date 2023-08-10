@@ -38,9 +38,16 @@ jobs:
         with:
           creds: '${{ secrets.AZURE_CREDENTIALS }}'
 
-      - name: Build and deploy Container App
+      - name: Build and Deploy Frontend+Backend Container App
         uses: azure/container-apps-deploy-action@v1
         with:
           containerAppName: ${{ secrets.AZURE_CONTAINER_APP_NAME }}
           resourceGroup: ${{ secrets.AZURE_RESOURCEGROUP }}
           imageToDeploy: ghcr.io/${{ env.repository }}:${{ env.sha}}
+
+      - name: Build and Deploy Plugins Container App
+        uses: azure/container-apps-deploy-action@v1
+        with:
+          containerAppName: ${{ secrets.AZURE_CONTAINER_APP_NAME_STAGING_PLUGINS }}
+          resourceGroup: ${{ secrets.AZURE_RESOURCEGROUP }}
+          imageToDeploy: ghcr.io/${{ env.repository }}-plugins:${{ env.sha}}
