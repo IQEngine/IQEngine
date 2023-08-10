@@ -95,8 +95,7 @@ def validate_and_decode_jwt(token: str) -> dict:
             token, public_key, algorithms=[algorithm], audience=CLIENT_ID
         )  # Checks expiration, audience, and signature
         return payload
-    except jwt.PyJWTError as e:
-        print(e)
+    except jwt.PyJWTError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid JWT",
