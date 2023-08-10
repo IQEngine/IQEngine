@@ -2,3 +2,10 @@
 
 Use this page for usage docs related to the backend (aka /api)
 
+## Generating DB_ENCRYPTION_KEY
+
+in Python:
+```
+from cryptography.fernet import Fernet
+Fernet.generate_key().decode('utf-8')
+```
