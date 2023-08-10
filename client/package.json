@@ -32,7 +32,7 @@
     "konva": "^8.3.14",
     "leaflet": "^1.9.4",
     "moment": "^2.29.4",
-    "plotly.js": "^2.22.0",
+    "plotly.js": "^2.25.1",
     "postcss": "^8.4.23",
     "pyodide": "^0.23.2",
     "react": "^18.2.0",
