@@ -6,7 +6,7 @@ from database.datasource_repo import create, datasource_exists
 from database.models import DataSource
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from fastapi.responses import StreamingResponse
-from helpers.authorization import get_current_user
+from helpers.authorization import get_current_user, required_roles
 from helpers.cipher import encrypt
 from helpers.urlmapping import ApiType, add_URL_sasToken
 from motor.core import AgnosticCollection
@@ -20,7 +20,7 @@ router = APIRouter()
 async def create_datasource(
     datasource: DataSource,
     datasources: AgnosticCollection = Depends(datasource_repo.collection),
-    current_user: Optional[dict] = Depends(get_current_user),
+    current_user: dict = Depends(required_roles(["IQEngine-User"])),
 ):
     """
     Create a new datasource. The datasource will be henceforth identified by account/container which

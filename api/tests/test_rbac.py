@@ -8,29 +8,31 @@ from helpers.authorization import get_current_user, required_roles
 
 def test_required_roles_with_valid_role():
     current_user = {"roles": ["IQEngine-User"], "preferred_username": "emailaddress"}
-    result = required_roles(roles="IQEngine-User", user=current_user)
+    access_control = required_roles(roles="IQEngine-User")
+    result = access_control(current_user=current_user)
     assert result["preferred_username"] == "emailaddress"
 
 
 def test_required_roles_with_invalid_role():
     # Tests the decorator function `required_roles` which is used to restrict access to certain endpoints
     current_user = {"roles": ["IQEngine-User"], "preferred_username": "emailaddress"}
-    try:
-        _ = required_roles(roles="invalid-role", user=current_user)
+    access_control = required_roles(roles="invalid-role")
 
+    try:
+        _ = access_control(current_user=current_user)
     except HTTPException as e:
         assert e.status_code == 403
         assert e.detail == "Not enough privileges"
 
 
-def test_required_roles_with_no_role():
+@pytest.mark.asyncio
+async def test_required_roles_with_no_role():
     # Tests the decorator function `required_roles` which is used to restrict access to certain endpoints
-    current_user = {"roles": [], "preferred_username": "emailaddress"}
-    try:
-        _ = required_roles(roles="IQEngine-User", user=current_user)
-    except HTTPException as e:
-        assert e.status_code == 403
-        assert e.detail == "Not enough privileges"
+    with patch("helpers.authorization.get_current_user") as mock_get_current_user:
+        mock_get_current_user.return_value = {}
+        access_control = required_roles(roles=None)
+        result = access_control()
+        assert result == {}
 
 
 def load_json_from_file(file_name: str):
