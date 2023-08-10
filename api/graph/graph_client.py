@@ -9,7 +9,7 @@ def get_token():
     app = msal.ConfidentialClientApplication(
         client_id=os.getenv("IQENGINE_APP_ID"),
         authority=os.getenv("IQENGINE_APP_AUTHORITY"),
-        client_credential=os.getenv("IQENGINE_APP_SECRET"),
+        client_credential=os.getenv("APP_SECRET"),
     )
 
     # Request an access token
