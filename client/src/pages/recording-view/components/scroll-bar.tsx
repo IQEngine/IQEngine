@@ -76,7 +76,7 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
   // filter the displayed iq as we receive new data
   const displayedIQ = useMemo<Float32Array>(() => {
     // join the current ffts
-    if (!currentData) return;
+    if (!currentData || !fftsRequired) return new Float32Array(0);
     const iqData = new Float32Array(MINIMAP_FFT_SIZE * fftsRequired.length * 2);
     let offset = 0;
     for (let i = 0; i < fftsRequired.length; i++) {
