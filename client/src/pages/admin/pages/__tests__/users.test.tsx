@@ -17,7 +17,7 @@ describe('Test Users', () => {
   });
 
   test('Basic Rendering', async () => {
-    render(<Users></Users>);
+    render(<Users></Users>, { wrapper: AllProviders });
     expect(await screen.findByRole('heading', { name: 'Users' })).toBeInTheDocument();
   });
 

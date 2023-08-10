@@ -59,7 +59,7 @@ export const MetadataQuery = () => {
               description={selections[item].description}
               handleQueryValid={handleQueryValid}
               handleQueryInvalid={handleQueryInvalid}
-              trackData={data?.iqengine_geotrack?.coordinates ?? []}
+              trackData={data ?? []}
               geoPositionUpdate={geoPositionUpdate}
               setGeoPositionUpdate={setGeoPositionUpdate}
             />

@@ -24,6 +24,7 @@ const TimeSelector = ({ currentFFT }: TimeSelectorProps) => {
   const cursorEndFFT = Math.floor(cursorTime.end / fftSize);
   const cursorYStart = cursorStartFFT - currentFFT;
   const cursorYEnd = cursorEndFFT - currentFFT;
+
   // update diff
   useEffect(() => {
     if (!cursorTimeEnabled || !meta) return;
@@ -36,6 +37,7 @@ const TimeSelector = ({ currentFFT }: TimeSelectorProps) => {
 
   // Sample-start bar
   const handleDragMoveStart = (e) => {
+    e.target.x(0); // keep line in the same x location
     const newStartSample = Math.max(currentFFT * fftSize, (currentFFT + e.target.y()) * fftSize);
     // check if there is the need to reverse the two
     if (newStartSample > cursorTime.end) {
@@ -53,6 +55,7 @@ const TimeSelector = ({ currentFFT }: TimeSelectorProps) => {
 
   // Sample-end bar
   const handleDragMoveEnd = (e) => {
+    e.target.x(0); // keep line in the same x location
     const newStartSample = Math.max(currentFFT * fftSize, (currentFFT + e.target.y()) * fftSize);
     if (newStartSample > cursorTime.start) {
       setCursorTime({
@@ -66,6 +69,14 @@ const TimeSelector = ({ currentFFT }: TimeSelectorProps) => {
       });
     }
   };
+
+  // add cursor styling
+  function onMouseOver() {
+    document.body.style.cursor = 'move';
+  }
+  function onMouseOut() {
+    document.body.style.cursor = 'default';
+  }
 
   if (!cursorTimeEnabled) return null;
 
@@ -90,6 +101,8 @@ const TimeSelector = ({ currentFFT }: TimeSelectorProps) => {
             height={0}
             draggable={true}
             onDragMove={handleDragMoveStart}
+            onMouseOver={onMouseOver}
+            onMouseOut={onMouseOut}
             strokeEnabled={true}
             strokeWidth={5}
             stroke="red"
@@ -106,6 +119,8 @@ const TimeSelector = ({ currentFFT }: TimeSelectorProps) => {
             height={0}
             draggable={true}
             onDragMove={handleDragMoveEnd}
+            onMouseOver={onMouseOver}
+            onMouseOut={onMouseOut}
             strokeEnabled={true}
             strokeWidth={5}
             stroke="red"

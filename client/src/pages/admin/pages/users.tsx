@@ -5,7 +5,7 @@ export const Users = () => {
   const { data } = useGetUsers();
 
   return (
-    <div className="card shadow-lg compact side bg-base-100">
+    <div>
       <h2>Users</h2>
       {data && data?.length > 0 ? (
         <div>

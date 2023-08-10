@@ -19,6 +19,7 @@ const TimeSelectorMinimap = ({ currentFFT }) => {
   const scalingFactor = totalFFTs / spectrogramHeight;
   // Sample-start bar
   const handleDragMoveStart = (e) => {
+    e.target.x(0); // keep line in the same x location
     const newStartSample = Math.max(0, e.target.y() * fftSize * scalingFactor);
     // check if there is the need to reverse the two
     if (newStartSample > cursorTime.end) {
@@ -36,6 +37,7 @@ const TimeSelectorMinimap = ({ currentFFT }) => {
 
   // Sample-end bar
   const handleDragMoveEnd = (e) => {
+    e.target.x(0); // keep line in the same x location
     const newStartSample = Math.max(totalFFTs, e.target.y() * fftSize * scalingFactor);
     if (newStartSample > cursorTime.start) {
       setCursorTime({
@@ -50,6 +52,14 @@ const TimeSelectorMinimap = ({ currentFFT }) => {
     }
   };
 
+  // add cursor styling
+  function onMouseOver() {
+    document.body.style.cursor = 'move';
+  }
+  function onMouseOut() {
+    document.body.style.cursor = 'default';
+  }
+
   if (!cursorTimeEnabled) return null;
 
   return (
@@ -63,6 +73,8 @@ const TimeSelectorMinimap = ({ currentFFT }) => {
             height={0}
             draggable={true}
             onDragMove={handleDragMoveStart}
+            onMouseOver={onMouseOver}
+            onMouseOut={onMouseOut}
             strokeEnabled={true}
             strokeWidth={5}
             stroke="red"
@@ -79,6 +91,8 @@ const TimeSelectorMinimap = ({ currentFFT }) => {
             height={0}
             draggable={true}
             onDragMove={handleDragMoveEnd}
+            onMouseOver={onMouseOver}
+            onMouseOut={onMouseOut}
             strokeEnabled={true}
             strokeWidth={5}
             stroke="red"
