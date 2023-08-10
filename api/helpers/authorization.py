@@ -2,7 +2,7 @@ import json
 import logging
 import os
 import time
-from typing import Any, Optional, Tuple, cast
+from typing import Any, Optional, Tuple, cast, Union, List
 
 import jwt
 import requests
@@ -124,3 +124,35 @@ def get_current_user(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="No Authorization token provided",
         )
+
+
+async def required_roles(roles: Optional[Union[str, List[str]]] = None, user=Depends(get_current_user)) -> str | None:
+    if roles is None:
+        return user
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="No Authorization token provided",
+        )
+
+    if isinstance(roles, str):
+        roles = [roles]
+    elif not isinstance(roles, list):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Invalid claims parameter",
+        )
+
+    if not any(role in user.get("roles", []) for role in roles):
+        logging.info(
+            f"User {user.get('preferred_username')} attempted to access without sufficient privileges"
+        )
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not enough privileges",
+        )
+    
+    logging.info(
+    f"User {user.get('preferred_username')} accessed successfully"
+    )
+    return user
