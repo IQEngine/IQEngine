@@ -54,6 +54,7 @@ export function useGetIQData(
   const [pyodide, setPyodide] = useState<any>(null);
 
   async function initPyodide() {
+    console.log('Loading pyodide...');
     const pyodide = await window.loadPyodide();
     await pyodide.loadPackage('numpy');
     await pyodide.loadPackage('matplotlib');
@@ -61,12 +62,12 @@ export function useGetIQData(
   }
 
   useEffect(() => {
-    if (!pyodide) {
+    if (!pyodide && pythonScript && pythonScript !== INITIAL_PYTHON_SNIPPET) {
       initPyodide().then((pyodide) => {
         setPyodide(pyodide);
       });
     }
-  }, []);
+  }, [pythonScript]);
 
   const queryClient = useQueryClient();
   const { filesQuery, dataSourcesQuery } = useUserSettings();

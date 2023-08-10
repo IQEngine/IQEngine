@@ -22,6 +22,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/")
+async def get_root():
+    return "Try /plugins"
 
 @app.get("/plugins")
 async def get_plugins_list():
@@ -97,11 +100,3 @@ async def get_core_plugin_definition(plugin_name: str):
         )
     except ModuleNotFoundError:
         raise fastapi.HTTPException(status_code=404, detail="Plugin does not exist")
-
-
-# When running as an azure function this is used
-if os.getenv("ON_AZURE"):
-    import azure.functions as func
-
-    async def main(req: func.HttpRequest, context: func.Context) -> func.HttpResponse:
-        return await func.AsgiMiddleware(app).handle_async(req, context)

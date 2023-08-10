@@ -1,0 +1,30 @@
+GET http://staging.iqengine.org/api/datasources
+
+###
+
+GET http://staging.iqengine.org/api/datasources
+
+###
+
+# Use everything but delete and immutable storage
+
+
+###
+GET https://staging.iqengine.org/api/datasources/gnuradio/iqengine/datasource
+
+####
+
+# 204 = good
+
+PUT https://staging.iqengine.org/api/datasources/gnuradio/iqengine/datasource
+Content-Type: application/json
+
+{
+  "type": "api",
+  "name": "GNU Radio SigMF Repo",
+  "account": "gnuradio",
+  "container": "iqengine",
+  "description": "A collection of example SigMF recordings hosted by the GNU Radio project, to contribute recordings use https://staging.iqengine.org/upload",
+  "imageURL": "https://gnuradio.blob.core.windows.net/iqengine/cellular_downlink_880MHz.jpeg",
+  "sasToken": "********"
+}

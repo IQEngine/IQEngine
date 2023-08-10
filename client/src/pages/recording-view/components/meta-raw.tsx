@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import { vscodeDark } from '@uiw/codemirror-theme-vscode';
 import CodeMirror from '@uiw/react-codemirror';
 import { langs } from '@uiw/codemirror-extensions-langs';
+import { useMsal } from '@azure/msal-react';
 
 export interface MetaRawProps {
   meta: SigMFMetadata;
@@ -14,6 +15,9 @@ export interface MetaRawProps {
 export const MetaRaw = ({ meta }: MetaRawProps) => {
   const updateMeta = useUpdateMeta(meta);
   const { canUpdateMeta } = useGetMetadataFeatures(meta.getOrigin().type);
+
+  const { instance } = useMsal();
+  const activeAccount = instance.getActiveAccount();
 
   const downloadInfo = () => {
     const fileData = meta.getSigMFRaw();
@@ -60,7 +64,7 @@ export const MetaRaw = ({ meta }: MetaRawProps) => {
           <ArrowDownTrayIcon className="inline-block mr-2 h-6 w-6" />
           Download meta JSON
         </button>
-        {canUpdateMeta && (
+        {activeAccount && canUpdateMeta && (
           <button
             aria-label="Save Metadata"
             className="text-right mb-1 ml-1"
