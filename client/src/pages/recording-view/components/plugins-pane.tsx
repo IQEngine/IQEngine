@@ -60,7 +60,7 @@ export const PluginsPane = () => {
     console.log('Plugin Params:', pluginParameters);
     e.preventDefault();
 
-    if (!cursorTimeEnabled) {
+    if (selectedMethod == 'Cursor' && !cursorTimeEnabled) {
       toast.error('First enable cursors and choose a region of time to run the plugin on');
       return;
     }
