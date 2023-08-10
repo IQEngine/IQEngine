@@ -30,7 +30,7 @@ export class LocalClient implements IQDataClient {
     if (!dataFile) {
       return Promise.reject('No data file found');
     }
-    
+
     return Promise.all(indexes.map(async (index) => {
       const bytesPerIQSample = meta.getBytesPerIQSample();
       const countBytes = blockSize * bytesPerIQSample;

@@ -4,9 +4,8 @@ import { LocalClient } from '@/api/iqdata/LocalClient';
 import { FileWithDirectoryAndFileHandle } from 'browser-fs-access';
 import { IQDataSlice } from '@/api/Models';
 
-
 describe('local file client tests', () => {
- 
+
   const baseMetadataFile = {
     global: {
       'core:datatype': 'cf32_le',
