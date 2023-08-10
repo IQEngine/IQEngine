@@ -22,7 +22,7 @@
     "@tanstack/react-query-devtools": "^4.29.7",
     "@uiw/codemirror-extensions-langs": "^4.21.2",
     "@uiw/codemirror-theme-vscode": "^4.19.16",
-    "@uiw/react-codemirror": "^4.19.14",
+    "@uiw/react-codemirror": "^4.21.9",
     "@vitejs/plugin-react": "^4.0.0",
     "axios": "^1.4.0",
     "bootswatch": "^5.2.3",
