@@ -29,7 +29,7 @@
     "browser-fs-access": "^0.34.1",
     "daisyui": "^3.2.1",
     "fftshift": "^1.0.1",
-    "konva": "^8.3.14",
+    "konva": "^9.2.0",
     "leaflet": "^1.9.4",
     "moment": "^2.29.4",
     "plotly.js": "^2.22.0",
