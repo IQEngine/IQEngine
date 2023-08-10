@@ -1,11 +1,9 @@
 # vim: tabstop=4 shiftwidth=4 expandtab
-import json
 import os
 from unittest import mock
-from unittest.mock import AsyncMock, Mock
+from unittest.mock import Mock
 
 import pytest
-from requests import Response
 from database.models import Configuration, Metadata
 from tests.test_data import test_datasource, valid_metadata
 
@@ -356,10 +354,15 @@ async def test_api_update_file_version(client):
     assert response_object["global"]["traceability:origin"]["file_path"] == "file/path"
     assert response_object["annotations"][0]["core:sample_start"] == 10000
 
+
 @mock.patch("graph.graph_client.requests.get", return_value=Mock())
-@mock.patch("graph.graph_client.msal.ConfidentialClientApplication", return_value=Mock())
+@mock.patch(
+    "graph.graph_client.msal.ConfidentialClientApplication", return_value=Mock()
+)
 @pytest.mark.asyncio
-async def test_api_get_users_successful_acquire_token_silent(mock_confidential_client, mock_get, client):
+async def test_api_get_users_successful_acquire_token_silent(
+    mock_confidential_client, mock_get, client
+):
     mock_confidential_client.return_value.acquire_token_silent.return_value = {
         "access_token": "123"
     }
@@ -373,7 +376,7 @@ async def test_api_get_users_successful_acquire_token_silent(mock_confidential_c
             {
                 "id": "456",
                 "displayName": "test2",
-            }
+            },
         ]
     }
 
@@ -388,10 +391,15 @@ async def test_api_get_users_successful_acquire_token_silent(mock_confidential_c
     assert response.json()[1]["id"] == "456"
     assert response.json()[1]["displayName"] == "test2"
 
+
 @mock.patch("graph.graph_client.requests.get", return_value=Mock())
-@mock.patch("graph.graph_client.msal.ConfidentialClientApplication", return_value=Mock())
+@mock.patch(
+    "graph.graph_client.msal.ConfidentialClientApplication", return_value=Mock()
+)
 @pytest.mark.asyncio
-async def test_api_get_users_successful_acquire_token_for_client(mock_confidential_client, mock_get, client):
+async def test_api_get_users_successful_acquire_token_for_client(
+    mock_confidential_client, mock_get, client
+):
     mock_confidential_client.return_value.acquire_token_silent.return_value = None
     mock_confidential_client.return_value.acquire_token_for_client.return_value = {
         "access_token": "123"
@@ -406,7 +414,7 @@ async def test_api_get_users_successful_acquire_token_for_client(mock_confidenti
             {
                 "id": "456",
                 "displayName": "test2",
-            }
+            },
         ]
     }
 

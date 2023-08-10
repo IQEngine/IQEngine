@@ -2,6 +2,7 @@ from typing import List, Optional
 
 from pydantic import BaseModel, Extra, Field, SecretStr
 
+
 class DataSource(BaseModel):
     type: str
     name: str
