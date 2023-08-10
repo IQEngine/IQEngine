@@ -1,5 +1,5 @@
 # Debian's bookworm has GNU Radio 3.10.5 already built
-FROM ghcr.io/iqengine/iqengine-plugins-base:latest
+FROM ghcr.io/iqengine/iqengine-plugins-base:latest@sha256:58cfb3753e4de978bca9adeabb06f444eae85a9c43a8db8b937ef9a2176aecc7
 LABEL org.opencontainers.image.description="Plugins for IQEngine to provide additional post processing capabilities"
 LABEL org.opencontainers.image.licenses=MIT
 

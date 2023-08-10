@@ -17,6 +17,9 @@ on:
 ###############
 # Set the Job #
 ###############
+permissions:
+  contents: read
+
 jobs:
   build:
     # Name the Job
@@ -39,8 +42,13 @@ jobs:
       ##########################
       # Checkout the code base #
       ##########################
+      - name: Harden Runner
+        uses: step-security/harden-runner@8ca2b8b2ece13480cda6dacd3511b49857a23c09 # v2.5.1
+        with:
+          egress-policy: audit
+
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
         with:
           # Full git history is needed to get a proper
           # list of changed files within `super-linter`
@@ -50,7 +58,7 @@ jobs:
       # Run Linter against code base #
       ################################
       - name: MegaLinter
-        uses: oxsecurity/megalinter/flavors/cupcake@v7.1.0
+        uses: oxsecurity/megalinter/flavors/cupcake@a7b1a3af0f3bd4de4db855969d27e224005665a6 # v7.1.0
         env:
           VALIDATE_ALL_CODEBASE: false
           DEFAULT_BRANCH: main
