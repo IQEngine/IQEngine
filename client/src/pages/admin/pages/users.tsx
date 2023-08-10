@@ -7,7 +7,7 @@ export const Users = () => {
   return (
     <div>
       <h2>Users</h2>
-      {data && data?.length > 0 ? (
+      {data && data?.length > 0 && (
         <div>
           <table className="table w-full">
             <thead className="text-left">
@@ -34,7 +34,7 @@ export const Users = () => {
             </tbody>
           </table>
         </div>
-      ) : null}
+      )}
     </div>
   );
 };
