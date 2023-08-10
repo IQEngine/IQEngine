@@ -5,24 +5,19 @@
 import React, { useEffect, useState } from 'react';
 import { Layer, Rect, Text } from 'react-konva';
 import { unitPrefixHz } from '@/utils/rfFunctions';
+import { useSpectrogramContext } from '../hooks/use-spectrogram-context';
+import { useCursorContext } from '../hooks/use-cursor-context';
 
-const FreqSelector = (props) => {
-  const {
-    spectrogramWidth,
-    spectrogramHeight,
-    freqSelectionLower,
-    freqSelectionUpper,
-    setFreqSelectionLower,
-    setFreqSelectionUpper,
-    sampleRate,
-  } = props;
-
+const FreqSelector = () => {
+  const { spectrogramWidth, spectrogramHeight, meta } = useSpectrogramContext();
+  const { cursorFreq, setCursorFreq, cursorFreqEnabled } = useCursorContext();
   const [lowerText, setLowerText] = useState('');
   const [upperText, setUpperText] = useState('');
   const [diffText, setDiffText] = useState('');
+  const sampleRate = meta?.getSampleRate() || 0;
 
-  const lowerPosition = (freqSelectionLower + 0.5) * spectrogramWidth; // in pixels. this auto-updates
-  const upperPosition = (freqSelectionUpper + 0.5) * spectrogramWidth;
+  const lowerPosition = (cursorFreq.start + 0.5) * spectrogramWidth; // in pixels. this auto-updates
+  const upperPosition = (cursorFreq.end + 0.5) * spectrogramWidth;
 
   useEffect(() => {
     const formatted = unitPrefixHz((lowerPosition / spectrogramWidth - 0.5) * sampleRate);
@@ -39,26 +34,63 @@ const FreqSelector = (props) => {
   }, [upperPosition]);
 
   const handleDragMoveLower = (e) => {
-    setFreqSelectionLower(handleMovement(e));
-  };
-
-  const handleDragMoveUpper = (e) => {
-    setFreqSelectionUpper(handleMovement(e));
-  };
-
-  const handleMovement = (e) => {
     let newX = e.target.x();
     if (newX <= 2) newX = 2;
     if (newX > spectrogramWidth - 2) newX = spectrogramWidth - 2;
     e.target.x(newX);
     e.target.y(0); // keep line in the same y location
-    return newX / spectrogramWidth - 0.5;
+    const newPos = newX / spectrogramWidth - 0.5;
+    if (newPos < cursorFreq.end) {
+      setCursorFreq({
+        start: newPos,
+        end: cursorFreq.end,
+      });
+    } else {
+      setCursorFreq({
+        start: cursorFreq.end,
+        end: newPos,
+      });
+    }
   };
 
-  const handleDragEnd = (e) => {
-    setFreqSelectionLower(Math.min(lowerPosition / spectrogramWidth - 0.5, upperPosition / spectrogramWidth - 0.5));
-    setFreqSelectionUpper(Math.max(lowerPosition / spectrogramWidth - 0.5, upperPosition / spectrogramWidth - 0.5));
+  const handleDragMoveUpper = (e) => {
+    let newX = e.target.x();
+    if (newX <= 2) newX = 2;
+    if (newX > spectrogramWidth - 2) newX = spectrogramWidth - 2;
+    e.target.x(newX);
+    e.target.y(0); // keep line in the same y location
+    const newPos = newX / spectrogramWidth - 0.5;
+    if (newPos > cursorFreq.start) {
+      setCursorFreq({
+        start: cursorFreq.start,
+        end: newPos,
+      });
+    } else {
+      setCursorFreq({
+        start: newPos,
+        end: cursorFreq.start,
+      });
+    }
   };
+
+  const handleMovement = (e) => {};
+
+  const handleDragEnd = (e) => {
+    setCursorFreq({
+      start: Math.min(lowerPosition / spectrogramWidth - 0.5, upperPosition / spectrogramWidth - 0.5),
+      end: Math.max(lowerPosition / spectrogramWidth - 0.5, upperPosition / spectrogramWidth - 0.5),
+    });
+  };
+
+  // add cursor styling
+  function onMouseOver() {
+    document.body.style.cursor = 'move';
+  }
+  function onMouseOut() {
+    document.body.style.cursor = 'default';
+  }
+
+  if (!cursorFreqEnabled) return null;
 
   return (
     <>
@@ -82,6 +114,8 @@ const FreqSelector = (props) => {
             draggable={true}
             onDragMove={handleDragMoveLower}
             onDragEnd={handleDragEnd}
+            onMouseOver={onMouseOver}
+            onMouseOut={onMouseOut}
             strokeEnabled={true}
             strokeWidth={5}
             stroke="blue"
@@ -99,6 +133,8 @@ const FreqSelector = (props) => {
             draggable={true}
             onDragMove={handleDragMoveUpper}
             onDragEnd={handleDragEnd}
+            onMouseOver={onMouseOver}
+            onMouseOut={onMouseOut}
             strokeEnabled={true}
             strokeWidth={5}
             stroke="blue"

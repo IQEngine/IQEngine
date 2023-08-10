@@ -1,9 +1,10 @@
 import { useGetIQData } from '@/api/iqdata/Queries';
-import { useMeta } from '@/api/metadata/queries';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useSpectrogramContext } from './use-spectrogram-context';
+import { useDebounce } from 'usehooks-ts';
+import { FETCH_PADDING } from '@/utils/constants';
 
-export function useSpectrogram() {
+export function useSpectrogram(currentFFT) {
   const {
     type,
     account,
@@ -15,10 +16,22 @@ export function useSpectrogram() {
     setFFTStepSize,
     setSpectrogramHeight,
     meta,
+    taps,
+    pythonSnippet,
   } = useSpectrogramContext();
-  const { currentData, setFFTsRequired, fftsRequired } = useGetIQData(type, account, container, filePath, fftSize);
+  const { currentData, setFFTsRequired, fftsRequired } = useGetIQData(
+    type,
+    account,
+    container,
+    filePath,
+    fftSize,
+    taps,
+    pythonSnippet
+  );
   const totalFFTs = Math.ceil(meta?.getTotalSamples() / fftSize);
-  const [currentFFT, setCurrentFFT] = useState<number>(0);
+
+  const debouncedCurrentFFT = useDebounce<string>(currentFFT, 200);
+
   // This is the list of ffts we display
   const displayedIQ = useMemo<Float32Array>(() => {
     if (!totalFFTs || !spectrogramHeight || !currentData) {
@@ -26,9 +39,30 @@ export function useSpectrogram() {
     }
     // get the current required blocks
     const requiredBlocks: number[] = [];
+    const displayedBlocks: number[] = [];
+
+    // make the padding dependent on the size of fft so we avoid to fetch too much data for large ffts
+    const currentPadding = Math.floor(FETCH_PADDING / (fftSize / 1024));
     for (let i = 0; i < spectrogramHeight; i++) {
-      requiredBlocks.push(currentFFT + i * (fftStepSize + 1));
+      const nextFFT = currentFFT + i * (fftStepSize + 1);
+      if (nextFFT <= totalFFTs && nextFFT >= 0) {
+        requiredBlocks.push(nextFFT);
+        displayedBlocks.push(nextFFT);
+      }
     }
+    // add the padding
+    for (let i = 1; i <= currentPadding; i++) {
+      let start = displayedBlocks[0];
+      let end = displayedBlocks[displayedBlocks.length - 1];
+      let step = i * (fftStepSize + 1);
+      if (start - step >= 0) {
+        requiredBlocks.push(start - step);
+      }
+      if (end + step <= totalFFTs) {
+        requiredBlocks.push(end + step);
+      }
+    }
+
     if (!currentData) {
       setFFTsRequired(requiredBlocks);
       return null;
@@ -36,25 +70,27 @@ export function useSpectrogram() {
     // check if the blocks are already loaded
     const blocksToLoad = requiredBlocks.filter((block) => !currentData[block]);
     setFFTsRequired(blocksToLoad);
-
-    console.log('blocks to load', blocksToLoad);
+    if (blocksToLoad.length > 0) {
+      console.debug('loading blocks', blocksToLoad);
+    }
 
     // return the data with 0s for the missing blocks
     const iqData = new Float32Array(spectrogramHeight * fftSize * 2);
     let offset = 0;
     for (let i = 0; i < spectrogramHeight; i++) {
-      if (currentData[requiredBlocks[i]]) {
-        iqData.set(currentData[requiredBlocks[i]], offset);
+      if (currentData[displayedBlocks[i]]) {
+        iqData.set(currentData[displayedBlocks[i]], offset);
+      } else {
+        iqData.fill(-Infinity, offset, offset + fftSize * 2);
       }
       offset += fftSize * 2;
     }
     return iqData;
-  }, [currentData, fftSize, currentFFT, fftStepSize, totalFFTs, spectrogramHeight]);
+  }, [currentData, fftSize, debouncedCurrentFFT, fftStepSize, totalFFTs, spectrogramHeight]);
 
   return {
     totalFFTs,
     currentFFT,
-    setCurrentFFT,
     spectrogramHeight,
     displayedIQ,
     currentData,

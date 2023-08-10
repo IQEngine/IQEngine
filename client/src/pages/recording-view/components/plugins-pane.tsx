@@ -12,7 +12,7 @@ import { convertFloat32ArrayToBase64, convertBase64ToFloat32Array } from '@/util
 import { colMaps } from '@/utils/colormap';
 import { fftshift } from 'fftshift';
 import { FFT } from '@/utils/fft';
-import { useGetPluginsComponents } from '@/pages/spectrogram/hooks/use-get-plugins-components';
+import { useGetPluginsComponents } from '@/pages/recording-view/hooks/use-get-plugins-components';
 import { useGetPlugins } from '@/api/plugin/queries';
 import { toast } from 'react-hot-toast';
 import { dataTypeToBytesPerIQSample } from '@/utils/selector';
@@ -28,23 +28,33 @@ export enum MimeTypes {
 }
 
 export const PluginsPane = () => {
-  const { meta, account, container, spectrogramHeight, fftSize } = useSpectrogramContext();
-  const { cursorTimeEnabled } = useCursorContext();
-  const currentFFT = 0;
+  const { meta, account, container, spectrogramHeight, fftSize, selectedAnnotation, setMeta } = useSpectrogramContext();
+  const { cursorTimeEnabled, cursorTime, cursorData } = useCursorContext();
   const { data: plugins, isError } = useGetPlugins();
   const { PluginOption, EditPluginParameters, pluginParameters, setPluginParameters } = useGetPluginsComponents();
   const [selectedPlugin, setSelectedPlugin] = useState('');
+  const [selectedMethod, setSelectedMethod] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [modalSamples, setModalSamples] = useState<Float32Array>(new Float32Array([]));
   const [modalSpectrogram, setmodalSpectrogram] = useState(null);
   const [useCloudStorage, setUseCloudStorage] = useState(true);
   const { dataSourcesQuery } = useUserSettings();
   const connectionInfo = dataSourcesQuery?.data[`${account}/${container}`];
-  const byte_offset = meta.getBytesPerIQSample() * fftSize * currentFFT;
-  const byte_length = meta.getBytesPerIQSample() * spectrogramHeight * fftSize;
+  let byte_offset = meta.getBytesPerIQSample() * cursorTime.start;
+  let byte_length = meta.getBytesPerIQSample() * (cursorTime.end - cursorTime.start);
   const handleChangePlugin = (e) => {
     setSelectedPlugin(e.target.value);
   };
+
+  const handleChangeMethod = (e) => {
+    setSelectedMethod(e.target.value);
+  };
+
+  const methodOptions = [
+    // { value: 'Full', label: '' },
+    { value: 'Cursor', label: 'Cursor' },
+    { value: 'Annotation', label: 'Annotation' },
+  ];
 
   const handleSubmit = (e) => {
     console.log('Plugin Params:', pluginParameters);
@@ -60,6 +70,19 @@ export const PluginsPane = () => {
 
     const sampleRate = meta.getSampleRate();
     const freq = meta.getCenterFrequency();
+
+    let annotation: Annotation = null;
+    if (selectedMethod == 'Annotation') {
+      if (selectedAnnotation == -1) {
+        toast.error('Please select the annotation you want to run a plugin on');
+        setSelectedMethod('');
+      } else {
+        annotation = meta.annotations[selectedAnnotation];
+        const calculateMultiplier = dataTypeToBytesPerIQSample(MimeTypes[meta.getDataType()]);
+        byte_offset = Math.floor(annotation['core:sample_start']) * calculateMultiplier;
+        byte_length = annotation['core:sample_count'] * calculateMultiplier;
+      }
+    }
 
     let body = {
       samples_b64: [],
@@ -83,10 +106,13 @@ export const PluginsPane = () => {
             byte_length: byte_length,
           },
         ],
-        custom_params: {},
+        custom_params: {
+          start_freq: annotation ? annotation['core:freq_lower_edge'] : null,
+          end_freq: annotation ? annotation['core:freq_upper_edge'] : null,
+        },
       };
     } else {
-      const newSamps = convertFloat32ArrayToBase64(Float32Array.from(modalSamples));
+      const newSamps = convertFloat32ArrayToBase64(cursorData);
       console.log(newSamps);
 
       body = {
@@ -226,7 +252,7 @@ export const PluginsPane = () => {
 
         if (data.annotations) {
           for (let i = 0; i < data.annotations.length; i++) {
-            data.annotations[i]['core:sample_start'] += meta['core:sample_start'];
+            data.annotations[i]['core:sample_start'] += cursorTime.start;
           }
           let newAnnotations = data.annotations.map((annotation) => Object.assign(new Annotation(), annotation));
           console.log(newAnnotations);
@@ -257,6 +283,20 @@ export const PluginsPane = () => {
             plugins?.map((plugin, groupIndex) => (
               <PluginOption key={groupIndex} groupIndex={groupIndex} plugin={plugin} />
             ))}
+        </select>
+      </label>
+      <label className="label">
+        Method:
+        <select
+          className="rounded bg-base-content text-base-100 w-34"
+          value={selectedMethod}
+          onChange={handleChangeMethod}
+        >
+          {methodOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
         </select>
       </label>
       {connectionInfo && (

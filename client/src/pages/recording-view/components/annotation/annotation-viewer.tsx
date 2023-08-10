@@ -2,82 +2,95 @@
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
 
-import React, { Fragment, useCallback } from 'react';
+import React, { Fragment, useCallback, useMemo } from 'react';
 import { Layer, Rect, Text } from 'react-konva';
 import { TILE_SIZE_IN_IQ_SAMPLES } from '@/utils/constants';
 import { Annotation, SigMFMetadata } from '@/utils/sigmfMetadata';
+import { useSpectrogramContext } from '../../hooks/use-spectrogram-context';
 
 interface AnnotationViewerProps {
-  spectrogramWidthScale: number;
-  meta: SigMFMetadata;
-  fftSize: number;
-  lowerTile: number;
-  upperTile: number;
-  zoomLevel: number;
-  setMeta: (meta: SigMFMetadata) => void;
-  selectedAnnotation: number;
-  setSelectedAnnotation: (index: number) => void;
+  currentFFT: number;
 }
 
-const AnnotationViewer = ({
-  spectrogramWidthScale,
-  meta,
-  fftSize,
-  lowerTile,
-  zoomLevel,
-  upperTile,
-  setMeta,
-  selectedAnnotation,
-  setSelectedAnnotation,
-}: AnnotationViewerProps) => {
+const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
+  const {
+    meta,
+    setMeta,
+    spectrogramWidth,
+    spectrogramHeight,
+    fftSize,
+    fftStepSize,
+    selectedAnnotation,
+    setSelectedAnnotation,
+  } = useSpectrogramContext();
+  const lower_freq = meta.getCenterFrequency() - meta.getSampleRate() / 2;
+
   function onDragEnd(e) {
     const x = e.target.x(); // coords of the corner box
     const y = e.target.y();
+    // Getting the index of the annotation from the id of the box
     const annot_indx = e.target.id().split('-')[0];
     const annot_pos_x = e.target.id().split('-')[1];
     const annot_pos_y = e.target.id().split('-')[2];
-    annotations[annot_indx][annot_pos_x] = x / spectrogramWidthScale; // reverse the calcs done to generate the coords
+    annotations[annot_indx][annot_pos_x] = x / spectrogramWidth; // reverse the calcs done to generate the coords
     annotations[annot_indx][annot_pos_y] = y;
-    const start_sample_index = lowerTile * TILE_SIZE_IN_IQ_SAMPLES;
-    const lower_freq = meta.captures[0]['core:frequency'] - meta.global['core:sample_rate'] / 2;
+
+    // Check if the min/max is swapped for x and y
+    if (annotations[annot_indx].x1 > annotations[annot_indx].x2) {
+      // one-liner for swapping the two
+      annotations[annot_indx].x2 = [
+        annotations[annot_indx].x1,
+        (annotations[annot_indx].x1 = annotations[annot_indx].x2),
+      ][0];
+    }
+    if (annotations[annot_indx].y1 > annotations[annot_indx].y2) {
+      // one-liner for swapping the two
+      annotations[annot_indx].y2 = [
+        annotations[annot_indx].y1,
+        (annotations[annot_indx].y1 = annotations[annot_indx].y2),
+      ][0];
+    }
+
+    // Getting new values for the annotation
+    const newValues = {
+      'core:sample_start': (annotations[annot_indx].y1 + currentFFT) * fftSize * (fftStepSize + 1),
+      'core:sample_count': (annotations[annot_indx].y2 - annotations[annot_indx].y1) * fftSize * (fftStepSize + 1),
+      'core:freq_lower_edge': annotations[annot_indx].x1 * meta.getSampleRate() + lower_freq,
+      'core:freq_upper_edge': annotations[annot_indx].x2 * meta.getSampleRate() + lower_freq,
+    };
     const f = annotations[annot_indx]['index'];
-    console.log('Starting changes to meta');
-    console.log(meta.annotations[f]);
-    meta.annotations[f]['core:sample_start'] = annotations[annot_indx].y1 * fftSize * zoomLevel + start_sample_index;
-    meta.annotations[f]['core:sample_count'] =
-      (annotations[annot_indx].y2 - annotations[annot_indx].y1) * fftSize * zoomLevel;
-    meta.annotations[f]['core:freq_lower_edge'] =
-      (annotations[annot_indx].x1 / fftSize) * meta.global['core:sample_rate'] + lower_freq;
-    meta.annotations[f]['core:freq_upper_edge'] =
-      (annotations[annot_indx].x2 / fftSize) * meta.global['core:sample_rate'] + lower_freq;
-    console.log('Finish changes to meta');
-    console.log(meta);
-    console.log(meta.annotations[f]);
+    // Updating the annotation
+    meta.annotations[f] = Object.assign(meta.annotations[f], {
+      ...meta.annotations[f],
+      ...newValues,
+    });
     let new_meta = Object.assign(new SigMFMetadata(), meta);
     setMeta(new_meta);
     setSelectedAnnotation(annot_indx);
   }
 
-  const annotations =
-    meta?.annotations.map((annotation, index) => {
-      let position = annotation.getAnnotationPosition(
-        lowerTile,
-        upperTile,
-        meta.getCenterFrequency(),
-        meta.getSampleRate(),
-        fftSize,
-        zoomLevel
-      );
-      let result = {
-        ...position,
+  const annotations = useMemo(() => {
+    const minimumFFT = currentFFT;
+    const maximumFFT = currentFFT + spectrogramHeight * (fftStepSize + 1);
+    const annotations = meta.annotations.map((annotation, index) => {
+      if (!annotation['core:sample_count']) {
+        return;
+      }
+      const start = annotation['core:sample_start'] / fftSize;
+      const end = annotation['core:sample_count'] / fftSize + start;
+      const visible = start < maximumFFT || end > minimumFFT;
+      return {
+        x1: (annotation['core:freq_lower_edge'] - meta.getCenterFrequency()) / meta.getSampleRate() + 0.5,
+        x2: (annotation['core:freq_upper_edge'] - meta.getCenterFrequency()) / meta.getSampleRate() + 0.5,
+        y1: (start - minimumFFT) / (fftStepSize + 1),
+        y2: (end - minimumFFT) / (fftStepSize + 1),
         label: annotation.getLabel(),
         index: index,
+        visible: visible,
       };
-      if (selectedAnnotation == index && !position.visible) {
-        setSelectedAnnotation(-1);
-      }
-      return result;
-    }) ?? [];
+    });
+    return annotations;
+  }, [meta, currentFFT, fftStepSize, fftSize, spectrogramWidth]);
 
   // add cursor styling
   function onMouseOver() {
@@ -102,22 +115,23 @@ const AnnotationViewer = ({
     let updatedAnnotations = [...meta.annotations];
     annotations[annotations.length - 1]['index'] = updatedAnnotations.length;
 
-    let start_sample_index = lowerTile * TILE_SIZE_IN_IQ_SAMPLES;
+    let start_sample_index = currentFFT * TILE_SIZE_IN_IQ_SAMPLES;
     const annot_indx = annotations.length - 1;
     let lower_freq = meta.captures[0]['core:frequency'] - meta.global['core:sample_rate'] / 2;
     meta.annotations.push(
       Object.assign(new Annotation(), {
-        'core:sample_start': annotations[annot_indx].y1 * fftSize * zoomLevel + start_sample_index,
-        'core:sample_count': (annotations[annot_indx].y2 - annotations[annot_indx].y1) * fftSize * zoomLevel,
+        'core:sample_start': annotations[annot_indx].y1 * fftSize * (fftStepSize + 1) + start_sample_index,
+        'core:sample_count': (annotations[annot_indx].y2 - annotations[annot_indx].y1) * fftSize * (fftStepSize + 1),
         'core:freq_lower_edge': (annotations[annot_indx].x1 / fftSize) * meta.global['core:sample_rate'] + lower_freq,
         'core:freq_upper_edge': (annotations[annot_indx].x2 / fftSize) * meta.global['core:sample_rate'] + lower_freq,
         'core:label': annotations[annot_indx]['label'],
       })
     );
     let new_meta = Object.assign(new SigMFMetadata(), meta);
+    console.log('new_meta', new_meta);
     setMeta(new_meta);
-    setSelectedAnnotation(annot_indx);
-  }, [annotations, meta, lowerTile, fftSize, zoomLevel, setMeta]);
+    // setSelectedAnnotation(annot_indx);
+  }, [annotations, meta, currentFFT, fftSize, fftStepSize, setMeta]);
 
   // Ability to update annotation labels
   const handleTextClick = useCallback(
@@ -126,10 +140,13 @@ const AnnotationViewer = ({
       var textarea = document.createElement('textarea');
       document.body.appendChild(textarea);
 
+      const element = document.getElementById('spectrogram');
+      const spectrogram = element.getBoundingClientRect();
+
       textarea.value = e.target.text();
       textarea.style.position = 'absolute';
-      textarea.style.top = '300px'; // middle of screen
-      textarea.style.left = '500px'; // middle of screen
+      textarea.style.top = spectrogram.top + e.target.attrs.y + 'px';
+      textarea.style.left = spectrogram.left + e.target.attrs.x + 'px';
       textarea.style.width = '400px';
       textarea.style.fontSize = '25px';
       textarea.rows = 1;
@@ -142,8 +159,8 @@ const AnnotationViewer = ({
       document.body.appendChild(textarea2);
       textarea2.value = 'Hit Enter to Finish';
       textarea2.style.position = 'absolute';
-      textarea2.style.top = '270px';
-      textarea2.style.left = '600px';
+      textarea2.style.top = spectrogram.top + e.target.attrs.y - 30 + 'px';
+      textarea2.style.left = spectrogram.left + e.target.attrs.x + 100 + 'px';
       textarea2.style.width = '140px';
       textarea2.style.height = '30px';
       textarea2.rows = 1;
@@ -205,20 +222,22 @@ const AnnotationViewer = ({
         <Fragment key={index}>
           {/* Main rectangle */}
           <Rect
-            x={annotation.x1 * spectrogramWidthScale}
+            x={annotation.x1 * spectrogramWidth}
             y={annotation.y1}
-            width={(annotation.x2 - annotation.x1) * spectrogramWidthScale}
+            width={(annotation.x2 - annotation.x1) * spectrogramWidth}
             height={annotation.y2 - annotation.y1}
-            fillEnabled={true}
+            fillEnabled={false}
             stroke={selectedAnnotation == index ? 'pink' : 'black'}
             strokeWidth={4}
             onClick={onBoxClick}
+            onMouseOver={onMouseOver}
+            onMouseOut={onMouseOut}
             key={index}
             id={index.toString()}
           />
           {/* Top Left Corner */}
           <Rect
-            x={annotation.x1 * spectrogramWidthScale - 4}
+            x={annotation.x1 * spectrogramWidth - 4}
             y={annotation.y1 - 4}
             width={8}
             height={8}
@@ -236,7 +255,7 @@ const AnnotationViewer = ({
           />
           {/* Top Right Corner */}
           <Rect
-            x={annotation.x2 * spectrogramWidthScale - 4}
+            x={annotation.x2 * spectrogramWidth - 4}
             y={annotation.y1 - 4}
             width={8}
             height={8}
@@ -254,7 +273,7 @@ const AnnotationViewer = ({
           />
           {/* Bottom Left Corner */}
           <Rect
-            x={annotation.x1 * spectrogramWidthScale - 4}
+            x={annotation.x1 * spectrogramWidth - 4}
             y={annotation.y2 - 4}
             width={8}
             height={8}
@@ -272,7 +291,7 @@ const AnnotationViewer = ({
           />
           {/* Bottom Right Corner */}
           <Rect
-            x={annotation.x2 * spectrogramWidthScale - 4}
+            x={annotation.x2 * spectrogramWidth - 4}
             y={annotation.y2 - 4}
             width={8}
             height={8}
@@ -293,7 +312,7 @@ const AnnotationViewer = ({
             text={annotation.label}
             fontFamily="serif"
             fontSize={24}
-            x={annotation.x1 * spectrogramWidthScale}
+            x={annotation.x1 * spectrogramWidth}
             y={annotation.y1 - 23}
             fill={selectedAnnotation == index ? 'pink' : 'black'}
             fontStyle="bold"

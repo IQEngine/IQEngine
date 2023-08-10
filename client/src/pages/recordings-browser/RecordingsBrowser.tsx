@@ -61,7 +61,6 @@ export function RecordingsBrowser() {
                   <th className="p-2">Sample Rate</th>
                   <th className="p-2">Number of Annotations</th>
                   <th className="p-2">Author</th>
-                  {featureFlags?.useNewSpectrogramPage && <th className="p-2">Inspect</th>}
                 </tr>
               </thead>
               <tbody>

@@ -13,10 +13,14 @@ import { colMaps } from '@/utils/colormap';
 import { useSpectrogramContext } from '../hooks/use-spectrogram-context';
 import { useCursorContext } from '../hooks/use-cursor-context';
 
-const SettingsPane = () => {
+interface SettingsPaneProps {
+  currentFFT: number;
+}
+
+const SettingsPane = ({ currentFFT }) => {
   const fftSizes = [128, 256, 512, 1024, 2048, 4096, 16384, 65536, TILE_SIZE_IN_IQ_SAMPLES];
   const context = useSpectrogramContext();
-  const { cursorFreqEnabled, setCursorFreqEnabled, cursorTimeEnabled, setCursorTimeEnabled } = useCursorContext();
+  const cursorContext = useCursorContext();
   const [localPythonSnippet, setLocalPythonSnippet] = useState(context.pythonSnippet);
   const [localTaps, setLocalTaps] = useState(JSON.stringify(context.taps));
 
@@ -53,19 +57,19 @@ const SettingsPane = () => {
 
   const onPressSaveButton = (e) => {
     console.log(context.meta);
-
     // Grab metadata and remove the parts that shouldn't be included in the metafile
     let metaClone = JSON.parse(JSON.stringify(context.meta));
     delete metaClone['dataClient'];
     const a = document.createElement('a');
 
-    // TODO: Return with the download of the blob
-    // var blobUrl = window.URL.createObjectURL(blob);
-    // var blob = new Blob([trimmedSamples], { type: 'octet/stream' });
-    // a.href = blobUrl;
-    // a.download = 'trimmedSamples.sigmf-data';
-    // a.click();
-    // window.URL.revokeObjectURL(blobUrl);
+    // Return with the download of the blob
+    const blobUrl = window.URL.createObjectURL(
+      new Blob([cursorContext.cursorData], { type: 'application/octet-stream' })
+    );
+    a.href = blobUrl;
+    a.download = 'trimmedSamples.sigmf-data';
+    a.click();
+    window.URL.revokeObjectURL(blobUrl);
 
     a.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent(JSON.stringify(metaClone, null, 2));
     a.download = 'trimmedSamples.sigmf-meta';
@@ -97,9 +101,16 @@ const SettingsPane = () => {
         <input
           type="checkbox"
           className="toggle toggle-primary float-right"
-          checked={cursorTimeEnabled}
+          checked={cursorContext.cursorTimeEnabled}
           onChange={(e) => {
-            setCursorTimeEnabled(e.target.checked);
+            if (!cursorContext.cursorTimeEnabled && cursorContext.cursorTime.start == cursorContext.cursorTime.end) {
+              cursorContext.setCursorTime({
+                start: (currentFFT + context.spectrogramHeight / 4) * context.fftSize,
+                end: (currentFFT + context.spectrogramHeight / 2) * context.fftSize,
+              });
+            }
+            cursorContext.setCursorTimeEnabled(e.target.checked);
+            context.setCanDownload(e.target.checked);
           }}
         />
       </label>
@@ -109,9 +120,15 @@ const SettingsPane = () => {
         <input
           type="checkbox"
           className="toggle toggle-primary float-right"
-          checked={cursorFreqEnabled}
+          checked={cursorContext.cursorFreqEnabled}
           onChange={(e) => {
-            setCursorFreqEnabled(e.target.checked);
+            if (!cursorContext.cursorFreqEnabled && cursorContext.cursorFreq.start == cursorContext.cursorFreq.end) {
+              cursorContext.setCursorFreq({
+                start: -0.2,
+                end: 0.2,
+              });
+            }
+            cursorContext.setCursorFreqEnabled(e.target.checked);
           }}
         />
       </label>
@@ -146,10 +163,10 @@ const SettingsPane = () => {
           <button tabIndex={0} className="m-1 px-16 w-full">
             Colormap
           </button>
-          <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
-            {Object.entries(colMaps).map(([value, index]) => (
+          <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 z-50">
+            {Object.entries(colMaps).map(([value]) => (
               <li
-                key={index[0][0]}
+                key={value}
                 data-value={value}
                 onClick={(e) => {
                   context.setColmap(e.currentTarget.dataset.value);
@@ -167,7 +184,7 @@ const SettingsPane = () => {
           <button tabIndex={0} className="m-1 px-16 w-full">
             FFT Size
           </button>
-          <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
+          <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 z-50">
             {fftSizes.map((x, index) => (
               <li
                 key={index}
@@ -225,7 +242,7 @@ const SettingsPane = () => {
             <button tabIndex={0} className="m-1 px-7 w-full">
               Example Filter Taps
             </button>
-            <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
+            <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 z-50">
               <li
                 key={0}
                 data-value="[0.021019600765633,0.05574786251380393,0.04504671465435009,-0.012858837474581268,-0.042883835223827396,0.013822126400016621,0.05882808073316635,-0.014316809227248763,-0.10299625870988743,0.015410773935742991,0.31701869995313076,0.48460819626209206,0.31701869995313076,0.015410773935742991,-0.10299625870988743,-0.014316809227248763,0.05882808073316635,0.013822126400016621,-0.042883835223827396,-0.012858837474581268,0.04504671465435009,0.05574786251380393,0.021019600765633]"
@@ -258,7 +275,7 @@ const SettingsPane = () => {
           <button tabIndex={0} className="m-1 px-16 w-full">
             Window
           </button>
-          <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
+          <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 z-50">
             <li key={0} data-value="hamming" onClick={onChangeWindowFunction}>
               {context.windowFunction === 'hamming' ? <a className="active">Hamming</a> : <a>Hamming</a>}
             </li>
@@ -306,12 +323,12 @@ const SettingsPane = () => {
         <textarea
           className="bg-base-content text-base-100 p-1"
           rows={6}
-          cols={28}
+          cols={25}
           wrap="off"
           onChange={(e) => {
             setLocalPythonSnippet(e.target.value);
           }}
-          value={context.pythonSnippet}
+          value={localPythonSnippet}
         />
         <button onClick={onSubmitPythonSnippet}>Run Python</button>
       </div>

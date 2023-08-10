@@ -6,6 +6,7 @@ import { act } from 'react-dom/test-utils';
 import { SpectrogramContextProvider } from '@/pages/recording-view/hooks/use-spectrogram-context';
 import React from 'react';
 import { TraceabilityOrigin } from '@/utils/sigmfMetadata';
+import { FETCH_PADDING } from '@/utils/constants';
 
 function getDefaultSeedValues() {
   return {
@@ -75,7 +76,7 @@ describe('test metadata fetch and fft calculation', () => {
     const seed = getDefaultSeedValues();
     seed.fftSize = fftSize;
 
-    const { result } = renderHook(() => useSpectrogram(), {
+    const { result } = renderHook(() => useSpectrogram(0), {
       wrapper: ({ children }) => createTestWrapper(origin, seed, children),
     });
     await waitFor(() => expect(result.current.totalFFTs).toBe(total_ffts));
@@ -85,7 +86,7 @@ describe('test metadata fetch and fft calculation', () => {
     const { getValidMetadata } = useAllProviders();
     const metadata = getValidMetadata();
     const fftSize = 1024;
-    const total_ffts = 128;
+    const total_ffts = 256;
     metadata.global['traceability:sample_length'] = fftSize * total_ffts;
     nock('http://localhost:3000')
       .get('/api/datasources/testaccount/testcontainer/test_file_path/meta')
@@ -94,19 +95,22 @@ describe('test metadata fetch and fft calculation', () => {
     const seed = getDefaultSeedValues();
     seed.fftSize = fftSize;
     seed.spectrogramHeight = 10;
-    const { result } = renderHook(() => useSpectrogram(), {
+    const { result } = renderHook(() => useSpectrogram(0), {
       wrapper: ({ children }) => createTestWrapper(origin, seed, children),
     });
 
-    await waitFor(() => expect(result.current.fftsRequired.length).toBe(10));
-    expect(result.current.fftsRequired).toStrictEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+    await waitFor(() => expect(result.current.fftsRequired.length).toBe(10 + FETCH_PADDING));
+    const expected = Array(10 + FETCH_PADDING)
+      .fill(0)
+      .map((_, i) => i);
+    expect(result.current.fftsRequired).toStrictEqual(expected);
   });
 
   test('should calculate the correct ffts that need to be displayed when decimating', async () => {
     const { getValidMetadata } = useAllProviders();
     const metadata = getValidMetadata();
     const fftSize = 1024;
-    const total_ffts = 128;
+    const total_ffts = 512;
     metadata.global['traceability:sample_length'] = fftSize * total_ffts;
     nock('http://localhost:3000')
       .get('/api/datasources/testaccount/testcontainer/test_file_path/meta')
@@ -116,26 +120,32 @@ describe('test metadata fetch and fft calculation', () => {
     seed.fftSize = fftSize;
     seed.spectrogramHeight = 10;
     seed.fftStepSize = 1;
-    const { result } = renderHook(() => useSpectrogram(), {
+    const { result } = renderHook(() => useSpectrogram(0), {
       wrapper: ({ children }) => createTestWrapper(origin, seed, children),
     });
 
-    await waitFor(() => expect(result.current.fftsRequired.length).toBe(10));
-    expect(result.current.fftsRequired).toStrictEqual([0, 2, 4, 6, 8, 10, 12, 14, 16, 18]);
+    await waitFor(() => expect(result.current.fftsRequired.length).toBe(10 + FETCH_PADDING));
+    let expected = Array(10 + FETCH_PADDING)
+      .fill(0)
+      .map((_, i) => i * 2);
+    expect(result.current.fftsRequired).toStrictEqual(expected);
 
     act(() => {
       result.current.setFFTStepSize(2);
     });
 
-    await waitFor(() => expect(result.current.fftsRequired.length).toBe(10));
-    expect(result.current.fftsRequired).toStrictEqual([0, 3, 6, 9, 12, 15, 18, 21, 24, 27]);
+    await waitFor(() => expect(result.current.fftsRequired.length).toBe(10 + FETCH_PADDING));
+    expected = Array(10 + FETCH_PADDING)
+      .fill(0)
+      .map((_, i) => i * 3);
+    expect(result.current.fftsRequired).toStrictEqual(expected);
   });
 
   test('should calculate the correct ffts that need to be displayed when decimating and changing height', async () => {
     const { getValidMetadata } = useAllProviders();
     const metadata = getValidMetadata();
     const fftSize = 1024;
-    const total_ffts = 128;
+    const total_ffts = 512;
     metadata.global['traceability:sample_length'] = fftSize * total_ffts;
     nock('http://localhost:3000')
       .get('/api/datasources/testaccount/testcontainer/test_file_path/meta')
@@ -145,19 +155,25 @@ describe('test metadata fetch and fft calculation', () => {
     seed.fftSize = fftSize;
     seed.spectrogramHeight = 10;
     seed.fftStepSize = 1;
-    const { result } = renderHook(() => useSpectrogram(), {
+    const { result } = renderHook(() => useSpectrogram(0), {
       wrapper: ({ children }) => createTestWrapper(origin, seed, children),
     });
-
-    await waitFor(() => expect(result.current.fftsRequired.length).toBe(10));
-    expect(result.current.fftsRequired).toStrictEqual([0, 2, 4, 6, 8, 10, 12, 14, 16, 18]);
+    let expected = Array(10 + FETCH_PADDING)
+      .fill(0)
+      .map((_, i) => i * 2);
+    await waitFor(() => expect(result.current.fftsRequired.length).toBe(10 + FETCH_PADDING));
+    expect(result.current.fftsRequired).toStrictEqual(expected);
 
     act(() => {
       result.current.setFFTStepSize(2);
       result.current.setSpectrogramHeight(5);
     });
 
-    await waitFor(() => expect(result.current.fftsRequired.length).toBe(5));
-    expect(result.current.fftsRequired).toStrictEqual([0, 3, 6, 9, 12]);
+    await waitFor(() => expect(result.current.fftsRequired.length).toBe(5 + FETCH_PADDING));
+
+    expected = Array(5 + FETCH_PADDING)
+      .fill(0)
+      .map((_, i) => i * 3);
+    expect(result.current.fftsRequired).toStrictEqual(expected);
   });
 });

@@ -8,7 +8,7 @@ import { queries } from './queries';
 export const MetadataQuery = () => {
   const [selections, setSelections] = useState(queries);
   const [queryString, setQueryString] = useState('');
-  const [trackData, setTrackData] = useState([]);
+  const [geoPositionUpdate, setGeoPositionUpdate] = useState('manual');
   const [selectedTrack, setSelectedTrack] = useState({
     account: '',
     container: '',
@@ -50,6 +50,21 @@ export const MetadataQuery = () => {
     return Object.keys(selections).map((item) => {
       if (selections[item].selected) {
         const Component = selections[item].component;
+        if (item === 'geo') {
+          return (
+            <Component
+              key={item}
+              queryName={item}
+              validator={selections[item].validator}
+              description={selections[item].description}
+              handleQueryValid={handleQueryValid}
+              handleQueryInvalid={handleQueryInvalid}
+              trackData={data ?? []}
+              geoPositionUpdate={geoPositionUpdate}
+              setGeoPositionUpdate={setGeoPositionUpdate}
+            />
+          );
+        }
         return (
           <Component
             key={item}
@@ -58,7 +73,6 @@ export const MetadataQuery = () => {
             description={selections[item].description}
             handleQueryValid={handleQueryValid}
             handleQueryInvalid={handleQueryInvalid}
-            trackData={data?.iqengine_geotrack?.coordinates ?? []}
           />
         );
       }
@@ -82,8 +96,9 @@ export const MetadataQuery = () => {
       account: encodeURIComponent(account),
       container: encodeURIComponent(container),
       filepath: encodeURIComponent(filepath),
-    })
-  }
+    });
+    setGeoPositionUpdate('track');
+  };
 
   const showQueryButton = () => {
     let empty = true;
@@ -100,7 +115,13 @@ export const MetadataQuery = () => {
   };
 
   const renderResults = () => {
-    return <Results geoSelected={selections['geo'].selected} handleToggleTrack={(account, container, filepath) => handleSetSelectedTrack(account, container, filepath)} queryString={queryString}  />;
+    return (
+      <Results
+        geoSelected={selections['geo'].selected}
+        handleToggleTrack={(account, container, filepath) => handleSetSelectedTrack(account, container, filepath)}
+        queryString={queryString}
+      />
+    );
   };
 
   const handleQuery = async () => {

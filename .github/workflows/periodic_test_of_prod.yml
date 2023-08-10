@@ -1,0 +1,33 @@
+---
+name: Periodic Test of Prod
+
+on:
+  schedule:
+    # 3:20 AM UTC = 11:20 PM EST every day
+    - cron: "20 3 * * *"
+
+jobs:
+  playwright:
+    name: RunPlaywrightTests
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        working-directory: e2e
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        working-directory: e2e
+        run: npx playwright install --with-deps
+
+      - name: Run Playwright tests on Prod
+        working-directory: e2e
+        run: |
+          npx playwright test --config playwright-prod.config.ts --grep @CICompatible

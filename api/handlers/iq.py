@@ -2,6 +2,7 @@ import asyncio
 import base64
 import io
 import logging
+import time
 from typing import List, Optional
 
 from blob.azure_client import AzureBlobClient
@@ -51,10 +52,13 @@ async def get_iq_data(
 ):
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
+    if hasattr(datasource, "sasToken"):
+        if datasource.sasToken:
+            azure_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
     try:
         block_indexes = [int(num) for num in block_indexes_str.split(",")]
         return StreamingResponse(
-            get_byte_stream(
+            calculate_iq_data(
                 block_indexes,
                 block_size,
                 get_bytes_per_iq_sample(format),
@@ -67,30 +71,89 @@ async def get_iq_data(
         raise HTTPException(status_code=400, detail=str(e))
 
 
-async def get_byte_stream(
+async def calculate_iq_data(
+    block_indexes,
+    block_size,
+    format,
+    iq_file,
+    azure_client,
+):
+    iq_data_list = await get_byte_streams(
+        block_indexes,
+        block_size,
+        format,
+        iq_file,
+        azure_client,
+    )
+    for iq_data in iq_data_list:
+        yield iq_data
+
+
+async def get_byte_streams(
     block_indexes, block_size, bytes_per_iq_sample, iq_file, azure_client
 ):
+    max_concurrent_requests = 100
+    chunk_size = 100 * 1024 // block_size
     block_indexes_arrs = find_smallest_and_largest_next_to_each_other(block_indexes)
 
-    for block_index_arr in block_indexes_arrs:
-        offsetBytes = block_index_arr[0] * block_size * bytes_per_iq_sample
-        countBytes = (
-            (block_index_arr[1] - block_index_arr[0] + 1)
-            * block_size
-            * bytes_per_iq_sample
-        )
+    block_indexes_chunks = []
+    for i in block_indexes_arrs:
+        if i[1] - i[0] > chunk_size:
+            indexes = [
+                [j, min(j + chunk_size - 1, i[1])]
+                for j in range(i[0], i[1] + 1, chunk_size)
+            ]
+            block_indexes_chunks.extend(indexes)
+        else:
+            block_indexes_chunks.append(i)
 
-        blob_size = await azure_client.get_file_length(iq_file)
-        if blob_size < offsetBytes:
-            return
-        if blob_size < offsetBytes + countBytes:
-            countBytes = blob_size - offsetBytes
+    blob_size = await azure_client.get_file_length(iq_file)
 
-        content = await azure_client.get_blob_content(
-            filepath=iq_file, offset=offsetBytes, length=countBytes
-        )
+    semaphore = asyncio.Semaphore(max_concurrent_requests)
 
-        yield content
+    async def get_byte_stream_wrapper(block_index_chunk):
+        async with semaphore:
+            return await get_byte_stream(
+                block_index_chunk,
+                block_size,
+                bytes_per_iq_sample,
+                iq_file,
+                azure_client,
+                blob_size,
+            )
+
+    tasks = [get_byte_stream_wrapper(block_index_chunk) for block_index_chunk in block_indexes_chunks]
+    return await asyncio.gather(*tasks)
+
+
+async def get_byte_stream(
+    block_indexes_chunk,
+    block_size,
+    bytes_per_iq_sample,
+    iq_file,
+    azure_client,
+    blob_size,
+):
+    st = time.time()
+
+    offsetBytes = block_indexes_chunk[0] * block_size * bytes_per_iq_sample
+    countBytes = (
+        (block_indexes_chunk[1] - block_indexes_chunk[0] + 1)
+        * block_size
+        * bytes_per_iq_sample
+    )
+
+    if blob_size < offsetBytes:
+        return b""
+    if blob_size < offsetBytes + countBytes:
+        countBytes = blob_size - offsetBytes
+    content = await azure_client.get_blob_content(
+        filepath=iq_file, offset=offsetBytes, length=countBytes
+    )
+
+    print(f"get_byte_stream: {time.time() - st}")
+
+    return content
 
 
 @router.get(

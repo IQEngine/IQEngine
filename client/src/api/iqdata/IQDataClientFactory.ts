@@ -5,7 +5,11 @@ import { LocalClient } from './LocalClient';
 import { IQDataClient } from './IQDataClient';
 import { FileWithDirectoryAndFileHandle } from 'browser-fs-access';
 
-export const IQDataClientFactory = (type: string, files: FileWithDirectoryAndFileHandle[], dataSources: Record<string, DataSource>): IQDataClient => {
+export const IQDataClientFactory = (
+  type: string,
+  files: FileWithDirectoryAndFileHandle[],
+  dataSources: Record<string, DataSource>
+): IQDataClient => {
   switch (type) {
     case CLIENT_TYPE_API:
       return new ApiClient();

@@ -4,6 +4,7 @@ import { MapContainer, TileLayer, Marker, Circle, LayerGroup, Polyline } from 'r
 import { Icon } from 'leaflet';
 
 import GeoQueryTypes from './geo-query-types';
+import TrackView from './track-view';
 
 function DraggableMarker({ updatePosition, defaultPosition, radius }) {
   const customIcon = new Icon({
@@ -40,11 +41,20 @@ function DraggableMarker({ updatePosition, defaultPosition, radius }) {
   );
 }
 
-export const GeoQuery = ({ queryName, description, validator, handleQueryValid, trackData }) => {
+export const GeoQuery = ({
+  queryName,
+  description,
+  validator,
+  handleQueryValid,
+  trackData,
+  geoPositionUpdate,
+  setGeoPositionUpdate,
+}) => {
   const defaultCenter = {
     lat: 51.505,
     lng: -0.09,
   };
+
   const defaultRadius = 20000;
   const fillBlueOptions = { fillColor: 'blue' };
   const minRadius = 100;
@@ -57,23 +67,30 @@ export const GeoQuery = ({ queryName, description, validator, handleQueryValid, 
   const handleRadiusChange = (e) => {
     const value = parseInt(e.target.value);
     setRadius(value);
+    setGeoPositionUpdate('manual');
     const valid = validator({ lat: position.lat, lon: position.lng, radius: value, queryType: selectedQueryType });
     handleQueryValid(queryName, valid);
   };
-
-  const getRadius = () => {
-    return radius;
-  };
-
   const handlePositionChange = (updatedPosition) => {
     const valid = validator({
       lat: updatedPosition.lat,
       lon: updatedPosition.lng,
-      radius: getRadius(),
+      radius: radius,
       queryType: selectedQueryType,
     });
     setPosition(updatedPosition);
+    setGeoPositionUpdate('manual');
     handleQueryValid(queryName, valid);
+  };
+
+  const getCenter = () => {
+    if (geoPositionUpdate === 'manual') {
+      return position;
+    }
+    if (trackData.length > 0) {
+      return trackData[(trackData.length / 2) | 0];
+    }
+    return position;
   };
 
   return (
@@ -99,11 +116,12 @@ export const GeoQuery = ({ queryName, description, validator, handleQueryValid, 
           <div className="badge badge-lg mb-5">Radius: {radius}m</div>
           <GeoQueryTypes types={queryTypes} selected={selectedQueryType} handleSelection={setSelectedQueryType} />
           <MapContainer center={position} zoom={8} scrollWheelZoom={true}>
+            <TrackView center={getCenter()} />
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
-            {trackData.length > 0  &&  <Polyline pathOptions={{color: 'red'}} positions={trackData} />}
+            {trackData.length > 0 && <Polyline pathOptions={{ color: 'red' }} positions={trackData} />}
             <LayerGroup>
               <Circle center={position} pathOptions={fillBlueOptions} radius={radius} />
             </LayerGroup>
