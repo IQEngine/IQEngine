@@ -33,11 +33,6 @@ jobs:
       repository: ${{needs.create_pre_release.outputs.repository}}
       sha: ${{needs.create_pre_release.outputs.sha}}
     steps:
-      - name: Harden Runner
-        uses: step-security/harden-runner@8ca2b8b2ece13480cda6dacd3511b49857a23c09 # v2.5.1
-        with:
-          egress-policy: audit
-
       - name: Log in with Azure with Service Principal
         uses: azure/login@92a5484dfaf04ca78a94597f4f19fea633851fa2 # v1.4.7
         with:
