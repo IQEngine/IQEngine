@@ -34,19 +34,19 @@ jobs:
       sha: ${{needs.create_pre_release.outputs.sha}}
     steps:
       - name: Log in with Azure with Service Principal
-        uses: azure/login@v1
+        uses: azure/login@92a5484dfaf04ca78a94597f4f19fea633851fa2 # v1.4.7
         with:
           creds: '${{ secrets.AZURE_CREDENTIALS }}'
 
       - name: Build and Deploy Frontend+Backend Container App
-        uses: azure/container-apps-deploy-action@v1
+        uses: azure/container-apps-deploy-action@900fbf4c695af15656553e442a65192e797b9dd2 # v1
         with:
           containerAppName: ${{ secrets.AZURE_CONTAINER_APP_NAME }}
           resourceGroup: ${{ secrets.AZURE_RESOURCEGROUP }}
           imageToDeploy: ghcr.io/${{ env.repository }}:${{ env.sha}}
 
       - name: Build and Deploy Plugins Container App
-        uses: azure/container-apps-deploy-action@v1
+        uses: azure/container-apps-deploy-action@900fbf4c695af15656553e442a65192e797b9dd2 # v1
         with:
           containerAppName: ${{ secrets.AZURE_CONTAINER_APP_NAME_STAGING_PLUGINS }}
           resourceGroup: ${{ secrets.AZURE_RESOURCEGROUP }}
