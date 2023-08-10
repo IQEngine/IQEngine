@@ -3,14 +3,15 @@ import base64
 import io
 import logging
 import time
-import asyncio
 from typing import List, Optional
+from pprint import pprint
 
 from blob.azure_client import AzureBlobClient
 from database import datasource_repo
 from database.models import DataSource
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import StreamingResponse
+from helpers.apidisconnect import cancel_on_disconnect, CancelOnDisconnectRoute
 from helpers.authorization import required_roles
 from helpers.cipher import decrypt
 from helpers.conversions import find_smallest_and_largest_next_to_each_other
@@ -18,7 +19,7 @@ from helpers.urlmapping import ApiType, get_content_type, get_file_name
 from pydantic import BaseModel, SecretStr
 from rf.samples import get_bytes_per_iq_sample
 
-router = APIRouter()
+router = APIRouter(route_class=CancelOnDisconnectRoute)
 
 
 class IQData(BaseModel):
@@ -39,11 +40,12 @@ async def get_sas_token(
     else:
         return SecretStr("")
 
-
 @router.get(
     "/api/datasources/{account}/{container}/{filepath:path}/iq-data", status_code=200
 )
+@cancel_on_disconnect
 async def get_iq_data(
+    request: Request,
     filepath: str,
     block_indexes_str: str,
     block_size: int,
@@ -56,8 +58,11 @@ async def get_iq_data(
     if hasattr(datasource, "sasToken"):
         if datasource.sasToken:
             azure_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
+    
     try:
         block_indexes = [int(num) for num in block_indexes_str.split(",")]
+        pprint(vars(request))
+
         return StreamingResponse(
             calculate_iq_data(
                 block_indexes,
@@ -68,6 +73,7 @@ async def get_iq_data(
             ),
             media_type="application/octet-stream",
         )
+        
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -93,41 +99,40 @@ async def calculate_iq_data(
 async def get_byte_streams(
     block_indexes, block_size, bytes_per_iq_sample, iq_file, azure_client
 ):
-    try:
-        max_concurrent_requests = 100
-        chunk_size = 100 * 1024 // block_size
-        block_indexes_arrs = find_smallest_and_largest_next_to_each_other(block_indexes)
 
-        block_indexes_chunks = []
-        for i in block_indexes_arrs:
-            if i[1] - i[0] > chunk_size:
-                indexes = [
-                    [j, min(j + chunk_size - 1, i[1])]
-                    for j in range(i[0], i[1] + 1, chunk_size)
-                ]
-                block_indexes_chunks.extend(indexes)
-            else:
-                block_indexes_chunks.append(i)
+    max_concurrent_requests = 100
+    chunk_size = 100 * 1024 // block_size
+    block_indexes_arrs = find_smallest_and_largest_next_to_each_other(block_indexes)
 
-        blob_size = await azure_client.get_file_length(iq_file)
+    block_indexes_chunks = []
+    for i in block_indexes_arrs:
+        if i[1] - i[0] > chunk_size:
+            indexes = [
+                [j, min(j + chunk_size - 1, i[1])]
+                for j in range(i[0], i[1] + 1, chunk_size)
+            ]
+            block_indexes_chunks.extend(indexes)
+        else:
+            block_indexes_chunks.append(i)
 
-        semaphore = asyncio.Semaphore(max_concurrent_requests)
+    blob_size = await azure_client.get_file_length(iq_file)
 
-        async def get_byte_stream_wrapper(block_index_chunk):
-            async with semaphore:
-                return await get_byte_stream(
-                    block_index_chunk,
-                    block_size,
-                    bytes_per_iq_sample,
-                    iq_file,
-                    azure_client,
-                    blob_size,
-                )
+    semaphore = asyncio.Semaphore(max_concurrent_requests)
 
-        tasks = [get_byte_stream_wrapper(block_index_chunk) for block_index_chunk in block_indexes_chunks]
-        return await asyncio.gather(*tasks)
-    except asyncio.CancelledError:
-        raise HTTPException(status_code=499, detail=str("Client closed connection"))
+    async def get_byte_stream_wrapper(block_index_chunk):
+        async with semaphore:
+            return await get_byte_stream(
+                block_index_chunk,
+                block_size,
+                bytes_per_iq_sample,
+                iq_file,
+                azure_client,
+                blob_size,
+            )
+
+    tasks = [get_byte_stream_wrapper(block_index_chunk) for block_index_chunk in block_indexes_chunks]
+    return await asyncio.gather(*tasks)
+
 
 
 async def get_byte_stream(
@@ -151,6 +156,7 @@ async def get_byte_stream(
         return b""
     if blob_size < offsetBytes + countBytes:
         countBytes = blob_size - offsetBytes
+    print("Getting byte stream")
     content = await azure_client.get_blob_content(
         filepath=iq_file, offset=offsetBytes, length=countBytes
     )
