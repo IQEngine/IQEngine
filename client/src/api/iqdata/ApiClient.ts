@@ -32,7 +32,6 @@ export class ApiClient implements IQDataClient {
     if (binaryResponse.status !== 200) {
       throw new Error(`Unexpected status code: ${binaryResponse.status}`);
     }
-
     if (!binaryResponse.data) {
       return null;
     }
