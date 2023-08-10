@@ -10,13 +10,13 @@ updates:
     schedule:
       interval: daily
 
-  - package-ecosystem: pip
-    directory: /api
+  - package-ecosystem: docker
+    directory: /client
     schedule:
       interval: daily
 
   - package-ecosystem: docker
-    directory: /client
+    directory: /plugins
     schedule:
       interval: daily
 
@@ -30,47 +30,12 @@ updates:
     schedule:
       interval: daily
 
-  - package-ecosystem: docker
-    directory: /plugins
-    schedule:
-      interval: daily
-
-  - package-ecosystem: pip
-    directory: /plugins/src/azure_functions
-    schedule:
-      interval: daily
-
-  - package-ecosystem: pip
-    directory: /plugins/src/lowpass_filter
-    schedule:
-      interval: daily
-
-  - package-ecosystem: pip
-    directory: /plugins/src/markos_detector
-    schedule:
-      interval: daily
-
   - package-ecosystem: pip
     directory: /plugins/src
     schedule:
       interval: daily
 
   - package-ecosystem: pip
-    directory: /plugins/src/simple_detector
-    schedule:
-      interval: daily
-
-  - package-ecosystem: pip
-    directory: /plugins/src/template_plugin
-    schedule:
-      interval: daily
-
-  - package-ecosystem: pip
-    directory: /tools/metadata_loader
-    schedule:
-      interval: daily
-
-  - package-ecosystem: pip
-    directory: /tools/pmtiles
+    directory: /api
     schedule:
       interval: daily
