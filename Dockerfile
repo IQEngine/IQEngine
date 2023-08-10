@@ -1,5 +1,5 @@
 # Build step #1: build the React front end
-FROM docker.io/node:18-alpine@sha256:58878e9e1ed3911bdd675d576331ed8838fc851607aed3bb91e25dfaffab3267 as build-step
+FROM docker.io/node:20-alpine@sha256:d9d53500783a153234cc47d89a2f9117d1ed4eadf29cbeb46c377d172348aa73 as build-step
 WORKDIR /app
 ENV PATH /app/node_modules/.bin:$PATH
 COPY client/package*.json ./
