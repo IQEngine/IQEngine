@@ -16,6 +16,6 @@
     "dotenv": "^16.3.1",
     "dotenv-expand": "^10.0.0",
     "@azure/identity": "^3.2.3",
-    "@azure/storage-blob": "^12.14.0"
+    "@azure/storage-blob": "^12.15.0"
   }
 }
