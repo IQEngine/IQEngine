@@ -20,7 +20,7 @@ itsdangerous==2.1.2
 Jinja2==3.1.2
 MarkupSafe==2.1.2
 Motor==3.2.0
-msal==1.17.0
+msal==1.23.0
 packaging==23.1
 pillow==9.5.0
 pluggy==1.0.0
