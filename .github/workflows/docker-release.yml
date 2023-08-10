@@ -43,7 +43,7 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN  }}
       - name: Build and Push Docker Image
-        uses: docker/build-push-action@ac9327eae2b366085ac7f6a2d02df8aa8ead720a # v2.10.0
+        uses: docker/build-push-action@2eb1c1961a95fc15694676618e422e8ba1d63825 # v4.1.1
         with:
           labels: |
             org.opencontainers.image.source=https://github.com/IQEngine/IQEngine
@@ -55,7 +55,7 @@ jobs:
         env:
           NODE_ENV: production
       - name: Build and Push Plugins
-        uses: docker/build-push-action@ac9327eae2b366085ac7f6a2d02df8aa8ead720a # v2.10.0
+        uses: docker/build-push-action@2eb1c1961a95fc15694676618e422e8ba1d63825 # v4.1.1
         if: steps.draft_a_release.outputs.tag_name != ''
         with:
           context: plugins
