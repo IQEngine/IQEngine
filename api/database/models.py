@@ -2,7 +2,18 @@ from typing import List, Optional
 
 from pydantic import BaseModel, Extra, Field, SecretStr
 
+class Group(BaseModel):
+    group_id: str | None = Field(alias="groupId")
+    display_name: str | None = Field(alias="displayName")
 
+class User(BaseModel):
+    user_id: str | None = Field(alias="userId")
+    display_name: str | None = Field(alias="displayName")
+    member_of: List[Group] | None = Field(alias="memberOf")
+
+class UserList(BaseModel):
+    users: List[User]
+    
 class DataSource(BaseModel):
     type: str
     name: str
