@@ -6,7 +6,7 @@ import React, { useState, useEffect } from 'react';
 import { Layer, Rect, Text } from 'react-konva';
 import { useEffectOnce } from 'usehooks-ts';
 import { TILE_SIZE_IN_IQ_SAMPLES } from '@/utils/constants';
-import { unitPrefixSamples, unitPrefixSeconds } from '@/utils/rfFunctions';
+import { unitPrefixSamples, unitPrefixSeconds } from '@/utils/rf-functions';
 import { useCursorContext } from '../hooks/use-cursor-context';
 import { useSpectrogramContext } from '../hooks/use-spectrogram-context';
 
@@ -70,6 +70,14 @@ const TimeSelector = ({ currentFFT }: TimeSelectorProps) => {
     }
   };
 
+  // add cursor styling
+  function onMouseOver() {
+    document.body.style.cursor = 'move';
+  }
+  function onMouseOut() {
+    document.body.style.cursor = 'default';
+  }
+
   if (!cursorTimeEnabled) return null;
 
   return (
@@ -93,6 +101,8 @@ const TimeSelector = ({ currentFFT }: TimeSelectorProps) => {
             height={0}
             draggable={true}
             onDragMove={handleDragMoveStart}
+            onMouseOver={onMouseOver}
+            onMouseOut={onMouseOut}
             strokeEnabled={true}
             strokeWidth={5}
             stroke="red"
@@ -109,6 +119,8 @@ const TimeSelector = ({ currentFFT }: TimeSelectorProps) => {
             height={0}
             draggable={true}
             onDragMove={handleDragMoveEnd}
+            onMouseOver={onMouseOver}
+            onMouseOut={onMouseOut}
             strokeEnabled={true}
             strokeWidth={5}
             stroke="red"

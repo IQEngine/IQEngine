@@ -1,0 +1,35 @@
+---
+name: Periodic Test of Staging
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+
+permissions:
+  contents: read
+
+jobs:
+  playwright:
+    name: RunPlaywrightTests
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@ee0669bd1cc54295c223e0bb666b733df41de1c5 # v2.7.0
+
+      - uses: actions/setup-node@e33196f7422957bea03ed53f6fbb155025ffc7b8 # v3.7.0
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        working-directory: e2e
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        working-directory: e2e
+        run: npx playwright install --with-deps
+
+      - name: Run Playwright tests on Staging
+        working-directory: e2e
+        run: |
+          npx playwright test --config playwright-staging.config.ts --grep @CICompatible

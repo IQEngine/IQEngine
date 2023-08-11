@@ -35,6 +35,22 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
     annotations[annot_indx][annot_pos_x] = x / spectrogramWidth; // reverse the calcs done to generate the coords
     annotations[annot_indx][annot_pos_y] = y;
 
+    // Check if the min/max is swapped for x and y
+    if (annotations[annot_indx].x1 > annotations[annot_indx].x2) {
+      // one-liner for swapping the two
+      annotations[annot_indx].x2 = [
+        annotations[annot_indx].x1,
+        (annotations[annot_indx].x1 = annotations[annot_indx].x2),
+      ][0];
+    }
+    if (annotations[annot_indx].y1 > annotations[annot_indx].y2) {
+      // one-liner for swapping the two
+      annotations[annot_indx].y2 = [
+        annotations[annot_indx].y1,
+        (annotations[annot_indx].y1 = annotations[annot_indx].y2),
+      ][0];
+    }
+
     // Getting new values for the annotation
     const newValues = {
       'core:sample_start': (annotations[annot_indx].y1 + currentFFT) * fftSize * (fftStepSize + 1),
@@ -74,7 +90,7 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
       };
     });
     return annotations;
-  }, [meta.annotations, currentFFT, fftStepSize, fftSize, spectrogramWidth]);
+  }, [meta, currentFFT, fftStepSize, fftSize, spectrogramWidth]);
 
   // add cursor styling
   function onMouseOver() {
@@ -210,10 +226,12 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
             y={annotation.y1}
             width={(annotation.x2 - annotation.x1) * spectrogramWidth}
             height={annotation.y2 - annotation.y1}
-            fillEnabled={true}
+            fillEnabled={false}
             stroke={selectedAnnotation == index ? 'pink' : 'black'}
             strokeWidth={4}
             onClick={onBoxClick}
+            onMouseOver={onMouseOver}
+            onMouseOut={onMouseOut}
             key={index}
             id={index.toString()}
           />

@@ -19,7 +19,7 @@ export function useSpectrogram(currentFFT) {
     taps,
     pythonSnippet,
   } = useSpectrogramContext();
-  const { currentData, setFFTsRequired, fftsRequired } = useGetIQData(
+  const { currentData, setFFTsRequired, fftsRequired, processedDataUpdated } = useGetIQData(
     type,
     account,
     container,
@@ -79,14 +79,20 @@ export function useSpectrogram(currentFFT) {
     let offset = 0;
     for (let i = 0; i < spectrogramHeight; i++) {
       if (currentData[displayedBlocks[i]]) {
+        if (currentData[displayedBlocks[i]].length + offset > iqData.length) {
+          continue;
+        }
         iqData.set(currentData[displayedBlocks[i]], offset);
       } else {
+        if (offset + fftSize * 2 > iqData.length) {
+          continue;
+        }
         iqData.fill(-Infinity, offset, offset + fftSize * 2);
       }
       offset += fftSize * 2;
     }
     return iqData;
-  }, [currentData, fftSize, debouncedCurrentFFT, fftStepSize, totalFFTs, spectrogramHeight]);
+  }, [processedDataUpdated, fftSize, debouncedCurrentFFT, fftStepSize, totalFFTs, spectrogramHeight]);
 
   return {
     totalFFTs,

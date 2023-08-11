@@ -8,7 +8,8 @@ import {
   validateFrequency,
   convertFloat32ArrayToBase64,
   convertBase64ToFloat32Array,
-} from '@/utils/rfFunctions';
+  reshapeFFT,
+} from '@/utils/rf-functions';
 
 describe('Calculate date', () => {
   // Arrange
@@ -180,3 +181,79 @@ describe('Convert float32array to base64 and back', () => {
     expect(input[987654]).toEqual(expected[987654]);
   });
 });
+
+describe("Check reshape array works correctly", () => {
+
+  function createTestArray(fftSize, numLines) {
+    const testArray = [];
+    for (let i = 0; i < numLines; i++) {
+      testArray[i] = new Float32Array(fftSize * 2).fill(i);
+    }
+    return testArray;
+  }
+
+  function flatten(a: Array<Float32Array>): number[] {
+    return a.map(e => [...e]).flat();
+  }
+
+  test('Same size produces identical array', async ({ expect }) => {
+    const fftSize = 128;
+    const testArray = createTestArray(fftSize, 800);
+    const newArray = reshapeFFTs(fftSize, testArray, fftSize);
+    expect(newArray).toBe(testArray);
+  });
+
+  test('Reshape to larger fftSize', async ({ expect }) => {
+    const fftSize = 128;
+    const testArray = createTestArray(fftSize, 800);
+    const newArray = reshapeFFTs(fftSize, testArray, fftSize * 2);
+    console.log();
+    expect(newArray).toHaveLength(testArray.length / 2);
+    expect(flatten(newArray)).toEqual(flatten(testArray));
+  });
+
+  test('Reshape to smaller fftSize', async ({ expect }) => {
+    const fftSize = 128;
+    const testArray = createTestArray(fftSize, 800);
+    const newArray = reshapeFFTs(fftSize, testArray, fftSize / 2);
+    console.log();
+    expect(newArray).toHaveLength(testArray.length * 2);
+    expect(flatten(newArray)).toEqual(flatten(testArray));
+  });
+
+  test('Reshape to very different size', async ({ expect }) => {
+    const fftSize = 16;
+    const testArray = createTestArray(fftSize, 800);
+    const newArray = reshapeFFTs(fftSize, testArray, 512);
+    console.log();
+    expect(newArray).toHaveLength(testArray.length * (fftSize/512));
+    expect(flatten(newArray)).toEqual(flatten(testArray));
+  });
+
+  test('Reshape to non-integer-multiple size', async ({ expect }) => {
+    const fftSize = 16;
+    const testArray = createTestArray(fftSize, 800);
+    console.log();
+    expect(() => reshapeFFTs(fftSize, testArray, 30)).toThrow();
+  });
+
+  test('Copes with sparse arrays', async ({ expect }) => {
+    const fftSize = 128;
+    const testArray = createTestArray(fftSize, 800);
+
+    for (let i = 0; i < testArray.length; i++) {
+      // Remove every other line
+      if (i % 2 == 1) {
+        delete testArray[i];
+      }
+    }
+
+    const newArray = reshapeFFTs(fftSize, testArray, 512);
+    console.log();
+    expect(newArray).toHaveLength(testArray.length * (fftSize/512));
+    expect(newArray[0][0]).toEqual(testArray[0][0]);
+    // NaN indicated the data was missing in original array
+    expect(newArray[0][fftSize * 2]).toEqual(NaN);
+  });
+});
+
