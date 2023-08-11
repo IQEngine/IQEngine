@@ -29,6 +29,7 @@ jobs:
 
     ############################################
     # Grant status permission for MULTI_STATUS #
+    # A status API is made for each language that is linted to make visual parsing easier #
     ############################################
     permissions:
       contents: read
