@@ -16,9 +16,9 @@ export const useGetImage = (
 
   const ffts = useMemo(() => {
     if (!iqData || !fftSize) return null;
-    performance.mark('calcFftOfTile');
+    //performance.mark('calcFftOfTile');
     const ffts_calc = calcFftOfTile(iqData, fftSize, windowFunction, spectrogramHeight);
-    console.debug(performance.measure('calcFftOfTile', 'calcFftOfTile'));
+    //console.debug(performance.measure('calcFftOfTile', 'calcFftOfTile'));
     return ffts_calc;
   }, [iqData, fftSize, windowFunction, spectrogramHeight]);
 
