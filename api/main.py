@@ -99,9 +99,7 @@ app.add_event_handler("startup", import_all_from_env)
 
 
 @app.exception_handler(ServerSelectionTimeoutError)
-async def database_exception_handler(
-    request: Request, exc: ServerSelectionTimeoutError
-):
+async def database_exception_handler():
     return JSONResponse(
         status_code=503,
         content={"message": "Service Unavailable: Unable to connect to the database."},
