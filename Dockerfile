@@ -10,7 +10,7 @@ COPY .en[v] ./
 RUN npm run build
 
 # Build step #2: build the API with the client as static files
-FROM docker.io/python:3.10@sha256:74cdd039dc36f6476dd5dfdbc187830e0c0f760a1bdfc73d186060ef4c4bd78f
+FROM docker.io/python:3.11@sha256:bc1d76a8360d77a6ab467a8c48ce40369707c9aa76492df094968ce55cca88ae
 LABEL org.opencontainers.image.description="IQEngine is a container image that provides a concise and efficient visualization and exploration tool for RF data in the SIGMF format."
 LABEL org.opencontainers.image.licenses=MIT
 WORKDIR /app
