@@ -6,7 +6,7 @@ import React, { useState, useEffect } from 'react';
 import { Layer, Rect, Text } from 'react-konva';
 import { useEffectOnce } from 'usehooks-ts';
 import { TILE_SIZE_IN_IQ_SAMPLES } from '@/utils/constants';
-import { unitPrefixSamples, unitPrefixSeconds } from '@/utils/rfFunctions';
+import { unitPrefixSamples, unitPrefixSeconds } from '@/utils/rf-functions';
 import { useCursorContext } from '../hooks/use-cursor-context';
 import { useSpectrogramContext } from '../hooks/use-spectrogram-context';
 

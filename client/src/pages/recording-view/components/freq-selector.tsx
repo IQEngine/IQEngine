@@ -4,7 +4,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Layer, Rect, Text } from 'react-konva';
-import { unitPrefixHz } from '@/utils/rfFunctions';
+import { unitPrefixHz } from '@/utils/rf-functions';
 import { useSpectrogramContext } from '../hooks/use-spectrogram-context';
 import { useCursorContext } from '../hooks/use-cursor-context';
 
