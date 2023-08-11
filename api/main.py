@@ -80,7 +80,7 @@ class LogConfig(BaseModel):
 dictConfig(LogConfig().dict())
 logger = logging.getLogger("api")
 
-app = FastAPI()
+app = FastAPI(docs_url="/api_docs")
 app.router.route_class = CancelOnDisconnectRoute
 
 app.include_router(iq_router)
