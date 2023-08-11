@@ -39,6 +39,7 @@ async def get_sas_token(
     else:
         return SecretStr("")
 
+
 @router.get(
     "/api/datasources/{account}/{container}/{filepath:path}/iq-data", status_code=200
 )
@@ -57,7 +58,7 @@ async def get_iq_data(
     if hasattr(datasource, "sasToken"):
         if datasource.sasToken:
             azure_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
-    
+
     try:
         block_indexes = [int(num) for num in block_indexes_str.split(",")]
 
@@ -72,7 +73,7 @@ async def get_iq_data(
             ),
             media_type="application/octet-stream",
         )
-        
+  
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -134,7 +135,6 @@ async def get_byte_streams(
 
     tasks = [get_byte_stream_wrapper(block_index_chunk) for block_index_chunk in block_indexes_chunks]
     return await asyncio.gather(*tasks)
-
 
 
 async def get_byte_stream(
