@@ -9,3 +9,12 @@ in Python:
 from cryptography.fernet import Fernet
 Fernet.generate_key().decode('utf-8')
 ```
+
+## Details about Permissions
+
+- (This all requires your IQEngine deployment be deployed within Azure)
+- A security group is a group of users that can be assigned to certain datasources (either read or read/write)
+- You can also assign a specific user read or read/write to a datasource
+- Ability within IQEngine admin page to view users, their security groups, their roles, and their app assignments (last one is purely for double checking we connected the user to the IQEngine app)
+- Users who aren't admins of their AAD can be set to IQEngine admins so they can see ^^^ on IQEngine's admin page
+- Configuration of security groups is done within Azure portal
