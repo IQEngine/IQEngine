@@ -40,7 +40,11 @@ async def get_sas_token(
         return SecretStr("")
 
 
-async def get_iq_data_impl(
+@router.get(
+    "/api/datasources/{account}/{container}/{filepath:path}/iq-data", status_code=200
+)
+@cancel_on_disconnect
+async def get_iq_data(
     request: Request,
     filepath: str,
     block_indexes_str: str,
@@ -72,23 +76,6 @@ async def get_iq_data_impl(
 
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
-
-@router.get(
-    "/api/datasources/{account}/{container}/{filepath:path}/iq-data", status_code=200
-)
-@cancel_on_disconnect
-async def get_iq_data(
-    request: Request,
-    filepath: str,
-    block_indexes_str: str,
-    block_size: int,
-    format: str,
-    datasource: DataSource = Depends(datasource_repo.get),
-    azure_client: AzureBlobClient = Depends(AzureBlobClient),
-):
-    return await get_iq_data_impl(
-        request, filepath, block_indexes_str, block_size, format, datasource, azure_client
-    )
 
 
 async def calculate_iq_data(
