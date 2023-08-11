@@ -2,7 +2,7 @@ import asyncio
 from fastapi import Request, HTTPException
 from fastapi.routing import APIRoute
 from functools import wraps
-from typing import Any, Awaitable, Callable
+from typing import Any, Awaitable, Callable, Coroutine
 
 
 class CancelOnDisconnectRoute(APIRoute):
@@ -14,7 +14,8 @@ class CancelOnDisconnectRoute(APIRoute):
             raise
 
 
-def cancel_on_disconnect(handler: Callable[[Request], Awaitable[Any]]):
+def cancel_on_disconnect(handler: Callable[[Any, str, str, int, str, Any, Any], Coroutine[Any, Any, Any]]):
+    
     """
     Decorator that will check if the client disconnects,
     and cancel the task if required.
