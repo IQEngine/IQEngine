@@ -13,3 +13,4 @@ json5==0.9.14
 pymongo==4.4.1
 Motor==3.2.0
 opencv-python==4.8.0.76
+python-dotenv==1.0.0
