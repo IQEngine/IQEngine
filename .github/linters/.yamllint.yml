@@ -12,3 +12,5 @@ rules:
     check-keys: false
   line-length:
     max: 160
+  comments:
+    min-spaces-from-content: 1 # Used to follow prettier standard: https://github.com/prettier/prettier/pull/10926
