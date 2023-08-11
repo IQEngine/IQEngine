@@ -4,6 +4,7 @@ from fastapi.routing import APIRoute
 from functools import wraps
 from typing import Any, Awaitable, Callable
 
+
 class CancelOnDisconnectRoute(APIRoute):
     async def __call__(self, receive, send):
         try:
@@ -11,6 +12,7 @@ class CancelOnDisconnectRoute(APIRoute):
         except asyncio.CancelledError:
             print(f"Request {self.endpoint.__name__} cancelled")
             raise
+
 
 def cancel_on_disconnect(handler: Callable[[Request], Awaitable[Any]]):
     """
@@ -39,7 +41,7 @@ def cancel_on_disconnect(handler: Callable[[Request], Awaitable[Any]]):
 
         if handler_task in done:
             return await handler_task
-        
+
         raise HTTPException(499)
 
     return cancel_on_disconnect_decorator
@@ -54,7 +56,3 @@ async def disconnect_poller(request: Request, result: Any):
         return result
     except asyncio.CancelledError:
         print("Stopping polling loop")
-
-
-
-
