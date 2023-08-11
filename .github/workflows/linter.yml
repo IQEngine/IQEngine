@@ -61,3 +61,4 @@ jobs:
           APPLY_FIXES: false
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DISABLE_LINTERS: SPELL_LYCHEE
+          PRE_COMMANDS: pip install api/requirements.txt
