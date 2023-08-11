@@ -3,8 +3,9 @@
 [![AUR](https://img.shields.io/github/license/IQEngine/IQEngine)](https://github.com/IQEngine/IQEngine/blob/main/LICENSE)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/IQEngine/IQEngine/badge)](https://securityscorecards.dev/viewer/?uri=github.com/IQEngine/IQEngine)
 [![OpenSSF Best Practices](https://bestpractices.coreinfrastructure.org/projects/7730/badge)](https://bestpractices.coreinfrastructure.org/projects/7730)
-[![Staging](https://img.shields.io/github/actions/workflow/status/IQEngine/IQEngine/periodic_test_of_staging.yml?label=Staging)](https://staging.iqengine.org)
-[![Prod](https://img.shields.io/github/actions/workflow/status/IQEngine/IQEngine/periodic_test_of_prod.yml?label=Prod)](https://iqengine.org)
+[![Staging](https://img.shields.io/github/actions/workflow/status/IQEngine/IQEngine/periodic_test_of_staging.yml?label=staging)](https://staging.iqengine.org)
+[![Prod](https://img.shields.io/github/actions/workflow/status/IQEngine/IQEngine/periodic_test_of_prod.yml?label=prod)](https://iqengine.org)
+[![GitHub Sponsors](https://img.shields.io/github/sponsors/IQEngine)](https://github.com/sponsors/IQEngine)
 
 <p align="center">
   <img width=250 src="client/public/IQEngine_Black.svg" />
