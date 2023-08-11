@@ -68,6 +68,7 @@ async def get_iq_data(
                 get_bytes_per_iq_sample(format),
                 get_file_name(filepath, ApiType.IQDATA),
                 azure_client,
+                request,
             ),
             media_type="application/octet-stream",
         )
@@ -82,6 +83,7 @@ async def calculate_iq_data(
     format,
     iq_file,
     azure_client,
+    request,
 ):
     iq_data_list = await get_byte_streams(
         block_indexes,
@@ -89,13 +91,14 @@ async def calculate_iq_data(
         format,
         iq_file,
         azure_client,
+        request,
     )
     for iq_data in iq_data_list:
         yield iq_data
 
 
 async def get_byte_streams(
-    block_indexes, block_size, bytes_per_iq_sample, iq_file, azure_client
+    block_indexes, block_size, bytes_per_iq_sample, iq_file, azure_client, request
 ):
 
     max_concurrent_requests = 100
@@ -120,6 +123,7 @@ async def get_byte_streams(
     async def get_byte_stream_wrapper(block_index_chunk):
         async with semaphore:
             return await get_byte_stream(
+                request,
                 block_index_chunk,
                 block_size,
                 bytes_per_iq_sample,
@@ -134,6 +138,7 @@ async def get_byte_streams(
 
 
 async def get_byte_stream(
+    request,
     block_indexes_chunk,
     block_size,
     bytes_per_iq_sample,
