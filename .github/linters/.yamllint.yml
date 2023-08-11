@@ -10,3 +10,5 @@ extends: default
 rules:
   truthy:
     check-keys: false
+  line-length:
+    max: 160
