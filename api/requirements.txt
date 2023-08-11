@@ -1,3 +1,4 @@
+aiohttp==3.8.5
 azure-storage-blob==12.17.0
 blinker==1.6.2
 cachetools==5.3.1
