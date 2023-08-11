@@ -15,9 +15,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@e33196f7422957bea03ed53f6fbb155025ffc7b8 # v3.7.0
         with:
           node-version: 18
 
@@ -41,7 +41,7 @@ jobs:
           MONGO_PASSWORD: secret
 
       - name: Check build has succeeded
-        uses: cygnetdigital/wait_for_response@v2.0.0
+        uses: cygnetdigital/wait_for_response@510ed9823ee9c5f876e57d25bd87c575032d8156 # v2.0.0
         with:
           url: 'http://localhost:3000/'
           responseCode: '200,500'

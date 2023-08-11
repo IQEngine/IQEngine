@@ -6,6 +6,9 @@ on:
     # 3:20 AM UTC = 11:20 PM EST every day
     - cron: "20 3 * * *"
 
+permissions:
+  contents: read
+
 jobs:
   playwright:
     name: RunPlaywrightTests
@@ -13,9 +16,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@e33196f7422957bea03ed53f6fbb155025ffc7b8 # v3.7.0
         with:
           node-version: 18
 

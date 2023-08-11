@@ -35,6 +35,17 @@ export class PluginParameters {
   };
 }
 
+export class UserDefinition {
+  id: string;
+  displayName: string;
+  memberOf: GroupDefinition[];
+}
+
+export class GroupDefinition {
+  id: string;
+  displayName: string;
+}
+
 export interface FFTParams {
   fftSize: number;
   windowFunction: string;

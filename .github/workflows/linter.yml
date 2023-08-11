@@ -17,6 +17,9 @@ on:
 ###############
 # Set the Job #
 ###############
+permissions:
+  contents: read
+
 jobs:
   build:
     # Name the Job
@@ -26,6 +29,7 @@ jobs:
 
     ############################################
     # Grant status permission for MULTI_STATUS #
+    # A status API is made for each language that is linted to make visual parsing easier #
     ############################################
     permissions:
       contents: read
@@ -40,7 +44,7 @@ jobs:
       # Checkout the code base #
       ##########################
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
         with:
           # Full git history is needed to get a proper
           # list of changed files within `super-linter`
@@ -50,9 +54,10 @@ jobs:
       # Run Linter against code base #
       ################################
       - name: MegaLinter
-        uses: oxsecurity/megalinter/flavors/cupcake@v7.1.0
+        uses: oxsecurity/megalinter/flavors/cupcake@fda6ac3a38be0e969820709ac16e442464e5a035 # v7.3.0
         env:
           VALIDATE_ALL_CODEBASE: false
           DEFAULT_BRANCH: main
           APPLY_FIXES: false
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DISABLE_LINTERS: SPELL_LYCHEE

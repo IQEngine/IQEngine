@@ -12,6 +12,8 @@ from handlers.iq import router as iq_router
 from handlers.metadata import router as metadata_router
 from handlers.plugins import router as plugins_router
 from handlers.status import router as status_router
+from helpers.apidisconnect import CancelOnDisconnectRoute
+from handlers.users import router as users_router
 from importer.all import import_all_from_env
 from pydantic import BaseModel
 from pymongo.errors import ServerSelectionTimeoutError
@@ -79,12 +81,15 @@ dictConfig(LogConfig().dict())
 logger = logging.getLogger("api")
 
 app = FastAPI()
+app.router.route_class = CancelOnDisconnectRoute
+
 app.include_router(iq_router)
 app.include_router(datasources_router)
 app.include_router(metadata_router)
 app.include_router(status_router)
 app.include_router(config_router)
 app.include_router(plugins_router)
+app.include_router(users_router)
 
 app.mount("/", SPAStaticFiles(directory="iqengine", html=True), name="iqengine")
 

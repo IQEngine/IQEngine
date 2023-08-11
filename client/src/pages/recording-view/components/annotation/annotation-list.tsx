@@ -8,7 +8,7 @@ import {
   unitPrefixSeconds,
   validateFrequency,
   validateDate,
-} from '@/utils/rfFunctions';
+} from '@/utils/rf-functions';
 import AutoSizeInput from '@/features/ui/auto-size-input/AutoSizeInput';
 import { Annotation, SigMFMetadata } from '@/utils/sigmfMetadata';
 import Actions from './actions';
