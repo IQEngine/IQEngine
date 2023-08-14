@@ -35,7 +35,6 @@ async def get_plugins_list():
         if os.path.isdir(d):
             dirs.append(file)
     dirs.remove("__pycache__")
-    dirs.remove("azure_functions")
     dirs.remove("template_plugin")
     return dirs
 

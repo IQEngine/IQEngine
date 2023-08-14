@@ -163,7 +163,7 @@ async def get_byte_stream(
         filepath=iq_file, offset=offsetBytes, length=countBytes
     )
 
-    print(f"get_byte_stream: {time.time() - st}")
+    #print(f"get_byte_stream: {time.time() - st}")
 
     return content
 

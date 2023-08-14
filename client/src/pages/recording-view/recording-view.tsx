@@ -44,7 +44,7 @@ export function DisplaySpectrogram({ currentFFT, setCurrentFFT }) {
 
   useEffect(() => {
     const spectrogramHeight = height - 450; // hand-tuned for now
-    console.log('spectrogramHeight: ', spectrogramHeight);
+    //console.log('spectrogramHeight: ', spectrogramHeight);
     setSpectrogramHeight(Math.max(MIN_SPECTROGRAM_HEIGHT, spectrogramHeight));
     const newSpectrogramWidth = width - 430; // hand-tuned for now
     setSpectrogramWidth(newSpectrogramWidth);

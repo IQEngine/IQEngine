@@ -80,7 +80,7 @@ class LogConfig(BaseModel):
 dictConfig(LogConfig().dict())
 logger = logging.getLogger("api")
 
-app = FastAPI()
+app = FastAPI(docs_url="/api_docs")
 app.router.route_class = CancelOnDisconnectRoute
 
 app.include_router(iq_router)
@@ -99,9 +99,7 @@ app.add_event_handler("startup", import_all_from_env)
 
 
 @app.exception_handler(ServerSelectionTimeoutError)
-async def database_exception_handler(
-    request: Request, exc: ServerSelectionTimeoutError
-):
+async def database_exception_handler():
     return JSONResponse(
         status_code=503,
         content={"message": "Service Unavailable: Unable to connect to the database."},

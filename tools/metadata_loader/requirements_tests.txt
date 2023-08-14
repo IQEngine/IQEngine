@@ -1,5 +1,2 @@
 requests==2.31.0
-python-dotenv==1.0.0
-azure-storage-blob==12.16.0
-pytest-mock==3.10.0
 types-requests==2.31.0.0

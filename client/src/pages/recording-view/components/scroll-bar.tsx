@@ -89,9 +89,9 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
 
   const ffts = useMemo(() => {
     if (!displayedIQ) return null;
-    performance.mark('calcFftOfTile');
+    //performance.mark('calcFftOfTile');
     const ffts_calc = calcFftOfTile(displayedIQ, MINIMAP_FFT_SIZE, windowFunction, spectrogramHeight);
-    console.debug(performance.measure('calcFftOfTile', 'calcFftOfTile'));
+    //console.debug(performance.measure('calcFftOfTile', 'calcFftOfTile'));
     const min = Math.min(...ffts_calc);
     const max = Math.max(...ffts_calc);
     setMagnitudeMin(min);

@@ -70,9 +70,9 @@ export function useSpectrogram(currentFFT) {
     // check if the blocks are already loaded
     const blocksToLoad = requiredBlocks.filter((block) => !currentData[block]);
     setFFTsRequired(blocksToLoad);
-    if (blocksToLoad.length > 0) {
-      console.debug('loading blocks', blocksToLoad);
-    }
+    //if (blocksToLoad.length > 0) {
+    //  console.debug('loading blocks', blocksToLoad);
+    //}
 
     // return the data with 0s for the missing blocks
     const iqData = new Float32Array(spectrogramHeight * fftSize * 2);

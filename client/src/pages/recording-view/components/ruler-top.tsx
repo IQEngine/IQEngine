@@ -39,7 +39,7 @@ const RulerTop = () => {
         temp_ticks.push({ x: (spectrogramWidth / num_ticks) * i, y: 20, width: 0, height: 5 });
       }
     }
-    console.debug('RulerTop: useEffect', temp_ticks, temp_labels);
+    //console.debug('RulerTop: useEffect', temp_ticks, temp_labels);
 
     setTicks(temp_ticks);
     setLabels(temp_labels);
