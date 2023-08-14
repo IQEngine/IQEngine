@@ -1,8 +1,9 @@
 import argparse
-from datetime import datetime
 import json
-from pathlib import Path
 import struct
+from datetime import datetime
+from pathlib import Path
+
 import numpy as np
 
 

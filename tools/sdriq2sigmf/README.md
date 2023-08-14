@@ -10,7 +10,7 @@ Before using `sdriq2sigmf`, ensure you have the following prerequisites installe
 
 * Python 3.x
 * Required Python packages (dependencies):
-    * numpy
+  * numpy
 
 You can install the required packages using the following command:
 
