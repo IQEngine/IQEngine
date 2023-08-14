@@ -14,6 +14,7 @@ import React, { useState, useRef } from 'react';
 interface PluginRowProps {
   plugin: PluginDefinition;
   removePlugin?: (plugin: PluginDefinition) => void;
+  setShowModal?: (showModal: boolean) => void;
 }
 
 import toast from 'react-hot-toast';
@@ -72,12 +73,10 @@ export const PluginDetail = ({ plugin }: PluginRowProps) => {
   );
 };
 
-export const PluginEdit = ({ plugin }: PluginRowProps) => {
-  const [showModal, setShowModal] = useState(false);
+export const PluginEdit = ({ plugin, setShowModal }: PluginRowProps) => {
   const updatePlugin = useUpdatePlugin();
-  function handleUpdate(event: React.SyntheticEvent) {
-    event.preventDefault();
 
+  function handleUpdate(event: React.SyntheticEvent) {
     const formData = new FormData(event.target as HTMLFormElement);
     const url = formData.get('url') as string;
     updatePlugin.mutate(
@@ -97,7 +96,6 @@ export const PluginEdit = ({ plugin }: PluginRowProps) => {
         },
       }
     );
-    setShowModal(!showModal);
   }
 
   return (
@@ -126,7 +124,7 @@ export const PluginEdit = ({ plugin }: PluginRowProps) => {
           <button
             className="h-9"
             onClick={(e) => {
-              e.preventDefault();
+              setShowModal(false);
             }}
           >
             Cancel
@@ -228,7 +226,7 @@ export const PluginRow = ({ plugin, removePlugin }: PluginRowProps) => {
         </button>
         {showEditModal && (
           <ModalDialog heading={'Edit plugin'} setShowModal={setEditShowModal}>
-            <PluginEdit plugin={plugin} />
+            <PluginEdit plugin={plugin} setShowModal={setEditShowModal} />
           </ModalDialog>
         )}
 
