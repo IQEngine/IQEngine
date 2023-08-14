@@ -22,7 +22,7 @@ const LocalFileBrowser = () => {
     console.debug('dataSourceQuery', dataSourceQuery.data, 'container', container, 'filePath', filePath);
     if (dataSourceQuery.data && dataSourceQuery.data.container === container) {
       if (filePath) {
-        const spectogramLink = `/spectrogram/${CLIENT_TYPE_LOCAL}/local/single_file/${encodeURIComponent(filePath)}`;
+        const spectogramLink = `/view/${CLIENT_TYPE_LOCAL}/local/single_file/${encodeURIComponent(filePath)}`;
         navigate(spectogramLink);
       } else {
         navigate(`/recordings/${CLIENT_TYPE_LOCAL}/${dataSourceQuery.data.account}/${dataSourceQuery.data.container}`);
