@@ -4,7 +4,7 @@ blinker==1.6.2
 cachetools==5.3.1
 click==8.1.6
 cryptography
-fastapi==0.101.0
+fastapi==0.101.1
 httpx==0.24.1
 Motor==3.2.0
 msal==1.23.0
