@@ -1,7 +1,7 @@
 azure-storage-blob==12.17.0
 numpy==1.25.2
 scipy==1.11.1
-fastapi==0.101.0
+fastapi==0.101.1
 jsonschema==4.19.0
 PyYAML==6.0.1
 pre-commit==3.3.3
