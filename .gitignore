@@ -50,3 +50,7 @@ tiling/spectrogram.pmtiles
 
 # in case someone by mistake do npm i in the root do not check in package-lock.json
 /package-lock.json
+
+# ignore parsed files in sdriq2sigmf
+**/sdriq2sigmf/*.sigmf*
+
