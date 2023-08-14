@@ -8,7 +8,11 @@
 #
 # Source repository: https://github.com/actions/dependency-review-action
 name: 'Dependency Review'
-on: [pull_request]
+
+on:
+  schedule:
+    # At 03:47 on Wednesday (random)
+    - cron: "47 3 * * 3"
 
 permissions:
   contents: read
