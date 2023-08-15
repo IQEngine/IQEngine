@@ -4,6 +4,7 @@ import { BlobClient } from './blob-client';
 import { DataSourceClient } from './datasource-client';
 import { CLIENT_TYPE_API, CLIENT_TYPE_LOCAL, CLIENT_TYPE_BLOB, DataSource } from '@/api/Models';
 import { FileWithDirectoryAndFileHandle } from 'browser-fs-access';
+import { useMsal } from '@azure/msal-react';
 
 export const DataSourceClientFactory = (
   type: string,
@@ -12,7 +13,8 @@ export const DataSourceClientFactory = (
 ): DataSourceClient => {
   switch (type) {
     case CLIENT_TYPE_API:
-      return new ApiClient();
+      const { instance } = useMsal();
+      return new ApiClient(instance);
     case CLIENT_TYPE_LOCAL:
       return new LocalClient(files);
     case CLIENT_TYPE_BLOB:

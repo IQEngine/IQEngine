@@ -3,14 +3,12 @@ import { DataSourceClient } from './datasource-client';
 import { DataSource } from '@/api/Models';
 import { TraceabilityOrigin } from '@/utils/sigmfMetadata';
 import { AccountInfo, IPublicClientApplication } from '@azure/msal-browser';
-import { useMsal } from '@azure/msal-react';
 
 export class ApiClient implements DataSourceClient {
   private instance: IPublicClientApplication;
   private account: AccountInfo;
 
-  constructor() {
-    const { instance } = useMsal();
+  constructor(instance: IPublicClientApplication) {
     const accounts = instance.getAllAccounts();
     this.instance = instance;
     if (accounts.length > 0) this.account = accounts[0];
