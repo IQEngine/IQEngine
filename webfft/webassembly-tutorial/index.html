@@ -3,6 +3,7 @@
 <body>
   asdasdasd
   <script type="application/javascript" src="matrixMultiply.js"></script>
+  <script type="application/javascript" src="indutny_fft.js"></script>
   <script type="application/javascript">
     testModule()
       .then(m => {
@@ -11,6 +12,8 @@
         console.log(x);
 
         size = 1024;
+        const num_trials = 1000;
+
         fcfg = m._kiss_fft_alloc(size, false);
         icfg = m._kiss_fft_alloc(size, true);
 
@@ -24,8 +27,14 @@
           cin[i*2 + 1] = i / 2.0;
         }
 
+        // warmup
+        for (var j = 0; j < num_trials; ++j) {
+          cout = new Float32Array(m.HEAPU8.buffer, outptr, size * 2);
+          m._kiss_fft(fcfg, inptr, outptr);
+        }
+
         var start = performance.now();
-        const num_trials = 1000; // 11k ffts per second initially in edge, 50k in chrome.  enabling SIMD makes it drop a little
+        // 11k ffts per second initially in edge, 50k in chrome.  enabling SIMD makes it drop a little
         for (var j = 0; j < num_trials; ++j) {
           // forward 
           cout = new Float32Array(m.HEAPU8.buffer, outptr, size * 2);
@@ -33,7 +42,7 @@
           //const output = new Float32Array(m.HEAPU8.buffer, outptr, size * 2);
         }
         var end = performance.now();
-        console.log(end - start, 'ms');
+        //console.log(end - start, 'ms');
         console.log(1e3 * num_trials /(end - start), 'FFTs per second');
 
         //dispose 
@@ -41,16 +50,43 @@
         m._kiss_fft_free(fcfg);
         m._kiss_fft_free(icfg);
 
+        // Sum the magnitudes
+        //let total = 0;
+        //for (var j = 0; j < size; ++j) {
+        //  total += Math.sqrt(cout[j * 2] * cout[j * 2] + cout[j * 2 + 1] * cout[j * 2 + 1]);
+        //}
+        //console.log(total);
 
 
-        console.log(cout);
+
+
+
+        // Compare with what IQEngine currently uses (indutny)
+        var fft2 = new FFT_indutny(size);
+        var cin2 = new Float32Array(2 * size);
+        for (var i = 0; i < size; i++) {
+          cin2[i*2] = i / 2.0;
+          cin2[i*2 + 1] = i / 2.0;
+        }
+        var cout2 = new Float32Array(2 * size); // output buffer
+
+        //warmup
+        for (var i = 0; i < num_trials; ++i) { fft2.transform(cout2, cin2);}
+
+        var start = performance.now();
+        for (var i = 0; i < num_trials; ++i) {
+          fft2.transform(cout2, cin2);
+        }
+        var end = performance.now();
+        //console.log(end - start, 'ms');
+        console.log(1e3 * num_trials /(end - start), 'FFTs per second');
 
         // Sum the magnitudes
-        let total = 0;
-        for (var j = 0; j < size; ++j) {
-          total += Math.sqrt(cout[j * 2] * cout[j * 2] + cout[j * 2 + 1] * cout[j * 2 + 1]);
-        }
-        console.log(total);
+        //let total2 = 0;
+        //for (var j = 0; j < size; ++j) {
+        //  total2 += Math.sqrt(cout2[j * 2] * cout2[j * 2] + cout2[j * 2 + 1] * cout2[j * 2 + 1]);
+        //}
+        //console.log(total2);
 
       });
   </script>
