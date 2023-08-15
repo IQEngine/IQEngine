@@ -14,7 +14,7 @@
         fcfg = m._kiss_fft_alloc(size, false);
         icfg = m._kiss_fft_alloc(size, true);
 
-        inptr = m._malloc(size * 8 + size * 8);
+        inptr = m._malloc(size * 8 + size * 8); // allocate both input and output
         outptr = inptr + size * 8;
 
         cin = new Float32Array(m.HEAPU8.buffer, inptr, size * 2);
