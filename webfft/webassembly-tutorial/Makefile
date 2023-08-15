@@ -11,6 +11,7 @@ matrixMultiply.js: matrixMultiply.c kiss_fft.c kiss_fft.h
 	  -s EXPORTED_RUNTIME_METHODS='["ccall", "cwrap"]'  \
 	  -O3
 
+
 .PHONY: clean
 clean:
 	rm matrixMultiply.wasm matrixMultiply.js

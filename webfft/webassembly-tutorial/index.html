@@ -24,15 +24,24 @@
           cin[i*2 + 1] = i / 2.0;
         }
 
-        // forward 
-        cout = new Float32Array(m.HEAPU8.buffer, outptr, size * 2);
-        m._kiss_fft(fcfg, inptr, outptr);
-        //const output = new Float32Array(m.HEAPU8.buffer, outptr, size * 2);
+        var start = performance.now();
+        const num_trials = 1000; // 11k ffts per second initially in edge, 50k in chrome.  enabling SIMD makes it drop a little
+        for (var j = 0; j < num_trials; ++j) {
+          // forward 
+          cout = new Float32Array(m.HEAPU8.buffer, outptr, size * 2);
+          m._kiss_fft(fcfg, inptr, outptr);
+          //const output = new Float32Array(m.HEAPU8.buffer, outptr, size * 2);
+        }
+        var end = performance.now();
+        console.log(end - start, 'ms');
+        console.log(1e3 * num_trials /(end - start), 'FFTs per second');
 
         //dispose 
         m._free(inptr);
         m._kiss_fft_free(fcfg);
         m._kiss_fft_free(icfg);
+
+
 
         console.log(cout);
 
