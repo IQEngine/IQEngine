@@ -215,7 +215,7 @@ function crossWasm(size) {
   return [end - start, total];
 }
 
-// wasm, single precision
+// wasm, single precision.  was at 7400 before marcs tweaks
 function kissWasm(size) {
   var fft = new KissFFT(size);
   var cin = genInputComplex32(size);
