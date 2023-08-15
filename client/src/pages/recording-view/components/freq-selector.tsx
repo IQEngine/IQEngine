@@ -4,34 +4,35 @@
 
 import React, { useEffect, useState } from 'react';
 import { Layer, Rect, Text } from 'react-konva';
-import { unitPrefixHz } from '@/utils/rfFunctions';
+import { unitPrefixHz } from '@/utils/rf-functions';
 import { useSpectrogramContext } from '../hooks/use-spectrogram-context';
 import { useCursorContext } from '../hooks/use-cursor-context';
 
 const FreqSelector = () => {
-  const { spectrogramWidth, spectrogramHeight, meta } = useSpectrogramContext();
+  const { spectrogramWidth, spectrogramHeight, meta, includeRfFreq } = useSpectrogramContext();
   const { cursorFreq, setCursorFreq, cursorFreqEnabled } = useCursorContext();
   const [lowerText, setLowerText] = useState('');
   const [upperText, setUpperText] = useState('');
   const [diffText, setDiffText] = useState('');
   const sampleRate = meta?.getSampleRate() || 0;
+  const coreFrequency = (includeRfFreq) ? meta.getCenterFrequency() : 0;
 
   const lowerPosition = (cursorFreq.start + 0.5) * spectrogramWidth; // in pixels. this auto-updates
   const upperPosition = (cursorFreq.end + 0.5) * spectrogramWidth;
 
   useEffect(() => {
-    const formatted = unitPrefixHz((lowerPosition / spectrogramWidth - 0.5) * sampleRate);
+    const formatted = unitPrefixHz((lowerPosition / spectrogramWidth - 0.5) * sampleRate + coreFrequency);
     setLowerText(formatted.freq + ' ' + formatted.unit);
     const diffFormatted = unitPrefixHz(Math.abs(((upperPosition - lowerPosition) / spectrogramWidth) * sampleRate));
     setDiffText('Δ ' + diffFormatted.freq + ' ' + diffFormatted.unit);
-  }, [lowerPosition]);
+  }, [lowerPosition, includeRfFreq]);
 
   useEffect(() => {
-    const formatted = unitPrefixHz((upperPosition / spectrogramWidth - 0.5) * sampleRate);
+    const formatted = unitPrefixHz((upperPosition / spectrogramWidth - 0.5) * sampleRate + coreFrequency);
     setUpperText(formatted.freq + ' ' + formatted.unit);
     const diffFormatted = unitPrefixHz(Math.abs(((upperPosition - lowerPosition) / spectrogramWidth) * sampleRate));
     setDiffText('Δ ' + diffFormatted.freq + ' ' + diffFormatted.unit);
-  }, [upperPosition]);
+  }, [upperPosition, includeRfFreq]);
 
   const handleDragMoveLower = (e) => {
     let newX = e.target.x();

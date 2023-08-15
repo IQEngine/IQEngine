@@ -35,9 +35,9 @@ export class ApiClient implements IQDataClient {
     if (!binaryResponse.data) {
       return null;
     }
-    console.log('getIQDataBlocks response', binaryResponse.data);
+    //console.log('getIQDataBlocks response', binaryResponse.data);
     const intValue = new Int32Array(binaryResponse.data.slice(0, 4));
-    console.log(`getIQDataBlocks ${binaryResponse.data}`, intValue);
+    //console.log(`getIQDataBlocks ${binaryResponse.data}`, intValue);
     // convert to float32
     const iqArray = convertToFloat32(binaryResponse.data, format);
 
@@ -47,7 +47,7 @@ export class ApiClient implements IQDataClient {
         iqArray: iqArray.slice(i * blockSize * 2, (i + 1) * blockSize * 2),
       };
     });
-    console.log('getIQDataBlocks', result);
+    //console.log('getIQDataBlocks', result);
     return result;
   }
 }

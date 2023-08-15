@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
+import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import DualRangeSlider from '@/features/ui/dual-range-slider/DualRangeSlider';
 import { TILE_SIZE_IN_IQ_SAMPLES, COLORMAP_DEFAULT } from '@/utils/constants';
 import { colMaps } from '@/utils/colormap';
@@ -157,14 +158,13 @@ const SettingsPane = ({ currentFFT }) => {
           unit="dB"
         />
       </div>
-
-      <div className="mt-2">
-        <div className="dropdown dropdown-hover">
-          <button tabIndex={0} className="m-1 px-16 w-full">
-            Colormap
-          </button>
-          <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 z-50">
-            {Object.entries(colMaps).map(([value]) => (
+      <div className="mt-4">
+        <details className="dropdown dropdown-right w-full">
+          <summary className="btn btn-outline btn-success btn-sm w-full">
+              Colormap <ArrowRightIcon />
+          </summary>
+          <ul className="p-2 shadow menu dropdown-content mt-0 z-[1] bg-base-100 rounded-box w-52">
+          {Object.entries(colMaps).map(([value]) => (
               <li
                 key={value}
                 data-value={value}
@@ -172,19 +172,18 @@ const SettingsPane = ({ currentFFT }) => {
                   context.setColmap(e.currentTarget.dataset.value);
                 }}
               >
-                {context.colmap === value ? <a className="bg-primary">{value}</a> : <a>{value}</a>}
+                {context.colmap === value ? <a className="bg-primary text-black">{value}</a> : <a>{value}</a>}
               </li>
             ))}
           </ul>
-        </div>
+        </details>
       </div>
-
-      <div className="mt-2">
-        <div className="dropdown dropdown-hover">
-          <button tabIndex={0} className="m-1 px-16 w-full">
-            FFT Size
-          </button>
-          <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 z-50">
+      <div className="mt-4">
+        <details className="dropdown dropdown-right w-full">
+          <summary className=" btn btn-outline btn-success btn-sm w-full">
+              FFT Size <ArrowRightIcon />
+          </summary>
+          <ul className="p-2 shadow menu dropdown-content z-[1] mt-0 bg-base-100 rounded-box w-52">
             {fftSizes.map((x, index) => (
               <li
                 key={index}
@@ -193,22 +192,14 @@ const SettingsPane = ({ currentFFT }) => {
                   context.setFFTSize(parseInt(e.currentTarget.dataset.value));
                 }}
               >
-                {context.fftSize === x ? <a className="bg-primary">{x}</a> : <a>{x}</a>}
+                {context.fftSize === x ? <a className="bg-primary text-black">{x}</a> : <a>{x}</a>}
               </li>
             ))}
           </ul>
-        </div>
-        <a
-          style={{ textDecoration: 'none', color: 'white', marginLeft: '5px' }}
-          target="_blank"
-          rel="noreferrer"
-          href="https://pysdr.org/content/frequency_domain.html#fft-sizing"
-        >
-          <HelpOutlineOutlinedIcon />
-        </a>
+        </details>
       </div>
       <>
-        <div className="mb-3" id="formTaps">
+        <div className="mt-2" id="formTaps">
           <label className="label">
             <span className="label-text text-base">
               FIR Filter Taps
@@ -222,7 +213,7 @@ const SettingsPane = ({ currentFFT }) => {
               </a>
             </span>
           </label>
-          <div className="mb-3 flex">
+          <div className="mt-2 flex">
             <input
               type="text"
               className="h-8 w-54 rounded-l text-base-100 ml-1 pl-2"
@@ -236,14 +227,14 @@ const SettingsPane = ({ currentFFT }) => {
             </button>
           </div>
         </div>
-
-        <div className="mb-3 flex">
-          <div className="dropdown dropdown-hover">
-            <button tabIndex={0} className="m-1 px-7 w-full">
-              Example Filter Taps
-            </button>
-            <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 z-50">
-              <li
+      </>
+      <div className="mt-2">
+        <details className="dropdown dropdown-right w-full">
+          <summary className=" btn btn-outline btn-success btn-sm w-full">
+              Example Filter Taps <ArrowRightIcon />
+          </summary>
+          <ul className="p-2 shadow menu dropdown-content z-[1] mt-0 bg-base-100 rounded-box w-70">
+          <li
                 key={0}
                 data-value="[0.021019600765633,0.05574786251380393,0.04504671465435009,-0.012858837474581268,-0.042883835223827396,0.013822126400016621,0.05882808073316635,-0.014316809227248763,-0.10299625870988743,0.015410773935742991,0.31701869995313076,0.48460819626209206,0.31701869995313076,0.015410773935742991,-0.10299625870988743,-0.014316809227248763,0.05882808073316635,0.013822126400016621,-0.042883835223827396,-0.012858837474581268,0.04504671465435009,0.05574786251380393,0.021019600765633]"
                 onClick={onClickPremadeTaps}
@@ -257,25 +248,15 @@ const SettingsPane = ({ currentFFT }) => {
               >
                 <a>Low Pass Filter, Keep Center 25%</a>
               </li>
-            </ul>
-          </div>
-          <a
-            className="ml-3 mt-1"
-            target="_blank"
-            rel="noreferrer"
-            href="http://t-filter.engineerjs.com/" //DevSkim: ignore DS137138
-          >
-            <InfoOutlinedIcon></InfoOutlinedIcon>
-          </a>
-        </div>
-      </>
-
-      <div className="mb-3">
-        <div className="dropdown dropdown-hover">
-          <button tabIndex={0} className="m-1 px-16 w-full">
-            Window
-          </button>
-          <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 z-50">
+          </ul>
+        </details>
+      </div>
+      <div className="mt-4 mb-2">
+        <details className="dropdown dropdown-right w-full">
+        <summary className=" btn btn-outline btn-success btn-sm w-full">
+              window <ArrowRightIcon />
+          </summary>
+          <ul className="p-2 shadow menu dropdown-content z-[1] mt-0 bg-base-100 rounded-box w-70">
             <li key={0} data-value="hamming" onClick={onChangeWindowFunction}>
               {context.windowFunction === 'hamming' ? <a className="active">Hamming</a> : <a>Hamming</a>}
             </li>
@@ -292,17 +273,8 @@ const SettingsPane = ({ currentFFT }) => {
               {context.windowFunction === 'blackman' ? <a className="active">Blackman</a> : <a>Blackman</a>}
             </li>
           </ul>
-        </div>
-        <a
-          className="ml-4"
-          target="_blank"
-          rel="noreferrer"
-          href="https://pysdr.org/content/frequency_domain.html#windowing"
-        >
-          <HelpOutlineOutlinedIcon />
-        </a>
+        </details>
       </div>
-
       <div id="toggleFreq">
         <label className="label">
           <span className="label-text text-base">Display RF Freq</span>

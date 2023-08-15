@@ -1,6 +1,6 @@
 import React from 'react';
 import { SigMFMetadata } from '@/utils/sigmfMetadata';
-import { unitPrefixHz } from '@/utils/rfFunctions';
+import { unitPrefixHz } from '@/utils/rf-functions';
 
 export interface MetaViewerProps {
   meta: SigMFMetadata;
