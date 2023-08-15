@@ -2,11 +2,12 @@
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
 
-import React, { Fragment, useCallback, useMemo } from 'react';
+import React, { Fragment, useCallback, useMemo, useRef, useState } from 'react';
 import { Layer, Rect, Text } from 'react-konva';
 import { TILE_SIZE_IN_IQ_SAMPLES } from '@/utils/constants';
 import { Annotation, SigMFMetadata } from '@/utils/sigmfMetadata';
 import { useSpectrogramContext } from '../../hooks/use-spectrogram-context';
+import { Html } from 'react-konva-utils';
 
 interface AnnotationViewerProps {
   currentFFT: number;
@@ -23,7 +24,31 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
     selectedAnnotation,
     setSelectedAnnotation,
   } = useSpectrogramContext();
+
   const lower_freq = meta.getCenterFrequency() - meta.getSampleRate() / 2;
+  const [editAnnotationLabelId, setEditAnnotationLabelId] = useState(null);
+  const [editAnnotationLabelText, setEditAnnotationLabelText] = useState(null);
+  const [editAnnotationLabelPosition, setEditAnnotationLabelPosition] = useState({ x: 0, y: 0 });
+
+  const onAnnotationsLabelKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      annotations[editAnnotationLabelId]['label'] = e.target.value;
+      meta.annotations[annotations[editAnnotationLabelId]['index']]['core:label'] = e.target.value;
+      let new_meta = Object.assign(new SigMFMetadata(), meta);
+      setMeta(new_meta);
+      setEditAnnotationLabelId(null);
+    }
+  };
+
+  const onAnnotationLabelClick = useCallback((e) => {
+    // create textarea and style it
+    setEditAnnotationLabelId(e.target.id());
+    setEditAnnotationLabelText(e.target.text());
+    setEditAnnotationLabelPosition({
+      x: e.target.attrs.x,
+      y: e.target.attrs.y - 25,
+    });
+  }, []);
 
   function onDragEnd(e) {
     const x = e.target.x(); // coords of the corner box
@@ -132,57 +157,6 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
     setMeta(new_meta);
     // setSelectedAnnotation(annot_indx);
   }, [annotations, meta, currentFFT, fftSize, fftStepSize, setMeta]);
-
-  // Ability to update annotation labels
-  const handleTextClick = useCallback(
-    (e) => {
-      // create textarea and style it
-      var textarea = document.createElement('textarea');
-      document.body.appendChild(textarea);
-
-      const element = document.getElementById('spectrogram');
-      const spectrogram = element.getBoundingClientRect();
-
-      textarea.value = e.target.text();
-      textarea.style.position = 'absolute';
-      textarea.style.top = spectrogram.top + e.target.attrs.y + 'px';
-      textarea.style.left = spectrogram.left + e.target.attrs.x + 'px';
-      textarea.style.width = '400px';
-      textarea.style.fontSize = '25px';
-      textarea.rows = 1;
-      textarea.id = e.target.id();
-      textarea.focus();
-      textarea.classList.add('text-base-100');
-
-      // Add a note about hitting enter to finish the edit
-      var textarea2 = document.createElement('textarea');
-      document.body.appendChild(textarea2);
-      textarea2.value = 'Hit Enter to Finish';
-      textarea2.style.position = 'absolute';
-      textarea2.style.top = spectrogram.top + e.target.attrs.y - 30 + 'px';
-      textarea2.style.left = spectrogram.left + e.target.attrs.x + 100 + 'px';
-      textarea2.style.width = '140px';
-      textarea2.style.height = '30px';
-      textarea2.rows = 1;
-      textarea2.disabled = true;
-      textarea2.style.resize = 'none';
-      textarea2.classList.add('text-base-100');
-
-      textarea.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter') {
-          console.debug(textarea.value, textarea.id);
-          annotations[textarea.id]['label'] = textarea.value; // update the local version first
-          // Now update the actual meta info
-          meta.annotations[annotations[textarea.id]['index']]['core:label'] = textarea.value;
-          let new_meta = Object.assign(new SigMFMetadata(), meta);
-          setMeta(new_meta);
-          document.body.removeChild(textarea);
-          document.body.removeChild(textarea2);
-        }
-      });
-    },
-    [annotations, meta, setMeta]
-  );
 
   const onBoxCornerClick = useCallback(
     (e) => {
@@ -317,9 +291,33 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
             fill={selectedAnnotation == index ? 'pink' : 'black'}
             fontStyle="bold"
             key={index + 1000000}
-            onClick={handleTextClick}
+            onClick={onAnnotationLabelClick}
             id={index.toString()} // tells the event which annotation to update
           />
+
+          {editAnnotationLabelId === index.toString() && (
+            <Html>
+              <div
+                className="form-control w-full max-w-xs"
+                style={{
+                  top: editAnnotationLabelPosition.y,
+                  left: editAnnotationLabelPosition.x,
+                  position: 'absolute',
+                }}
+              >
+                <label style={{ width: '200px', fontSize: '16px' }}>
+                  <span>Hit Enter to Finish</span>
+                </label>
+                <input
+                  type="text"
+                  value={editAnnotationLabelText}
+                  onChange={(e) => setEditAnnotationLabelText(e.target.value)}
+                  onKeyDown={onAnnotationsLabelKeyDown}
+                  style={{ width: '200px', fontSize: '16px', color: 'black' }}
+                />
+              </div>
+            </Html>
+          )}
         </Fragment>
       ))}
     </Layer>

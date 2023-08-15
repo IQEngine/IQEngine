@@ -12,6 +12,7 @@ from handlers.iq import router as iq_router
 from handlers.metadata import router as metadata_router
 from handlers.plugins import router as plugins_router
 from handlers.status import router as status_router
+from helpers.apidisconnect import CancelOnDisconnectRoute
 from handlers.users import router as users_router
 from importer.all import import_all_from_env
 from pydantic import BaseModel
@@ -79,7 +80,9 @@ class LogConfig(BaseModel):
 dictConfig(LogConfig().dict())
 logger = logging.getLogger("api")
 
-app = FastAPI()
+app = FastAPI(docs_url="/api_docs")
+app.router.route_class = CancelOnDisconnectRoute
+
 app.include_router(iq_router)
 app.include_router(datasources_router)
 app.include_router(metadata_router)
@@ -96,9 +99,7 @@ app.add_event_handler("startup", import_all_from_env)
 
 
 @app.exception_handler(ServerSelectionTimeoutError)
-async def database_exception_handler(
-    request: Request, exc: ServerSelectionTimeoutError
-):
+async def database_exception_handler():
     return JSONResponse(
         status_code=503,
         content={"message": "Service Unavailable: Unable to connect to the database."},

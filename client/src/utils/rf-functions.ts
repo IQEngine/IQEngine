@@ -142,3 +142,51 @@ export function convertBase64ToFloat32Array(base64String: string): Float32Array 
   for (let i = 0; i < blob.length; i++) dataView.setUint8(i, blob.charCodeAt(i));
   return new Float32Array(arrayBuffer);
 }
+
+export function reshapeFFTs(
+  currentFFTSize: number, currentData: Float32Array[], newFFTSize: number): Float32Array[]
+{
+  const newData = [];
+
+  if (currentFFTSize % newFFTSize != 0 && newFFTSize % currentFFTSize != 0) {
+    // Don't attempt to deal with sizes that don't fit neatly into each other
+    // (We could do though, if needed)
+    throw new Error("FFT sizes must be integer multiples of each other");
+  }
+
+  const multiplier = currentFFTSize / newFFTSize;
+  if (multiplier == 1) {
+    // No change, return original data
+    return currentData;
+  }
+  else if (multiplier > 1) {
+    // currentFFTSize > newFFTSize, each line in current array will
+    // create multiple lines in new array
+    currentData.forEach((data, i) => {
+      const j = Math.floor(i * multiplier);
+
+      // Create 'multiplier' new lines in the new array
+      for (let slice = 0; slice < multiplier; slice++) {
+        assert(!newData[j + slice]);
+        newData[j + slice] = new Float32Array(data.slice(slice * newFFTSize * 2, (slice + 1) * newFFTSize * 2));
+      }
+    });
+  }
+  else {
+    // currentFFTSize < newFFTSize, each line in new array will contain
+    // multiple lines from current array
+    currentData.forEach((data, i) => {
+      const j = Math.floor(i * multiplier);
+      if (!newData[j]) {
+        newData[j] = new Float32Array(newFFTSize * 2).fill(NaN);
+      }
+
+      // Copy data into right line in new array (RHS
+      // maps line in original array to it's place in the new new, larger
+      // line)
+      newData[j].set(data, (i % (1/multiplier)) * currentFFTSize * 2);
+    });
+  }
+
+  return newData;
+}

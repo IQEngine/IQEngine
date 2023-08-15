@@ -8,7 +8,7 @@ import { TimePlot } from './time-plot';
 import { FrequencyPlot } from './frequency-plot';
 import { IQPlot } from './iq-plot';
 import { Layer, Image, Stage } from 'react-konva';
-import { convertFloat32ArrayToBase64, convertBase64ToFloat32Array } from '@/utils/rfFunctions';
+import { convertFloat32ArrayToBase64, convertBase64ToFloat32Array } from '@/utils/rf-functions';
 import { colMaps } from '@/utils/colormap';
 import { fftshift } from 'fftshift';
 import { FFT } from '@/utils/fft';
@@ -21,8 +21,14 @@ import { useSpectrogramContext } from '../hooks/use-spectrogram-context';
 import { useCursorContext } from '../hooks/use-cursor-context';
 
 export enum MimeTypes {
+  ci8 = 'iq/ci8',
   ci8_le = 'iq/ci8_le',
+  ci16 = 'iq/ci16',
   ci16_le = 'iq/ci16_le',
+  ci32 = 'iq/ci32',
+  cf16 = 'iq/cf16',
+  cf16_le = 'iq/cf16_le',
+  cf32 = 'iq/cf32',
   cf32_le = 'iq/cf32_le',
   audio_wav = 'audio/wav',
 }

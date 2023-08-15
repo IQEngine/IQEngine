@@ -8,16 +8,19 @@ from typing import List
 from blob.azure_client import AzureBlobClient
 from database import datasource_repo
 from database.models import DataSource
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import StreamingResponse
+
 from helpers.datasource_access import check_access
+from helpers.apidisconnect import cancel_on_disconnect, CancelOnDisconnectRoute
+from helpers.authorization import required_roles
 from helpers.cipher import decrypt
 from helpers.conversions import find_smallest_and_largest_next_to_each_other
 from helpers.urlmapping import ApiType, get_content_type, get_file_name
 from pydantic import BaseModel, SecretStr
 from rf.samples import get_bytes_per_iq_sample
 
-router = APIRouter()
+router = APIRouter(route_class=CancelOnDisconnectRoute)
 
 
 class IQData(BaseModel):
@@ -42,7 +45,9 @@ async def get_sas_token(
 @router.get(
     "/api/datasources/{account}/{container}/{filepath:path}/iq-data", status_code=200
 )
+@cancel_on_disconnect
 async def get_iq_data(
+    request: Request,
     filepath: str,
     block_indexes_str: str,
     block_size: int,
@@ -55,8 +60,10 @@ async def get_iq_data(
     if hasattr(datasource, "sasToken"):
         if datasource.sasToken:
             azure_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
+
     try:
         block_indexes = [int(num) for num in block_indexes_str.split(",")]
+
         return StreamingResponse(
             calculate_iq_data(
                 block_indexes,
@@ -64,9 +71,11 @@ async def get_iq_data(
                 get_bytes_per_iq_sample(format),
                 get_file_name(filepath, ApiType.IQDATA),
                 azure_client,
+                request,
             ),
             media_type="application/octet-stream",
         )
+
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -77,6 +86,7 @@ async def calculate_iq_data(
     format,
     iq_file,
     azure_client,
+    request,
 ):
     iq_data_list = await get_byte_streams(
         block_indexes,
@@ -84,14 +94,16 @@ async def calculate_iq_data(
         format,
         iq_file,
         azure_client,
+        request,
     )
     for iq_data in iq_data_list:
         yield iq_data
 
 
 async def get_byte_streams(
-    block_indexes, block_size, bytes_per_iq_sample, iq_file, azure_client
+    block_indexes, block_size, bytes_per_iq_sample, iq_file, azure_client, request
 ):
+
     max_concurrent_requests = 100
     chunk_size = 100 * 1024 // block_size
     block_indexes_arrs = find_smallest_and_largest_next_to_each_other(block_indexes)
@@ -114,6 +126,7 @@ async def get_byte_streams(
     async def get_byte_stream_wrapper(block_index_chunk):
         async with semaphore:
             return await get_byte_stream(
+                request,
                 block_index_chunk,
                 block_size,
                 bytes_per_iq_sample,
@@ -127,6 +140,7 @@ async def get_byte_streams(
 
 
 async def get_byte_stream(
+    request,
     block_indexes_chunk,
     block_size,
     bytes_per_iq_sample,
@@ -151,7 +165,7 @@ async def get_byte_stream(
         filepath=iq_file, offset=offsetBytes, length=countBytes
     )
 
-    print(f"get_byte_stream: {time.time() - st}")
+    #print(f"get_byte_stream: {time.time() - st}")
 
     return content
 
