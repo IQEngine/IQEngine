@@ -14,17 +14,17 @@ jobs:
   create_pre_release:
     uses: ./.github/workflows/docker-pre-release.yml
     permissions:
-      contents: write
+      contents: read
       pull-requests: write
-      packages: write
+      packages: read
 
   run_staging_deployment:
     if: github.repository == 'IQEngine/IQEngine'
     needs: create_pre_release
     permissions:
-      contents: write
+      contents: read
       pull-requests: write
-      packages: write
+      packages: read
     runs-on: ubuntu-latest
     environment:
       name: 'Staging'

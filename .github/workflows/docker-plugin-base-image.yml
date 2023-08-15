@@ -16,7 +16,7 @@ permissions:
 jobs:
   create_new_plugin_base_image:
     permissions:
-      contents: write
+      contents: read
       pull-requests: write
       packages: write
     runs-on: ubuntu-latest

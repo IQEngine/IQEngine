@@ -17,7 +17,7 @@ permissions:
 jobs:
   create_pre_release:
     permissions:
-      contents: write
+      contents: read
       pull-requests: write
       packages: write
     runs-on: ubuntu-latest
