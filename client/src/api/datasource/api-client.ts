@@ -3,18 +3,23 @@ import { DataSourceClient } from './datasource-client';
 import { DataSource } from '@/api/Models';
 import { TraceabilityOrigin } from '@/utils/sigmfMetadata';
 import { AccountInfo, IPublicClientApplication } from '@azure/msal-browser';
+import { useMsal } from '@azure/msal-react';
 
 export class ApiClient implements DataSourceClient {
   private instance: IPublicClientApplication;
   private account: AccountInfo;
 
-  constructor(instance: IPublicClientApplication, account: AccountInfo) {
+  constructor() {
+    const { instance } = useMsal();
+    const accounts = instance.getAllAccounts();
     this.instance = instance;
-    this.account = account;
+    if (accounts.length > 0) this.account = accounts[0];
+    else this.account = null;
   }
 
   private async getAccessToken() {
     const api_scope = 'api://' + import.meta.env.IQENGINE_APP_ID + '/api';
+    if (!this.account) return null;
     try {
       const response = await this.instance.acquireTokenSilent({
         account: this.account,
@@ -42,10 +47,8 @@ export class ApiClient implements DataSourceClient {
       method: 'get',
       url: `/api/datasources/${account}/${container}/sync`,
     });
-    //await axios.put(`/api/datasources/${account}/${container}/sync`);
   }
   async query(queryString: string, signal: AbortSignal): Promise<TraceabilityOrigin[]> {
-    //const response = await axios.get(`/api/datasources/query?${queryString}`, { signal });
     const response = await this.requestWithAuth({
       method: 'get',
       url: `/api/datasources/query?${queryString}`,
@@ -61,7 +64,6 @@ export class ApiClient implements DataSourceClient {
       method: 'get',
       url: '/api/datasources',
     });
-    //const response = await axios.get('/api/datasources');
     if (response.status !== 200) {
       throw new Error(`Unexpected status code: ${response.status}`);
     }
@@ -75,7 +77,6 @@ export class ApiClient implements DataSourceClient {
       method: 'get',
       url: `/api/datasources/${account}/${container}/datasource`,
     });
-    //const response = await axios.get(`/api/datasources/${account}/${container}/datasource`);
     if (response.status !== 200) {
       throw new Error(`Unexpected status code: ${response.status}`);
     }
@@ -90,7 +91,6 @@ export class ApiClient implements DataSourceClient {
       url: '/api/datasources',
       data: dataSource,
     });
-    //const response = await axios.post('/api/datasources', dataSource);
     if (response.status !== 201) {
       throw new Error(`Failed to create datasource: ${response.status}`);
     }
