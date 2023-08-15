@@ -6,8 +6,43 @@
   <script type="application/javascript">
     testModule()
       .then(m => {
+        console.log(m);
         const x = m._add(1,2);
         console.log(x);
+
+        size = 1024;
+        fcfg = m._kiss_fft_alloc(size, false);
+        icfg = m._kiss_fft_alloc(size, true);
+
+        inptr = m._malloc(size * 8 + size * 8);
+        outptr = inptr + size * 8;
+
+        cin = new Float32Array(m.HEAPU8.buffer, inptr, size * 2);
+
+        for (var i = 0; i < size; i++) {
+          cin[i*2] = i / 2.0;
+          cin[i*2 + 1] = i / 2.0;
+        }
+
+        // forward 
+        cout = new Float32Array(m.HEAPU8.buffer, outptr, size * 2);
+        m._kiss_fft(fcfg, inptr, outptr);
+        //const output = new Float32Array(m.HEAPU8.buffer, outptr, size * 2);
+
+        //dispose 
+        m._free(inptr);
+        m._kiss_fft_free(fcfg);
+        m._kiss_fft_free(icfg);
+
+        console.log(cout);
+
+        // Sum the magnitudes
+        let total = 0;
+        for (var j = 0; j < size; ++j) {
+          total += Math.sqrt(cout[j * 2] * cout[j * 2] + cout[j * 2 + 1] * cout[j * 2 + 1]);
+        }
+        console.log(total);
+
       });
   </script>
 </body>
