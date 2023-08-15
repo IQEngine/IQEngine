@@ -24,6 +24,10 @@ const SettingsPane = ({ currentFFT }) => {
   const cursorContext = useCursorContext();
   const [localPythonSnippet, setLocalPythonSnippet] = useState(context.pythonSnippet);
   const [localTaps, setLocalTaps] = useState(JSON.stringify(context.taps));
+  const [allSample, setAllSample] = useState(false);
+
+  const lowerTimeCursor = (currentFFT + context.spectrogramHeight / 4) * context.fftSize;
+  const upperTimeCursor = (currentFFT + context.spectrogramHeight / 2) * context.fftSize;
 
   const onChangeWindowFunction = (event) => {
     const newWindowFunction = event.currentTarget.dataset.value;
@@ -106,8 +110,8 @@ const SettingsPane = ({ currentFFT }) => {
           onChange={(e) => {
             if (!cursorContext.cursorTimeEnabled && cursorContext.cursorTime.start == cursorContext.cursorTime.end) {
               cursorContext.setCursorTime({
-                start: (currentFFT + context.spectrogramHeight / 4) * context.fftSize,
-                end: (currentFFT + context.spectrogramHeight / 2) * context.fftSize,
+                start: lowerTimeCursor,
+                end: upperTimeCursor,
               });
             }
             cursorContext.setCursorTimeEnabled(e.target.checked);
@@ -115,6 +119,28 @@ const SettingsPane = ({ currentFFT }) => {
           }}
         />
       </label>
+
+      {cursorContext.cursorTimeEnabled && (
+        <div className="form-control">
+          <label className="label cursor-pointer">
+            <span className="label-text">Select Entire Sample</span>
+            <input onChange={() => {
+              setAllSample(!allSample);
+              if(!allSample) {
+                cursorContext.setCursorTime({
+                  start: 0,
+                  end: context.meta?.global['traceability:sample_length'] ?? upperTimeCursor,
+                });
+              } else {
+                cursorContext.setCursorTime({
+                  start: lowerTimeCursor,
+                  end: upperTimeCursor,
+                });
+              }
+            }} type="checkbox" checked={allSample} className="checkbox" />
+          </label>
+        </div>
+      )}
 
       <label className="mb-3" id="toggle">
         <span className="label-text text-base">Toggle Freq. Cursors</span>
