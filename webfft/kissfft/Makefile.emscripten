@@ -1,0 +1,16 @@
+
+KissFFT.js:	kiss_fft.c kiss_fft.h _kiss_fft_guts.h tools/kiss_fftr.c tools/kiss_fftr.h Makefile.emscripten
+	emcc -O3 -I. \
+	     --memory-init-file 0 \
+	     -s NO_FILESYSTEM=1 \
+	     -s NO_BROWSER=1 \
+	     -s PRECISE_F32=1 \
+	     -s MODULARIZE=1 \
+	     -s EXPORT_NAME="'KissFFTModule'" \
+	     -s EXPORTED_FUNCTIONS="['_kiss_fftr_alloc','_kiss_fftr','_kiss_fftri','_kiss_fftr_free','_kiss_fft_alloc','_kiss_fft','_kiss_fft_free',]" \
+	     -o KissFFT.js \
+	     kiss_fft.c tools/kiss_fftr.c
+
+clean:
+	rm -f KissFFT.js
+

@@ -1,0 +1,16 @@
+
+NayukiCFFT.js:	fft.c fft.h Makefile.emscripten
+	emcc -O3 -I. \
+	     --memory-init-file 0 \
+	     -s NO_FILESYSTEM=1 \
+	     -s NO_BROWSER=1 \
+	     -s PRECISE_F32=1 \
+	     -s MODULARIZE=1 \
+	     -s EXPORT_NAME="'NayukiCModule'" \
+	     -s EXPORTED_FUNCTIONS="['_transform_radix2_precalc','_precalc','_dispose','_transform_radix2_precalc_f','_precalc_f','_dispose_f']" \
+	     -o NayukiCFFT.js \
+	     fft.c
+
+clean:
+	rm -f NayukiCFFT.js
+
