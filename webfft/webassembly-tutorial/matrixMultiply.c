@@ -1,7 +1,7 @@
 #include <emscripten/emscripten.h>
 #include <stdlib.h>
 
-EMSCRIPTEN_KEEPALIVE float *matrixMultiply(float *arg1, float *arg2, float *result, int length)
+float *matrixMultiply(float *arg1, float *arg2, float *result, int length)
 /**
  * matrixMultiply multiplies two square matrices (arg1, arg2) and places the result in (result).
  *
@@ -33,8 +33,9 @@ EMSCRIPTEN_KEEPALIVE float *matrixMultiply(float *arg1, float *arg2, float *resu
     return result;
 }
 
-EMSCRIPTEN_KEEPALIVE int add(int a, int b)
+int add(int a, int b)
 {
     // trivial function for testing
     return a + b;
 }
+
