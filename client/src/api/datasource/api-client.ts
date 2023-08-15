@@ -8,11 +8,9 @@ export class ApiClient implements DataSourceClient {
   private instance: IPublicClientApplication;
   private account: AccountInfo;
 
-  constructor(instance: IPublicClientApplication) {
-    const accounts = instance.getAllAccounts();
+  constructor(instance: IPublicClientApplication, account: AccountInfo) {
     this.instance = instance;
-    if (accounts.length > 0) this.account = accounts[0];
-    else this.account = null;
+    this.account = account;
   }
 
   private async getAccessToken() {

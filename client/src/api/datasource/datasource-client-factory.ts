@@ -12,9 +12,15 @@ export const DataSourceClientFactory = (
   dataSources: Record<string, DataSource>
 ): DataSourceClient => {
   switch (type) {
-    case CLIENT_TYPE_API:
+    case CLIENT_TYPE_API: {
       const { instance } = useMsal();
-      return new ApiClient(instance);
+      const accounts = instance.getAllAccounts();
+      if (accounts.length === 0) {
+        return new ApiClient(null, null);
+      } else {
+        return new ApiClient(instance, accounts[0]);
+      }
+    }
     case CLIENT_TYPE_LOCAL:
       return new LocalClient(files);
     case CLIENT_TYPE_BLOB:
