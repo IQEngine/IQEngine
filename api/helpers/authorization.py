@@ -2,7 +2,7 @@ import json
 import logging
 import os
 import time
-from typing import Any, List, Optional, Tuple, Callable, Union, cast
+from typing import Any, Optional, Tuple, cast, Union, List, Callable
 
 import jwt
 import requests
@@ -95,8 +95,7 @@ def validate_and_decode_jwt(token: str) -> dict:
             token, public_key, algorithms=[algorithm], audience=CLIENT_ID
         )  # Checks expiration, audience, and signature
         return payload
-    except jwt.PyJWTError as e:
-        print(e)
+    except jwt.PyJWTError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid JWT",
@@ -164,10 +163,3 @@ def required_roles(
         return current_user
 
     return _check_roles
-
-
-# Example usage
-# @app.get("/some-endpoint")
-# def read_items(test:str, dependencies=[Depends(required_roles("IQEngine-User"))]):
-#     # business logic here
-#     return {"message": "You have access!"}

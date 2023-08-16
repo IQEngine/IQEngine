@@ -93,7 +93,7 @@ export function DisplaySpectrogram({ currentFFT, setCurrentFFT }) {
         </Stage>
         <Stage width={MINIMAP_FFT_SIZE + 5} height={spectrogramHeight}>
           <ScrollBar currentFFT={currentFFT} setCurrentFFT={setCurrentFFT} />
-          <TimeSelectorMinimap currentFFT={currentFFT} />
+          <TimeSelectorMinimap />
         </Stage>
       </div>
     </>

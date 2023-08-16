@@ -1,21 +1,26 @@
 from typing import List, Dict, Any, Optional
 from datetime import datetime
-from database.database import db
+
+from fastapi import Depends
+from helpers.datasource_access import check_access
+
 from database.models import Metadata, DataSourceReference
 from motor.core import AgnosticCollection
 
 
 def collection() -> AgnosticCollection:
+    from database.database import db
     collection: AgnosticCollection = db().metadata
     return collection
 
 
 def versions_collection() -> AgnosticCollection:
+    from database.database import db
     collection: AgnosticCollection = db().versions
     return collection
 
 
-async def get(account, container, filepath) -> Metadata | None:
+async def get(account, container, filepath, access_allowed=Depends(check_access)) -> Metadata | None:
     """
     Get a metadata by account, container and filepath
 
@@ -33,6 +38,9 @@ async def get(account, container, filepath) -> Metadata | None:
     Metadata
         The Sigmf metadata.
     """
+    if access_allowed is None:
+        return None
+
     metadata_collection: AgnosticCollection = collection()
     metadata = await metadata_collection.find_one(
         {
@@ -46,7 +54,7 @@ async def get(account, container, filepath) -> Metadata | None:
     return Metadata(**metadata)
 
 
-async def exists(account, container, filepath) -> bool:
+async def exists(account, container, filepath, access_allowed=Depends(check_access)) -> bool:
     """
     Check if a metadata exists by account, container and filepath
 
@@ -64,6 +72,9 @@ async def exists(account, container, filepath) -> bool:
     bool
         True if the metadata exists, False otherwise.
     """
+    if access_allowed is None:
+        return False
+
     metadata_collection: AgnosticCollection = collection()
     metadata = await metadata_collection.find_one(
         {
@@ -160,7 +171,7 @@ async def query_metadata(
     min_datetime: Optional[datetime] = None,
     max_datetime: Optional[datetime] = None,
     text: Optional[str] = None,
-) -> List[dict]:
+) -> List[DataSourceReference]:
     """
     This function is responsible for querying metadata from the specified MongoDB collection based on various
     query parameters. It performs a database search using the provided criteria and returns a list of

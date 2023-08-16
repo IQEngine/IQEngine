@@ -18,6 +18,7 @@ export const AuthProvider = ({ children }) => {
     if (event.eventType === EventType.LOGIN_SUCCESS && event.payload.account) {
       const account = event.payload.account;
       msalInstance.setActiveAccount(account);
+      window.location.reload();
     }
   });
 
