@@ -1,0 +1,142 @@
+{
+  "id": "OBJECT-ID-GUID",
+  "acceptMappedClaims": null,
+  "accessTokenAcceptedVersion": 2,
+  "addIns": [],
+  "allowPublicClient": true,
+  "appId": "APP-ID-GUID",
+  "appRoles": [
+    {
+      "allowedMemberTypes": ["User"],
+      "description": "User can access the IQEngine services",
+      "displayName": "IQEngine-User",
+      "id": "85b27cfb-9dc8-4dec-9ce4-00880f49e542",
+      "isEnabled": true,
+      "lang": null,
+      "origin": "Application",
+      "value": "IQEngine-User"
+    },
+    {
+      "allowedMemberTypes": ["User"],
+      "description": "Administrator can manage the IQEngine services",
+      "displayName": "IQEngine-Admin",
+      "id": "62d02c53-eb0f-4905-81ce-068b70fe2f22",
+      "isEnabled": true,
+      "lang": null,
+      "origin": "Application",
+      "value": "IQEngine-Admin"
+    }
+  ],
+  "oauth2AllowUrlPathMatching": false,
+  "description": null,
+  "certification": null,
+  "disabledByMicrosoftStatus": null,
+  "groupMembershipClaims": "SecurityGroup",
+  "identifierUris": ["api://APP-ID-GUID"],
+  "informationalUrls": {
+    "termsOfService": null,
+    "support": null,
+    "privacy": null,
+    "marketing": null
+  },
+  "keyCredentials": [],
+  "knownClientApplications": [],
+  "logoUrl": null,
+  "logoutUrl": null,
+  "name": "iqengine-app",
+  "notes": null,
+  "oauth2AllowIdTokenImplicitFlow": true,
+  "oauth2AllowImplicitFlow": true,
+  "oauth2Permissions": [
+    {
+      "adminConsentDescription": "API Scope",
+      "adminConsentDisplayName": "API Scope",
+      "id": "85241fab-a416-43bd-ba05-6e92764afa15",
+      "isEnabled": true,
+      "lang": null,
+      "origin": "Application",
+      "type": "User",
+      "userConsentDescription": null,
+      "userConsentDisplayName": null,
+      "value": "api"
+    },
+    {
+      "adminConsentDescription": "User Scope",
+      "adminConsentDisplayName": "User Scope",
+      "id": "656fbb2b-8922-4f98-a48d-c87391c829c0",
+      "isEnabled": true,
+      "lang": null,
+      "origin": "Application",
+      "type": "User",
+      "userConsentDescription": null,
+      "userConsentDisplayName": null,
+      "value": "user"
+    }
+  ],
+  "oauth2RequirePostResponse": false,
+  "optionalClaims": {
+    "idToken": [
+      {
+        "name": "groups",
+        "source": null,
+        "essential": false,
+        "additionalProperties": []
+      }
+    ],
+    "accessToken": [
+      {
+        "name": "groups",
+        "source": null,
+        "essential": false,
+        "additionalProperties": []
+      }
+    ],
+    "saml2Token": []
+  },
+  "orgRestrictions": [],
+  "parentalControlSettings": {
+    "countriesBlockedForMinors": [],
+    "legalAgeGroupRule": "Allow"
+  },
+  "passwordCredentials": [],
+  "preAuthorizedApplications": [],
+  "publisherDomain": "DOMAIN-NAME",
+  "replyUrlsWithType": [
+    {
+      "url": "APP-URL",
+      "type": "Spa"
+    }
+  ],
+  "requiredResourceAccess": [
+    {
+      "resourceAppId": "00000003-0000-0000-c000-000000000000",
+      "resourceAccess": [
+        {
+          "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+          "type": "Scope"
+        },
+        {
+          "id": "a154be20-db9c-4678-8ab7-66f6cc099a59",
+          "type": "Scope"
+        },
+        {
+          "id": "5f8c59db-677d-491f-a6b8-5f174b11ec1d",
+          "type": "Scope"
+        },
+        {
+          "id": "5b567255-7703-4780-807c-7be8301ae99b",
+          "type": "Role"
+        },
+        {
+          "id": "df021288-bdef-4463-88db-98f22de89214",
+          "type": "Role"
+        }
+      ]
+    }
+  ],
+  "samlMetadataUrl": null,
+  "signInUrl": null,
+  "signInAudience": "AzureADandPersonalMicrosoftAccount",
+  "tags": [],
+  "tokenEncryptionKeyId": null
+}

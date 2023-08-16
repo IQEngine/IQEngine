@@ -1,4 +1,45 @@
 # Admin Page
 
-Use this page for usage docs related to the admin page
-
+IQEngine now has the ability to allow you add an administrator to your application to allow you to view users of your tenant and configure data sources, plugins and feature flags.
+<br/>
+This currently supports Azure AD App Registrations, if you look at the admin-manifest.json docs located here:
+<br/>
+[Admin-Manifest](/admin-manifest.json)
+<br/>
+You can upload this manifest to your Azure APP Registration and it will allow you to login to the admin page.
+<br/>
+You will need to update the following values:
+<br/>
+- "OBJECT-ID-GUID" - Replace this with the Object ID of the App Registration
+- "APP-ID-GUID" - Replace this with the App ID of the App Registration
+- "api://APP-ID-GUID" - Replace this with the App ID URI of the App Registration
+- "DOMAIN-NAME" - Replace this with the domain name of your Azure AD Tenant
+- "APP-URL" - Replace this with the URL of your application
+<br/>
+Once you have uploaded this manifest to your app registration you need to add an app secret in your app registration here:
+<p align="left">
+  <img src="/add_client_secret.png" />
+</p>
+<br/>
+Once you have added the secret you need to add the following environment variables to your .env file:
+- IQENGINE_APP_ID - This is the App ID of your App Registration
+- IQENGINE_APP_AUTHORITY - This is the authority of your Azure AD Tenant
+- APP_SECRET - This is the secret you created in your App Registration
+<br/>
+You will also need to grant consent to the application, you can do this by doing to the following:
+<p align="left">
+  <img src="/grant_consent.png" />
+</p>
+<br/>
+Once you have done this, you will need to assign your administrative user to the application role 'IQEngine-Admin' in your Azure AD Tenant.
+You can do this by going to your enterprise application:
+<p align="left">
+  <img src="/enterprise_app.png" />
+</p>
+<br/>
+And then selecting the user you want to assign the role to:
+<p align="left">
+  <img  src="/assign_role.png" />
+</p>
+<br/>
+Repeat this step for all the users/groups you want to assign to the role/s.

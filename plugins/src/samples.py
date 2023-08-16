@@ -7,8 +7,15 @@ from azure.storage.blob import BlobClient
 from models.plugins import Plugin, SamplesB64, SamplesCloud
 
 data_mapping = {
+    "iq/ci8": np.int8,
     "iq/ci8_le": np.int8,
+    "iq/ci16": np.int16,
     "iq/ci16_le": np.int16,
+    "iq/ci32": np.int32,
+    "iq/ci32_le": np.int32,
+    "iq/cf16": np.float16,
+    "iq/cf16_le": np.float16,
+    "iq/cf32": np.float32,
     "iq/cf32_le": np.float32,
 }
 
