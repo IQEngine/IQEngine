@@ -1,6 +1,6 @@
-import database.metadata_repo
+from typing import Optional
 from blob.azure_client import AzureBlobClient
-from database.database import db
+
 from database.models import DataSource, DataSourceReference
 from helpers.cipher import decrypt, encrypt
 from motor.core import AgnosticCollection
@@ -8,6 +8,7 @@ from rf.samples import get_bytes_per_iq_sample
 
 
 def collection() -> AgnosticCollection:
+    from database.database import db
     collection: AgnosticCollection = db().datasources
     return collection
 
@@ -28,7 +29,6 @@ async def get(account, container) -> DataSource | None:
     DataSource
         The datasource.
     """
-
     datasource_collection: AgnosticCollection = collection()
     datasource = await datasource_collection.find_one(
         {"account": account, "container": container}
@@ -58,6 +58,7 @@ async def datasource_exists(account, container) -> bool:
 
 
 async def sync(account: str, container: str):
+    import database.metadata_repo
     azure_blob_client = AzureBlobClient(account, container)
     datasource = await get(account, container)
     if datasource is None:
@@ -98,7 +99,7 @@ async def sync(account: str, container: str):
     print(f"[SYNC] Finished syncing {account}/{container}")
 
 
-async def create(datasource: DataSource) -> DataSource:
+async def create(datasource: DataSource, user: Optional[dict]) -> DataSource:
     """
     Create a new datasource. The datasource will be henceforth identified by account/container which
     must be unique or this function will return a 400.
@@ -122,5 +123,14 @@ async def create(datasource: DataSource) -> DataSource:
     else:
         datasource.sasToken = ""
     datasource_dict = datasource.dict(by_alias=True, exclude_unset=True)
+
+    if "owners" not in datasource_dict:
+        datasource_dict["owners"] = []
+    if user and user["preferred_username"]:
+        datasource_dict["owners"].append(user["preferred_username"])
+    if "readers" not in datasource_dict:
+        datasource_dict["readers"] = []
+    if "public" not in datasource_dict:
+        datasource_dict["public"] = True
     await datasource_collection.insert_one(datasource_dict)
     return datasource

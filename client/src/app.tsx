@@ -34,6 +34,7 @@ export const App = () => {
     instance.logoutPopup({
       postLogoutRedirectUri: '/',
     });
+    window.location.reload();
   };
 
   const location = useLocation();
