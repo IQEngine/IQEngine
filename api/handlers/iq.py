@@ -3,13 +3,15 @@ import base64
 import io
 import logging
 import time
-from typing import List, Optional
+from typing import List
 
 from blob.azure_client import AzureBlobClient
 from database import datasource_repo
 from database.models import DataSource
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import StreamingResponse
+
+from helpers.datasource_access import check_access
 from helpers.apidisconnect import cancel_on_disconnect, CancelOnDisconnectRoute
 from helpers.authorization import required_roles
 from helpers.cipher import decrypt
@@ -176,7 +178,7 @@ async def get_iqfile(
     filepath: str,
     datasource: DataSource = Depends(datasource_repo.get),
     azure_client: AzureBlobClient = Depends(AzureBlobClient),
-    current_user: Optional[dict] = Depends(required_roles()),
+    access_allowed=Depends(check_access),
 ):
     # Create the imageURL with sasToken
     if not datasource:
@@ -200,10 +202,12 @@ async def get_iq(
     filepath: str,
     offsetBytes: int,
     countBytes: int,
+    access_allowed=Depends(check_access),
     datasource: DataSource = Depends(datasource_repo.get),
     azure_client: AzureBlobClient = Depends(AzureBlobClient),
-    current_user: Optional[dict] = Depends(required_roles()),
 ):
+    if access_allowed is None:
+        raise HTTPException(status_code=403, detail="No Access")
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
     try:
@@ -248,8 +252,10 @@ async def get_iq_data_slices(
     filepath: str,
     datasource: DataSource = Depends(datasource_repo.get),
     azure_client: AzureBlobClient = Depends(AzureBlobClient),
-    current_user: Optional[dict] = Depends(required_roles()),
+    access_allowed=Depends(check_access)
 ):
+    if access_allowed is None:
+        raise HTTPException(status_code=403, detail="No Access")
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
     try:
