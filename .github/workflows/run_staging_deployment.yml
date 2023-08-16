@@ -16,7 +16,7 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
-      packages: read
+      packages: write
 
   run_staging_deployment:
     if: github.repository == 'IQEngine/IQEngine'
