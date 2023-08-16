@@ -145,10 +145,11 @@ We have several feature flags currently in use. Their purposes are as follows:
 The solution implements RBAC controls using configuration setup for each data source defined. The data source documents have the following properties:
 
 ```json
-	"owners" : [ ],
-	"readers" : [ ],
-	"public" : true
+"owners" : [ ],
+"readers" : [ ],
+"public" : true
 ```
+
 Where owners and readers are string lists that can contain individual user email addresses or the id guid of Azure Active Directory security groups.
 Owners identifies the group of users able to modify the security permissions for the data source.
 Readers identifies the group of people that have read access to the data source in addition to the owners collection.
