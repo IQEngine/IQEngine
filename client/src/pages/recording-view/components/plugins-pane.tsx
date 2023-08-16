@@ -19,7 +19,6 @@ import { dataTypeToBytesPerIQSample } from '@/utils/selector';
 import { getDataSource } from '@/api/datasource/queries';
 import { useSpectrogramContext } from '../hooks/use-spectrogram-context';
 import { useCursorContext } from '../hooks/use-cursor-context';
-import { CLIENT_TYPE_API } from '@/api/Models';
 
 export enum MimeTypes {
   ci8 = 'iq/ci8',
@@ -35,9 +34,10 @@ export enum MimeTypes {
 }
 
 export const PluginsPane = () => {
-  const { meta, account, container, spectrogramHeight, fftSize, selectedAnnotation, setMeta } = useSpectrogramContext();
+  const { meta, type, account, container, spectrogramHeight, fftSize, selectedAnnotation, setMeta } = useSpectrogramContext();
   const { cursorTimeEnabled, cursorTime, cursorData } = useCursorContext();
   const { data: plugins, isError } = useGetPlugins();
+  const { data } = getDataSource(type, account, container, true);
   const { PluginOption, EditPluginParameters, pluginParameters, setPluginParameters } = useGetPluginsComponents();
   const [selectedPlugin, setSelectedPlugin] = useState('');
   const [selectedMethod, setSelectedMethod] = useState('');
@@ -45,13 +45,13 @@ export const PluginsPane = () => {
   const [modalSamples, setModalSamples] = useState<Float32Array>(new Float32Array([]));
   const [modalSpectrogram, setmodalSpectrogram] = useState(null);
   const [useCloudStorage, setUseCloudStorage] = useState(true);
-  const dataSource = getDataSource(CLIENT_TYPE_API, account, container, true).data;
   let byte_offset = meta.getBytesPerIQSample() * cursorTime.start;
   let byte_length = meta.getBytesPerIQSample() * (cursorTime.end - cursorTime.start);
   let publicDataSource = false
 
-  if(dataSource) {
-     publicDataSource = dataSource.sasToken == ""
+
+  if(data) {
+    publicDataSource = data.sasToken == ""
   }
 
   const handleChangePlugin = (e) => {
@@ -102,7 +102,7 @@ export const PluginsPane = () => {
       custom_params: {},
     };
 
-    
+
     if(useCloudStorage && publicDataSource) {
       body = {
         samples_b64: [],
@@ -126,15 +126,15 @@ export const PluginsPane = () => {
       };
     }
 
-    if (useCloudStorage && dataSource) {
+    if (useCloudStorage) {
       body = {
         samples_b64: [],
         samples_cloud: [
           {
-            account_name: dataSource.account,
-            container_name: dataSource.container,
+            account_name: account,
+            container_name: container,
             file_path: meta.getFileName(),
-            sas_token: dataSource.sasToken,
+            sas_token: null,
             sample_rate: sampleRate,
             center_freq: freq,
             data_type: MimeTypes[meta.getDataType()],
@@ -335,7 +335,7 @@ export const PluginsPane = () => {
           ))}
         </select>
       </label>
-      {dataSource && (
+      {(data && type != 'local') && (
         <label className="label cursor-pointer">
           <span>Use Cloud Storage</span>
           <input
