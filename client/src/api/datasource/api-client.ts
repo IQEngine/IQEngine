@@ -27,7 +27,7 @@ export class ApiClient implements DataSourceClient {
     }
   }
 
-  private async requestWithAuth(config) {
+  private async requestWithAuthIfRequired(config) {
     const token = await this.getAccessToken();
     if (token != null) {
       const headers = {
@@ -39,13 +39,13 @@ export class ApiClient implements DataSourceClient {
   }
 
   async sync(account: string, container: string): Promise<void> {
-    await this.requestWithAuth({
+    await this.requestWithAuthIfRequired({
       method: 'get',
       url: `/api/datasources/${account}/${container}/sync`,
     });
   }
   async query(queryString: string, signal: AbortSignal): Promise<TraceabilityOrigin[]> {
-    const response = await this.requestWithAuth({
+    const response = await this.requestWithAuthIfRequired({
       method: 'get',
       url: `/api/datasources/query?${queryString}`,
       signal,
@@ -56,7 +56,7 @@ export class ApiClient implements DataSourceClient {
     });
   }
   async list(): Promise<DataSource[]> {
-    const response = await this.requestWithAuth({
+    const response = await this.requestWithAuthIfRequired({
       method: 'get',
       url: '/api/datasources',
     });
@@ -69,7 +69,7 @@ export class ApiClient implements DataSourceClient {
     return response.data;
   }
   async get(account: string, container: string): Promise<DataSource> {
-    const response = await this.requestWithAuth({
+    const response = await this.requestWithAuthIfRequired({
       method: 'get',
       url: `/api/datasources/${account}/${container}/datasource`,
     });
@@ -82,7 +82,7 @@ export class ApiClient implements DataSourceClient {
     return response.data;
   }
   async create(dataSource: DataSource): Promise<DataSource> {
-    const response = await this.requestWithAuth({
+    const response = await this.requestWithAuthIfRequired({
       method: 'post',
       url: '/api/datasources',
       data: dataSource,
