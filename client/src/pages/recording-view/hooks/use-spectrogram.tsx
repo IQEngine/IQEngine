@@ -92,7 +92,7 @@ export function useSpectrogram(currentFFT) {
       offset += fftSize * 2;
     }
     return iqData;
-  }, [processedDataUpdated, fftSize, debouncedCurrentFFT, fftStepSize, totalFFTs, spectrogramHeight]);
+  }, [processedDataUpdated, fftSize, debouncedCurrentFFT, fftStepSize, totalFFTs, spectrogramHeight, taps]);
 
   return {
     totalFFTs,
