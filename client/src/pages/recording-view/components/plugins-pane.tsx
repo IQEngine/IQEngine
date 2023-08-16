@@ -16,9 +16,10 @@ import { useGetPluginsComponents } from '@/pages/recording-view/hooks/use-get-pl
 import { useGetPlugins } from '@/api/plugin/queries';
 import { toast } from 'react-hot-toast';
 import { dataTypeToBytesPerIQSample } from '@/utils/selector';
-import { useUserSettings } from '@/api/user-settings/use-user-settings';
+import { getDataSource } from '@/api/datasource/queries';
 import { useSpectrogramContext } from '../hooks/use-spectrogram-context';
 import { useCursorContext } from '../hooks/use-cursor-context';
+import { CLIENT_TYPE_API } from '@/api/Models';
 
 export enum MimeTypes {
   ci8 = 'iq/ci8',
@@ -44,10 +45,15 @@ export const PluginsPane = () => {
   const [modalSamples, setModalSamples] = useState<Float32Array>(new Float32Array([]));
   const [modalSpectrogram, setmodalSpectrogram] = useState(null);
   const [useCloudStorage, setUseCloudStorage] = useState(true);
-  const { dataSourcesQuery } = useUserSettings();
-  const connectionInfo = dataSourcesQuery?.data[`${account}/${container}`];
+  const dataSource = getDataSource(CLIENT_TYPE_API, account, container, true).data;
   let byte_offset = meta.getBytesPerIQSample() * cursorTime.start;
   let byte_length = meta.getBytesPerIQSample() * (cursorTime.end - cursorTime.start);
+  let publicDataSource = false
+
+  if(dataSource) {
+     publicDataSource = dataSource.sasToken == ""
+  }
+
   const handleChangePlugin = (e) => {
     setSelectedPlugin(e.target.value);
   };
@@ -96,15 +102,39 @@ export const PluginsPane = () => {
       custom_params: {},
     };
 
-    if (useCloudStorage && connectionInfo) {
+    
+    if(useCloudStorage && publicDataSource) {
       body = {
         samples_b64: [],
         samples_cloud: [
           {
-            account_name: connectionInfo.account,
-            container_name: connectionInfo.container,
+            account_name: account,
+            container_name: container,
             file_path: meta.getFileName(),
-            sas_token: connectionInfo.sasToken,
+            sas_token: "",
+            sample_rate: sampleRate,
+            center_freq: freq,
+            data_type: MimeTypes[meta.getDataType()],
+            byte_offset: byte_offset,
+            byte_length: byte_length,
+          },
+        ],
+        custom_params: {
+          start_freq: annotation ? annotation['core:freq_lower_edge'] : null,
+          end_freq: annotation ? annotation['core:freq_upper_edge'] : null,
+        },
+      };
+    }
+
+    if (useCloudStorage && dataSource) {
+      body = {
+        samples_b64: [],
+        samples_cloud: [
+          {
+            account_name: dataSource.account,
+            container_name: dataSource.container,
+            file_path: meta.getFileName(),
+            sas_token: dataSource.sasToken,
             sample_rate: sampleRate,
             center_freq: freq,
             data_type: MimeTypes[meta.getDataType()],
@@ -305,7 +335,7 @@ export const PluginsPane = () => {
           ))}
         </select>
       </label>
-      {connectionInfo && (
+      {dataSource && (
         <label className="label cursor-pointer">
           <span>Use Cloud Storage</span>
           <input
