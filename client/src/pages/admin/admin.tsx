@@ -35,11 +35,14 @@ export const Admin = () => {
     activeAccount?.idTokenClaims?.roles?.includes('IQEngine-Admin') === false
   ) {
     return (
-      <div className="flex justify-center text-lg text-center">
-        <p>You are unauthorized to view this page.</p>
-        <br />
-        <p>Please contact your administrator.</p>
-      </div>
+      <>
+        <div className="flex justify-center text-2xl font-bold">
+          <p>You are unauthorized to view this page.</p>
+        </div>
+        <div className="flex justify-center">
+          <p>Please contact your administrator.</p>
+        </div>
+      </>
     );
   }
 

@@ -2,13 +2,14 @@
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { CLIENT_TYPE_BLOB } from '@/api/Models';
 import { getMeta } from '@/api/metadata/queries';
-import { FileAnnotationData } from './FileAnnotationData';
+import { FileAnnotationData } from './file-annotation-data';
 import { ModalDialog } from '@/features/ui/modal/Modal';
 import { useFeatureFlags } from '@/hooks/use-feature-flags';
+import { useIntersectionObserver } from 'usehooks-ts'
 
 interface FileRowProps {
   filepath: string;
@@ -33,12 +34,17 @@ export default function FileRow({
 }: FileRowProps) {
   const [showModal, setShowModal] = useState(false);
   const { featureFlags } = useFeatureFlags();
+
   const { type: paramType, account: paramAccount, container: paramContainer, sasToken: paramSASToken } = useParams();
   type = type ?? paramType;
   account = account ?? paramAccount;
   container = container ?? paramContainer;
   sasToken = sasToken ?? paramSASToken;
-  const { data: item } = getMeta(type, account, container, filepath);
+  const ref = useRef<HTMLTableRowElement | null>(null)
+  const entry = useIntersectionObserver(ref, {})
+  const isVisible = !!entry?.isIntersecting
+  const { data: item } = getMeta(type, account, container, filepath, isVisible);
+
 
   const spectrogramLink = `/view/${item?.getOrigin().type}/${item?.getOrigin().account}/${
     item?.getOrigin().container
@@ -93,7 +99,7 @@ export default function FileRow({
 
   if (!item) {
     return (
-      <tr className="hover:bg-info/10 text-center py-2 h-32">
+      <tr ref={ref} className="hover:bg-info/10 text-center py-2 h-32">
         <td className="px-4 min-w-fit"></td>
         <td className="align-middle text-left">
           <h2>{filepath}</h2>
@@ -110,6 +116,7 @@ export default function FileRow({
 
   return (
     <tr
+      ref={ref}
       className={
         queryResult
           ? 'hover:bg-info/10 grid grid-cols-10 text-center py-2 h-32 mb-5'

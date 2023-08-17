@@ -36,6 +36,7 @@ async def get_plugins_list():
             dirs.append(file)
     dirs.remove("__pycache__")
     dirs.remove("template_plugin")
+    dirs.remove("models")
     return dirs
 
 
