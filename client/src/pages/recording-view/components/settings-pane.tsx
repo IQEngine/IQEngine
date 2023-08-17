@@ -79,7 +79,24 @@ const SettingsPane = ({ currentFFT }) => {
     document.body.removeChild(a);
   };
 
-  const zoomMultipliers = [ 0, 10, 100, 1000, 10000, 100000 ];
+  function calcZoomStepSizes() {
+    /* 
+      What we're doing here is calculating the number of ffts we
+      skip per image line in order to show N% of the total
+      file in the spectrogram. The first element in the 
+      array is special, don't skip
+    */
+
+    const fftSize = context.fftSize;
+    const imageHeight = context.spectrogramHeight;
+    const totalSamples = context.meta.getTotalSamples(); 
+    const onePercent = (totalSamples / fftSize) / 100;
+
+    const zoomLevels = [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ];
+    return zoomLevels.map((z) => Math.floor((onePercent * z) / imageHeight));
+  }
+
+  const zoomStepSizes = calcZoomStepSizes();
 
   return (
     <div className="form-control">
@@ -88,12 +105,12 @@ const SettingsPane = ({ currentFFT }) => {
         <input
           type="range"
           className="range range-xs range-primary"
-          value={zoomMultipliers.indexOf(context.fftStepSize)}
+          value={zoomStepSizes.indexOf(context.fftStepSize)}
           min={0}
-          max={zoomMultipliers.length - 1}
+          max={zoomStepSizes.length - 1}
           step={1}
           onChange={(e) => {
-            const newZoomLevel = zoomMultipliers[parseInt(e.target.value)];
+            const newZoomLevel = zoomStepSizes[parseInt(e.target.value)];
             context.setFFTStepSize(newZoomLevel);
           }}
         />
