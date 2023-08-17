@@ -258,22 +258,17 @@ export const App = () => {
         <Outlet />
 
         {/* TODO Figure out how to use mailerlites embedded form*/}
-        
-          
-            <h2 className="text-center py-2">
-              <Feature flag={FeatureFlag.useIQEngineOutReach.name}>
-                <a
-                  target="_blank"
-                  rel="noreferrer"
-                  href="https://dashboard.mailerlite.com/forms/299501/77960409531811734/share"
-                >
-                  Sign up for a once-a-month email update on IQEngine, such as new features, demos, and more!
-                </a>
-              </Feature>
-            </h2>
-          
-        
-        
+        <h2 className="text-center py-2">
+          <Feature flag={FeatureFlag.useIQEngineOutReach.name}>
+            <a
+              target="_blank"
+              rel="noreferrer"
+              href="https://dashboard.mailerlite.com/forms/299501/77960409531811734/share"
+            >
+              Sign up for a once-a-month email update on IQEngine, such as new features, demos, and more!
+            </a>
+          </Feature>
+        </h2>
       </div>
       <ReactQueryDevtools initialIsOpen={false} />
     </ThemeSelector>
