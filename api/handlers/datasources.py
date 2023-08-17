@@ -1,18 +1,18 @@
+from typing import Optional
+
 import httpx
-from database import datasource_repo
-from helpers.datasource_access import check_access
-from database.datasource_repo import create, datasource_exists
 from blob.azure_client import AzureBlobClient
+from database import datasource_repo
+from database.datasource_repo import create, datasource_exists
 from database.models import DataSource
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from helpers.authorization import get_current_user
-from helpers.cipher import encrypt, decrypt
+from helpers.cipher import decrypt, encrypt
+from helpers.datasource_access import check_access
 from helpers.urlmapping import ApiType, add_URL_sasToken
 from motor.core import AgnosticCollection
-
 from pydantic import SecretStr
-from typing import Optional
 
 router = APIRouter()
 
@@ -42,7 +42,12 @@ async def get_datasources(
     datasources = datasources_collection.find()
     result = []
     async for datasource_item in datasources:
-        if await check_access(datasource_item["account"], datasource_item["container"], current_user) is not None:
+        if (
+            await check_access(
+                datasource_item["account"], datasource_item["container"], current_user
+            )
+            is not None
+        ):
             result.append(datasource_item)
     return result
 
@@ -158,7 +163,7 @@ async def sync_datasource(
     return {"message": "Syncing"}
 
 
-@router.get("/api/datasources/{account}/{container}/{file_path}/sas") 
+@router.get("/api/datasources/{account}/{container}/{file_path}/sas")
 async def generate_sas_token(
     account: str,
     container: str,
@@ -186,7 +191,10 @@ async def generate_sas_token(
     if not token:
         blob_client = AzureBlobClient(account, container)
         try:
-            token = blob_client.generate_sas_token(file_path, decrypt(existing_datasource["account_key"]).get_secret_value())
-        except Exception as e:
+            token = blob_client.generate_sas_token(
+                file_path,
+                decrypt(existing_datasource["account_key"]).get_secret_value(),
+            )
+        except Exception:
             raise HTTPException(status_code=500, detail="unable to generate sas token")
     return {"sasToken": token}
