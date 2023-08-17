@@ -83,7 +83,8 @@ async def get_meta(
     metadata: Metadata = Depends(metadata_repo.get),
     access_allowed=Depends(check_access)
 ):
-
+    if access_allowed is None:
+        raise HTTPException(status_code=403, detail="No Access")
     if not metadata:
         raise HTTPException(status_code=404, detail="Metadata not found")
     return metadata
@@ -97,6 +98,9 @@ async def get_track_meta(
     metadata: Metadata = Depends(metadata_repo.get),
     access_allowed=Depends(check_access)
 ):
+    if access_allowed is None:
+        raise HTTPException(status_code=403, detail="No Access")
+    
     if not metadata:
         raise HTTPException(status_code=404, detail="Metadata not found")
 
@@ -123,6 +127,8 @@ async def get_meta_thumbnail(
     azure_client: AzureBlobClient = Depends(AzureBlobClient),
     access_allowed=Depends(check_access)
 ):
+    if access_allowed is None:
+        raise HTTPException(status_code=403, detail="No Access")
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
 
