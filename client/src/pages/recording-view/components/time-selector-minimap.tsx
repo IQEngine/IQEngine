@@ -8,13 +8,13 @@ import { MINIMAP_FFT_SIZE } from '@/utils/constants';
 import { useSpectrogramContext } from '../hooks/use-spectrogram-context';
 import { useCursorContext } from '../hooks/use-cursor-context';
 
-const TimeSelectorMinimap = ({ currentFFT }) => {
+const TimeSelectorMinimap = () => {
   const { spectrogramHeight, meta, fftSize } = useSpectrogramContext();
   const { cursorTime, cursorTimeEnabled, setCursorTime } = useCursorContext();
   const cursorStartFFT = Math.floor(cursorTime.start / fftSize);
   const cursorEndFFT = Math.floor(cursorTime.end / fftSize);
-  const cursorYStart = cursorStartFFT - currentFFT;
-  const cursorYEnd = cursorEndFFT - currentFFT;
+  const cursorYStart = cursorStartFFT;
+  const cursorYEnd = cursorEndFFT;
   const totalFFTs = meta.getTotalSamples() / fftSize;
   const scalingFactor = totalFFTs / spectrogramHeight;
   // Sample-start bar
