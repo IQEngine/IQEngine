@@ -58,3 +58,4 @@ def test_get_current_user(mock_get_jwks):
     credentials = Mock(credentials=VALID_TEST_TOKEN)
     current_user = get_current_user(token=credentials)
     assert current_user["preferred_username"] == "JohnDoe@test.com"
+    

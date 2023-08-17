@@ -284,6 +284,7 @@ export const PluginsPane = () => {
           value={selectedPlugin}
           onChange={handleChangePlugin}
         >
+          <option value="">Select Plugin</option>
           {plugins &&
             !isError &&
             plugins?.map((plugin, groupIndex) => (

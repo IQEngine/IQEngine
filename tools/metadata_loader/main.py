@@ -50,6 +50,9 @@ def create_datasource(args):
         "container": f"{args.containerName}",
         "description": f"{args.description}",
         "sasToken": f"{args.sasToken}",
+        "owners": ["IQEngine-Admin"],
+        "readers": [],
+        "public": True
     }
     resp = call_create_datasource_api(url, payload=data)
 

@@ -41,8 +41,11 @@ async def import_datasources_from_env(
                 else None,
                 imageURL=connection["imageURL"] if "imageURL" in connection else None,
                 type="api",
+                public=connection["public"] if "public" in connection else True,
+                owners=connection["owners"] if "owners" in connection else ["IQEngine-Admin"],
+                readers=connection["readers"] if "readers" in connection else [],
             )
-            await datasource_repo.create(datasource=datasource)
+            await datasource_repo.create(datasource=datasource, user=None)
             asyncio.create_task(
                 datasource_repo.sync(
                     connection["accountName"], connection["containerName"]
