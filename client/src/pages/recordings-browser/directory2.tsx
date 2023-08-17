@@ -2,7 +2,7 @@
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
 
-import FileRow from './file2';
+import FileRow from './file';
 import styled from 'styled-components';
 import FolderIcon from '@mui/icons-material/Folder';
 import FolderOpen from '@mui/icons-material/FolderOpen';
