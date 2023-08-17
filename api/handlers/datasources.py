@@ -10,7 +10,6 @@ from helpers.authorization import get_current_user
 from helpers.cipher import encrypt, decrypt
 from helpers.urlmapping import ApiType, add_URL_sasToken
 from motor.core import AgnosticCollection
-from blob.azure_client import AzureBlobClient
 
 from pydantic import SecretStr
 from typing import Optional
