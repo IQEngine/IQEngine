@@ -158,10 +158,10 @@ export const PluginsPane = () => {
         return response.json();
       })
       .then(function (data) {
-        console.debug('Plugin Status:', data.status);
-        console.debug('data:', data);
-        if (data.status !== 'SUCCESS') {
-          toast.error(`Plugin failed to run: ${data.status}`);
+        console.debug('Plugin return:', data);
+        if ('detail' in data) {
+          // this is currently how we detect if the plugin failed to run
+          toast.error(`Plugin failed to run: ${data.detail}`);
           return;
         }
         if (data.data_output && data.data_output.length > 0) {
