@@ -258,8 +258,8 @@ export const App = () => {
         <Outlet />
 
         {/* TODO Figure out how to use mailerlites embedded form*/}
-        <h2 className="text-center py-2">
-          <Feature flag={FeatureFlag.useIQEngineOutReach.name}>
+        <Feature flag={FeatureFlag.useIQEngineOutReach.name}>
+          <h2 className="text-center py-2">
             <a
               target="_blank"
               rel="noreferrer"
@@ -267,8 +267,8 @@ export const App = () => {
             >
               Sign up for a once-a-month email update on IQEngine, such as new features, demos, and more!
             </a>
-          </Feature>
-        </h2>
+          </h2>
+        </Feature>
       </div>
       <ReactQueryDevtools initialIsOpen={false} />
     </ThemeSelector>
