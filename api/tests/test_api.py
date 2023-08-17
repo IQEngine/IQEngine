@@ -287,7 +287,6 @@ async def test_api_get_temp_sas_token_no_key(mock_get_sas_token: Mock, client):
     assert mock_get_sas_token.call_count == 0
 
 
-
 @pytest.mark.asyncio
 async def test_api_get_datasource(client):
     response = client.post("/api/datasources", json=test_datasource)
