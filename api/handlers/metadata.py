@@ -100,7 +100,7 @@ async def get_track_meta(
 ):
     if access_allowed is None:
         raise HTTPException(status_code=403, detail="No Access")
-    
+
     if not metadata:
         raise HTTPException(status_code=404, detail="Metadata not found")
 
@@ -215,7 +215,6 @@ async def query_meta(
                 filtered_result.append(item)
 
         return filtered_result
-
 
     except InvalidGeolocationFormat as e:
         raise HTTPException(status_code=400, detail=str(e))

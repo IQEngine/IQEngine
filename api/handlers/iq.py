@@ -150,7 +150,6 @@ async def get_byte_stream(
     azure_client,
     blob_size,
 ):
-    st = time.time()
 
     offsetBytes = block_indexes_chunk[0] * block_size * bytes_per_iq_sample
     countBytes = (
@@ -167,8 +166,6 @@ async def get_byte_stream(
         filepath=iq_file, offset=offsetBytes, length=countBytes
     )
 
-    #print(f"get_byte_stream: {time.time() - st}")
-
     return content
 
 
@@ -184,7 +181,7 @@ async def get_iqfile(
 ):
     if access_allowed is None:
         raise HTTPException(status_code=403, detail="No Access")
-    
+
     # Create the imageURL with sasToken
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
