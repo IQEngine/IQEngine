@@ -34,7 +34,7 @@ export default function FileRow({
 }: FileRowProps) {
   const [showModal, setShowModal] = useState(false);
   const { featureFlags } = useFeatureFlags();
-  
+
   const { type: paramType, account: paramAccount, container: paramContainer, sasToken: paramSASToken } = useParams();
   type = type ?? paramType;
   account = account ?? paramAccount;

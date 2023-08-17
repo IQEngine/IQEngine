@@ -31,7 +31,7 @@ describe('Validate metadata', () => {
 
     // Assert
     expect(result.metadata).toBe('{,');
-    expect(result.errors[0].message).toStrictEqual("Syntax Error: Expected property name or '}' in JSON at position 1");
+    expect(result.errors[0].message).toStrictEqual('Syntax Error: Unexpected token , in JSON at position 1');
   });
 
   test.each`
