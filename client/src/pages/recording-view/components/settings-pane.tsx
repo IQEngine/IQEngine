@@ -79,6 +79,8 @@ const SettingsPane = ({ currentFFT }) => {
     document.body.removeChild(a);
   };
 
+  const zoomMultipliers = [ 0, 10, 100, 1000, 10000, 100000 ];
+
   return (
     <div className="form-control">
       <label className="mb-3" id="formZoom">
@@ -86,13 +88,13 @@ const SettingsPane = ({ currentFFT }) => {
         <input
           type="range"
           className="range range-xs range-primary"
-          value={context.fftStepSize + 1}
-          min={1}
-          max={10}
+          value={zoomMultipliers.indexOf(context.fftStepSize)}
+          min={0}
+          max={zoomMultipliers.length - 1}
           step={1}
           onChange={(e) => {
-            const newZoomLevel = parseInt(e.target.value);
-            context.setFFTStepSize(newZoomLevel - 1);
+            const newZoomLevel = zoomMultipliers[parseInt(e.target.value)];
+            context.setFFTStepSize(newZoomLevel);
           }}
         />
       </label>
