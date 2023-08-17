@@ -3,7 +3,7 @@
 // Licensed under the MIT License
 
 import React, { useEffect, useState } from 'react';
-import Directory from './directory2';
+import Directory from './directory';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { useParams } from 'react-router-dom';
 import { useQueryDataSourceMetaPaths } from '@/api/metadata/queries';
