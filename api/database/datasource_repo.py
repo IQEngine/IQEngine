@@ -122,6 +122,10 @@ async def create(datasource: DataSource, user: Optional[dict]) -> DataSource:
         datasource.sasToken = encrypt(datasource.sasToken)
     else:
         datasource.sasToken = ""
+    if datasource.account_key:
+         datasource.account_key = encrypt(datasource.account_key)
+    else:
+        datasource.account_key = ""
     datasource_dict = datasource.dict(by_alias=True, exclude_unset=True)
 
     if "owners" not in datasource_dict:

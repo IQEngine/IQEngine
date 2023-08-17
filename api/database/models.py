@@ -11,6 +11,7 @@ class DataSource(BaseModel):
     description: Optional[str] = None
     imageURL: Optional[str] = None
     sasToken: Optional[SecretStr] = None
+    account_key: Optional[SecretStr] = None
     owners: Optional[List[str]] = []
     readers: Optional[List[str]] = []
     public: Optional[bool] = False

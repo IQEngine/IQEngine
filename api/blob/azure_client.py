@@ -1,11 +1,12 @@
 from typing import Optional
 
-from azure.storage.blob import BlobProperties
+from azure.storage.blob import BlobProperties, BlobSasPermissions, generate_blob_sas
 from azure.storage.blob.aio import BlobClient, ContainerClient
 from database.models import Metadata
 from helpers.urlmapping import ApiType, get_file_name
 from pydantic import SecretStr
 from rf.spectrogram import get_spectrogram_image
+import datetime
 
 
 class AzureBlobClient:
@@ -117,3 +118,20 @@ class AzureBlobClient:
         blob_client = self.get_blob_client(filepath)
         blob = await blob_client.get_blob_properties()
         return int(blob.size)
+
+    def generate_sas_token(self, filepath: str, account_key: str):
+        start_time = datetime.datetime.now(datetime.timezone.utc)
+        expiry_time = start_time + datetime.timedelta(hours=1)
+        try:
+            sas_token = generate_blob_sas(
+                account_name=self.account,
+                container_name=self.container,
+                blob_name=filepath,
+                account_key=account_key,
+                permission=BlobSasPermissions(read=True),
+                expiry=expiry_time,
+                start=start_time,
+            )
+        except Exception as e:
+            raise Exception(f"Error generating SAS token: {e}")
+        return sas_token
