@@ -80,16 +80,16 @@ const SettingsPane = ({ currentFFT }) => {
   };
 
   function calcZoomStepSizes() {
-    /* 
+    /*
       What we're doing here is calculating the number of ffts we
       skip per image line in order to show N% of the total
-      file in the spectrogram. The first element in the 
+      file in the spectrogram. The first element in the
       array is special, don't skip
     */
 
     const fftSize = context.fftSize;
     const imageHeight = context.spectrogramHeight;
-    const totalSamples = context.meta.getTotalSamples(); 
+    const totalSamples = context.meta.getTotalSamples();
     const onePercent = (totalSamples / fftSize) / 100;
 
     const zoomLevels = [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ];
