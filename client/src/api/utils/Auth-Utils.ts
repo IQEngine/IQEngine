@@ -34,8 +34,7 @@ export class AuthUtil {
         headers: {
           ...config.headers,
           ...authorizationHeaders
-        },
-        signal: config.signal,
+        }
       });
     }
   }
