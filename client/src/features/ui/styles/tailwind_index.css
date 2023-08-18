@@ -28,6 +28,14 @@
     @apply text-primary text-lg mt-1;
   }
 
+  h3 {
+    @apply text-primary;
+  }
+
+  h4 {
+    @apply text-primary;
+  }
+
   h5 {
     @apply text-primary;
   }
