@@ -41,9 +41,9 @@ export class ApiClient implements MetadataClient {
         url: `/api/datasources/${account}/${container}/${filePath}/meta`,
         data: meta
       };
-      
+
       await this.authUtil.requestWithAuthIfRequired(config);
-      
+
       return meta as SigMFMetadata;
     } catch (error) {
       console.error(error);
