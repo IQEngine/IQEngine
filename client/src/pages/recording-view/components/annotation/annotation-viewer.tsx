@@ -4,7 +4,6 @@
 
 import React, { Fragment, useCallback, useMemo, useRef, useState } from 'react';
 import { Layer, Rect, Text } from 'react-konva';
-import { TILE_SIZE_IN_IQ_SAMPLES } from '@/utils/constants';
 import { Annotation, SigMFMetadata } from '@/utils/sigmfMetadata';
 import { useSpectrogramContext } from '../../hooks/use-spectrogram-context';
 import { Html } from 'react-konva-utils';
@@ -140,7 +139,7 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
     let updatedAnnotations = [...meta.annotations];
     annotations[annotations.length - 1]['index'] = updatedAnnotations.length;
 
-    let start_sample_index = currentFFT * TILE_SIZE_IN_IQ_SAMPLES;
+    let start_sample_index = currentFFT * fftSize;
     const annot_indx = annotations.length - 1;
     let lower_freq = meta.captures[0]['core:frequency'] - meta.global['core:sample_rate'] / 2;
     meta.annotations.push(

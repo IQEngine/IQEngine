@@ -8,7 +8,7 @@ import { MINIMUM_SCROLL_HANDLE_HEIGHT_PIXELS, MINIMAP_FFT_SIZE } from '@/utils/c
 import { useGetIQData, useRawIQData } from '@/api/iqdata/Queries';
 import { useSpectrogramContext } from '../hooks/use-spectrogram-context';
 import { colMaps } from '@/utils/colormap';
-import { calcFftOfTile, fftToRGB } from '@/utils/selector';
+import { calcFfts, fftToRGB } from '@/utils/selector';
 
 interface ScrollBarProps {
   currentFFT: number;
@@ -47,18 +47,18 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
   const [handleHeightPixels, setHandleHeightPixels] = useState(1);
   const [scalingFactor, setScalingFactor] = useState(1);
 
-  const downloadedTiles = useMemo(() => {
+  const downloadedFfts = useMemo(() => {
     if (!downloadedIndexes || !meta) return [];
-    // we will have a maximum of 100 tiles to show data that has been downloaded
-    const tiles = [];
+    // we will have a maximum of 100 indicators to show data that has been downloaded
+    const ticks = [];
     const downloadScaling = meta.getTotalSamples() / fftSize / 100;
     for (let i = 0; i < 100; i++) {
       const exist = downloadedIndexes.find((x) => x >= i * downloadScaling && x < (i + 1) * downloadScaling);
       if (exist) {
-        tiles.push(i);
+        ticks.push(i);
       }
     }
-    return tiles;
+    return ticks;
   }, [meta, fftSize, downloadedIndexes]);
 
   // Changes in the spectrogram height require a recalculation of the ffts required
@@ -89,9 +89,9 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
 
   const ffts = useMemo(() => {
     if (!displayedIQ) return null;
-    //performance.mark('calcFftOfTile');
-    const ffts_calc = calcFftOfTile(displayedIQ, MINIMAP_FFT_SIZE, windowFunction, spectrogramHeight);
-    //console.debug(performance.measure('calcFftOfTile', 'calcFftOfTile'));
+    //performance.mark('calcFfts');
+    const ffts_calc = calcFfts(displayedIQ, MINIMAP_FFT_SIZE, windowFunction, spectrogramHeight);
+    //console.debug(performance.measure('calcFfts', 'calcFfts'));
     const min = Math.min(...ffts_calc);
     const max = Math.max(...ffts_calc);
     setMagnitudeMin(min);
@@ -242,10 +242,10 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
         ))}
 
         {/* white boxes showing what has been downloaded */}
-        {downloadedTiles?.map((tile) => (
+        {downloadedFfts?.map((fftIndx) => (
           <Rect
             x={MINIMAP_FFT_SIZE}
-            y={((tile - 1) * spectrogramHeight) / 100}
+            y={((fftIndx - 1) * spectrogramHeight) / 100}
             width={5}
             height={spectrogramHeight / 100}
             fillEnabled={true}
