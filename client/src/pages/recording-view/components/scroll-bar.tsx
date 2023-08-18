@@ -66,11 +66,11 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
     // for minimap only. there's so much overhead with blob downloading that this might as well be a high value...
     const skipNFfts = Math.floor(meta.getTotalSamples() / (spectrogramHeight * MINIMAP_FFT_SIZE)); // sets the decimation rate
     const numFfts = Math.floor(meta.getTotalSamples() / MINIMAP_FFT_SIZE / skipNFfts);
-    let dataRange = [];
+    let newMinimapFFTIndices = [];
     for (let i = 0; i < numFfts; i++) {
-      dataRange.push(i * skipNFfts);
+      newMinimapFFTIndices.push(i * skipNFfts);
     }
-    setMinimapFFTIndices(dataRange);
+    setMinimapFFTIndices(newMinimapFFTIndices);
   }, [meta?.getTotalSamples(), spectrogramHeight]);
 
   // filter the displayed iq as we receive new data
