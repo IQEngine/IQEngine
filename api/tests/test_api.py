@@ -118,7 +118,6 @@ async def test_api_post_existing_meta(client):
         f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path/meta',
         json=valid_metadata,
     )
-    print(response.json())
     assert response.status_code == 409
     assert response.json() == {"detail": "Metadata already exists"}
 
@@ -262,6 +261,30 @@ async def test_api_get_datasources(client):
     response = client.get("/api/datasources")
     assert response.status_code == 200
     assert len(response.json()) == 1
+
+
+@mock.patch("handlers.datasources.AzureBlobClient.generate_sas_token", return_value="temp_sas_token")
+@pytest.mark.asyncio
+async def test_api_get_temp_sas_token(mock_get_sas_token: Mock, client):
+    client.post("/api/datasources", json=test_datasource).json()
+    response = client.get(f"/api/datasources/{test_datasource['account']}/{test_datasource['container']}/file_path/sas")
+    assert response.status_code == 200
+    response_object = response.json()
+    assert response_object["sasToken"] == "temp_sas_token"
+    assert mock_get_sas_token.call_count == 1
+
+
+@mock.patch("handlers.datasources.AzureBlobClient.generate_sas_token", return_value="temp_sas_token")
+@pytest.mark.asyncio
+async def test_api_get_temp_sas_token_no_key(mock_get_sas_token: Mock, client):
+    modded_datasourse = test_datasource.copy()
+    modded_datasourse["account_key"] = None
+    client.post("/api/datasources", json=modded_datasourse).json()
+    response = client.get(f"/api/datasources/{test_datasource['account']}/{test_datasource['container']}/file_path/sas")
+    assert response.status_code == 200
+    response_object = response.json()
+    assert response_object["sasToken"] == "sasToken"
+    assert mock_get_sas_token.call_count == 0
 
 
 @pytest.mark.asyncio

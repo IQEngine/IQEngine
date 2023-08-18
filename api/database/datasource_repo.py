@@ -1,6 +1,6 @@
 from typing import Optional
-from blob.azure_client import AzureBlobClient
 
+from blob.azure_client import AzureBlobClient
 from database.models import DataSource, DataSourceReference
 from helpers.cipher import decrypt, encrypt
 from motor.core import AgnosticCollection
@@ -9,6 +9,7 @@ from rf.samples import get_bytes_per_iq_sample
 
 def collection() -> AgnosticCollection:
     from database.database import db
+
     collection: AgnosticCollection = db().datasources
     return collection
 
@@ -59,6 +60,7 @@ async def datasource_exists(account, container) -> bool:
 
 async def sync(account: str, container: str):
     import database.metadata_repo
+
     azure_blob_client = AzureBlobClient(account, container)
     datasource = await get(account, container)
     if datasource is None:
@@ -122,6 +124,10 @@ async def create(datasource: DataSource, user: Optional[dict]) -> DataSource:
         datasource.sasToken = encrypt(datasource.sasToken)
     else:
         datasource.sasToken = ""
+    if datasource.account_key:
+        datasource.account_key = encrypt(datasource.account_key)
+    else:
+        datasource.account_key = ""
     datasource_dict = datasource.dict(by_alias=True, exclude_unset=True)
 
     if "owners" not in datasource_dict:
