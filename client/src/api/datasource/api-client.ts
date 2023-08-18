@@ -3,49 +3,23 @@ import { DataSourceClient } from './datasource-client';
 import { DataSource } from '@/api/Models';
 import { TraceabilityOrigin } from '@/utils/sigmfMetadata';
 import { AccountInfo, IPublicClientApplication } from '@azure/msal-browser';
+import { AuthUtil } from '@/api/utils/Auth-Utils';
 
 export class ApiClient implements DataSourceClient {
-  private instance: IPublicClientApplication;
-  private account: AccountInfo;
+  private authUtil: AuthUtil;
 
   constructor(instance: IPublicClientApplication, account: AccountInfo) {
-    this.instance = instance;
-    this.account = account;
-  }
-
-  private async getAccessToken() {
-    const api_scope = 'api://' + import.meta.env.IQENGINE_APP_ID + '/api';
-    if (!this.account) return null;
-    try {
-      const response = await this.instance.acquireTokenSilent({
-        account: this.account,
-        scopes: [api_scope],
-      });
-      return response.accessToken;
-    } catch (error) {
-      return null;
-    }
-  }
-
-  private async requestWithAuthIfRequired(config) {
-    const token = await this.getAccessToken();
-    if (token != null) {
-      const headers = {
-        Authorization: `Bearer ${token}`,
-      };
-      return axios({ ...config, headers });
-    }
-    return axios({ ...config, headers: {} });
+    this.authUtil = new AuthUtil(instance, account);
   }
 
   async sync(account: string, container: string): Promise<void> {
-    await this.requestWithAuthIfRequired({
+    await this.authUtil.requestWithAuthIfRequired({
       method: 'get',
       url: `/api/datasources/${account}/${container}/sync`,
     });
   }
   async query(queryString: string, signal: AbortSignal): Promise<TraceabilityOrigin[]> {
-    const response = await this.requestWithAuthIfRequired({
+    const response = await this.authUtil.requestWithAuthIfRequired({
       method: 'get',
       url: `/api/datasources/query?${queryString}`,
       signal,
@@ -56,7 +30,7 @@ export class ApiClient implements DataSourceClient {
     });
   }
   async list(): Promise<DataSource[]> {
-    const response = await this.requestWithAuthIfRequired({
+    const response = await this.authUtil.requestWithAuthIfRequired({
       method: 'get',
       url: '/api/datasources',
     });
@@ -69,7 +43,7 @@ export class ApiClient implements DataSourceClient {
     return response.data;
   }
   async get(account: string, container: string): Promise<DataSource> {
-    const response = await this.requestWithAuthIfRequired({
+    const response = await this.authUtil.requestWithAuthIfRequired({
       method: 'get',
       url: `/api/datasources/${account}/${container}/datasource`,
     });
@@ -82,7 +56,7 @@ export class ApiClient implements DataSourceClient {
     return response.data;
   }
   async create(dataSource: DataSource): Promise<DataSource> {
-    const response = await this.requestWithAuthIfRequired({
+    const response = await this.authUtil.requestWithAuthIfRequired({
       method: 'post',
       url: '/api/datasources',
       data: dataSource,
