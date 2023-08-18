@@ -30,7 +30,7 @@ export function useSpectrogram(currentFFT) {
   );
   const totalFFTs = Math.ceil(meta?.getTotalSamples() / fftSize);
 
-  const debouncedCurrentFFT = useDebounce<string>(currentFFT, 200);
+  const debouncedCurrentFFT = useDebounce<string>(currentFFT, 50);
 
   // This is the list of ffts we display
   const displayedIQ = useMemo<Float32Array>(() => {
