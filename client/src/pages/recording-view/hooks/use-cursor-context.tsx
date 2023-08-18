@@ -39,7 +39,13 @@ export function CursorContextProvider({ children }) {
   const [cursorTimeEnabled, setCursorTimeEnabled] = useState<boolean>(false);
 
   const { type, account, container, filePath, fftSize } = useSpectrogramContext();
-  const { currentData, setFFTsRequired, fftsRequired } = useGetIQData(type, account, container, filePath, fftSize);
+  const { currentData, setMinimapFFTIndices, minimapFFTIndices } = useGetIQData(
+    type,
+    account,
+    container,
+    filePath,
+    fftSize
+  );
 
   const [cursorData, setCursorData] = useState<Float32Array>(new Float32Array(0));
   const debouseCursorTime = useDebounce(cursorTime, 500);
@@ -62,7 +68,7 @@ export function CursorContextProvider({ children }) {
       offset += fftSize * 2;
     }
     setCursorData(iqData);
-    setFFTsRequired(requiredBlocks);
+    setMinimapFFTIndices(requiredBlocks);
   }, [debouseCursorTime, currentData, fftSize]);
 
   return (

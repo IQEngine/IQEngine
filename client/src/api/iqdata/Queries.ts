@@ -71,15 +71,15 @@ export function useGetIQData(
 
   const queryClient = useQueryClient();
   const { filesQuery, dataSourcesQuery } = useUserSettings();
-  const [fftsRequired, setFFTsRequired] = useState<number[]>([]);
+  const [minimapFFTIndices, setMinimapFFTIndices] = useState<number[]>([]);
 
   const { data: meta } = useMeta(type, account, container, filePath);
 
   const { data: iqData } = useQuery({
-    queryKey: ['iqData', type, account, container, filePath, fftSize, fftsRequired],
+    queryKey: ['iqData', type, account, container, filePath, fftSize, minimapFFTIndices],
     queryFn: async ({ signal }) => {
       const iqDataClient = IQDataClientFactory(type, filesQuery.data, dataSourcesQuery.data);
-      const iqData = await iqDataClient.getIQDataBlocks(meta, fftsRequired, fftSize, signal);
+      const iqData = await iqDataClient.getIQDataBlocks(meta, minimapFFTIndices, fftSize, signal);
       return iqData;
     },
     enabled: !!meta && !!filesQuery.data && !!dataSourcesQuery.data,
@@ -151,8 +151,8 @@ export function useGetIQData(
   return {
     fftSize,
     currentData,
-    fftsRequired,
-    setFFTsRequired,
+    minimapFFTIndices,
+    setMinimapFFTIndices,
     processedDataUpdated,
   };
 }

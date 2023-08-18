@@ -19,7 +19,7 @@ export function useSpectrogram(currentFFT) {
     taps,
     pythonSnippet,
   } = useSpectrogramContext();
-  const { currentData, setFFTsRequired, fftsRequired, processedDataUpdated } = useGetIQData(
+  const { currentData, setMinimapFFTIndices, minimapFFTIndices, processedDataUpdated } = useGetIQData(
     type,
     account,
     container,
@@ -64,13 +64,13 @@ export function useSpectrogram(currentFFT) {
     }
 
     if (!currentData || Object.keys(currentData).length === 0) {
-      setFFTsRequired(requiredBlocks);
+      setMinimapFFTIndices(requiredBlocks);
       return null;
     }
     // check if the blocks are already loaded
     const blocksToLoad = requiredBlocks.filter((block) => !currentData[block]);
-    setFFTsRequired(blocksToLoad);
-    // setFFTsRequired(blocksToLoad);
+    setMinimapFFTIndices(blocksToLoad);
+    // setMinimapFFTIndices(blocksToLoad);
     //if (blocksToLoad.length > 0) {
     //  console.debug('loading blocks', blocksToLoad);
     //}
@@ -101,7 +101,7 @@ export function useSpectrogram(currentFFT) {
     spectrogramHeight,
     displayedIQ,
     currentData,
-    fftsRequired,
+    minimapFFTIndices,
     setFFTStepSize,
     setSpectrogramHeight,
   };

@@ -99,11 +99,11 @@ describe('test metadata fetch and fft calculation', () => {
       wrapper: ({ children }) => createTestWrapper(origin, seed, children),
     });
 
-    await waitFor(() => expect(result.current.fftsRequired.length).toBe(10 + FETCH_PADDING));
+    await waitFor(() => expect(result.current.minimapFFTIndices.length).toBe(10 + FETCH_PADDING));
     const expected = Array(10 + FETCH_PADDING)
       .fill(0)
       .map((_, i) => i);
-    expect(result.current.fftsRequired).toStrictEqual(expected);
+    expect(result.current.minimapFFTIndices).toStrictEqual(expected);
   });
 
   test('should calculate the correct ffts that need to be displayed when decimating', async () => {
@@ -124,21 +124,21 @@ describe('test metadata fetch and fft calculation', () => {
       wrapper: ({ children }) => createTestWrapper(origin, seed, children),
     });
 
-    await waitFor(() => expect(result.current.fftsRequired.length).toBe(10 + FETCH_PADDING));
+    await waitFor(() => expect(result.current.minimapFFTIndices.length).toBe(10 + FETCH_PADDING));
     let expected = Array(10 + FETCH_PADDING)
       .fill(0)
       .map((_, i) => i * 2);
-    expect(result.current.fftsRequired).toStrictEqual(expected);
+    expect(result.current.minimapFFTIndices).toStrictEqual(expected);
 
     act(() => {
       result.current.setFFTStepSize(2);
     });
 
-    await waitFor(() => expect(result.current.fftsRequired.length).toBe(10 + FETCH_PADDING));
+    await waitFor(() => expect(result.current.minimapFFTIndices.length).toBe(10 + FETCH_PADDING));
     expected = Array(10 + FETCH_PADDING)
       .fill(0)
       .map((_, i) => i * 3);
-    expect(result.current.fftsRequired).toStrictEqual(expected);
+    expect(result.current.minimapFFTIndices).toStrictEqual(expected);
   });
 
   test('should calculate the correct ffts that need to be displayed when decimating and changing height', async () => {
@@ -161,19 +161,19 @@ describe('test metadata fetch and fft calculation', () => {
     let expected = Array(10 + FETCH_PADDING)
       .fill(0)
       .map((_, i) => i * 2);
-    await waitFor(() => expect(result.current.fftsRequired.length).toBe(10 + FETCH_PADDING));
-    expect(result.current.fftsRequired).toStrictEqual(expected);
+    await waitFor(() => expect(result.current.minimapFFTIndices.length).toBe(10 + FETCH_PADDING));
+    expect(result.current.minimapFFTIndices).toStrictEqual(expected);
 
     act(() => {
       result.current.setFFTStepSize(2);
       result.current.setSpectrogramHeight(5);
     });
 
-    await waitFor(() => expect(result.current.fftsRequired.length).toBe(5 + FETCH_PADDING));
+    await waitFor(() => expect(result.current.minimapFFTIndices.length).toBe(5 + FETCH_PADDING));
 
     expected = Array(5 + FETCH_PADDING)
       .fill(0)
       .map((_, i) => i * 3);
-    expect(result.current.fftsRequired).toStrictEqual(expected);
+    expect(result.current.minimapFFTIndices).toStrictEqual(expected);
   });
 });

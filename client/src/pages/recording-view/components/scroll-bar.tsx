@@ -32,7 +32,7 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
     setMagnitudeMax,
     windowFunction,
   } = useSpectrogramContext();
-  const { currentData, setFFTsRequired, fftsRequired } = useGetIQData(
+  const { currentData, setMinimapFFTIndices, minimapFFTIndices } = useGetIQData(
     type,
     account,
     container,
@@ -70,17 +70,17 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
     for (let i = 0; i < numFfts; i++) {
       dataRange.push(i * skipNFfts);
     }
-    setFFTsRequired(dataRange);
+    setMinimapFFTIndices(dataRange);
   }, [meta?.getTotalSamples(), spectrogramHeight]);
 
   // filter the displayed iq as we receive new data
   const displayedIQ = useMemo<Float32Array>(() => {
     // join the current ffts
-    if (!currentData || !fftsRequired) return new Float32Array(0);
-    const iqData = new Float32Array(MINIMAP_FFT_SIZE * fftsRequired.length * 2);
+    if (!currentData || !minimapFFTIndices) return new Float32Array(0);
+    const iqData = new Float32Array(MINIMAP_FFT_SIZE * minimapFFTIndices.length * 2);
     let offset = 0;
-    for (let i = 0; i < fftsRequired.length; i++) {
-      iqData.set(currentData[fftsRequired[i]], offset);
+    for (let i = 0; i < minimapFFTIndices.length; i++) {
+      iqData.set(currentData[minimapFFTIndices[i]], offset);
       offset += MINIMAP_FFT_SIZE * 2;
     }
     return iqData;
@@ -101,19 +101,19 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
   // Calc scroll handle height and new scaling factor
   useEffect(() => {
     console.log('========');
-    console.log(fftsRequired);
+    console.log(minimapFFTIndices);
     if (!meta) return;
     let newHandleHeight =
       (spectrogramHeight / (meta.getTotalSamples() / fftSize / (fftStepSize + 1))) * spectrogramHeight;
     setHandleHeightPixels(Math.max(MINIMUM_SCROLL_HANDLE_HEIGHT_PIXELS, newHandleHeight));
 
-    if (fftsRequired.length > 0) {
+    if (minimapFFTIndices.length > 0) {
       const totalffts = meta.getTotalSamples() / fftSize;
       // get the length ot any of the iqData arrays
       const newScalingFactor = totalffts / spectrogramHeight;
       setScalingFactor(newScalingFactor);
     }
-  }, [spectrogramHeight, fftSize, fftStepSize, meta, fftsRequired]);
+  }, [spectrogramHeight, fftSize, fftStepSize, meta, minimapFFTIndices]);
 
   // Calc the minimap image from ffts to rgb
   useEffect(() => {
