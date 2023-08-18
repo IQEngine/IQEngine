@@ -69,7 +69,6 @@ class Plugin:
             annotations.append(an)
 
         return {
-            "status" : "SUCCESS",
             "data_output" : [],
             "annotations" : annotations
         }

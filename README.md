@@ -140,6 +140,21 @@ We have several feature flags currently in use. Their purposes are as follows:
 
 * `displayInternalBranding`: When true this flag displays an additional logo for customers using IQ Engine. This is false as default.
 
+## Database RBAC setup
+
+The solution implements RBAC controls using configuration setup for each data source defined. The data source documents have the following properties:
+
+```json
+"owners" : [ ],
+"readers" : [ ],
+"public" : true
+```
+
+Where owners and readers are string lists that can contain individual user email addresses or the id guid of Azure Active Directory security groups.
+Owners identifies the group of users able to modify the security permissions for the data source.
+Readers identifies the group of people that have read access to the data source in addition to the owners collection.
+Public is a boolean flag indicating public access to the data source enabling any user identity (anonymous or logged in) to use the data source.
+A admin screen will be implemented in the near future to allow easy management of these properties on the data source.
 ## Project Roadmap
 
 The following roadmap highlights the past, current, and future work items across multiple (simultaneous) focus areas.  Not included in this list are ongoing efforts to make IQEngine valuable for use in education, as well as user experience (UX) improvements.
