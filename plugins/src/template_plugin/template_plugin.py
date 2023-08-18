@@ -34,7 +34,6 @@ class Plugin:
         an["core:label"] = "Unknown"
         annotations.append(an)
         return {
-            "status" : "SUCCESS",
             "data_output" : [],
             "annotations" : annotations
         }
