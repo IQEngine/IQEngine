@@ -47,7 +47,7 @@ export const generateSampleImageData = (
     return { sampleImageData: null, num_ffts: 0, expectedImageData: null };
   }
 
-  let num_ffts = spectrogramHeight / fftSize;
+  let num_ffts = spectrogramHeight;
   let expectedImageData = new ImageData(1, 1);
   const { sampleIQData } = generateSampleIQData(fftSize, num_ffts);
   const ffts = calcFfts(sampleIQData, fftSize, 'hamming', num_ffts);
