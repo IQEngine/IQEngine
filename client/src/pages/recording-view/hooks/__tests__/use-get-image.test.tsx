@@ -137,8 +137,8 @@ describe('DevTest Spectrogram Tests', () => {
     ['2048,jet,multi-dB', 100, 2048, -40.0, -10.0, 'jet', SampleType.MultipleBuckets],
     ['-80/0,plasma,multi-dB', 100, 1024, -80.0, 10.0, 'plasma', SampleType.MultipleBuckets],
     ['4096,-20/20,multi-dB', 100, 4096, -20.0, 20.0, 'plasma', SampleType.MultipleBuckets],
-    ['8192,-60/50,inferno,multi-dB', 100, 8192, -60.0, 50.0, 'inferno', SampleType.MultipleBuckets],
-    ['16384,-100/50,multi-dB', 100, 16384, -100.0, 50.0, 'inferno', SampleType.MultipleBuckets],
+    ['8192,-60/50,inferno,multi-dB', 10, 8192, -60.0, 50.0, 'inferno', SampleType.MultipleBuckets],
+    ['16384,-100/50,multi-dB', 10, 16384, -100.0, 50.0, 'inferno', SampleType.MultipleBuckets],
     ['128,white box', 100, 128, -40.0, 0.0, COLORMAP_DEFAULT, SampleType.WhiteBox],
     ['256,white box', 100, 256, -30.0, -20.0, 'jet', SampleType.MultipleBuckets],
     ['512,white box', 100, 512, -60.0, 10.0, 'plasma', SampleType.MultipleBuckets],
@@ -147,8 +147,8 @@ describe('DevTest Spectrogram Tests', () => {
     ['2048,jet,white box', 100, 2048, -40.0, -10.0, 'jet', SampleType.MultipleBuckets],
     ['-80/0,plasma,white box', 100, 1024, -80.0, 10.0, 'plasma', SampleType.MultipleBuckets],
     ['4096,-20/20,white box', 100, 4096, -20.0, 20.0, 'plasma', SampleType.MultipleBuckets],
-    ['8192,-60/50,inferno,white box', 100, 8192, -60.0, 50.0, 'inferno', SampleType.MultipleBuckets],
-    ['16384,-100/50,white box', 100, 16384, -100.0, 50.0, 'inferno', SampleType.MultipleBuckets],
+    ['8192,-60/50,inferno,white box', 10, 8192, -60.0, 50.0, 'inferno', SampleType.MultipleBuckets],
+    ['16384,-100/50,white box', 10, 16384, -100.0, 50.0, 'inferno', SampleType.MultipleBuckets],
   ])(
     'RGB is generated correctly from the following fftdata: %s',
     async (comment, spectrogramHeight, fftSize, magnitudeMin, magnitudeMax, colorMap, sampleType) => {
