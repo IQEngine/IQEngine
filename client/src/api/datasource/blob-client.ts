@@ -18,7 +18,7 @@ export class BlobClient implements DataSourceClient {
   }
   
   getSasToken(account: string, container: string, filepath: string): Promise<String> {
-    throw new Error('Method not implemented.');
+    throw new Error('get sas not supported for blob data sources');
   }
 
   list(): Promise<DataSource[]> {
