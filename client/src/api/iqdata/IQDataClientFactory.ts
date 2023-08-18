@@ -14,7 +14,10 @@ export const IQDataClientFactory = (
 ): IQDataClient => {
   switch (type) {
     case CLIENT_TYPE_API:{
-        const accounts = instance.getAllAccounts();
+      let accounts = [];
+      if (instance) {
+        accounts = instance.getAllAccounts();
+      }
         if (accounts.length === 0) {
           return new ApiClient(null, null);
         } else {
