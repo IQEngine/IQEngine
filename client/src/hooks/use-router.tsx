@@ -129,7 +129,7 @@ export function useRouter() {
         {
           path: 'recordings/:type/:account/:container/:sasToken?',
           async lazy() {
-            let { RecordingsBrowser } = await import('@/pages/recordings-browser/RecordingsBrowser');
+            let { RecordingsBrowser } = await import('@/pages/recordings-browser/recordings-browser');
             return { Component: RecordingsBrowser };
           },
         },
