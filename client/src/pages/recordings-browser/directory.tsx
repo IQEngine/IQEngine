@@ -2,11 +2,11 @@
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
 
-import FileRow from './File';
+import FileRow from './file';
 import styled from 'styled-components';
 import FolderIcon from '@mui/icons-material/Folder';
 import FolderOpen from '@mui/icons-material/FolderOpen';
-import { DirectoryNode } from './DirectoryNode';
+import { DirectoryNode } from './directory-node';
 import React, { useState } from 'react';
 
 const StyledOpenFolderIcon = styled(FolderOpen)`

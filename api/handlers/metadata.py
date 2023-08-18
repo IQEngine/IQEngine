@@ -1,13 +1,14 @@
 from datetime import datetime
 from typing import List, Optional
-
 from blob.azure_client import AzureBlobClient
+from helpers.datasource_access import check_access
 from database import datasource_repo, metadata_repo
 from database.metadata_repo import InvalidGeolocationFormat, query_metadata
+
 from database.models import DataSource, DataSourceReference, Metadata, TrackMetadata
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Response
 from fastapi.responses import StreamingResponse
-from helpers.authorization import required_roles
+from helpers.authorization import get_current_user
 from helpers.cipher import decrypt
 from helpers.urlmapping import ApiType, get_content_type, get_file_name
 from motor.core import AgnosticCollection
@@ -24,9 +25,11 @@ async def get_all_meta(
     account,
     container,
     metadatas: AgnosticCollection = Depends(metadata_repo.collection),
-    current_user: Optional[dict] = Depends(required_roles()),
+    access_allowed=Depends(check_access),
 ):
-    # TODO: Should we validate datasource_id?
+
+    if access_allowed is None:
+        return []
 
     # Return all metadata for this datasource, could be an empty
     # list
@@ -51,8 +54,11 @@ async def get_all_meta_name(
     account,
     container,
     metadata_source: AgnosticCollection = Depends(metadata_repo.collection),
-    current_user: Optional[dict] = Depends(required_roles()),
+    access_allowed=Depends(check_access),
 ):
+    if access_allowed is None:
+        return []
+
     metadata = metadata_source.find(
         {
             "global.traceability:origin.account": account,
@@ -75,8 +81,10 @@ async def get_all_meta_name(
 )
 async def get_meta(
     metadata: Metadata = Depends(metadata_repo.get),
-    current_user: Optional[dict] = Depends(required_roles()),
+    access_allowed=Depends(check_access)
 ):
+    if access_allowed is None:
+        raise HTTPException(status_code=403, detail="No Access")
     if not metadata:
         raise HTTPException(status_code=404, detail="Metadata not found")
     return metadata
@@ -88,16 +96,23 @@ async def get_meta(
 )
 async def get_track_meta(
     metadata: Metadata = Depends(metadata_repo.get),
-    current_user: Optional[dict] = Depends(required_roles()),
+    access_allowed=Depends(check_access)
 ):
+    if access_allowed is None:
+        raise HTTPException(status_code=403, detail="No Access")
+
     if not metadata:
         raise HTTPException(status_code=404, detail="Metadata not found")
 
     return TrackMetadata(
         iqengine_geotrack=metadata.globalMetadata.__dict__.get("iqengine:geotrack"),
         description=metadata.globalMetadata.core_description,
-        account=metadata.globalMetadata.traceability_origin.account,
-        container=metadata.globalMetadata.traceability_origin.container,
+        account=metadata.globalMetadata.traceability_origin.account
+        if metadata.globalMetadata.traceability_origin is not None
+        else None,
+        container=metadata.globalMetadata.traceability_origin.container
+        if metadata.globalMetadata.traceability_origin is not None
+        else None,
     )
 
 
@@ -110,8 +125,10 @@ async def get_meta_thumbnail(
     background_tasks: BackgroundTasks,
     datasource: DataSource = Depends(datasource_repo.get),
     azure_client: AzureBlobClient = Depends(AzureBlobClient),
-    current_user: Optional[dict] = Depends(required_roles()),
+    access_allowed=Depends(check_access)
 ):
+    if access_allowed is None:
+        raise HTTPException(status_code=403, detail="No Access")
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
 
@@ -162,7 +179,7 @@ async def query_meta(
     text: Optional[str] = Query(None),
     captures_geo: Optional[str] = Query(None),
     annotations_geo: Optional[str] = Query(None),
-    current_user: Optional[dict] = Depends(required_roles()),
+    current_user: Optional[dict] = Depends(get_current_user),
 ):
     try:
         result = await query_metadata(
@@ -181,12 +198,29 @@ async def query_meta(
             max_datetime=max_datetime,
             text=text,
         )
-        return result
+
+        if not result:
+            return []
+
+        # Process result to remove metadata from unauthorized datasources
+        access_cache = {}
+        filtered_result = []
+
+        for item in result:
+            key = (item.account, item.container)
+            if key not in access_cache:
+                access_cache[key] = await check_access(item.account, item.container, current_user)
+
+            if access_cache[key] is not None:
+                filtered_result.append(item)
+
+        return filtered_result
 
     except InvalidGeolocationFormat as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-    except Exception:
+    except Exception as e:
+        print(f"Error querying metadata: {e}")
         raise HTTPException(status_code=500, detail="An unexpected error occurred.")
 
 
@@ -203,8 +237,10 @@ async def create_meta(
     datasources: AgnosticCollection = Depends(datasource_repo.collection),
     metadatas: AgnosticCollection = Depends(metadata_repo.collection),
     versions: AgnosticCollection = Depends(metadata_repo.versions_collection),
-    current_user: Optional[dict] = Depends(required_roles()),
+    access_allowed=Depends(check_access),
 ):
+    if access_allowed != "owner":
+        raise HTTPException(status_code=403, detail="No Access")
     # Check datasource id is valid
     datasource = await datasources.find_one(
         {"account": account, "container": container}
@@ -251,8 +287,11 @@ async def update_meta(
     metadata: Metadata,
     metadatas: AgnosticCollection = Depends(metadata_repo.collection),
     versions: AgnosticCollection = Depends(metadata_repo.versions_collection),
-    current_user: Optional[dict] = Depends(required_roles()),
+    access_allowed=Depends(check_access),
 ):
+    if access_allowed != "owner":
+        raise HTTPException(status_code=403, detail="No Access")
+
     current = await metadatas.find_one(
         {
             "global.traceability:origin.account": account,
