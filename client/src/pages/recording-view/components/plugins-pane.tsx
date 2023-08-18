@@ -14,9 +14,9 @@ import { fftshift } from 'fftshift';
 import { FFT } from '@/utils/fft';
 import { useGetPluginsComponents } from '@/pages/recording-view/hooks/use-get-plugins-components';
 import { useGetPlugins } from '@/api/plugin/queries';
+import { useSasToken } from '@/api/datasource/queries';
 import { toast } from 'react-hot-toast';
 import { dataTypeToBytesPerIQSample } from '@/utils/selector';
-import { useUserSettings } from '@/api/user-settings/use-user-settings';
 import { useSpectrogramContext } from '../hooks/use-spectrogram-context';
 import { useCursorContext } from '../hooks/use-cursor-context';
 
@@ -34,7 +34,7 @@ export enum MimeTypes {
 }
 
 export const PluginsPane = () => {
-  const { meta, account, container, spectrogramHeight, fftSize, selectedAnnotation, setMeta } = useSpectrogramContext();
+  const { meta, account, type, container, spectrogramHeight, fftSize, selectedAnnotation, setMeta } = useSpectrogramContext();
   const { cursorTimeEnabled, cursorTime, cursorData } = useCursorContext();
   const { data: plugins, isError } = useGetPlugins();
   const { PluginOption, EditPluginParameters, pluginParameters, setPluginParameters } = useGetPluginsComponents();
@@ -44,8 +44,7 @@ export const PluginsPane = () => {
   const [modalSamples, setModalSamples] = useState<Float32Array>(new Float32Array([]));
   const [modalSpectrogram, setmodalSpectrogram] = useState(null);
   const [useCloudStorage, setUseCloudStorage] = useState(true);
-  const { dataSourcesQuery } = useUserSettings();
-  const connectionInfo = dataSourcesQuery?.data[`${account}/${container}`];
+  const token = useSasToken(type, account, container, meta.getFileName());
   let byte_offset = meta.getBytesPerIQSample() * cursorTime.start;
   let byte_length = meta.getBytesPerIQSample() * (cursorTime.end - cursorTime.start);
   const handleChangePlugin = (e) => {
@@ -96,15 +95,15 @@ export const PluginsPane = () => {
       custom_params: {},
     };
 
-    if (useCloudStorage && connectionInfo) {
+    if (useCloudStorage) {
       body = {
         samples_b64: [],
         samples_cloud: [
           {
-            account_name: connectionInfo.account,
-            container_name: connectionInfo.container,
+            account_name: account,
+            container_name: container,
             file_path: meta.getFileName(),
-            sas_token: connectionInfo.sasToken,
+            sas_token: token.data.data.sasToken,
             sample_rate: sampleRate,
             center_freq: freq,
             data_type: MimeTypes[meta.getDataType()],
@@ -306,7 +305,7 @@ export const PluginsPane = () => {
           ))}
         </select>
       </label>
-      {connectionInfo && (
+      {(type != 'local') && (
         <label className="label cursor-pointer">
           <span>Use Cloud Storage</span>
           <input

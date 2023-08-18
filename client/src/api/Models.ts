@@ -6,6 +6,7 @@ export interface DataSource {
   account: string;
   container: string;
   sasToken?: string;
+  accountKey?: string;
 }
 
 export interface IQDataSlice {
