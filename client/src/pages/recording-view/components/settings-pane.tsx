@@ -2,7 +2,7 @@
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
@@ -12,7 +12,9 @@ import { COLORMAP_DEFAULT } from '@/utils/constants';
 import { colMaps } from '@/utils/colormap';
 import { useSpectrogramContext } from '../hooks/use-spectrogram-context';
 import { useCursorContext } from '../hooks/use-cursor-context';
+import { vscodeDark } from '@uiw/codemirror-theme-vscode';
 import CodeMirror from '@uiw/react-codemirror';
+import { langs } from '@uiw/codemirror-extensions-langs';
 
 interface SettingsPaneProps {
   currentFFT: number;
@@ -78,6 +80,13 @@ const SettingsPane = ({ currentFFT }) => {
 
     document.body.removeChild(a);
   };
+
+  const onChangePythonSnippet = useCallback(
+    (value, viewUpdate) => {
+      setLocalPythonSnippet(value);
+    },
+    [localPythonSnippet]
+  );
 
   return (
     <div className="form-control">
@@ -292,16 +301,20 @@ const SettingsPane = ({ currentFFT }) => {
         <label className="label">
           <span className="label-text text-base">Python Snippet</span>
         </label>
-        <textarea
-          className="bg-base-content text-base-100 p-1"
-          rows={6}
-          cols={25}
-          wrap="off"
-          onChange={(e) => {
-            setLocalPythonSnippet(e.target.value);
-          }}
+
+        <CodeMirror
+          className="mb-3"
           value={localPythonSnippet}
+          onChange={onChangePythonSnippet}
+          height="150px"
+          theme={vscodeDark}
+          extensions={[langs.python()]}
+          basicSetup={{
+            lineNumbers: false,
+            foldGutter: false,
+          }}
         />
+
         <button onClick={onSubmitPythonSnippet}>Run Python</button>
       </div>
     </div>
