@@ -14,15 +14,11 @@ export const IQDataClientFactory = (
 ): IQDataClient => {
   switch (type) {
     case CLIENT_TYPE_API:{
-      let accounts = [];
-      if (instance) {
-        accounts = instance.getAllAccounts();
+      if (!instance || !instance.getAllAccounts || instance.getAllAccounts().length === 0) {
+        return new ApiClient(null, null);
       }
-        if (accounts.length === 0) {
-          return new ApiClient(null, null);
-        } else {
-          return new ApiClient(instance, accounts[0]);
-        }
+      const accounts = instance.getAllAccounts();
+      return new ApiClient(instance, accounts[0]);
       }
     case CLIENT_TYPE_LOCAL:
       return new LocalClient(files);
