@@ -112,7 +112,6 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
     if (!ffts) return;
     const rgbData = fftToRGB(ffts, MINIMAP_FFT_SIZE, magnitudeMin, magnitudeMax, colMaps[colmap]);
     let num_final_ffts = ffts.length / MINIMAP_FFT_SIZE;
-    console.log('====', num_final_ffts);
     const newImageData = new ImageData(rgbData, MINIMAP_FFT_SIZE, num_final_ffts);
 
     createImageBitmap(newImageData).then((imageBitmap) => {
