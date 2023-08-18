@@ -80,9 +80,8 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
     const iqData = new Float32Array(MINIMAP_FFT_SIZE * fftsRequired.length * 2);
     let offset = 0;
     for (let i = 0; i < fftsRequired.length; i++) {
-      const iqDataSlice = currentData[fftsRequired[i]];
-      iqData.set(iqDataSlice, offset);
-      offset += iqDataSlice.length;
+      iqData.set(currentData[fftsRequired[i]], offset);
+      offset += MINIMAP_FFT_SIZE * 2;
     }
     return iqData;
   }, [currentData]);
@@ -101,6 +100,8 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
 
   // Calc scroll handle height and new scaling factor
   useEffect(() => {
+    console.log('========');
+    console.log(fftsRequired);
     if (!meta) return;
     let newHandleHeight =
       (spectrogramHeight / (meta.getTotalSamples() / fftSize / (fftStepSize + 1))) * spectrogramHeight;

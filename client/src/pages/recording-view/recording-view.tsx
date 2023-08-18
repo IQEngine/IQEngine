@@ -25,6 +25,7 @@ import { AnnotationViewer } from './components/annotation/annotation-viewer';
 import TimeSelectorMinimap from './components/time-selector-minimap';
 import { useWindowSize } from 'usehooks-ts';
 
+// currentFFT is the index of the FFT at the top of the screen
 export function DisplaySpectrogram({ currentFFT, setCurrentFFT }) {
   const {
     spectrogramWidth,
@@ -58,6 +59,7 @@ export function DisplaySpectrogram({ currentFFT, setCurrentFFT }) {
     colmap,
     windowFunction
   );
+
   function handleWheel(evt: KonvaEventObject<WheelEvent>): void {
     evt.evt.preventDefault();
     const scrollAmount = Math.floor(evt.evt.deltaY);
@@ -74,6 +76,7 @@ export function DisplaySpectrogram({ currentFFT, setCurrentFFT }) {
       setIQData(displayedIQ);
     }
   }, [displayedIQ]);
+
   return (
     <>
       <Stage width={spectrogramWidth + 110} height={30}>
