@@ -25,7 +25,7 @@ export class AuthUtil {
       }
     }
 
-    async requestWithAuthIfRequired(config: {cancelToken?: CancelToken, headers?: any }) {
+    async requestWithAuthIfRequired(config: {headers?: any, method: string, url: string, data?: any, signal?: AbortSignal}) {
       const token = await this.getAccessToken();
       const authorizationHeaders = token ? { Authorization: `Bearer ${token}` } : {};
 
@@ -34,7 +34,8 @@ export class AuthUtil {
         headers: {
           ...config.headers,
           ...authorizationHeaders
-        }
+        },
+        signal: config.signal,
       });
     }
   }

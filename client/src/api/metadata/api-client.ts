@@ -58,7 +58,7 @@ export class ApiClient implements MetadataClient {
     const response = await this.authUtil.requestWithAuthIfRequired({
       method: 'get',
       url: `/api/datasources/${account}/${container}/${filepath}/track`,
-      signal: { signal },
+      signal: signal,
     });
     if (response.status !== 200) {
       throw new Error(`Unexpected status code: ${response.status}`);
