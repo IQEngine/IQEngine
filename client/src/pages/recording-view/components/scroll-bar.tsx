@@ -100,8 +100,6 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
 
   // Calc scroll handle height and new scaling factor
   useEffect(() => {
-    console.log('========');
-    console.log(minimapFFTIndices);
     if (!meta) return;
     let newHandleHeight =
       (spectrogramHeight / (meta.getTotalSamples() / fftSize / (fftStepSize + 1))) * spectrogramHeight;
