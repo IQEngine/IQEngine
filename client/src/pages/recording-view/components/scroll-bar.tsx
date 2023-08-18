@@ -4,7 +4,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { Layer, Rect, Image } from 'react-konva';
-import { MINIMUM_SCROLL_HANDLE_HEIGHT_PIXELS, MINIMAP_FFT_SIZE } from '@/utils/constants';
+import { MINIMUM_SCROLL_HANDLE_HEIGHT_PIXELS, MINIMAP_FFT_SIZE, MINIMAP_NUM_FFTs } from '@/utils/constants';
 import { useGetIQData, useRawIQData } from '@/api/iqdata/Queries';
 import { useSpectrogramContext } from '../hooks/use-spectrogram-context';
 import { colMaps } from '@/utils/colormap';
@@ -30,7 +30,6 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
     setMagnitudeMin,
     magnitudeMax,
     setMagnitudeMax,
-    windowFunction,
   } = useSpectrogramContext();
   const { currentData, setMinimapFFTIndices, minimapFFTIndices } = useGetIQData(
     type,
@@ -61,17 +60,14 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
     return tiles;
   }, [meta, fftSize, downloadedIndexes]);
 
-  // Changes in the spectrogram height require a recalculation of the ffts required
   useEffect(() => {
-    // for minimap only. there's so much overhead with blob downloading that this might as well be a high value...
-    const skipNFfts = Math.floor(meta.getTotalSamples() / (spectrogramHeight * MINIMAP_FFT_SIZE)); // sets the decimation rate
-    const numFfts = Math.floor(meta.getTotalSamples() / MINIMAP_FFT_SIZE / skipNFfts);
+    const skipNFfts = Math.floor(meta.getTotalSamples() / (MINIMAP_NUM_FFTs * MINIMAP_FFT_SIZE)); // sets the decimation rate
     let newMinimapFFTIndices = [];
-    for (let i = 0; i < numFfts; i++) {
+    for (let i = 0; i < MINIMAP_NUM_FFTs; i++) {
       newMinimapFFTIndices.push(i * skipNFfts);
     }
     setMinimapFFTIndices(newMinimapFFTIndices);
-  }, [meta?.getTotalSamples(), spectrogramHeight]);
+  }, [meta?.getTotalSamples()]);
 
   // filter the displayed iq as we receive new data
   const displayedIQ = useMemo<Float32Array>(() => {
@@ -88,9 +84,7 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
 
   const ffts = useMemo(() => {
     if (!displayedIQ) return null;
-    //performance.mark('calcFftOfTile');
-    const ffts_calc = calcFftOfTile(displayedIQ, MINIMAP_FFT_SIZE, windowFunction, spectrogramHeight);
-    //console.debug(performance.measure('calcFftOfTile', 'calcFftOfTile'));
+    const ffts_calc = calcFftOfTile(displayedIQ, MINIMAP_FFT_SIZE, 'no-windowing', MINIMAP_NUM_FFTs);
     const min = Math.min(...ffts_calc);
     const max = Math.max(...ffts_calc);
     setMagnitudeMin(min);
@@ -118,6 +112,7 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
     if (!ffts) return;
     const rgbData = fftToRGB(ffts, MINIMAP_FFT_SIZE, magnitudeMin, magnitudeMax, colMaps[colmap]);
     let num_final_ffts = ffts.length / MINIMAP_FFT_SIZE;
+    console.log('====', num_final_ffts);
     const newImageData = new ImageData(rgbData, MINIMAP_FFT_SIZE, num_final_ffts);
 
     createImageBitmap(newImageData).then((imageBitmap) => {

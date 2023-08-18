@@ -6,6 +6,7 @@ export const TILE_SIZE_IN_IQ_SAMPLES = Math.pow(2, 17); // should always be a po
 export const MINIMUM_SCROLL_HANDLE_HEIGHT_PIXELS = 10;
 export const COLORMAP_DEFAULT = 'viridis';
 export const MINIMAP_FFT_SIZE = 64; // determines columns of minimap image
+export const MINIMAP_NUM_FFTs = 300; // determines how many pixels are in the minimap image, higher will make the initial page load slower
 export const FETCH_PADDING = 50; // how many extra ffts we fetch to smooth scrolling this si based on the fft size
 export const MIN_SPECTROGRAM_HEIGHT = 650;
 export const INITIAL_PYTHON_SNIPPET = `import numpy as np
