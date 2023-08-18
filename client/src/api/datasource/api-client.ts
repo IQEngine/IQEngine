@@ -3,7 +3,7 @@ import { DataSourceClient } from './datasource-client';
 import { DataSource } from '@/api/Models';
 import { TraceabilityOrigin } from '@/utils/sigmfMetadata';
 import { AccountInfo, IPublicClientApplication } from '@azure/msal-browser';
-import { AuthUtil } from '@/api/utils/AuthUtils';
+import { AuthUtil } from '@/api/utils/Auth-Utils';
 
 export class ApiClient implements DataSourceClient {
   private authUtil: AuthUtil;

@@ -1,7 +1,7 @@
 import { MetadataClient } from './metadata-client';
 import { SigMFMetadata, Annotation, CaptureSegment, Track } from '@/utils/sigmfMetadata';
 import { AccountInfo, IPublicClientApplication } from '@azure/msal-browser';
-import { AuthUtil } from '@/api/utils/AuthUtils';
+import { AuthUtil } from '@/api/utils/Auth-Utils';
 
 export class ApiClient implements MetadataClient {
   private authUtil: AuthUtil;

@@ -4,7 +4,7 @@ import { SigMFMetadata } from '@/utils/sigmfMetadata';
 import { IQDataSlice } from '@/api/Models';
 import { convertToFloat32 } from '@/utils/fetch-more-data-source';
 import { AccountInfo, IPublicClientApplication } from '@azure/msal-browser';
-import { AuthUtil } from '@/api/utils/AuthUtils';
+import { AuthUtil } from '@/api/utils/Auth-Utils';
 
 
 export class ApiClient implements IQDataClient {
