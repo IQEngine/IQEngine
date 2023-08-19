@@ -1,4 +1,4 @@
-import { Annotation, CaptureSegment, SigMFMetadata } from '@/utils/sigmfMetadata';
+import { Annotation, CaptureSegment, SigMFMetadata, Track } from '@/utils/sigmfMetadata';
 import { ContainerClient } from '@azure/storage-blob';
 import { MetadataClient } from './metadata-client';
 import { getContainerClient } from '@/api/utils/AzureBlob';
@@ -64,6 +64,10 @@ export class BlobClient implements MetadataClient {
 
   constructor(dataSources: Record<string, DataSource>) {
     this.dataSources = dataSources;
+  }
+
+  track(account: string, container: string, filepath: string): Promise<Track> {
+    throw new Error('track not supported for blob data sources');
   }
 
   async getMeta(account: string, container: string, filePath: string): Promise<SigMFMetadata> {

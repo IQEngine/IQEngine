@@ -125,10 +125,10 @@ async def get_meta_thumbnail(
     background_tasks: BackgroundTasks,
     datasource: DataSource = Depends(datasource_repo.get),
     azure_client: AzureBlobClient = Depends(AzureBlobClient),
-    access_allowed=Depends(check_access)
+    # access_allowed=Depends(check_access)
 ):
-    if access_allowed is None:
-        raise HTTPException(status_code=403, detail="No Access")
+    # access_allowed is always None because the API url is referenced directly in the UI HTML
+    # No authorization header is added to the request so the access_allowed is always None
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
 

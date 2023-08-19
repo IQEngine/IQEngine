@@ -4,6 +4,7 @@ import { DataSource } from '@/api/Models';
 import { TraceabilityOrigin } from '@/utils/sigmfMetadata';
 import { useUserSettings } from '@/api/user-settings/use-user-settings';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMsal } from '@azure/msal-react';
 import { ClientType } from '@/api/Models';
 
 const fetchDataSources = async (client: DataSourceClient) => {
@@ -24,7 +25,8 @@ const fetchDataSource = async (client: DataSourceClient, account: string, contai
 
 export const getDataSources = (type: string, enabled = true) => {
   const { filesQuery, dataSourcesQuery } = useUserSettings();
-  const client = DataSourceClientFactory(type, filesQuery.data, dataSourcesQuery.data);
+  const { instance } = useMsal();
+  const client = DataSourceClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance);
   return useQuery(['datasource', type], () => fetchDataSources(client), {
     enabled: enabled,
   });
@@ -32,10 +34,12 @@ export const getDataSources = (type: string, enabled = true) => {
 
 export const getDataSource = (type: string, account: string, container: string, enabled = true) => {
   const { dataSourcesQuery, filesQuery } = useUserSettings();
+  const { instance } = useMsal();
+  const client = DataSourceClientFactory(type, filesQuery.data, dataSourcesQuery.data,instance);
   return useQuery(
     ['datasource', type, account, container],
     () => {
-      const client = DataSourceClientFactory(type, filesQuery.data, dataSourcesQuery.data);
+
       return fetchDataSource(client, account, container);
     },
     {
@@ -46,10 +50,11 @@ export const getDataSource = (type: string, account: string, container: string, 
 
 export const useQueryMeta = (type: string, queryString: string, enabled = true) => {
   const { dataSourcesQuery, filesQuery } = useUserSettings();
+  const { instance } = useMsal();
+  const client = DataSourceClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance);
   return useQuery<TraceabilityOrigin[]>(
     ['metadata-query', queryString],
     async ({ signal }) => {
-      const client = DataSourceClientFactory(type, filesQuery.data, dataSourcesQuery.data);
       return await client.query(queryString, signal);
     },
     {
@@ -60,19 +65,22 @@ export const useQueryMeta = (type: string, queryString: string, enabled = true) 
 
 export const useGetDatasourceFeatures = (type: string) => {
   const { dataSourcesQuery, filesQuery } = useUserSettings();
-  const client = DataSourceClientFactory(type, filesQuery.data, dataSourcesQuery.data);
+  const { instance } = useMsal();
+  const client = DataSourceClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance);
   return client.features();
 };
 
 export const useSyncDataSource = (type: string, account: string, container) => {
   const { dataSourcesQuery, filesQuery } = useUserSettings();
-  const client = DataSourceClientFactory(type, filesQuery.data, dataSourcesQuery.data);
+  const { instance } = useMsal();
+  const client = DataSourceClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance);
   return () => client.sync(account, container);
 };
 
 export const useAddDataSource = () => {
   const { dataSourcesQuery, filesQuery } = useUserSettings();
-  const dataSourceClient = DataSourceClientFactory(ClientType.API, filesQuery.data, dataSourcesQuery.data);
+  const { instance } = useMsal();
+  const dataSourceClient = DataSourceClientFactory(ClientType.API, filesQuery.data, dataSourcesQuery.data, instance);
 
   return useMutation({
     mutationFn: (dataSource: DataSource) => {
