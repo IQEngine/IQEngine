@@ -2,14 +2,14 @@
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
 import { directoryOpen, fileOpen, supported } from 'browser-fs-access';
 import { FileWithDirectoryAndFileHandle } from 'browser-fs-access';
 import { getDataSource } from '@/api/datasource/queries';
 import { CLIENT_TYPE_LOCAL } from '@/api/Models';
 import { useUserSettings } from '@/api/user-settings/use-user-settings';
+import toast from 'react-hot-toast';
 
 const LocalFileBrowser = () => {
   const navigate = useNavigate();
@@ -38,6 +38,12 @@ const LocalFileBrowser = () => {
       multiple: true,
     });
     console.log('files', files);
+
+    if (files.length != 2) {
+      toast('Please select 1 .sigmf-meta and 1 .sigmf-data file (matching)');
+      return;
+    }
+
     let fileWithoutExtension = files[0].name.replace('.sigmf-meta', '').replace('.sigmf-data', '');
     setFiles(files);
     setFilePath(fileWithoutExtension);
