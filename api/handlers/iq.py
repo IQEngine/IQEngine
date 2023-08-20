@@ -1,9 +1,6 @@
 import asyncio
-import base64
 import io
-import logging
 import math
-import time
 from typing import List
 
 from blob.azure_client import AzureBlobClient
@@ -11,11 +8,10 @@ from database import datasource_repo
 from database.models import DataSource
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.responses import StreamingResponse
-
-from helpers.datasource_access import check_access
-from helpers.apidisconnect import cancel_on_disconnect, CancelOnDisconnectRoute
+from helpers.apidisconnect import CancelOnDisconnectRoute, cancel_on_disconnect
 from helpers.cipher import decrypt
 from helpers.conversions import find_smallest_and_largest_next_to_each_other
+from helpers.datasource_access import check_access
 from helpers.urlmapping import ApiType, get_content_type, get_file_name
 from pydantic import BaseModel, SecretStr
 from rf.samples import get_bytes_per_iq_sample
@@ -106,7 +102,6 @@ async def calculate_iq_data(
 async def get_byte_streams(
     block_indexes, block_size, bytes_per_iq_sample, iq_file, azure_client, request
 ):
-
     max_concurrent_requests = 100
     chunk_size = 100 * 1024 // block_size
     block_indexes_arrs = find_smallest_and_largest_next_to_each_other(block_indexes)
@@ -138,7 +133,10 @@ async def get_byte_streams(
                 blob_size,
             )
 
-    tasks = [get_byte_stream_wrapper(block_index_chunk) for block_index_chunk in block_indexes_chunks]
+    tasks = [
+        get_byte_stream_wrapper(block_index_chunk)
+        for block_index_chunk in block_indexes_chunks
+    ]
     return await asyncio.gather(*tasks)
 
 
@@ -151,7 +149,6 @@ async def get_byte_stream(
     azure_client,
     blob_size,
 ):
-
     offsetBytes = block_indexes_chunk[0] * block_size * bytes_per_iq_sample
     countBytes = (
         (block_indexes_chunk[1] - block_indexes_chunk[0] + 1)
@@ -197,7 +194,6 @@ async def get_iqfile(
     return StreamingResponse(response.chunks(), media_type=content_type)
 
 
-
 @router.get(
     "/api/datasources/{account}/{container}/{filepath:path}/minimap-data",
     status_code=200,
@@ -219,7 +215,9 @@ async def get_minimap_iq(
         if datasource.sasToken:
             azure_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
         if datasource.account_key:
-            azure_client.set_account_key(decrypt(datasource.account_key.get_secret_value()))
+            azure_client.set_account_key(
+                decrypt(datasource.account_key.get_secret_value())
+            )
         minimap_iq_file = get_file_name(filepath, ApiType.MINIMAP)
         if await azure_client.blob_exist(minimap_iq_file):
             blob = await azure_client.get_blob_content(filepath=minimap_iq_file)
@@ -231,28 +229,25 @@ async def get_minimap_iq(
             blob_size = blob_data_properties.size
             total_ffts = math.floor(blob_size / (bytes_per_sample * fft_size))
             # get 1000 ffts equally spaced out
-            block_indexes = [
-                math.floor(i * total_ffts / 1000) for i in range(1000)
-            ]
+            block_indexes = [math.floor(i * total_ffts / 1000) for i in range(1000)]
             # make sure that no block index it is larger than the total number of ffts
             block_indexes = [i for i in block_indexes if i < total_ffts]
             data = calculate_iq_data(
                 block_indexes,
-                fft_size, # default minimap fft size
+                fft_size,  # default minimap fft size
                 get_bytes_per_iq_sample(format),
                 file_name,
                 azure_client,
                 request,
             )
-            
+
             content = io.BytesIO()
             async for chunk in data:
                 content.write(chunk)
             content.seek(0)
             if azure_client.can_write():
                 await azure_client.upload_blob(
-                    filepath=minimap_iq_file,
-                    data=content.getvalue()
+                    filepath=minimap_iq_file, data=content.getvalue()
                 )
             else:
                 print("Cannot write mnimap to blob")

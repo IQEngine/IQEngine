@@ -53,13 +53,14 @@ class AzureBlobClient:
 
     def can_write(self):
         return self.account_key or self.sas_token_has_write_permission()
-    
 
     def get_blob_client(self, filepath):
         if filepath in self.clients:
             return self.clients[filepath]
         if self.account_key:
-            sas_token = self.generate_sas_token(filepath, self.account_key.get_secret_value(), True)
+            sas_token = self.generate_sas_token(
+                filepath, self.account_key.get_secret_value(), True
+            )
             blob_client = BlobClient.from_blob_url(
                 f"https://{self.account}.blob.core.windows.net/"
                 f"{self.container}/{filepath}",
@@ -147,7 +148,9 @@ class AzureBlobClient:
         blob = await blob_client.get_blob_properties()
         return int(blob.size)
 
-    def generate_sas_token(self, filepath: str, account_key: str, include_write: bool = False):
+    def generate_sas_token(
+        self, filepath: str, account_key: str, include_write: bool = False
+    ):
         start_time = datetime.datetime.now(datetime.timezone.utc)
         expiry_time = start_time + datetime.timedelta(hours=1)
         try:
@@ -156,7 +159,9 @@ class AzureBlobClient:
                 container_name=self.container,
                 blob_name=filepath,
                 account_key=account_key,
-                permission=BlobSasPermissions(read=True, write=include_write, create=include_write),
+                permission=BlobSasPermissions(
+                    read=True, write=include_write, create=include_write
+                ),
                 expiry=expiry_time,
                 start=start_time,
             )

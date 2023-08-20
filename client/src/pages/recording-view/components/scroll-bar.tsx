@@ -49,7 +49,7 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
       iqData.set(minimapData[i], i * minimapData[i].length);
     }
     //performance.mark('calcFftOfTile');
-    const ffts_calc = calcFftOfTile(iqData, MINIMAP_FFT_SIZE, windowFunction, spectrogramHeight);
+    const ffts_calc = calcFftOfTile(iqData, MINIMAP_FFT_SIZE, windowFunction, 1000);
     //console.debug(performance.measure('calcFftOfTile', 'calcFftOfTile'));
     const min = Math.min(...ffts_calc);
     const max = Math.max(...ffts_calc);
