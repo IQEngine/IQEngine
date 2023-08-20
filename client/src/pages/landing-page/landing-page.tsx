@@ -14,6 +14,8 @@ export const LandingPage = () => {
   };
 
   if (getFeatureFlag('bypassLandingPage')) {
+    navigate('/browser');
+  } else {
     return (
       <div className="flex pt-4 pb-6">
         <div className="w-96"></div>
@@ -104,8 +106,6 @@ export const LandingPage = () => {
         <div className="w-96"></div>
       </div>
     );
-  } else {
-    navigate('/browser');
   }
 };
 
