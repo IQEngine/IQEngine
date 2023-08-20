@@ -1,6 +1,5 @@
 import { SigMFMetadata } from '@/utils/sigmfMetadata';
 import { IQDataSlice } from '@/api/Models';
-import { getIQDataSlices } from './Queries';
 
 export interface IQDataClient {
   getIQDataBlocks(

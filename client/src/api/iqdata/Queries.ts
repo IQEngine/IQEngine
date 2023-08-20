@@ -5,36 +5,8 @@ import { INITIAL_PYTHON_SNIPPET, TILE_SIZE_IN_IQ_SAMPLES } from '@/utils/constan
 import { useUserSettings } from '@/api/user-settings/use-user-settings';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useMeta } from '@/api/metadata/queries';
+import { useMsal } from '@azure/msal-react';
 import { applyProcessing } from '@/utils/fetch-more-data-source';
-
-export const getIQDataSlices = (
-  meta: SigMFMetadata,
-  indexes: number[],
-  tileSize: number = TILE_SIZE_IN_IQ_SAMPLES,
-  enabled = true
-) => {
-  const { filesQuery, dataSourcesQuery } = useUserSettings();
-  if (!meta || !indexes || !indexes.length || !filesQuery.data || !dataSourcesQuery.data) {
-    return useQueries({
-      queries: [],
-    });
-  }
-  const { type, account, container, file_path } = meta?.getOrigin();
-  return useQueries({
-    queries: indexes.map((index) => {
-      return {
-        queryKey: ['datasource', type, account, container, file_path, 'iq', { index: index, tileSize: tileSize }],
-        queryFn: async () => {
-          const signal = new AbortController().signal;
-          const iqDataClient = IQDataClientFactory(type, filesQuery.data, dataSourcesQuery.data);
-          return iqDataClient.getIQDataSlice(meta, index, tileSize, signal);
-        },
-        enabled: enabled && !!meta && index >= 0,
-        staleTime: Infinity,
-      };
-    }),
-  });
-};
 
 declare global {
   interface Window {
@@ -74,11 +46,11 @@ export function useGetIQData(
   const [fftsRequired, setFFTsRequired] = useState<number[]>([]);
 
   const { data: meta } = useMeta(type, account, container, filePath);
-
+  const { instance } = useMsal();
+  const iqDataClient = IQDataClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance);
   const { data: iqData } = useQuery({
     queryKey: ['iqData', type, account, container, filePath, fftSize, fftsRequired],
     queryFn: async ({ signal }) => {
-      const iqDataClient = IQDataClientFactory(type, filesQuery.data, dataSourcesQuery.data);
       const iqData = await iqDataClient.getIQDataBlocks(meta, fftsRequired, fftSize, signal);
       return iqData;
     },

@@ -4,15 +4,22 @@ import { BlobClient } from './blob-client';
 import { LocalClient } from './local-client';
 import { MetadataClient } from './metadata-client';
 import { FileWithDirectoryAndFileHandle } from 'browser-fs-access';
+import { IPublicClientApplication } from '@azure/msal-browser';
 
 export const MetadataClientFactory = (
   type: string,
   files: FileWithDirectoryAndFileHandle[],
-  dataSources: Record<string, DataSource>
+  dataSources: Record<string, DataSource>,
+  instance: IPublicClientApplication,
 ): MetadataClient => {
   switch (type) {
-    case CLIENT_TYPE_API:
-      return new ApiClient();
+    case CLIENT_TYPE_API:{
+      if (!instance || !instance.getAllAccounts || instance.getAllAccounts().length === 0) {
+        return new ApiClient(null, null);
+      }
+      const accounts = instance.getAllAccounts();
+      return new ApiClient(instance, accounts[0]);
+    }
     case CLIENT_TYPE_LOCAL:
       return new LocalClient(files);
     case CLIENT_TYPE_BLOB:
