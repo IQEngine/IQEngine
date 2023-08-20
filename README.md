@@ -140,6 +140,8 @@ We have several feature flags currently in use. Their purposes are as follows:
 
 * `displayInternalBranding`: When true this flag displays an additional logo for customers using IQ Engine. This is false as default.
 
+* `bypassLandingPage`: Skips the landing page meant for www.iqengine.org
+
 ## Database RBAC setup
 
 The solution implements RBAC controls using configuration setup for each data source defined. The data source documents have the following properties:
