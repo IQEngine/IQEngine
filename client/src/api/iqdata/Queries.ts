@@ -152,3 +152,18 @@ export function useRawIQData(type, account, container, filePath, fftSize) {
     rawIQQuery,
   };
 }
+
+export function useGetMinimapIQ(type: string, account: string, container: string, filePath: string, enabled = true) {
+  const { data: meta } = useMeta(type, account, container, filePath);
+  const { filesQuery, dataSourcesQuery } = useUserSettings();
+  const iqDataClient = IQDataClientFactory(type, filesQuery.data, dataSourcesQuery.data);
+  const minimapQuery = useQuery<Float32Array[]>({
+    queryKey: ['minimapiq', type, account, container, filePath],
+    queryFn: async ({ signal }) => {
+      const minimapIQ = await iqDataClient.getMinimapIQ(meta, signal);
+      return minimapIQ;
+    },
+    enabled: enabled && !!meta && !!filesQuery.data && !!dataSourcesQuery.data,
+  });
+  return minimapQuery;
+}

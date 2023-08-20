@@ -2,13 +2,14 @@ import asyncio
 import base64
 import io
 import logging
+import math
 import time
 from typing import List
 
 from blob.azure_client import AzureBlobClient
 from database import datasource_repo
 from database.models import DataSource
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.responses import StreamingResponse
 
 from helpers.datasource_access import check_access
@@ -196,95 +197,69 @@ async def get_iqfile(
     return StreamingResponse(response.chunks(), media_type=content_type)
 
 
+
 @router.get(
-    "/api/datasources/{account}/{container}/{filepath:path}/iqslice",
+    "/api/datasources/{account}/{container}/{filepath:path}/minimap-data",
     status_code=200,
 )
-async def get_iq(
+async def get_minimap_iq(
+    request: Request,
     filepath: str,
-    offsetBytes: int,
-    countBytes: int,
+    format: str,
     access_allowed=Depends(check_access),
     datasource: DataSource = Depends(datasource_repo.get),
     azure_client: AzureBlobClient = Depends(AzureBlobClient),
 ):
+    fft_size = 64
     if access_allowed is None:
         raise HTTPException(status_code=403, detail="No Access")
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
     try:
-        azure_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
-        iq_file = get_file_name(filepath, ApiType.IQDATA)
-        blob = await azure_client.get_blob_content(
-            filepath=iq_file, offset=offsetBytes, length=countBytes
-        )
-        data = io.BytesIO(blob)
-        encoded_data = base64.b64encode(data.getvalue()).decode("utf-8")
-        return {"data": encoded_data}
-
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-
-async def download_blob(
-    azure_client: AzureBlobClient,
-    filepath: str,
-    index: int,
-    tile_size: int,
-    bytes_per_iq_sample: int,
-    blob_size: int,
-):
-    offsetBytes = index * tile_size * bytes_per_iq_sample
-    countBytes = tile_size * bytes_per_iq_sample
-    if (offsetBytes + countBytes) > blob_size:
-        countBytes = blob_size - offsetBytes
-    blob = await azure_client.get_blob_content(
-        filepath=filepath, offset=offsetBytes, length=countBytes
-    )
-    data = io.BytesIO(blob)
-    encoded_data = base64.b64encode(data.getvalue()).decode("utf-8")
-    return {"index": index, "data": encoded_data}
-
-
-@router.post(
-    "/api/datasources/{account}/{container}/{filepath:path}/iqslices", status_code=200
-)
-async def get_iq_data_slices(
-    iq_data: IQData,
-    filepath: str,
-    datasource: DataSource = Depends(datasource_repo.get),
-    azure_client: AzureBlobClient = Depends(AzureBlobClient),
-    access_allowed=Depends(check_access)
-):
-    if access_allowed is None:
-        raise HTTPException(status_code=403, detail="No Access")
-    if not datasource:
-        raise HTTPException(status_code=404, detail="Datasource not found")
-    try:
-        azure_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
-        logger = logging.getLogger("api")
-        logger.info(f"tile_size: {iq_data.tile_size}")
-        iq_file = get_file_name(filepath, ApiType.IQDATA)
-        blob_properties = await azure_client.get_blob_properties(iq_file)
-        blob_size = blob_properties.size
-
-        data_list = []
-
-        # asyncio solution. Much faster
-        tasks = [
-            download_blob(
+        if datasource.sasToken:
+            azure_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
+        if datasource.account_key:
+            azure_client.set_account_key(decrypt(datasource.account_key.get_secret_value()))
+        minimap_iq_file = get_file_name(filepath, ApiType.MINIMAP)
+        if await azure_client.blob_exist(minimap_iq_file):
+            blob = await azure_client.get_blob_content(filepath=minimap_iq_file)
+            return Response(content=blob, media_type="application/octet-stream")
+        else:
+            file_name = get_file_name(filepath, ApiType.IQDATA)
+            bytes_per_sample = get_bytes_per_iq_sample(format)
+            blob_data_properties = await azure_client.get_blob_properties(file_name)
+            blob_size = blob_data_properties.size
+            total_ffts = math.floor(blob_size / (bytes_per_sample * fft_size))
+            # get 1000 ffts equally spaced out
+            block_indexes = [
+                math.floor(i * total_ffts / 1000) for i in range(1000)
+            ]
+            # make sure that no block index it is larger than the total number of ffts
+            block_indexes = [i for i in block_indexes if i < total_ffts]
+            data = calculate_iq_data(
+                block_indexes,
+                fft_size, # default minimap fft size
+                get_bytes_per_iq_sample(format),
+                file_name,
                 azure_client,
-                iq_file,
-                index,
-                iq_data.tile_size,
-                iq_data.bytes_per_iq_sample,
-                blob_size,
+                request,
             )
-            for index in iq_data.indexes
-        ]
-        data_list = await asyncio.gather(*tasks)
-
-        return data_list
-
+            
+            content = io.BytesIO()
+            async for chunk in data:
+                content.write(chunk)
+            content.seek(0)
+            if azure_client.can_write():
+                await azure_client.upload_blob(
+                    filepath=minimap_iq_file,
+                    data=content.getvalue()
+                )
+            else:
+                print("Cannot write mnimap to blob")
+            content.seek(0)
+            return Response(
+                content=content.getvalue(),
+                media_type="application/octet-stream",
+            )
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))

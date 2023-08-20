@@ -135,6 +135,10 @@ async def get_meta_thumbnail(
     sas_token = datasource.sasToken.get_secret_value() if datasource.sasToken else None
     if sas_token is not None:
         azure_client.set_sas_token(decrypt(sas_token))
+    
+    account_key = datasource.account_key.get_secret_value() if datasource.account_key else None
+    if account_key is not None:
+        azure_client.set_account_key(decrypt(account_key))
 
     thumbnail_path = get_file_name(filepath, ApiType.THUMB)
     content_type = get_content_type(ApiType.THUMB)
