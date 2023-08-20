@@ -18,7 +18,7 @@ export const LandingPage = () => {
         <h1>A web-based SDR toolkit for analyzing, processing, and sharing RF recordings</h1>
 
         <div className="py-6">
-          <button className="text-3xl py-2 px-4 bg-accent hover:bg-primary" onClick={handleOnClick}>
+          <button id="browse-button" className="text-3xl py-2 px-4 bg-accent hover:bg-primary" onClick={handleOnClick}>
             &#128270; Start Browsing
           </button>
         </div>
