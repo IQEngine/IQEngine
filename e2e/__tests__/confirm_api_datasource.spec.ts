@@ -17,7 +17,7 @@ test.beforeAll(async ({ request }) => {
 
 // the "Open Local Directory" and "Select 1" options are not tested
 test('Confirm api datasource @CICompatible', async ({ page }) => {
-  await page.goto('./');
+  await page.goto('/browser');
 
   // api data source
   await page.locator('[id="(API)TestAPIDataSource"]').first().click();

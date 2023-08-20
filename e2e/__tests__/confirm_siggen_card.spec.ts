@@ -1,7 +1,7 @@
 import { test } from '@playwright/test';
 
 test('Confirm siggen card @CICompatible', async ({ page }) => {
-  await page.goto('./');
+  await page.goto('/browser');
 
   // signal generator
   await page.locator('[id="Siggen"]').click();
