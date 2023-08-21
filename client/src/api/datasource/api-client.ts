@@ -64,7 +64,7 @@ export class ApiClient implements DataSourceClient {
       if (!response.data) {
         return null;
       }
-      
+
       return response
 
     } catch (error) {
@@ -73,7 +73,7 @@ export class ApiClient implements DataSourceClient {
         throw new Error(`Unexpected status code: ${status}`);
       }
     }
-    
+
   }
   async create(dataSource: DataSource): Promise<DataSource> {
     const response = await this.authUtil.requestWithAuthIfRequired({
