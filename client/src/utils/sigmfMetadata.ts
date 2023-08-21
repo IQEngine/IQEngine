@@ -276,5 +276,31 @@ export class Annotation {
     return String(this['core:label'] ?? this['core:description'] ?? '');
   }
 
+  getComment() {
+    return String(this['core:comment'] ?? '');
+  }
+
+  getRaw() {
+    return JSON.stringify(
+      {
+        'core:sample_start': this['core:sample_start'] ?? 0,
+        'core:sample_count': this['core:sample_count'] ?? 0,
+        'core:generator': this['core:generator'],
+        'core:label': this['core:label'],
+        'core:comment': this['core:comment'],
+        'core:freq_lower_edge': this['core:freq_lower_edge'] ?? 0,
+        'core:freq_upper_edge': this['core:freq_upper_edge'] ?? 0,
+        'core:uuid': this['core:uuid'],
+        capture_details: this.capture_details,
+      },
+      (key, value) => {
+        if (value !== null) {
+          return value;
+        }
+      },
+      4
+    );
+  }
+
   [key: string]: any;
 }
