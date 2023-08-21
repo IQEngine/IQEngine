@@ -12,6 +12,7 @@ import { CLIENT_TYPE_LOCAL } from '@/api/Models';
 import { useUserSettings } from '@/api/user-settings/use-user-settings';
 
 const LocalFileBrowser = () => {
+  const [goToPage, setGoToPage] = useState(false);
   const navigate = useNavigate();
   const { setFiles } = useUserSettings();
   const [container, setContainer] = useState<string>(null);
@@ -20,7 +21,7 @@ const LocalFileBrowser = () => {
 
   useEffect(() => {
     console.debug('dataSourceQuery', dataSourceQuery.data, 'container', container, 'filePath', filePath);
-    if (dataSourceQuery.data && dataSourceQuery.data.container === container) {
+    if (dataSourceQuery.data && dataSourceQuery.data.container === container && goToPage) {
       if (filePath) {
         const spectogramLink = `/view/${CLIENT_TYPE_LOCAL}/local/single_file/${encodeURIComponent(filePath)}`;
         navigate(spectogramLink);
@@ -28,7 +29,7 @@ const LocalFileBrowser = () => {
         navigate(`/recordings/${CLIENT_TYPE_LOCAL}/${dataSourceQuery.data.account}/${dataSourceQuery.data.container}`);
       }
     }
-  }, [dataSourceQuery.data, container, filePath]);
+  }, [dataSourceQuery.data, container, filePath, goToPage]);
 
   const directoryPickerAvailable = supported; // not all browsers support it yet
 
@@ -41,6 +42,7 @@ const LocalFileBrowser = () => {
     let fileWithoutExtension = files[0].name.replace('.sigmf-meta', '').replace('.sigmf-data', '');
     setFiles(files);
     setFilePath(fileWithoutExtension);
+    setGoToPage(true);
   };
 
   const openDir = async () => {
@@ -54,6 +56,7 @@ const LocalFileBrowser = () => {
     let containerPath = dirHandle[0].webkitRelativePath.split('/')[0];
     setFiles(dirHandle);
     setContainer(containerPath);
+    setGoToPage(true);
   };
 
   return (
