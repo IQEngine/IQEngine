@@ -56,7 +56,7 @@ export class LocalClient implements MetadataClient {
         continue;
       }
       // check if there is a corresponding sigmf-data file
-      const dataFile = localFiles.find((f) => f.name === file.name.split('.')[0] + '.sigmf-data');
+      const dataFile = localFiles.find((f) => f.name === file.name.replace('.sigmf-meta', '.sigmf-data'));
       if (!dataFile) {
         continue;
       }
