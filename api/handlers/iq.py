@@ -250,7 +250,7 @@ async def get_minimap_iq(
                     filepath=minimap_iq_file, data=content.getvalue()
                 )
             else:
-                print("Cannot write mnimap to blob")
+                print("Cannot write minimap to blob")
             content.seek(0)
             return Response(
                 content=content.getvalue(),
