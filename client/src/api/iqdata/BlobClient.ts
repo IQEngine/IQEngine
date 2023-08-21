@@ -5,12 +5,41 @@ import { SigMFMetadata } from '@/utils/sigmfMetadata';
 import { DataSource, IQDataSlice } from '@/api/Models';
 import { BlobClient as AzureBlobClient } from '@azure/storage-blob';
 import { groupContingousIndexes } from '@/utils/group';
+import { MINIMAP_FFT_SIZE } from '@/utils/constants';
 
 export class BlobClient implements IQDataClient {
   dataSources: Record<string, DataSource>;
 
   constructor(dataSources: Record<string, DataSource>) {
     this.dataSources = dataSources;
+  }
+
+  async getMinimapIQ(meta: SigMFMetadata, signal: AbortSignal): Promise<Float32Array[]> {
+    // Changes in the spectrogram height require a recalculation of the ffts required
+    // for minimap only. there's so much overhead with blob downloading that this might as well be a high value...
+    const skipNFfts = Math.floor(meta.getTotalSamples() / (1000 * MINIMAP_FFT_SIZE)); // sets the decimation rate (manually tweaked)
+    const numFfts = Math.floor(meta.getTotalSamples() / MINIMAP_FFT_SIZE / (skipNFfts + 1));
+    let dataRange = [];
+    for (let i = 0; i < numFfts; i++) {
+      dataRange.push(i * skipNFfts);
+    }
+    const { account, container, file_path } = meta.getOrigin();
+    const blobClient = getBlobClient(this.dataSources, account, container, file_path)
+    const iqBlocks: Float32Array[] = [];
+    for(const index of dataRange) {
+      const bytesPerSample = meta.getBytesPerIQSample();
+      const offsetBytes = index * MINIMAP_FFT_SIZE * bytesPerSample;
+      const countBytes = MINIMAP_FFT_SIZE * bytesPerSample;
+      // This is ugly but it is the only way to get the blob as an ArrayBuffer
+      const download = await blobClient.download(offsetBytes, countBytes, {
+        abortSignal: signal,
+      });
+      const blobBody = await (await download.blobBody).arrayBuffer();
+      const iqArray = convertToFloat32(blobBody, meta.getDataType());
+      iqBlocks.push(iqArray);
+      
+    }
+    return iqBlocks;
   }
 
   async getIQDataBlocks(
@@ -52,7 +81,7 @@ export class BlobClient implements IQDataClient {
     const bytesPerSample = meta.getBytesPerIQSample();
     const offsetBytes = index * blockSize * bytesPerSample;
     const countBytes = blockSize * count * bytesPerSample;
-    // Thi is ugly but it is the only way to get the blob as an ArrayBuffer
+    // This is ugly but it is the only way to get the blob as an ArrayBuffer
     const download = await blobClient.download(offsetBytes, countBytes, {
       abortSignal: signal,
     });

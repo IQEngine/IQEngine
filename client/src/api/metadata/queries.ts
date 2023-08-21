@@ -41,7 +41,7 @@ export const useQueryDataSourceMetaPaths = (type: string, account: string, conta
       return metadataClient.getDataSourceMetaPaths(account, container);
     },
     {
-      enabled: enabled,
+      enabled: enabled && !!dataSourcesQuery.data && !!filesQuery.data,
       staleTime: Infinity,
     }
   );
