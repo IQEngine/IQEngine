@@ -165,3 +165,69 @@ describe('getSigMFRaw', () => {
     expect(sampleSigmfMetadata.getSigMFRaw()).toBe(expectedRaw);
   });
 });
+
+describe('getRaw', () => {
+  test('should return raw annotation', () => {
+    const annotationMetadata: SigMFMetadata = Object.assign(new SigMFMetadata(), {
+      global: {
+        'core:author': 'TestAuthor',
+        'core:datatype': 'cf32_le',
+        'core:sample_rate': 1e6,
+        'core:version': '0.0.1',
+        'core:num_channels': 2,
+        'traceability:origin': {},
+      },
+      annotations: [
+        Object.assign(new Annotation(), {
+          'core:sample_start': 0,
+          'core:sample_count': 100,
+          'core:label': 'test',
+          'core:comment': 'test comment',
+          'core:freq_lower_edge': 0,
+          'core:freq_upper_edge': 0,
+        }),
+      ],
+    });
+
+    const expectedRaw = JSON.stringify(annotationMetadata.annotations[0], null, 4);
+
+    expect(annotationMetadata.annotations[0].getRaw()).toBe(expectedRaw);
+  });
+
+  test('should return raw annotation without null values', () => {
+    const annotationMetadata: SigMFMetadata = Object.assign(new SigMFMetadata(), {
+      global: {
+        'core:author': 'TestAuthor',
+        'core:datatype': 'cf32_le',
+        'core:sample_rate': 1e6,
+        'core:version': '0.0.1',
+        'core:num_channels': 2,
+        'traceability:origin': {},
+      },
+      annotations: [
+        Object.assign(new Annotation(), {
+          'core:sample_start': 0,
+          'core:sample_count': 100,
+          'core:label': 'test',
+          'core:comment': null,
+          'core:freq_lower_edge': 0,
+          'core:freq_upper_edge': 0,
+        }),
+      ],
+    });
+
+    const expectedRaw = JSON.stringify(
+      {
+        'core:sample_start': 0,
+        'core:sample_count': 100,
+        'core:label': 'test',
+        'core:freq_lower_edge': 0,
+        'core:freq_upper_edge': 0,
+      },
+      null,
+      4
+    );
+
+    expect(annotationMetadata.annotations[0].getRaw()).toBe(expectedRaw);
+  });
+});
