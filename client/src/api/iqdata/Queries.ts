@@ -14,6 +14,8 @@ declare global {
   }
 }
 
+const MAXIMUM_SAMPLES_PER_REQUEST = 1024 * 256;
+
 export function useGetIQData(
   type: string,
   account: string,
@@ -43,7 +45,12 @@ export function useGetIQData(
 
   const queryClient = useQueryClient();
   const { filesQuery, dataSourcesQuery } = useUserSettings();
-  const [fftsRequired, setFFTsRequired] = useState<number[]>([]);
+  const [fftsRequired, setStateFFTsRequired] = useState<number[]>([]);
+
+  function setFFTsRequired(fftsRequired: number[]) {
+    fftsRequired = fftsRequired.slice(0, fftsRequired.length > Math.ceil(MAXIMUM_SAMPLES_PER_REQUEST / fftSize) ? Math.ceil(MAXIMUM_SAMPLES_PER_REQUEST / fftSize) : fftsRequired.length);
+    setStateFFTsRequired(fftsRequired);
+  }
 
   const { data: meta } = useMeta(type, account, container, filePath);
   const { instance } = useMsal();

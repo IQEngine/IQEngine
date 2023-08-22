@@ -1,5 +1,5 @@
 import { AccountInfo, IPublicClientApplication } from "@azure/msal-browser";
-import axios, { CancelToken } from "axios";
+import axios, { AxiosRequestConfig, CancelToken } from "axios";
 import { C } from "vitest/dist/types-3c7dbfa5";
 
 export class AuthUtil {
@@ -25,7 +25,7 @@ export class AuthUtil {
       }
     }
 
-    async requestWithAuthIfRequired(config: {headers?: any, method: string, url: string, data?: any, signal?: AbortSignal}) {
+    async requestWithAuthIfRequired(config: AxiosRequestConfig) {
       const token = await this.getAccessToken();
       const authorizationHeaders = token ? { Authorization: `Bearer ${token}` } : {};
 
