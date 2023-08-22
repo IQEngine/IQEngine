@@ -33,8 +33,8 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
     windowFunction,
   } = useSpectrogramContext();
 
-  const { data: minimapData } = useGetMinimapIQ(type, account, container, filePath)
-  const { downloadedIndexes } = useRawIQData(type, account, container, filePath, fftSize)
+  const { data: minimapData } = useGetMinimapIQ(type, account, container, filePath);
+  const { downloadedIndexes } = useRawIQData(type, account, container, filePath, fftSize);
 
   const [minimapImg, setMinimapImg] = useState(null);
   const [ticks, setTicks] = useState([]);
@@ -49,7 +49,7 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
       iqData.set(minimapData[i], i * minimapData[i].length);
     }
     //performance.mark('calcFftOfTile');
-    const ffts_calc = calcFftOfTile(iqData, MINIMAP_FFT_SIZE, windowFunction, 1000);
+    const ffts_calc = calcFfts(iqData, MINIMAP_FFT_SIZE, windowFunction, 1000);
     //console.debug(performance.measure('calcFftOfTile', 'calcFftOfTile'));
 
     const min = Math.min(...ffts_calc);
@@ -66,13 +66,11 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
       (spectrogramHeight / (meta.getTotalSamples() / fftSize / (fftStepSize + 1))) * spectrogramHeight;
     setHandleHeightPixels(Math.max(MINIMUM_SCROLL_HANDLE_HEIGHT_PIXELS, newHandleHeight));
 
-    
-      const totalffts = meta.getTotalSamples() / fftSize;
-      // get the length ot any of the iqData arrays
-      const newScalingFactor = totalffts / spectrogramHeight;
-      setScalingFactor(newScalingFactor);
+    const totalffts = meta.getTotalSamples() / fftSize;
+    // get the length ot any of the iqData arrays
+    const newScalingFactor = totalffts / spectrogramHeight;
+    setScalingFactor(newScalingFactor);
   }, [spectrogramHeight, fftSize, fftStepSize, meta]);
-
 
   const downloadedTiles = useMemo(() => {
     console.debug('downloadedIndexes', downloadedIndexes);
@@ -217,7 +215,7 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
         ))}
 
         {/* white boxes showing what has been downloaded */}
-        {downloadedFfts?.map((fftIndx) => (
+        {downloadedIndexes?.map((fftIndx) => (
           <Rect
             x={MINIMAP_FFT_SIZE}
             y={((fftIndx - 1) * spectrogramHeight) / 100}
