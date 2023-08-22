@@ -2,6 +2,26 @@
   "name": "iqengine",
   "version": "0.1.0",
   "private": true,
+  "scripts": {
+    "build": "vite build",
+    "pretty": "prettier --write \"./**/*.{js,jsx,ts,tsx,json}\"",
+    "pretty-check": "prettier --check \"./**/*.{js,jsx,ts,tsx,json}\"",
+    "serve": "vite preview --host",
+    "start": "vite --host",
+    "test": "vitest"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
   "dependencies": {
     "@azure/msal-browser": "^3.0.2",
     "@azure/msal-react": "^2.0.2",
@@ -16,11 +36,6 @@
     "@mdx-js/rollup": "^2.3.0",
     "@monaco-editor/react": "^4.5.1",
     "@mui/icons-material": "^5.14.3",
-    "@rjsf/core": "^5.12.0",
-    "@rjsf/validator-ajv8": "^5.12.0",
-    "@tanstack/react-query": "^4.32.6",
-    "@tanstack/react-query-devtools": "^4.32.6",
-    "@uiw/codemirror-extensions-basic-setup": "^4.21.9",
     "@rjsf/core": "^5.12.1",
     "@rjsf/validator-ajv8": "^5.12.1",
     "@tanstack/react-query": "^4.33.0",
@@ -61,26 +76,6 @@
     "vite-plugin-svgr": "^3.2.0",
     "vite-tsconfig-paths": "^4.2.0",
     "web-vitals": "^3.4.0"
-  },
-  "scripts": {
-    "start": "vite --host",
-    "build": "vite build",
-    "serve": "vite preview --host",
-    "pretty": "prettier --write \"./**/*.{js,jsx,ts,tsx,json}\"",
-    "pretty-check": "prettier --check \"./**/*.{js,jsx,ts,tsx,json}\"",
-    "test": "vitest"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
   },
   "devDependencies": {
     "@tanstack/eslint-plugin-query": "^4.32.5",
