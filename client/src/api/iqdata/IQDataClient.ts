@@ -8,4 +8,6 @@ export interface IQDataClient {
     blockSize: number,
     signal: AbortSignal
   ): Promise<IQDataSlice[]>;
+
+  getMinimapIQ(meta: SigMFMetadata, signal: AbortSignal): Promise<Float32Array[]>;
 }

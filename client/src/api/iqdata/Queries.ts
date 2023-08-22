@@ -4,6 +4,7 @@ import { INITIAL_PYTHON_SNIPPET } from '@/utils/constants';
 import { useUserSettings } from '@/api/user-settings/use-user-settings';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useMeta } from '@/api/metadata/queries';
+import { useMsal } from '@azure/msal-react';
 import { applyProcessing } from '@/utils/fetch-more-data-source';
 
 declare global {
@@ -11,6 +12,8 @@ declare global {
     loadPyodide: any;
   }
 }
+
+const MAXIMUM_SAMPLES_PER_REQUEST = 1024 * 256;
 
 export function useGetIQData(
   type: string,
@@ -41,14 +44,19 @@ export function useGetIQData(
 
   const queryClient = useQueryClient();
   const { filesQuery, dataSourcesQuery } = useUserSettings();
-  const [fftsRequired, setFFTsRequired] = useState<number[]>([]);
+  const [fftsRequired, setStateFFTsRequired] = useState<number[]>([]);
+
+  function setFFTsRequired(fftsRequired: number[]) {
+    fftsRequired = fftsRequired.slice(0, fftsRequired.length > Math.ceil(MAXIMUM_SAMPLES_PER_REQUEST / fftSize) ? Math.ceil(MAXIMUM_SAMPLES_PER_REQUEST / fftSize) : fftsRequired.length);
+    setStateFFTsRequired(fftsRequired);
+  }
 
   const { data: meta } = useMeta(type, account, container, filePath);
-
+  const { instance } = useMsal();
+  const iqDataClient = IQDataClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance);
   const { data: iqData } = useQuery({
     queryKey: ['iqData', type, account, container, filePath, fftSize, fftsRequired],
     queryFn: async ({ signal }) => {
-      const iqDataClient = IQDataClientFactory(type, filesQuery.data, dataSourcesQuery.data);
       const iqData = await iqDataClient.getIQDataBlocks(meta, fftsRequired, fftSize, signal);
       return iqData;
     },
@@ -149,4 +157,19 @@ export function useRawIQData(type, account, container, filePath, fftSize) {
     downloadedIndexes,
     rawIQQuery,
   };
+}
+
+export function useGetMinimapIQ(type: string, account: string, container: string, filePath: string, enabled = true) {
+  const { data: meta } = useMeta(type, account, container, filePath);
+  const { filesQuery, dataSourcesQuery } = useUserSettings();
+  const iqDataClient = IQDataClientFactory(type, filesQuery.data, dataSourcesQuery.data);
+  const minimapQuery = useQuery<Float32Array[]>({
+    queryKey: ['minimapiq', type, account, container, filePath],
+    queryFn: async ({ signal }) => {
+      const minimapIQ = await iqDataClient.getMinimapIQ(meta, signal);
+      return minimapIQ;
+    },
+    enabled: enabled && !!meta && !!filesQuery.data && !!dataSourcesQuery.data,
+  });
+  return minimapQuery;
 }

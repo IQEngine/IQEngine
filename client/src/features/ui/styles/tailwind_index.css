@@ -25,7 +25,15 @@
   }
 
   h2 {
-    @apply text-primary text-lg;
+    @apply text-primary text-lg mt-1;
+  }
+
+  h3 {
+    @apply text-primary;
+  }
+
+  h4 {
+    @apply text-primary;
   }
 
   h5 {

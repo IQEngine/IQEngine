@@ -7,6 +7,7 @@ import { Layer, Rect, Text } from 'react-konva';
 import { Annotation, SigMFMetadata } from '@/utils/sigmfMetadata';
 import { useSpectrogramContext } from '../../hooks/use-spectrogram-context';
 import { Html } from 'react-konva-utils';
+import { color } from '@uiw/react-codemirror';
 
 interface AnnotationViewerProps {
   currentFFT: number;
@@ -109,6 +110,7 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
         y1: (start - minimumFFT) / (fftStepSize + 1),
         y2: (end - minimumFFT) / (fftStepSize + 1),
         label: annotation.getLabel(),
+        comment: annotation.getComment(),
         index: index,
         visible: visible,
       };
@@ -131,6 +133,7 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
       y1: 200,
       y2: 400,
       label: 'Fill Me In',
+      comment: null,
       index: -1,
       visible: true,
     });
@@ -281,18 +284,21 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
             id={index.toString() + '-x2-y2'} // tells the event which annotation, and which x and y to update
           />
           {/* Label */}
-          <Text
-            text={annotation.label}
-            fontFamily="serif"
-            fontSize={24}
-            x={annotation.x1 * spectrogramWidth}
-            y={annotation.y1 - 23}
-            fill={selectedAnnotation == index ? 'pink' : 'black'}
-            fontStyle="bold"
-            key={index + 1000000}
-            onClick={onAnnotationLabelClick}
-            id={index.toString()} // tells the event which annotation to update
-          />
+          <Html>
+            <div
+              className={annotation.comment ? 'tooltip absolute' : 'absolute'}
+              data-tip={annotation.comment}
+              id={index.toString()}
+              onClick={onAnnotationLabelClick}
+              style={{
+                top: annotation.y1 - 23,
+                left: annotation.x1 * spectrogramWidth,
+                color: selectedAnnotation == index ? 'pink' : 'black',
+              }}
+            >
+              <p className="font-serif font-bold">{annotation.label}</p>
+            </div>
+          </Html>
 
           {editAnnotationLabelId === index.toString() && (
             <Html>

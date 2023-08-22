@@ -1,15 +1,15 @@
 from datetime import datetime
 from typing import List, Optional
+
 from blob.azure_client import AzureBlobClient
-from helpers.datasource_access import check_access
 from database import datasource_repo, metadata_repo
 from database.metadata_repo import InvalidGeolocationFormat, query_metadata
-
 from database.models import DataSource, DataSourceReference, Metadata, TrackMetadata
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Response
 from fastapi.responses import StreamingResponse
 from helpers.authorization import get_current_user
 from helpers.cipher import decrypt
+from helpers.datasource_access import check_access
 from helpers.urlmapping import ApiType, get_content_type, get_file_name
 from motor.core import AgnosticCollection
 
@@ -27,7 +27,6 @@ async def get_all_meta(
     metadatas: AgnosticCollection = Depends(metadata_repo.collection),
     access_allowed=Depends(check_access),
 ):
-
     if access_allowed is None:
         return []
 
@@ -81,7 +80,7 @@ async def get_all_meta_name(
 )
 async def get_meta(
     metadata: Metadata = Depends(metadata_repo.get),
-    access_allowed=Depends(check_access)
+    access_allowed=Depends(check_access),
 ):
     if access_allowed is None:
         raise HTTPException(status_code=403, detail="No Access")
@@ -96,7 +95,7 @@ async def get_meta(
 )
 async def get_track_meta(
     metadata: Metadata = Depends(metadata_repo.get),
-    access_allowed=Depends(check_access)
+    access_allowed=Depends(check_access),
 ):
     if access_allowed is None:
         raise HTTPException(status_code=403, detail="No Access")
@@ -125,16 +124,22 @@ async def get_meta_thumbnail(
     background_tasks: BackgroundTasks,
     datasource: DataSource = Depends(datasource_repo.get),
     azure_client: AzureBlobClient = Depends(AzureBlobClient),
-    access_allowed=Depends(check_access)
+    # access_allowed=Depends(check_access)
 ):
-    if access_allowed is None:
-        raise HTTPException(status_code=403, detail="No Access")
+    # access_allowed is always None because the API url is referenced directly in the UI HTML
+    # No authorization header is added to the request so the access_allowed is always None
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
 
     sas_token = datasource.sasToken.get_secret_value() if datasource.sasToken else None
     if sas_token is not None:
         azure_client.set_sas_token(decrypt(sas_token))
+
+    account_key = (
+        datasource.account_key.get_secret_value() if datasource.account_key else None
+    )
+    if account_key is not None:
+        azure_client.set_account_key(decrypt(account_key))
 
     thumbnail_path = get_file_name(filepath, ApiType.THUMB)
     content_type = get_content_type(ApiType.THUMB)
@@ -209,7 +214,9 @@ async def query_meta(
         for item in result:
             key = (item.account, item.container)
             if key not in access_cache:
-                access_cache[key] = await check_access(item.account, item.container, current_user)
+                access_cache[key] = await check_access(
+                    item.account, item.container, current_user
+                )
 
             if access_cache[key] is not None:
                 filtered_result.append(item)
