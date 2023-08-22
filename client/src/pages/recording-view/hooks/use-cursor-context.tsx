@@ -48,7 +48,6 @@ export function CursorContextProvider({ children }) {
     if (!currentData || !cursorTime || cursorTime.start === cursorTime.end || !cursorTimeEnabled) {
       return;
     }
-    console.log('CURSOR_DATA: cursorTime', cursorTime);
     const startingFFT = Math.floor(cursorTime.start / fftSize);
     const endingFFT = Math.floor(cursorTime.end / fftSize);
     const iqData = new Float32Array((endingFFT - startingFFT) * fftSize * 2);
