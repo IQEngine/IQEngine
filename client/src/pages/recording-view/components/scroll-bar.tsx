@@ -217,7 +217,7 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
         {downloadedIndexesMemo?.map((fftIndx) => (
           <Rect
             x={MINIMAP_FFT_SIZE}
-            y={((fftIndx - 1) * spectrogramHeight) / 100}
+            y={(fftIndx * spectrogramHeight) / 100}
             width={5}
             height={spectrogramHeight / 100}
             fillEnabled={true}
