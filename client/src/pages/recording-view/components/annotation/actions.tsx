@@ -23,12 +23,12 @@ export const Actions = ({
   setMeta,
   setSelectedAnnotation,
 }: ActionsProps) => {
-  const [currentAnnotation, setCurrentAnnotation] = useState(JSON.stringify(meta.annotations[index], undefined, 4));
+  const [currentAnnotation, setCurrentAnnotation] = useState(meta.annotations[index].getRaw());
   const [errors, setErrors] = useState([]);
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
-    setCurrentAnnotation(JSON.stringify(meta.annotations[index], undefined, 4));
+    setCurrentAnnotation(meta.annotations[index].getRaw());
   }, [meta]);
 
   useEffect(() => {

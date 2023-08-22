@@ -14,7 +14,7 @@ export class ApiClient implements DataSourceClient {
 
   async sync(account: string, container: string): Promise<void> {
     await this.authUtil.requestWithAuthIfRequired({
-      method: 'get',
+      method: 'put',
       url: `/api/datasources/${account}/${container}/sync`,
     });
   }
