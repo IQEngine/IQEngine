@@ -72,8 +72,7 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
     setScalingFactor(newScalingFactor);
   }, [spectrogramHeight, fftSize, fftStepSize, meta]);
 
-  const downloadedTiles = useMemo(() => {
-    console.debug('downloadedIndexes', downloadedIndexes);
+  const downloadedIndexesMemo = useMemo(() => {
     if (!downloadedIndexes || !meta) return [];
     // we will have a maximum of 100 tiles to show data that has been downloaded
     const tiles = [];
@@ -215,7 +214,7 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
         ))}
 
         {/* white boxes showing what has been downloaded */}
-        {downloadedIndexes?.map((fftIndx) => (
+        {downloadedIndexesMemo?.map((fftIndx) => (
           <Rect
             x={MINIMAP_FFT_SIZE}
             y={((fftIndx - 1) * spectrogramHeight) / 100}
