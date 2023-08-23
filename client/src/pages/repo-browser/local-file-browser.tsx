@@ -2,16 +2,17 @@
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
 import { directoryOpen, fileOpen, supported } from 'browser-fs-access';
 import { FileWithDirectoryAndFileHandle } from 'browser-fs-access';
 import { getDataSource } from '@/api/datasource/queries';
 import { CLIENT_TYPE_LOCAL } from '@/api/Models';
 import { useUserSettings } from '@/api/user-settings/use-user-settings';
+import toast from 'react-hot-toast';
 
 const LocalFileBrowser = () => {
+  const [goToPage, setGoToPage] = useState(false);
   const navigate = useNavigate();
   const { setFiles } = useUserSettings();
   const [container, setContainer] = useState<string>(null);
@@ -20,7 +21,7 @@ const LocalFileBrowser = () => {
 
   useEffect(() => {
     console.debug('dataSourceQuery', dataSourceQuery.data, 'container', container, 'filePath', filePath);
-    if (dataSourceQuery.data && dataSourceQuery.data.container === container) {
+    if (dataSourceQuery.data && dataSourceQuery.data.container === container && goToPage) {
       if (filePath) {
         const spectogramLink = `/view/${CLIENT_TYPE_LOCAL}/local/single_file/${encodeURIComponent(filePath)}`;
         navigate(spectogramLink);
@@ -28,7 +29,7 @@ const LocalFileBrowser = () => {
         navigate(`/recordings/${CLIENT_TYPE_LOCAL}/${dataSourceQuery.data.account}/${dataSourceQuery.data.container}`);
       }
     }
-  }, [dataSourceQuery.data, container, filePath]);
+  }, [dataSourceQuery.data, container, filePath, goToPage]);
 
   const directoryPickerAvailable = supported; // not all browsers support it yet
 
@@ -38,9 +39,16 @@ const LocalFileBrowser = () => {
       multiple: true,
     });
     console.log('files', files);
+
+    if (files.length != 2) {
+      toast('Please select 1 .sigmf-meta and 1 .sigmf-data file (matching)');
+      return;
+    }
+
     let fileWithoutExtension = files[0].name.replace('.sigmf-meta', '').replace('.sigmf-data', '');
     setFiles(files);
     setFilePath(fileWithoutExtension);
+    setGoToPage(true);
   };
 
   const openDir = async () => {
@@ -54,6 +62,7 @@ const LocalFileBrowser = () => {
     let containerPath = dirHandle[0].webkitRelativePath.split('/')[0];
     setFiles(dirHandle);
     setContainer(containerPath);
+    setGoToPage(true);
   };
 
   return (
