@@ -2,24 +2,26 @@
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import DualRangeSlider from '@/features/ui/dual-range-slider/DualRangeSlider';
-import { TILE_SIZE_IN_IQ_SAMPLES, COLORMAP_DEFAULT } from '@/utils/constants';
+import { COLORMAP_DEFAULT } from '@/utils/constants';
 import { colMaps } from '@/utils/colormap';
 import { useSpectrogramContext } from '../hooks/use-spectrogram-context';
 import { useCursorContext } from '../hooks/use-cursor-context';
+import { vscodeDark } from '@uiw/codemirror-theme-vscode';
+import CodeMirror from '@uiw/react-codemirror';
+import { langs } from '@uiw/codemirror-extensions-langs';
 
 interface SettingsPaneProps {
   currentFFT: number;
 }
 
 const SettingsPane = ({ currentFFT }) => {
-  const fftSizes = [128, 256, 512, 1024, 2048, 4096, 16384, 65536, TILE_SIZE_IN_IQ_SAMPLES];
+  const fftSizes = [128, 256, 512, 1024, 2048, 4096, 16384, 65536];
   const context = useSpectrogramContext();
   const cursorContext = useCursorContext();
   const [localPythonSnippet, setLocalPythonSnippet] = useState(context.pythonSnippet);
@@ -78,6 +80,13 @@ const SettingsPane = ({ currentFFT }) => {
 
     document.body.removeChild(a);
   };
+
+  const onChangePythonSnippet = useCallback(
+    (value, viewUpdate) => {
+      setLocalPythonSnippet(value);
+    },
+    [localPythonSnippet]
+  );
 
   return (
     <div className="form-control">
@@ -161,10 +170,10 @@ const SettingsPane = ({ currentFFT }) => {
       <div className="mt-4">
         <details className="dropdown dropdown-right w-full">
           <summary className="btn btn-outline btn-success btn-sm w-full">
-              Colormap <ArrowRightIcon />
+            Colormap <ArrowRightIcon />
           </summary>
           <ul className="p-2 shadow menu dropdown-content mt-0 z-[1] bg-base-100 rounded-box w-52">
-          {Object.entries(colMaps).map(([value]) => (
+            {Object.entries(colMaps).map(([value]) => (
               <li
                 key={value}
                 data-value={value}
@@ -181,7 +190,7 @@ const SettingsPane = ({ currentFFT }) => {
       <div className="mt-4">
         <details className="dropdown dropdown-right w-full">
           <summary className=" btn btn-outline btn-success btn-sm w-full">
-              FFT Size <ArrowRightIcon />
+            FFT Size <ArrowRightIcon />
           </summary>
           <ul className="p-2 shadow menu dropdown-content z-[1] mt-0 bg-base-100 rounded-box w-52">
             {fftSizes.map((x, index) => (
@@ -231,30 +240,30 @@ const SettingsPane = ({ currentFFT }) => {
       <div className="mt-2">
         <details className="dropdown dropdown-right w-full">
           <summary className=" btn btn-outline btn-success btn-sm w-full">
-              Example Filter Taps <ArrowRightIcon />
+            Example Filter Taps <ArrowRightIcon />
           </summary>
           <ul className="p-2 shadow menu dropdown-content z-[1] mt-0 bg-base-100 rounded-box w-70">
-          <li
-                key={0}
-                data-value="[0.021019600765633,0.05574786251380393,0.04504671465435009,-0.012858837474581268,-0.042883835223827396,0.013822126400016621,0.05882808073316635,-0.014316809227248763,-0.10299625870988743,0.015410773935742991,0.31701869995313076,0.48460819626209206,0.31701869995313076,0.015410773935742991,-0.10299625870988743,-0.014316809227248763,0.05882808073316635,0.013822126400016621,-0.042883835223827396,-0.012858837474581268,0.04504671465435009,0.05574786251380393,0.021019600765633]"
-                onClick={onClickPremadeTaps}
-              >
-                <a>Low Pass Filter, Keep Center 50%</a>
-              </li>
-              <li
-                key={1}
-                data-value="[0.016149208122345958,0.0315506154302014,0.044989927419396177,0.05039076977222029,0.036274497853720514,0.007612901271369674,-0.02948294665811137,-0.053019565543615366,-0.048888438402198676,-0.004134055886676617,0.07118987013413654,0.15929327646574953,0.22747019061450077,0.2546143327815347,0.22747019061450077,0.15929327646574953,0.07118987013413654,-0.004134055886676617,-0.048888438402198676,-0.053019565543615366,-0.02948294665811137,0.007612901271369674,0.036274497853720514,0.05039076977222029,0.044989927419396177,0.0315506154302014,0.016149208122345958]"
-                onClick={onClickPremadeTaps}
-              >
-                <a>Low Pass Filter, Keep Center 25%</a>
-              </li>
+            <li
+              key={0}
+              data-value="[0.021019600765633,0.05574786251380393,0.04504671465435009,-0.012858837474581268,-0.042883835223827396,0.013822126400016621,0.05882808073316635,-0.014316809227248763,-0.10299625870988743,0.015410773935742991,0.31701869995313076,0.48460819626209206,0.31701869995313076,0.015410773935742991,-0.10299625870988743,-0.014316809227248763,0.05882808073316635,0.013822126400016621,-0.042883835223827396,-0.012858837474581268,0.04504671465435009,0.05574786251380393,0.021019600765633]"
+              onClick={onClickPremadeTaps}
+            >
+              <a>Low Pass Filter, Keep Center 50%</a>
+            </li>
+            <li
+              key={1}
+              data-value="[0.016149208122345958,0.0315506154302014,0.044989927419396177,0.05039076977222029,0.036274497853720514,0.007612901271369674,-0.02948294665811137,-0.053019565543615366,-0.048888438402198676,-0.004134055886676617,0.07118987013413654,0.15929327646574953,0.22747019061450077,0.2546143327815347,0.22747019061450077,0.15929327646574953,0.07118987013413654,-0.004134055886676617,-0.048888438402198676,-0.053019565543615366,-0.02948294665811137,0.007612901271369674,0.036274497853720514,0.05039076977222029,0.044989927419396177,0.0315506154302014,0.016149208122345958]"
+              onClick={onClickPremadeTaps}
+            >
+              <a>Low Pass Filter, Keep Center 25%</a>
+            </li>
           </ul>
         </details>
       </div>
       <div className="mt-4 mb-2">
         <details className="dropdown dropdown-right w-full">
-        <summary className=" btn btn-outline btn-success btn-sm w-full">
-              window <ArrowRightIcon />
+          <summary className=" btn btn-outline btn-success btn-sm w-full">
+            window <ArrowRightIcon />
           </summary>
           <ul className="p-2 shadow menu dropdown-content z-[1] mt-0 bg-base-100 rounded-box w-70">
             <li key={0} data-value="hamming" onClick={onChangeWindowFunction}>
@@ -292,16 +301,20 @@ const SettingsPane = ({ currentFFT }) => {
         <label className="label">
           <span className="label-text text-base">Python Snippet</span>
         </label>
-        <textarea
-          className="bg-base-content text-base-100 p-1"
-          rows={6}
-          cols={25}
-          wrap="off"
-          onChange={(e) => {
-            setLocalPythonSnippet(e.target.value);
-          }}
+
+        <CodeMirror
+          className="mb-3"
           value={localPythonSnippet}
+          onChange={onChangePythonSnippet}
+          height="150px"
+          theme={vscodeDark}
+          extensions={[langs.python()]}
+          basicSetup={{
+            lineNumbers: false,
+            foldGutter: false,
+          }}
         />
+
         <button onClick={onSubmitPythonSnippet}>Run Python</button>
       </div>
     </div>

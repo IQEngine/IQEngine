@@ -1,11 +1,11 @@
 import { test, describe } from 'vitest';
 import { useGetImage } from '../use-get-image';
 import { renderHook, waitFor } from '@testing-library/react';
-import { TILE_SIZE_IN_IQ_SAMPLES as tilesize, COLORMAP_DEFAULT } from '@/utils/constants';
+import { COLORMAP_DEFAULT } from '@/utils/constants';
 import { SampleType, generateSampleImageData, normalizeMagnitude, generateSampleIQData } from '@/utils/test-functions';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
-import { calcFftOfTile } from '@/utils/selector';
+import { calcFfts } from '@/utils/selector';
 
 describe('DevTest Spectrogram Tests', () => {
   //template test.each([[], []])('test', async () => {});
@@ -20,10 +20,10 @@ describe('DevTest Spectrogram Tests', () => {
     ['50hz', 2048, 100, 50, 4096, 'hanning'],
     ['10hz', 2048, 100, 10, 4096, 'bartlett'],
   ])(
-    'calcFftOfTile should return correct FFT for standard inputs: %s',
+    'calcFfts should return correct FFT for standard inputs: %s',
     async (comment, fftSize, spectrogramHeight, frequency, sample_rate, windowFunction) => {
       const { sampleIQData } = generateSampleIQData(fftSize, spectrogramHeight, frequency, sample_rate);
-      const fftsConcatenated = calcFftOfTile(sampleIQData, fftSize, windowFunction, spectrogramHeight);
+      const fftsConcatenated = calcFfts(sampleIQData, fftSize, windowFunction, spectrogramHeight);
 
       expect(fftsConcatenated.length).toEqual(fftSize * spectrogramHeight);
 
@@ -58,7 +58,7 @@ describe('DevTest Spectrogram Tests', () => {
       const { sampleIQData } = generateSampleIQData(fftSize, spectrogramHeight, frequency, sampleRate);
 
       // run the code-under-test
-      const fftResult = calcFftOfTile(sampleIQData, fftSize, windowFunction, spectrogramHeight);
+      const fftResult = calcFfts(sampleIQData, fftSize, windowFunction, spectrogramHeight);
       expect(fftResult.length / fftSize).toEqual(spectrogramHeight);
       for (let i = 1; i < 10; i++) {
         const centerPoint = fftSize / 2 + i * fftSize;
@@ -104,22 +104,20 @@ describe('DevTest Spectrogram Tests', () => {
   );
 
   test.each([
-    ['min=NaN', tilesize, 128, NaN, 10.0, COLORMAP_DEFAULT, SampleType.MultipleBuckets],
-    ['max=Nan', tilesize, 128, -10.0, NaN, COLORMAP_DEFAULT, SampleType.MultipleBuckets],
-    ['min>max', tilesize, 256, -20.0, -30.0, 'jet', SampleType.MultipleBuckets],
-    ['min==max', tilesize, 512, -60.0, -60.0, 'plasma', SampleType.MultipleBuckets],
-    ['fftSize==0', tilesize, 0, -40.0, -10.0, 'jet', SampleType.MultipleBuckets],
+    ['min=NaN', 1000, 128, NaN, 10.0, COLORMAP_DEFAULT, SampleType.MultipleBuckets],
+    ['max=Nan', 1000, 128, -10.0, NaN, COLORMAP_DEFAULT, SampleType.MultipleBuckets],
+    ['min>max', 1000, 256, -20.0, -30.0, 'jet', SampleType.MultipleBuckets],
+    ['min==max', 1000, 512, -60.0, -60.0, 'plasma', SampleType.MultipleBuckets],
+    ['fftSize==0', 1000, 0, -40.0, -10.0, 'jet', SampleType.MultipleBuckets],
 
-    ['min=NaN', tilesize, 128, NaN, 10.0, COLORMAP_DEFAULT, SampleType.WhiteBox],
-    ['max=Nan', tilesize, 128, -10.0, NaN, COLORMAP_DEFAULT, SampleType.WhiteBox],
-    ['min>max', tilesize, 256, -20.0, -30.0, 'jet', SampleType.WhiteBox],
-    ['min==max', tilesize, 512, -60.0, -60.0, 'plasma', SampleType.WhiteBox],
-    ['fftSize==0', tilesize, 0, -40.0, -10.0, 'jet', SampleType.WhiteBox],
+    ['min=NaN', 1000, 128, NaN, 10.0, COLORMAP_DEFAULT, SampleType.WhiteBox],
+    ['max=Nan', 1000, 128, -10.0, NaN, COLORMAP_DEFAULT, SampleType.WhiteBox],
+    ['min>max', 1000, 256, -20.0, -30.0, 'jet', SampleType.WhiteBox],
+    ['min==max', 1000, 512, -60.0, -60.0, 'plasma', SampleType.WhiteBox],
+    ['fftSize==0', 1000, 0, -40.0, -10.0, 'jet', SampleType.WhiteBox],
   ])(
     'Unacceptable parameters should be rejected: %s',
-    async (comment, tile_size, fftSize, magnitudeMin, magnitudeMax, colorMap, sampleType) => {
-      const spectrogramHeight = tile_size / (fftSize == 0 ? 1024 : fftSize);
-
+    async (comment, spectrogramHeight, fftSize, magnitudeMin, magnitudeMax, colorMap, sampleType) => {
       // run the code-under-test
       const { result } = renderHook(() =>
         useGetImage(fftSize, spectrogramHeight, magnitudeMin, magnitudeMax, colorMap, 'hamming')
@@ -131,38 +129,37 @@ describe('DevTest Spectrogram Tests', () => {
   );
 
   test.each([
-    ['128,multi-dB', tilesize, 128, -40.0, 0.0, COLORMAP_DEFAULT, SampleType.MultipleBuckets],
-    ['256,multi-dB', tilesize, 256, -30.0, -20.0, 'jet', SampleType.MultipleBuckets],
-    ['512,multi-dB', tilesize, 512, -60.0, 10.0, 'plasma', SampleType.MultipleBuckets],
-    ['defaults,multi-dB', tilesize, 1024, -40.0, -10.0, COLORMAP_DEFAULT, SampleType.MultipleBuckets],
-    ['defaults,jet,multi-dB', tilesize, 1024, -40.0, -10.0, 'jet', SampleType.MultipleBuckets],
-    ['2048,jet,multi-dB', tilesize, 2048, -40.0, -10.0, 'jet', SampleType.MultipleBuckets],
-    ['-80/0,plasma,multi-dB', tilesize, 1024, -80.0, 10.0, 'plasma', SampleType.MultipleBuckets],
-    ['4096,-20/20,multi-dB', tilesize, 4096, -20.0, 20.0, 'plasma', SampleType.MultipleBuckets],
-    ['8192,-60/50,inferno,multi-dB', tilesize, 8192, -60.0, 50.0, 'inferno', SampleType.MultipleBuckets],
-    ['16384,-100/50,multi-dB', tilesize, 16384, -100.0, 50.0, 'inferno', SampleType.MultipleBuckets],
-    ['128,white box', tilesize, 128, -40.0, 0.0, COLORMAP_DEFAULT, SampleType.WhiteBox],
-    ['256,white box', tilesize, 256, -30.0, -20.0, 'jet', SampleType.MultipleBuckets],
-    ['512,white box', tilesize, 512, -60.0, 10.0, 'plasma', SampleType.MultipleBuckets],
-    ['defaults,white box', tilesize, 1024, -40.0, -10.0, COLORMAP_DEFAULT, SampleType.MultipleBuckets],
-    ['defaults,jet,white box', tilesize, 1024, -40.0, -10.0, 'jet', SampleType.MultipleBuckets],
-    ['2048,jet,white box', tilesize, 2048, -40.0, -10.0, 'jet', SampleType.MultipleBuckets],
-    ['-80/0,plasma,white box', tilesize, 1024, -80.0, 10.0, 'plasma', SampleType.MultipleBuckets],
-    ['4096,-20/20,white box', tilesize, 4096, -20.0, 20.0, 'plasma', SampleType.MultipleBuckets],
-    ['8192,-60/50,inferno,white box', tilesize, 8192, -60.0, 50.0, 'inferno', SampleType.MultipleBuckets],
-    ['16384,-100/50,white box', tilesize, 16384, -100.0, 50.0, 'inferno', SampleType.MultipleBuckets],
+    ['128,multi-dB', 100, 128, -40.0, 0.0, COLORMAP_DEFAULT, SampleType.MultipleBuckets],
+    ['256,multi-dB', 100, 256, -30.0, -20.0, 'jet', SampleType.MultipleBuckets],
+    ['512,multi-dB', 100, 512, -60.0, 10.0, 'plasma', SampleType.MultipleBuckets],
+    ['defaults,multi-dB', 100, 1024, -40.0, -10.0, COLORMAP_DEFAULT, SampleType.MultipleBuckets],
+    ['defaults,jet,multi-dB', 100, 1024, -40.0, -10.0, 'jet', SampleType.MultipleBuckets],
+    ['2048,jet,multi-dB', 100, 2048, -40.0, -10.0, 'jet', SampleType.MultipleBuckets],
+    ['-80/0,plasma,multi-dB', 100, 1024, -80.0, 10.0, 'plasma', SampleType.MultipleBuckets],
+    ['4096,-20/20,multi-dB', 100, 4096, -20.0, 20.0, 'plasma', SampleType.MultipleBuckets],
+    ['8192,-60/50,inferno,multi-dB', 10, 8192, -60.0, 50.0, 'inferno', SampleType.MultipleBuckets],
+    ['16384,-100/50,multi-dB', 10, 16384, -100.0, 50.0, 'inferno', SampleType.MultipleBuckets],
+    ['128,white box', 100, 128, -40.0, 0.0, COLORMAP_DEFAULT, SampleType.WhiteBox],
+    ['256,white box', 100, 256, -30.0, -20.0, 'jet', SampleType.MultipleBuckets],
+    ['512,white box', 100, 512, -60.0, 10.0, 'plasma', SampleType.MultipleBuckets],
+    ['defaults,white box', 100, 1024, -40.0, -10.0, COLORMAP_DEFAULT, SampleType.MultipleBuckets],
+    ['defaults,jet,white box', 100, 1024, -40.0, -10.0, 'jet', SampleType.MultipleBuckets],
+    ['2048,jet,white box', 100, 2048, -40.0, -10.0, 'jet', SampleType.MultipleBuckets],
+    ['-80/0,plasma,white box', 100, 1024, -80.0, 10.0, 'plasma', SampleType.MultipleBuckets],
+    ['4096,-20/20,white box', 100, 4096, -20.0, 20.0, 'plasma', SampleType.MultipleBuckets],
+    ['8192,-60/50,inferno,white box', 10, 8192, -60.0, 50.0, 'inferno', SampleType.MultipleBuckets],
+    ['16384,-100/50,white box', 10, 16384, -100.0, 50.0, 'inferno', SampleType.MultipleBuckets],
   ])(
     'RGB is generated correctly from the following fftdata: %s',
-    async (comment, tile_size, fftSize, magnitudeMin, magnitudeMax, colorMap, sampleType) => {
+    async (comment, spectrogramHeight, fftSize, magnitudeMin, magnitudeMax, colorMap, sampleType) => {
       const { sampleIQData, num_ffts, expectedImageData } = generateSampleImageData(
-        tile_size,
+        spectrogramHeight,
         fftSize,
         sampleType,
         magnitudeMin,
         magnitudeMax,
         colorMap
       );
-      const spectrogramHeight = tile_size / (fftSize == 0 ? 1024 : fftSize);
 
       // run the code-under-test
       const { result } = renderHook(() =>
