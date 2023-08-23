@@ -16,7 +16,8 @@ test.beforeAll(async ({ request }) => {
 });
 
 test('API Datasource Browsing @CICompatible', async ({ page }) => {
-  await page.goto('/browser');
+  await page.goto('/');
+  await page.waitForTimeout(5000);
   await page.locator('[id="TestAPIDataSource"]').first().click(); // After first run there will be more than one element by this name
   await expect(page.getByText('Author')).toBeDefined();
 });

@@ -40,7 +40,8 @@ test('Azure Blob Datasource', async ({ page }) => {
 
   const accountName = process.env.STORAGE_ACCOUNT_NAME || '';
 
-  await page.goto('/browser');
+  await page.goto('/');
+  await page.waitForTimeout(5000);
   await page.getByPlaceholder('Storage Account Name').fill(accountName);
   await page.getByPlaceholder('Container Name').fill('test-container');
   await page.locator('#AzureBlob').click();
