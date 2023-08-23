@@ -18,7 +18,7 @@ test.beforeAll(async ({ request }) => {
 // the "Open Local Directory" and "Select 1" options are not tested
 test('Confirm api datasource @CICompatible', async ({ page }) => {
   await page.goto('/');
-  await page.waitForTimeout(5000);
+  await page.waitForTimeout(500); // bypass landing page is on by default but takes a moment
 
   // api data source
   await page.locator('[id="(API)TestAPIDataSource"]').first().click();

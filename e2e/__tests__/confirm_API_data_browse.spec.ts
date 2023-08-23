@@ -17,7 +17,7 @@ test.beforeAll(async ({ request }) => {
 
 test('API Datasource Browsing @CICompatible', async ({ page }) => {
   await page.goto('/');
-  await page.waitForTimeout(5000);
+  await page.waitForTimeout(500); // bypass landing page is on by default but takes a moment
   await page.locator('[id="TestAPIDataSource"]').first().click(); // After first run there will be more than one element by this name
   await expect(page.getByText('Author')).toBeDefined();
 });
