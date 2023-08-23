@@ -1,7 +1,7 @@
 import { fftToRGB } from '@/utils/selector';
 import { colMaps } from '@/utils/colormap';
 import { useEffect, useMemo, useState } from 'react';
-import { calcFftOfTile } from '@/utils/selector';
+import { calcFfts } from '@/utils/selector';
 
 export const useGetImage = (
   fftSize: number,
@@ -16,9 +16,9 @@ export const useGetImage = (
 
   const ffts = useMemo(() => {
     if (!iqData || !fftSize) return null;
-    //performance.mark('calcFftOfTile');
-    const ffts_calc = calcFftOfTile(iqData, fftSize, windowFunction, spectrogramHeight);
-    //console.debug(performance.measure('calcFftOfTile', 'calcFftOfTile'));
+    //performance.mark('calcFfts');
+    const ffts_calc = calcFfts(iqData, fftSize, windowFunction, spectrogramHeight);
+    //console.debug(performance.measure('calcFfts', 'calcFfts'));
     return ffts_calc;
   }, [iqData, fftSize, windowFunction, spectrogramHeight]);
 
