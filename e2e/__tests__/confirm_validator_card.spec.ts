@@ -9,7 +9,7 @@ test('Confirm Validator and AzureBlob cards @CICompatible', async ({ page }) => 
 
   // Go to landing page, but by default its bypassed so it will redirect to the browser page
   await page.locator('[id="IQEngineLogo"]').click();
-  await page.waitForTimeout(500); // bypass landing page is on by default but takes a moment
+  await page.waitForTimeout(5000); // bypass landing page is on by default but takes a moment
 
   // Azure blob
   await page.locator('[id="AzureBlob"]').click();
