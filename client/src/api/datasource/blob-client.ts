@@ -17,6 +17,10 @@ export class BlobClient implements DataSourceClient {
     throw new Error('query not supported for blob data sources');
   }
 
+  getSasToken(account: string, container: string, filepath: string): Promise<String> {
+    throw new Error('get sas not supported for blob data sources');
+  }
+
   list(): Promise<DataSource[]> {
     if (!this.dataSources) {
       return Promise.reject('No data sources found');
