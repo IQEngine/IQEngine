@@ -8,7 +8,7 @@ import { MINIMUM_SCROLL_HANDLE_HEIGHT_PIXELS, MINIMAP_FFT_SIZE } from '@/utils/c
 import { useGetIQData, useGetMinimapIQ, useRawIQData } from '@/api/iqdata/Queries';
 import { useSpectrogramContext } from '../hooks/use-spectrogram-context';
 import { colMaps } from '@/utils/colormap';
-import { calcFftOfTile, fftToRGB } from '@/utils/selector';
+import { calcFfts, fftToRGB } from '@/utils/selector';
 
 interface ScrollBarProps {
   currentFFT: number;
@@ -33,8 +33,8 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
     windowFunction,
   } = useSpectrogramContext();
 
-  const { data: minimapData } = useGetMinimapIQ(type, account, container, filePath)
-  const { downloadedIndexes } = useRawIQData(type, account, container, filePath, fftSize)
+  const { data: minimapData } = useGetMinimapIQ(type, account, container, filePath);
+  const { downloadedIndexes } = useRawIQData(type, account, container, filePath, fftSize);
 
   const [minimapImg, setMinimapImg] = useState(null);
   const [ticks, setTicks] = useState([]);
@@ -49,8 +49,9 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
       iqData.set(minimapData[i], i * minimapData[i].length);
     }
     //performance.mark('calcFftOfTile');
-    const ffts_calc = calcFftOfTile(iqData, MINIMAP_FFT_SIZE, windowFunction, 1000);
+    const ffts_calc = calcFfts(iqData, MINIMAP_FFT_SIZE, windowFunction, 1000);
     //console.debug(performance.measure('calcFftOfTile', 'calcFftOfTile'));
+
     const min = Math.min(...ffts_calc);
     const max = Math.max(...ffts_calc);
     setMagnitudeMin(min);
@@ -65,16 +66,13 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
       (spectrogramHeight / (meta.getTotalSamples() / fftSize / (fftStepSize + 1))) * spectrogramHeight;
     setHandleHeightPixels(Math.max(MINIMUM_SCROLL_HANDLE_HEIGHT_PIXELS, newHandleHeight));
 
-    
-      const totalffts = meta.getTotalSamples() / fftSize;
-      // get the length ot any of the iqData arrays
-      const newScalingFactor = totalffts / spectrogramHeight;
-      setScalingFactor(newScalingFactor);
+    const totalffts = meta.getTotalSamples() / fftSize;
+    // get the length ot any of the iqData arrays
+    const newScalingFactor = totalffts / spectrogramHeight;
+    setScalingFactor(newScalingFactor);
   }, [spectrogramHeight, fftSize, fftStepSize, meta]);
 
-
-  const downloadedTiles = useMemo(() => {
-    console.debug('downloadedIndexes', downloadedIndexes);
+  const downloadedIndexesMemo = useMemo(() => {
     if (!downloadedIndexes || !meta) return [];
     // we will have a maximum of 100 tiles to show data that has been downloaded
     const tiles = [];
@@ -216,10 +214,10 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
         ))}
 
         {/* white boxes showing what has been downloaded */}
-        {downloadedTiles?.map((tile) => (
+        {downloadedIndexesMemo?.map((fftIndx) => (
           <Rect
             x={MINIMAP_FFT_SIZE}
-            y={((tile - 1) * spectrogramHeight) / 100}
+            y={(fftIndx * spectrogramHeight) / 100}
             width={5}
             height={spectrogramHeight / 100}
             fillEnabled={true}

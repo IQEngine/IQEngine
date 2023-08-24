@@ -2,7 +2,6 @@
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
 
-export const TILE_SIZE_IN_IQ_SAMPLES = Math.pow(2, 17); // should always be a power of 2
 export const MINIMUM_SCROLL_HANDLE_HEIGHT_PIXELS = 10;
 export const COLORMAP_DEFAULT = 'viridis';
 export const MINIMAP_FFT_SIZE = 64;

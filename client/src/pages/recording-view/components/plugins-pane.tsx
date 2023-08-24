@@ -70,9 +70,6 @@ export const PluginsPane = () => {
       return;
     }
 
-    // this does the tile calc and gets the right samples in currentSamples
-    // const { trimmedSamples, startSampleOffset } = handleProcessTime();
-
     const sampleRate = meta.getSampleRate();
     const freq = meta.getCenterFrequency();
 

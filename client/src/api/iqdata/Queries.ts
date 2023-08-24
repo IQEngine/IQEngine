@@ -1,7 +1,6 @@
-import { SigMFMetadata } from '@/utils/sigmfMetadata';
-import { useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { IQDataClientFactory } from './IQDataClientFactory';
-import { INITIAL_PYTHON_SNIPPET, TILE_SIZE_IN_IQ_SAMPLES } from '@/utils/constants';
+import { INITIAL_PYTHON_SNIPPET } from '@/utils/constants';
 import { useUserSettings } from '@/api/user-settings/use-user-settings';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useMeta } from '@/api/metadata/queries';

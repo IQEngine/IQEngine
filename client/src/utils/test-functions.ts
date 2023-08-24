@@ -1,5 +1,5 @@
 import { colMaps } from '@/utils/colormap';
-import { calcFftOfTile } from './selector';
+import { calcFfts } from './selector';
 
 // types of sample recordings
 export enum SampleType {
@@ -36,7 +36,7 @@ export const generateSampleIQData = (
 };
 
 export const generateSampleImageData = (
-  tile_size: number,
+  spectrogramHeight: number,
   fftSize: number,
   recordingType: SampleType,
   magnitudeMin: number,
@@ -47,10 +47,10 @@ export const generateSampleImageData = (
     return { sampleImageData: null, num_ffts: 0, expectedImageData: null };
   }
 
-  let num_ffts = tile_size / fftSize;
+  let num_ffts = spectrogramHeight;
   let expectedImageData = new ImageData(1, 1);
   const { sampleIQData } = generateSampleIQData(fftSize, num_ffts);
-  const ffts = calcFftOfTile(sampleIQData, fftSize, 'hamming', num_ffts);
+  const ffts = calcFfts(sampleIQData, fftSize, 'hamming', num_ffts);
 
   // normalize to 0-255
   const fftsNormalized = new Float32Array(ffts.length);
