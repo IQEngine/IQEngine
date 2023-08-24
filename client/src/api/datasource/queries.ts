@@ -18,8 +18,13 @@ const fetchDataSources = async (client: DataSourceClient) => {
   return response;
 };
 
-const fetchDataSource = async (client: DataSourceClient, account: string, container: string) => {
+export const fetchDataSource = async (client: DataSourceClient, account: string, container: string) => {
   const response = await client.get(account, container);
+  return response;
+};
+
+const fetchSasToken = async (client: DataSourceClient, account: string, container: string, filepath: string) => {
+  const response = await client.getSasToken(account, container, filepath);
   return response;
 };
 
@@ -35,12 +40,26 @@ export const getDataSources = (type: string, enabled = true) => {
 export const getDataSource = (type: string, account: string, container: string, enabled = true) => {
   const { dataSourcesQuery, filesQuery } = useUserSettings();
   const { instance } = useMsal();
-  const client = DataSourceClientFactory(type, filesQuery.data, dataSourcesQuery.data,instance);
+  const client = DataSourceClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance);
   return useQuery(
     ['datasource', type, account, container],
     () => {
-
       return fetchDataSource(client, account, container);
+    },
+    {
+      enabled: enabled,
+    }
+  );
+};
+
+export const useSasToken = (type: string, account: string, container: string, filepath: string, enabled = true) => {
+  const { dataSourcesQuery, filesQuery } = useUserSettings();
+  const client = DataSourceClientFactory(type, filesQuery.data, dataSourcesQuery.data);
+
+  return useQuery(
+    ['sas', type, account, container, filepath],
+    () => {
+      return fetchSasToken(client, account, container, filepath);
     },
     {
       enabled: enabled,

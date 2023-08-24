@@ -20,6 +20,7 @@ export const DataSourceForm = () => {
       description: event.target.elements.description.value,
       imageURL: event.target.elements.imageURL.value,
       sasToken: event.target.elements.sasToken.value,
+      accountKey: event.target.elements.accountKey.value,
     };
     addDataSource.mutate(formData, {
       onSuccess: () => {
@@ -88,6 +89,13 @@ export const DataSourceForm = () => {
         type="text"
         name="sasToken"
         placeholder="SAS Token (optional)"
+        className="input input-bordered input-success w-full max-w-xs"
+      />
+      <br />
+      <input
+        type="text"
+        name="accountKey"
+        placeholder="Account Key (optional)"
         className="input input-bordered input-success w-full max-w-xs"
       />
       <br />
