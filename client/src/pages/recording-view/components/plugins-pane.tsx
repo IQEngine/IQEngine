@@ -19,6 +19,7 @@ import { toast } from 'react-hot-toast';
 import { dataTypeToBytesPerIQSample } from '@/utils/selector';
 import { useSpectrogramContext } from '../hooks/use-spectrogram-context';
 import { useCursorContext } from '../hooks/use-cursor-context';
+import { useUserSettings } from '@/api/user-settings/use-user-settings';
 
 export enum MimeTypes {
   ci8 = 'iq/ci8',
@@ -44,6 +45,8 @@ export const PluginsPane = () => {
   const [modalSamples, setModalSamples] = useState<Float32Array>(new Float32Array([]));
   const [modalSpectrogram, setmodalSpectrogram] = useState(null);
   const [useCloudStorage, setUseCloudStorage] = useState(true);
+  const { dataSourcesQuery } = useUserSettings();
+  const connectionInfo = dataSourcesQuery?.data[`${account}/${container}`];
   const token = useSasToken(type, account, container, meta.getFileName());
   let byte_offset = meta.getBytesPerIQSample() * cursorTime.start;
   let byte_length = meta.getBytesPerIQSample() * (cursorTime.end - cursorTime.start);
@@ -100,7 +103,8 @@ export const PluginsPane = () => {
             account_name: account,
             container_name: container,
             file_path: meta.getFileName(),
-            sas_token: token.data.data.sasToken,
+            sas_token: connectionInfo.sasToken,
+           // sas_token: token.data.data.sasToken,
             sample_rate: sampleRate,
             center_freq: freq,
             data_type: MimeTypes[meta.getDataType()],
