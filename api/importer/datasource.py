@@ -35,7 +35,7 @@ async def import_datasources_from_env(
                 account=connection["accountName"],
                 container=connection["containerName"],
                 sasToken=connection["sasToken"],
-                accountKey=connection["accountKey"],
+                # accountKey=connection["accountKey"],
                 name=connection["name"],
                 description=connection["description"]
                 if "description" in connection
