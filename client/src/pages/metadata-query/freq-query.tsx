@@ -7,7 +7,7 @@ export const FreqQuery = ({ description, validator, queryName, handleQueryValid,
     MF: ['MF', 300000, 3000000],
     HF: ['HF', 3000000, 30000000],
     VHF: ['VHF', 30000000, 300000000],
-    UHF: ['UHF', 300000000, 3000000000], //300 MHz -3 GHz
+    UHF: ['UHF', 300000000, 3000000000],
     L: ['L', 1000000000, 2000000000],
     S: ['S', 2000000000, 4000000000],
     C: ['C', 4000000000, 8000000000],
