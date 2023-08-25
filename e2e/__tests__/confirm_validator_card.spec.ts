@@ -1,12 +1,8 @@
-import { test } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 
 test('Confirm Validator and AzureBlob cards @CICompatible', async ({ page }) => {
   await page.goto('/');
-
-  // signal generator
+  await page.waitForTimeout(500); // bypass landing page is on by default but takes a moment
   await page.locator('[id="Validator"]').click();
-  await page.locator('[id="IQEngineLogo"]').click();
-
-  // Azure blob
-  await page.locator('[id="AzureBlob"]').click();
+  await expect(page.getByText('"global"', { exact: true })).toBeVisible();
 });

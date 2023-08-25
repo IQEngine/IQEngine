@@ -122,6 +122,13 @@ export function useRouter() {
         {
           index: true,
           async lazy() {
+            let { LandingPage } = await import('@/pages/landing-page/landing-page');
+            return { Component: LandingPage };
+          },
+        },
+        {
+          path: 'browser',
+          async lazy() {
             let { RepoBrowser } = await import('@/pages/repo-browser/repo-browser');
             return { Component: RepoBrowser };
           },

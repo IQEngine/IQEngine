@@ -41,6 +41,7 @@ test('Azure Blob Datasource', async ({ page }) => {
   const accountName = process.env.STORAGE_ACCOUNT_NAME || '';
 
   await page.goto('/');
+  await page.waitForTimeout(500); // bypass landing page is on by default but takes a moment
   await page.getByPlaceholder('Storage Account Name').fill(accountName);
   await page.getByPlaceholder('Container Name').fill('test-container');
   await page.locator('#AzureBlob').click();
