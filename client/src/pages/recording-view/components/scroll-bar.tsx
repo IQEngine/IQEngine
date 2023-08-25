@@ -5,7 +5,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Layer, Rect, Image } from 'react-konva';
 import { MINIMUM_SCROLL_HANDLE_HEIGHT_PIXELS, MINIMAP_FFT_SIZE } from '@/utils/constants';
-import { useGetIQData, useGetMinimapIQ, useRawIQData } from '@/api/iqdata/Queries';
+import { useGetMinimapIQ, useRawIQData } from '@/api/iqdata/Queries';
 import { useSpectrogramContext } from '../hooks/use-spectrogram-context';
 import { colMaps } from '@/utils/colormap';
 import { calcFfts, fftToRGB } from '@/utils/selector';
