@@ -4,7 +4,7 @@ import { getBlobClient } from '@/api/utils/AzureBlob';
 import { SigMFMetadata } from '@/utils/sigmfMetadata';
 import { DataSource, IQDataSlice } from '@/api/Models';
 import { BlobClient as AzureBlobClient } from '@azure/storage-blob';
-import { groupContingousIndexes } from '@/utils/group';
+import { groupContiguousIndexes } from '@/utils/group';
 import { MINIMAP_FFT_SIZE } from '@/utils/constants';
 
 export class BlobClient implements IQDataClient {
@@ -24,9 +24,9 @@ export class BlobClient implements IQDataClient {
       dataRange.push(i * skipNFfts);
     }
     const { account, container, file_path } = meta.getOrigin();
-    const blobClient = getBlobClient(this.dataSources, account, container, file_path)
+    const blobClient = getBlobClient(this.dataSources, account, container, file_path);
     const iqBlocks: Float32Array[] = [];
-    for(const index of dataRange) {
+    for (const index of dataRange) {
       const bytesPerSample = meta.getBytesPerIQSample();
       const offsetBytes = index * MINIMAP_FFT_SIZE * bytesPerSample;
       const countBytes = MINIMAP_FFT_SIZE * bytesPerSample;
@@ -37,7 +37,6 @@ export class BlobClient implements IQDataClient {
       const blobBody = await (await download.blobBody).arrayBuffer();
       const iqArray = convertToFloat32(blobBody, meta.getDataType());
       iqBlocks.push(iqArray);
-      
     }
     return iqBlocks;
   }
@@ -49,14 +48,14 @@ export class BlobClient implements IQDataClient {
     signal: AbortSignal
   ): Promise<IQDataSlice[]> {
     console.debug('getIQDataBlocks', indexes);
-    const contingousIndexes = groupContingousIndexes(indexes);
+    const contiguousIndexes = groupContiguousIndexes(indexes);
     let { account, container, file_path } = meta.getOrigin();
     // if filePath does not finish in .sigmf-data, add it
     if (!file_path.endsWith('.sigmf-data')) {
       file_path += '.sigmf-data';
     }
     const content = await Promise.all(
-      contingousIndexes.map((indexGroup) =>
+      contiguousIndexes.map((indexGroup) =>
         this.getIQDataBlockFromBlob(
           getBlobClient(this.dataSources, account, container, file_path),
           meta,
