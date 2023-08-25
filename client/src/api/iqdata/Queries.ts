@@ -46,8 +46,14 @@ export function useGetIQData(
   const { filesQuery, dataSourcesQuery } = useUserSettings();
   const [fftsRequired, setStateFFTsRequired] = useState<number[]>([]);
 
+  // enforce MAXIMUM_SAMPLES_PER_REQUEST by truncating if need be
   function setFFTsRequired(fftsRequired: number[]) {
-    fftsRequired = fftsRequired.slice(0, fftsRequired.length > Math.ceil(MAXIMUM_SAMPLES_PER_REQUEST / fftSize) ? Math.ceil(MAXIMUM_SAMPLES_PER_REQUEST / fftSize) : fftsRequired.length);
+    fftsRequired = fftsRequired.slice(
+      0,
+      fftsRequired.length > Math.ceil(MAXIMUM_SAMPLES_PER_REQUEST / fftSize)
+        ? Math.ceil(MAXIMUM_SAMPLES_PER_REQUEST / fftSize)
+        : fftsRequired.length
+    );
     setStateFFTsRequired(fftsRequired);
   }
 
