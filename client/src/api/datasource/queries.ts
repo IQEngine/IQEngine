@@ -54,7 +54,8 @@ export const getDataSource = (type: string, account: string, container: string, 
 
 export const useSasToken = (type: string, account: string, container: string, filepath: string, enabled = true) => {
   const { dataSourcesQuery, filesQuery } = useUserSettings();
-  const client = DataSourceClientFactory(type, filesQuery.data, dataSourcesQuery.data);
+  const { instance } = useMsal();
+  const client = DataSourceClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance);
 
   return useQuery(
     ['sas', type, account, container, filepath],
