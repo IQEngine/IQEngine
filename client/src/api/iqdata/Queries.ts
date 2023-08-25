@@ -22,7 +22,8 @@ export function useGetIQData(
   filePath: string,
   fftSize: number,
   taps: number[] = [1],
-  pythonScript: string = INITIAL_PYTHON_SNIPPET
+  pythonScript: string = INITIAL_PYTHON_SNIPPET,
+  fftStepSize: number = 0
 ) {
   const [pyodide, setPyodide] = useState<any>(null);
 
@@ -35,12 +36,12 @@ export function useGetIQData(
   }
 
   useEffect(() => {
-    if (!pyodide && pythonScript && pythonScript !== INITIAL_PYTHON_SNIPPET) {
+    if (!pyodide && pythonScript && pythonScript !== INITIAL_PYTHON_SNIPPET && fftStepSize === 0) {
       initPyodide().then((pyodide) => {
         setPyodide(pyodide);
       });
     }
-  }, [pythonScript]);
+  }, [pythonScript, fftStepSize]);
 
   const queryClient = useQueryClient();
   const { filesQuery, dataSourcesQuery } = useUserSettings();
@@ -58,8 +59,12 @@ export function useGetIQData(
   }
 
   const { data: meta } = useMeta(type, account, container, filePath);
+
   const { instance } = useMsal();
+
   const iqDataClient = IQDataClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance);
+
+  // fetches iqData, this happens first, and the iqData is in one big continuous chunk
   const { data: iqData } = useQuery({
     queryKey: ['iqData', type, account, container, filePath, fftSize, fftsRequired],
     queryFn: async ({ signal }) => {
@@ -69,6 +74,7 @@ export function useGetIQData(
     enabled: !!meta && !!filesQuery.data && !!dataSourcesQuery.data,
   });
 
+  // This sets rawiqdata, rawiqdata contains all the data, while the iqData above is just the recently fetched one
   useEffect(() => {
     if (iqData) {
       const previousData = queryClient.getQueryData<Float32Array[]>([
@@ -88,6 +94,7 @@ export function useGetIQData(
     }
   }, [iqData, fftSize]);
 
+  // fetches rawiqdata
   const { data: processedIQData, dataUpdatedAt: processedDataUpdated } = useQuery<Float32Array[]>({
     queryKey: ['rawiqdata', type, account, container, filePath, fftSize],
     queryFn: async () => {
