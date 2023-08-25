@@ -162,7 +162,8 @@ export function useRawIQData(type, account, container, filePath, fftSize) {
 export function useGetMinimapIQ(type: string, account: string, container: string, filePath: string, enabled = true) {
   const { data: meta } = useMeta(type, account, container, filePath);
   const { filesQuery, dataSourcesQuery } = useUserSettings();
-  const iqDataClient = IQDataClientFactory(type, filesQuery.data, dataSourcesQuery.data);
+  const { instance } = useMsal();
+  const iqDataClient = IQDataClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance);
   const minimapQuery = useQuery<Float32Array[]>({
     queryKey: ['minimapiq', type, account, container, filePath],
     queryFn: async ({ signal }) => {
