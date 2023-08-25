@@ -62,7 +62,9 @@ export class ApiClient implements IQDataClient {
     const { account, container, file_path } = meta.getOrigin();
     const format = meta.getDataType();
     const dataUrl = `/api/datasources/${account}/${container}/${file_path}/minimap-data`;
-    const binaryResponse = await axios.get(dataUrl, {
+    const binaryResponse = await this.authUtil.requestWithAuthIfRequired({
+      method: 'get',
+      url: dataUrl,
       responseType: 'arraybuffer',
       signal: signal,
       params: {
