@@ -30,7 +30,7 @@ ignorePatterns:
 parser: '@typescript-eslint/parser'
 parserOptions:
   project: "tsconfig.json"
-  tsconfigRootDir: __dirname
+  tsconfigRootDir: /github/workspace/client/
   ecmaVersion: 2018
   sourceType: module
 
