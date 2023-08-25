@@ -19,6 +19,7 @@ export function useSpectrogram(currentFFT) {
     taps,
     pythonSnippet,
   } = useSpectrogramContext();
+
   const { currentData, setFFTsRequired, fftsRequired, processedDataUpdated } = useGetIQData(
     type,
     account,
@@ -26,7 +27,8 @@ export function useSpectrogram(currentFFT) {
     filePath,
     fftSize,
     taps,
-    pythonSnippet
+    pythonSnippet,
+    fftStepSize
   );
   const totalFFTs = Math.ceil(meta?.getTotalSamples() / fftSize);
 
