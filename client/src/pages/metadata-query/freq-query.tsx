@@ -4,12 +4,18 @@ import BandSelection from './band-selection';
 
 export const FreqQuery = ({ description, validator, queryName, handleQueryValid, handleQueryInvalid }) => {
   const bands = {
-    VLF: ['VLF', 3000, 30000],
-    LF: ['LF', 30000, 3000000],
     MF: ['MF', 300000, 3000000],
     HF: ['HF', 3000000, 30000000],
     VHF: ['VHF', 30000000, 300000000],
-    UHF: ['UHF', 300000000, 3000000000],
+    UHF: ['UHF', 300000000, 3000000000], //300 MHz -3 GHz
+    L: ['L', 1000000000, 2000000000],
+    S: ['S', 2000000000, 4000000000],
+    C: ['C', 4000000000, 8000000000],
+    X: ['X', 8000000000, 12000000000],
+    Ku: ['Ku', 12000000000, 18000000000],
+    K: ['K', 18000000000, 26000000000],
+    Ka: ['Ka', 26000000000, 40000000000]
+
   };
   const [show, setShow] = useState(true);
   const [freqRange, setFreqRange] = useState({
