@@ -6,5 +6,5 @@ test('homepage has title @CICompatible', async ({ page }) => {
   skipLandingPage(page);
 
   // Expect a title "to contain" a substring.
-  await expect(page).toHaveTitle('IQ Engine');
+  await expect(page).toHaveTitle('IQEngine');
 });
