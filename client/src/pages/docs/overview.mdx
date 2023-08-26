@@ -1,3 +1,30 @@
 # Overview
 
-Overview of the tool
+For basic usage of IQEngine, reference the landing page and animated gifs.
+
+## High level architecture
+
+The IQEngine app can be broken down into the following components:
+
+1. Frontend (a.k.a. client)
+2. Backend (a.k.a. api)
+3. Plugins server
+4. Database
+5. Blob storage
+
+Separately, there is the deployment/infrastructure side, which contains services like container apps and an app registration to hold permissions.
+<br></br>
+The plugins server is intentionally kept as isolated as possible for the sake of security,
+as its job is to run plugins which can take any form (can be thought of as arbitrary code).
+Plugins are able to access only the IQ from the recording they were triggered to process,
+and the interface between the plugins server and client is specified in an OpenAPI spec (see Plugins docs).
+<br></br>
+The following diagram shows the high-level architecture of IQEngine, not including security/admin oriented features.
+
+<br></br>
+<center>
+<div className="bg-white lg:w-2/3 md:w-3/4 p-0 m-0">
+<img className="w-full p-0 m-0" src={'/security_overview.drawio.png'} alt="high level IQEngine architecture including frontend backend plugins database"  />
+</div>
+</center>
+<br></br>
