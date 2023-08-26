@@ -1,8 +1,9 @@
 import { test } from '@playwright/test';
+import { skipLandingPage } from '../common-steps';
 
 test('Confirm siggen card @CICompatible', async ({ page }) => {
   await page.goto('/');
-  await page.waitForTimeout(500); // bypass landing page is on by default but takes a moment
+  skipLandingPage(page);
 
   // signal generator
   await page.locator('[id="Siggen"]').click();

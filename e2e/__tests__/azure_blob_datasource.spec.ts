@@ -8,6 +8,7 @@ import {
   ContainerClient,
   ContainerCreateResponse,
 } from '@azure/storage-blob';
+import { skipLandingPage } from '../common-steps';
 
 test.beforeAll(async ({}) => {
   var conn = dotenv.config();
@@ -41,7 +42,7 @@ test('Azure Blob Datasource', async ({ page }) => {
   const accountName = process.env.STORAGE_ACCOUNT_NAME || '';
 
   await page.goto('/');
-  await page.waitForTimeout(500); // bypass landing page is on by default but takes a moment
+  skipLandingPage(page);
   await page.getByPlaceholder('Storage Account Name').fill(accountName);
   await page.getByPlaceholder('Container Name').fill('test-container');
   await page.locator('#AzureBlob').click();

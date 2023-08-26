@@ -1,5 +1,5 @@
 ---
-name: Run Playwright frontend integration tests
+name: Run Playwright Integration Tests
 
 on:
   pull_request:

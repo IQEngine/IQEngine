@@ -132,13 +132,13 @@ To configure the project, you need to set specific environment variables. The cu
 
 We have several feature flags currently in use. Their purposes are as follows:
 
-* `useIQEngineOutReach`: When true this flag shows IQ Engine outreach links, specifically the Discord and the link to sign up for the monthly IQ Engine email. This is true as default.
+* `useIQEngineOutReach`: When true this flag shows IQEngine outreach links, specifically the Discord and the link to sign up for the monthly IQEngine email. This is true as default.
 
 * `useAPIDatasources`: When true this flag allows the use and display of API data sources in the RepoBrowser component. This is true as default.
 
-* `displayIQEngineGitHub`: When true this flag shows the link for the IQ Engine GitHub repo. This is true as default.
+* `displayIQEngineGitHub`: When true this flag shows the link for the IQEngine GitHub repo. This is true as default.
 
-* `displayInternalBranding`: When true this flag displays an additional logo for customers using IQ Engine. This is false as default.
+* `displayInternalBranding`: When true this flag displays an additional logo for customers using IQEngine. This is false as default.
 
 * `bypassLandingPage`: Skips the landing page meant for www.iqengine.org
 
