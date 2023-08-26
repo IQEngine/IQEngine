@@ -6,9 +6,10 @@ import Plot from 'react-plotly.js';
 import React, { useEffect, useState } from 'react';
 import { template } from '@/utils/plotlyTemplate';
 import { useCursorContext } from '../hooks/use-cursor-context';
+import { useSpectrogramContext } from '../hooks/use-spectrogram-context';
 
-export const IQPlot = (props) => {
-  let { plotWidth, plotHeight } = props;
+export const IQPlot = () => {
+  const { spectrogramWidth, spectrogramHeight } = useSpectrogramContext();
   const { cursorData } = useCursorContext();
   const [I, setI] = useState<Float32Array>();
   const [Q, setQ] = useState<Float32Array>();
@@ -52,8 +53,8 @@ export const IQPlot = (props) => {
           },
         ]}
         layout={{
-          width: plotWidth,
-          height: plotHeight,
+          width: spectrogramWidth,
+          height: spectrogramHeight,
           dragmode: 'pan',
           template: template,
           xaxis: {

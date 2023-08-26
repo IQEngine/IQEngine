@@ -8,9 +8,10 @@ import { fftshift } from 'fftshift';
 import { template } from '@/utils/plotlyTemplate';
 import { FFT } from '@/utils/fft';
 import { useCursorContext } from '../hooks/use-cursor-context';
+import { useSpectrogramContext } from '../hooks/use-spectrogram-context';
 
-export const FrequencyPlot = (props) => {
-  let { plotWidth, plotHeight } = props;
+export const FrequencyPlot = () => {
+  const { spectrogramWidth, spectrogramHeight } = useSpectrogramContext();
   const { cursorData } = useCursorContext();
   const [magnitudes, setMagnitudes] = useState();
 
@@ -51,8 +52,8 @@ export const FrequencyPlot = (props) => {
           },
         ]}
         layout={{
-          width: plotWidth,
-          height: plotHeight,
+          width: spectrogramWidth,
+          height: spectrogramHeight,
           dragmode: 'pan',
           template: template,
           xaxis: {
