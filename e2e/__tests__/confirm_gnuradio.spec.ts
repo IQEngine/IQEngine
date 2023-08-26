@@ -1,8 +1,9 @@
 import { test, expect } from '@playwright/test';
+import { skipLandingPage } from '../common-steps';
 
 test('GNURadio repocard displays spectrogram page', async ({ page }) => {
   await page.goto('/');
-  await page.waitForTimeout(500); // bypass landing page is on by default but takes a moment
+  skipLandingPage(page);
 
   await page.locator('#GNURadioSigMFRepo').last().click();
   await page.getByRole('link', { name: 'analog_FM_France' }).click();

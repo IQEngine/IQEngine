@@ -2,6 +2,7 @@ import { test } from '@playwright/test';
 import { MongoClient, Db } from 'mongodb';
 import dotenv from 'dotenv';
 import dotenvExpand from 'dotenv-expand';
+import { skipLandingPage } from '../common-steps';
 
 test.beforeAll(async ({ request }) => {
   const dataSource = {
@@ -18,7 +19,7 @@ test.beforeAll(async ({ request }) => {
 // the "Open Local Directory" and "Select 1" options are not tested
 test('Confirm api datasource @CICompatible', async ({ page }) => {
   await page.goto('/');
-  await page.waitForTimeout(500); // bypass landing page is on by default but takes a moment
+  skipLandingPage(page);
 
   // api data source
   await page.locator('[id="(API)TestAPIDataSource"]').first().click();
