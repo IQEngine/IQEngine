@@ -10,6 +10,7 @@ import { fileOpen } from 'browser-fs-access';
 export const UploadPage = () => {
   const [statusText, setStatusText] = useState<string>('Choose one or multiple Files');
   const [uploadedFiles, setUploadedFiles] = useState<string[]>([]);
+  const [progress, setProgress] = useState<Number>(0);
 
   const config = useConfigQuery();
 
@@ -27,7 +28,7 @@ export const UploadPage = () => {
     console.log(blockCount, 'blocks');
     const blockIds = [];
     for (let i = 0; i < blockCount; i++) {
-      console.log(i);
+      setProgress((i / blockCount) * 100); // update progress bar
       const start = i * blockSize;
       const end = Math.min(start + blockSize, f.size);
       const chunk = f.slice(start, end);
@@ -60,11 +61,19 @@ export const UploadPage = () => {
     <div className="my-24 grid justify-center">
       <h2>Files will be uploaded to a triage container where they will be reviewed by admins</h2>
 
-      <div className="mt-4 grid justify-center">
+      <div className="my-4 grid justify-center">
         <button className="btn btn-primary opacity-75 w-32" onClick={openFiles}>
           Upload
         </button>
       </div>
+
+      {progress !== 0 && (
+        <div className="w-fill h-6 text-center outline outline-1 outline-primary rounded-lg">
+          <div className="bg-secondary h-6 rounded-lg" style={{ width: `${String(progress.toFixed(1))}%` }}>
+            <span className="text-white font-bold">{`${String(progress.toFixed(1))}%`}</span>
+          </div>
+        </div>
+      )}
 
       <div className="mt-4 grid justify-center">Status: {statusText}</div>
 
