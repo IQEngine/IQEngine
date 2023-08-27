@@ -38,6 +38,7 @@ export const UploadPage = () => {
       await blockBlobClient.stageBlock(blockId, chunk, chunkSize);
     }
     await blockBlobClient.commitBlockList(blockIds);
+    setProgress(100);
     console.log('done uploading ' + f.name);
   }
 
