@@ -63,7 +63,7 @@ test-api:
 
 test-client:
 	@echo "Running client unit tests"
-	@cd client && npx vitest run
+	@cd client && npm run test
 
 lint:
 	@echo "Do you want to lint to correct the files? [y/N] " && read ans && if [ $${ans:-'N'} = 'y' ]; then make lint-corrections; else make lint-no-corrections;fi
