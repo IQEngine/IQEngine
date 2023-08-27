@@ -9,6 +9,7 @@ import { fileOpen } from 'browser-fs-access';
 
 export const UploadPage = () => {
   const [statusText, setStatusText] = useState<string>('Choose one or multiple Files');
+  const [uploadedFiles, setUploadedFiles] = useState<string[]>([]);
 
   const config = useConfigQuery();
 
@@ -44,9 +45,12 @@ export const UploadPage = () => {
       multiple: true,
     });
 
+    let uploadedFilesList = [];
     for (let indx in files) {
       setStatusText('Uploading ' + files[indx].name + '...');
       await uploadBlob(files[indx]);
+      uploadedFilesList = uploadedFilesList.concat(files[indx].name);
+      setUploadedFiles(uploadedFilesList);
     }
 
     setStatusText('Done uploading all files!');
@@ -63,6 +67,12 @@ export const UploadPage = () => {
       </div>
 
       <div className="mt-4 grid justify-center">Status: {statusText}</div>
+
+      {uploadedFiles.map((fname) => (
+        <div className="mt-4 grid justify-center" key={fname}>
+          Uploaded {fname}
+        </div>
+      ))}
     </div>
   );
 };
