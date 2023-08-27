@@ -4,25 +4,8 @@
 
 import React, { useState } from 'react';
 import { useConfigQuery } from '@/api/config/queries';
-import { ContainerClient, newPipeline, AnonymousCredential, BlockBlobClient } from '@azure/storage-blob';
+import { newPipeline, AnonymousCredential, BlockBlobClient } from '@azure/storage-blob';
 import { fileOpen } from 'browser-fs-access';
-
-function readFile(file: Blob): Promise<ArrayBuffer> {
-  return new Promise<ArrayBuffer>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (!reader.result || typeof reader.result === 'string') {
-        reject(new Error('Failed to read the file'));
-        return;
-      }
-      resolve(reader.result);
-    };
-    reader.onerror = () => {
-      reject(new Error('Failed to read the file'));
-    };
-    reader.readAsArrayBuffer(file);
-  });
-}
 
 export const UploadPage = () => {
   const [statusText, setStatusText] = useState<string>('Choose one or multiple Files');
@@ -30,18 +13,12 @@ export const UploadPage = () => {
   const config = useConfigQuery();
 
   async function uploadBlob(f) {
-    //let content = await readFile(f);
-
     // Create azure blob client
     const blobName = f.name.split('.')[0] + '_' + new Date().toISOString().split('.')[0] + '.' + f.name.split('.')[1];
-
-    const fullBlobURL =
-      'https://gnuradio.blob.core.windows.net/triage/' +
-      blobName +
-      '?sp=racwdli&st=2023-08-27T18:14:28Z&se=2023-09-28T02:14:28Z&sv=2022-11-02&sr=c&sig=84AXbsLwge1EDEu20FQ3N8e%2BKIcpVm91pLWUv%2FFPnro%3D';
-    console.log(fullBlobURL);
+    const containerUrl = config.data.uploadPageBlobSasUrl; // Note - it needs ADD, CREATE, WRITE
+    const blobUrl = containerUrl.split('?')[0] + '/' + blobName + '?' + containerUrl.split('?')[1];
     const pipeline = newPipeline(new AnonymousCredential());
-    const blockBlobClient = new BlockBlobClient(fullBlobURL, pipeline);
+    const blockBlobClient = new BlockBlobClient(blobUrl, pipeline);
 
     // chunking related
     const blockSize = 1 * 1024 * 1024; // 1MB
@@ -60,14 +37,6 @@ export const UploadPage = () => {
     }
     await blockBlobClient.commitBlockList(blockIds);
     console.log('done uploading ' + f.name);
-
-    // Create a new blob
-    //try {
-    //  const resp = await blockBlobClient.upload(content, f.size);
-    //  console.log(resp);
-    //} catch (error) {
-    //  console.error(error);
-    //}
   }
 
   const openFiles = async () => {
@@ -79,6 +48,7 @@ export const UploadPage = () => {
       setStatusText('Uploading ' + files[indx].name + '...');
       await uploadBlob(files[indx]);
     }
+
     setStatusText('Done uploading all files!');
   };
 
