@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useMeta } from '@/api/metadata/queries';
 import { useMsal } from '@azure/msal-react';
 import { applyProcessing } from '@/utils/fetch-more-data-source';
+import { groupContiguousIndexes } from '@/utils/group';
 
 declare global {
   interface Window {
@@ -14,6 +15,19 @@ declare global {
 }
 
 const MAXIMUM_SAMPLES_PER_REQUEST = 1024 * 256;
+
+export function useDataCacheFunctions(type: string, account: string, container: string, filePath: string, fftSize: number) {
+
+  const queryClient = useQueryClient();
+  function clearIQData() {
+    queryClient.removeQueries(['iqData', type, account, container, filePath, fftSize]);
+    queryClient.removeQueries(['rawiqdata', type, account, container, filePath, fftSize]);
+    queryClient.removeQueries(['processedIQData', type, account, container, filePath, fftSize]);
+  }
+  return {
+    clearIQData
+  };
+}
 
 export function useGetIQData(
   type: string,
@@ -105,8 +119,8 @@ export function useGetIQData(
         if (!data) {
           return null;
         }
-        //performance.mark('start');
-        const currentProcessedData = queryClient.getQueryData<number[][]>([
+        performance.mark('start');
+        let currentProcessedData = queryClient.getQueryData<number[][]>([
           'processedIQData',
           type,
           account,
@@ -117,20 +131,31 @@ export function useGetIQData(
           pythonScript,
           !!pyodide,
         ]);
-        const processedData = data.map((iqData: Float32Array, i: number) => {
-          if (currentProcessedData && currentProcessedData[i]) {
-            return currentProcessedData[i];
+
+        if (!currentProcessedData) {
+          currentProcessedData = [];
+        }
+        let currentIndexes = data.map((_, i) => i);
+        // remove any data that have already being processed
+        const dataRange = currentIndexes.filter((index) => !currentProcessedData[index]);
+
+
+        groupContiguousIndexes(dataRange).forEach((group) => {
+          const iqData = data.slice(group.start, group.start + group.count);
+          const result = applyProcessing(iqData, taps, pythonScript, pyodide);
+          for (let i = 0; i < group.count; i++) {
+            currentProcessedData[group.start + i] = result[i];
           }
-          return applyProcessing(iqData, taps, pythonScript, pyodide);
         });
-        //performance.mark('end');
-        //const performanceMeasure = performance.measure('processing', 'start', 'end');
+        performance.mark('end');
+        const performanceMeasure = performance.measure('processing', 'start', 'end');
+        console.log('Processing took', performanceMeasure.duration, 'ms');
         queryClient.setQueryData(
           ['processedIQData', type, account, container, filePath, fftSize, taps, pythonScript, !!pyodide],
-          processedData
+          currentProcessedData
         );
 
-        return processedData;
+        return currentProcessedData;
       },
       [!!pyodide, pythonScript, taps.join(',')]
     ),
