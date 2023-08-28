@@ -119,7 +119,7 @@ export function useGetIQData(
         if (!data) {
           return null;
         }
-        performance.mark('start');
+        // performance.mark('start');
         let currentProcessedData = queryClient.getQueryData<number[][]>([
           'processedIQData',
           type,
@@ -147,9 +147,8 @@ export function useGetIQData(
             currentProcessedData[group.start + i] = result[i];
           }
         });
-        performance.mark('end');
-        const performanceMeasure = performance.measure('processing', 'start', 'end');
-        console.log('Processing took', performanceMeasure.duration, 'ms');
+        // performance.mark('end');
+        // const performanceMeasure = performance.measure('processing', 'start', 'end');
         queryClient.setQueryData(
           ['processedIQData', type, account, container, filePath, fftSize, taps, pythonScript, !!pyodide],
           currentProcessedData
