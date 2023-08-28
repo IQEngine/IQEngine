@@ -4,13 +4,13 @@ blinker==1.6.2
 cachetools==5.3.1
 click==8.1.7
 cryptography
-fastapi==0.101.1
+fastapi==0.103.0
 httpx==0.24.1
-Motor==3.2.0
+Motor==3.3.0
 msal==1.23.0
 pydantic==1.10.12
 pyjwt==2.8.0
-pymongo==4.4.1
+pymongo==4.5.0
 pymongo-inmemory==0.3.0
 pytest==7.4.0
 pytest-asyncio==0.21.1
