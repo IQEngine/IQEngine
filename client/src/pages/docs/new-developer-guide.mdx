@@ -2,6 +2,13 @@
 
 ## Basic Setup
 
+To run IQEngine from source code, you need to have Node.js and npm installed on your system.
+If you don't have them, you can download and install them from [here](https://nodejs.org/en/download/).
+Additionally, ensure that you have Python 3.10 or a higher version installed.
+You can download and install Python from [here](https://www.python.org/downloads/).
+Lastly, you'll need to have "make" installed on your system, which can be obtained from [here](https://www.gnu.org/software/make/).
+<br />
+Once you have Node.js, npm, Python, and make installed, follow these steps:
 1. Clone this repo
 1. Add the PPA to get the latest Node version using the following commands:
     - `curl -sL https://deb.nodesource.com/setup_18.x -o nodesource_setup.sh`
@@ -15,3 +22,65 @@
     1. Optionally, in the **plugins** terminal, run `make run-plugins` to start the plugins server (uses port 8000)
 1. Open your browser to http://localhost:3000 to access the site
 1. Optionally- if you want to see the public "GNU Radio Repo" recordings, ask Marc for a SAS token which gets used in the .env within IQENGINE_CONNECTION_INFO
+
+
+## Using the Public Docker Image
+
+Alternatively, you can run the latest Docker image from the GitHub repository by executing the following command after [installing Docker](https://docs.docker.com/engine/install/ubuntu/):
+<br />
+```bash
+docker run -p 3000:3000 -d ghcr.io/iqengine/iqengine:latest
+```
+<br />
+Or, if you prefer to run the latest pre-release version from the "main" branch:
+<br />
+```bash
+docker run -p 3000:3000 -d ghcr.io/iqengine/iqengine:pre
+```
+<br />
+This command will launch IQEngine, and you can access it at [http://localhost:3000](http://localhost:3000).
+<br />
+
+### Running from a Local Docker Build Image
+
+If you prefer to build and run the IQEngine Docker image locally, follow these steps:
+
+1. Clone the repository and navigate to the project directory.
+2. Build the Docker image by executing the following command:
+
+```bash
+docker build -t iqengine-local .
+```
+
+3. Once the image is built successfully, run the Docker container with the following command:
+
+```bash
+docker run -p 3000:3000 -d iqengine-local
+```
+<br />
+This will instantiate IQEngine using your locally built Docker image, and you can access it at [http://localhost:3000](http://localhost:3000).
+
+### Misc Developer Tips
+
+To fix 99% of linting warnings automatically, try running:
+
+```bash
+docker run -d -v $(git rev-parse --show-toplevel):/tmp/lint ghcr.io/oxsecurity/megalinter:v6
+```
+
+Feature flags are set up across the application. To use a feature flag, add it to your .env file in the root of the repo and then use it to wrap UI elements as illustrated below, or use the getFeatureFlag(flagname) method to programmatically get a feature flag value.
+
+Each component needs to import the Feature component.
+
+```HTML
+      <Feature flag="useIQEngineOutReach">
+        <h2 className="text-center py-2">
+          Sign up for a once-a-month email update on IQEngine, such as new features, demos, and more!
+        </h2>
+      </Feature>
+```
+
+Azure Container App Config Notes:
+
+* Within the GitHub repository settings under Secrets and vars > Actions, there needs to be a Repository secret with AZUREAPPSERVICE_PUBLISHPROFILE...
+* Connection settings live in GitHub Secrets > Actions (not Azure App Service anymore), enter it in without the outer double quotes and don't escape any quotes.

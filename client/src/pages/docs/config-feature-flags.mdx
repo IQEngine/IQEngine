@@ -1,0 +1,37 @@
+# IQEngine Config and Feature Flags
+
+Note that feature flags set with env vars are simply to set the defaults, you can always change them within the admin page in the web GUI if you set up admin permissions.
+
+## Project Configuration
+
+To configure the project, you need to set specific environment variables. The currently supported environment variables are as follows:
+
+* `IQENGINE_CONNECTION_INFO`: This variable contains information about the connection string and data sources. You can refer to the `example.env` file for an example.
+
+* `IQENGINE_GOOGLE_ANALYTICS_KEY`: This variable holds the key for Google Analytics. If you don't intend to use Google Analytics, you can leave this variable empty.
+
+* `IQENGINE_PLUGINS`: Use this variable to specify the plugins you want to use it needs to be an array of objects with the following properties: name, url. The name is the name of the plugin and the url is the url to the plugin. ex: IQENGINE_PLUGINS = [\{"name": "My Plugin", "url": "http://localhost:3000"\}]
+
+* `IQENGINE_FEATURE_FLAGS`: Use this variable to specify feature flags for the web app. If you have a Metadata database you can specify the `useAPIDatasources` flag like this: IQENGINE_FEATURE_FLAGS = \{"useAPIDatasources": false\}. Additional feature flags can be added using comma separation.
+
+* `IQENGINE_METADATA_DB_CONNECTION_STRING`: This variable stores the connection string for the Metadata DB. If you don't want to utilize the Metadata DB, you can leave this variable empty. Please note that this variable is only used by the backend API.
+
+* `IN_MEMORY_DB`: This variable switches in-memory DB on or off. The in-memory DB is intended for testing only. Use IN_MEMORY_DB = 0 for off and 1 for on. PyTest tests of the API make use of the in-memory DB.
+
+* `IQENGINE_APP_ID` = For your administrative user, it is crucial to set up this variable. Create a registration app dedicated to the administrative user within your application. This variable is necessary to enable their login functionality. Remember to include your website's redirect URI as a Single Page Application (SPA) redirect. The redirect should consist of your site's URL followed by "/admin.".
+
+* `IQENGINE_APP_AUTHORITY`: This is the authority for your application that will login to the third party provider.
+
+## Feature Flags
+
+We have several feature flags currently in use. Their purposes are as follows:
+
+* `useIQEngineOutReach`: When true this flag shows IQEngine outreach links, specifically the Discord and the link to sign up for the monthly IQEngine email. This is true as default.
+
+* `useAPIDatasources`: When true this flag allows the use and display of API data sources in the RepoBrowser component. This is true as default.
+
+* `displayIQEngineGitHub`: When true this flag shows the link for the IQEngine GitHub repo. This is true as default.
+
+* `displayInternalBranding`: When true this flag displays an additional logo for customers using IQEngine. This is false as default.
+
+* `bypassLandingPage`: Skips the landing page meant for www.iqengine.org
