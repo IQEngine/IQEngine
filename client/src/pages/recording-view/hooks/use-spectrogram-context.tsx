@@ -1,7 +1,9 @@
+import { useDataCacheFunctions } from '@/api/iqdata/Queries';
 import { useMeta } from '@/api/metadata/queries';
 import { INITIAL_PYTHON_SNIPPET } from '@/utils/constants';
 import { SigMFMetadata } from '@/utils/sigmfMetadata';
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 
 interface SpectrogramContextProperties {
   type: string;
@@ -57,6 +59,7 @@ export function SpectrogramContextProvider({
     fftStepSize: 0,
   },
 }) {
+  
   const [magnitudeMin, setMagnitudeMin] = useState<number>(seedValues.magnitudeMin);
   const [magnitudeMax, setMagnitudeMax] = useState<number>(seedValues.magnitudeMax);
   const [colmap, setColmap] = useState<string>(seedValues.colmap);
@@ -67,11 +70,20 @@ export function SpectrogramContextProvider({
   const [fftStepSize, setFFTStepSize] = useState<number>(seedValues.fftStepSize);
   const [includeRfFreq, setIncludeRfFreq] = useState<boolean>(false);
   const [taps, setTaps] = useState<number[]>([1]);
-  const [pythonSnippet, setPythonSnippet] = useState<string>(INITIAL_PYTHON_SNIPPET);
+  const [pythonSnippet, setPythonLocalSnippet] = useState<string>(INITIAL_PYTHON_SNIPPET);
   const { data: originMeta } = useMeta(type, account, container, filePath);
   const [meta, setMeta] = useState<SigMFMetadata>(originMeta);
   const [canDownload, setCanDownload] = useState<boolean>(false);
   const [selectedAnnotation, setSelectedAnnotation] = useState<number>();
+  const { clearIQData } = useDataCacheFunctions(type, account, container, filePath, fftSize);
+
+  function setPythonSnippet(pythonParameterSnippet: string) {
+    clearIQData();
+    setPythonLocalSnippet(pythonParameterSnippet);
+  }
+  
+  
+
   useEffect(() => {
     setMeta(originMeta);
   }, [originMeta]);
