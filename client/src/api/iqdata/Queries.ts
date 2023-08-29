@@ -109,15 +109,15 @@ export function useGetIQData(
   }, [iqData, fftSize]);
 
   // fetches rawiqdata
-  const { data: processedIQData, dataUpdatedAt: processedDataUpdated } = useQuery<Float32Array[]>({
+  const { data: processedIQData, dataUpdatedAt: processedDataUpdated } = useQuery<number[][]>({
     queryKey: ['rawiqdata', type, account, container, filePath, fftSize],
     queryFn: async () => {
-      return null;
+      return [];
     },
     select: useCallback(
       (data) => {
         if (!data) {
-          return null;
+          return [];
         }
         // performance.mark('start');
         let currentProcessedData = queryClient.getQueryData<number[][]>([
