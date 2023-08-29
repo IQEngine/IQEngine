@@ -19,3 +19,4 @@ matplotlib==3.7.2
 python-dotenv==1.0.0
 pytest-mock==3.11.1
 cache3==0.4.3
+openai==0.27.9

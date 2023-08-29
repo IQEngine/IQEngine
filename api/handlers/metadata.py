@@ -12,6 +12,7 @@ from helpers.cipher import decrypt
 from helpers.datasource_access import check_access
 from helpers.urlmapping import ApiType, get_content_type, get_file_name
 from motor.core import AgnosticCollection
+from aifunctions import aiquery
 
 router = APIRouter()
 
@@ -230,6 +231,109 @@ async def query_meta(
         print(f"Error querying metadata: {e}")
         raise HTTPException(status_code=500, detail="An unexpected error occurred.")
 
+
+@router.get(
+    "/api/datasources/open-query",
+    status_code=200,
+    response_model=None,
+)
+async def open_query_meta(
+    query: str,
+    current_user: Optional[dict] = Depends(get_current_user),
+):
+    if not aiquery.is_open_ai_available():
+        return {
+            "parameters": "",
+            "results": []
+        }
+    if not query:
+        return {
+            "parameters": "",
+            "results": []
+        }
+    jsonParameters = aiquery.get_query_result(query)
+    if not jsonParameters:
+        return {
+            "parameters": "",
+            "results": []
+        }
+    account = jsonParameters.get("account")
+    container = jsonParameters.get("container")
+    database_id = jsonParameters.get("database_id")
+    min_frequency = jsonParameters.get("min_frequency")
+    max_frequency = jsonParameters.get("max_frequency")
+    author = jsonParameters.get("author")
+    description = jsonParameters.get("description")
+    label = jsonParameters.get("label")
+    comment = jsonParameters.get("comment")
+    captures_geo = jsonParameters.get("captures_geo")
+    annotations_geo = jsonParameters.get("annotations_geo")
+    min_datetime = jsonParameters.get("min_datetime")
+    max_datetime = jsonParameters.get("max_datetime")
+    captures_geo_json = jsonParameters.get("captures_geo_json")
+    captures_radius = jsonParameters.get("captures_radius")
+    annotations_geo_json = jsonParameters.get("annotations_geo_json")
+    annotations_radius = jsonParameters.get("annotations_radius")
+    text = jsonParameters.get("text")
+
+    if min_datetime:
+        min_datetime = datetime.fromisoformat(min_datetime.replace("Z", "+00:00"))
+    if max_datetime:
+        max_datetime = datetime.fromisoformat(max_datetime.replace("Z", "+00:00"))
+
+    try:
+        result = await query_metadata(
+            account=account,
+            container=container,
+            database_id=database_id,
+            min_frequency=min_frequency,
+            max_frequency=max_frequency,
+            author=author,
+            description=description,
+            label=label,
+            comment=comment,
+            captures_geo=captures_geo,
+            annotations_geo=annotations_geo,
+            min_datetime=min_datetime,
+            max_datetime=max_datetime,
+            captures_geo_json=captures_geo_json,
+            captures_radius=captures_radius,
+            annotations_geo_json=annotations_geo_json,
+            annotations_radius=annotations_radius,
+            text=text,
+        )
+
+        if not result:
+            return {
+                "parameters": jsonParameters,
+                "results": []
+            }
+
+        # Process result to remove metadata from unauthorized datasources
+        access_cache = {}
+        filtered_result = []
+
+        for item in result:
+            key = (item.account, item.container)
+            if key not in access_cache:
+                access_cache[key] = await check_access(
+                    item.account, item.container, current_user
+                )
+
+            if access_cache[key] is not None:
+                filtered_result.append(item)
+
+        return {
+            "parameters": jsonParameters,
+            "results": filtered_result
+        }
+
+    except InvalidGeolocationFormat as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    except Exception as e:
+        print(f"Error querying metadata: {e}")
+        raise HTTPException(status_code=500, detail="An unexpected error occurred.")
 
 @router.post(
     "/api/datasources/{account}/{container}/{filepath:path}/meta",

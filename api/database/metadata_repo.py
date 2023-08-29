@@ -1,3 +1,4 @@
+import json
 from typing import List, Dict, Any, Optional
 from datetime import datetime
 
@@ -171,6 +172,10 @@ async def query_metadata(
     min_datetime: Optional[datetime] = None,
     max_datetime: Optional[datetime] = None,
     text: Optional[str] = None,
+    captures_geo_json: Optional[str] = None,
+    captures_radius: Optional[float] = None,
+    annotations_geo_json: Optional[str] = None,
+    annotations_radius: Optional[float] = None,
 ) -> List[DataSourceReference]:
     """
     This function is responsible for querying metadata from the specified MongoDB collection based on various
@@ -295,6 +300,28 @@ async def query_metadata(
     if annotations_geo:
         query_condition.update(
             await process_geolocation("annotations", annotations_geo)
+        )
+    if captures_geo_json:
+        query_condition.update(
+            {
+                "captures.core:geolocation": {
+                    "$near": {
+                        "$geometry": json.loads(captures_geo_json),
+                        "$maxDistance": captures_radius or 0,
+                    }
+                }
+            }
+        )
+    if annotations_geo_json:
+        query_condition.update(
+            {
+                "annotations.core:geolocation": {
+                    "$near": {
+                        "$geometry": json.loads(annotations_geo_json),
+                        "$maxDistance": annotations_radius or 0,
+                    }
+                }
+            }
         )
 
     if text is not None:
