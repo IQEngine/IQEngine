@@ -108,6 +108,7 @@ class Configuration(BaseModel):
     internal_branding: str = Field(None, alias="internalBranding")
     app_id: str = Field(None, alias="appId")
     app_authority: str = Field(None, alias="appAuthority")
+    has_ai_query: bool = Field(None, alias="hasAIQuery")
 
 
 class GeoTrack(BaseModel):
