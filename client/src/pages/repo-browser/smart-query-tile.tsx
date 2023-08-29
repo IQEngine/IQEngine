@@ -24,8 +24,8 @@ const SmartQueryTile = (props) => {
       <button
         className="repocardbutton"
         onClick={handleOnClick}
-        id="metadata-query-button"
-        aria-label="Metadata query browse"
+        id="smart-query-button"
+        aria-label="Smart query browse"
       >
         Browse
       </button>
