@@ -22,11 +22,6 @@ export const LandingPage = () => {
   };
 
   useEffect(() => {
-    const curr = getFeatureFlag('bypassLandingPage');
-    console.log('curr', curr);
-  }, [getFeatureFlag]);
-
-  useEffect(() => {
     heightFix();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tab]);
