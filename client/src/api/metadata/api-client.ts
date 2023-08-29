@@ -51,7 +51,7 @@ export class ApiClient implements MetadataClient {
     }
   }
 
-  async track(account: string, container: string, filepath: string, signal: AbortSignal): Promise<Track> {
+  async track(account: string, container: string, filepath: string, signal: AbortSignal): Promise<number[][]> {
     if (!account || !container || !filepath) {
       return null;
     }
@@ -86,6 +86,19 @@ export class ApiClient implements MetadataClient {
       item.captures = item.captures?.map((capture) => Object.assign(new CaptureSegment(), capture));
       return item;
     });
+  }
+
+  async smartQuery(queryString: string, signal: AbortSignal): Promise<any> {
+    const response = await this.authUtil.requestWithAuthIfRequired({
+      method: 'get',
+      url: '/api/datasources/open-query',
+      params: {
+        query: queryString,
+      },
+      signal: signal,
+    });
+    console.log('SmartQueryRepsonse' ,response.data);
+    return response.data;
   }
 
   features() {
