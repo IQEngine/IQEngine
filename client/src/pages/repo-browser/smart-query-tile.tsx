@@ -15,7 +15,7 @@ const SmartQueryTile = (props) => {
   return (
     <div className="repocard">
       <figure>
-        <img onClick={handleOnClick} className="repoimage" src="/query.png" alt="Metadata query tile" />
+        <img onClick={handleOnClick} className="repoimage" src="/query.png" alt="Smart query tile" />
       </figure>
       <div className="repocardbody">
         <h2>Smart Query</h2>
