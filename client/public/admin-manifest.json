@@ -99,7 +99,15 @@
     "legalAgeGroupRule": "Allow"
   },
   "passwordCredentials": [],
-  "preAuthorizedApplications": [],
+	"preAuthorizedApplications": [
+		{
+			"appId": "APP-ID-GUID",
+			"permissionIds": [
+				"85241fab-a416-43bd-ba05-6e92764afa15",
+				"656fbb2b-8922-4f98-a48d-c87391c829c0"
+			]
+		}
+	],
   "publisherDomain": "DOMAIN-NAME",
   "replyUrlsWithType": [
     {
