@@ -106,6 +106,6 @@ describe('Test Results', () => {
   test('Basic Rendering', async () => {
     var { wrapper } = useAllProviders();
     render(<Results queryString="test query string" />, { wrapper });
-    waitFor(() => expect(screen.findByText(/Sample Count/i)).toBeInTheDocument());
+    waitFor(() => expect(screen.findByText("Sample Count")).toBeInTheDocument());
   });
 });
