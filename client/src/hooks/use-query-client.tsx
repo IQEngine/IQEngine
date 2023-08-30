@@ -15,6 +15,7 @@ export function useQueryClient() {
   queryClient.setQueryDefaults(['rawiqdata'], { staleTime: Infinity });
   queryClient.setQueryDefaults(['iqData'], { staleTime: 5, cacheTime: 10 });
   queryClient.setQueryDefaults(['user-settings'], { staleTime: Infinity });
+  queryClient.setQueryDefaults(['smart-query'], { staleTime: 1000 * 60 * 60 * 24 });
 
   return {
     queryClient,

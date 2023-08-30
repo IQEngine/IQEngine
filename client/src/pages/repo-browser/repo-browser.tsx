@@ -18,6 +18,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import Feature from '@/features/feature/Feature';
 import { FeatureFlag, useFeatureFlags, FeatureFlagName } from '@/hooks/use-feature-flags';
 import { useUserSettings } from '@/api/user-settings/use-user-settings';
+import SmartQueryTile from './smart-query-tile';
 
 export const RepoBrowser = () => {
   let [dataAvailable, setDataAvailable] = useState(false);
@@ -69,6 +70,7 @@ export const RepoBrowser = () => {
           <LocalFileBrowser />
           <AzureBlobBrowser />
           <MetadataQueryTile />
+          <SmartQueryTile />
           <SiggenTile />
           <ValidatorTile />
         </div>

@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useMeta } from '@/api/metadata/queries';
 import { useMsal } from '@azure/msal-react';
 import { applyProcessing } from '@/utils/fetch-more-data-source';
+import { groupContiguousIndexes } from '@/utils/group';
 
 declare global {
   interface Window {
@@ -15,6 +16,19 @@ declare global {
 
 const MAXIMUM_SAMPLES_PER_REQUEST = 1024 * 256;
 
+export function useDataCacheFunctions(type: string, account: string, container: string, filePath: string, fftSize: number) {
+
+  const queryClient = useQueryClient();
+  function clearIQData() {
+    queryClient.removeQueries(['iqData', type, account, container, filePath, fftSize]);
+    queryClient.removeQueries(['rawiqdata', type, account, container, filePath, fftSize]);
+    queryClient.removeQueries(['processedIQData', type, account, container, filePath, fftSize]);
+  }
+  return {
+    clearIQData
+  };
+}
+
 export function useGetIQData(
   type: string,
   account: string,
@@ -22,7 +36,8 @@ export function useGetIQData(
   filePath: string,
   fftSize: number,
   taps: number[] = [1],
-  pythonScript: string = INITIAL_PYTHON_SNIPPET
+  pythonScript: string = INITIAL_PYTHON_SNIPPET,
+  fftStepSize: number = 0
 ) {
   const [pyodide, setPyodide] = useState<any>(null);
 
@@ -35,25 +50,35 @@ export function useGetIQData(
   }
 
   useEffect(() => {
-    if (!pyodide && pythonScript && pythonScript !== INITIAL_PYTHON_SNIPPET) {
+    if (!pyodide && pythonScript && pythonScript !== INITIAL_PYTHON_SNIPPET && fftStepSize === 0) {
       initPyodide().then((pyodide) => {
         setPyodide(pyodide);
       });
     }
-  }, [pythonScript]);
+  }, [pythonScript, fftStepSize]);
 
   const queryClient = useQueryClient();
   const { filesQuery, dataSourcesQuery } = useUserSettings();
   const [fftsRequired, setStateFFTsRequired] = useState<number[]>([]);
 
+  // enforce MAXIMUM_SAMPLES_PER_REQUEST by truncating if need be
   function setFFTsRequired(fftsRequired: number[]) {
-    fftsRequired = fftsRequired.slice(0, fftsRequired.length > Math.ceil(MAXIMUM_SAMPLES_PER_REQUEST / fftSize) ? Math.ceil(MAXIMUM_SAMPLES_PER_REQUEST / fftSize) : fftsRequired.length);
+    fftsRequired = fftsRequired.slice(
+      0,
+      fftsRequired.length > Math.ceil(MAXIMUM_SAMPLES_PER_REQUEST / fftSize)
+        ? Math.ceil(MAXIMUM_SAMPLES_PER_REQUEST / fftSize)
+        : fftsRequired.length
+    );
     setStateFFTsRequired(fftsRequired);
   }
 
   const { data: meta } = useMeta(type, account, container, filePath);
+
   const { instance } = useMsal();
+
   const iqDataClient = IQDataClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance);
+
+  // fetches iqData, this happens first, and the iqData is in one big continuous chunk
   const { data: iqData } = useQuery({
     queryKey: ['iqData', type, account, container, filePath, fftSize, fftsRequired],
     queryFn: async ({ signal }) => {
@@ -63,6 +88,7 @@ export function useGetIQData(
     enabled: !!meta && !!filesQuery.data && !!dataSourcesQuery.data,
   });
 
+  // This sets rawiqdata, rawiqdata contains all the data, while the iqData above is just the recently fetched one
   useEffect(() => {
     if (iqData) {
       const previousData = queryClient.getQueryData<Float32Array[]>([
@@ -82,18 +108,19 @@ export function useGetIQData(
     }
   }, [iqData, fftSize]);
 
-  const { data: processedIQData, dataUpdatedAt: processedDataUpdated } = useQuery<Float32Array[]>({
+  // fetches rawiqdata
+  const { data: processedIQData, dataUpdatedAt: processedDataUpdated } = useQuery<number[][]>({
     queryKey: ['rawiqdata', type, account, container, filePath, fftSize],
     queryFn: async () => {
-      return null;
+      return [];
     },
     select: useCallback(
       (data) => {
         if (!data) {
-          return null;
+          return [];
         }
-        //performance.mark('start');
-        const currentProcessedData = queryClient.getQueryData<number[][]>([
+        // performance.mark('start');
+        let currentProcessedData = queryClient.getQueryData<number[][]>([
           'processedIQData',
           type,
           account,
@@ -104,20 +131,30 @@ export function useGetIQData(
           pythonScript,
           !!pyodide,
         ]);
-        const processedData = data.map((iqData: Float32Array, i: number) => {
-          if (currentProcessedData && currentProcessedData[i]) {
-            return currentProcessedData[i];
+
+        if (!currentProcessedData) {
+          currentProcessedData = [];
+        }
+        let currentIndexes = data.map((_, i) => i);
+        // remove any data that have already being processed
+        const dataRange = currentIndexes.filter((index) => !currentProcessedData[index]);
+
+
+        groupContiguousIndexes(dataRange).forEach((group) => {
+          const iqData = data.slice(group.start, group.start + group.count);
+          const result = applyProcessing(iqData, taps, pythonScript, pyodide);
+          for (let i = 0; i < group.count; i++) {
+            currentProcessedData[group.start + i] = result[i];
           }
-          return applyProcessing(iqData, taps, pythonScript, pyodide);
         });
-        //performance.mark('end');
-        //const performanceMeasure = performance.measure('processing', 'start', 'end');
+        // performance.mark('end');
+        // const performanceMeasure = performance.measure('processing', 'start', 'end');
         queryClient.setQueryData(
           ['processedIQData', type, account, container, filePath, fftSize, taps, pythonScript, !!pyodide],
-          processedData
+          currentProcessedData
         );
 
-        return processedData;
+        return currentProcessedData;
       },
       [!!pyodide, pythonScript, taps.join(',')]
     ),

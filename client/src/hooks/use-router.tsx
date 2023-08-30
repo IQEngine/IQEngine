@@ -34,6 +34,13 @@ export function useRouter() {
           },
         },
         {
+          path: 'smart-query',
+          async lazy() {
+            let { SmartQuery } = await import('@/pages/smart-query/smart-query');
+            return { Component: SmartQuery };
+          },
+        },
+        {
           path: 'upload',
           async lazy() {
             let { UploadPage } = await import('@/pages/upload-page');

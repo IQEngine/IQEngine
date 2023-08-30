@@ -1,4 +1,4 @@
-export function groupContingousIndexes(indexes: number[]) {
+export function groupContiguousIndexes(indexes: number[]) {
   const contigousIndexes: { start: number; count: number }[] = [];
   if (indexes.length === 0) {
     return contigousIndexes;

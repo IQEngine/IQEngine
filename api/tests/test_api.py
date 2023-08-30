@@ -29,6 +29,7 @@ async def test_api_get_config(client):
             "appId": "app_id",
             "appAuthority": "app_authority",
             "uploadPageBlobSasUrl": None,
+            "hasAIQuery": False,
         }
 
 
@@ -54,6 +55,7 @@ async def test_api_get_config_feature_flags(client):
             "appId": "app_id",
             "appAuthority": "app_authority",
             "uploadPageBlobSasUrl": None,
+            "hasAIQuery": False,
         }
 
 

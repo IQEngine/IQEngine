@@ -2,18 +2,12 @@
 
 ## Basic Setup
 
-To run IQEngine from source code, you need to have Node.js and npm installed on your system.
-If you don't have them, you can download and install them from [here](https://nodejs.org/en/download/).
-Additionally, ensure that you have Python 3.10 or a higher version installed.
-You can download and install Python from [here](https://www.python.org/downloads/).
-Lastly, you'll need to have "make" installed on your system, which can be obtained from [here](https://www.gnu.org/software/make/).
-<br />
-Once you have Node.js, npm, Python, and make installed, follow these steps:
+To run IQEngine from source, to allow for easily making changes, use the following steps,
+which assume you're on Ubuntu 22 with Python and make already installed, but should work for other debian-based distros too.
 1. Clone this repo
 1. Add the PPA to get the latest Node version using the following commands:
     - `curl -sL https://deb.nodesource.com/setup_18.x -o nodesource_setup.sh`
     - `sudo bash nodesource_setup.sh`
-1. Install NodeJs, npm, and pip with `apt install nodejs npm python3-pip`
 1. From the root directory run the command ```make setup``` (ignore warnings)
 1. Within the root directory copy and paste the 'example.env' and rename to '.env', this is where you can configure your deployment
 1. Open three concurrent terminals for frontend, backend, and plugins
@@ -22,6 +16,8 @@ Once you have Node.js, npm, Python, and make installed, follow these steps:
     1. Optionally, in the **plugins** terminal, run `make run-plugins` to start the plugins server (uses port 8000)
 1. Open your browser to http://localhost:3000 to access the site
 1. Optionally- if you want to see the public "GNU Radio Repo" recordings, ask Marc for a SAS token which gets used in the .env within IQENGINE_CONNECTION_INFO
+
+
 
 
 ## Using the Public Docker Image

@@ -4,7 +4,7 @@
     "editor.formatOnSave": true
   },
   "[typescriptreact]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.defaultFormatter": "vscode.typescript-language-features",
     "editor.formatOnSave": true
   },
   "[javascript]": {
@@ -33,5 +33,6 @@
   "[python]": {
     "editor.defaultFormatter": "ms-python.python"
   },
-  "python.formatting.provider": "black"
+  "python.formatting.provider": "black",
+  "python.analysis.typeCheckingMode": "off"
 }

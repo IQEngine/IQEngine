@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useEffectOnce } from 'usehooks-ts';
 
 import BandSelection from './band-selection';
 
@@ -14,8 +15,7 @@ export const FreqQuery = ({ description, validator, queryName, handleQueryValid,
     X: ['X', 8000000000, 12000000000],
     Ku: ['Ku', 12000000000, 18000000000],
     K: ['K', 18000000000, 26000000000],
-    Ka: ['Ka', 26000000000, 40000000000]
-
+    Ka: ['Ka', 26000000000, 40000000000],
   };
   const [show, setShow] = useState(true);
   const [freqRange, setFreqRange] = useState({
@@ -23,6 +23,14 @@ export const FreqQuery = ({ description, validator, queryName, handleQueryValid,
     to: bands.VHF[2],
   });
   const [band, setBand] = useState(bands.VHF);
+
+  useEffectOnce(() => {
+    const valid = validator({ from: freqRange.from, to: freqRange.to });
+    if (valid) {
+      return handleQueryValid(queryName, valid);
+    }
+    return handleQueryInvalid(queryName);
+  });
 
   const handleFreqChange = (e) => {
     const name = e.target.name;

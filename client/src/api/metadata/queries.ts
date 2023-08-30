@@ -1,9 +1,10 @@
-import { SigMFMetadata, Track } from '@/utils/sigmfMetadata';
+import { SigMFMetadata, TraceabilityOrigin, Track } from '@/utils/sigmfMetadata';
 import { MetadataClientFactory } from './metadata-client-factory';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { MetadataClient } from './metadata-client';
 import { useUserSettings } from '@/api/user-settings/use-user-settings';
 import { useMsal } from '@azure/msal-react';
+import { CLIENT_TYPE_API, SmartQueryResult } from '../Models';
 
 export const fetchMeta = async (
   client: MetadataClient,
@@ -51,15 +52,14 @@ export const useQueryTrack = (type: string, account: string, container: string, 
   const { dataSourcesQuery, filesQuery } = useUserSettings();
   const { instance } = useMsal();
   const client = MetadataClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance);
-  return useQuery<Track>(
-    ['track', account, container, filepath],
-    async ({ signal }) => {
-      return await client.track(account, container, filepath, signal);
+
+  return useQuery<number[][]>({
+    queryKey: ['track', account, container, filepath ],
+    queryFn: ({signal}) => {
+      return client.track(account, container, filepath, signal);
     },
-    {
-      enabled: enabled,
-    }
-  );
+    enabled: enabled && !!filesQuery.data && !!dataSourcesQuery.data,
+  });
 };
 
 export const getMeta = (type: string, account: string, container: string, filePath: string, enabled = true) => {
@@ -127,3 +127,17 @@ export const useMeta = (type: string, account: string, container: string, filePa
     enabled: !!filesQuery.data && !!dataSourcesQuery.data,
   });
 };
+
+export const useSmartQueryMeta = (query: string, enabled = true) => {
+  const { filesQuery, dataSourcesQuery } = useUserSettings();
+  const { instance } = useMsal();
+  const metadataClient = MetadataClientFactory(CLIENT_TYPE_API, filesQuery.data, dataSourcesQuery.data, instance);
+  return useQuery<SmartQueryResult>({
+    queryKey: ['smart-query', query ],
+    queryFn: ({signal}) => {
+      console.log('smartQuery', query);
+      return metadataClient.smartQuery(query, signal);
+    },
+    enabled: enabled && !!filesQuery.data && !!dataSourcesQuery.data,
+  });
+}
