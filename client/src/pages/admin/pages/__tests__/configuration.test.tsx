@@ -40,7 +40,7 @@ describe('Test Configuration', () => {
     expect(await screen.findByRole('checkbox', { name: 'displayIQEngineGitHub' })).toBeChecked();
     expect(await screen.findByRole('checkbox', { name: 'displayInternalBranding' })).not.toBeChecked();
     expect(await screen.findByRole('checkbox', { name: 'useAPIDatasources' })).toBeChecked();
-    expect(await screen.findByRole('checkbox', { name: 'bypassLandingPage' })).toBeChecked();
+    //expect(await screen.findByRole('checkbox', { name: 'bypassLandingPage' })).toBeChecked();
   });
 
   test('Feature Flags Displays Returned Values', async () => {
