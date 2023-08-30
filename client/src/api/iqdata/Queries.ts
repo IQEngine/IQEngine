@@ -16,8 +16,13 @@ declare global {
 
 const MAXIMUM_SAMPLES_PER_REQUEST = 1024 * 256;
 
-export function useDataCacheFunctions(type: string, account: string, container: string, filePath: string, fftSize: number) {
-
+export function useDataCacheFunctions(
+  type: string,
+  account: string,
+  container: string,
+  filePath: string,
+  fftSize: number
+) {
   const queryClient = useQueryClient();
   function clearIQData() {
     queryClient.removeQueries(['iqData', type, account, container, filePath, fftSize]);
@@ -25,7 +30,7 @@ export function useDataCacheFunctions(type: string, account: string, container: 
     queryClient.removeQueries(['processedIQData', type, account, container, filePath, fftSize]);
   }
   return {
-    clearIQData
+    clearIQData,
   };
 }
 
@@ -139,12 +144,16 @@ export function useGetIQData(
         // remove any data that have already being processed
         const dataRange = currentIndexes.filter((index) => !currentProcessedData[index]);
 
-
         groupContiguousIndexes(dataRange).forEach((group) => {
           const iqData = data.slice(group.start, group.start + group.count);
-          const result = applyProcessing(iqData, taps, pythonScript, pyodide);
+          const iqDataFloatArray = new Float32Array((iqData.length + 1) * fftSize);
+          iqData.forEach((data, index) => {
+            iqDataFloatArray.set(data, index * fftSize);
+          });
+          const result = applyProcessing(iqDataFloatArray, taps, pythonScript, pyodide);
+
           for (let i = 0; i < group.count; i++) {
-            currentProcessedData[group.start + i] = result[i];
+            currentProcessedData[group.start + i] = result.slice(i * fftSize, (i + 1) * fftSize);
           }
         });
         // performance.mark('end');
