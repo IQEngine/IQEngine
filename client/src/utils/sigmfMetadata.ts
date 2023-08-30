@@ -74,6 +74,12 @@ export class SigMFMetadata {
   getFileName() {
     return this.global['traceability:origin'].file_path.split('/').pop();
   }
+  getDataFileName() {
+    return this.getFileName() + '.sigmf-data';
+  }
+  getMetadataFileName() {
+    return this.getFileName() + '.sigmf-meta';
+  }
   getEmail() {
     const emailName = this.getAuthor();
     let author = emailName.split('<');
