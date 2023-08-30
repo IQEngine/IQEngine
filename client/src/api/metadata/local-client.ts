@@ -1,6 +1,7 @@
 import { MetadataClient } from './metadata-client';
 import { Annotation, CaptureSegment, SigMFMetadata, TraceabilityOrigin, Track } from '@/utils/sigmfMetadata';
 import { FileWithDirectoryAndFileHandle } from 'browser-fs-access';
+import { SmartQueryResult } from '../Models';
 
 export class LocalClient implements MetadataClient {
   files: FileWithDirectoryAndFileHandle[];
@@ -89,6 +90,10 @@ export class LocalClient implements MetadataClient {
       return Promise.reject('No file found');
     }
     return this.getMetaFromFile(metadataFile, dataFile, account, container);
+  }
+
+  async smartQuery(queryString: string, signal: AbortSignal): Promise<SmartQueryResult> {
+    throw new Error('smartQuery not supported for local data sources');
   }
 
   features() {

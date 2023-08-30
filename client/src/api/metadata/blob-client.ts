@@ -91,6 +91,10 @@ export class BlobClient implements MetadataClient {
     return meta;
   }
 
+  async smartQuery(queryString: string): Promise<any> {
+    throw new Error('smartQuery not supported for blob data sources');
+  }
+
   features() {
     return {
       canUpdateMeta: false,
