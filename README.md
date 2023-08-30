@@ -26,6 +26,8 @@ Try IQEngine now using the canonical instance at [www.iqengine.org](http://iqeng
 
 IQEngine is rapidly evolving, so [sign up](https://dashboard.mailerlite.com/forms/299501/77960409531811734/share) for a once-a-month email update, including new features, demos, and more!  There is also an IQEngine [Discord](https://discord.gg/k7C8kp3b76) chat channel if you want to get involved in the development or have questions.
 
+[Link to the live docs](https://staging.iqengine.org/docs) which can also be found in the source code at `client/src/pages/docs/***.mdx`
+
 ## List of Major Features:
 
 * Spectrogram + time + freq + IQ plots with zooming and adjustable scales
