@@ -8,8 +8,8 @@ import { langs } from '@uiw/codemirror-extensions-langs';
 import FileRow from "../recordings-browser/file";
 import TrackView from "../metadata-query/geo/track-view";
 import 'leaflet/dist/leaflet.css';
-import { MapContainer, TileLayer, Marker, Circle, LayerGroup, Polyline } from 'react-leaflet';
-import { Icon } from 'leaflet';
+import { MapContainer, TileLayer, Polyline } from 'react-leaflet';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
 export const SmartQuery = () => {
     const defaultCenter = {
@@ -144,23 +144,50 @@ export const SmartQuery = () => {
                                 </MapContainer>
                             </div>
                         </details>
-                        <div className="flex justify-center	mt-10">
-                            <div className="grid grid-cols-1 gap-1">
-                                {
-                                    smartQueryData.results.map((item, i) => {
-                                        return (
-                                            <FileRow
-                                                key={i}
-                                                trackToggle={(account, container, filepath) => handleSetSelectedTrack(account, container, filepath)}
-                                                queryResult={true}
-                                                geoSelected={true}
-                                                filepath={item.file_path}
-                                                account={item.account}
-                                                container={item.container}
-                                                type={item.type}
-                                            />
-                                        );
-                                    })}
+                        <div className="md:px-8 xl:px-10">
+                            <div className="flex justify-items-stretch text-start">
+                                <table className="w-full">
+                                    <thead>
+                                        <tr>
+                                            <th className="p-2">Spectrogram Thumbnail</th>
+                                            <th className="p-2">Recording Name</th>
+                                            <th className="p-2">Length in Samples</th>
+                                            <th className="p-2">
+                                                Data Type
+                                                <a
+                                                    style={{ textDecoration: 'none', color: 'white' }}
+                                                    className="mr-2"
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    href="https://pysdr.org/content/iq_files.html#binary-files"
+                                                >
+                                                    <InfoOutlinedIcon></InfoOutlinedIcon>
+                                                </a>
+                                            </th>
+                                            <th className="p-2">Frequency</th>
+                                            <th className="p-2">Sample Rate</th>
+                                            <th className="p-2">Number of Annotations</th>
+                                            <th className="p-2">Author</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {
+                                            smartQueryData.results.map((item, i) => {
+                                                return (
+                                                    <FileRow
+                                                        key={i}
+                                                        trackToggle={(account, container, filepath) => handleSetSelectedTrack(account, container, filepath)}
+                                                        queryResult={false}
+                                                        geoSelected={true}
+                                                        filepath={item.file_path}
+                                                        account={item.account}
+                                                        container={item.container}
+                                                        type={item.type}
+                                                    />
+                                                );
+                                            })}
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
