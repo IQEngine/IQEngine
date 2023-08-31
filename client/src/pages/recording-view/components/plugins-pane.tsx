@@ -44,9 +44,9 @@ export const PluginsPane = () => {
   const [modalSamples, setModalSamples] = useState<Float32Array>(new Float32Array([]));
   const [modalSpectrogram, setmodalSpectrogram] = useState(null);
   const [useCloudStorage, setUseCloudStorage] = useState(true);
-  const token = useSasToken(type, account, container, meta.getFileName());
-  let byte_offset = meta.getBytesPerIQSample() * cursorTime.start;
-  let byte_length = meta.getBytesPerIQSample() * (cursorTime.end - cursorTime.start);
+  const token = useSasToken(type, account, container, meta.getDataFileName());
+  let byte_offset = meta.getBytesPerIQSample() * Math.floor(cursorTime.start);
+  let byte_length = meta.getBytesPerIQSample() * Math.ceil(cursorTime.end - cursorTime.start);
   const handleChangePlugin = (e) => {
     setSelectedPlugin(e.target.value);
   };
@@ -82,7 +82,7 @@ export const PluginsPane = () => {
         annotation = meta.annotations[selectedAnnotation];
         const calculateMultiplier = dataTypeToBytesPerIQSample(MimeTypes[meta.getDataType()]);
         byte_offset = Math.floor(annotation['core:sample_start']) * calculateMultiplier;
-        byte_length = annotation['core:sample_count'] * calculateMultiplier;
+        byte_length = Math.ceil(annotation['core:sample_count']) * calculateMultiplier;
       }
     }
 
