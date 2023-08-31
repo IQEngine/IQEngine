@@ -52,6 +52,10 @@ export class LocalClient implements DataSourceClient {
     return Promise.reject('Not implemented');
   }
 
+  update(dataSource: DataSource): Promise<DataSource> {
+    return Promise.reject('Not implemented');
+  }
+
   features() {
     return {
       updateMeta: false,

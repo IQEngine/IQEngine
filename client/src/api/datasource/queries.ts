@@ -3,7 +3,7 @@ import { DataSourceClient } from './datasource-client';
 import { DataSource } from '@/api/Models';
 import { TraceabilityOrigin } from '@/utils/sigmfMetadata';
 import { useUserSettings } from '@/api/user-settings/use-user-settings';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMsal } from '@azure/msal-react';
 import { ClientType } from '@/api/Models';
 
@@ -97,6 +97,13 @@ export const useSyncDataSource = (type: string, account: string, container) => {
   return () => client.sync(account, container);
 };
 
+export const useGetDataSource = (type: string, account: string, container: string) => {
+  const { dataSourcesQuery, filesQuery } = useUserSettings();
+  const { instance } = useMsal();
+  const client = DataSourceClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance);
+  return () => client.get(account, container);
+};
+
 export const useAddDataSource = () => {
   const { dataSourcesQuery, filesQuery } = useUserSettings();
   const { instance } = useMsal();
@@ -106,6 +113,26 @@ export const useAddDataSource = () => {
     mutationFn: (dataSource: DataSource) => {
       let response = dataSourceClient.create(dataSource);
       return response;
+    },
+    onError: (err, newMeta, context) => {
+      console.error('onError', err);
+    },
+  });
+};
+
+export const useUpdateDataSource = () => {
+  const { dataSourcesQuery, filesQuery } = useUserSettings();
+  const { instance } = useMsal();
+  const dataSourceClient = DataSourceClientFactory(ClientType.API, filesQuery.data, dataSourcesQuery.data, instance);
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (dataSource: DataSource) => {
+      let response = dataSourceClient.update(dataSource);
+      return response;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['datasource', ClientType.API]);
     },
     onError: (err, newMeta, context) => {
       console.error('onError', err);

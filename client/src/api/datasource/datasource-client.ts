@@ -7,6 +7,7 @@ export interface DataSourceClient {
   getSasToken(account: string, container: string, filepath: string): Promise<Object>;
   query(queryString: string, signal: AbortSignal): Promise<TraceabilityOrigin[]>;
   create(dataSource: DataSource): Promise<DataSource>;
+  update(dataSource: DataSource): Promise<DataSource>;
   sync(account: string, container: string): Promise<void>;
   features(): { updateMeta: boolean; sync: boolean; query: boolean };
 }
