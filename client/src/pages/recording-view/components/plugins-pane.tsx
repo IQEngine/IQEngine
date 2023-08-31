@@ -2,7 +2,7 @@
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Annotation, SigMFMetadata } from '@/utils/sigmfMetadata';
 import { TimePlot } from './time-plot';
 import { FrequencyPlot } from './frequency-plot';
@@ -19,6 +19,7 @@ import { toast } from 'react-hot-toast';
 import { dataTypeToBytesPerIQSample } from '@/utils/selector';
 import { useSpectrogramContext } from '../hooks/use-spectrogram-context';
 import { useCursorContext } from '../hooks/use-cursor-context';
+import { CLIENT_TYPE_LOCAL } from '@/api/Models';
 
 export enum MimeTypes {
   ci8 = 'iq/ci8',
@@ -47,6 +48,12 @@ export const PluginsPane = () => {
   const token = useSasToken(type, account, container, meta.getDataFileName());
   let byte_offset = meta.getBytesPerIQSample() * Math.floor(cursorTime.start);
   let byte_length = meta.getBytesPerIQSample() * Math.ceil(cursorTime.end - cursorTime.start);
+
+  useEffect(() => {
+    if (type == CLIENT_TYPE_LOCAL) {
+      setUseCloudStorage(false);
+    }
+  }, [type]);
   const handleChangePlugin = (e) => {
     setSelectedPlugin(e.target.value);
   };
@@ -317,7 +324,7 @@ export const PluginsPane = () => {
           ))}
         </select>
       </label>
-      {(type != 'local') && (
+      {(type != CLIENT_TYPE_LOCAL) && (
         <label className="label cursor-pointer">
           <span>Use Cloud Storage</span>
           <input
