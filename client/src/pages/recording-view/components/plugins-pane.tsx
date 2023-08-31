@@ -234,8 +234,7 @@ export const PluginsPane = () => {
           } else {
             // non-IQ Data file
             let d = new Date();
-            let datestring = d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2)
-            datestring += "T" + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2) + ":" + ("0" + d.getSeconds()).slice(-2);
+            let datestring = (new Date().toISOString()).split('.')[0]
 
             for (let j = 0; j < data.data_output.length; j++) {
               let data_type = data.data_output[j]['data_type'];
