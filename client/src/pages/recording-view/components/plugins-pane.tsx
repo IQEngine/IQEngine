@@ -142,6 +142,15 @@ export const PluginsPane = () => {
       }
     }
 
+    const BlobFromSamples = (samples_base64, data_type) => {
+      const samples = window.atob(samples_base64);
+      var blob_array = new Uint8Array(samples.length);
+      for (var i = 0; i < samples.length; i++) {
+        blob_array[i] = samples.charCodeAt(i);
+      }
+      return new Blob([blob_array], { type: data_type });
+    }
+
     fetch(selectedPlugin, {
       method: 'POST',
       headers: {
@@ -224,31 +233,37 @@ export const PluginsPane = () => {
             setModalOpen(true);
           } else {
             // non-IQ Data file
-            const samples_base64 = data.data_output[0]['samples'];
-            const samples = window.atob(samples_base64);
-            var blob_array = new Uint8Array(samples.length);
-            for (var i = 0; i < samples.length; i++) {
-              blob_array[i] = samples.charCodeAt(i);
-            }
-            const a = document.createElement('a');
-            const blob = new Blob([blob_array], { type: data.data_output[0]['data_type'] });
-            const url = window.URL.createObjectURL(blob);
+            let d = new Date();
+            let datestring = (new Date().toISOString()).split('.')[0]
 
-            a.href = url;
+            for (let j = 0; j < data.data_output.length; j++) {
+              let data_type = data.data_output[j]['data_type'];
 
-            let filename = '';
-            switch (data.data_output[0]['data_type']) {
-              case MimeTypes.audio_wav:
-                filename = 'samples.wav';
-                break;
-            }
-            if (filename != '') {
+              let ext = '';
+              switch (data_type) {
+                case MimeTypes.audio_wav:
+                  ext = 'wav';
+                  break;
+
+                default:
+                  toast.error(`The plugins pane doesn't handle the mime type ${data_type} output by the plugin.`);
+                  break;
+              }
+              if (ext == '') continue;
+
+              let data_output = data.data_output[j]['samples']
+
+              let blob = BlobFromSamples(data_output, data_type)
+
+              let url = window.URL.createObjectURL(blob);
+              let a = document.createElement('a');
+              a.href = url;
+
+              let filename = `sample_${datestring}_${j}.${ext}`;
               a.download = filename;
               a.click();
-            } else {
-              toast.error("The plugins pane doesn't handle the mime type output by the plugin.");
+              window.URL.revokeObjectURL(url);
             }
-            window.URL.revokeObjectURL(url);
           }
         }
 
