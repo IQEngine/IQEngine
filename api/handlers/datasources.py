@@ -5,7 +5,7 @@ from blob.azure_client import AzureBlobClient
 from database import datasource_repo
 from database.datasource_repo import create, datasource_exists
 from database.models import DataSource
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query
 from fastapi.responses import StreamingResponse
 from helpers.authorization import get_current_user
 from helpers.cipher import decrypt, encrypt
@@ -145,7 +145,6 @@ async def sync_datasource(
     container: str,
     background_tasks: BackgroundTasks,
     datasources_collection: AgnosticCollection = Depends(datasource_repo.collection),
-    current_user: Optional[dict] = Depends(get_current_user),
     access_allowed=Depends(check_access),
 ):
     if access_allowed is None:
@@ -168,10 +167,14 @@ async def generate_sas_token(
     account: str,
     container: str,
     file_path: str,
+    write: Optional[bool] = Query(False),
     datasources_collection: AgnosticCollection = Depends(datasource_repo.collection),
-    current_user: Optional[dict] = Depends(get_current_user),
     access_allowed=Depends(check_access),
 ):
+    
+    if (access_allowed is not "owner" and write) or access_allowed is None:
+        raise HTTPException(status_code=403, detail="No Access")
+    
     token: str = ""
     existing_datasource = await datasources_collection.find_one(
         {
@@ -188,13 +191,15 @@ async def generate_sas_token(
             raise HTTPException(status_code=404, detail="No Account Key or SAS Token")
         if access_allowed is None:
             raise HTTPException(status_code=403, detail="No Access")
-        token = decrypt(existing_datasource["sasToken"]).get_secret_value()
+        if not write:
+            token = decrypt(existing_datasource["sasToken"]).get_secret_value()
     if not token:
         blob_client = AzureBlobClient(account, container)
         try:
             token = blob_client.generate_sas_token(
                 file_path,
                 decrypt(existing_datasource["account_key"]).get_secret_value(),
+                write,
             )
         except Exception:
             raise HTTPException(status_code=500, detail="unable to generate sas token")

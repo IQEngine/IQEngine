@@ -160,7 +160,7 @@ class AzureBlobClient:
                 blob_name=filepath,
                 account_key=account_key,
                 permission=BlobSasPermissions(
-                    read=True, write=include_write, create=include_write
+                    read=True, write=include_write, create=include_write, add=include_write
                 ),
                 expiry=expiry_time,
                 start=start_time,

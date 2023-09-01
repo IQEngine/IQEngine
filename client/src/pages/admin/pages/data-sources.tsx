@@ -3,8 +3,9 @@ import { useGetDatasources } from '@/api/datasource/hooks/use-get-datasources';
 import React, { useState } from 'react';
 import { ModalDialog } from '@/features/ui/modal/Modal';
 import DataSourceForm from './add-data-source';
-import { useGetDatasourceFeatures, useSyncDataSource, getDataSource, useGetDataSource } from '@/api/datasource/queries';
+import { useGetDatasourceFeatures, useSyncDataSource, useGetDataSource, useUploadDataSource, useSasToken } from '@/api/datasource/queries';
 import toast from 'react-hot-toast';
+
 
 interface DataSourceRowProps {
   dataSource: DataSource;
@@ -15,6 +16,7 @@ export const DataSourceRow = ({ dataSource, onEdit }: DataSourceRowProps) => {
   const features = useGetDatasourceFeatures(dataSource.type);
   const sync = useSyncDataSource(dataSource.type, dataSource.account, dataSource.container);
   const edit = useGetDataSource(dataSource.type, dataSource.account, dataSource.container);
+  const upload = useUploadDataSource(dataSource.type, dataSource.account, dataSource.container);
   return (
     <div className="card p-2 pb-4 w-80 bg-base-100 shadow-xl border-secondary border-2">
       <figure className="p-2">
@@ -28,7 +30,17 @@ export const DataSourceRow = ({ dataSource, onEdit }: DataSourceRowProps) => {
         <p>{dataSource.description}</p>
       </div>
       {features.sync && (
-        <div className="card-actions justify-end">
+        <div className="card-actions justify-center">
+          <button
+            aria-label={'upload ' + dataSource.name}
+            className="btn btn-primary"
+            onClick={async (e) => {
+              e.preventDefault();
+              upload();
+            }}
+          >
+            Upload
+          </button>
           <button
             aria-label={'edit ' + dataSource.name}
             className="btn btn-primary"
