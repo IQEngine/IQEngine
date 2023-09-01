@@ -75,6 +75,17 @@ export class ApiClient implements DataSourceClient {
     }
 
   }
+  async update(dataSource: DataSource): Promise<DataSource> {
+    const response = await this.authUtil.requestWithAuthIfRequired({
+      method: 'put',
+      url: `/api/datasources/${dataSource.account}/${dataSource.container}/datasource`,
+      data: dataSource,
+    });
+    if (response.status !== 204) {
+      throw new Error(`Failed to update datasource: ${response.status}`);
+    }
+    return response.data;
+  }
   async create(dataSource: DataSource): Promise<DataSource> {
     const response = await this.authUtil.requestWithAuthIfRequired({
       method: 'post',

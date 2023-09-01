@@ -9,6 +9,9 @@ export interface DataSource {
   container: string;
   sasToken?: string;
   accountKey?: string;
+  owners?: string[];
+  readers?: string[];
+  public?: boolean;
 }
 
 
