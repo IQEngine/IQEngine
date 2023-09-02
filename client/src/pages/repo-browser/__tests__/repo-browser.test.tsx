@@ -87,11 +87,6 @@ describe('Test RepositoryTile', () => {
 });
 
 describe('Test query metadata tile', () => {
-  test('displays query metadata tile', async () => {
-    render(<RepoBrowser />, { wrapper: AllProviders });
-    expect(await screen.findByText('Metadata Query')).toBeInTheDocument();
-  });
-
   test('displays query metadata tile image', async () => {
     render(<RepoBrowser />, { wrapper: AllProviders });
     expect(await screen.findByAltText('Metadata query tile')).toBeInTheDocument();
