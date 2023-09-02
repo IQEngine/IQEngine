@@ -43,15 +43,12 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
 
   const ffts = useMemo(() => {
     if (!minimapData) return null;
-    // transform the minimap data into an one bif FLOAT32ARRAY
+    // transform the minimap data into an one big FLOAT32ARRAY
     const iqData = new Float32Array(minimapData.length * minimapData[0].length);
     for (let i = 0; i < minimapData.length; i++) {
       iqData.set(minimapData[i], i * minimapData[i].length);
     }
-    //performance.mark('calcFftOfTile');
     const ffts_calc = calcFfts(iqData, MINIMAP_FFT_SIZE, windowFunction, 1000);
-    //console.debug(performance.measure('calcFftOfTile', 'calcFftOfTile'));
-
     const min = Math.min(...ffts_calc);
     const max = Math.max(...ffts_calc);
     setMagnitudeMin(min);
