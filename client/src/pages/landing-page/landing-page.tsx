@@ -102,9 +102,8 @@ export const LandingPage = () => {
                   {/* Tabs buttons */}
                   <div className="mb-8 md:mb-0">
                     <a
-                      className={`flex items-center text-lg p-5 rounded transition duration-300 ease-in-out mb-3 ${
-                        tab !== 1 ? 'bg-gray-400  ' : 'bg-gray-200'
-                      }`}
+                      className={`flex items-center text-lg p-5 rounded transition duration-300 ease-in-out mb-3 ${tab !== 1 ? 'bg-gray-400  ' : 'bg-gray-200'
+                        }`}
                       href="#0"
                       onClick={(e) => {
                         e.preventDefault();
@@ -123,9 +122,8 @@ export const LandingPage = () => {
                       </div>
                     </a>
                     <a
-                      className={`flex items-center text-lg p-5 rounded transition duration-300 ease-in-out mb-3 ${
-                        tab !== 2 ? 'bg-gray-400  ' : 'bg-gray-200'
-                      }`}
+                      className={`flex items-center text-lg p-5 rounded transition duration-300 ease-in-out mb-3 ${tab !== 2 ? 'bg-gray-400  ' : 'bg-gray-200'
+                        }`}
                       href="#0"
                       onClick={(e) => {
                         e.preventDefault();
@@ -147,9 +145,8 @@ export const LandingPage = () => {
                       </div>
                     </a>
                     <a
-                      className={`flex items-center text-lg p-5 rounded transition duration-300 ease-in-out mb-3 ${
-                        tab !== 3 ? 'bg-gray-400  ' : 'bg-gray-200'
-                      }`}
+                      className={`flex items-center text-lg p-5 rounded transition duration-300 ease-in-out mb-3 ${tab !== 3 ? 'bg-gray-400  ' : 'bg-gray-200'
+                        }`}
                       href="#0"
                       onClick={(e) => {
                         e.preventDefault();
@@ -251,10 +248,119 @@ export const LandingPage = () => {
 
         <section className="relative">
           {/* Section background (needs .relative class on parent and next sibling elements) */}
+          <div className="relative max-w-6xl mx-auto px-4 sm:px-6 pt-10">
 
-          <div className="relative max-w-6xl mx-auto px-4 sm:px-6 pt-10"></div>
+            <div className="">
+              <h1 className="text-center p-4">Great For...</h1>
+              <div className="columns-2 pl-64 pr-48 pb-4">
+                <ul className="text-lg mt-0">
+                  <li className="list-group-item">RFML</li>
+                  <li className="list-group-item">Wireless CTFs</li>
+                  <li className="list-group-item">SIGINT</li>
+                </ul>
+                <ul className="text-lg mt-0">
+                  <li className="list-group-item">Spectrum Awareness</li>
+                  <li className="list-group-item">Debugging</li>
+                  <li className="list-group-item">SDR/DSP/Wireless Students</li>
+                </ul>
+              </div>
+            </div>
+
+            <h1 className="text-center">Example Use-Cases</h1>
+            <div className="columns-2 pl-32 pr-24 pb-4">
+              <ul className="text-lg mt-0">
+                <li className="list-group-item">Analyze one RF recording</li>
+                <li className="list-group-item">Organize and query millions of RF recordings</li>
+                <li className="list-group-item">
+                  Evaluate signal detection/classification algorithms on a variety of recordings
+                </li>
+              </ul>
+              <ul className="text-lg mt-0">
+                <li className="list-group-item">Share your RF recordings or non-realtime RF functions with the world</li>
+                <li className="list-group-item">Learn DSP basics (e.g., FFTs, filtering, wavelets)</li>
+                <li className="list-group-item">
+                  Share RF recordings/datasets within your team or organization using a local instance of IQEngine
+                </li>
+              </ul>
+            </div>
+
+          </div>
         </section>
-      </main>
+
+
+        <section className="relative">
+          <div className="absolute inset-0 bg-secondary pointer-events-none" aria-hidden="true"></div>
+          <div className="absolute left-0 right-0 m-auto w-px p-px h-20 bg-gray-200 transform -translate-y-1/2"></div>
+          <div className="relative max-w-6xl mx-auto px-4 sm:px-6 pt-10 pb-14">
+
+            <h1 className="text-center mx-4 mb-0 text-base-100 font-bold">
+              IQEngine is a community effort, always seeking volunteers!
+            </h1>
+            <h1 className="text-center mx-4 my-0 text-base-100 font-bold">
+              Ways to get Involved:
+            </h1>
+
+            <ul className="list-disc text-lg m-4 pl-64">
+              <li>
+                Join the{' '}
+                <a href="https://discord.gg/k7C8kp3b76" target="_blank">
+                  IQEngine Discord
+                </a>
+              </li>
+              <li>Contribute recordings</li>
+              <li>Contribute plugins</li>
+              <li>Post GitHub Issues/PRs</li>
+              <li>Email questions/comments about IQEngine to iqengine@vt.edu</li>
+            </ul>
+
+
+            <h1 className="text-center text-base-100">Origin</h1>
+            <p className="text-lg px-24 pb-4">
+              The idea for a web-based spectrogram tool started while Marc was teaching an SDR course at UMD, with students
+              who had varying OS's; some ran into trouble installing existing SDR desktop apps. By removing the software
+              installation barrier, SDR/DSP tooling, and education, could be made more accessible. Next came several ideas for
+              SigMF-centric features beyond what existing software provided, such as the ability to organize hundreds of
+              recordings or visually edit annotations.
+              <br></br>
+              <br></br>
+              Implementation of IQEngine began during a 1-week internal hackathon at Microsoft, where Marc and SDR coworkers
+              Luke, Craig, Johanna, Ani, Marko, and Tensae built a proof-of-concept prototype. It was open sourced and{' '}
+              <a href="https://youtu.be/hZy0lIsBlkg">shown off at GNU Radio Conference '22</a>. The first full version was
+              completed in January '23 with help from a group of undergraduate "sprinterns" at Microsoft, consisting of
+              students from UMD and GMU that were part of the{' '}
+              <a href="https://www.breakthroughtech.org/" target="_blank">
+                Break Through Tech
+              </a>{' '}
+              program. In February '23 it was transitioned from an open source Microsoft project to a community-led FOSS
+              project, entirely separate from Microsoft, with representation from several organizations and individuals.
+            </p>
+
+            <center>
+              <img className="w-1/4" alt="sprintern" src="./sprinterns.jpeg"></img>
+              <p className="text-lg pt-1">Winter '23 Sprinterns from UMD and GMU</p>
+            </center>
+
+          </div>
+        </section>
+
+        <div className="absolute left-0 right-0 m-auto w-px p-px h-20 bg-gray-200 transform -translate-y-1/2" ></div>
+
+        {/* Browse button repeated at bottom */}
+        <div
+          className="pt-20 pb-6 max-w-xs mx-auto sm:max-w-none sm:flex sm:justify-center"
+          data-aos="zoom-y-out"
+          data-aos-delay="300"
+        >
+          <button
+            id="browse-button"
+            className="text-3xl py-2 px-4 bg-accent hover:bg-primary"
+            onClick={handleOnClick}
+          >
+            &#128270; Start Browsing
+          </button>
+        </div>
+
+      </main >
     </>
   );
 };
