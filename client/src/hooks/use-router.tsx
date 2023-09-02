@@ -15,8 +15,8 @@ export function useRouter() {
         {
           path: 'about',
           async lazy() {
-            let { About } = await import('@/pages/about');
-            return { Component: About };
+            let { LandingPage } = await import('@/pages/landing-page/landing-page');
+            return { Component: LandingPage };
           },
         },
         {
