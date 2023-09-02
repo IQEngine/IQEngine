@@ -45,6 +45,10 @@ dev:
 	@echo "Running React application for debugging..."
 	@cd client && npm run start
 
+dev-prod:
+	@echo "Running React application for debugging..."
+	@cd client && npm run build && npm run preview
+
 test:
 	@echo "Running Playwright frontend and end-to-end tests"
 	@cd e2e && npx playwright test
