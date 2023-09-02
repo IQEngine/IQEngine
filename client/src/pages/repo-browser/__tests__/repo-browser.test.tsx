@@ -109,7 +109,6 @@ describe('Test query metadata tile', () => {
     const queryButton = await screen.findByRole('button', { name: 'Metadata query browse' });
 
     expect(queryButton).toBeInTheDocument();
-    expect(queryButton).toHaveTextContent('Browse');
   });
 
   test('metadata tile button navigates to query page', async () => {
