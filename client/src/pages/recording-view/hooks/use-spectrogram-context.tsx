@@ -3,7 +3,6 @@ import { useMeta } from '@/api/metadata/queries';
 import { INITIAL_PYTHON_SNIPPET } from '@/utils/constants';
 import { SigMFMetadata } from '@/utils/sigmfMetadata';
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
 
 interface SpectrogramContextProperties {
   type: string;
@@ -59,7 +58,7 @@ export function SpectrogramContextProvider({
     fftStepSize: 0,
   },
 }) {
-  
+
   const [magnitudeMin, setMagnitudeMin] = useState<number>(seedValues.magnitudeMin);
   const [magnitudeMax, setMagnitudeMax] = useState<number>(seedValues.magnitudeMax);
   const [colmap, setColmap] = useState<string>(seedValues.colmap);
@@ -81,12 +80,11 @@ export function SpectrogramContextProvider({
     clearIQData();
     setPythonLocalSnippet(pythonParameterSnippet);
   }
-  
-  
 
   useEffect(() => {
     setMeta(originMeta);
   }, [originMeta]);
+
   return (
     <SpectrogramContext.Provider
       value={{
