@@ -83,6 +83,15 @@ export function fftToRGB(
   let startOfs = 0;
   let newFftData = new Uint8ClampedArray(fftsConcatenated.length * 4); // 4 because RGBA
 
+  // This happens when the FFTs are being loaded
+  let sum = 0;
+  fftsConcatenated.map((e) => (sum += e));
+  if (sum == 0) {
+    newFftData.fill(0);
+    return newFftData;
+  }
+
+  // this doesnt appear to be happening anymore
   if (fftsConcatenated[0] === Number.NEGATIVE_INFINITY) {
     newFftData.fill(255);
     return newFftData;
@@ -92,6 +101,7 @@ export function fftToRGB(
   for (let i = 0; i < fftsConcatenated.length / fftSize; i++) {
     let magnitudes = fftsConcatenated.slice(i * fftSize, (i + 1) * fftSize);
 
+    // this doesnt appear to be happening anymore
     if (magnitudes[0] === Number.NEGATIVE_INFINITY) {
       newFftData.fill(255, i * fftSize * 4, (i + 1) * fftSize * 4);
       continue;
