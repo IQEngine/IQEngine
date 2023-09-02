@@ -97,7 +97,7 @@ export function fftToRGB(
     let sum = 0;
     magnitudes.map((e) => (sum += e));
     if (sum == 0) {
-      newFftData.fill(100, i * fftSize * 4, (i + 1) * fftSize * 4);
+      newFftData.fill(100, i * fftSize * 4, (i + 1) * fftSize * 4); // gray
       continue;
     }
 
