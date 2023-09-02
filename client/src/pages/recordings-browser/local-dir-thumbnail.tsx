@@ -1,13 +1,6 @@
 // Licensed under the MIT License
 
-import React, { useRef, useState, useMemo, useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import { CLIENT_TYPE_BLOB, CLIENT_TYPE_LOCAL } from '@/api/Models';
-import { getMeta } from '@/api/metadata/queries';
-import { FileAnnotationData } from './file-annotation-data';
-import { ModalDialog } from '@/features/ui/modal/Modal';
-import { useFeatureFlags } from '@/hooks/use-feature-flags';
-import { useIntersectionObserver } from 'usehooks-ts'
+import React, { useState, useMemo, useEffect } from 'react';
 import { useGetMinimapIQ } from '@/api/iqdata/Queries';
 import { MINIMAP_FFT_SIZE } from '@/utils/constants';
 import { calcFfts, fftToRGB } from '@/utils/selector';
@@ -36,8 +29,6 @@ function LocalDirThumbnail({ filepath, type, account, container }: LocalDirThumb
             iqData.set(minimapData[i], i * minimapData[i].length);
         }
         const ffts_calc = calcFfts(iqData, MINIMAP_FFT_SIZE, 'nowindow', 1000);
-        const min = Math.min(...ffts_calc);
-        const max = Math.max(...ffts_calc);
         return ffts_calc;
     }, [minimapData]);
 

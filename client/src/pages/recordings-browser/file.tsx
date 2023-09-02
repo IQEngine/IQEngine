@@ -2,19 +2,13 @@
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
 
-import React, { useRef, useState, useMemo, useEffect } from 'react';
+import React, { useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { CLIENT_TYPE_BLOB, CLIENT_TYPE_LOCAL } from '@/api/Models';
 import { getMeta } from '@/api/metadata/queries';
 import { FileAnnotationData } from './file-annotation-data';
 import { ModalDialog } from '@/features/ui/modal/Modal';
-import { useFeatureFlags } from '@/hooks/use-feature-flags';
 import { useIntersectionObserver } from 'usehooks-ts'
-import { useGetMinimapIQ } from '@/api/iqdata/Queries';
-import { MINIMAP_FFT_SIZE } from '@/utils/constants';
-import { calcFfts, fftToRGB } from '@/utils/selector';
-import { colMaps } from '@/utils/colormap';
-import { Stage, Layer, Image } from 'react-konva';
 import LocalDirThumbnail from './local-dir-thumbnail';
 
 interface FileRowProps {
@@ -39,7 +33,6 @@ const FileRow = ({
   trackToggle,
 }: FileRowProps) => {
   const [showModal, setShowModal] = useState(false);
-  const { featureFlags } = useFeatureFlags();
 
   const { type: paramType, account: paramAccount, container: paramContainer, sasToken: paramSASToken } = useParams();
   type = type ?? paramType;
@@ -52,9 +45,6 @@ const FileRow = ({
   const { data: item } = getMeta(type, account, container, filepath, isVisible);
 
   const spectrogramLink = `/view/${item?.getOrigin().type}/${item?.getOrigin().account}/${item?.getOrigin().container
-    }/${encodeURIComponent(item?.getFilePath())}`;
-
-  const recordInspectionLink = `/view/${item?.getOrigin().type}/${item?.getOrigin().account}/${item?.getOrigin().container
     }/${encodeURIComponent(item?.getFilePath())}`;
 
   const getUrlWithAuth = (url) => {
