@@ -36,7 +36,7 @@ export function useRouter() {
         {
           path: 'smart-query',
           async lazy() {
-            let { SmartQuery } = await import('@/pages/smart-query/smart-query');
+            let { SmartQuery } = await import('@/pages/metadata-query/smart-query');
             return { Component: SmartQuery };
           },
         },
