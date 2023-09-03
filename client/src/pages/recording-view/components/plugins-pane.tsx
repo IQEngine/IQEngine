@@ -35,7 +35,8 @@ export enum MimeTypes {
 }
 
 export const PluginsPane = () => {
-  const { meta, account, type, container, spectrogramHeight, fftSize, selectedAnnotation, setMeta } = useSpectrogramContext();
+  const { meta, account, type, container, spectrogramWidth, spectrogramHeight, fftSize, selectedAnnotation, setMeta } =
+    useSpectrogramContext();
   const { cursorTimeEnabled, cursorTime, cursorData } = useCursorContext();
   const { data: plugins, isError } = useGetPlugins();
   const { PluginOption, EditPluginParameters, pluginParameters, setPluginParameters } = useGetPluginsComponents();
@@ -156,7 +157,7 @@ export const PluginsPane = () => {
         blob_array[i] = samples.charCodeAt(i);
       }
       return new Blob([blob_array], { type: data_type });
-    }
+    };
 
     fetch(selectedPlugin, {
       method: 'POST',
@@ -241,7 +242,7 @@ export const PluginsPane = () => {
           } else {
             // non-IQ Data file
             let d = new Date();
-            let datestring = (new Date().toISOString()).split('.')[0]
+            let datestring = new Date().toISOString().split('.')[0];
 
             for (let j = 0; j < data.data_output.length; j++) {
               let data_type = data.data_output[j]['data_type'];
@@ -258,9 +259,9 @@ export const PluginsPane = () => {
               }
               if (ext == '') continue;
 
-              let data_output = data.data_output[j]['samples']
+              let data_output = data.data_output[j]['samples'];
 
-              let blob = BlobFromSamples(data_output, data_type)
+              let blob = BlobFromSamples(data_output, data_type);
 
               let url = window.URL.createObjectURL(blob);
               let a = document.createElement('a');
@@ -324,7 +325,7 @@ export const PluginsPane = () => {
           ))}
         </select>
       </label>
-      {(type != CLIENT_TYPE_LOCAL) && (
+      {type != CLIENT_TYPE_LOCAL && (
         <label className="label cursor-pointer">
           <span>Use Cloud Storage</span>
           <input
@@ -362,14 +363,14 @@ export const PluginsPane = () => {
               ✕
             </button>
             <div className="grid justify-items-stretch">
-              <Stage width={800} height={600}>
+              <Stage width={spectrogramWidth} height={800}>
                 <Layer>
-                  <Image image={modalSpectrogram} x={0} y={0} width={800} height={600} />
+                  <Image image={modalSpectrogram} x={0} y={0} width={spectrogramWidth} height={600} />
                 </Layer>
               </Stage>
-              <TimePlot currentSamples={modalSamples} cursorsEnabled={true} plotWidth={800} plotHeight={400} />
-              <FrequencyPlot currentSamples={modalSamples} cursorsEnabled={true} plotWidth={800} plotHeight={400} />
-              <IQPlot currentSamples={modalSamples} cursorsEnabled={true} plotWidth={800} plotHeight={400} />
+              <TimePlot displayedIQ={modalSamples} />
+              <FrequencyPlot displayedIQ={modalSamples} />
+              <IQPlot displayedIQ={modalSamples} />
             </div>
           </form>
         </dialog>
