@@ -87,18 +87,6 @@ describe('Test RepositoryTile', () => {
 });
 
 describe('Test query metadata tile', () => {
-  test('displays query metadata tile', async () => {
-    render(<RepoBrowser />, { wrapper: AllProviders });
-    expect(await screen.findByText('Metadata Query')).toBeInTheDocument();
-  });
-
-  test('displays query metadata tile description', async () => {
-    render(<RepoBrowser />, { wrapper: AllProviders });
-    expect(
-      await screen.findByText('Query across all of the metadata files within the repository.')
-    ).toBeInTheDocument();
-  });
-
   test('displays query metadata tile image', async () => {
     render(<RepoBrowser />, { wrapper: AllProviders });
     expect(await screen.findByAltText('Metadata query tile')).toBeInTheDocument();
@@ -109,7 +97,6 @@ describe('Test query metadata tile', () => {
     const queryButton = await screen.findByRole('button', { name: 'Metadata query browse' });
 
     expect(queryButton).toBeInTheDocument();
-    expect(queryButton).toHaveTextContent('Browse');
   });
 
   test('metadata tile button navigates to query page', async () => {

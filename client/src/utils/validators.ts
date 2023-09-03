@@ -1,4 +1,5 @@
 import Ajv from 'ajv';
+import addFormats from 'ajv-formats';
 import sigmfSchema from '@/data/sigmf-schema.json';
 
 interface MetadataValidator {
@@ -15,6 +16,7 @@ export function metadataValidator(metadataValue: string, path: string = null) {
 
 export function validator(value: string, schema: any, validator: any, path: string = null) {
   const ajv = new Ajv({ strict: false, allErrors: true });
+  addFormats(ajv);
   try {
     const jsonValue = JSON.parse(value);
 

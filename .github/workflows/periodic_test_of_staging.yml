@@ -32,4 +32,4 @@ jobs:
       - name: Run Playwright tests on Staging
         working-directory: e2e
         run: |
-          npx playwright test --config playwright-staging.config.ts --grep @CICompatible
+          npx playwright test --config playwright-staging.config.ts

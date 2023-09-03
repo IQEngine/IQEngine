@@ -46,7 +46,7 @@ async def get_iq_data(
     request: Request,
     filepath: str,
     block_indexes_str: str,
-    block_size: int,
+    block_size: int, # we grab 2x this many ints/floats
     format: str,
     datasource: DataSource = Depends(datasource_repo.get),
     azure_client: AzureBlobClient = Depends(AzureBlobClient),
@@ -149,7 +149,7 @@ async def get_byte_stream(
     azure_client,
     blob_size,
 ):
-    offsetBytes = block_indexes_chunk[0] * block_size * bytes_per_iq_sample
+    offsetBytes = block_indexes_chunk[0] * block_size * bytes_per_iq_sample # FYI, bytes_per_iq_sample includes the *2 for I+Q
     countBytes = (
         (block_indexes_chunk[1] - block_indexes_chunk[0] + 1)
         * block_size
