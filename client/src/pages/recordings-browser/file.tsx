@@ -4,12 +4,12 @@
 
 import React, { useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { CLIENT_TYPE_BLOB } from '@/api/Models';
+import { CLIENT_TYPE_BLOB, CLIENT_TYPE_LOCAL } from '@/api/Models';
 import { getMeta } from '@/api/metadata/queries';
 import { FileAnnotationData } from './file-annotation-data';
 import { ModalDialog } from '@/features/ui/modal/Modal';
-import { useFeatureFlags } from '@/hooks/use-feature-flags';
 import { useIntersectionObserver } from 'usehooks-ts'
+import LocalDirThumbnail from './local-dir-thumbnail';
 
 interface FileRowProps {
   filepath: string;
@@ -22,7 +22,7 @@ interface FileRowProps {
   trackToggle?: (account: string, container: string, filepath: string) => any;
 }
 
-export default function FileRow({
+const FileRow = ({
   filepath,
   type,
   account,
@@ -31,9 +31,8 @@ export default function FileRow({
   queryResult = false,
   geoSelected = false,
   trackToggle,
-}: FileRowProps) {
+}: FileRowProps) => {
   const [showModal, setShowModal] = useState(false);
-  const { featureFlags } = useFeatureFlags();
 
   const { type: paramType, account: paramAccount, container: paramContainer, sasToken: paramSASToken } = useParams();
   type = type ?? paramType;
@@ -45,14 +44,8 @@ export default function FileRow({
   const isVisible = !!entry?.isIntersecting
   const { data: item } = getMeta(type, account, container, filepath, isVisible);
 
-
-  const spectrogramLink = `/view/${item?.getOrigin().type}/${item?.getOrigin().account}/${
-    item?.getOrigin().container
-  }/${encodeURIComponent(item?.getFilePath())}`;
-
-  const recordInspectionLink = `/view/${item?.getOrigin().type}/${item?.getOrigin().account}/${
-    item?.getOrigin().container
-  }/${encodeURIComponent(item?.getFilePath())}`;
+  const spectrogramLink = `/view/${item?.getOrigin().type}/${item?.getOrigin().account}/${item?.getOrigin().container
+    }/${encodeURIComponent(item?.getFilePath())}`;
 
   const getUrlWithAuth = (url) => {
     if (type == CLIENT_TYPE_BLOB && sasToken) {
@@ -125,16 +118,20 @@ export default function FileRow({
     >
       {
         <>
-          {/* If we are looking at a recording from blob storage */}
           <td className="px-4 min-w-fit">
-            <Link to={spectrogramLink} onClick={() => {}}>
-              <div className="zoom">
-                <img src={getThumbnailUrl()} alt="Spectrogram Thumbnail" style={{ width: '200px', height: '100px' }} />
-              </div>
-            </Link>
+            {/* When looking at a local dir vs blob */}
+            {(type === CLIENT_TYPE_LOCAL) ? (
+              <LocalDirThumbnail filepath={filepath} type={type} account={account} container={container} />
+            ) : (
+              <Link to={spectrogramLink} onClick={() => { }}>
+                <div className="zoom">
+                  <img src={getThumbnailUrl()} alt="Spectrogram Thumbnail" style={{ width: '200px', height: '100px' }} />
+                </div>
+              </Link>
+            )}
           </td>
           <td className={queryResult ? 'ml-10 align-middle col-span-2 text-left' : 'align-middle text-left'}>
-            <Link to={spectrogramLink} onClick={() => {}}>
+            <Link to={spectrogramLink} onClick={() => { }}>
               <h2>{item.getFileName()}</h2>
             </Link>
             <div title={item.getDescription()}>{item.getShortDescription()}</div>
@@ -192,3 +189,5 @@ export default function FileRow({
     </tr>
   );
 }
+
+export default FileRow;
