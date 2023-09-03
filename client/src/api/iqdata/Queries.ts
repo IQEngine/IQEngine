@@ -39,7 +39,7 @@ export function useGetIQData(
   account: string,
   container: string,
   filePath: string,
-  fftSize: number,
+  fftSize: number, // we grab 2x this many floats/ints
   taps: number[] = [1],
   pythonScript: string = INITIAL_PYTHON_SNIPPET,
   fftStepSize: number = 0
@@ -146,14 +146,14 @@ export function useGetIQData(
 
         groupContiguousIndexes(dataRange).forEach((group) => {
           const iqData = data.slice(group.start, group.start + group.count);
-          const iqDataFloatArray = new Float32Array((iqData.length + 1) * fftSize);
+          const iqDataFloatArray = new Float32Array((iqData.length + 1) * fftSize * 2);
           iqData.forEach((data, index) => {
-            iqDataFloatArray.set(data, index * fftSize);
+            iqDataFloatArray.set(data, index * fftSize * 2);
           });
           const result = applyProcessing(iqDataFloatArray, taps, pythonScript, pyodide);
 
           for (let i = 0; i < group.count; i++) {
-            currentProcessedData[group.start + i] = result.slice(i * fftSize, (i + 1) * fftSize);
+            currentProcessedData[group.start + i] = result.slice(i * fftSize * 2, (i + 1) * fftSize * 2);
           }
         });
         // performance.mark('end');

@@ -25,7 +25,7 @@ import { AnnotationViewer } from './components/annotation/annotation-viewer';
 import TimeSelectorMinimap from './components/time-selector-minimap';
 import { useWindowSize } from 'usehooks-ts';
 
-export function DisplaySpectrogram({ currentFFT, setCurrentFFT }) {
+export function DisplaySpectrogram({ currentFFT, setCurrentFFT, currentTab }) {
   const {
     spectrogramWidth,
     magnitudeMin,
@@ -58,6 +58,7 @@ export function DisplaySpectrogram({ currentFFT, setCurrentFFT }) {
     colmap,
     windowFunction
   );
+
   function handleWheel(evt: KonvaEventObject<WheelEvent>): void {
     evt.evt.preventDefault();
     const scrollAmount = Math.floor(evt.evt.deltaY);
@@ -74,28 +75,36 @@ export function DisplaySpectrogram({ currentFFT, setCurrentFFT }) {
       setIQData(displayedIQ);
     }
   }, [displayedIQ]);
+
   return (
     <>
-      <Stage width={spectrogramWidth + 110} height={30}>
-        <RulerTop />
-      </Stage>
-      <div className="flex flex-row" id="spectrogram">
-        <Stage width={spectrogramWidth} height={spectrogramHeight}>
-          <Layer onWheel={handleWheel}>
-            <Image image={image} x={0} y={0} width={spectrogramWidth} height={spectrogramHeight} />
-          </Layer>
-          <AnnotationViewer currentFFT={currentFFT} />
-          <FreqSelector />
-          <TimeSelector currentFFT={currentFFT} />
-        </Stage>
-        <Stage width={50} height={spectrogramHeight} className="mr-1">
-          <RulerSide currentRowAtTop={currentFFT} />
-        </Stage>
-        <Stage width={MINIMAP_FFT_SIZE + 5} height={spectrogramHeight}>
-          <ScrollBar currentFFT={currentFFT} setCurrentFFT={setCurrentFFT} />
-          <TimeSelectorMinimap />
-        </Stage>
-      </div>
+      {currentTab === Tab.Spectrogram && (
+        <>
+          <Stage width={spectrogramWidth + 110} height={30}>
+            <RulerTop />
+          </Stage>
+          <div className="flex flex-row" id="spectrogram">
+            <Stage width={spectrogramWidth} height={spectrogramHeight}>
+              <Layer onWheel={handleWheel}>
+                <Image image={image} x={0} y={0} width={spectrogramWidth} height={spectrogramHeight} />
+              </Layer>
+              <AnnotationViewer currentFFT={currentFFT} />
+              <FreqSelector />
+              <TimeSelector currentFFT={currentFFT} />
+            </Stage>
+            <Stage width={50} height={spectrogramHeight} className="mr-1">
+              <RulerSide currentRowAtTop={currentFFT} />
+            </Stage>
+            <Stage width={MINIMAP_FFT_SIZE + 5} height={spectrogramHeight}>
+              <ScrollBar currentFFT={currentFFT} setCurrentFFT={setCurrentFFT} />
+              <TimeSelectorMinimap />
+            </Stage>
+          </div>
+        </>
+      )}
+      {currentTab === Tab.Time && <TimePlot displayedIQ={displayedIQ} />}
+      {currentTab === Tab.Frequency && <FrequencyPlot displayedIQ={displayedIQ} />}
+      {currentTab === Tab.IQ && <IQPlot displayedIQ={displayedIQ} />}
     </>
   );
 }
@@ -146,21 +155,16 @@ export function RecordingViewPage() {
                       onClick={() => {
                         setCurrentTab(Tab[key as keyof typeof Tab]);
                       }}
-                      className={` ${
-                        currentTab === Tab[key as keyof typeof Tab] ? 'bg-primary !text-base-100' : ''
-                      } inline-block px-3 py-0 outline outline-primary outline-1 text-lg text-primary hover:text-accent hover:shadow-lg hover:shadow-accent`}
+                      className={` ${currentTab === Tab[key as keyof typeof Tab] ? 'bg-primary !text-base-100' : ''
+                        } inline-block px-3 py-0 outline outline-primary outline-1 text-lg text-primary hover:text-accent hover:shadow-lg hover:shadow-accent`}
                     >
                       {key}
                     </div>
                   );
                 })}
               </div>
-              {currentTab === Tab.Spectrogram && (
-                <DisplaySpectrogram currentFFT={currentFFT} setCurrentFFT={setCurrentFFT} />
-              )}
-              {currentTab === Tab.Time && <TimePlot />}
-              {currentTab === Tab.Frequency && <FrequencyPlot />}
-              {currentTab === Tab.IQ && <IQPlot />}
+              {/* The following displays the spectrogram, time, freq, and IQ plots depending on which one is selected*/}
+              <DisplaySpectrogram currentFFT={currentFFT} setCurrentFFT={setCurrentFFT} currentTab={currentTab} />
               <DisplayMetaSummary />
             </div>
           </div>
