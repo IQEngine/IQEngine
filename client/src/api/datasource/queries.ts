@@ -151,7 +151,7 @@ export const useUploadDataSource = (type: string, account: string, container: st
     // Create azure blob client
     const blobName = f.name;
     const sas_token = await fetchSasToken(dataSourceClient, account, container, blobName, true); // Note - it needs ADD, CREATE, WRITE
-    const blobUrl = `https://${account}.blob.core.windows.net/${container}/${blobName}?${sas_token.data.sasToken}`; 
+    const blobUrl = `https://${account}.blob.core.windows.net/${container}/${blobName}?${sas_token.data.sasToken}`;
 
     const blockBlobClient = new BlockBlobClient(blobUrl);
     const uploadBlobResponse = await blockBlobClient.uploadData(f, {
@@ -160,7 +160,7 @@ export const useUploadDataSource = (type: string, account: string, container: st
     });
 
   }
-  
+
   const uploadFiles = async () => {
     const files = await fileOpen({
       multiple: true,

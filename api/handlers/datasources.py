@@ -176,7 +176,7 @@ async def generate_sas_token(
     account: str,
     container: str,
     file_path: str,
-    write: Optional[bool] = Query(False),
+    write: bool = Query(False),
     datasources_collection: AgnosticCollection = Depends(datasource_repo.collection),
     access_allowed=Depends(check_access),
 ):

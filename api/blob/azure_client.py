@@ -45,7 +45,7 @@ class AzureBlobClient:
             return False
         if self.sas_token.get_secret_value() == "":
             return False
-        # make sure that sp contains w and c and they need to be in this 
+        # make sure that sp contains w and c and they need to be in this
         # part of the query string not in the & that follows
         content = self.sas_token.get_secret_value().split("&")[0]
         if "w" in content and "c" in content:
