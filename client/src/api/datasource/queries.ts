@@ -6,7 +6,7 @@ import { useUserSettings } from '@/api/user-settings/use-user-settings';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMsal } from '@azure/msal-react';
 import { ClientType } from '@/api/Models';
-import { newPipeline, AnonymousCredential, BlockBlobClient } from '@azure/storage-blob';
+import { BlockBlobClient } from '@azure/storage-blob';
 import { FileWithHandle, fileOpen } from 'browser-fs-access';
 
 const fetchDataSources = async (client: DataSourceClient) => {
@@ -142,52 +142,35 @@ export const useUpdateDataSource = () => {
   });
 };
 
-export const useUploadDataSource = (type: string, account: string, container: string) => {
+export const useUploadDataSource = (type: string, account: string, container: string, setProgress) => {
   const { dataSourcesQuery, filesQuery } = useUserSettings();
   const { instance } = useMsal();
   const dataSourceClient = DataSourceClientFactory(ClientType.API, filesQuery.data, dataSourcesQuery.data, instance);
 
-  async function streamToBuffer(readableStream) {
-    return new Promise((resolve, reject) => {
-        const chunks = [];
-        readableStream.on('data', (data) => {
-            chunks.push(data instanceof Buffer ? data : Buffer.from(data));
-            console.log("..");
-        });
-        readableStream.on('end', () => {
-            resolve(Buffer.concat(chunks));
-        });
-        readableStream.on('error', reject);
-    });
-  }
-
   async function uploadBlob(f:FileWithHandle, account, container) {
     // Create azure blob client
-    const blobName = f.name.split('.')[0] + '_' + new Date().toISOString().split('.')[0] + '.' + f.name.split('.')[1];
+    const blobName = f.name;
     const sas_token = await fetchSasToken(dataSourceClient, account, container, blobName, true); // Note - it needs ADD, CREATE, WRITE
     const blobUrl = `https://${account}.blob.core.windows.net/${container}/${blobName}?${sas_token.data.sasToken}`; 
+
     const blockBlobClient = new BlockBlobClient(blobUrl);
-    const buffer = await f.arrayBuffer();
-    try {
-      await blockBlobClient.uploadData(buffer)
-    } catch (error) {
-      console.error(error);
-    }
+    const uploadBlobResponse = await blockBlobClient.uploadData(f, {
+      blobHTTPHeaders: { blobContentType: f.type },
+      onProgress: (ev) => setProgress((ev.loadedBytes / f.size) * 100),
+    });
+
   }
   
   const uploadFiles = async () => {
     const files = await fileOpen({
       multiple: true,
     });
-    //setStatusText('Uploading ' + files.length + ' files...');
     let uploadedFilesList = [];
     for (let indx in files) {
-      //setStatusText('Uploading ' + files[indx].name + '...');
       await uploadBlob(files[indx], account, container);
       uploadedFilesList = uploadedFilesList.concat(files[indx].name);
-      //setUploadedFiles(uploadedFilesList);
     }
-    //setStatusText('Done uploading all files!');
+    setProgress(0);
   };
 
   // Upload files with progress bar

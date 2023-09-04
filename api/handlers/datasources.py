@@ -123,15 +123,24 @@ async def update_datasource(
     if not existing_datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
     # If the incoming datasource has a sasToken or account_key, encrypt it and replace the existing one
-    # Once encrypted sasToken or account_key is just a str not a SecretStr anymore
-    if datasource.sasToken and isinstance(datasource.sasToken, SecretStr):
+    if datasource.sasToken and (datasource.sasToken.get_secret_value() != "**********"):
         datasource.sasToken = encrypt(datasource.sasToken)  # returns a str
-    if datasource.account_key and isinstance(datasource.account_key, SecretStr):
-        datasource.account_key = encrypt(datasource.account_key)
+    if datasource.accountKey and (datasource.accountKey.get_secret_value() != "**********"):
+        datasource.accountKey = encrypt(datasource.accountKey)
     datasource_dict = datasource.dict(by_alias=True, exclude_unset=True)
     # if sasToken is "" or null then set it to a empty str instead of SecretStr
     if not datasource.sasToken:
         datasource_dict["sasToken"] = ""
+    if not datasource.accountKey:
+        datasource_dict["accountKey"] = ""
+
+    # if sasToken or accountKey is SecretStr, pop it from the dict so not to overwrite the existing one
+    # as incoming datasource parameter will not have sasToken or accountKey but ***********
+    if isinstance(datasource_dict["sasToken"], SecretStr):
+        datasource_dict.pop("sasToken")
+    if isinstance(datasource_dict["accountKey"], SecretStr):
+        datasource_dict.pop("accountKey")
+
     await datasources_collection.update_one(
         {"account": account, "container": container},
         {"$set": datasource_dict},
@@ -172,7 +181,7 @@ async def generate_sas_token(
     access_allowed=Depends(check_access),
 ):
     
-    if (access_allowed is not "owner" and write) or access_allowed is None:
+    if (access_allowed != "owner" and write) or access_allowed is None:
         raise HTTPException(status_code=403, detail="No Access")
     
     token: str = ""
@@ -198,7 +207,7 @@ async def generate_sas_token(
         try:
             token = blob_client.generate_sas_token(
                 file_path,
-                decrypt(existing_datasource["account_key"]).get_secret_value(),
+                decrypt(existing_datasource["accountKey"]).get_secret_value(),
                 write,
             )
         except Exception:

@@ -3,9 +3,8 @@ import { useGetDatasources } from '@/api/datasource/hooks/use-get-datasources';
 import React, { useState } from 'react';
 import { ModalDialog } from '@/features/ui/modal/Modal';
 import DataSourceForm from './add-data-source';
-import { useGetDatasourceFeatures, useSyncDataSource, useGetDataSource, useUploadDataSource, useSasToken } from '@/api/datasource/queries';
+import { useGetDatasourceFeatures, useSyncDataSource, useGetDataSource, useSasToken, useUploadDataSource } from '@/api/datasource/queries';
 import toast from 'react-hot-toast';
-
 
 interface DataSourceRowProps {
   dataSource: DataSource;
@@ -14,9 +13,11 @@ interface DataSourceRowProps {
 
 export const DataSourceRow = ({ dataSource, onEdit }: DataSourceRowProps) => {
   const features = useGetDatasourceFeatures(dataSource.type);
+  const [progress, setProgress] = useState<number>(0);
   const sync = useSyncDataSource(dataSource.type, dataSource.account, dataSource.container);
   const edit = useGetDataSource(dataSource.type, dataSource.account, dataSource.container);
-  const upload = useUploadDataSource(dataSource.type, dataSource.account, dataSource.container);
+  const upload = useUploadDataSource(dataSource.type, dataSource.account, dataSource.container, setProgress);
+
   return (
     <div className="card p-2 pb-4 w-80 bg-base-100 shadow-xl border-secondary border-2">
       <figure className="p-2">
@@ -32,16 +33,6 @@ export const DataSourceRow = ({ dataSource, onEdit }: DataSourceRowProps) => {
       {features.sync && (
         <div className="card-actions justify-center">
           <button
-            aria-label={'upload ' + dataSource.name}
-            className="btn btn-primary"
-            onClick={async (e) => {
-              e.preventDefault();
-              upload();
-            }}
-          >
-            Upload
-          </button>
-          <button
             aria-label={'edit ' + dataSource.name}
             className="btn btn-primary"
             onClick={async (e) => {
@@ -50,6 +41,24 @@ export const DataSourceRow = ({ dataSource, onEdit }: DataSourceRowProps) => {
             }}
           >
             Edit
+          </button>
+          <button
+            aria-label={'upload ' + dataSource.name}
+            className="btn btn-primary"
+            onClick={async (e) => {
+              e.preventDefault();
+              upload();
+            }}
+          >
+            {progress === 0 ? (
+              "Upload"
+            ) : (
+              <div className="w-fill h-6 text-center outline outline-1 outline-primary rounded-lg">
+                <div className="bg-secondary h-6 rounded-lg" style={{ width: `${String(progress.toFixed(1))}%` }}>
+                  <span className="text-white font-bold">{`${String(progress.toFixed(1))}%`}</span>
+                </div>
+              </div>
+            )}
           </button>
           <button
             aria-label={'sync ' + dataSource.name}
