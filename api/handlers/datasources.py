@@ -193,7 +193,7 @@ async def generate_sas_token(
     )
     if not existing_datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
-    if not existing_datasource.get("account_key", None):
+    if not existing_datasource.get("accountKey", None):
         if access_allowed == "public":
             return {"sasToken": None}
         if not existing_datasource["sasToken"]:
