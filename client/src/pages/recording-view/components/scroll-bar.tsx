@@ -76,7 +76,7 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
     const downloadScaling = meta.getTotalSamples() / fftSize / 100;
     for (let i = 0; i < 100; i++) {
       const foundIndex = downloadedIndexes.find((x) => x >= i * downloadScaling && x < (i + 1) * downloadScaling);
-      if (foundIndex != undefined) {
+      if (foundIndex && foundIndex != undefined) {
         tiles.push(i);
       }
     }
