@@ -96,14 +96,15 @@ export const DataSourceForm = ({ initialData, isEditMode, setShowModal }: DataSo
   };
 
   return (
-    <form ref={formRef} onSubmit={handleSubmit}>
+    <form ref={formRef} onSubmit={handleSubmit} className="grid grid-cols-2">
+      <label>Data Source Name</label>
       <input
         type="text"
         name="name"
         placeholder="Data Source Name"
         className="input input-bordered input-success w-full max-w-xs"
       />
-      <br />
+      <label>Storage Account name</label>
       <input
         type="text"
         name="account"
@@ -111,7 +112,7 @@ export const DataSourceForm = ({ initialData, isEditMode, setShowModal }: DataSo
         className="input input-bordered input-success w-full max-w-xs"
         disabled={isEditMode}
       />
-      <br />
+      <label>Container Name</label>
       <input
         type="text"
         name="container"
@@ -119,53 +120,55 @@ export const DataSourceForm = ({ initialData, isEditMode, setShowModal }: DataSo
         className="input input-bordered input-success w-full max-w-xs"
         disabled={isEditMode}
       />
-      <br />
+      <label>Description</label>
       <input
         type="text"
         name="description"
         placeholder="Description (optional)"
         className="input input-bordered input-success w-full max-w-xs"
       />
-      <br />
+      <label>Image URL</label>
       <input
         type="text"
         name="imageURL"
         placeholder="Image URL (optional)"
         className="input input-bordered input-success w-full max-w-xs"
       />
-      <br />
+      <label>SAS Token</label>
       <input
         type="text"
         name="sasToken"
         placeholder="SAS Token (optional)"
         className="input input-bordered input-success w-full max-w-xs"
       />
-      <br />
+      <label>Account Key</label>
       <input
         type="text"
         name="accountKey"
         placeholder="Account Key (optional)"
         className="input input-bordered input-success w-full max-w-xs"
       />
+      <label>Owners</label>
       <input
         type="text"
         name="owners"
         placeholder="Owners (optional)"
         className="input input-bordered input-success w-full max-w-xs"
       />
+      <label>Readers</label>
       <input
         type="text"
         name="readers"
         placeholder="Readers (optional)"
         className="input input-bordered input-success w-full max-w-xs"
       />
+      <label>Public access</label>
       <input
         type="text"
         name="public"
         placeholder="Public access (optional)"
         className="input input-bordered input-success w-full max-w-xs"
       />
-      <br />
       <button type="submit" aria-label="Submit Data Source" className="bg-white text-black px-4 py-2 rounded-md mt-3">
         Submit
       </button>
