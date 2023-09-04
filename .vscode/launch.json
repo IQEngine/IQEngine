@@ -77,10 +77,7 @@
       "module": "uvicorn",
       "args": ["main:app", "--reload", "--port", "5000"],
       "jinja": true,
-      "justMyCode": true,
-      "env": {
-        "IQENGINE_PLUGINS": "[{\"name\": \"IQEngine\", \"url\":\"https://iqengine-detector.eastus2.cloudapp.azure.com:8000/plugins\"}]"
-      }
+      "justMyCode": true
     },
     {
       "name": "[API]: Plugin API",

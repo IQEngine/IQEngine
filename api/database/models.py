@@ -11,6 +11,7 @@ class DataSource(BaseModel):
     description: Optional[str] = None
     imageURL: Optional[str] = None
     sasToken: Optional[SecretStr] = None
+    account_key: Optional[SecretStr] = None
     owners: Optional[List[str]] = []
     readers: Optional[List[str]] = []
     public: Optional[bool] = False
@@ -107,6 +108,7 @@ class Configuration(BaseModel):
     internal_branding: str = Field(None, alias="internalBranding")
     app_id: str = Field(None, alias="appId")
     app_authority: str = Field(None, alias="appAuthority")
+    has_ai_query: bool = Field(None, alias="hasAIQuery")
 
 
 class GeoTrack(BaseModel):

@@ -94,29 +94,29 @@ export const App = () => {
                 className="md:hidden menu menu-sm dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
               >
                 <li>
-                  <Link to="/" onClick={() => {}}>
+                  <Link to="/browser" onClick={() => { }}>
                     Home
                   </Link>
                 </li>
                 <li>
-                  <Link to="/about" onClick={() => {}}>
+                  <Link to="/about" onClick={() => { }}>
                     About
                   </Link>
                 </li>
                 <li>
-                  <Link to="/sigmf" onClick={() => {}}>
+                  <Link to="/sigmf" onClick={() => { }}>
                     SigMF
                   </Link>
                 </li>
                 <li>
-                  <Link to="/docs" onClick={() => {}}>
+                  <Link to="/docs" onClick={() => { }}>
                     Docs
                   </Link>
                 </li>
                 {activeAccount ? (
                   <>
                     <li>
-                      <Link to="/admin" onClick={() => {}}>
+                      <Link to="/admin" onClick={() => { }}>
                         Admin
                       </Link>
                     </li>
@@ -136,7 +136,7 @@ export const App = () => {
               </ul>
             </div>
           </div>
-          <Link to="/" onClick={() => {}}>
+          <Link to="/browser" onClick={() => { }}>
             <div id="IQEngineLogo" className="absolute mt-4 pt-2 top-0 left-1/2 transform -translate-x-1/2 flex">
               <Feature flag={FeatureFlag.displayInternalBranding.name}>
                 {config.data && config.data.internalBranding && (
@@ -153,12 +153,12 @@ export const App = () => {
           <div className="absolute right-0 py-2 mr-2 ">
             <ul className="flex-row flex mb-4 mt-0 space-x-5 text-sm font-medium">
               <li className="hidden md:block">
-                <Link to="/about" onClick={() => {}}>
+                <Link to="/about" onClick={() => { }}>
                   <div className="text-base">About</div>
                 </Link>
               </li>
               <li className="hidden md:block">
-                <Link to="/sigmf" onClick={() => {}}>
+                <Link to="/sigmf" onClick={() => { }}>
                   <div className="text-base">SigMF</div>
                 </Link>
               </li>
@@ -166,7 +166,7 @@ export const App = () => {
               {activeAccount ? (
                 <>
                   <li className="hidden md:block">
-                    <Link to="/admin" onClick={() => {}}>
+                    <Link to="/admin" onClick={() => { }}>
                       <div className="text-base">Admin</div>
                     </Link>
                   </li>
@@ -185,7 +185,7 @@ export const App = () => {
               )}
 
               <li className="hidden md:block">
-                <Link to="/docs" onClick={() => {}}>
+                <Link to="/docs" onClick={() => { }}>
                   <div className="text-base">Docs</div>
                 </Link>
               </li>
@@ -258,17 +258,17 @@ export const App = () => {
         <Outlet />
 
         {/* TODO Figure out how to use mailerlites embedded form*/}
-        <a
-          target="_blank"
-          rel="noreferrer"
-          href="https://dashboard.mailerlite.com/forms/299501/77960409531811734/share"
-        >
-          <Feature flag={FeatureFlag.useIQEngineOutReach.name}>
-            <h2 className="text-center py-2">
+        <Feature flag={FeatureFlag.useIQEngineOutReach.name}>
+          <h2 className="text-center py-2">
+            <a
+              target="_blank"
+              rel="noreferrer"
+              href="https://dashboard.mailerlite.com/forms/299501/77960409531811734/share"
+            >
               Sign up for a once-a-month email update on IQEngine, such as new features, demos, and more!
-            </h2>
-          </Feature>
-        </a>
+            </a>
+          </h2>
+        </Feature>
       </div>
       <ReactQueryDevtools initialIsOpen={false} />
     </ThemeSelector>

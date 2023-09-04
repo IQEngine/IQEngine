@@ -3,11 +3,11 @@
 // Licensed under the MIT License
 
 import React, { useEffect, useState } from 'react';
-import Directory from './Directory';
+import Directory from './directory';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { useParams } from 'react-router-dom';
 import { useQueryDataSourceMetaPaths } from '@/api/metadata/queries';
-import { DirectoryNode, groupDataByDirectories } from './DirectoryNode';
+import { DirectoryNode, groupDataByDirectories } from './directory-node';
 import { useFeatureFlags } from '@/hooks/use-feature-flags';
 
 export function RecordingsBrowser() {

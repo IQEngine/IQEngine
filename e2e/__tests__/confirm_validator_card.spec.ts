@@ -1,12 +1,10 @@
-import { test } from '@playwright/test';
+import { test, expect } from '@playwright/test';
+import { skipLandingPage } from '../common-steps';
 
 test('Confirm Validator and AzureBlob cards @CICompatible', async ({ page }) => {
   await page.goto('/');
+  skipLandingPage(page);
 
-  // signal generator
   await page.locator('[id="Validator"]').click();
-  await page.locator('[id="IQEngineLogo"]').click();
-
-  // Azure blob
-  await page.locator('[id="AzureBlob"]').click();
+  await expect(page.getByText('"global"', { exact: true })).toBeVisible();
 });

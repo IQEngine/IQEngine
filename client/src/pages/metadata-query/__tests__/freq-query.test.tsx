@@ -48,7 +48,7 @@ describe('Test FreqQuery', () => {
       from: 30000000,
       to: '100000000',
     });
-    expect(handleQueryValidMock).toHaveBeenCalledTimes(1);
+    expect(handleQueryValidMock).toHaveBeenCalledTimes(2);
   });
 
   test('Changing the upper frequency bound to lower than the lower bound calls the validator function and handleQueryInvalid function', () => {
@@ -74,6 +74,6 @@ describe('Test FreqQuery', () => {
       from: 30000000,
       to: '1',
     });
-    expect(handleQueryInvalidMock).toHaveBeenCalledTimes(1);
+    expect(handleQueryInvalidMock).toHaveBeenCalledTimes(2);
   });
 });

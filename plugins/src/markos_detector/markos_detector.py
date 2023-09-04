@@ -45,7 +45,6 @@ class Plugin:
             plot_spectrogram(samples, sample_rate, rects)
 
         return {
-            "status" : "SUCCESS",
             "data_output" : [],
             "annotations" : anots
         }

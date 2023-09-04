@@ -6,7 +6,7 @@ import React from 'react';
 import { SourceQuery } from '@/pages/metadata-query/data-source-query';
 import userEvent from '@testing-library/user-event';
 import { AllProviders } from '@/mocks/setup-tests';
-import '@testing-library/jest-dom/extend-expect';
+import '@testing-library/jest-dom';
 
 describe('Test SourceQuery', () => {
   const mockName = 'datasource name';

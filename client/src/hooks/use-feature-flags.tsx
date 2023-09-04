@@ -27,6 +27,11 @@ export const FeatureFlag = {
     description: 'Use API Datasources',
     default: true,
   },
+  bypassLandingPage: {
+    name: 'bypassLandingPage',
+    description: 'Bypass Landing Page',
+    default: true,
+  },
 };
 
 interface ContextProps {

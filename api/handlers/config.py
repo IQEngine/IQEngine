@@ -6,6 +6,7 @@ from database.config_repo import exists, get
 from database.models import Configuration
 from fastapi import APIRouter, Depends, HTTPException
 from motor.core import AgnosticCollection
+from aifunctions import aiquery
 
 router = APIRouter()
 
@@ -15,7 +16,7 @@ async def get_config():
     """
     get the IQEngine configuration
     """
-    configuration = await get()
+    configuration: Configuration | None = await get()
 
     if configuration is None:
         configuration = Configuration()
@@ -38,6 +39,8 @@ async def get_config():
     configuration.app_authority = os.getenv(
         "IQENGINE_APP_AUTHORITY", configuration.app_authority
     )
+
+    configuration.has_ai_query = aiquery.is_open_ai_available()
 
     return configuration
 

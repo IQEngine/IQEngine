@@ -5,40 +5,37 @@
 import Plot from 'react-plotly.js';
 import React, { useEffect, useState } from 'react';
 import { template } from '@/utils/plotlyTemplate';
-import { useCursorContext } from '../hooks/use-cursor-context';
+import { useSpectrogramContext } from '../hooks/use-spectrogram-context';
 
-export const TimePlot = (props) => {
-  let { plotWidth, plotHeight } = props;
-  const { cursorData } = useCursorContext();
+interface TimePlotProps {
+  displayedIQ: Float32Array;
+}
+
+export const TimePlot = ({ displayedIQ }: TimePlotProps) => {
+  const { spectrogramWidth, spectrogramHeight } = useSpectrogramContext();
   const [I, setI] = useState<Float32Array>();
   const [Q, setQ] = useState<Float32Array>();
 
   useEffect(() => {
-    if (cursorData && cursorData.length > 0) {
+    if (displayedIQ && displayedIQ.length > 0) {
       setI(
-        cursorData.filter((element, index) => {
+        displayedIQ.filter((element, index) => {
           return index % 2 === 0;
         })
       );
 
       setQ(
-        cursorData.filter((element, index) => {
+        displayedIQ.filter((element, index) => {
           return index % 2 === 1;
         })
       );
     }
-  }, [cursorData]); // TODO make sure this isnt going to be sluggish when currentSamples is huge
+  }, [displayedIQ]); // TODO make sure this isnt going to be sluggish when the number of samples is huge
 
-  if (!cursorData || cursorData.length === 0) {
-    return (
-      <div>
-        <p>Please enable cursors first</p>
-      </div>
-    );
-  }
 
   return (
     <div className="px-3">
+      <p className="text-primary text-center">Below shows the time domain of the sample range displayed on the spectrogram tab</p>
       <Plot
         data={[
           {
@@ -53,8 +50,15 @@ export const TimePlot = (props) => {
           },
         ]}
         layout={{
-          width: plotWidth,
-          height: plotHeight,
+          width: spectrogramWidth,
+          height: spectrogramHeight,
+          margin: {
+            l: 0,
+            r: 0,
+            b: 0,
+            t: 0,
+            pad: 0
+          },
           dragmode: 'pan',
           showlegend: true,
           template: template,

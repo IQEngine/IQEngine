@@ -4,22 +4,21 @@ import { BlobClient } from './blob-client';
 import { DataSourceClient } from './datasource-client';
 import { CLIENT_TYPE_API, CLIENT_TYPE_LOCAL, CLIENT_TYPE_BLOB, DataSource } from '@/api/Models';
 import { FileWithDirectoryAndFileHandle } from 'browser-fs-access';
-import { useMsal } from '@azure/msal-react';
+import { IPublicClientApplication } from '@azure/msal-browser';
 
 export const DataSourceClientFactory = (
   type: string,
   files: FileWithDirectoryAndFileHandle[],
-  dataSources: Record<string, DataSource>
+  dataSources: Record<string, DataSource>,
+  instance: IPublicClientApplication,
 ): DataSourceClient => {
   switch (type) {
     case CLIENT_TYPE_API: {
-      const { instance } = useMsal();
-      const accounts = instance.getAllAccounts();
-      if (accounts.length === 0) {
+      if (!instance || !instance.getAllAccounts || instance.getAllAccounts().length === 0) {
         return new ApiClient(null, null);
-      } else {
-        return new ApiClient(instance, accounts[0]);
       }
+      const accounts = instance.getAllAccounts();
+      return new ApiClient(instance, accounts[0]);
     }
     case CLIENT_TYPE_LOCAL:
       return new LocalClient(files);

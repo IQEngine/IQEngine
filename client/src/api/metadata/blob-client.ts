@@ -1,4 +1,4 @@
-import { Annotation, CaptureSegment, SigMFMetadata } from '@/utils/sigmfMetadata';
+import { Annotation, CaptureSegment, SigMFMetadata, Track } from '@/utils/sigmfMetadata';
 import { ContainerClient } from '@azure/storage-blob';
 import { MetadataClient } from './metadata-client';
 import { getContainerClient } from '@/api/utils/AzureBlob';
@@ -66,6 +66,10 @@ export class BlobClient implements MetadataClient {
     this.dataSources = dataSources;
   }
 
+  track(account: string, container: string, filepath: string): Promise<Track> {
+    throw new Error('track not supported for blob data sources');
+  }
+
   async getMeta(account: string, container: string, filePath: string): Promise<SigMFMetadata> {
     const containerClient = getContainerClient(this.dataSources, account, container);
     return blobNameToMetadata(filePath, containerClient);
@@ -85,6 +89,10 @@ export class BlobClient implements MetadataClient {
   async updateMeta(account: string, container: string, filePath: string, meta: SigMFMetadata): Promise<any> {
     // Currently update meta doesnt even try to update the blob so we are just going to return here
     return meta;
+  }
+
+  async smartQuery(queryString: string): Promise<any> {
+    throw new Error('smartQuery not supported for blob data sources');
   }
 
   features() {

@@ -7,6 +7,7 @@ import Backend from './backend.mdx';
 import AdminPage from './admin-page.mdx';
 import CodingStyle from './coding-style.mdx';
 import NewDevGuide from './new-developer-guide.mdx';
+import ConfigFeatureFlags from './config-feature-flags.mdx';
 import { Link } from 'react-router-dom';
 
 export const DocsPages = () => {
@@ -35,6 +36,9 @@ export const DocsPages = () => {
     case 'new-developer-guide':
       currentPage = <NewDevGuide />;
       break;
+    case 'config-feature-flags':
+      currentPage = <ConfigFeatureFlags />;
+      break;
     default:
       currentPage = <OverviewPage />;
   }
@@ -51,6 +55,7 @@ export const DocsPages = () => {
               <TableItem href="/docs/frontend">Frontend</TableItem>
               <TableItem href="/docs/backend">Backend</TableItem>
               <TableItem href="/docs/admin-page">Admin Page</TableItem>
+              <TableItem href="/docs/config-feature-flags">Config & Feature Flags</TableItem>
 
               <TableHeader>Developer Docs</TableHeader>
               <TableItem href="/docs/new-developer-guide">New Dev Guide</TableItem>

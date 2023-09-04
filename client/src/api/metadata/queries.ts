@@ -1,8 +1,10 @@
-import { SigMFMetadata, Track } from '@/utils/sigmfMetadata';
+import { SigMFMetadata, TraceabilityOrigin, Track } from '@/utils/sigmfMetadata';
 import { MetadataClientFactory } from './metadata-client-factory';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { MetadataClient } from './metadata-client';
 import { useUserSettings } from '@/api/user-settings/use-user-settings';
+import { useMsal } from '@azure/msal-react';
+import { CLIENT_TYPE_API, SmartQueryResult } from '../Models';
 
 export const fetchMeta = async (
   client: MetadataClient,
@@ -28,17 +30,19 @@ const updateDataSourceMeta = async (
 
 export const useQueryDataSourceMetaPaths = (type: string, account: string, container: string, enabled = true) => {
   const { dataSourcesQuery, filesQuery } = useUserSettings();
+  const { instance } = useMsal();
   if (!dataSourcesQuery.data || !filesQuery.data) {
     return useQuery(['invalidQuery'], () => null);
   }
+  const metadataClient = MetadataClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance);
   return useQuery(
     ['datasource', type, account, container, 'meta', 'paths'],
     () => {
-      const metadataClient = MetadataClientFactory(type, filesQuery.data, dataSourcesQuery.data);
+
       return metadataClient.getDataSourceMetaPaths(account, container);
     },
     {
-      enabled: enabled,
+      enabled: enabled && !!dataSourcesQuery.data && !!filesQuery.data,
       staleTime: Infinity,
     }
   );
@@ -46,16 +50,16 @@ export const useQueryDataSourceMetaPaths = (type: string, account: string, conta
 
 export const useQueryTrack = (type: string, account: string, container: string, filepath: string, enabled = true) => {
   const { dataSourcesQuery, filesQuery } = useUserSettings();
-  return useQuery<Track>(
-    ['track', account, container, filepath],
-    async ({ signal }) => {
-      const client = MetadataClientFactory(type, filesQuery.data, dataSourcesQuery.data);
-      return await client.track(account, container, filepath, signal);
+  const { instance } = useMsal();
+  const client = MetadataClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance);
+
+  return useQuery<number[][]>({
+    queryKey: ['track', account, container, filepath ],
+    queryFn: ({signal}) => {
+      return client.track(account, container, filepath, signal);
     },
-    {
-      enabled: enabled,
-    }
-  );
+    enabled: enabled && !!filesQuery.data && !!dataSourcesQuery.data,
+  });
 };
 
 export const getMeta = (type: string, account: string, container: string, filePath: string, enabled = true) => {
@@ -63,10 +67,11 @@ export const getMeta = (type: string, account: string, container: string, filePa
   if (!dataSourcesQuery.data || !filesQuery.data) {
     return useQuery(['invalidQuery'], () => null);
   }
+  const { instance } = useMsal();
+  const metadataClient = MetadataClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance);
   return useQuery(
     ['datasource', type, account, container, filePath, 'meta'],
     () => {
-      const metadataClient = MetadataClientFactory(type, filesQuery.data, dataSourcesQuery.data);
       return fetchMeta(metadataClient, type, account, container, filePath);
     },
     {
@@ -83,10 +88,11 @@ export const useUpdateMeta = (meta: SigMFMetadata) => {
   }
   const { type, account, container, file_path: filePath } = meta.getOrigin();
   const { dataSourcesQuery, filesQuery } = useUserSettings();
+  const { instance } = useMsal();
+  const metadataClient = MetadataClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance);
 
   return useMutation({
     mutationFn: (newMeta: SigMFMetadata) => {
-      const metadataClient = MetadataClientFactory(type, filesQuery.data, dataSourcesQuery.data);
       return updateDataSourceMeta(metadataClient, account, container, filePath, newMeta);
     },
     onMutate: async () => {
@@ -104,18 +110,34 @@ export const useUpdateMeta = (meta: SigMFMetadata) => {
 
 export const useGetMetadataFeatures = (type: string) => {
   const { filesQuery, dataSourcesQuery } = useUserSettings();
-  const metadataClient = MetadataClientFactory(type, filesQuery.data, dataSourcesQuery.data);
+  const { instance } = useMsal();
+  const metadataClient = MetadataClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance);
   return metadataClient.features();
 };
 
 export const useMeta = (type: string, account: string, container: string, filePath: string) => {
   const { filesQuery, dataSourcesQuery } = useUserSettings();
+  const { instance } = useMsal();
+  const metadataClient = MetadataClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance);
   return useQuery<SigMFMetadata>({
     queryKey: ['datasource', type, account, container, filePath, 'meta'],
     queryFn: () => {
-      const metadataClient = MetadataClientFactory(type, filesQuery.data, dataSourcesQuery.data);
       return metadataClient.getMeta(account, container, filePath);
     },
     enabled: !!filesQuery.data && !!dataSourcesQuery.data,
   });
 };
+
+export const useSmartQueryMeta = (query: string, enabled = true) => {
+  const { filesQuery, dataSourcesQuery } = useUserSettings();
+  const { instance } = useMsal();
+  const metadataClient = MetadataClientFactory(CLIENT_TYPE_API, filesQuery.data, dataSourcesQuery.data, instance);
+  return useQuery<SmartQueryResult>({
+    queryKey: ['smart-query', query ],
+    queryFn: ({signal}) => {
+      console.log('smartQuery', query);
+      return metadataClient.smartQuery(query, signal);
+    },
+    enabled: enabled && !!filesQuery.data && !!dataSourcesQuery.data,
+  });
+}

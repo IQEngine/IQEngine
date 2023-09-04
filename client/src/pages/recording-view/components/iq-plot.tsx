@@ -5,18 +5,21 @@
 import Plot from 'react-plotly.js';
 import React, { useEffect, useState } from 'react';
 import { template } from '@/utils/plotlyTemplate';
-import { useCursorContext } from '../hooks/use-cursor-context';
+import { useSpectrogramContext } from '../hooks/use-spectrogram-context';
 
-export const IQPlot = (props) => {
-  let { plotWidth, plotHeight } = props;
-  const { cursorData } = useCursorContext();
+interface IQPlotProps {
+  displayedIQ: Float32Array;
+}
+
+export const IQPlot = ({ displayedIQ }: IQPlotProps) => {
+  const { spectrogramWidth, spectrogramHeight } = useSpectrogramContext();
   const [I, setI] = useState<Float32Array>();
   const [Q, setQ] = useState<Float32Array>();
 
   useEffect(() => {
-    if (cursorData && cursorData.length > 0) {
+    if (displayedIQ && displayedIQ.length > 0) {
       // For now just show the first 1000 IQ samples, else it's too busy
-      const tempCurrentSamples = cursorData.slice(0, 2000);
+      const tempCurrentSamples = displayedIQ.slice(0, 2000);
 
       setI(
         tempCurrentSamples.filter((element, index) => {
@@ -30,18 +33,11 @@ export const IQPlot = (props) => {
         })
       );
     }
-  }, [cursorData]); // TODO make sure this isnt going to be sluggish when currentSamples is huge
-
-  if (!cursorData || cursorData.length === 0) {
-    return (
-      <div>
-        <p>Please enable cursors first</p>
-      </div>
-    );
-  }
+  }, [displayedIQ]); // TODO make sure this isnt going to be sluggish when currentSamples is huge
 
   return (
     <div className="px-3">
+      <p className="text-primary text-center">Below shows the first 1000 IQ samples displayed on the spectrogram tab</p>
       <Plot
         data={[
           {
@@ -52,8 +48,15 @@ export const IQPlot = (props) => {
           },
         ]}
         layout={{
-          width: plotWidth,
-          height: plotHeight,
+          width: spectrogramHeight,
+          height: spectrogramHeight, // so it's square
+          margin: {
+            l: 0,
+            r: 0,
+            b: 0,
+            t: 0,
+            pad: 0
+          },
           dragmode: 'pan',
           template: template,
           xaxis: {

@@ -2,7 +2,7 @@
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Annotation, SigMFMetadata } from '@/utils/sigmfMetadata';
 import { TimePlot } from './time-plot';
 import { FrequencyPlot } from './frequency-plot';
@@ -14,11 +14,12 @@ import { fftshift } from 'fftshift';
 import { FFT } from '@/utils/fft';
 import { useGetPluginsComponents } from '@/pages/recording-view/hooks/use-get-plugins-components';
 import { useGetPlugins } from '@/api/plugin/queries';
+import { useSasToken } from '@/api/datasource/queries';
 import { toast } from 'react-hot-toast';
 import { dataTypeToBytesPerIQSample } from '@/utils/selector';
-import { useUserSettings } from '@/api/user-settings/use-user-settings';
 import { useSpectrogramContext } from '../hooks/use-spectrogram-context';
 import { useCursorContext } from '../hooks/use-cursor-context';
+import { CLIENT_TYPE_LOCAL } from '@/api/Models';
 
 export enum MimeTypes {
   ci8 = 'iq/ci8',
@@ -34,7 +35,8 @@ export enum MimeTypes {
 }
 
 export const PluginsPane = () => {
-  const { meta, account, container, spectrogramHeight, fftSize, selectedAnnotation, setMeta } = useSpectrogramContext();
+  const { meta, account, type, container, spectrogramWidth, spectrogramHeight, fftSize, selectedAnnotation, setMeta } =
+    useSpectrogramContext();
   const { cursorTimeEnabled, cursorTime, cursorData } = useCursorContext();
   const { data: plugins, isError } = useGetPlugins();
   const { PluginOption, EditPluginParameters, pluginParameters, setPluginParameters } = useGetPluginsComponents();
@@ -44,10 +46,15 @@ export const PluginsPane = () => {
   const [modalSamples, setModalSamples] = useState<Float32Array>(new Float32Array([]));
   const [modalSpectrogram, setmodalSpectrogram] = useState(null);
   const [useCloudStorage, setUseCloudStorage] = useState(true);
-  const { dataSourcesQuery } = useUserSettings();
-  const connectionInfo = dataSourcesQuery?.data[`${account}/${container}`];
-  let byte_offset = meta.getBytesPerIQSample() * cursorTime.start;
-  let byte_length = meta.getBytesPerIQSample() * (cursorTime.end - cursorTime.start);
+  const token = useSasToken(type, account, container, meta.getDataFileName());
+  let byte_offset = meta.getBytesPerIQSample() * Math.floor(cursorTime.start);
+  let byte_length = meta.getBytesPerIQSample() * Math.ceil(cursorTime.end - cursorTime.start);
+
+  useEffect(() => {
+    if (type == CLIENT_TYPE_LOCAL) {
+      setUseCloudStorage(false);
+    }
+  }, [type]);
   const handleChangePlugin = (e) => {
     setSelectedPlugin(e.target.value);
   };
@@ -71,9 +78,6 @@ export const PluginsPane = () => {
       return;
     }
 
-    // this does the tile calc and gets the right samples in currentSamples
-    // const { trimmedSamples, startSampleOffset } = handleProcessTime();
-
     const sampleRate = meta.getSampleRate();
     const freq = meta.getCenterFrequency();
 
@@ -86,7 +90,7 @@ export const PluginsPane = () => {
         annotation = meta.annotations[selectedAnnotation];
         const calculateMultiplier = dataTypeToBytesPerIQSample(MimeTypes[meta.getDataType()]);
         byte_offset = Math.floor(annotation['core:sample_start']) * calculateMultiplier;
-        byte_length = annotation['core:sample_count'] * calculateMultiplier;
+        byte_length = Math.ceil(annotation['core:sample_count']) * calculateMultiplier;
       }
     }
 
@@ -96,15 +100,15 @@ export const PluginsPane = () => {
       custom_params: {},
     };
 
-    if (useCloudStorage && connectionInfo) {
+    if (useCloudStorage) {
       body = {
         samples_b64: [],
         samples_cloud: [
           {
-            account_name: connectionInfo.account,
-            container_name: connectionInfo.container,
+            account_name: account,
+            container_name: container,
             file_path: meta.getFileName(),
-            sas_token: connectionInfo.sasToken,
+            sas_token: token.data.data.sasToken,
             sample_rate: sampleRate,
             center_freq: freq,
             data_type: MimeTypes[meta.getDataType()],
@@ -146,6 +150,15 @@ export const PluginsPane = () => {
       }
     }
 
+    const BlobFromSamples = (samples_base64, data_type) => {
+      const samples = window.atob(samples_base64);
+      var blob_array = new Uint8Array(samples.length);
+      for (var i = 0; i < samples.length; i++) {
+        blob_array[i] = samples.charCodeAt(i);
+      }
+      return new Blob([blob_array], { type: data_type });
+    };
+
     fetch(selectedPlugin, {
       method: 'POST',
       headers: {
@@ -158,10 +171,10 @@ export const PluginsPane = () => {
         return response.json();
       })
       .then(function (data) {
-        console.debug('Plugin Status:', data.status);
-        console.debug('data:', data);
-        if (data.status !== 'SUCCESS') {
-          toast.error(`Plugin failed to run: ${data.status}`);
+        console.debug('Plugin return:', data);
+        if ('detail' in data) {
+          // this is currently how we detect if the plugin failed to run
+          toast.error(`Plugin failed to run: ${data.detail}`);
           return;
         }
         if (data.data_output && data.data_output.length > 0) {
@@ -228,31 +241,37 @@ export const PluginsPane = () => {
             setModalOpen(true);
           } else {
             // non-IQ Data file
-            const samples_base64 = data.data_output[0]['samples'];
-            const samples = window.atob(samples_base64);
-            var blob_array = new Uint8Array(samples.length);
-            for (var i = 0; i < samples.length; i++) {
-              blob_array[i] = samples.charCodeAt(i);
-            }
-            const a = document.createElement('a');
-            const blob = new Blob([blob_array], { type: data.data_output[0]['data_type'] });
-            const url = window.URL.createObjectURL(blob);
+            let d = new Date();
+            let datestring = new Date().toISOString().split('.')[0];
 
-            a.href = url;
+            for (let j = 0; j < data.data_output.length; j++) {
+              let data_type = data.data_output[j]['data_type'];
 
-            let filename = '';
-            switch (data.data_output[0]['data_type']) {
-              case MimeTypes.audio_wav:
-                filename = 'samples.wav';
-                break;
-            }
-            if (filename != '') {
+              let ext = '';
+              switch (data_type) {
+                case MimeTypes.audio_wav:
+                  ext = 'wav';
+                  break;
+
+                default:
+                  toast.error(`The plugins pane doesn't handle the mime type ${data_type} output by the plugin.`);
+                  break;
+              }
+              if (ext == '') continue;
+
+              let data_output = data.data_output[j]['samples'];
+
+              let blob = BlobFromSamples(data_output, data_type);
+
+              let url = window.URL.createObjectURL(blob);
+              let a = document.createElement('a');
+              a.href = url;
+
+              let filename = `sample_${datestring}_${j}.${ext}`;
               a.download = filename;
               a.click();
-            } else {
-              toast.error("The plugins pane doesn't handle the mime type output by the plugin.");
+              window.URL.revokeObjectURL(url);
             }
-            window.URL.revokeObjectURL(url);
           }
         }
 
@@ -284,6 +303,7 @@ export const PluginsPane = () => {
           value={selectedPlugin}
           onChange={handleChangePlugin}
         >
+          <option value="">Select Plugin</option>
           {plugins &&
             !isError &&
             plugins?.map((plugin, groupIndex) => (
@@ -305,7 +325,7 @@ export const PluginsPane = () => {
           ))}
         </select>
       </label>
-      {connectionInfo && (
+      {type != CLIENT_TYPE_LOCAL && (
         <label className="label cursor-pointer">
           <span>Use Cloud Storage</span>
           <input
@@ -343,14 +363,14 @@ export const PluginsPane = () => {
               ✕
             </button>
             <div className="grid justify-items-stretch">
-              <Stage width={800} height={600}>
+              <Stage width={spectrogramWidth} height={800}>
                 <Layer>
-                  <Image image={modalSpectrogram} x={0} y={0} width={800} height={600} />
+                  <Image image={modalSpectrogram} x={0} y={0} width={spectrogramWidth} height={600} />
                 </Layer>
               </Stage>
-              <TimePlot currentSamples={modalSamples} cursorsEnabled={true} plotWidth={800} plotHeight={400} />
-              <FrequencyPlot currentSamples={modalSamples} cursorsEnabled={true} plotWidth={800} plotHeight={400} />
-              <IQPlot currentSamples={modalSamples} cursorsEnabled={true} plotWidth={800} plotHeight={400} />
+              <TimePlot displayedIQ={modalSamples} />
+              <FrequencyPlot displayedIQ={modalSamples} />
+              <IQPlot displayedIQ={modalSamples} />
             </div>
           </form>
         </dialog>

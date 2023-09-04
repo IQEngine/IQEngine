@@ -1,5 +1,5 @@
 import { useGetIQData } from '@/api/iqdata/Queries';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useSpectrogramContext } from './use-spectrogram-context';
 import { useDebounce } from 'usehooks-ts';
 import { FETCH_PADDING } from '@/utils/constants';
@@ -19,6 +19,7 @@ export function useSpectrogram(currentFFT) {
     taps,
     pythonSnippet,
   } = useSpectrogramContext();
+
   const { currentData, setFFTsRequired, fftsRequired, processedDataUpdated } = useGetIQData(
     type,
     account,
@@ -26,15 +27,16 @@ export function useSpectrogram(currentFFT) {
     filePath,
     fftSize,
     taps,
-    pythonSnippet
+    pythonSnippet,
+    fftStepSize
   );
   const totalFFTs = Math.ceil(meta?.getTotalSamples() / fftSize);
 
-  const debouncedCurrentFFT = useDebounce<string>(currentFFT, 200);
+  const debouncedCurrentFFT = useDebounce<string>(currentFFT, 50);
 
   // This is the list of ffts we display
   const displayedIQ = useMemo<Float32Array>(() => {
-    if (!totalFFTs || !spectrogramHeight || !currentData) {
+    if (!totalFFTs || !spectrogramHeight) {
       return null;
     }
     // get the current required blocks
@@ -63,16 +65,13 @@ export function useSpectrogram(currentFFT) {
       }
     }
 
-    if (!currentData) {
+    if (!currentData || Object.keys(currentData).length === 0) {
       setFFTsRequired(requiredBlocks);
       return null;
     }
     // check if the blocks are already loaded
     const blocksToLoad = requiredBlocks.filter((block) => !currentData[block]);
     setFFTsRequired(blocksToLoad);
-    //if (blocksToLoad.length > 0) {
-    //  console.debug('loading blocks', blocksToLoad);
-    //}
 
     // return the data with 0s for the missing blocks
     const iqData = new Float32Array(spectrogramHeight * fftSize * 2);
