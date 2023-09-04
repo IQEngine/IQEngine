@@ -168,10 +168,10 @@ const SettingsPane = ({ currentFFT }) => {
         />
       </div>
       <div className="mt-4">
-        <details className="dropdown dropdown-right w-full">
-          <summary className="btn btn-outline btn-success btn-sm w-full">
+        <div className="dropdown dropdown-hover dropdown-right w-full">
+          <label tabIndex={0} className="btn btn-outline btn-success btn-sm w-full">
             Colormap <ArrowRightIcon />
-          </summary>
+          </label>
           <ul className="p-2 shadow menu dropdown-content mt-0 z-[1] bg-base-100 rounded-box w-52">
             {Object.entries(colMaps).map(([value]) => (
               <li
@@ -185,13 +185,13 @@ const SettingsPane = ({ currentFFT }) => {
               </li>
             ))}
           </ul>
-        </details>
+        </div>
       </div>
       <div className="mt-4">
-        <details className="dropdown dropdown-right w-full">
-          <summary className=" btn btn-outline btn-success btn-sm w-full">
+        <div className="dropdown dropdown-hover dropdown-right w-full">
+          <label tabIndex={0} className="btn btn-outline btn-success btn-sm w-full">
             FFT Size <ArrowRightIcon />
-          </summary>
+          </label>
           <ul className="p-2 shadow menu dropdown-content z-[1] mt-0 bg-base-100 rounded-box w-52">
             {fftSizes.map((x, index) => (
               <li
@@ -205,7 +205,7 @@ const SettingsPane = ({ currentFFT }) => {
               </li>
             ))}
           </ul>
-        </details>
+        </div>
       </div>
       <>
         <div className="mt-2" id="formTaps">
@@ -238,10 +238,10 @@ const SettingsPane = ({ currentFFT }) => {
         </div>
       </>
       <div className="mt-2">
-        <details className="dropdown dropdown-right w-full">
-          <summary className=" btn btn-outline btn-success btn-sm w-full">
+        <div className="dropdown dropdown-hover dropdown-right w-full">
+          <label tabIndex={0} className="btn btn-outline btn-success btn-sm w-full">
             Example Filter Taps <ArrowRightIcon />
-          </summary>
+          </label>
           <ul className="p-2 shadow menu dropdown-content z-[1] mt-0 bg-base-100 rounded-box w-96">
             <li
               key={0}
@@ -258,13 +258,13 @@ const SettingsPane = ({ currentFFT }) => {
               <a>Low Pass Filter, Keep Center 25%</a>
             </li>
           </ul>
-        </details>
+        </div>
       </div>
       <div className="mt-4 mb-2">
-        <details className="dropdown dropdown-right w-full">
-          <summary className=" btn btn-outline btn-success btn-sm w-full">
-            window <ArrowRightIcon />
-          </summary>
+      <div className="dropdown dropdown-hover dropdown-right w-full">
+          <label tabIndex={0} className="btn btn-outline btn-success btn-sm w-full">
+            Window <ArrowRightIcon />
+          </label>
           <ul className="p-2 shadow menu dropdown-content z-[1] mt-0 bg-base-100 rounded-box w-70">
             <li key={0} data-value="hamming" onClick={onChangeWindowFunction}>
               {context.windowFunction === 'hamming' ? <a className="active">Hamming</a> : <a>Hamming</a>}
@@ -282,7 +282,7 @@ const SettingsPane = ({ currentFFT }) => {
               {context.windowFunction === 'blackman' ? <a className="active">Blackman</a> : <a>Blackman</a>}
             </li>
           </ul>
-        </details>
+        </div>
       </div>
       <div id="toggleFreq">
         <label className="label">
