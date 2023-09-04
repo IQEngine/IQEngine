@@ -14,7 +14,7 @@ export const MetaViewer = ({ meta }: MetaViewerProps) => {
         <div className="text-primary mr-2 text-sm">data type:</div>
         <div className="text-base-content text-sm">{meta.getDataType()}</div>
       </div>
-      <div className="flex text-left">
+      <div className="flex">
         <div className="text-primary mr-2 text-sm">sample rate:</div>
         <div className="text-base-content text-sm">
           {unitPrefixHz(meta.getSampleRate()).freq} {unitPrefixHz(meta.getSampleRate()).unit}
