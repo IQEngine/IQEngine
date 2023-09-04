@@ -214,9 +214,9 @@ async def get_minimap_iq(
     try:
         if datasource.sasToken:
             azure_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
-        if datasource.account_key:
+        if datasource.accountKey:
             azure_client.set_account_key(
-                decrypt(datasource.account_key.get_secret_value())
+                decrypt(datasource.accountKey.get_secret_value())
             )
         minimap_iq_file = get_file_name(filepath, ApiType.MINIMAP)
         if await azure_client.blob_exist(minimap_iq_file):
