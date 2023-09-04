@@ -335,6 +335,7 @@ async def open_query_meta(
         print(f"Error querying metadata: {e}")
         raise HTTPException(status_code=500, detail="An unexpected error occurred.")
 
+
 @router.post(
     "/api/datasources/{account}/{container}/{filepath:path}/meta",
     status_code=201,
