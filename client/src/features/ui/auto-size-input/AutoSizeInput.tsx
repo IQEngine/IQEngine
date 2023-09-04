@@ -59,7 +59,7 @@ export const AutoSizeInput = ({
           aria-label={label}
           type={type ?? 'text'}
           title={content}
-          value={content}
+          value={content ?? ''}
           className={`bg-base-100 input input-autosize no-spin ${className}`}
           style={{ width, minWidth: minWidth ?? width }}
           autoFocus

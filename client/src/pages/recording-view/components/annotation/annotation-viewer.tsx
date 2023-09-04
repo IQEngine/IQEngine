@@ -28,7 +28,6 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
   const lower_freq = meta.getCenterFrequency() - meta.getSampleRate() / 2;
   const [editAnnotationLabelId, setEditAnnotationLabelId] = useState(null);
   const [editAnnotationLabelText, setEditAnnotationLabelText] = useState(null);
-  const [editAnnotationLabelPosition, setEditAnnotationLabelPosition] = useState({ x: 0, y: 0 });
 
   const onAnnotationsLabelKeyDown = (e) => {
     if (e.key === 'Enter') {
@@ -42,12 +41,8 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
 
   const onAnnotationLabelClick = useCallback((e) => {
     // create textarea and style it
-    setEditAnnotationLabelId(e.target.id());
-    setEditAnnotationLabelText(e.target.text());
-    setEditAnnotationLabelPosition({
-      x: e.target.attrs.x,
-      y: e.target.attrs.y - 25,
-    });
+    setEditAnnotationLabelId(e.currentTarget.id);
+    setEditAnnotationLabelText(e.currentTarget.textContent);
   }, []);
 
   function onDragEnd(e) {
@@ -306,8 +301,8 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
                 <div
                   className="form-control w-full max-w-xs"
                   style={{
-                    top: editAnnotationLabelPosition.y,
-                    left: editAnnotationLabelPosition.x,
+                    top: annotation.y1 - 50,
+                    left: annotation.x1 * spectrogramWidth,
                     position: 'absolute',
                   }}
                 >
