@@ -15,8 +15,8 @@ export function useRouter() {
         {
           path: 'about',
           async lazy() {
-            let { About } = await import('@/pages/about');
-            return { Component: About };
+            let { LandingPage } = await import('@/pages/landing-page/landing-page');
+            return { Component: LandingPage };
           },
         },
         {
@@ -36,7 +36,7 @@ export function useRouter() {
         {
           path: 'smart-query',
           async lazy() {
-            let { SmartQuery } = await import('@/pages/smart-query/smart-query');
+            let { SmartQuery } = await import('@/pages/metadata-query/smart-query');
             return { Component: SmartQuery };
           },
         },

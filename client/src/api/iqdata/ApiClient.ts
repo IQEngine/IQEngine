@@ -6,7 +6,6 @@ import { convertToFloat32 } from '@/utils/fetch-more-data-source';
 import { AccountInfo, IPublicClientApplication } from '@azure/msal-browser';
 import { AuthUtil } from '@/api/utils/Auth-Utils';
 
-
 export class ApiClient implements IQDataClient {
   private authUtil: AuthUtil;
 
@@ -16,7 +15,7 @@ export class ApiClient implements IQDataClient {
   async getIQDataBlocks(
     meta: SigMFMetadata,
     indexes: number[],
-    blockSize: number,
+    blockSize: number, // we fetch 2x this many ints/floats
     signal: AbortSignal
   ): Promise<IQDataSlice[]> {
     if (!meta || indexes.length === 0) {
