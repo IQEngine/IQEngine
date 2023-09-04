@@ -154,10 +154,24 @@ export const useUploadDataSource = (type: string, account: string, container: st
     const blobUrl = `https://${account}.blob.core.windows.net/${container}/${blobName}?${sas_token.data.sasToken}`;
 
     const blockBlobClient = new BlockBlobClient(blobUrl);
-    const uploadBlobResponse = await blockBlobClient.uploadData(f, {
-      blobHTTPHeaders: { blobContentType: f.type },
-      onProgress: (ev) => setProgress((ev.loadedBytes / f.size) * 100),
-    });
+
+    // chunking related
+    const blockSize = 1 * 1024 * 1024; // 1MB
+    const blockCount = Math.ceil(f.size / blockSize);
+    console.log(blockCount, 'blocks');
+    const blockIds = [];
+    for (let i = 0; i < blockCount; i++) {
+      setProgress((i / blockCount) * 100); // update progress bar
+      const start = i * blockSize;
+      const end = Math.min(start + blockSize, f.size);
+      const chunk = f.slice(start, end);
+      const chunkSize = end - start;
+      const blockId = btoa('block-' + i.toString().padStart(6, '0'));
+      blockIds.push(blockId);
+      await blockBlobClient.stageBlock(blockId, chunk, chunkSize);
+    }
+    await blockBlobClient.commitBlockList(blockIds);
+    setProgress(100);
 
   }
 
