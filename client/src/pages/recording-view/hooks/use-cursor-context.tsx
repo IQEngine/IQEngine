@@ -42,7 +42,7 @@ export function CursorContextProvider({ children }) {
   const { currentData, setFFTsRequired, fftsRequired } = useGetIQData(type, account, container, filePath, fftSize);
 
   const [cursorData, setCursorData] = useState<Float32Array>(new Float32Array(0));
-  const debouseCursorTime = useDebounce(cursorTime, 500);
+  const debounceCursorTime = useDebounce(cursorTime, 500);
 
   useEffect(() => {
     if (!currentData || !cursorTime || cursorTime.start === cursorTime.end || !cursorTimeEnabled) {
@@ -63,7 +63,7 @@ export function CursorContextProvider({ children }) {
     }
     setCursorData(iqData);
     setFFTsRequired(requiredBlocks);
-  }, [debouseCursorTime, currentData, fftSize]);
+  }, [debounceCursorTime, currentData, fftSize]);
 
   return (
     <CursorContext.Provider

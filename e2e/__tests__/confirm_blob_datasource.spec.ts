@@ -5,6 +5,8 @@ test('Confirm a blob datasource @CICompatible', async ({ page }) => {
   await page.goto('/');
   skipLandingPage(page);
 
-  await page.locator('[id="GNURadioSigMFRepo"]').last().click();
+  const grRepo = page.locator('#GNURadioSigMFRepo');
+  const grRepo2 = page.locator('#GNURadioHostedRecordings');
+  await grRepo.or(grRepo2).last().click();
   await page.locator('[id="IQEngineLogo"]').click();
 });
