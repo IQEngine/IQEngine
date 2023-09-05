@@ -44,7 +44,7 @@ Content-Type: application/json
     "description": "A collection of example SigMF recordings hosted by the GNU Radio project (contact Marc to have your recordings added)",
     "imageURL": "https://gnuradio.blob.core.windows.net/iqengine/cellular_downlink_880MHz.jpeg",
     "sasToken": "",
-    "account_key": "INSERT YOUR STORAGE ACCOUNT WIDE KEY HERE",
+    "accountKey": "INSERT YOUR STORAGE ACCOUNT WIDE KEY HERE",
     "owners": [
       "HEX STRING WITH HYPHENS"
     ],

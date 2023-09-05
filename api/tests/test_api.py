@@ -279,9 +279,9 @@ async def test_api_get_temp_sas_token(mock_get_sas_token: Mock, client):
 @mock.patch("handlers.datasources.AzureBlobClient.generate_sas_token", return_value="temp_sas_token")
 @pytest.mark.asyncio
 async def test_api_get_temp_sas_token_no_key(mock_get_sas_token: Mock, client):
-    modded_datasourse = test_datasource.copy()
-    modded_datasourse["account_key"] = None
-    client.post("/api/datasources", json=modded_datasourse).json()
+    modded_datasource = test_datasource.copy()
+    modded_datasource["accountKey"] = None
+    client.post("/api/datasources", json=modded_datasource).json()
     response = client.get(f"/api/datasources/{test_datasource['account']}/{test_datasource['container']}/file_path/sas")
     assert response.status_code == 200
     response_object = response.json()
