@@ -1,7 +1,6 @@
 import { BlobClient } from '@azure/storage-blob';
 import { dataTypeToBytesPerIQSample } from './selector';
 import { FileWithDirectoryAndFileHandle } from 'browser-fs-access';
-import { TILE_SIZE_IN_IQ_SAMPLES } from './constants';
 import { metadataValidator } from './validators';
 export class SigMFMetadata {
   global: {
@@ -74,6 +73,12 @@ export class SigMFMetadata {
   }
   getFileName() {
     return this.global['traceability:origin'].file_path.split('/').pop();
+  }
+  getDataFileName() {
+    return this.getFileName() + '.sigmf-data';
+  }
+  getMetadataFileName() {
+    return this.getFileName() + '.sigmf-meta';
   }
   getEmail() {
     const emailName = this.getAuthor();
@@ -228,52 +233,34 @@ export class Annotation {
   'core:uuid'?: string;
   capture_details?: string;
 
-  getAnnotationPosition(
-    lowerTile: number,
-    upperTile: number,
-    centerFrequency: number,
-    sampleRate: number,
-    fftSize: number,
-    zoomLevel: number
-  ) {
-    let result = {
-      x1: 0,
-      x2: 0,
-      y1: 0,
-      y2: 0,
-      visible: false,
-    };
-    let freq_lower_edge = this['core:freq_lower_edge']
-      ? this['core:freq_lower_edge']
-      : centerFrequency - sampleRate / 2;
-    let freq_upper_edge = this['core:freq_upper_edge']
-      ? this['core:freq_upper_edge']
-      : centerFrequency + sampleRate / 2;
-    let sample_start = this['core:sample_start'];
-    let sample_count = this['core:sample_count'];
-
-    // Calc the sample index of the first FFT being displayed
-    let start_sample_index = lowerTile * TILE_SIZE_IN_IQ_SAMPLES;
-    let samples_in_window = (upperTile - lowerTile) * TILE_SIZE_IN_IQ_SAMPLES;
-    let stop_sample_index = start_sample_index + samples_in_window;
-    let lower_freq = centerFrequency - sampleRate / 2;
-    if (
-      (sample_start >= start_sample_index && sample_start < stop_sample_index) ||
-      (sample_start + sample_count >= start_sample_index && sample_start < stop_sample_index)
-    ) {
-      result = {
-        x1: ((freq_lower_edge - lower_freq) / sampleRate) * fftSize, // left side. units are in fractions of an FFT size, e.g. 0-1024
-        x2: ((freq_upper_edge - lower_freq) / sampleRate) * fftSize, // right side
-        y1: (sample_start - start_sample_index) / fftSize / zoomLevel, // top
-        y2: (sample_start - start_sample_index + sample_count) / fftSize / zoomLevel, // bottom
-        visible: true,
-      };
-    }
-    return result;
-  }
-
   getLabel() {
     return String(this['core:label'] ?? this['core:description'] ?? '');
+  }
+
+  getComment() {
+    return String(this['core:comment'] ?? '');
+  }
+
+  getRaw() {
+    return JSON.stringify(
+      {
+        'core:sample_start': this['core:sample_start'] ?? 0,
+        'core:sample_count': this['core:sample_count'] ?? 0,
+        'core:generator': this['core:generator'],
+        'core:label': this['core:label'],
+        'core:comment': this['core:comment'],
+        'core:freq_lower_edge': this['core:freq_lower_edge'] ?? 0,
+        'core:freq_upper_edge': this['core:freq_upper_edge'] ?? 0,
+        'core:uuid': this['core:uuid'],
+        capture_details: this.capture_details,
+      },
+      (key, value) => {
+        if (value !== null) {
+          return value;
+        }
+      },
+      4
+    );
   }
 
   [key: string]: any;

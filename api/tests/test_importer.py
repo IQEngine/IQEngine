@@ -130,7 +130,8 @@ async def test_import_datasources_from_env(mock_plugins, mock_config, mock_datas
                     "sasToken": "test_sas_token",
                     "name": "test_name",
                     "description": "test_description",
-                    "imageURL": "test_image_url"
+                    "imageURL": "test_image_url",
+                    "accountKey": "test_account_key"
                 }
             ]
         }

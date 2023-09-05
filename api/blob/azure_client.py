@@ -1,6 +1,7 @@
+import datetime
 from typing import Optional
 
-from azure.storage.blob import BlobProperties
+from azure.storage.blob import BlobProperties, BlobSasPermissions, generate_blob_sas
 from azure.storage.blob.aio import BlobClient, ContainerClient
 from database.models import Metadata
 from helpers.urlmapping import ApiType, get_file_name
@@ -24,6 +25,7 @@ class AzureBlobClient:
     account: str
     container: str
     sas_token: SecretStr = None
+    account_key: SecretStr = None
     clients: dict[str, BlobClient] = {}
 
     def __init__(self, account, container):
@@ -33,10 +35,39 @@ class AzureBlobClient:
     def set_sas_token(self, sas_token):
         self.sas_token = sas_token
 
+    def set_account_key(self, account_key):
+        self.account_key = account_key
+
+    def sas_token_has_write_permission(self):
+        if not self.sas_token:
+            return False
+        if not self.sas_token.get_secret_value():
+            return False
+        if self.sas_token.get_secret_value() == "":
+            return False
+        # make sure that sp contains w and c and they need to be in this
+        # part of the query string not in the & that follows
+        content = self.sas_token.get_secret_value().split("&")[0]
+        if "w" in content and "c" in content:
+            return True
+        return False
+
+    def can_write(self):
+        return self.account_key or self.sas_token_has_write_permission()
+
     def get_blob_client(self, filepath):
         if filepath in self.clients:
             return self.clients[filepath]
-        if not self.sas_token:
+        if self.account_key:
+            sas_token = self.generate_sas_token(
+                filepath, self.account_key.get_secret_value(), True
+            )
+            blob_client = BlobClient.from_blob_url(
+                f"https://{self.account}.blob.core.windows.net/"
+                f"{self.container}/{filepath}",
+                credential=sas_token,
+            )
+        elif not self.sas_token:
             blob_client = BlobClient.from_blob_url(
                 f"https://{self.account}.blob.core.windows.net/"
                 f"{self.container}/{filepath}"
@@ -117,3 +148,24 @@ class AzureBlobClient:
         blob_client = self.get_blob_client(filepath)
         blob = await blob_client.get_blob_properties()
         return int(blob.size)
+
+    def generate_sas_token(
+        self, filepath: str, account_key: str, include_write: bool = False
+    ):
+        start_time = datetime.datetime.now(datetime.timezone.utc)
+        expiry_time = start_time + datetime.timedelta(hours=1)
+        try:
+            sas_token = generate_blob_sas(
+                account_name=self.account,
+                container_name=self.container,
+                blob_name=filepath,
+                account_key=account_key,
+                permission=BlobSasPermissions(
+                    read=True, write=include_write, create=include_write, add=include_write
+                ),
+                expiry=expiry_time,
+                start=start_time,
+            )
+        except Exception as e:
+            raise Exception(f"Error generating SAS token: {e}")
+        return sas_token

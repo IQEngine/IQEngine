@@ -70,4 +70,4 @@ class Plugin:
             "center_freq": self.center_freq,
             "data_type": "iq/cf32_le",
         }
-        return {"status": "SUCCESS", "data_output": [samples_obj], "annotations": []}
+        return {"data_output": [samples_obj], "annotations": []}

@@ -15,8 +15,8 @@ export function useRouter() {
         {
           path: 'about',
           async lazy() {
-            let { About } = await import('@/pages/about');
-            return { Component: About };
+            let { LandingPage } = await import('@/pages/landing-page/landing-page');
+            return { Component: LandingPage };
           },
         },
         {
@@ -31,6 +31,13 @@ export function useRouter() {
           async lazy() {
             let { MetadataQuery } = await import('@/pages/metadata-query/metadata-query');
             return { Component: MetadataQuery };
+          },
+        },
+        {
+          path: 'smart-query',
+          async lazy() {
+            let { SmartQuery } = await import('@/pages/metadata-query/smart-query');
+            return { Component: SmartQuery };
           },
         },
         {
@@ -122,6 +129,13 @@ export function useRouter() {
         {
           index: true,
           async lazy() {
+            let { LandingPage } = await import('@/pages/landing-page/landing-page');
+            return { Component: LandingPage };
+          },
+        },
+        {
+          path: 'browser',
+          async lazy() {
             let { RepoBrowser } = await import('@/pages/repo-browser/repo-browser');
             return { Component: RepoBrowser };
           },
@@ -129,7 +143,7 @@ export function useRouter() {
         {
           path: 'recordings/:type/:account/:container/:sasToken?',
           async lazy() {
-            let { RecordingsBrowser } = await import('@/pages/recordings-browser/RecordingsBrowser');
+            let { RecordingsBrowser } = await import('@/pages/recordings-browser/recordings-browser');
             return { Component: RecordingsBrowser };
           },
         },

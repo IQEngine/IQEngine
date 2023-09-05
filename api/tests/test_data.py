@@ -6,6 +6,7 @@ test_datasource = {
     "description": "description",
     "imageURL": "imageURL",
     "sasToken": "sasToken",
+    "accountKey": "accountKey",
     "public": True,
     "readers": ["IQEngine-User"],
     "owners": ["IQEngine-Admin"],

@@ -28,3 +28,26 @@ Content-Type: application/json
   "imageURL": "https://gnuradio.blob.core.windows.net/iqengine/cellular_downlink_880MHz.jpeg",
   "sasToken": "********"
 }
+
+####
+
+# 204 = good
+
+PUT http://127.0.0.1:5000/api/datasources/gnuradio/iqengine/datasource
+Content-Type: application/json
+
+{
+    "type": "api",
+    "name": "GNU Radio SigMF Repo",
+    "account": "gnuradio",
+    "container": "iqengine",
+    "description": "A collection of example SigMF recordings hosted by the GNU Radio project (contact Marc to have your recordings added)",
+    "imageURL": "https://gnuradio.blob.core.windows.net/iqengine/cellular_downlink_880MHz.jpeg",
+    "sasToken": "",
+    "accountKey": "INSERT YOUR STORAGE ACCOUNT WIDE KEY HERE",
+    "owners": [
+      "HEX STRING WITH HYPHENS"
+    ],
+    "readers": [],
+    "public": true
+  }

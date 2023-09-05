@@ -15,6 +15,9 @@ export class LocalClient implements DataSourceClient {
   query(querystring: string, signal: AbortSignal): Promise<TraceabilityOrigin[]> {
     throw new Error('query not supported for blob data sources');
   }
+  getSasToken(account: string, container: string, filepath: string): Promise<String> {
+    throw new Error('get sas token not supported for local data sources');
+  }
 
   list(): Promise<DataSource[]> {
     const localDirectory: FileWithDirectoryAndFileHandle[] = this.files;
@@ -46,6 +49,10 @@ export class LocalClient implements DataSourceClient {
   }
 
   create(dataSource: DataSource): Promise<DataSource> {
+    return Promise.reject('Not implemented');
+  }
+
+  update(dataSource: DataSource): Promise<DataSource> {
     return Promise.reject('Not implemented');
   }
 

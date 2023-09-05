@@ -1,17 +1,18 @@
 from datetime import datetime
 from typing import List, Optional
+
 from blob.azure_client import AzureBlobClient
-from helpers.datasource_access import check_access
 from database import datasource_repo, metadata_repo
 from database.metadata_repo import InvalidGeolocationFormat, query_metadata
-
 from database.models import DataSource, DataSourceReference, Metadata, TrackMetadata
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Response
 from fastapi.responses import StreamingResponse
 from helpers.authorization import get_current_user
 from helpers.cipher import decrypt
+from helpers.datasource_access import check_access
 from helpers.urlmapping import ApiType, get_content_type, get_file_name
 from motor.core import AgnosticCollection
+from aifunctions import aiquery
 
 router = APIRouter()
 
@@ -27,7 +28,6 @@ async def get_all_meta(
     metadatas: AgnosticCollection = Depends(metadata_repo.collection),
     access_allowed=Depends(check_access),
 ):
-
     if access_allowed is None:
         return []
 
@@ -81,9 +81,10 @@ async def get_all_meta_name(
 )
 async def get_meta(
     metadata: Metadata = Depends(metadata_repo.get),
-    access_allowed=Depends(check_access)
+    access_allowed=Depends(check_access),
 ):
-
+    if access_allowed is None:
+        raise HTTPException(status_code=403, detail="No Access")
     if not metadata:
         raise HTTPException(status_code=404, detail="Metadata not found")
     return metadata
@@ -95,8 +96,11 @@ async def get_meta(
 )
 async def get_track_meta(
     metadata: Metadata = Depends(metadata_repo.get),
-    access_allowed=Depends(check_access)
+    access_allowed=Depends(check_access),
 ):
+    if access_allowed is None:
+        raise HTTPException(status_code=403, detail="No Access")
+
     if not metadata:
         raise HTTPException(status_code=404, detail="Metadata not found")
 
@@ -121,14 +125,22 @@ async def get_meta_thumbnail(
     background_tasks: BackgroundTasks,
     datasource: DataSource = Depends(datasource_repo.get),
     azure_client: AzureBlobClient = Depends(AzureBlobClient),
-    access_allowed=Depends(check_access)
+    # access_allowed=Depends(check_access)
 ):
+    # access_allowed is always None because the API url is referenced directly in the UI HTML
+    # No authorization header is added to the request so the access_allowed is always None
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
 
     sas_token = datasource.sasToken.get_secret_value() if datasource.sasToken else None
     if sas_token is not None:
         azure_client.set_sas_token(decrypt(sas_token))
+
+    account_key = (
+        datasource.accountKey.get_secret_value() if datasource.accountKey else None
+    )
+    if account_key is not None:
+        azure_client.set_account_key(decrypt(account_key))
 
     thumbnail_path = get_file_name(filepath, ApiType.THUMB)
     content_type = get_content_type(ApiType.THUMB)
@@ -203,13 +215,118 @@ async def query_meta(
         for item in result:
             key = (item.account, item.container)
             if key not in access_cache:
-                access_cache[key] = await check_access(item.account, item.container, current_user)
+                access_cache[key] = await check_access(
+                    item.account, item.container, current_user
+                )
 
             if access_cache[key] is not None:
                 filtered_result.append(item)
 
         return filtered_result
 
+    except InvalidGeolocationFormat as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    except Exception as e:
+        print(f"Error querying metadata: {e}")
+        raise HTTPException(status_code=500, detail="An unexpected error occurred.")
+
+
+@router.get(
+    "/api/datasources/open-query",
+    status_code=200,
+    response_model=None,
+)
+async def open_query_meta(
+    query: str,
+    current_user: Optional[dict] = Depends(get_current_user),
+):
+    if not aiquery.is_open_ai_available():
+        return {
+            "parameters": "",
+            "results": []
+        }
+    if not query:
+        return {
+            "parameters": "",
+            "results": []
+        }
+    jsonParameters = aiquery.get_query_result(query)
+    if not jsonParameters:
+        return {
+            "parameters": "",
+            "results": []
+        }
+    account = jsonParameters.get("account")
+    container = jsonParameters.get("container")
+    database_id = jsonParameters.get("database_id")
+    min_frequency = jsonParameters.get("min_frequency")
+    max_frequency = jsonParameters.get("max_frequency")
+    author = jsonParameters.get("author")
+    description = jsonParameters.get("description")
+    label = jsonParameters.get("label")
+    comment = jsonParameters.get("comment")
+    captures_geo = jsonParameters.get("captures_geo")
+    annotations_geo = jsonParameters.get("annotations_geo")
+    min_datetime = jsonParameters.get("min_datetime")
+    max_datetime = jsonParameters.get("max_datetime")
+    captures_geo_json = jsonParameters.get("captures_geo_json")
+    captures_radius = jsonParameters.get("captures_radius")
+    annotations_geo_json = jsonParameters.get("annotations_geo_json")
+    annotations_radius = jsonParameters.get("annotations_radius")
+    text = jsonParameters.get("text")
+
+    if min_datetime:
+        min_datetime = datetime.fromisoformat(min_datetime.replace("Z", "+00:00"))
+    if max_datetime:
+        max_datetime = datetime.fromisoformat(max_datetime.replace("Z", "+00:00"))
+
+    try:
+        result = await query_metadata(
+            account=account,
+            container=container,
+            database_id=database_id,
+            min_frequency=min_frequency,
+            max_frequency=max_frequency,
+            author=author,
+            description=description,
+            label=label,
+            comment=comment,
+            captures_geo=captures_geo,
+            annotations_geo=annotations_geo,
+            min_datetime=min_datetime,
+            max_datetime=max_datetime,
+            captures_geo_json=captures_geo_json,
+            captures_radius=captures_radius,
+            annotations_geo_json=annotations_geo_json,
+            annotations_radius=annotations_radius,
+            text=text,
+        )
+
+        if not result:
+            return {
+                "parameters": jsonParameters,
+                "results": []
+            }
+
+        # Process result to remove metadata from unauthorized datasources
+        access_cache = {}
+        filtered_result = []
+
+        for item in result:
+            key = (item.account, item.container)
+            if key not in access_cache:
+                access_cache[key] = await check_access(
+                    item.account, item.container, current_user
+                )
+
+            if access_cache[key] is not None:
+                filtered_result.append(item)
+
+        return {
+            "parameters": jsonParameters,
+            "results": filtered_result
+        }
 
     except InvalidGeolocationFormat as e:
         raise HTTPException(status_code=400, detail=str(e))

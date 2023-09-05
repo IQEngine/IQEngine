@@ -1,17 +1,18 @@
-import httpx
-from database import datasource_repo
-from helpers.datasource_access import check_access
-from database.datasource_repo import create, datasource_exists
+from typing import Optional
 
+import httpx
+from blob.azure_client import AzureBlobClient
+from database import datasource_repo
+from database.datasource_repo import create, datasource_exists
 from database.models import DataSource
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query
 from fastapi.responses import StreamingResponse
 from helpers.authorization import get_current_user
-from helpers.cipher import encrypt
+from helpers.cipher import decrypt, encrypt
+from helpers.datasource_access import check_access
 from helpers.urlmapping import ApiType, add_URL_sasToken
 from motor.core import AgnosticCollection
 from pydantic import SecretStr
-from typing import Optional
 
 router = APIRouter()
 
@@ -41,7 +42,12 @@ async def get_datasources(
     datasources = datasources_collection.find()
     result = []
     async for datasource_item in datasources:
-        if await check_access(datasource_item["account"], datasource_item["container"], current_user) is not None:
+        if (
+            await check_access(
+                datasource_item["account"], datasource_item["container"], current_user
+            )
+            is not None
+        ):
             result.append(datasource_item)
     return result
 
@@ -108,7 +114,6 @@ async def update_datasource(
 ):
     if access_allowed is None:
         raise HTTPException(status_code=403, detail="No Access")
-
     existing_datasource = await datasources_collection.find_one(
         {
             "account": account,
@@ -117,23 +122,29 @@ async def update_datasource(
     )
     if not existing_datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
-
-    # If the incoming datasource has a sasToken, encrypt it and replace the existing one
-    # Once encrypted sasToken is just a str not a SecretStr anymore
-    if datasource.sasToken and isinstance(datasource.sasToken, SecretStr):
+    # If the incoming datasource has a sasToken or account_key, encrypt it and replace the existing one
+    if datasource.sasToken and (datasource.sasToken.get_secret_value() != "**********"):
         datasource.sasToken = encrypt(datasource.sasToken)  # returns a str
-
+    if datasource.accountKey and (datasource.accountKey.get_secret_value() != "**********"):
+        datasource.accountKey = encrypt(datasource.accountKey)
     datasource_dict = datasource.dict(by_alias=True, exclude_unset=True)
-
     # if sasToken is "" or null then set it to a empty str instead of SecretStr
     if not datasource.sasToken:
         datasource_dict["sasToken"] = ""
+    if not datasource.accountKey:
+        datasource_dict["accountKey"] = ""
+
+    # if sasToken or accountKey is SecretStr, pop it from the dict so not to overwrite the existing one
+    # as incoming datasource parameter will not have sasToken or accountKey but ***********
+    if isinstance(datasource_dict["sasToken"], SecretStr):
+        datasource_dict.pop("sasToken")
+    if isinstance(datasource_dict["accountKey"], SecretStr):
+        datasource_dict.pop("accountKey")
 
     await datasources_collection.update_one(
         {"account": account, "container": container},
         {"$set": datasource_dict},
     )
-
     return
 
 
@@ -143,7 +154,6 @@ async def sync_datasource(
     container: str,
     background_tasks: BackgroundTasks,
     datasources_collection: AgnosticCollection = Depends(datasource_repo.collection),
-    current_user: Optional[dict] = Depends(get_current_user),
     access_allowed=Depends(check_access),
 ):
     if access_allowed is None:
@@ -159,3 +169,47 @@ async def sync_datasource(
         raise HTTPException(status_code=404, detail="Datasource not found")
     background_tasks.add_task(datasource_repo.sync, account, container)
     return {"message": "Syncing"}
+
+
+@router.get("/api/datasources/{account}/{container}/{file_path}/sas")
+async def generate_sas_token(
+    account: str,
+    container: str,
+    file_path: str,
+    write: bool = Query(False),
+    datasources_collection: AgnosticCollection = Depends(datasource_repo.collection),
+    access_allowed=Depends(check_access),
+):
+
+    if (access_allowed != "owner" and write) or access_allowed is None:
+        raise HTTPException(status_code=403, detail="No Access")
+
+    token: str = ""
+    existing_datasource = await datasources_collection.find_one(
+        {
+            "account": account,
+            "container": container,
+        }
+    )
+    if not existing_datasource:
+        raise HTTPException(status_code=404, detail="Datasource not found")
+    if not existing_datasource.get("accountKey", None):
+        if access_allowed == "public":
+            return {"sasToken": None}
+        if not existing_datasource["sasToken"]:
+            raise HTTPException(status_code=404, detail="No Account Key or SAS Token")
+        if access_allowed is None:
+            raise HTTPException(status_code=403, detail="No Access")
+        if not write:
+            token = decrypt(existing_datasource["sasToken"]).get_secret_value()
+    if not token:
+        blob_client = AzureBlobClient(account, container)
+        try:
+            token = blob_client.generate_sas_token(
+                file_path,
+                decrypt(existing_datasource["accountKey"]).get_secret_value(),
+                write,
+            )
+        except Exception:
+            raise HTTPException(status_code=500, detail="unable to generate sas token")
+    return {"sasToken": token}

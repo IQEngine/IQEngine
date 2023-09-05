@@ -57,7 +57,7 @@ class Plugin:
             "samples": base64.b64encode(byte_io.read()),
             "data_type": "audio/wav",
         }
-        return {"status": "SUCCESS", "data_output": [samples_obj], "annotations": []}
+        return {"data_output": [samples_obj], "annotations": []}
 
 
 if __name__ == "__main__":

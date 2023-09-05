@@ -1,3 +1,5 @@
+import { TraceabilityOrigin } from "@/utils/sigmfMetadata";
+
 export interface DataSource {
   type: string;
   name: string;
@@ -6,6 +8,16 @@ export interface DataSource {
   account: string;
   container: string;
   sasToken?: string;
+  accountKey?: string;
+  owners?: string[];
+  readers?: string[];
+  public?: boolean;
+}
+
+
+export interface SmartQueryResult {
+  parameters: object;
+  results: TraceabilityOrigin[];
 }
 
 export interface IQDataSlice {

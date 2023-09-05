@@ -39,7 +39,7 @@ async def test_api_get_thumbnail_with_image(
     mock_get_metadata.assert_not_called()
     mock_get_blob_content.assert_called_once()
     mock_blob_exist.assert_called_once()
-    mock_decrypt.assert_called_once()
+    mock_decrypt.mock_calls == 2
 
 
 @mock.patch("handlers.metadata.AzureBlobClient.blob_exist", return_value=False)
@@ -73,4 +73,4 @@ async def test_api_get_thumbnail_with_no_image(
     mock_get_new_thumbnail.assert_called_once()
     mock_upload_blob.assert_called_once()
     mock_blob_exist.assert_called_once()
-    mock_decrypt.assert_called_once()
+    mock_decrypt.mock_calls == 2

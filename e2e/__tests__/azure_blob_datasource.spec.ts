@@ -8,7 +8,9 @@ import {
   ContainerClient,
   ContainerCreateResponse,
 } from '@azure/storage-blob';
+import { skipLandingPage } from '../common-steps';
 
+/*
 test.beforeAll(async ({}) => {
   var conn = dotenv.config();
   dotenvExpand.expand(conn);
@@ -33,22 +35,19 @@ test.beforeAll(async ({}) => {
     containerCreateResponse: ContainerCreateResponse;
   } = await blobServiceClient.createContainer(containerName, options);
 });
+*/
 
 test('Azure Blob Datasource', async ({ page }) => {
-  var conn = dotenv.config();
-  dotenvExpand.expand(conn);
-
-  const accountName = process.env.STORAGE_ACCOUNT_NAME || '';
-
   await page.goto('/');
-  await page.getByPlaceholder('Storage Account Name').fill(accountName);
-  await page.getByPlaceholder('Container Name').fill('test-container');
+  skipLandingPage(page);
+  await page.getByPlaceholder('Storage Account Name').fill('gnuradio');
+  await page.getByPlaceholder('Container Name').fill('e2e-test-container');
+  // Note that this container was set to public so that SAS token isnt needed
   await page.locator('#AzureBlob').click();
-  await expect(page.getByRole('cell', { name: 'Spectrogram Thumbnail' })).toBeVisible({
-    timeout: 15000,
-  });
+  await expect(page.getByText('cellular3', { exact: true })).toBeVisible();
 });
 
+/*
 test.afterAll(async ({}) => {
   var conn = dotenv.config();
   dotenvExpand.expand(conn);
@@ -63,3 +62,4 @@ test.afterAll(async ({}) => {
 
   await blobServiceClient.deleteContainer(containerName);
 });
+*/

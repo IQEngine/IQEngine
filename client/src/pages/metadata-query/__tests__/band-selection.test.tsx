@@ -9,15 +9,15 @@ import BandSelection from '@/pages/metadata-query/band-selection';
 describe('Test BandSelection', () => {
   const mockHandle = vi.fn();
   const bands = {
-    VLF: ['VLF', 3000, 30000],
-    LF: ['LF', 30000, 3000000],
     MF: ['MF', 300000, 3000000],
+    HF: ['HF', 3000000, 30000000],
+    VHF: ['VHF', 30000000, 300000000],
   };
 
   test('Basic Rendering', () => {
     render(<BandSelection handleSelection={mockHandle} selected={false} bands={bands} />);
-    expect(screen.getByText('VLF')).exist;
-    expect(screen.getByText('LF')).exist;
     expect(screen.getByText('MF')).exist;
+    expect(screen.getByText('HF')).exist;
+    expect(screen.getByText('VHF')).exist;
   });
 });

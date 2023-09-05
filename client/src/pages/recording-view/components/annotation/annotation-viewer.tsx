@@ -4,10 +4,10 @@
 
 import React, { Fragment, useCallback, useMemo, useRef, useState } from 'react';
 import { Layer, Rect, Text } from 'react-konva';
-import { TILE_SIZE_IN_IQ_SAMPLES } from '@/utils/constants';
 import { Annotation, SigMFMetadata } from '@/utils/sigmfMetadata';
 import { useSpectrogramContext } from '../../hooks/use-spectrogram-context';
 import { Html } from 'react-konva-utils';
+import { color } from '@uiw/react-codemirror';
 
 interface AnnotationViewerProps {
   currentFFT: number;
@@ -28,7 +28,6 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
   const lower_freq = meta.getCenterFrequency() - meta.getSampleRate() / 2;
   const [editAnnotationLabelId, setEditAnnotationLabelId] = useState(null);
   const [editAnnotationLabelText, setEditAnnotationLabelText] = useState(null);
-  const [editAnnotationLabelPosition, setEditAnnotationLabelPosition] = useState({ x: 0, y: 0 });
 
   const onAnnotationsLabelKeyDown = (e) => {
     if (e.key === 'Enter') {
@@ -42,12 +41,8 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
 
   const onAnnotationLabelClick = useCallback((e) => {
     // create textarea and style it
-    setEditAnnotationLabelId(e.target.id());
-    setEditAnnotationLabelText(e.target.text());
-    setEditAnnotationLabelPosition({
-      x: e.target.attrs.x,
-      y: e.target.attrs.y - 25,
-    });
+    setEditAnnotationLabelId(e.currentTarget.id);
+    setEditAnnotationLabelText(e.currentTarget.textContent);
   }, []);
 
   function onDragEnd(e) {
@@ -103,13 +98,14 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
       }
       const start = annotation['core:sample_start'] / fftSize;
       const end = annotation['core:sample_count'] / fftSize + start;
-      const visible = start < maximumFFT || end > minimumFFT;
+      const visible = (start > minimumFFT && start < maximumFFT) || (end < maximumFFT && end > minimumFFT);
       return {
         x1: (annotation['core:freq_lower_edge'] - meta.getCenterFrequency()) / meta.getSampleRate() + 0.5,
         x2: (annotation['core:freq_upper_edge'] - meta.getCenterFrequency()) / meta.getSampleRate() + 0.5,
         y1: (start - minimumFFT) / (fftStepSize + 1),
         y2: (end - minimumFFT) / (fftStepSize + 1),
         label: annotation.getLabel(),
+        comment: annotation.getComment(),
         index: index,
         visible: visible,
       };
@@ -132,6 +128,7 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
       y1: 200,
       y2: 400,
       label: 'Fill Me In',
+      comment: null,
       index: -1,
       visible: true,
     });
@@ -140,7 +137,7 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
     let updatedAnnotations = [...meta.annotations];
     annotations[annotations.length - 1]['index'] = updatedAnnotations.length;
 
-    let start_sample_index = currentFFT * TILE_SIZE_IN_IQ_SAMPLES;
+    let start_sample_index = currentFFT * fftSize;
     const annot_indx = annotations.length - 1;
     let lower_freq = meta.captures[0]['core:frequency'] - meta.global['core:sample_rate'] / 2;
     meta.annotations.push(
@@ -190,135 +187,140 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
       />
 
       {annotations?.map((annotation, index) => (
-        // for params of Rect see https://konvajs.org/api/Konva.Rect.html
-        // for Text params see https://konvajs.org/api/Konva.Text.html
-        // Note that index is for the list of annotations currently on the screen, not for meta.annotations which contains all
-        <Fragment key={index}>
-          {/* Main rectangle */}
-          <Rect
-            x={annotation.x1 * spectrogramWidth}
-            y={annotation.y1}
-            width={(annotation.x2 - annotation.x1) * spectrogramWidth}
-            height={annotation.y2 - annotation.y1}
-            fillEnabled={false}
-            stroke={selectedAnnotation == index ? 'pink' : 'black'}
-            strokeWidth={4}
-            onClick={onBoxClick}
-            onMouseOver={onMouseOver}
-            onMouseOut={onMouseOut}
-            key={index}
-            id={index.toString()}
-          />
-          {/* Top Left Corner */}
-          <Rect
-            x={annotation.x1 * spectrogramWidth - 4}
-            y={annotation.y1 - 4}
-            width={8}
-            height={8}
-            fillEnabled={true}
-            fill="white"
-            stroke="black"
-            strokeWidth={1}
-            key={index + 4000000}
-            draggable
-            onDragEnd={onDragEnd}
-            onMouseOver={onMouseOver}
-            onMouseOut={onMouseOut}
-            onClick={onBoxCornerClick}
-            id={index.toString() + '-x1-y1'} // tells the event which annotation, and which x and y to update
-          />
-          {/* Top Right Corner */}
-          <Rect
-            x={annotation.x2 * spectrogramWidth - 4}
-            y={annotation.y1 - 4}
-            width={8}
-            height={8}
-            fillEnabled={true}
-            fill="white"
-            stroke="black"
-            strokeWidth={1}
-            key={index + 5000000}
-            draggable
-            onDragEnd={onDragEnd}
-            onMouseOver={onMouseOver}
-            onMouseOut={onMouseOut}
-            onClick={onBoxCornerClick}
-            id={index.toString() + '-x2-y1'} // tells the event which annotation, and which x and y to update
-          />
-          {/* Bottom Left Corner */}
-          <Rect
-            x={annotation.x1 * spectrogramWidth - 4}
-            y={annotation.y2 - 4}
-            width={8}
-            height={8}
-            fillEnabled={true}
-            fill="white"
-            stroke="black"
-            strokeWidth={1}
-            key={index + 6000000}
-            draggable
-            onDragEnd={onDragEnd}
-            onMouseOver={onMouseOver}
-            onMouseOut={onMouseOut}
-            onClick={onBoxCornerClick}
-            id={index.toString() + '-x1-y2'} // tells the event which annotation, and which x and y to update
-          />
-          {/* Bottom Right Corner */}
-          <Rect
-            x={annotation.x2 * spectrogramWidth - 4}
-            y={annotation.y2 - 4}
-            width={8}
-            height={8}
-            fillEnabled={true}
-            fill="white"
-            stroke="black"
-            strokeWidth={1}
-            key={index + 7000000}
-            draggable
-            onDragEnd={onDragEnd}
-            onMouseOver={onMouseOver}
-            onMouseOut={onMouseOut}
-            onClick={onBoxCornerClick}
-            id={index.toString() + '-x2-y2'} // tells the event which annotation, and which x and y to update
-          />
-          {/* Label */}
-          <Text
-            text={annotation.label}
-            fontFamily="serif"
-            fontSize={24}
-            x={annotation.x1 * spectrogramWidth}
-            y={annotation.y1 - 23}
-            fill={selectedAnnotation == index ? 'pink' : 'black'}
-            fontStyle="bold"
-            key={index + 1000000}
-            onClick={onAnnotationLabelClick}
-            id={index.toString()} // tells the event which annotation to update
-          />
-
-          {editAnnotationLabelId === index.toString() && (
+        annotation.visible && (
+          // for params of Rect see https://konvajs.org/api/Konva.Rect.html
+          // for Text params see https://konvajs.org/api/Konva.Text.html
+          // Note that index is for the list of annotations currently on the screen, not for meta.annotations which contains all
+          <Fragment key={index}>
+            {/* Main rectangle */}
+            <Rect
+              x={annotation.x1 * spectrogramWidth}
+              y={annotation.y1}
+              width={(annotation.x2 - annotation.x1) * spectrogramWidth}
+              height={annotation.y2 - annotation.y1}
+              fillEnabled={false}
+              stroke={selectedAnnotation == index ? 'pink' : 'black'}
+              strokeWidth={4}
+              onClick={onBoxClick}
+              onMouseOver={onMouseOver}
+              onMouseOut={onMouseOut}
+              key={index}
+              id={index.toString()}
+            />
+            {/* Top Left Corner */}
+            <Rect
+              x={annotation.x1 * spectrogramWidth - 4}
+              y={annotation.y1 - 4}
+              width={8}
+              height={8}
+              fillEnabled={true}
+              fill="white"
+              stroke="black"
+              strokeWidth={1}
+              key={index + 4000000}
+              draggable
+              onDragEnd={onDragEnd}
+              onMouseOver={onMouseOver}
+              onMouseOut={onMouseOut}
+              onClick={onBoxCornerClick}
+              id={index.toString() + '-x1-y1'} // tells the event which annotation, and which x and y to update
+            />
+            {/* Top Right Corner */}
+            <Rect
+              x={annotation.x2 * spectrogramWidth - 4}
+              y={annotation.y1 - 4}
+              width={8}
+              height={8}
+              fillEnabled={true}
+              fill="white"
+              stroke="black"
+              strokeWidth={1}
+              key={index + 5000000}
+              draggable
+              onDragEnd={onDragEnd}
+              onMouseOver={onMouseOver}
+              onMouseOut={onMouseOut}
+              onClick={onBoxCornerClick}
+              id={index.toString() + '-x2-y1'} // tells the event which annotation, and which x and y to update
+            />
+            {/* Bottom Left Corner */}
+            <Rect
+              x={annotation.x1 * spectrogramWidth - 4}
+              y={annotation.y2 - 4}
+              width={8}
+              height={8}
+              fillEnabled={true}
+              fill="white"
+              stroke="black"
+              strokeWidth={1}
+              key={index + 6000000}
+              draggable
+              onDragEnd={onDragEnd}
+              onMouseOver={onMouseOver}
+              onMouseOut={onMouseOut}
+              onClick={onBoxCornerClick}
+              id={index.toString() + '-x1-y2'} // tells the event which annotation, and which x and y to update
+            />
+            {/* Bottom Right Corner */}
+            <Rect
+              x={annotation.x2 * spectrogramWidth - 4}
+              y={annotation.y2 - 4}
+              width={8}
+              height={8}
+              fillEnabled={true}
+              fill="white"
+              stroke="black"
+              strokeWidth={1}
+              key={index + 7000000}
+              draggable
+              onDragEnd={onDragEnd}
+              onMouseOver={onMouseOver}
+              onMouseOut={onMouseOut}
+              onClick={onBoxCornerClick}
+              id={index.toString() + '-x2-y2'} // tells the event which annotation, and which x and y to update
+            />
+            {/* Label */}
             <Html>
               <div
-                className="form-control w-full max-w-xs"
+                className={annotation.comment ? 'tooltip absolute' : 'absolute'}
+                data-tip={annotation.comment}
+                id={index.toString()}
+                onClick={onAnnotationLabelClick}
                 style={{
-                  top: editAnnotationLabelPosition.y,
-                  left: editAnnotationLabelPosition.x,
-                  position: 'absolute',
+                  top: annotation.y1 - 23,
+                  left: annotation.x1 * spectrogramWidth,
+                  color: selectedAnnotation == index ? 'pink' : 'black',
                 }}
               >
-                <label style={{ width: '200px', fontSize: '16px' }}>
-                  <span>Hit Enter to Finish</span>
-                </label>
-                <input
-                  type="text"
-                  value={editAnnotationLabelText}
-                  onChange={(e) => setEditAnnotationLabelText(e.target.value)}
-                  onKeyDown={onAnnotationsLabelKeyDown}
-                  style={{ width: '200px', fontSize: '16px', color: 'black' }}
-                />
+                <p className="font-serif font-bold">{annotation.label}</p>
               </div>
             </Html>
-          )}
-        </Fragment>
+
+            {editAnnotationLabelId === index.toString() && (
+              <Html>
+                <div
+                  className="form-control w-full max-w-xs"
+                  style={{
+                    top: annotation.y1 - 50,
+                    left: annotation.x1 * spectrogramWidth,
+                    position: 'absolute',
+                  }}
+                >
+                  <label style={{ width: '200px', fontSize: '16px' }}>
+                    <span>Hit Enter to Finish</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={editAnnotationLabelText}
+                    onChange={(e) => setEditAnnotationLabelText(e.target.value)}
+                    onKeyDown={onAnnotationsLabelKeyDown}
+                    style={{ width: '200px', fontSize: '16px', color: 'black' }}
+                  />
+                </div>
+              </Html>
+            )}
+          </Fragment>
+        )
       ))}
     </Layer>
   );
