@@ -45,7 +45,8 @@ class AzureBlobClient:
             return False
         if self.sas_token.get_secret_value() == "":
             return False
-        # make sure that sp contains w and c and they need to be in this part of the query string not in the & that follows
+        # make sure that sp contains w and c and they need to be in this
+        # part of the query string not in the & that follows
         content = self.sas_token.get_secret_value().split("&")[0]
         if "w" in content and "c" in content:
             return True
@@ -160,7 +161,7 @@ class AzureBlobClient:
                 blob_name=filepath,
                 account_key=account_key,
                 permission=BlobSasPermissions(
-                    read=True, write=include_write, create=include_write
+                    read=True, write=include_write, create=include_write, add=include_write
                 ),
                 expiry=expiry_time,
                 start=start_time,
