@@ -26,11 +26,12 @@ class AzureBlobClient:
     container: str
     sas_token: SecretStr = None
     account_key: SecretStr = None
-    clients: dict[str, BlobClient] = {}
 
     def __init__(self, account, container):
         self.account = account
         self.container = container
+        self.clients: dict[str, BlobClient] = {}
+
 
     def set_sas_token(self, sas_token):
         self.sas_token = sas_token
