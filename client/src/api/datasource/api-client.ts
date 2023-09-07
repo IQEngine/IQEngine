@@ -55,11 +55,11 @@ export class ApiClient implements DataSourceClient {
     }
     return response.data;
   }
-  async getSasToken(account: string, container: string, filepath: string): Promise<Object> {
+  async getSasToken(account: string, container: string, filepath: string, write: boolean): Promise<Object> {
     try {
       const response = await this.authUtil.requestWithAuthIfRequired({
         method: 'get',
-        url: `/api/datasources/${account}/${container}/${filepath}/sas`,
+        url: `/api/datasources/${account}/${container}/${filepath}/sas?write=${write}`,
       });
       if (!response.data) {
         return null;

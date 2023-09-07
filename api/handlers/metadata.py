@@ -137,7 +137,7 @@ async def get_meta_thumbnail(
         azure_client.set_sas_token(decrypt(sas_token))
 
     account_key = (
-        datasource.account_key.get_secret_value() if datasource.account_key else None
+        datasource.accountKey.get_secret_value() if datasource.accountKey else None
     )
     if account_key is not None:
         azure_client.set_account_key(decrypt(account_key))
@@ -334,6 +334,7 @@ async def open_query_meta(
     except Exception as e:
         print(f"Error querying metadata: {e}")
         raise HTTPException(status_code=500, detail="An unexpected error occurred.")
+
 
 @router.post(
     "/api/datasources/{account}/{container}/{filepath:path}/meta",
