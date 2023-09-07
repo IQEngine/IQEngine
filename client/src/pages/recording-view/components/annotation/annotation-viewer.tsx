@@ -291,10 +291,16 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
                     top: annotation.y1 - 23,
                     left: annotation.x1 * spectrogramWidth,
                     color: selectedAnnotation == index ? 'pink' : 'black',
-                    whiteSpace: 'nowrap',
                   }}
                 >
-                  <p className="font-serif font-bold">{annotation.label}</p>
+                  <p
+                    className="font-serif font-bold"
+                    style={{
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {annotation.label}
+                  </p>
                 </div>
               </Html>
 
