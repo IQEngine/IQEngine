@@ -106,6 +106,7 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
         y2: (end - minimumFFT) / (fftStepSize + 1),
         label: annotation.getLabel(),
         comment: annotation.getComment(),
+        shortComment: annotation.getShortComment(),
         index: index,
         visible: visible,
       };
@@ -129,6 +130,7 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
       y2: 400,
       label: 'Fill Me In',
       comment: null,
+      shortComment: null,
       index: -1,
       visible: true,
     });
@@ -284,7 +286,7 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
               <Html>
                 <div
                   className={annotation.comment ? 'tooltip tooltip-bottom tooltip-accent absolute' : 'absolute'}
-                  data-tip={annotation.comment}
+                  data-tip={annotation.shortComment}
                   id={index.toString()}
                   onClick={onAnnotationLabelClick}
                   style={{
