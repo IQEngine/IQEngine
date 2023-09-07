@@ -18,6 +18,12 @@ describe('MetaViewer list component', () => {
           'core:sample_rate': 1,
           'core:description':
             'lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+          'traceability:origin': {
+            type: 'API',
+            account: 'gnuradio',
+            container: 'iqengine',
+            file_path: 'bluetooth',
+          },
         },
       })
     )
@@ -25,11 +31,12 @@ describe('MetaViewer list component', () => {
   test('Renders correctly', async () => {
     render(<MetaViewer meta={meta} />);
     expect(await screen.findByText('datatype test')).toBeInTheDocument();
-    expect(await screen.findByText('version test')).toBeInTheDocument();
-    expect(await screen.findByText('0')).toBeInTheDocument();
     expect(await screen.findByText('1 Hz')).toBeInTheDocument();
+    expect(await screen.findByText('bluetooth')).toBeInTheDocument();
     expect(
-      await screen.findByText('lorem ipsum dolor sit amet, consectetur adipiscing elit, sed...')
+      await screen.findByText(
+        'lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
+      )
     ).toBeInTheDocument();
   });
 });

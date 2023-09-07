@@ -9,32 +9,24 @@ export interface MetaViewerProps {
 export const MetaViewer = ({ meta }: MetaViewerProps) => {
   if (!meta) return <></>;
   return (
-    <div className="border border-primary ml-3 mt-2">
-      <div className="flex mt-3 mb-3 stats shadow">
-        <div className="stat place-items-center">
-          <div className="stat-title">data type</div>
-          <div className="stat-value">{meta.getDataType()}</div>
+    <div className="flex justify-evenly border border-primary p-2">
+      <div className="flex">
+        <div className="text-primary mr-2 text-sm">data type:</div>
+        <div className="text-base-content text-sm">{meta.getDataType()}</div>
+      </div>
+      <div className="flex">
+        <div className="text-primary mr-2 text-sm">sample rate:</div>
+        <div className="text-base-content text-sm">
+          {unitPrefixHz(meta.getSampleRate()).freq} {unitPrefixHz(meta.getSampleRate()).unit}
         </div>
-        <div className="stat place-items-center">
-          <div className="stat-title">offset</div>
-          <div className="stat-value">{meta.getOffset()}</div>
-        </div>
-        <div className="stat place-items-center">
-          <div className="stat-title">sample rate</div>
-          <div className="stat-value">
-            {unitPrefixHz(meta.getSampleRate()).freq} {unitPrefixHz(meta.getSampleRate()).unit}
-          </div>
-        </div>
-        <div className="stat place-items-center">
-          <div className="stat-title">version</div>
-          <div className="stat-value">{meta.getVersion()}</div>
-        </div>
-        <div className="stat place-items-center">
-          <div className="stat-title">description</div>
-          <div className="tooltip" data-tip={meta.getDescription()}>
-            <div className="stat-desc text-white">{meta.getShortDescription()}</div>
-          </div>
-        </div>
+      </div>
+      <div className="flex">
+        <div className="text-primary mr-2 text-sm">file name:</div>
+        <div className="text-base-content text-sm">{meta.getFileName()}</div>
+      </div>
+      <div className="flex">
+        <div className="text-primary mr-2 text-sm">description:</div>
+        <div className="text-base-content text-sm">{meta.getDescription()}</div>
       </div>
     </div>
   );
