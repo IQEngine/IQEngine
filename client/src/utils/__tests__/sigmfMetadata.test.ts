@@ -284,5 +284,8 @@ describe('getShortComment', () => {
         }),
       ],
     });
+    const expectedShortComment =
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.';
+    expect(annotationMetadata.annotations[0].getShortComment()).toBe(expectedShortComment);
   });
 });
