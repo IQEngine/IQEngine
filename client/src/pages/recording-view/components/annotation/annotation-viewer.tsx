@@ -98,7 +98,10 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
       }
       const start = annotation['core:sample_start'] / fftSize;
       const end = annotation['core:sample_count'] / fftSize + start;
-      const visible = (start > minimumFFT && start < maximumFFT) || (end < maximumFFT && end > minimumFFT);
+
+      const visible = start < maximumFFT || end > minimumFFT;
+      const labelVisible = (start > minimumFFT && start < maximumFFT) || (end < maximumFFT && end > minimumFFT);
+
       return {
         x1: (annotation['core:freq_lower_edge'] - meta.getCenterFrequency()) / meta.getSampleRate() + 0.5,
         x2: (annotation['core:freq_upper_edge'] - meta.getCenterFrequency()) / meta.getSampleRate() + 0.5,
@@ -109,6 +112,7 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
         shortComment: annotation.getShortComment(),
         index: index,
         visible: visible,
+        labelVisible: labelVisible,
       };
     });
     return annotations;
@@ -133,6 +137,7 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
       shortComment: null,
       index: -1,
       visible: true,
+      labelVisible: true,
     });
 
     // Add it to the meta.annotations as well. TODO: this is duplicate code
@@ -283,6 +288,8 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
                 id={index.toString() + '-x2-y2'} // tells the event which annotation, and which x and y to update
               />
               {/* Label */}
+              {annotation.labelVisible && (
+              <>
               <Html>
                 <div
                   className={annotation.comment ? 'tooltip tooltip-bottom tooltip-accent absolute' : 'absolute'}
@@ -305,7 +312,7 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
                   </p>
                 </div>
               </Html>
-
+              <>
               {editAnnotationLabelId === index.toString() && (
                 <Html>
                   <div
@@ -328,6 +335,9 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
                     />
                   </div>
                 </Html>
+              )}
+              </>
+              </>
               )}
             </Fragment>
           )
