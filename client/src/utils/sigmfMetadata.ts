@@ -241,6 +241,15 @@ export class Annotation {
     return String(this['core:comment'] ?? '');
   }
 
+  getShortComment() {
+    let shortComment = this.getComment();
+    shortComment = shortComment.substring(0, 240);
+    if (shortComment.length === 240) {
+      shortComment += '...';
+    }
+    return shortComment;
+  }
+
   getRaw() {
     return JSON.stringify(
       {
