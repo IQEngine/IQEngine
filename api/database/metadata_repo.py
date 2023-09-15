@@ -88,7 +88,7 @@ async def exists(account, container, filepath, access_allowed=Depends(check_acce
     return metadata is not None
 
 
-async def create(metadata: Metadata):
+async def create(metadata: Metadata, user: str):
     """
     Create a new metadata. The metadata will be henceforth identified by account/container/filepath which
     must be unique or this function will throw an exception.
@@ -120,7 +120,15 @@ async def create(metadata: Metadata):
     await metadata_collection.insert_one(
         metadata.dict(by_alias=True, exclude_unset=True)
     )
-    await versions.insert_one(metadata.dict(by_alias=True, exclude_unset=True))
+
+    # audit document
+    audit_document = {
+        "metadata": metadata.dict(by_alias=True, exclude_unset=True, exclude_none=True),
+        "user": user,
+        "action": "create",
+    }
+
+    await versions.insert_one(audit_document)
 
 
 class InvalidGeolocationFormat(Exception):
