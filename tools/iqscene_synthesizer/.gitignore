@@ -1,0 +1,5 @@
+*.sigmf-meta
+*.sigmf-data
+recordings
+recordings/*
+venv
