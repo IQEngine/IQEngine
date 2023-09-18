@@ -349,6 +349,7 @@ async def create_meta(
     datasources: AgnosticCollection = Depends(datasource_repo.collection),
     metadatas: AgnosticCollection = Depends(metadata_repo.collection),
     versions: AgnosticCollection = Depends(metadata_repo.versions_collection),
+    current_user=Depends(get_current_user),
     access_allowed=Depends(check_access),
 ):
     if access_allowed != "owner":
@@ -383,9 +384,14 @@ async def create_meta(
     await metadatas.insert_one(
         metadata.dict(by_alias=True, exclude_unset=True, exclude_none=True)
     )
-    await versions.insert_one(
-        metadata.dict(by_alias=True, exclude_unset=True, exclude_none=True)
-    )
+
+    # audit document
+    audit_document = {
+        "metadata": metadata.dict(by_alias=True, exclude_unset=True, exclude_none=True),
+        "user": current_user["preferred_username"],
+        "action": "create",
+    }
+    await versions.insert_one(audit_document)
     return metadata
 
 
@@ -399,6 +405,7 @@ async def update_meta(
     metadata: Metadata,
     metadatas: AgnosticCollection = Depends(metadata_repo.collection),
     versions: AgnosticCollection = Depends(metadata_repo.versions_collection),
+    current_user=Depends(get_current_user),
     access_allowed=Depends(check_access),
 ):
     if access_allowed != "owner":
@@ -422,9 +429,17 @@ async def update_meta(
         metadata.globalMetadata.traceability_origin = current["global"][
             "traceability:origin"
         ]
-        await versions.insert_one(
-            metadata.dict(by_alias=True, exclude_unset=True, exclude_none=True)
-        )
+        # audit document
+        audit_document = {
+            "metadata": metadata.dict(by_alias=True, exclude_unset=True, exclude_none=True),
+            "user": current_user["preferred_username"],
+            "action": "update"
+        }
+        try:
+            await versions.insert_one(audit_document)
+        except Exception as e:
+            print(f"Error inserting audit document: {e}")
+
         await metadatas.update_one(
             {"_id": id},
             {
