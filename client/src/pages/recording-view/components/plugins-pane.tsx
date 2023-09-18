@@ -46,6 +46,7 @@ export const PluginsPane = () => {
   const [modalSamples, setModalSamples] = useState<Float32Array>(new Float32Array([]));
   const [modalSpectrogram, setmodalSpectrogram] = useState(null);
   const [useCloudStorage, setUseCloudStorage] = useState(true);
+  const [isPluginRunning, setIsPluginRunning] = useState(false);
   const token = useSasToken(type, account, container, meta.getDataFileName(), false);
   let byte_offset = meta.getBytesPerIQSample() * Math.floor(cursorTime.start);
   let byte_length = meta.getBytesPerIQSample() * Math.ceil(cursorTime.end - cursorTime.start);
@@ -158,7 +159,7 @@ export const PluginsPane = () => {
       }
       return new Blob([blob_array], { type: data_type });
     };
-
+    setIsPluginRunning(true);
     fetch(selectedPlugin, {
       method: 'POST',
       headers: {
@@ -168,6 +169,7 @@ export const PluginsPane = () => {
       body: JSON.stringify(body),
     })
       .then(function (response) {
+        setIsPluginRunning(false);
         return response.json();
       })
       .then(function (data) {
@@ -296,6 +298,13 @@ export const PluginsPane = () => {
 
   return (
     <div className="pluginForm" id="pluginFormId" onSubmit={handleSubmit}>
+      {isPluginRunning && (
+        <div className="fixed top-0 left-0 right-0 bottom-0 w-full h-screen z-50 overflow-hidden bg-gray-700 opacity-75 flex flex-col items-center justify-center">
+            <span className="loading loading-infinity loading-lg text-primary"></span>
+            <h2 className="text-center text-white text-xl font-semibold">Running Plugin...</h2>
+            <p className="w-1/3 text-center text-white">This may take a few minutes.</p>
+        </div>
+      )}
       <label className="label">
         Plugin:
         <select

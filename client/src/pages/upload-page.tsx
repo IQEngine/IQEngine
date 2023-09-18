@@ -16,7 +16,8 @@ export const UploadPage = () => {
 
   async function uploadBlob(f) {
     // Create azure blob client
-    const blobName = f.name.split('.')[0] + '_' + new Date().toISOString().split('.')[0] + '.' + f.name.split('.')[1];
+    //const blobName = f.name.split('.')[0] + '_' + new Date().toISOString().split('.')[0] + '.' + f.name.split('.')[1];
+    const blobName = f.name;
     const containerUrl = config.data.uploadPageBlobSasUrl; // Note - it needs ADD, CREATE, WRITE
     const blobUrl = containerUrl.split('?')[0] + '/' + blobName + '?' + containerUrl.split('?')[1];
     const pipeline = newPipeline(new AnonymousCredential());

@@ -231,3 +231,61 @@ describe('getRaw', () => {
     expect(annotationMetadata.annotations[0].getRaw()).toBe(expectedRaw);
   });
 });
+
+describe('getShortComment', () => {
+  test('should return short comment', () => {
+    const annotationMetadata: SigMFMetadata = Object.assign(new SigMFMetadata(), {
+      global: {
+        'core:author': 'TestAuthor',
+        'core:datatype': 'cf32_le',
+        'core:sample_rate': 1e6,
+        'core:version': '0.0.1',
+        'core:num_channels': 2,
+        'traceability:origin': {},
+      },
+      annotations: [
+        Object.assign(new Annotation(), {
+          'core:sample_start': 0,
+          'core:sample_count': 100,
+          'core:label': 'test',
+          'core:comment':
+            'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+          'core:freq_lower_edge': 0,
+          'core:freq_upper_edge': 0,
+        }),
+      ],
+    });
+
+    const expectedShortComment =
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aut...';
+
+    expect(annotationMetadata.annotations[0].getShortComment()).toBe(expectedShortComment);
+  });
+
+  test('should return short comment with no ellipsis', () => {
+    const annotationMetadata: SigMFMetadata = Object.assign(new SigMFMetadata(), {
+      global: {
+        'core:author': 'TestAuthor',
+        'core:datatype': 'cf32_le',
+        'core:sample_rate': 1e6,
+        'core:version': '0.0.1',
+        'core:num_channels': 2,
+        'traceability:origin': {},
+      },
+      annotations: [
+        Object.assign(new Annotation(), {
+          'core:sample_start': 0,
+          'core:sample_count': 100,
+          'core:label': 'test',
+          'core:comment':
+            'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+          'core:freq_lower_edge': 0,
+          'core:freq_upper_edge': 0,
+        }),
+      ],
+    });
+    const expectedShortComment =
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.';
+    expect(annotationMetadata.annotations[0].getShortComment()).toBe(expectedShortComment);
+  });
+});
