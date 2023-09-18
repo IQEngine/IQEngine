@@ -1,5 +1,5 @@
-azure-storage-blob==12.17.0
-numpy==1.25.2
+azure-storage-blob==12.18.1
+numpy==1.26.0
 scipy==1.11.2
 fastapi==0.103.1
 jsonschema==4.19.0
@@ -7,7 +7,7 @@ PyYAML==6.0.1
 pre-commit==3.4.0
 uvicorn==0.23.2
 azure-functions==1.17.0
-matplotlib==3.7.2
+matplotlib==3.8.0
 urllib3==2.0.4
 json5==0.9.14
 pymongo==4.5.0
