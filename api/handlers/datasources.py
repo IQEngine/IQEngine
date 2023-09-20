@@ -159,7 +159,7 @@ async def sync_datasource(
 ):
     if access_allowed is None:
         raise HTTPException(status_code=403, detail="No Access")
-    
+
     if current_user is None or 'preferred_username' not in current_user:
         raise HTTPException(status_code=403, detail="No Access")
 
