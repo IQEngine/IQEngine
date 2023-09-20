@@ -1,4 +1,4 @@
- # How to Read a Spectrogram with IQEngine
+# How to Read a Spectrogram
  
 One of the primary tools in the Radio Frequency (RF) field is the spectrogram, a visual representation of frequencies as they change with time. IQEngine offers an intuitive platform to analyze these spectrograms.
  
@@ -6,47 +6,39 @@ One of the primary tools in the Radio Frequency (RF) field is the spectrogram, a
  
 A spectrogram is a 2D representation that showcases how the frequencies of a signal vary with time. On a spectrogram:
  
-- One axis represents time.
-- One axis represents frequency.
-- The color or intensity signifies the amplitude or strength of a particular frequency at a given time.
- 
-## Getting Started with IQEngine
- 
-To begin, navigate to the main IQEngine interface. Here, you can either browse RF recordings shared by the community or upload your own files for analysis. 
-
-1. **Upload or Browse and Select a Recording**
-2. **View the Spectrogram**: Once your recording is loaded, IQEngine will display its spectrogram.
+- One axis represents time (in IQEngine and GNU Radio it's the vertical)
+- One axis represents frequency (in IQEngine and GNU Radio it's the horizontal)
+- The color or intensity signifies the amplitude or strength of a particular frequency at a given time, using a colormap
  
 ## Interpreting the Spectrogram
  
 ### Color Intensity
  
-Darker shades (often blues) indicate lower amplitudes, while brighter shades (such as yellows or reds) denote higher amplitudes. This means a bright streak on the spectrogram indicates a strong frequency component at that particular time. You can adjust the maximum color mapping magnitudes when viewing samples using the scrollbar:
+For most colormaps, darker shades (dark blue using the default IQEngine colormap) indicate lower amplitudes, while brighter shades (such as yellows or reds) denote higher amplitudes. This means a bright streak on the spectrogram indicates a strong frequency component at that particular time. You can adjust the maximum color mapping magnitudes when viewing samples using the scrollbar:
 
 <br/>
-<img src={'/magnitude-color-mapping.png'} alt="Magnitude Color Mapping Scrollbar" className="w-1/4"/>
+<img src={'/magnitude-color-mapping.png'} alt="Magnitude Color Mapping Scrollbar" className="w-64"/>
 <br/>
+
+This scrollbar determines how the magnitudes of the FFTs map to color, and allows adjustment of the dynamic range.
 
 ### Frequency Patterns
  
-Horizontal lines represent steady frequencies over time, often indicating a continuous tone or signal. Wavy or curved lines can signify modulated signals, which are common in communication systems.
+Thin straight lines represent always-on tones over time, often indicating a continuous tone or narrow signal.
+Thick straight lines are usually digitally modulated signals which are common in modern wireless communication systems.
+Wavy or curved lines can signify frequency-modulated analog signals like FM radio.
+Signals may be always on (e.g., cellular downlinks), or they may turn on and off over time (e.g., Wi-Fi or any packet-based comms).
  
 ### Time Evolution
  
-Watching how colors change vertically can give insights into how the signal's strength varies with time. Sudden bright bursts can indicate bursts of activity or transmissions.
+Watching how colors change vertically can give insights into how the signal's strength varies with time.
+You may be receiving a signal that is always on, but the signal strength at the receiver varies as the receiver (or transmitter) moves.
  
 ## Adjusting the Spectrogram
----
 
 With IQEngine, you can:
  
-- **Zoom and Pan**: This allows for detailed analysis of specific sections of the spectrogram.
-- **Annotations**: View SigMF annotations and other metadata directly on the spectrogram for enhanced insights.
-- **Plugin Integration**: Enhance your analysis with plugins written in Python, GNU Radio, and more.
- 
-
- 
- 
- 
- 
- 
+- **Zoom In**: Lower the FFT size to zoom in, as it reduces the number of samples per row of the spectrogram, stretching it out.
+- **Zoom Out**: Either increase the FFT size or use the zoom slider, the latter of which simply shows you 1 out of every N FFT's worth of samples.
+- **Annotations**: View SigMF annotations and other metadata directly on the spectrogram for enhanced insights, and even edit them!
+- **Plugin Integration**: Enhance your analysis with plugins written in Python, GNU Radio, or whatever language you want as long as you follow IQEngine's OpenAPI spec.
