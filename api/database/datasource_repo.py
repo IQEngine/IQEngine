@@ -58,7 +58,7 @@ async def datasource_exists(account, container) -> bool:
     return await get(account, container) is not None
 
 
-async def sync(account: str, container: str):
+async def sync(account: str, container: str, user: str):
     import database.metadata_repo
 
     azure_blob_client = AzureBlobClient(account, container)
@@ -94,7 +94,7 @@ async def sync(account: str, container: str):
                 file_length
                 / get_bytes_per_iq_sample(metadata.globalMetadata.core_datatype)
             )
-            await database.metadata_repo.create(metadata)
+            await database.metadata_repo.create(metadata, user)
             print(f"[SYNC] Created metadata for {filepath}")
         except Exception as e:
             print(f"[SYNC] Error creating metadata for {filepath}: {e}")
