@@ -69,8 +69,10 @@ async def run(plugin_name, plugin: Plugin):
         return plugin_instance.run(samples) # all python plugins should have a run method that takes in the samples
     
     except ValueError as e:
+        print(e)
         raise fastapi.HTTPException(status_code=400, detail="Invalid parameters: " + str(e))
     except Exception as e:
+        print(e)
         logging.error(e)
         raise fastapi.HTTPException(status_code=500, detail="Unknown error in plugins_api")
 
