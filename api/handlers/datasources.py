@@ -154,9 +154,13 @@ async def sync_datasource(
     container: str,
     background_tasks: BackgroundTasks,
     datasources_collection: AgnosticCollection = Depends(datasource_repo.collection),
+    current_user: Optional[dict] = Depends(get_current_user),
     access_allowed=Depends(check_access),
 ):
     if access_allowed is None:
+        raise HTTPException(status_code=403, detail="No Access")
+
+    if current_user is None or 'preferred_username' not in current_user:
         raise HTTPException(status_code=403, detail="No Access")
 
     existing_datasource = await datasources_collection.find_one(
@@ -167,7 +171,8 @@ async def sync_datasource(
     )
     if not existing_datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
-    background_tasks.add_task(datasource_repo.sync, account, container)
+
+    background_tasks.add_task(datasource_repo.sync, account, container, current_user["preferred_username"])
     return {"message": "Syncing"}
 
 
