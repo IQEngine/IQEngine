@@ -8,6 +8,7 @@ import AdminPage from './admin-page.mdx';
 import CodingStyle from './coding-style.mdx';
 import NewDevGuide from './new-developer-guide.mdx';
 import ConfigFeatureFlags from './config-feature-flags.mdx';
+import ReadingSpectrograms from './reading-spectrograms.mdx'
 import { Link } from 'react-router-dom';
 
 export const DocsPages = () => {
@@ -39,6 +40,9 @@ export const DocsPages = () => {
     case 'config-feature-flags':
       currentPage = <ConfigFeatureFlags />;
       break;
+    case 'reading-spectrograms':
+      currentPage = <ReadingSpectrograms />;
+      break;
     default:
       currentPage = <OverviewPage />;
   }
@@ -56,7 +60,7 @@ export const DocsPages = () => {
               <TableItem href="/docs/backend">Backend</TableItem>
               <TableItem href="/docs/admin-page">Admin Page</TableItem>
               <TableItem href="/docs/config-feature-flags">Config & Feature Flags</TableItem>
-
+              <TableItem href="/docs/reading-spectrograms">Reading Spectrograms</TableItem>
               <TableHeader>Developer Docs</TableHeader>
               <TableItem href="/docs/new-developer-guide">New Dev Guide</TableItem>
               <TableItem href="/docs/coding-style">Code Styling Guidelines</TableItem>
