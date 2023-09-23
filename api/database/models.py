@@ -4,7 +4,6 @@ from pydantic import BaseModel, Extra, Field, SecretStr
 
 
 class DataSource(BaseModel):
-    type: str
     name: str
     account: str
     container: str
@@ -18,7 +17,6 @@ class DataSource(BaseModel):
 
 
 class DataSourceReference(BaseModel):
-    type: str
     account: str
     container: str
     file_path: str

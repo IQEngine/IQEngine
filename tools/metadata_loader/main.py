@@ -44,7 +44,6 @@ def create_datasource(args):
 
     url = f'{config["API_URL_BASE"]}/api/datasources'
     data = {
-        "type": f"{args.type}",
         "name": f"{args.name}",
         "account": f"{args.accountName}",
         "container": f"{args.containerName}",
@@ -172,7 +171,6 @@ def start():
     datasource_create_parser = datasource_subparsers.add_parser(
         "create", description="Create a datasource"
     )
-    datasource_create_parser.add_argument("-type", required=True)
     datasource_create_parser.add_argument("-name", required=True)
     datasource_create_parser.add_argument("-accountName", required=True)
     datasource_create_parser.add_argument("-containerName", required=True)

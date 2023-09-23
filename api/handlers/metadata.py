@@ -374,7 +374,6 @@ async def create_meta(
     # Create the first metadata record
     metadata.globalMetadata.traceability_origin = DataSourceReference(
         **{
-            "type": "api",
             "account": account,
             "container": container,
             "file_path": filepath,

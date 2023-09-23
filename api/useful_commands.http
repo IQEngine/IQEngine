@@ -20,7 +20,6 @@ PUT https://staging.iqengine.org/api/datasources/gnuradio/iqengine/datasource
 Content-Type: application/json
 
 {
-  "type": "api",
   "name": "GNU Radio SigMF Repo",
   "account": "gnuradio",
   "container": "iqengine",
@@ -37,7 +36,6 @@ PUT http://127.0.0.1:5000/api/datasources/gnuradio/iqengine/datasource
 Content-Type: application/json
 
 {
-    "type": "api",
     "name": "GNU Radio SigMF Repo",
     "account": "gnuradio",
     "container": "iqengine",

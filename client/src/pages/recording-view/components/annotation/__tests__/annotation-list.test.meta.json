@@ -2,7 +2,6 @@
   "global": {
     "core:sample_rate": 40000000,
     "traceability:origin": {
-      "type": "api",
       "account": "testaccount",
       "container": "testcontainer",
       "file_path": "test_file_path"

@@ -41,7 +41,6 @@ async def import_datasources_from_env(
                 if "description" in connection
                 else None,
                 imageURL=connection["imageURL"] if "imageURL" in connection else None,
-                type="api",
                 public=connection["public"] if "public" in connection else True,
                 owners=connection["owners"] if "owners" in connection else ["IQEngine-Admin"],
                 readers=connection["readers"] if "readers" in connection else [],

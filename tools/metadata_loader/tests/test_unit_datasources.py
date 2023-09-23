@@ -52,7 +52,6 @@ class TestDatasources(TestCase):
     @patch("metadata_loader.main.get_config", return_value=mock_config)
     def test_create_datasource(self, mockConfig, mockCallCreateDatasource):
         x = {
-            "type": "blob",
             "name": "name",
             "accountName": "account",
             "containerName": "container",

@@ -52,7 +52,6 @@ async def sync(account: str, container: str):
             metadata = metadata[1]
             metadata.globalMetadata.traceability_origin = DataSourceReference(
                 **{
-                    "type": "api",
                     "account": account,
                     "container": container,
                     "file_path": filepath,

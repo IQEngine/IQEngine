@@ -211,7 +211,6 @@ async def query_metadata(
     Returns:
     - A list of dictionaries, each containing the metadata information for a specific data source.
         The dictionaries contain the following keys:
-        - "type": The type of data source (e.g., "file", "stream").
         - "account": The account associated with the data source.
         - "container": The container associated with the data source.
         - "file_path": The file path of the data source.
@@ -353,7 +352,6 @@ async def query_metadata(
     metadata = metadataSet.find(
         query_condition,
         {
-            "global.traceability:origin.type": 1,
             "global.traceability:origin.account": 1,
             "global.traceability:origin.container": 1,
             "global.traceability:origin.file_path": 1,
@@ -365,7 +363,6 @@ async def query_metadata(
     async for datum in metadata:
         traceability_origin = datum.get("global", {}).get("traceability:origin", {})
         ds_reference = DataSourceReference(
-            type=traceability_origin.get("type"),
             account=traceability_origin.get("account"),
             container=traceability_origin.get("container"),
             file_path=traceability_origin.get("file_path"),

@@ -1,5 +1,4 @@
 test_datasource = {
-    "type": "api",
     "name": "name",
     "account": "account",
     "container": "container",
@@ -41,7 +40,6 @@ valid_metadata = {
             "core:trailing_bytes": None,
             "core:version": "0.0.1",
             "traceability:origin": {
-                "type": "api",
                 "account": "account",
                 "container": "container",
                 "file_path": "file_path",
@@ -98,7 +96,7 @@ valid_metadata_array = [
             "core:trailing_bytes": None,
             "core:version": "0.0.1",
             "traceability:origin": {
-                "type": "api",
+
                 "account": "account",
                 "container": "container",
                 "file_path": "file_path",
@@ -132,7 +130,6 @@ valid_metadata_array = [
 
 valid_datasourcereference_array = [
     {
-        "type": "api",
         "account": "account",
         "container": "container",
         "file_path": "file_path",
