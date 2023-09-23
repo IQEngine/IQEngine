@@ -11,15 +11,15 @@ def override_dependency_datasource_repo_get():
     return DataSource(**test_datasource)
 
 
-@mock.patch("app.metadata.AzureBlobClient.blob_exist", return_value=True)
+@mock.patch("app.metadata_router.AzureBlobClient.blob_exist", return_value=True)
 @mock.patch(
-    "app.metadata.AzureBlobClient.get_blob_content", return_value=b"<image data>"
+    "app.metadata_router.AzureBlobClient.get_blob_content", return_value=b"<image data>"
 )
 @mock.patch(
-    "app.metadata.metadata_repo.get",
+    "app.metadata_router.metadata_repo.get",
     return_value=Metadata(**valid_metadata),
 )
-@mock.patch("app.metadata.decrypt", return_value="secret")
+@mock.patch("app.metadata_router.decrypt", return_value="secret")
 @pytest.mark.asyncio
 async def test_api_get_thumbnail_with_image(
     mock_decrypt: Mock,
@@ -42,17 +42,17 @@ async def test_api_get_thumbnail_with_image(
     mock_decrypt.mock_calls == 2
 
 
-@mock.patch("app.metadata.AzureBlobClient.blob_exist", return_value=False)
+@mock.patch("app.metadata_router.AzureBlobClient.blob_exist", return_value=False)
 @mock.patch(
-    "app.metadata.metadata_repo.get",
+    "app.metadata_router.metadata_repo.get",
     return_value=Metadata(**valid_metadata),
 )
 @mock.patch(
-    "app.metadata.AzureBlobClient.get_new_thumbnail",
+    "app.metadata_router.AzureBlobClient.get_new_thumbnail",
     return_value=b"<thumbnail data>",
 )
-@mock.patch("app.metadata.AzureBlobClient.upload_blob", return_value=None)
-@mock.patch("app.metadata.decrypt", return_value="secret")
+@mock.patch("app.metadata_router.AzureBlobClient.upload_blob", return_value=None)
+@mock.patch("app.metadata_router.decrypt", return_value="secret")
 @pytest.mark.asyncio
 async def test_api_get_thumbnail_with_no_image(
     mock_decrypt: Mock,

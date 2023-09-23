@@ -8,12 +8,12 @@ from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 
 from app.config_router import router as config_router
-from app.datasources import router as datasources_router
+from app.datasources_router import router as datasources_router
 from app.iq_router import router as iq_router
-from app.metadata import router as metadata_router
+from app.metadata_router import router as metadata_router
 from app.plugins_router import router as plugins_router
-from app.status import router as status_router
-from app.users import router as users_router
+from app.status_router import router as status_router
+from app.users_router import router as users_router
 
 from helpers.apidisconnect import CancelOnDisconnectRoute
 from app.all import import_all_from_env

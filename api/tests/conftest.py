@@ -56,7 +56,7 @@ def client():
                 new=get_current_user_mock(),
         ):
             with mock.patch(
-                "app.datasources.get_current_user",
+                "app.datasources_router.get_current_user",
                 new=get_current_user_mock(),
             ):
                 with mock.patch("app.all.import_all_from_env") as mock_i:
