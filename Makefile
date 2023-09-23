@@ -8,7 +8,7 @@ setup:
 
 run-api:
 	@echo "Running FastAPI on port 5000..."
-	@cd api && IN_MEMORY_DB=1 && uvicorn --port 5000 main:app
+	@cd api && IN_MEMORY_DB=1 && python3 -m uvicorn --port 5000 main:app
 
 run-react:
 	@echo "Running React application on port 3000..."
