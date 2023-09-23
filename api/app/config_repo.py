@@ -2,7 +2,6 @@ from .database import db
 from .models import Configuration
 from motor.core import AgnosticCollection
 
-
 def collection() -> AgnosticCollection:
     collection: AgnosticCollection = db().configuration
     return collection

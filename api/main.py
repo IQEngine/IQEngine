@@ -6,11 +6,11 @@ from app.database import db
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
-#from app.config import router as config_router
+from app.config_router import router as config_router
 from app.datasources import router as datasources_router
 from app.iq import router as iq_router
 from app.metadata import router as metadata_router
-#from app.plugins import router as plugins_router
+from app.plugins_router import router as plugins_router
 from app.status import router as status_router
 from helpers.apidisconnect import CancelOnDisconnectRoute
 from app.users import router as users_router
@@ -87,8 +87,8 @@ app.include_router(iq_router)
 app.include_router(datasources_router)
 app.include_router(metadata_router)
 app.include_router(status_router)
-#app.include_router(config_router)
-#app.include_router(plugins_router)
+app.include_router(config_router)
+app.include_router(plugins_router)
 app.include_router(users_router)
 
 app.mount("/", SPAStaticFiles(directory="iqengine", html=True), name="iqengine")
