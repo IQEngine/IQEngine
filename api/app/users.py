@@ -1,7 +1,7 @@
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
-from graph.graph_client import get_token, get_users
+from .graph_client import get_token, get_users
 from helpers.authorization import required_roles
 
 router = APIRouter()

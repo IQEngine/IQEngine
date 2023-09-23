@@ -3,10 +3,10 @@ from typing import Optional
 
 from azure.storage.blob import BlobProperties, BlobSasPermissions, generate_blob_sas
 from azure.storage.blob.aio import BlobClient, ContainerClient
-from database.models import Metadata
+from .models import Metadata
 from helpers.urlmapping import ApiType, get_file_name
 from pydantic import SecretStr
-from rf.spectrogram import get_spectrogram_image
+from .spectrogram import get_spectrogram_image
 
 
 class AzureBlobClient:

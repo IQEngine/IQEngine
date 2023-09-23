@@ -1,5 +1,5 @@
-from database.database import db
-from database.models import Configuration
+from .database import db
+from .models import Configuration
 from motor.core import AgnosticCollection
 
 

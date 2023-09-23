@@ -1,4 +1,4 @@
-from database import datasource_repo
+from . import datasource_repo
 from fastapi import APIRouter, Depends
 from motor.motor_asyncio import AsyncIOMotorCollection
 from pymongo.errors import ServerSelectionTimeoutError

@@ -2,8 +2,8 @@ import asyncio
 import json
 import os
 
-from database import datasource_repo
-from database.models import DataSource
+from . import datasource_repo
+from .models import DataSource
 
 
 async def import_datasources_from_env(

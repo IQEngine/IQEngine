@@ -1,10 +1,10 @@
 from typing import Optional
 
 import httpx
-from blob.azure_client import AzureBlobClient
-from database import datasource_repo
-from database.datasource_repo import create, datasource_exists
-from database.models import DataSource
+from .azure_client import AzureBlobClient
+from . import datasource_repo
+from .datasource_repo import create, datasource_exists
+from .models import DataSource
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query
 from fastapi.responses import StreamingResponse
 from helpers.authorization import get_current_user

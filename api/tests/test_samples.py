@@ -1,6 +1,6 @@
 import numpy as np
 import pytest
-from rf.samples import get_samples
+from app.samples import get_samples
 
 
 def test_get_samples_i8():

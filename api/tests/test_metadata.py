@@ -2,8 +2,8 @@ from unittest import mock
 from unittest.mock import Mock
 
 import pytest
-from database import datasource_repo
-from database.models import DataSource, Metadata
+from app import datasource_repo
+from app.models import DataSource, Metadata
 from tests.test_data import test_datasource, valid_metadata
 
 
@@ -11,15 +11,15 @@ def override_dependency_datasource_repo_get():
     return DataSource(**test_datasource)
 
 
-@mock.patch("handlers.metadata.AzureBlobClient.blob_exist", return_value=True)
+@mock.patch("app.metadata.AzureBlobClient.blob_exist", return_value=True)
 @mock.patch(
-    "handlers.metadata.AzureBlobClient.get_blob_content", return_value=b"<image data>"
+    "app.metadata.AzureBlobClient.get_blob_content", return_value=b"<image data>"
 )
 @mock.patch(
-    "handlers.metadata.metadata_repo.get",
+    "app.metadata.metadata_repo.get",
     return_value=Metadata(**valid_metadata),
 )
-@mock.patch("handlers.metadata.decrypt", return_value="secret")
+@mock.patch("app.metadata.decrypt", return_value="secret")
 @pytest.mark.asyncio
 async def test_api_get_thumbnail_with_image(
     mock_decrypt: Mock,
@@ -42,17 +42,17 @@ async def test_api_get_thumbnail_with_image(
     mock_decrypt.mock_calls == 2
 
 
-@mock.patch("handlers.metadata.AzureBlobClient.blob_exist", return_value=False)
+@mock.patch("app.metadata.AzureBlobClient.blob_exist", return_value=False)
 @mock.patch(
-    "handlers.metadata.metadata_repo.get",
+    "app.metadata.metadata_repo.get",
     return_value=Metadata(**valid_metadata),
 )
 @mock.patch(
-    "handlers.metadata.AzureBlobClient.get_new_thumbnail",
+    "app.metadata.AzureBlobClient.get_new_thumbnail",
     return_value=b"<thumbnail data>",
 )
-@mock.patch("handlers.metadata.AzureBlobClient.upload_blob", return_value=None)
-@mock.patch("handlers.metadata.decrypt", return_value="secret")
+@mock.patch("app.metadata.AzureBlobClient.upload_blob", return_value=None)
+@mock.patch("app.metadata.decrypt", return_value="secret")
 @pytest.mark.asyncio
 async def test_api_get_thumbnail_with_no_image(
     mock_decrypt: Mock,

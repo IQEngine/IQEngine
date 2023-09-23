@@ -1,15 +1,14 @@
 from typing import Optional
 
-from blob.azure_client import AzureBlobClient
-from database.models import DataSource, DataSourceReference
+from .azure_client import AzureBlobClient
+from .models import DataSource, DataSourceReference
 from helpers.cipher import decrypt, encrypt
 from motor.core import AgnosticCollection
-from rf.samples import get_bytes_per_iq_sample
+from .samples import get_bytes_per_iq_sample
 
 
 def collection() -> AgnosticCollection:
-    from database.database import db
-
+    from .database import db
     collection: AgnosticCollection = db().datasources
     return collection
 
@@ -31,7 +30,7 @@ async def datasource_exists(account, container) -> bool:
 
 
 async def sync(account: str, container: str):
-    import database.metadata_repo
+    import metadata_repo
 
     azure_blob_client = AzureBlobClient(account, container)
     datasource = await get(account, container)
@@ -43,7 +42,7 @@ async def sync(account: str, container: str):
     async for metadata in metadatas:
         filepath = metadata[0].replace(".sigmf-meta", "")
         try:
-            if await database.metadata_repo.exists(account, container, filepath):
+            if await metadata_repo.exists(account, container, filepath):
                 print(f"[SYNC] Metadata already exists for {filepath}")
                 continue
             if not await azure_blob_client.blob_exist(filepath + ".sigmf-data"):
@@ -66,7 +65,7 @@ async def sync(account: str, container: str):
                 file_length
                 / get_bytes_per_iq_sample(metadata.globalMetadata.core_datatype)
             )
-            await database.metadata_repo.create(metadata, user=None)
+            await metadata_repo.create(metadata, user=None)
             print(f"[SYNC] Created metadata for {filepath}")
         except Exception as e:
             print(f"[SYNC] Error creating metadata for {filepath}: {e}")

@@ -3,9 +3,9 @@ import io
 import math
 from typing import List
 
-from blob.azure_client import AzureBlobClient
-from database import datasource_repo
-from database.models import DataSource
+from .azure_client import AzureBlobClient
+from . import datasource_repo
+from .models import DataSource
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.responses import StreamingResponse
 from helpers.apidisconnect import CancelOnDisconnectRoute, cancel_on_disconnect
@@ -14,7 +14,7 @@ from helpers.conversions import find_smallest_and_largest_next_to_each_other
 from helpers.datasource_access import check_access
 from helpers.urlmapping import ApiType, get_content_type, get_file_name
 from pydantic import BaseModel, SecretStr
-from rf.samples import get_bytes_per_iq_sample
+from .samples import get_bytes_per_iq_sample
 
 router = APIRouter(route_class=CancelOnDisconnectRoute)
 

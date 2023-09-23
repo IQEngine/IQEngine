@@ -1,10 +1,11 @@
+from .datasource import import_datasources_from_env
+from .plugins import import_plugins_from_env
 import copy
 import json
 import os
 
-from database.config_repo import collection, get
-from database.models import Configuration
-
+from .config_repo import collection, get
+from .models import Configuration
 
 async def import_default_config_from_env():
     try:
@@ -34,3 +35,13 @@ async def import_default_config_from_env():
             "Failed to load config from environment variables",
             e,
         )
+
+
+async def import_all_from_env():
+    try:
+        await import_plugins_from_env()
+        await import_default_config_from_env()
+        await import_datasources_from_env()
+    except Exception as e:
+        print("Failed to import all from env", e)
+        return None

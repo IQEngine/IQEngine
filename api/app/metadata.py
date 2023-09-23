@@ -1,10 +1,11 @@
 from datetime import datetime
 from typing import List, Optional
 
-from blob.azure_client import AzureBlobClient
-from database import datasource_repo, metadata_repo
-from database.metadata_repo import InvalidGeolocationFormat, query_metadata
-from database.models import DataSource, DataSourceReference, Metadata, TrackMetadata
+from .azure_client import AzureBlobClient
+from . import datasource_repo
+from . import metadata_repo
+from .metadata_repo import InvalidGeolocationFormat, query_metadata
+from .models import DataSource, DataSourceReference, Metadata, TrackMetadata
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Response
 from fastapi.responses import StreamingResponse
 from helpers.authorization import get_current_user
@@ -12,7 +13,7 @@ from helpers.cipher import decrypt
 from helpers.datasource_access import check_access
 from helpers.urlmapping import ApiType, get_content_type, get_file_name
 from motor.core import AgnosticCollection
-from aifunctions import aiquery
+from . import aiquery
 
 router = APIRouter()
 

@@ -4,7 +4,7 @@ from unittest import mock
 from unittest.mock import Mock
 
 import pytest
-from database.models import Configuration, Metadata
+from app.models import Configuration, Metadata
 from tests.test_data import test_datasource, valid_metadata
 
 
@@ -18,7 +18,7 @@ async def test_api_get_config(client):
 
     test_get_config = Configuration()
 
-    with mock.patch("handlers.config.get", return_value=test_get_config):
+    with mock.patch("app.config_repo.get", return_value=test_get_config):
         response = client.get("/api/config")
         assert response.status_code == 200
         assert response.json() == {
@@ -44,7 +44,7 @@ async def test_api_get_config_feature_flags(client):
     test_get_config = Configuration()
     test_get_config.feature_flags = {"test": True}
 
-    with mock.patch("handlers.config.get", return_value=test_get_config):
+    with mock.patch("app.config_repo.get", return_value=test_get_config):
         response = client.get("/api/config")
         assert response.status_code == 200
         assert response.json() == {
@@ -265,7 +265,7 @@ async def test_api_get_datasources(client):
     assert len(response.json()) == 1
 
 
-@mock.patch("handlers.datasources.AzureBlobClient.generate_sas_token", return_value="temp_sas_token")
+@mock.patch("app.datasources.AzureBlobClient.generate_sas_token", return_value="temp_sas_token")
 @pytest.mark.asyncio
 async def test_api_get_temp_sas_token(mock_get_sas_token: Mock, client):
     client.post("/api/datasources", json=test_datasource).json()
@@ -276,7 +276,7 @@ async def test_api_get_temp_sas_token(mock_get_sas_token: Mock, client):
     assert mock_get_sas_token.call_count == 1
 
 
-@mock.patch("handlers.datasources.AzureBlobClient.generate_sas_token", return_value="temp_sas_token")
+@mock.patch("app.datasources.AzureBlobClient.generate_sas_token", return_value="temp_sas_token")
 @pytest.mark.asyncio
 async def test_api_get_temp_sas_token_no_key(mock_get_sas_token: Mock, client):
     modded_datasource = test_datasource.copy()
@@ -381,9 +381,9 @@ async def test_api_update_file_version(client):
     assert response_object["annotations"][0]["core:sample_start"] == 10000
 
 
-@mock.patch("graph.graph_client.requests.get", return_value=Mock())
+@mock.patch("app.graph_client.requests.get", return_value=Mock())
 @mock.patch(
-    "graph.graph_client.msal.ConfidentialClientApplication", return_value=Mock()
+    "app.graph_client.msal.ConfidentialClientApplication", return_value=Mock()
 )
 @pytest.mark.asyncio
 async def test_api_get_users_successful_acquire_token_silent(
@@ -418,9 +418,9 @@ async def test_api_get_users_successful_acquire_token_silent(
     assert response.json()[1]["displayName"] == "test2"
 
 
-@mock.patch("graph.graph_client.requests.get", return_value=Mock())
+@mock.patch("app.graph_client.requests.get", return_value=Mock())
 @mock.patch(
-    "graph.graph_client.msal.ConfidentialClientApplication", return_value=Mock()
+    "app.graph_client.msal.ConfidentialClientApplication", return_value=Mock()
 )
 @pytest.mark.asyncio
 async def test_api_get_users_successful_acquire_token_for_client(
