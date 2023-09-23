@@ -13,10 +13,10 @@ test_blob_properties.size = 100
 
 
 @mock.patch(
-    "app.iq.AzureBlobClient.get_blob_properties", return_value=test_blob_properties
+    "app.iq_router.AzureBlobClient.get_blob_properties", return_value=test_blob_properties
 )
-@mock.patch("app.iq.AzureBlobClient.get_file_length", return_value=100)
-@mock.patch("app.iq.decrypt", return_value="secret")
+@mock.patch("app.iq_router.AzureBlobClient.get_file_length", return_value=100)
+@mock.patch("app.iq_router.decrypt", return_value="secret")
 @pytest.mark.asyncio
 async def test_get_iq_data_invalid_format(
     mock_decrypt, mock_get_file_length, mock_get_blob_properties, client
@@ -44,10 +44,10 @@ async def mock_get_test_datasource():
 
 
 @mock.patch(
-    "app.iq.AzureBlobClient.get_blob_properties", return_value=test_blob_properties
+    "app.iq_router.AzureBlobClient.get_blob_properties", return_value=test_blob_properties
 )
-@mock.patch("app.iq.AzureBlobClient.get_file_length", return_value=100)
-@mock.patch("app.iq.decrypt", return_value="secret")
+@mock.patch("app.iq_router.AzureBlobClient.get_file_length", return_value=100)
+@mock.patch("app.iq_router.decrypt", return_value="secret")
 @pytest.mark.asyncio
 async def test_get_iq_data_with_ci16_le(
     mock_decrypt, mock_get_file_length, mock_get_blob_properties, client
@@ -71,10 +71,10 @@ async def test_get_iq_data_with_ci16_le(
 
 
 @mock.patch(
-    "app.iq.AzureBlobClient.get_blob_properties", return_value=test_blob_properties
+    "app.iq_router.AzureBlobClient.get_blob_properties", return_value=test_blob_properties
 )
-@mock.patch("app.iq.AzureBlobClient.get_file_length", return_value=100)
-@mock.patch("app.iq.decrypt", return_value="secret")
+@mock.patch("app.iq_router.AzureBlobClient.get_file_length", return_value=100)
+@mock.patch("app.iq_router.decrypt", return_value="secret")
 @pytest.mark.asyncio
 async def test_get_iq_data_with_ci16(
     mock_decrypt, mock_get_file_length, mock_get_blob_properties, client
@@ -98,10 +98,10 @@ async def test_get_iq_data_with_ci16(
 
 
 @mock.patch(
-    "app.iq.AzureBlobClient.get_blob_properties", return_value=test_blob_properties
+    "app.iq_router.AzureBlobClient.get_blob_properties", return_value=test_blob_properties
 )
-@mock.patch("app.iq.AzureBlobClient.get_file_length", return_value=100)
-@mock.patch("app.iq.decrypt", return_value="secret")
+@mock.patch("app.iq_router.AzureBlobClient.get_file_length", return_value=100)
+@mock.patch("app.iq_router.decrypt", return_value="secret")
 @pytest.mark.asyncio
 async def test_get_iq_data_with_ci16_be(
     mock_decrypt, mock_get_file_length, mock_get_blob_properties, client
@@ -125,10 +125,10 @@ async def test_get_iq_data_with_ci16_be(
 
 
 @mock.patch(
-    "app.iq.AzureBlobClient.get_blob_properties", return_value=test_blob_properties
+    "app.iq_router.AzureBlobClient.get_blob_properties", return_value=test_blob_properties
 )
-@mock.patch("app.iq.AzureBlobClient.get_file_length", return_value=100)
-@mock.patch("app.iq.decrypt", return_value="secret")
+@mock.patch("app.iq_router.AzureBlobClient.get_file_length", return_value=100)
+@mock.patch("app.iq_router.decrypt", return_value="secret")
 @pytest.mark.asyncio
 async def test_get_iq_data_with_cf32_le(
     mock_decrypt, mock_get_file_length, mock_get_blob_properties, client
@@ -152,10 +152,10 @@ async def test_get_iq_data_with_cf32_le(
 
 
 @mock.patch(
-    "app.iq.AzureBlobClient.get_blob_properties", return_value=test_blob_properties
+    "app.iq_router.AzureBlobClient.get_blob_properties", return_value=test_blob_properties
 )
-@mock.patch("app.iq.AzureBlobClient.get_file_length", return_value=100)
-@mock.patch("app.iq.decrypt", return_value="secret")
+@mock.patch("app.iq_router.AzureBlobClient.get_file_length", return_value=100)
+@mock.patch("app.iq_router.decrypt", return_value="secret")
 @pytest.mark.asyncio
 async def test_get_iq_data_with_cf32(
     mock_decrypt, mock_get_file_length, mock_get_blob_properties, client
@@ -179,10 +179,10 @@ async def test_get_iq_data_with_cf32(
 
 
 @mock.patch(
-    "app.iq.AzureBlobClient.get_blob_properties", return_value=test_blob_properties
+    "app.iq_router.AzureBlobClient.get_blob_properties", return_value=test_blob_properties
 )
-@mock.patch("app.iq.AzureBlobClient.get_file_length", return_value=100)
-@mock.patch("app.iq.decrypt", return_value="secret")
+@mock.patch("app.iq_router.AzureBlobClient.get_file_length", return_value=100)
+@mock.patch("app.iq_router.decrypt", return_value="secret")
 @pytest.mark.asyncio
 async def test_get_iq_data_with_cf32_be(
     mock_decrypt, mock_get_file_length, mock_get_blob_properties, client
@@ -206,10 +206,10 @@ async def test_get_iq_data_with_cf32_be(
 
 
 @mock.patch(
-    "app.iq.AzureBlobClient.get_blob_properties", return_value=test_blob_properties
+    "app.iq_router.AzureBlobClient.get_blob_properties", return_value=test_blob_properties
 )
-@mock.patch("app.iq.AzureBlobClient.get_file_length", return_value=100)
-@mock.patch("app.iq.decrypt", return_value="secret")
+@mock.patch("app.iq_router.AzureBlobClient.get_file_length", return_value=100)
+@mock.patch("app.iq_router.decrypt", return_value="secret")
 @pytest.mark.asyncio
 async def test_get_iq_data_with_ci8(
     mock_decrypt, mock_get_file_length, mock_get_blob_properties, client
@@ -235,10 +235,10 @@ async def test_get_iq_data_with_ci8(
 
 
 @mock.patch(
-    "app.iq.AzureBlobClient.get_blob_properties", return_value=test_blob_properties
+    "app.iq_router.AzureBlobClient.get_blob_properties", return_value=test_blob_properties
 )
-@mock.patch("app.iq.AzureBlobClient.get_file_length", return_value=100)
-@mock.patch("app.iq.decrypt", return_value="secret")
+@mock.patch("app.iq_router.AzureBlobClient.get_file_length", return_value=100)
+@mock.patch("app.iq_router.decrypt", return_value="secret")
 @pytest.mark.asyncio
 async def test_get_iq_data_with_i8(
     mock_decrypt, mock_get_file_length, mock_get_blob_properties, client
@@ -262,10 +262,10 @@ async def test_get_iq_data_with_i8(
 
 
 @mock.patch(
-    "app.iq.AzureBlobClient.get_blob_properties", return_value=test_blob_properties
+    "app.iq_router.AzureBlobClient.get_blob_properties", return_value=test_blob_properties
 )
-@mock.patch("app.iq.AzureBlobClient.get_file_length", return_value=100)
-@mock.patch("app.iq.decrypt", return_value="secret")
+@mock.patch("app.iq_router.AzureBlobClient.get_file_length", return_value=100)
+@mock.patch("app.iq_router.decrypt", return_value="secret")
 @pytest.mark.asyncio
 async def test_get_iq_data_with_multiple_arr_elements_returns_data(
     mock_decrypt, mock_get_file_length, mock_get_blob_properties, client
@@ -289,10 +289,10 @@ async def test_get_iq_data_with_multiple_arr_elements_returns_data(
 
 
 @mock.patch(
-    "app.iq.AzureBlobClient.get_blob_properties", return_value=test_blob_properties
+    "app.iq_router.AzureBlobClient.get_blob_properties", return_value=test_blob_properties
 )
-@mock.patch("app.iq.AzureBlobClient.get_file_length", return_value=2)
-@mock.patch("app.iq.decrypt", return_value="secret")
+@mock.patch("app.iq_router.AzureBlobClient.get_file_length", return_value=2)
+@mock.patch("app.iq_router.decrypt", return_value="secret")
 @pytest.mark.asyncio
 async def test_get_iq_data_with_offset_larger_than_blob_size(
     mock_decrypt, mock_get_file_length, mock_get_blob_properties, client
@@ -316,10 +316,10 @@ async def test_get_iq_data_with_offset_larger_than_blob_size(
 
 
 @mock.patch(
-    "app.iq.AzureBlobClient.get_blob_properties", return_value=test_blob_properties
+    "app.iq_router.AzureBlobClient.get_blob_properties", return_value=test_blob_properties
 )
-@mock.patch("app.iq.AzureBlobClient.get_file_length", return_value=3)
-@mock.patch("app.iq.decrypt", return_value="secret")
+@mock.patch("app.iq_router.AzureBlobClient.get_file_length", return_value=3)
+@mock.patch("app.iq_router.decrypt", return_value="secret")
 @pytest.mark.asyncio
 async def test_get_iq_data_with_offset_plus_count_larger_than_blob_size(
     mock_decrypt, mock_get_file_length, mock_get_blob_properties, client

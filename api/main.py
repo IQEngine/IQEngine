@@ -9,7 +9,7 @@ from fastapi.staticfiles import StaticFiles
 
 from app.config_router import router as config_router
 from app.datasources import router as datasources_router
-from app.iq import router as iq_router
+from app.iq_router import router as iq_router
 from app.metadata import router as metadata_router
 from app.plugins_router import router as plugins_router
 from app.status import router as status_router
