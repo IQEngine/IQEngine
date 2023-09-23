@@ -15,21 +15,7 @@ def collection() -> AgnosticCollection:
 
 
 async def get(account, container) -> DataSource | None:
-    """
-    Get a datasource by account and container
-
-    Parameters
-    ----------
-    account : str
-        The account name.
-    container : str
-        The container name.
-
-    Returns
-    -------
-    DataSource
-        The datasource.
-    """
+    # Get a datasource by account and container
     datasource_collection: AgnosticCollection = collection()
     datasource = await datasource_collection.find_one(
         {"account": account, "container": container}
@@ -40,25 +26,11 @@ async def get(account, container) -> DataSource | None:
 
 
 async def datasource_exists(account, container) -> bool:
-    """
-    Check if a datasource exists by account and container
-
-    Parameters
-    ----------
-    account : str
-        The account name.
-    container : str
-        The container name.
-
-    Returns
-    -------
-    bool
-        True if the datasource exists, False otherwise.
-    """
+    # Check if a datasource exists by account and container
     return await get(account, container) is not None
 
 
-async def sync(account: str, container: str, user: str):
+async def sync(account: str, container: str):
     import database.metadata_repo
 
     azure_blob_client = AzureBlobClient(account, container)
@@ -94,7 +66,7 @@ async def sync(account: str, container: str, user: str):
                 file_length
                 / get_bytes_per_iq_sample(metadata.globalMetadata.core_datatype)
             )
-            await database.metadata_repo.create(metadata, user)
+            await database.metadata_repo.create(metadata, user=None)
             print(f"[SYNC] Created metadata for {filepath}")
         except Exception as e:
             print(f"[SYNC] Error creating metadata for {filepath}: {e}")
@@ -106,16 +78,6 @@ async def create(datasource: DataSource, user: Optional[dict]) -> DataSource:
     Create a new datasource. The datasource will be henceforth identified by account/container which
     must be unique or this function will return a 400.
     This will encrypt the sasToken if it is provided.
-
-    Parameters
-    ----------
-    datasource : DataSource
-        The datasource to create.
-
-    Returns
-    -------
-    DataSource
-        The datasource.
     """
     datasource_collection: AgnosticCollection = collection()
     if await datasource_exists(datasource.account, datasource.container):
