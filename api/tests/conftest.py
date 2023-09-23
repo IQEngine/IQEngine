@@ -31,7 +31,6 @@ def required_roles_mock(role: Optional[Union[str, List[str]]] = None):
 def check_access_mock(account: str, container: str, user=None):
     async def wrapper(account: str, container: str, user=None):
         return "owner"
-
     return wrapper
 
 

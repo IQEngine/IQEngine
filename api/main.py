@@ -6,14 +6,16 @@ from app.database import db
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
+
 from app.config_router import router as config_router
 from app.datasources import router as datasources_router
 from app.iq import router as iq_router
 from app.metadata import router as metadata_router
 from app.plugins_router import router as plugins_router
 from app.status import router as status_router
-from helpers.apidisconnect import CancelOnDisconnectRoute
 from app.users import router as users_router
+
+from helpers.apidisconnect import CancelOnDisconnectRoute
 from app.all import import_all_from_env
 from pydantic import BaseModel
 from pymongo.errors import ServerSelectionTimeoutError
