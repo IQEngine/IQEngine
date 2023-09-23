@@ -1,4 +1,4 @@
-from .datasource import import_datasources_from_env
+from .datasource_repo import import_datasources_from_env
 from .plugins import import_plugins_from_env
 from .config_repo import import_default_config_from_env
 

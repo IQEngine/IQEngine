@@ -1,11 +1,14 @@
 from typing import Optional
+import asyncio
+import json
+import os
 
 from .azure_client import AzureBlobClient
 from .models import DataSource, DataSourceReference
 from helpers.cipher import decrypt, encrypt
 from motor.core import AgnosticCollection
 from .samples import get_bytes_per_iq_sample
-
+from .models import DataSource
 
 def collection() -> AgnosticCollection:
     from .database import db
@@ -30,7 +33,7 @@ async def datasource_exists(account, container) -> bool:
 
 
 async def sync(account: str, container: str):
-    import metadata_repo
+    from . import metadata_repo
 
     azure_blob_client = AzureBlobClient(account, container)
     datasource = await get(account, container)
@@ -101,3 +104,55 @@ async def create(datasource: DataSource, user: Optional[dict]) -> DataSource:
         datasource_dict["public"] = True
     await datasource_collection.insert_one(datasource_dict)
     return datasource
+
+'''
+async def import_datasources_from_env(
+    environment_variable_name="IQENGINE_CONNECTION_INFO",
+):
+    """
+    Imports datasources from environment variable
+
+    Parameters
+    ----------
+    environment_variable_name : str
+        The name of the environment variable to load the datasources from
+
+    Returns
+    -------
+    None
+    """
+    connection_info = os.getenv(environment_variable_name, None)
+    if not connection_info:
+        return None
+    connections = json.loads(connection_info)["settings"]
+    for connection in connections:
+        try:
+            if await datasource_exists(
+                connection["accountName"], connection["containerName"]
+            ):
+                continue
+            datasource = DataSource(
+                account=connection["accountName"],
+                container=connection["containerName"],
+                sasToken=connection["sasToken"],
+                accountKey=connection["accountKey"]  if "accountKey" in connection else None,
+                name=connection["name"],
+                description=connection["description"]
+                if "description" in connection
+                else None,
+                imageURL=connection["imageURL"] if "imageURL" in connection else None,
+                type="api",
+                public=connection["public"] if "public" in connection else True,
+                owners=connection["owners"] if "owners" in connection else ["IQEngine-Admin"],
+                readers=connection["readers"] if "readers" in connection else [],
+            )
+            await create(datasource=datasource, user=None)
+            asyncio.create_task(
+                sync(
+                    connection["accountName"], connection["containerName"]
+                )
+            )
+        except Exception as e:
+            print(f"Failed to import datasource {connection['name']}", e)
+            continue
+'''
