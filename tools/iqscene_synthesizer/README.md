@@ -4,7 +4,7 @@ Generates a scene of a random number of signals that are modulated, and "transmi
 
 Saves to SigMF.
 
-Prepared for by Qoherent for the IQ Engine project.
+Prepared for by Qoherent for the IQEngine project.
 
 ## Installation
 
