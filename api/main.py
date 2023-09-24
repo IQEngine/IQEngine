@@ -16,7 +16,7 @@ from app.status_router import router as status_router
 from app.users_router import router as users_router
 
 from helpers.apidisconnect import CancelOnDisconnectRoute
-from app.all import import_all_from_env
+from helpers.import_env import import_all_from_env
 from pydantic import BaseModel
 from pymongo.errors import ServerSelectionTimeoutError
 from starlette.exceptions import HTTPException

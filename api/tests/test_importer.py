@@ -4,7 +4,7 @@ from unittest.mock import AsyncMock, Mock
 
 import pytest
 from app.models import Configuration
-from app.all import import_all_from_env
+from helpers.import_env import import_all_from_env
 
 
 @mock.patch("app.plugins.collection", return_value=Mock())

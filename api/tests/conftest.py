@@ -59,7 +59,7 @@ def client():
                 "app.datasources_router.get_current_user",
                 new=get_current_user_mock(),
             ):
-                with mock.patch("app.all.import_all_from_env") as mock_i:
+                with mock.patch("helpers.import_env.import_all_from_env") as mock_i:
                     mock_i.return_value = None
                     from main import app
                     import app.database as db
