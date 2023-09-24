@@ -25,19 +25,6 @@ class IQData(BaseModel):
     bytes_per_iq_sample: int
 
 
-async def get_sas_token(
-    datasource: DataSource = Depends(datasources.get),
-):
-    if not datasource:
-        raise HTTPException(status_code=404, detail="Datasource not found")
-
-    if "sasToken" in datasource and datasource["sasToken"] != "":
-        decrypted_sas_token = decrypt(datasource["sasToken"])
-        return decrypted_sas_token
-    else:
-        return SecretStr("")
-
-
 @router.get(
     "/api/datasources/{account}/{container}/{filepath:path}/iq-data", status_code=200
 )
