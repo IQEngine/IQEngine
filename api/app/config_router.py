@@ -22,9 +22,12 @@ async def get_config():
         configuration = Configuration()
 
     connection_info = os.getenv("IQENGINE_CONNECTION_INFO", None)
-
     if connection_info:
         configuration.connection_info = json.loads(connection_info)
+
+    feature_flags = os.getenv("IQENGINE_FEATURE_FLAGS", None)
+    if feature_flags:
+        configuration.feature_flags = json.loads(feature_flags)
 
     configuration.google_analytics_key = os.getenv(
         "IQENGINE_GOOGLE_ANALYTICS_KEY", configuration.google_analytics_key

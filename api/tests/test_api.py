@@ -16,6 +16,7 @@ async def test_api_get_config(client):
     os.environ["IQENGINE_APP_ID"] = "app_id"
     os.environ["IQENGINE_APP_AUTHORITY"] = "app_authority"
     os.environ["IQENGINE_FEATURE_FLAGS"] = '{"bypassLandingPage": false}'
+    del os.environ["IQENGINE_UPLOAD_PAGE_BLOB_SAS_URL"] # needed to set it to None
 
     test_get_config = Configuration()
 
