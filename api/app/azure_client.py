@@ -10,18 +10,8 @@ from helpers.samples import get_spectrogram_image
 
 
 class AzureBlobClient:
-    """
-    AzureBlobClient is a wrapper around the Azure BlobClient class.
-
-
-    Parameters
-    ----------
-    account : str
-        The Azure account name.
-    container : str
-        The Azure container name.
-    """
-
+    # IQEngine-oriented wrappers around the Azure BlobClient class.
+    
     account: str
     container: str
     sas_token: SecretStr = None

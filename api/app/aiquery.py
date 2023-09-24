@@ -85,5 +85,3 @@ def get_query_result(query: str) :
     except Exception as e:
         print(e)
         raise("Open AI is not available", e)
-
-    
