@@ -185,10 +185,10 @@ async def generate_sas_token(
     datasources_collection: AgnosticCollection = Depends(datasources.collection),
     access_allowed=Depends(check_access),
 ):
-
     if (access_allowed != "owner" and write) or access_allowed is None:
         raise HTTPException(status_code=403, detail="No Access")
-
+    if account == "local":
+        return {"sasToken": None}
     token: str = ""
     existing_datasource = await datasources_collection.find_one(
         {

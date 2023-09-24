@@ -20,6 +20,8 @@ async def check_access(account: str, container: str, user=Depends(get_current_us
     -------
     "public", "reader", "owner", or None
     """
+    if account == "local":
+        return "reader"
     groups = user.get("groups", [])
     if isinstance(groups, str):
         groups = [groups]

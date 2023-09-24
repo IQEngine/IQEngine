@@ -105,52 +105,59 @@ async def create(datasource: DataSource, user: Optional[dict]) -> DataSource:
     await datasource_collection.insert_one(datasource_dict)
     return datasource
 
-async def import_datasources_from_env(
-    environment_variable_name="IQENGINE_CONNECTION_INFO",
-):
-    """
-    Imports datasources from environment variable
-
-    Parameters
-    ----------
-    environment_variable_name : str
-        The name of the environment variable to load the datasources from
-
-    Returns
-    -------
-    None
-    """
-    connection_info = os.getenv(environment_variable_name, None)
-    if not connection_info:
+async def import_datasources_from_env():
+    connection_info = os.getenv("IQENGINE_CONNECTION_INFO", None)
+    base_filepath = os.getenv("IQENGINE_BACKEND_LOCAL_FILEPATH", None)
+    if (not connection_info) and (not base_filepath):
         return None
-    connections = json.loads(connection_info)["settings"]
-    for connection in connections:
+    if base_filepath:
         try:
-            if await datasource_exists(
-                connection["accountName"], connection["containerName"]
-            ):
-                continue
-            datasource = DataSource(
-                account=connection["accountName"],
-                container=connection["containerName"],
-                sasToken=connection["sasToken"],
-                accountKey=connection["accountKey"]  if "accountKey" in connection else None,
-                name=connection["name"],
-                description=connection["description"]
-                if "description" in connection
-                else None,
-                imageURL=connection["imageURL"] if "imageURL" in connection else None,
-                type="api",
-                public=connection["public"] if "public" in connection else True,
-                owners=connection["owners"] if "owners" in connection else ["IQEngine-Admin"],
-                readers=connection["readers"] if "readers" in connection else [],
-            )
-            await create(datasource=datasource, user=None)
-            asyncio.create_task(
-                sync(
-                    connection["accountName"], connection["containerName"]
+            if not await datasource_exists('local', 'local'):
+                datasource = DataSource(
+                    account='local',
+                    container='local',
+                    sasToken=None,
+                    accountKey=None,
+                    name="Local to Backend",
+                    description="Files stored on the backend server in the " + str(base_filepath) + " directory",
+                    imageURL="https://th.bing.com/th/id/OIP.BEfnKPs6kn83PoQ3rzjHogHaIz?pid=ImgDet&rs=1",
+                    type="api",
+                    public=True,
+                    owners=["IQEngine-Admin"],
+                    readers=[],
                 )
-            )
+                await create(datasource=datasource, user=None)
+                asyncio.create_task(sync("local", "local"))
         except Exception as e:
-            print(f"Failed to import datasource {connection['name']}", e)
-            continue
+            print(f"Failed to import datasource local to backend", e)
+    if connection_info:
+        for connection in json.loads(connection_info)["settings"]:
+            try:
+                if await datasource_exists(
+                    connection["accountName"], connection["containerName"]
+                ):
+                    continue
+                datasource = DataSource(
+                    account=connection["accountName"],
+                    container=connection["containerName"],
+                    sasToken=connection["sasToken"],
+                    accountKey=connection["accountKey"]  if "accountKey" in connection else None,
+                    name=connection["name"],
+                    description=connection["description"]
+                    if "description" in connection
+                    else None,
+                    imageURL=connection["imageURL"] if "imageURL" in connection else None,
+                    type="api",
+                    public=connection["public"] if "public" in connection else True,
+                    owners=connection["owners"] if "owners" in connection else ["IQEngine-Admin"],
+                    readers=connection["readers"] if "readers" in connection else [],
+                )
+                await create(datasource=datasource, user=None)
+                asyncio.create_task(
+                    sync(
+                        connection["accountName"], connection["containerName"]
+                    )
+                )
+            except Exception as e:
+                print(f"Failed to import datasource {connection['name']}", e)
+                continue

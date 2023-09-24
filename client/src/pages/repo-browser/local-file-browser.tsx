@@ -20,7 +20,6 @@ const LocalFileBrowser = () => {
   const dataSourceQuery = getDataSource(CLIENT_TYPE_LOCAL, 'local', container, !!container || !!filePath);
 
   useEffect(() => {
-    console.debug('dataSourceQuery', dataSourceQuery.data, 'container', container, 'filePath', filePath);
     if (dataSourceQuery.data && dataSourceQuery.data.container === container && goToPage) {
       if (filePath) {
         const spectogramLink = `/view/${CLIENT_TYPE_LOCAL}/local/single_file/${encodeURIComponent(filePath)}`;

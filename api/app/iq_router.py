@@ -178,7 +178,7 @@ async def get_iqfile(
         raise HTTPException(status_code=404, detail="File not found")
 
     response = await azure_client.get_blob_stream(iq_path)
-    return StreamingResponse(response.chunks(), media_type=content_type)
+    return StreamingResponse(response, media_type=content_type)
 
 
 @router.get(

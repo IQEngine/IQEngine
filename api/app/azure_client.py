@@ -1,5 +1,6 @@
 import datetime
 from typing import Optional
+import os
 
 from azure.storage.blob import BlobProperties, BlobSasPermissions, generate_blob_sas
 from azure.storage.blob.aio import BlobClient, ContainerClient
@@ -14,11 +15,16 @@ class AzureBlobClient:
     container: str
     sas_token: SecretStr = None
     account_key: SecretStr = None
+    base_filepath: str = None # only used for local
 
     def __init__(self, account, container):
         self.account = account
         self.container = container
         self.clients: dict[str, BlobClient] = {}
+        if account == "local":
+            self.base_filepath = os.getenv("IQENGINE_BACKEND_LOCAL_FILEPATH", None)
+            if not self.base_filepath:
+                raise Exception("IQENGINE_BACKEND_LOCAL_FILEPATH must be set to use local")
 
     def set_sas_token(self, sas_token):
         self.sas_token = sas_token
@@ -86,6 +92,12 @@ class AzureBlobClient:
     async def get_blob_content(
         self, filepath: str, offset: Optional[int] = None, length: Optional[int] = None
     ) -> bytes:
+        if self.account == "local":
+            if '..' in filepath:
+                raise Exception("Invalid filepath")
+            with open(os.path.join(self.base_filepath, filepath), "rb") as f:
+                f.seek(offset)
+                return f.read(length)
         blob_client = self.get_blob_client(filepath)
         blob = await blob_client.download_blob(offset=offset, length=length)
         content = await blob.readall()
@@ -94,11 +106,20 @@ class AzureBlobClient:
     async def get_blob_stream(
         self, filepath: str, offset: Optional[int] = None, length: Optional[int] = None
     ):
+        if self.account == "local":
+            if '..' in filepath:
+                raise Exception("Invalid filepath")
+            f = open(os.path.join(self.base_filepath, filepath), "rb")
+            if offset:
+                f.seek(offset)
+            return f # TODO: this leads to the download being pretty slow because it feeds it byte by byte
         blob_client = self.get_blob_client(filepath)
-        blob = await blob_client.download_blob(offset=offset, length=length)
-        return blob
+        blob = await blob_client.download_blob(offset=offset, length=length) # returns type StorageStreamDownloader, an Azure class, we use its chunks() method which returns Iterator[bytes]
+        return blob.chunks()
 
     async def upload_blob(self, filepath: str, data: bytes):
+        if self.account == "local":
+            raise Exception("Cannot upload to local")
         blob_client = self.get_blob_client(filepath)
         await blob_client.upload_blob(data, overwrite=True)
 
@@ -110,8 +131,18 @@ class AzureBlobClient:
         return image
 
     async def get_metadata_files(self):
+        # For local files
+        if self.account == "local":
+            for path, subdirs, files in os.walk(self.base_filepath):
+                for name in files:
+                    if name.endswith(".sigmf-meta"):
+                        metadata = await self.get_metadata_file(os.path.join(path, name))
+                        yield os.path.join(path, name).replace(self.base_filepath, '')[1:], metadata
+            return
+
+        # Azure blobs
         container_client = self.get_container_client()
-        # files that enf with .sigmf-meta
+        # files that end with .sigmf-meta
         async for blob in container_client.list_blobs():
             if blob.name.endswith(".sigmf-meta"):
                 try:
@@ -122,17 +153,26 @@ class AzureBlobClient:
         return
 
     async def get_metadata_file(self, filepath: str):
-        blob_client = self.get_blob_client(filepath)
-        blob = await blob_client.download_blob()
-        content = await blob.readall()
-        metadata = Metadata.parse_raw(content)
-        return metadata
+        if self.account == "local":
+            if '..' in filepath:
+                raise Exception("Invalid filepath")
+            with open(filepath, "r") as f:
+                content = f.read()
+        else:
+            blob_client = self.get_blob_client(filepath)
+            blob = await blob_client.download_blob()
+            content = await blob.readall()
+        return Metadata.parse_raw(content)
 
     async def blob_exist(self, filepath):
+        if self.account == "local":
+            return os.path.isfile(os.path.join(self.base_filepath, filepath)) 
         blob_client = self.get_blob_client(filepath)
         return await blob_client.exists()
 
     async def get_file_length(self, filepath):
+        if self.account == "local":
+            return os.path.getsize(os.path.join(self.base_filepath, filepath))
         blob_client = self.get_blob_client(filepath)
         blob = await blob_client.get_blob_properties()
         return int(blob.size)
@@ -140,6 +180,8 @@ class AzureBlobClient:
     def generate_sas_token(
         self, filepath: str, account_key: str, include_write: bool = False
     ):
+        if self.account == "local":
+            return None
         start_time = datetime.datetime.now(datetime.timezone.utc)
         expiry_time = start_time + datetime.timedelta(hours=1)
         try:
