@@ -12,14 +12,11 @@ test_blob_properties = BlobProperties()
 test_blob_properties.size = 100
 
 
-@mock.patch(
-    "app.iq_router.AzureBlobClient.get_blob_properties", return_value=test_blob_properties
-)
 @mock.patch("app.iq_router.AzureBlobClient.get_file_length", return_value=100)
 @mock.patch("app.iq_router.decrypt", return_value="secret")
 @pytest.mark.asyncio
 async def test_get_iq_data_invalid_format(
-    mock_decrypt, mock_get_file_length, mock_get_blob_properties, client
+    mock_decrypt, mock_get_file_length, client
 ):
     """Get IQ data with invalid format. Returns 400."""
     from app import datasources
@@ -43,14 +40,11 @@ async def mock_get_test_datasource():
     return DataSource(**test_datasource)
 
 
-@mock.patch(
-    "app.iq_router.AzureBlobClient.get_blob_properties", return_value=test_blob_properties
-)
 @mock.patch("app.iq_router.AzureBlobClient.get_file_length", return_value=100)
 @mock.patch("app.iq_router.decrypt", return_value="secret")
 @pytest.mark.asyncio
 async def test_get_iq_data_with_ci16_le(
-    mock_decrypt, mock_get_file_length, mock_get_blob_properties, client
+    mock_decrypt, mock_get_file_length, client
 ):
     """Get IQ data with iq16_le. Returns populated float of float array."""
     from app import datasources
@@ -70,14 +64,11 @@ async def test_get_iq_data_with_ci16_le(
         assert response.content == arr
 
 
-@mock.patch(
-    "app.iq_router.AzureBlobClient.get_blob_properties", return_value=test_blob_properties
-)
 @mock.patch("app.iq_router.AzureBlobClient.get_file_length", return_value=100)
 @mock.patch("app.iq_router.decrypt", return_value="secret")
 @pytest.mark.asyncio
 async def test_get_iq_data_with_ci16(
-    mock_decrypt, mock_get_file_length, mock_get_blob_properties, client
+    mock_decrypt, mock_get_file_length, client
 ):
     """Get IQ data with ci16. Returns populated float of float array."""
     from app import datasources
@@ -97,14 +88,11 @@ async def test_get_iq_data_with_ci16(
         assert response.content == arr
 
 
-@mock.patch(
-    "app.iq_router.AzureBlobClient.get_blob_properties", return_value=test_blob_properties
-)
 @mock.patch("app.iq_router.AzureBlobClient.get_file_length", return_value=100)
 @mock.patch("app.iq_router.decrypt", return_value="secret")
 @pytest.mark.asyncio
 async def test_get_iq_data_with_ci16_be(
-    mock_decrypt, mock_get_file_length, mock_get_blob_properties, client
+    mock_decrypt, mock_get_file_length, client
 ):
     """Get IQ data with ci16_be. Returns populated float of float array."""
     from app import datasources
@@ -124,14 +112,11 @@ async def test_get_iq_data_with_ci16_be(
         assert response.content == arr
 
 
-@mock.patch(
-    "app.iq_router.AzureBlobClient.get_blob_properties", return_value=test_blob_properties
-)
 @mock.patch("app.iq_router.AzureBlobClient.get_file_length", return_value=100)
 @mock.patch("app.iq_router.decrypt", return_value="secret")
 @pytest.mark.asyncio
 async def test_get_iq_data_with_cf32_le(
-    mock_decrypt, mock_get_file_length, mock_get_blob_properties, client
+    mock_decrypt, mock_get_file_length, client
 ):
     """Get IQ data with cf32_le. Returns populated float of float array."""
     from app import datasources
@@ -151,14 +136,11 @@ async def test_get_iq_data_with_cf32_le(
         assert response.content == arr
 
 
-@mock.patch(
-    "app.iq_router.AzureBlobClient.get_blob_properties", return_value=test_blob_properties
-)
 @mock.patch("app.iq_router.AzureBlobClient.get_file_length", return_value=100)
 @mock.patch("app.iq_router.decrypt", return_value="secret")
 @pytest.mark.asyncio
 async def test_get_iq_data_with_cf32(
-    mock_decrypt, mock_get_file_length, mock_get_blob_properties, client
+    mock_decrypt, mock_get_file_length, client
 ):
     """Get IQ data with cf32. Returns populated float of float array."""
     from app import datasources
@@ -178,14 +160,11 @@ async def test_get_iq_data_with_cf32(
         assert response.content == arr
 
 
-@mock.patch(
-    "app.iq_router.AzureBlobClient.get_blob_properties", return_value=test_blob_properties
-)
 @mock.patch("app.iq_router.AzureBlobClient.get_file_length", return_value=100)
 @mock.patch("app.iq_router.decrypt", return_value="secret")
 @pytest.mark.asyncio
 async def test_get_iq_data_with_cf32_be(
-    mock_decrypt, mock_get_file_length, mock_get_blob_properties, client
+    mock_decrypt, mock_get_file_length, client
 ):
     """Get IQ data with cf32_be. Returns populated float of float array."""
     from app import datasources
@@ -205,20 +184,16 @@ async def test_get_iq_data_with_cf32_be(
         assert response.content == arr
 
 
-@mock.patch(
-    "app.iq_router.AzureBlobClient.get_blob_properties", return_value=test_blob_properties
-)
 @mock.patch("app.iq_router.AzureBlobClient.get_file_length", return_value=100)
 @mock.patch("app.iq_router.decrypt", return_value="secret")
 @pytest.mark.asyncio
 async def test_get_iq_data_with_ci8(
-    mock_decrypt, mock_get_file_length, mock_get_blob_properties, client
+    mock_decrypt, mock_get_file_length, client
 ):
     """Get IQ data with ci8. Returns populated float of float array."""
     from app import datasources
 
     mock_client = AsyncMock()
-    mock_client.get_blob_properties.return_value = test_blob_properties
     client.app.dependency_overrides[datasources.get] = mock_get_test_datasource
     arr = numpy.array([1, 2, 3, 4, 5, 6, 7, 8], dtype=numpy.int8).tobytes()
     format = "ci8"
@@ -234,14 +209,11 @@ async def test_get_iq_data_with_ci8(
         assert response.content == arr
 
 
-@mock.patch(
-    "app.iq_router.AzureBlobClient.get_blob_properties", return_value=test_blob_properties
-)
 @mock.patch("app.iq_router.AzureBlobClient.get_file_length", return_value=100)
 @mock.patch("app.iq_router.decrypt", return_value="secret")
 @pytest.mark.asyncio
 async def test_get_iq_data_with_i8(
-    mock_decrypt, mock_get_file_length, mock_get_blob_properties, client
+    mock_decrypt, mock_get_file_length, client
 ):
     """Get IQ data with i8. Returns populated float of float array."""
     from app import datasources
@@ -261,14 +233,11 @@ async def test_get_iq_data_with_i8(
         assert response.content == arr
 
 
-@mock.patch(
-    "app.iq_router.AzureBlobClient.get_blob_properties", return_value=test_blob_properties
-)
 @mock.patch("app.iq_router.AzureBlobClient.get_file_length", return_value=100)
 @mock.patch("app.iq_router.decrypt", return_value="secret")
 @pytest.mark.asyncio
 async def test_get_iq_data_with_multiple_arr_elements_returns_data(
-    mock_decrypt, mock_get_file_length, mock_get_blob_properties, client
+    mock_decrypt, mock_get_file_length, client
 ):
     """Get IQ data with i8. Returns populated float of float array."""
     from app import datasources
@@ -288,14 +257,11 @@ async def test_get_iq_data_with_multiple_arr_elements_returns_data(
         assert response.content == arr + arr
 
 
-@mock.patch(
-    "app.iq_router.AzureBlobClient.get_blob_properties", return_value=test_blob_properties
-)
 @mock.patch("app.iq_router.AzureBlobClient.get_file_length", return_value=2)
 @mock.patch("app.iq_router.decrypt", return_value="secret")
 @pytest.mark.asyncio
 async def test_get_iq_data_with_offset_larger_than_blob_size(
-    mock_decrypt, mock_get_file_length, mock_get_blob_properties, client
+    mock_decrypt, mock_get_file_length, client
 ):
     """Get IQ data with offset larger than blob size. Returns partially populated float of float array."""
     from app import datasources
@@ -315,14 +281,11 @@ async def test_get_iq_data_with_offset_larger_than_blob_size(
         assert response.content == b""
 
 
-@mock.patch(
-    "app.iq_router.AzureBlobClient.get_blob_properties", return_value=test_blob_properties
-)
 @mock.patch("app.iq_router.AzureBlobClient.get_file_length", return_value=3)
 @mock.patch("app.iq_router.decrypt", return_value="secret")
 @pytest.mark.asyncio
 async def test_get_iq_data_with_offset_plus_count_larger_than_blob_size(
-    mock_decrypt, mock_get_file_length, mock_get_blob_properties, client
+    mock_decrypt, mock_get_file_length, client
 ):
     """Get IQ data with offset plus count larger than blob size. Returns empty float of float array."""
     from app import datasources

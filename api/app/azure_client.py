@@ -46,7 +46,9 @@ class AzureBlobClient:
     def get_blob_client(self, filepath):
         if filepath in self.clients:
             return self.clients[filepath]
-        if self.account_key:
+        if self.account == "local":
+            return None
+        elif self.account_key:
             sas_token = self.generate_sas_token(
                 filepath, self.account_key.get_secret_value(), True
             )
@@ -70,7 +72,9 @@ class AzureBlobClient:
         return blob_client
 
     def get_container_client(self):
-        if not self.sas_token:
+        if self.account == "local":
+            return None
+        elif not self.sas_token:
             return ContainerClient.from_container_url(
                 f"https://{self.account}.blob.core.windows.net/{self.container}"
             )
@@ -78,10 +82,6 @@ class AzureBlobClient:
             f"https://{self.account}.blob.core.windows.net/{self.container}",
             credential=self.sas_token.get_secret_value(),
         )
-
-    async def get_blob_properties(self, filepath) -> BlobProperties:
-        blob_client = self.get_blob_client(filepath)
-        return await blob_client.get_blob_properties()
 
     async def get_blob_content(
         self, filepath: str, offset: Optional[int] = None, length: Optional[int] = None
