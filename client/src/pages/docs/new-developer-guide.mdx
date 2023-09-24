@@ -1,18 +1,25 @@
 # New Developer Guide
 
+## Prerequisites
+
+- git
+- make
+- Python 3.10+
+
 ## Basic Setup
 
-To run IQEngine from source, to allow for easily making changes, use the following steps,
-which assume you're on Ubuntu 22 with Python and make already installed, but should work for other debian-based distros too.
-1. Clone this repo
-1. Add the PPA to get the latest Node version using the following commands:
-    - `curl -sL https://deb.nodesource.com/setup_18.x -o nodesource_setup.sh`
-    - `sudo bash nodesource_setup.sh`
-1. From the root directory run the command ```make setup``` (ignore warnings)
+To run IQEngine from source, to allow for easily making changes, use the following steps.
+Note that Python 3.10 and Node 18 or 20 is required.
+Tested on Ubuntu 22 with Python and make already installed, but should work for other debian-based distros as well.
+1. Install Node using steps 1-3 here https://github.com/nodesource/distributions#installation-instructions
+1. Clone this repo, `git clone https://github.com/IQEngine/IQEngine.git`
+1. `cd IQEngine`
 1. Within the root directory copy and paste the 'example.env' and rename to '.env', this is where you can configure your deployment
-1. Open three concurrent terminals for frontend, backend, and plugins
-    1. In the **frontend** terminal, run `make dev` to start the development web server (uses port 3000)
+1. (Optional) If you want the GNU Radio example tile to show up, ask an admin on Discord for the .env entry (specifically, IQENGINE_CONNECTION_INFO)
+1. From the root directory run the command ```make setup``` (ignore warnings)
+1. Open three concurrent terminals for backend, frontend, and plugins
     1. In the **backend** terminal, run `make run-api` to start the backend (uses port 5000)
+    1. In the **frontend** terminal, run `make dev` to start the development web server (uses port 3000)
     1. Optionally, in the **plugins** terminal, run `make run-plugins` to start the plugins server (uses port 8000)
 1. Open your browser to http://localhost:3000 to access the site
 1. Optionally- if you want to see the public "GNU Radio Repo" recordings, ask Marc for a SAS token which gets used in the .env within IQENGINE_CONNECTION_INFO
