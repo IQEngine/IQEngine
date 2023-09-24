@@ -8,10 +8,8 @@ from helpers.urlmapping import ApiType, get_file_name
 from pydantic import SecretStr
 from helpers.samples import get_spectrogram_image
 
-
+# IQEngine-oriented wrappers around the Azure BlobClient class.
 class AzureBlobClient:
-    # IQEngine-oriented wrappers around the Azure BlobClient class.
-    
     account: str
     container: str
     sas_token: SecretStr = None
@@ -21,7 +19,6 @@ class AzureBlobClient:
         self.account = account
         self.container = container
         self.clients: dict[str, BlobClient] = {}
-
 
     def set_sas_token(self, sas_token):
         self.sas_token = sas_token
