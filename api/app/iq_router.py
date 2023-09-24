@@ -14,7 +14,7 @@ from helpers.conversions import find_smallest_and_largest_next_to_each_other
 from helpers.datasource_access import check_access
 from helpers.urlmapping import ApiType, get_content_type, get_file_name
 from pydantic import BaseModel, SecretStr
-from .samples import get_bytes_per_iq_sample
+from helpers.samples import get_bytes_per_iq_sample
 
 router = APIRouter(route_class=CancelOnDisconnectRoute)
 

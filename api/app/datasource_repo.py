@@ -7,7 +7,7 @@ from .azure_client import AzureBlobClient
 from .models import DataSource, DataSourceReference
 from helpers.cipher import decrypt, encrypt
 from motor.core import AgnosticCollection
-from .samples import get_bytes_per_iq_sample
+from helpers.samples import get_bytes_per_iq_sample
 from .models import DataSource
 
 def collection() -> AgnosticCollection:
