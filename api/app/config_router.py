@@ -1,8 +1,8 @@
 import json
 import os
 
-from . import config_repo
-from .config_repo import exists, get
+from . import config
+from .config import exists, get
 from .models import Configuration
 from fastapi import APIRouter, Depends, HTTPException
 from motor.core import AgnosticCollection
@@ -48,7 +48,7 @@ async def get_config():
 @router.put("/api/config", status_code=200)
 async def update_config(
     config: Configuration,
-    configuration: AgnosticCollection = Depends(config_repo.collection),
+    configuration: AgnosticCollection = Depends(config.collection),
 ):
     """
     update the IQEngine configuration

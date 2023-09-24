@@ -33,7 +33,7 @@ async def datasource_exists(account, container) -> bool:
 
 
 async def sync(account: str, container: str):
-    from . import metadata_repo
+    from .metadata import exists, create
 
     azure_blob_client = AzureBlobClient(account, container)
     datasource = await get(account, container)
@@ -45,7 +45,7 @@ async def sync(account: str, container: str):
     async for metadata in metadatas:
         filepath = metadata[0].replace(".sigmf-meta", "")
         try:
-            if await metadata_repo.exists(account, container, filepath):
+            if await exists(account, container, filepath):
                 print(f"[SYNC] Metadata already exists for {filepath}")
                 continue
             if not await azure_blob_client.blob_exist(filepath + ".sigmf-data"):
@@ -68,7 +68,7 @@ async def sync(account: str, container: str):
                 file_length
                 / get_bytes_per_iq_sample(metadata.globalMetadata.core_datatype)
             )
-            await metadata_repo.create(metadata, user=None)
+            await create(metadata, user=None)
             print(f"[SYNC] Created metadata for {filepath}")
         except Exception as e:
             print(f"[SYNC] Error creating metadata for {filepath}: {e}")

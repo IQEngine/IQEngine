@@ -2,8 +2,8 @@ from typing import Optional
 
 import httpx
 from .azure_client import AzureBlobClient
-from . import datasource_repo
-from .datasource_repo import create, datasource_exists
+from . import datasources
+from .datasources import create, datasource_exists
 from .models import DataSource
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query
 from fastapi.responses import StreamingResponse
@@ -20,7 +20,7 @@ router = APIRouter()
 @router.post("/api/datasources", status_code=201, response_model=DataSource)
 async def create_datasource(
     datasource: DataSource,
-    datasources: AgnosticCollection = Depends(datasource_repo.collection),
+    datasources: AgnosticCollection = Depends(datasources.collection),
     current_user: dict = Depends(get_current_user),
 ):
     """
@@ -36,7 +36,7 @@ async def create_datasource(
 
 @router.get("/api/datasources", response_model=list[DataSource])
 async def get_datasources(
-    datasources_collection: AgnosticCollection = Depends(datasource_repo.collection),
+    datasources_collection: AgnosticCollection = Depends(datasources.collection),
     current_user: Optional[dict] = Depends(get_current_user),
 ):
     datasources = datasources_collection.find()
@@ -58,7 +58,7 @@ async def get_datasources(
 async def get_datasource_image(
     account: str,
     container: str,
-    datasources_collection: AgnosticCollection = Depends(datasource_repo.collection),
+    datasources_collection: AgnosticCollection = Depends(datasources.collection),
     access_allowed=Depends(check_access),
 ):
     if access_allowed is None:
@@ -95,7 +95,7 @@ async def get_datasource_image(
     "/api/datasources/{account}/{container}/datasource", response_model=DataSource
 )
 async def get_datasource(
-    datasource: DataSource = Depends(datasource_repo.get),
+    datasource: DataSource = Depends(datasources.get),
     current_user: Optional[dict] = Depends(get_current_user),
 ):
     if not datasource:
@@ -109,7 +109,7 @@ async def update_datasource(
     account: str,
     container: str,
     datasource: DataSource,
-    datasources_collection: AgnosticCollection = Depends(datasource_repo.collection),
+    datasources_collection: AgnosticCollection = Depends(datasources.collection),
     access_allowed=Depends(check_access),
 ):
     if access_allowed is None:
@@ -153,7 +153,7 @@ async def sync_datasource(
     account: str,
     container: str,
     background_tasks: BackgroundTasks,
-    datasources_collection: AgnosticCollection = Depends(datasource_repo.collection),
+    datasources_collection: AgnosticCollection = Depends(datasources.collection),
     current_user: Optional[dict] = Depends(get_current_user),
     access_allowed=Depends(check_access),
 ):
@@ -172,7 +172,7 @@ async def sync_datasource(
     if not existing_datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
 
-    background_tasks.add_task(datasource_repo.sync, account, container, current_user["preferred_username"])
+    background_tasks.add_task(datasources.sync, account, container, current_user["preferred_username"])
     return {"message": "Syncing"}
 
 
@@ -182,7 +182,7 @@ async def generate_sas_token(
     container: str,
     file_path: str,
     write: bool = Query(False),
-    datasources_collection: AgnosticCollection = Depends(datasource_repo.collection),
+    datasources_collection: AgnosticCollection = Depends(datasources.collection),
     access_allowed=Depends(check_access),
 ):
 

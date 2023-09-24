@@ -18,7 +18,7 @@ async def test_api_get_config(client):
 
     test_get_config = Configuration()
 
-    with mock.patch("app.config_repo.get", return_value=test_get_config):
+    with mock.patch("app.config.get", return_value=test_get_config):
         response = client.get("/api/config")
         assert response.status_code == 200
         assert response.json() == {
@@ -44,7 +44,7 @@ async def test_api_get_config_feature_flags(client):
     test_get_config = Configuration()
     test_get_config.feature_flags = {"test": True}
 
-    with mock.patch("app.config_repo.get", return_value=test_get_config):
+    with mock.patch("app.config.get", return_value=test_get_config):
         response = client.get("/api/config")
         assert response.status_code == 200
         assert response.json() == {

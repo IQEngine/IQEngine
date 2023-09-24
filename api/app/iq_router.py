@@ -4,7 +4,7 @@ import math
 from typing import List
 
 from .azure_client import AzureBlobClient
-from . import datasource_repo
+from . import datasources
 from .models import DataSource
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.responses import StreamingResponse
@@ -26,7 +26,7 @@ class IQData(BaseModel):
 
 
 async def get_sas_token(
-    datasource: DataSource = Depends(datasource_repo.get),
+    datasource: DataSource = Depends(datasources.get),
 ):
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
@@ -48,7 +48,7 @@ async def get_iq_data(
     block_indexes_str: str,
     block_size: int, # we grab 2x this many ints/floats
     format: str,
-    datasource: DataSource = Depends(datasource_repo.get),
+    datasource: DataSource = Depends(datasources.get),
     azure_client: AzureBlobClient = Depends(AzureBlobClient),
     access_allowed=Depends(check_access),
 ):
@@ -173,7 +173,7 @@ async def get_byte_stream(
 )
 async def get_iqfile(
     filepath: str,
-    datasource: DataSource = Depends(datasource_repo.get),
+    datasource: DataSource = Depends(datasources.get),
     azure_client: AzureBlobClient = Depends(AzureBlobClient),
     access_allowed=Depends(check_access),
 ):
@@ -203,7 +203,7 @@ async def get_minimap_iq(
     filepath: str,
     format: str,
     access_allowed=Depends(check_access),
-    datasource: DataSource = Depends(datasource_repo.get),
+    datasource: DataSource = Depends(datasources.get),
     azure_client: AzureBlobClient = Depends(AzureBlobClient),
 ):
     fft_size = 64

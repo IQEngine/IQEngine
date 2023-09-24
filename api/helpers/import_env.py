@@ -1,6 +1,6 @@
-from app.datasource_repo import import_datasources_from_env
+from app.datasources import import_datasources_from_env
 from app.plugins import import_plugins_from_env
-from app.config_repo import import_default_config_from_env
+from app.config import import_default_config_from_env
 
 # For whatever reason we cant define the 3 above in this file or else the mocks fail
 

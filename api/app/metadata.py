@@ -21,7 +21,7 @@ def versions_collection() -> AgnosticCollection:
     return collection
 
 
-async def get(account, container, filepath, access_allowed=Depends(check_access)) -> Metadata | None:
+async def get_metadata(account, container, filepath, access_allowed=Depends(check_access)) -> Metadata | None:
     """
     Get a metadata by account, container and filepath
 
