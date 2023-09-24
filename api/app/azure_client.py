@@ -6,7 +6,7 @@ from azure.storage.blob.aio import BlobClient, ContainerClient
 from .models import Metadata
 from helpers.urlmapping import ApiType, get_file_name
 from pydantic import SecretStr
-from .spectrogram import get_spectrogram_image
+from helpers.samples import get_spectrogram_image
 
 
 class AzureBlobClient:
