@@ -60,14 +60,11 @@ def get_spectrogram_image(
     ax = plt.Axes(fig, [0.0, 0.0, 1.0, 1.0])
     ax.set_axis_off()
     fig.add_axes(ax)
-    ax.imshow(
-        spectrogram, cmap=cmap, aspect="auto", vmin=30 + np.min(np.min(spectrogram))
-    )
+    ax.imshow(spectrogram, cmap=cmap, aspect="auto", vmin=30 + np.min(np.min(spectrogram)))
     img_buf = io.BytesIO()
     plt.savefig(img_buf, bbox_inches="tight", pad_inches=0)
     img_buf.seek(0)
     im = Image.open(img_buf)
     img_byte_arr = io.BytesIO()
     im.convert("RGB").save(img_byte_arr, format=format)
-    data = img_byte_arr.getvalue()
-    return data
+    return img_byte_arr.getvalue()

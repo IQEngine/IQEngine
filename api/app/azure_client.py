@@ -119,7 +119,8 @@ class AzureBlobClient:
 
     async def upload_blob(self, filepath: str, data: bytes):
         if self.account == "local":
-            raise Exception("Cannot upload to local")
+            print("Cannot upload to local") # making this a raise() was causing delay
+            return
         blob_client = self.get_blob_client(filepath)
         await blob_client.upload_blob(data, overwrite=True)
 
@@ -127,8 +128,7 @@ class AzureBlobClient:
         iq_path = get_file_name(filepath, ApiType.IQDATA)
         fftSize = 1024
         content = await self.get_blob_content(iq_path, 8000, fftSize * 512)
-        image = get_spectrogram_image(content, data_type, fftSize)
-        return image
+        return get_spectrogram_image(content, data_type, fftSize)
 
     async def get_metadata_files(self):
         # For local files

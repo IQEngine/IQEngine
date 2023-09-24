@@ -130,10 +130,7 @@ async def get_meta_thumbnail(
     # No authorization header is added to the request so the access_allowed is always None
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
-
-    if datasource.account == "local":
-        return None # TODO Add thumbnails for local to backend recordings
-
+    
     sas_token = datasource.sasToken.get_secret_value() if datasource.sasToken else None
     if sas_token is not None:
         azure_client.set_sas_token(decrypt(sas_token))
