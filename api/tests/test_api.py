@@ -15,6 +15,7 @@ async def test_api_get_config(client):
     os.environ["IQENGINE_INTERNAL_BRANDING"] = "internal_branding_string"
     os.environ["IQENGINE_APP_ID"] = "app_id"
     os.environ["IQENGINE_APP_AUTHORITY"] = "app_authority"
+    os.environ["IQENGINE_FEATURE_FLAGS"] = '{"bypassLandingPage": false}'
 
     test_get_config = Configuration()
 
@@ -24,33 +25,7 @@ async def test_api_get_config(client):
         assert response.json() == {
             "connectionInfo": {},
             "googleAnalyticsKey": "google_analytics_key",
-            "featureFlags": None,
-            "internalBranding": "internal_branding_string",
-            "appId": "app_id",
-            "appAuthority": "app_authority",
-            "uploadPageBlobSasUrl": None,
-            "hasAIQuery": False,
-        }
-
-
-@pytest.mark.asyncio
-async def test_api_get_config_feature_flags(client):
-    os.environ["IQENGINE_CONNECTION_INFO"] = "{}"
-    os.environ["IQENGINE_GOOGLE_ANALYTICS_KEY"] = "google_analytics_key"
-    os.environ["IQENGINE_INTERNAL_BRANDING"] = "internal_branding_string"
-    os.environ["IQENGINE_APP_ID"] = "app_id"
-    os.environ["IQENGINE_APP_AUTHORITY"] = "app_authority"
-
-    test_get_config = Configuration()
-    test_get_config.feature_flags = {"test": True}
-
-    with mock.patch("app.config.get", return_value=test_get_config):
-        response = client.get("/api/config")
-        assert response.status_code == 200
-        assert response.json() == {
-            "connectionInfo": {},
-            "googleAnalyticsKey": "google_analytics_key",
-            "featureFlags": {"test": True},
+            "featureFlags": {"bypassLandingPage": False},
             "internalBranding": "internal_branding_string",
             "appId": "app_id",
             "appAuthority": "app_authority",
