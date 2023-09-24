@@ -105,7 +105,6 @@ async def create(datasource: DataSource, user: Optional[dict]) -> DataSource:
     await datasource_collection.insert_one(datasource_dict)
     return datasource
 
-'''
 async def import_datasources_from_env(
     environment_variable_name="IQENGINE_CONNECTION_INFO",
 ):
@@ -155,4 +154,3 @@ async def import_datasources_from_env(
         except Exception as e:
             print(f"Failed to import datasource {connection['name']}", e)
             continue
-'''
