@@ -57,8 +57,14 @@ test:
 	@cd api && pytest
 
 test-pw:
+	@echo "NOTE- you must have make dev and make run-api running to use this"
 	@echo "Running Playwright frontend and end-to-end tests"
-	@cd e2e && npx playwright test
+	@cd e2e && npx playwright test --config playwright-pr.config.ts --grep @CICompatible
+	@e2e/teardown.sh
+
+test-pw-prod:
+	@echo "Running Playwright frontend and end-to-end tests"
+	@cd e2e && npx playwright test --config playwright-prod.config.ts
 	@e2e/teardown.sh
 
 test-api:
