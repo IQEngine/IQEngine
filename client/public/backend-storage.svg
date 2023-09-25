@@ -2,9 +2,9 @@
 <!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
 
 <svg
-   width="1800.2291"
-   height="1637.1884"
-   viewBox="0 0 54.006875 49.115652"
+   width="1655.1152"
+   height="711.00616"
+   viewBox="0 0 49.653458 21.330185"
    version="1.1"
    id="svg4"
    sodipodi:docname="backend-storage.svg"
@@ -24,9 +24,9 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      showgrid="false"
-     inkscape:zoom="0.22693708"
-     inkscape:cx="1531.2614"
-     inkscape:cy="1317.5458"
+     inkscape:zoom="0.3209375"
+     inkscape:cx="250.82765"
+     inkscape:cy="704.18695"
      inkscape:window-width="2560"
      inkscape:window-height="1369"
      inkscape:window-x="-8"
@@ -36,12 +36,12 @@
      fill="none"
      stroke="#000000"
      stroke-width="2"
-     d="m 17.003438,17.634749 c 0,0 1.666667,-3.076923 10,-3.076923 8.333333,0 10,3.076923 10,3.076923 v 13.846154 c 0,0 -1.666667,3.076923 -10,3.076923 -8.333333,0 -10,-3.076923 -10,-3.076923 z m 0,7.923077 c 0,0 3.333333,3 10,3 6.666667,0 10,-3 10,-3 m -20,-6 c 0,0 3.333333,3 10,3 6.666667,0 10,-3 10,-3"
+     d="m 0.30000001,3.376923 c 0,0 1.66666699,-3.07692299 9.99999999,-3.07692299 8.333333,0 10,3.07692299 10,3.07692299 v 13.846154 c 0,0 -1.666667,3.076923 -10,3.076923 -8.333333,0 -9.99999999,-3.076923 -9.99999999,-3.076923 z m 0,7.923077 c 0,0 3.33333299,3 9.99999999,3 6.666667,0 10,-3 10,-3 M 0.30000001,5.3 c 0,0 3.33333299,3 9.99999999,3 6.666667,0 10,-3 10,-3"
      id="path2"
-     style="stroke:#4de092;stroke-width:0.6;stroke-dasharray:none;stroke-opacity:1" /><rect
-     style="fill:none;stroke:#000000;stroke-width:0.6;stroke-opacity:1"
-     id="rect345"
-     width="54.067848"
-     height="49.308819"
-     x="-0.13219522"
-     y="-0.13219522" /></svg>
+     style="stroke:#4de092;stroke-width:0.6;stroke-dasharray:none;stroke-opacity:1" /><path
+     fill="none"
+     stroke="#000000"
+     stroke-width="2"
+     d="m 29.353457,4.1071082 c 0,0 1.666667,-3.076923 10,-3.076923 8.333333,0 10,3.076923 10,3.076923 V 17.953262 c 0,0 -1.666667,3.076923 -10,3.076923 -8.333333,0 -10,-3.076923 -10,-3.076923 z m 0,7.9230768 c 0,0 3.333333,3 10,3 6.666667,0 10,-3 10,-3 m -20,-5.9999999 c 0,0 3.333333,3.0000001 10,3.0000001 6.666667,0 10,-3 10,-3"
+     id="path2-3"
+     style="stroke:#4de092;stroke-width:0.6;stroke-dasharray:none;stroke-opacity:1" /></svg>
