@@ -120,7 +120,7 @@ async def import_datasources_from_env():
                     accountKey=None,
                     name="Local to Backend",
                     description="Files stored on the backend server in the " + str(base_filepath) + " directory",
-                    imageURL="https://th.bing.com/th/id/OIP.BEfnKPs6kn83PoQ3rzjHogHaIz?pid=ImgDet&rs=1",
+                    imageURL="https://raw.githubusercontent.com/IQEngine/IQEngine/backend-refactor/client/public/backend-storage.svg",
                     type="api",
                     public=True,
                     owners=["IQEngine-Admin"],
