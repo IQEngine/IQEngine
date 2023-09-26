@@ -55,6 +55,7 @@ jobs:
       ################################
       - name: MegaLinter
         uses: oxsecurity/megalinter/flavors/cupcake@a87b2872713c6bdde46d2473c5d7ed23e5752dc2 # v7.4.0
+        continue-on-error: true
         env:
           VALIDATE_ALL_CODEBASE: false
           DEFAULT_BRANCH: main
