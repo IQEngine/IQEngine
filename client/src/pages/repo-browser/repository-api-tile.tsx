@@ -13,6 +13,21 @@ const RepositoryAPITile = (props) => {
 
   const { type, name, account, container, imageURL, description } = item;
   const [isDisabled, setIsDisabled] = useState(false);
+  const [formattedDescription, setFormattedDescription] = useState<string>('');
+
+  useEffect(() => {
+    /*
+    const indx = description.indexOf('http');
+    let tempStr = ''
+    if (indx !== -1) {
+      tempStr += description.substring(0, indx);
+
+    } else {
+      tempStr += description;
+    }
+    */
+    setFormattedDescription(description + '<test>');
+  }, [description]);
 
   const handleOnClick = async () => {
     // so we can fetch when someone is linked to a repo directly
@@ -28,7 +43,7 @@ const RepositoryAPITile = (props) => {
       </figure>
       <div className="repocardbody">
         <h2>{name}</h2>
-        <p>{description}</p>
+        <p>{formattedDescription}</p>
       </div>
       <button
         id={name.replaceAll(' ', '')}
