@@ -1,5 +1,6 @@
 import asyncio
 import io
+import os
 
 import numpy as np
 from azure.storage.blob import BlobClient
@@ -20,6 +21,8 @@ data_mapping = {
 
 
 async def get_from_samples_cloud(samples_cloud: SamplesCloud) -> np.ndarray:
+    if samples_cloud.account_name == 'local':
+        return get_from_backend_server(samples_cloud.file_path, samples_cloud.byte_offset, samples_cloud.byte_length, samples_cloud.data_type)
     blob_url = f"https://{samples_cloud.account_name}.blob.core.windows.net/{samples_cloud.container_name}/{samples_cloud.file_path}.sigmf-data"
     if not samples_cloud.sas_token:
         blob_client = BlobClient.from_blob_url(blob_url)
@@ -27,14 +30,9 @@ async def get_from_samples_cloud(samples_cloud: SamplesCloud) -> np.ndarray:
         blob_client = BlobClient.from_blob_url(blob_url, credential=samples_cloud.sas_token)
 
     if samples_cloud.byte_length:
-        download_stream = await asyncio.to_thread(
-            blob_client.download_blob,
-            samples_cloud.byte_offset,
-            samples_cloud.byte_length,
-        )
+        download_stream = await asyncio.to_thread(blob_client.download_blob, samples_cloud.byte_offset, samples_cloud.byte_length)
     else:
-        # TODO: This is timing out, we need to find an asychronus way of
-        # processing the file without blocking a successful response
+        # TODO: This is timing out, we need to find an asynchronous way of processing the file without blocking a successful response
         download_stream = await asyncio.to_thread(blob_client.download_blob)
 
     buffer = np.frombuffer(
@@ -48,3 +46,11 @@ async def get_from_samples_cloud(samples_cloud: SamplesCloud) -> np.ndarray:
         buffer = buffer.astype(np.float32) / np.iinfo("int8").max
     
     return buffer.view(dtype=np.complex64)
+
+def get_from_backend_server(file_path, offset, length, data_type):
+    base_filepath = os.getenv("IQENGINE_BACKEND_LOCAL_FILEPATH", None)
+    if not base_filepath:
+        raise Exception("IQENGINE_BACKEND_LOCAL_FILEPATH not set")
+    dtype = data_mapping[data_type]
+    count = length // np.dtype(dtype).itemsize
+    return np.fromfile(os.path.join(base_filepath, file_path + '.sigmf-data'), dtype=dtype, count=count, offset=offset)
