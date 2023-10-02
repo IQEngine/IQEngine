@@ -1,7 +1,7 @@
-azure-storage-blob==12.18.1
+azure-storage-blob==12.18.2
 numpy==1.26.0
-scipy==1.11.2
-fastapi==0.103.1
+scipy==1.11.3
+fastapi==0.103.2
 jsonschema==4.19.1
 PyYAML==6.0.1
 pre-commit==3.4.0
@@ -12,6 +12,6 @@ urllib3==2.0.5
 json5==0.9.14
 pymongo==4.5.0
 Motor==3.3.1
-opencv-python==4.8.0.76
+opencv-python==4.8.1.78
 python-dotenv==1.0.0
-pydantic==1.10.12
+pydantic==1.10.13
