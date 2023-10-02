@@ -1,14 +1,14 @@
 aiohttp==3.8.5
-azure-storage-blob==12.18.1
+azure-storage-blob==12.18.2
 blinker==1.6.2
 cachetools==5.3.1
 click==8.1.7
 cryptography==41.0.4
-fastapi==0.103.1
+fastapi==0.103.2
 httpx==0.25.0
 Motor==3.3.1
-msal==1.24.0
-pydantic==1.10.12
+msal==1.24.1
+pydantic==1.10.13
 pyjwt==2.8.0
 pymongo==4.5.0
 pymongo-inmemory==0.3.1
@@ -19,4 +19,4 @@ matplotlib==3.8.0
 python-dotenv==1.0.0
 pytest-mock==3.11.1
 cache3==0.4.3
-openai==0.28.0
+openai==0.28.1
