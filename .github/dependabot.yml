@@ -3,8 +3,8 @@ updates:
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: weekly
-      day: sunday
+      interval: monthly
+      day: saturday
     # Create a group of dependencies to be updated together in one pull request
     groups:
       # Specify a name for the group, which will be used in pull request titles and branch names
@@ -16,8 +16,8 @@ updates:
   - package-ecosystem: docker
     directory: /
     schedule:
-      interval: weekly
-      day: sunday
+      interval: monthly
+      day: saturday
     groups:
       docker-root-repo:
         patterns:
@@ -26,8 +26,8 @@ updates:
   - package-ecosystem: docker
     directory: /client
     schedule:
-      interval: weekly
-      day: sunday
+      interval: monthly
+      day: saturday
     groups:
       docker-client:
         patterns:
@@ -36,8 +36,8 @@ updates:
   - package-ecosystem: docker
     directory: /plugins
     schedule:
-      interval: weekly
-      day: sunday
+      interval: monthly
+      day: saturday
     groups:
       docker-plugins:
         patterns:
@@ -56,7 +56,7 @@ updates:
   - package-ecosystem: npm
     directory: /e2e
     schedule:
-      interval: weekly
+      interval: monthly
       day: sunday
     groups:
       npm-e2e:
@@ -66,7 +66,7 @@ updates:
   - package-ecosystem: pip
     directory: /plugins/src
     schedule:
-      interval: weekly
+      interval: monthly
       day: sunday
     groups:
       pip-plugins:
