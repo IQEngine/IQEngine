@@ -76,7 +76,8 @@
     "vite-plugin-env-compatible": "^1.1.1",
     "vite-plugin-svgr": "^4.1.0",
     "vite-tsconfig-paths": "^4.2.1",
-    "web-vitals": "^3.5.0"
+    "web-vitals": "^3.5.0",
+    "webfft": "^1.0.0"
   },
   "devDependencies": {
     "@tanstack/eslint-plugin-query": "^4.36.0",
