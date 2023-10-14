@@ -125,6 +125,7 @@ export function useGetIQData(
           return [];
         }
         // performance.mark('start');
+        console.log('fftsize:===========', fftSize);
         let currentProcessedData = queryClient.getQueryData<number[][]>([
           'processedIQData',
           type,
@@ -181,6 +182,7 @@ export function useGetIQData(
   };
 }
 
+// currently only used by minimap
 export function useRawIQData(type, account, container, filePath, fftSize) {
   const rawIQQuery = useQuery<Float32Array[]>({
     queryKey: ['rawiqdata', type, account, container, filePath, fftSize],
