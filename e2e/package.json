@@ -11,14 +11,14 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@azure/identity": "^3.3.0",
+    "@azure/identity": "^3.3.1",
     "@azure/storage-blob": "^12.16.0",
-    "@playwright/test": "^1.38.1",
+    "@playwright/test": "^1.39.0",
     "dotenv": "^16.3.1",
     "dotenv-expand": "^10.0.0",
     "mongodb": "^6.1.0"
   },
   "dependencies": {
-    "playwright": "^1.38.1"
+    "playwright": "^1.39.0"
   }
 }
