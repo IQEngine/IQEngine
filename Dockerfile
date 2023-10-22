@@ -1,5 +1,5 @@
 # Build step #1: build the React front end
-FROM docker.io/node:20-alpine@sha256:37750e51d61bef92165b2e29a77da4277ba0777258446b7a9c99511f119db096 as build-step
+FROM docker.io/node:21-alpine@sha256:39bf945d56c29e7b3fa51632a7a07080475e5d5e5fc981543cdb735bc3bc01eb as build-step
 WORKDIR /app
 ENV PATH /app/node_modules/.bin:$PATH
 COPY client/package*.json ./
@@ -10,7 +10,7 @@ COPY .en[v] ./
 RUN npm run build
 
 # Build step #2: build the API with the client as static files
-FROM docker.io/python:3.12@sha256:1615c71b5f3d48844b8d20cac4838f34267d96c3b061dcb6e4fda61a71599a9d
+FROM docker.io/python:3.12@sha256:2586dd7abe015eeb6673bc66d18f0a628a997c293b41268bc981e826bc0b5a92
 LABEL org.opencontainers.image.description="IQEngine is a container image that provides a concise and efficient visualization and exploration tool for RF data in the SIGMF format."
 LABEL org.opencontainers.image.licenses=MIT
 WORKDIR /app
