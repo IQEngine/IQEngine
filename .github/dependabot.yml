@@ -4,7 +4,6 @@ updates:
     directory: /
     schedule:
       interval: monthly
-      day: saturday
     # Create a group of dependencies to be updated together in one pull request
     groups:
       # Specify a name for the group, which will be used in pull request titles and branch names
@@ -17,7 +16,6 @@ updates:
     directory: /
     schedule:
       interval: monthly
-      day: saturday
     groups:
       docker-root-repo:
         patterns:
@@ -27,7 +25,6 @@ updates:
     directory: /client
     schedule:
       interval: monthly
-      day: saturday
     groups:
       docker-client:
         patterns:
@@ -37,7 +34,6 @@ updates:
     directory: /plugins
     schedule:
       interval: monthly
-      day: saturday
     groups:
       docker-plugins:
         patterns:
@@ -57,7 +53,6 @@ updates:
     directory: /e2e
     schedule:
       interval: monthly
-      day: sunday
     groups:
       npm-e2e:
         patterns:
@@ -67,7 +62,6 @@ updates:
     directory: /plugins/src
     schedule:
       interval: monthly
-      day: sunday
     groups:
       pip-plugins:
         patterns:
