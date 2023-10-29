@@ -127,6 +127,13 @@ export function useRouter() {
           },
         },
         {
+          path: 'webfftbenchmark',
+          async lazy() {
+            let { WebfftBenchmark } = await import('@/pages/webfft-benchmark/webfft-benchmark');
+            return { Component: WebfftBenchmark };
+          },
+        },
+        {
           index: true,
           async lazy() {
             let { LandingPage } = await import('@/pages/landing-page/landing-page');

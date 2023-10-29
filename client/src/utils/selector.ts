@@ -13,9 +13,21 @@ stage4 - uint8 values after having the min/max and colormap applied
 // @ts-ignore
 import { fftshift } from 'fftshift';
 import { FFT } from '@/utils/fft';
+import webfft from 'webfft';
 
 export function calcFfts(samples: Float32Array, fftSize: number, windowFunction: string, numberOfFfts: number) {
   //let startTime = performance.now();
+
+  if (typeof window.webfft === 'undefined') {
+    window.webfft = new webfft(fftSize);
+    window.webfft.profile(0.5);
+  } else {
+    if (window.webfft.size !== fftSize) {
+      console.log('Changing to FFT Size:', window.webfft.size);
+      window.webfft = new webfft(fftSize);
+      window.webfft.profile(0.5);
+    }
+  }
 
   let fftsConcatenated = new Float32Array(numberOfFfts * fftSize);
 
@@ -50,9 +62,11 @@ export function calcFfts(samples: Float32Array, fftSize: number, windowFunction:
       }
     }
 
-    const f = new FFT(fftSize);
-    let out = f.createComplexArray(); // creates an empty array the length of fft.size*2
-    f.transform(out, samples_slice); // assumes input (2nd arg) is in form IQIQIQIQ and twice the length of fft.size
+    if (samples_slice.length !== fftSize * 2) {
+      console.error('samples_slice.length is', samples_slice.length, 'but should be fftSize * 2 which is', fftSize * 2);
+      continue;
+    }
+    let out = window.webfft.fft(samples_slice); // assumes input is in form IQIQIQIQ and twice the length of fftsize
 
     out = out.map((x) => x / fftSize); // divide by fftsize
 
