@@ -49,6 +49,7 @@
     "axios": "^1.5.1",
     "bootswatch": "^5.3.2",
     "browser-fs-access": "^0.35.0",
+    "chart.js": "^4.4.0",
     "daisyui": "^3.9.2",
     "fftshift": "^1.0.1",
     "konva": "^9.2.2",
@@ -58,6 +59,7 @@
     "postcss": "^8.4.31",
     "pyodide": "^0.24.1",
     "react": "^18.2.0",
+    "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
     "react-frame-component": "^5.2.6",
     "react-ga4": "^2.1.0",
@@ -65,6 +67,7 @@
     "react-konva": "18.2.10",
     "react-konva-utils": "^1.0.5",
     "react-leaflet": "^4.2.1",
+    "react-loader-spinner": "^5.4.5",
     "react-plotly.js": "^2.6.0",
     "react-router-dom": "^6.16.0",
     "styled-components": "^6.1.0",
@@ -76,7 +79,8 @@
     "vite-plugin-env-compatible": "^1.1.1",
     "vite-plugin-svgr": "^4.1.0",
     "vite-tsconfig-paths": "^4.2.1",
-    "web-vitals": "^3.5.0"
+    "web-vitals": "^3.5.0",
+    "webfft": "^1.0.0"
   },
   "devDependencies": {
     "@tanstack/eslint-plugin-query": "^4.36.1",

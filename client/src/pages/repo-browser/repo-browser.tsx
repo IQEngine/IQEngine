@@ -10,6 +10,7 @@ import RepositoryTile from './repository-tile';
 import RepositoryAPITile from './repository-api-tile';
 import SiggenTile from './siggen-tile';
 import ValidatorTile from './validator-tile';
+import WebfftBenchmark from './webfft-benchmark-tile';
 import MetadataQueryTile from './metadata-query-tile';
 import { useConfigQuery } from '@/api/config/queries';
 import { getDataSources } from '@/api/datasource/queries';
@@ -55,22 +56,17 @@ export const RepoBrowser = () => {
       <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
         <div className="grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-10 justify-items-center">
           {!getFeatureFlag(FeatureFlag.useAPIDatasources.name as FeatureFlagName) && (
-            <>
-              {blobDataSources.data?.map((item, i) => (
-                <RepositoryTile key={i} item={item} />
-              ))}
-            </>
+            <>{blobDataSources.data?.map((item, i) => <RepositoryTile key={i} item={item} />)}</>
           )}
           <Feature flag={FeatureFlag.useAPIDatasources.name}>
-            {apiDataSources?.data?.map((item, i) => (
-              <RepositoryAPITile key={i} item={item} />
-            ))}
+            {apiDataSources?.data?.map((item, i) => <RepositoryAPITile key={i} item={item} />)}
           </Feature>
           <LocalFileBrowser />
           <AzureBlobBrowser />
           <MetadataQueryTile />
           <SiggenTile />
           <ValidatorTile />
+          <WebfftBenchmark />
         </div>
       </div>
     </div>
