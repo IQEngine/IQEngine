@@ -15,6 +15,7 @@ Tested on Ubuntu 22 with Python and make already installed, but should work for 
 1. Clone this repo, `git clone https://github.com/IQEngine/IQEngine.git`
 1. `cd IQEngine`
 1. Within the root directory copy and paste the 'example.env' and rename to '.env', this is where you can configure your deployment
+1. To serve recordings stored on your computer, edit .env, and add `IQENGINE_BACKEND_LOCAL_FILEPATH = "/tmp/lte"` or whichever directory you want to serve from
 1. (Optional) If you want the GNU Radio example tile to show up, ask an admin on Discord for the .env entry (specifically, IQENGINE_CONNECTION_INFO)
 1. From the root directory run the command ```make setup``` (ignore warnings)
 1. Open three concurrent terminals for backend, frontend, and plugins
