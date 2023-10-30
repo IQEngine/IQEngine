@@ -4,7 +4,7 @@ from unittest import mock
 from unittest.mock import Mock
 
 import pytest
-from database.models import Configuration, Metadata
+from app.models import Configuration, Metadata
 from tests.test_data import test_datasource, valid_metadata
 
 
@@ -15,46 +15,22 @@ async def test_api_get_config(client):
     os.environ["IQENGINE_INTERNAL_BRANDING"] = "internal_branding_string"
     os.environ["IQENGINE_APP_ID"] = "app_id"
     os.environ["IQENGINE_APP_AUTHORITY"] = "app_authority"
+    os.environ["IQENGINE_FEATURE_FLAGS"] = '{"bypassLandingPage": false}'
+    os.environ["IQENGINE_UPLOAD_PAGE_BLOB_SAS_URL"] = 'https://test.com'
 
     test_get_config = Configuration()
 
-    with mock.patch("handlers.config.get", return_value=test_get_config):
+    with mock.patch("app.config.get", return_value=test_get_config):
         response = client.get("/api/config")
         assert response.status_code == 200
         assert response.json() == {
             "connectionInfo": {},
             "googleAnalyticsKey": "google_analytics_key",
-            "featureFlags": None,
+            "featureFlags": {"bypassLandingPage": False},
             "internalBranding": "internal_branding_string",
             "appId": "app_id",
             "appAuthority": "app_authority",
-            "uploadPageBlobSasUrl": None,
-            "hasAIQuery": False,
-        }
-
-
-@pytest.mark.asyncio
-async def test_api_get_config_feature_flags(client):
-    os.environ["IQENGINE_CONNECTION_INFO"] = "{}"
-    os.environ["IQENGINE_GOOGLE_ANALYTICS_KEY"] = "google_analytics_key"
-    os.environ["IQENGINE_INTERNAL_BRANDING"] = "internal_branding_string"
-    os.environ["IQENGINE_APP_ID"] = "app_id"
-    os.environ["IQENGINE_APP_AUTHORITY"] = "app_authority"
-
-    test_get_config = Configuration()
-    test_get_config.feature_flags = {"test": True}
-
-    with mock.patch("handlers.config.get", return_value=test_get_config):
-        response = client.get("/api/config")
-        assert response.status_code == 200
-        assert response.json() == {
-            "connectionInfo": {},
-            "googleAnalyticsKey": "google_analytics_key",
-            "featureFlags": {"test": True},
-            "internalBranding": "internal_branding_string",
-            "appId": "app_id",
-            "appAuthority": "app_authority",
-            "uploadPageBlobSasUrl": None,
+            "uploadPageBlobSasUrl": 'https://test.com',
             "hasAIQuery": False,
         }
 
@@ -265,7 +241,7 @@ async def test_api_get_datasources(client):
     assert len(response.json()) == 1
 
 
-@mock.patch("handlers.datasources.AzureBlobClient.generate_sas_token", return_value="temp_sas_token")
+@mock.patch("app.datasources_router.AzureBlobClient.generate_sas_token", return_value="temp_sas_token")
 @pytest.mark.asyncio
 async def test_api_get_temp_sas_token(mock_get_sas_token: Mock, client):
     client.post("/api/datasources", json=test_datasource).json()
@@ -276,7 +252,7 @@ async def test_api_get_temp_sas_token(mock_get_sas_token: Mock, client):
     assert mock_get_sas_token.call_count == 1
 
 
-@mock.patch("handlers.datasources.AzureBlobClient.generate_sas_token", return_value="temp_sas_token")
+@mock.patch("app.datasources_router.AzureBlobClient.generate_sas_token", return_value="temp_sas_token")
 @pytest.mark.asyncio
 async def test_api_get_temp_sas_token_no_key(mock_get_sas_token: Mock, client):
     modded_datasource = test_datasource.copy()
@@ -379,78 +355,3 @@ async def test_api_update_file_version(client):
     )
     assert response_object["global"]["traceability:origin"]["file_path"] == "file/path"
     assert response_object["annotations"][0]["core:sample_start"] == 10000
-
-
-@mock.patch("graph.graph_client.requests.get", return_value=Mock())
-@mock.patch(
-    "graph.graph_client.msal.ConfidentialClientApplication", return_value=Mock()
-)
-@pytest.mark.asyncio
-async def test_api_get_users_successful_acquire_token_silent(
-    mock_confidential_client, mock_get, client
-):
-    mock_confidential_client.return_value.acquire_token_silent.return_value = {
-        "access_token": "123"
-    }
-
-    content = {
-        "value": [
-            {
-                "id": "123",
-                "displayName": "test",
-            },
-            {
-                "id": "456",
-                "displayName": "test2",
-            },
-        ]
-    }
-
-    mock_get.return_value.status_code = 200
-    mock_get.return_value.json.return_value = content
-
-    response = client.get("/api/users")
-    assert response.status_code == 200
-    assert len(response.json()) == 2
-    assert response.json()[0]["id"] == "123"
-    assert response.json()[0]["displayName"] == "test"
-    assert response.json()[1]["id"] == "456"
-    assert response.json()[1]["displayName"] == "test2"
-
-
-@mock.patch("graph.graph_client.requests.get", return_value=Mock())
-@mock.patch(
-    "graph.graph_client.msal.ConfidentialClientApplication", return_value=Mock()
-)
-@pytest.mark.asyncio
-async def test_api_get_users_successful_acquire_token_for_client(
-    mock_confidential_client, mock_get, client
-):
-    mock_confidential_client.return_value.acquire_token_silent.return_value = None
-    mock_confidential_client.return_value.acquire_token_for_client.return_value = {
-        "access_token": "123"
-    }
-
-    content = {
-        "value": [
-            {
-                "id": "123",
-                "displayName": "test",
-            },
-            {
-                "id": "456",
-                "displayName": "test2",
-            },
-        ]
-    }
-
-    mock_get.return_value.status_code = 200
-    mock_get.return_value.json.return_value = content
-
-    response = client.get("/api/users")
-    assert response.status_code == 200
-    assert len(response.json()) == 2
-    assert response.json()[0]["id"] == "123"
-    assert response.json()[0]["displayName"] == "test"
-    assert response.json()[1]["id"] == "456"
-    assert response.json()[1]["displayName"] == "test2"

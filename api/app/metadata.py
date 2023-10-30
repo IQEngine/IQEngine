@@ -5,23 +5,23 @@ from datetime import datetime
 from fastapi import Depends
 from helpers.datasource_access import check_access
 
-from database.models import Metadata, DataSourceReference
+from .models import Metadata, DataSourceReference
 from motor.core import AgnosticCollection
 
 
 def collection() -> AgnosticCollection:
-    from database.database import db
+    from .database import db
     collection: AgnosticCollection = db().metadata
     return collection
 
 
 def versions_collection() -> AgnosticCollection:
-    from database.database import db
+    from .database import db
     collection: AgnosticCollection = db().versions
     return collection
 
 
-async def get(account, container, filepath, access_allowed=Depends(check_access)) -> Metadata | None:
+async def get_metadata(account, container, filepath, access_allowed=Depends(check_access)) -> Metadata | None:
     """
     Get a metadata by account, container and filepath
 

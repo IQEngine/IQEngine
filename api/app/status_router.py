@@ -1,4 +1,4 @@
-from database import datasource_repo
+from . import datasources
 from fastapi import APIRouter, Depends
 from motor.motor_asyncio import AsyncIOMotorCollection
 from pymongo.errors import ServerSelectionTimeoutError
@@ -9,7 +9,7 @@ router = APIRouter()
 @router.get("/api/status")
 async def get_status(
     datasources_collection: AsyncIOMotorCollection = Depends(
-        datasource_repo.collection
+        datasources.collection
     ),
 ):
     # Validate system functionality

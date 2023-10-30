@@ -1,15 +1,17 @@
 from typing import Optional
+import asyncio
+import json
+import os
 
-from blob.azure_client import AzureBlobClient
-from database.models import DataSource, DataSourceReference
+from .azure_client import AzureBlobClient
+from .models import DataSource, DataSourceReference
 from helpers.cipher import decrypt, encrypt
 from motor.core import AgnosticCollection
-from rf.samples import get_bytes_per_iq_sample
-
+from helpers.samples import get_bytes_per_iq_sample
+from .models import DataSource
 
 def collection() -> AgnosticCollection:
-    from database.database import db
-
+    from .database import db
     collection: AgnosticCollection = db().datasources
     return collection
 
@@ -31,7 +33,7 @@ async def datasource_exists(account, container) -> bool:
 
 
 async def sync(account: str, container: str):
-    import database.metadata_repo
+    from .metadata import exists, create
 
     azure_blob_client = AzureBlobClient(account, container)
     datasource = await get(account, container)
@@ -43,7 +45,7 @@ async def sync(account: str, container: str):
     async for metadata in metadatas:
         filepath = metadata[0].replace(".sigmf-meta", "")
         try:
-            if await database.metadata_repo.exists(account, container, filepath):
+            if await exists(account, container, filepath):
                 print(f"[SYNC] Metadata already exists for {filepath}")
                 continue
             if not await azure_blob_client.blob_exist(filepath + ".sigmf-data"):
@@ -66,7 +68,7 @@ async def sync(account: str, container: str):
                 file_length
                 / get_bytes_per_iq_sample(metadata.globalMetadata.core_datatype)
             )
-            await database.metadata_repo.create(metadata, user=None)
+            await create(metadata, user=None)
             print(f"[SYNC] Created metadata for {filepath}")
         except Exception as e:
             print(f"[SYNC] Error creating metadata for {filepath}: {e}")
@@ -102,3 +104,60 @@ async def create(datasource: DataSource, user: Optional[dict]) -> DataSource:
         datasource_dict["public"] = True
     await datasource_collection.insert_one(datasource_dict)
     return datasource
+
+async def import_datasources_from_env():
+    connection_info = os.getenv("IQENGINE_CONNECTION_INFO", None)
+    base_filepath = os.getenv("IQENGINE_BACKEND_LOCAL_FILEPATH", None)
+    if (not connection_info) and (not base_filepath):
+        return None
+    if base_filepath:
+        try:
+            if not await datasource_exists('local', 'local'):
+                datasource = DataSource(
+                    account='local',
+                    container='local',
+                    sasToken=None,
+                    accountKey=None,
+                    name="Local to Backend",
+                    description="Files stored on the backend server in the " + str(base_filepath) + " directory",
+                    imageURL="https://raw.githubusercontent.com/IQEngine/IQEngine/backend-refactor/client/public/backend-storage.svg",
+                    type="api",
+                    public=True,
+                    owners=["IQEngine-Admin"],
+                    readers=[],
+                )
+                await create(datasource=datasource, user=None)
+                asyncio.create_task(sync("local", "local"))
+        except Exception as e:
+            print(f"Failed to import datasource local to backend", e)
+    if connection_info:
+        for connection in json.loads(connection_info)["settings"]:
+            try:
+                if await datasource_exists(
+                    connection["accountName"], connection["containerName"]
+                ):
+                    continue
+                datasource = DataSource(
+                    account=connection["accountName"],
+                    container=connection["containerName"],
+                    sasToken=connection["sasToken"],
+                    accountKey=connection["accountKey"]  if "accountKey" in connection else None,
+                    name=connection["name"],
+                    description=connection["description"]
+                    if "description" in connection
+                    else None,
+                    imageURL=connection["imageURL"] if "imageURL" in connection else None,
+                    type="api",
+                    public=connection["public"] if "public" in connection else True,
+                    owners=connection["owners"] if "owners" in connection else ["IQEngine-Admin"],
+                    readers=connection["readers"] if "readers" in connection else [],
+                )
+                await create(datasource=datasource, user=None)
+                asyncio.create_task(
+                    sync(
+                        connection["accountName"], connection["containerName"]
+                    )
+                )
+            except Exception as e:
+                print(f"Failed to import datasource {connection['name']}", e)
+                continue

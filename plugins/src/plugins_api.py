@@ -1,16 +1,13 @@
 import copy
 import logging
 import os
+import base64
 
+import numpy as np
 import fastapi
 from fastapi.middleware.cors import CORSMiddleware
 from models.plugins import Plugin
-from samples import (
-    get_custom_params,
-    get_from_samples_b64,
-    get_from_samples_cloud,
-    validate_samples,
-)
+from samples import get_from_samples_cloud
 
 app = fastapi.FastAPI()
 
@@ -54,16 +51,21 @@ async def get_plugin_definition(plugin_name: str):
 async def run(plugin_name, plugin: Plugin):
     plugin_definition = await get_core_plugin_definition(plugin_name)
     try:
-        validate_samples(plugin.samples_b64, plugin.samples_cloud)
+        if plugin.samples_b64 and plugin.samples_cloud:
+            raise ValueError("Only one of samples_b64 or samples_cloud can be specified")
+        if not plugin.samples_b64 and not plugin.samples_cloud:
+            raise ValueError("One of samples_b64 or samples_cloud must be specified")
 
+        custom_params = plugin.custom_params
         if plugin.samples_b64:
-            samples = get_from_samples_b64(plugin.samples_b64[0])
-            custom_params = get_custom_params(plugin, plugin.samples_b64[0])
+            samples = np.frombuffer(base64.decodebytes(plugin.samples_b64[0].samples.encode()), dtype=np.complex64)
+            custom_params["sample_rate"] = plugin.samples_b64[0].sample_rate
+            custom_params["center_freq"] = plugin.samples_b64[0].center_freq
         else:
             samples = await get_from_samples_cloud(plugin.samples_cloud[0])
-            custom_params = get_custom_params(plugin, plugin.samples_cloud[0])
-            # Extract samples
-
+            custom_params["sample_rate"] = plugin.samples_cloud[0].sample_rate
+            custom_params["center_freq"] = plugin.samples_cloud[0].center_freq
+        
         plugin_instance = plugin_definition(**custom_params)  # a way to provide params as a single dict
 
         return plugin_instance.run(samples) # all python plugins should have a run method that takes in the samples

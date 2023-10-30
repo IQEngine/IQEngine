@@ -1,10 +1,10 @@
 from datetime import datetime
 from typing import List, Optional
 
-from blob.azure_client import AzureBlobClient
-from database import datasource_repo, metadata_repo
-from database.metadata_repo import InvalidGeolocationFormat, query_metadata
-from database.models import DataSource, DataSourceReference, Metadata, TrackMetadata
+from .azure_client import AzureBlobClient
+from . import datasources
+from .metadata import InvalidGeolocationFormat, query_metadata, collection, get_metadata, versions_collection
+from .models import DataSource, DataSourceReference, Metadata, TrackMetadata
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Response
 from fastapi.responses import StreamingResponse
 from helpers.authorization import get_current_user
@@ -12,7 +12,7 @@ from helpers.cipher import decrypt
 from helpers.datasource_access import check_access
 from helpers.urlmapping import ApiType, get_content_type, get_file_name
 from motor.core import AgnosticCollection
-from aifunctions import aiquery
+from . import aiquery
 
 router = APIRouter()
 
@@ -25,14 +25,13 @@ router = APIRouter()
 async def get_all_meta(
     account,
     container,
-    metadatas: AgnosticCollection = Depends(metadata_repo.collection),
+    metadatas: AgnosticCollection = Depends(collection),
     access_allowed=Depends(check_access),
 ):
     if access_allowed is None:
         return []
 
-    # Return all metadata for this datasource, could be an empty
-    # list
+    # Return all metadata for this datasource, could be an empty list
     metadata = metadatas.find(
         {
             "global.traceability:origin.account": account,
@@ -53,7 +52,7 @@ async def get_all_meta(
 async def get_all_meta_name(
     account,
     container,
-    metadata_source: AgnosticCollection = Depends(metadata_repo.collection),
+    metadata_source: AgnosticCollection = Depends(collection),
     access_allowed=Depends(check_access),
 ):
     if access_allowed is None:
@@ -80,7 +79,7 @@ async def get_all_meta_name(
     response_model=Metadata,
 )
 async def get_meta(
-    metadata: Metadata = Depends(metadata_repo.get),
+    metadata: Metadata = Depends(get_metadata),
     access_allowed=Depends(check_access),
 ):
     if access_allowed is None:
@@ -95,7 +94,7 @@ async def get_meta(
     response_model=TrackMetadata,
 )
 async def get_track_meta(
-    metadata: Metadata = Depends(metadata_repo.get),
+    metadata: Metadata = Depends(get_metadata),
     access_allowed=Depends(check_access),
 ):
     if access_allowed is None:
@@ -123,7 +122,7 @@ async def get_track_meta(
 async def get_meta_thumbnail(
     filepath: str,
     background_tasks: BackgroundTasks,
-    datasource: DataSource = Depends(datasource_repo.get),
+    datasource: DataSource = Depends(datasources.get),
     azure_client: AzureBlobClient = Depends(AzureBlobClient),
     # access_allowed=Depends(check_access)
 ):
@@ -131,7 +130,7 @@ async def get_meta_thumbnail(
     # No authorization header is added to the request so the access_allowed is always None
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
-
+    
     sas_token = datasource.sasToken.get_secret_value() if datasource.sasToken else None
     if sas_token is not None:
         azure_client.set_sas_token(decrypt(sas_token))
@@ -145,7 +144,7 @@ async def get_meta_thumbnail(
     thumbnail_path = get_file_name(filepath, ApiType.THUMB)
     content_type = get_content_type(ApiType.THUMB)
     if not await azure_client.blob_exist(thumbnail_path):
-        metadata = await metadata_repo.get(
+        metadata = await get_metadata(
             datasource.account,
             datasource.container,
             filepath,
@@ -346,9 +345,9 @@ async def create_meta(
     container: str,
     filepath: str,
     metadata: Metadata,
-    datasources: AgnosticCollection = Depends(datasource_repo.collection),
-    metadatas: AgnosticCollection = Depends(metadata_repo.collection),
-    versions: AgnosticCollection = Depends(metadata_repo.versions_collection),
+    datasources: AgnosticCollection = Depends(datasources.collection),
+    metadatas: AgnosticCollection = Depends(collection),
+    versions: AgnosticCollection = Depends(versions_collection),
     current_user=Depends(get_current_user),
     access_allowed=Depends(check_access),
 ):
@@ -403,8 +402,8 @@ async def update_meta(
     container,
     filepath,
     metadata: Metadata,
-    metadatas: AgnosticCollection = Depends(metadata_repo.collection),
-    versions: AgnosticCollection = Depends(metadata_repo.versions_collection),
+    metadatas: AgnosticCollection = Depends(collection),
+    versions: AgnosticCollection = Depends(versions_collection),
     current_user=Depends(get_current_user),
     access_allowed=Depends(check_access),
 ):

@@ -1,12 +1,12 @@
 import json
 import os
 
-from database import config_repo
-from database.config_repo import exists, get
-from database.models import Configuration
+from . import config
+from .config import exists, get
+from .models import Configuration
 from fastapi import APIRouter, Depends, HTTPException
 from motor.core import AgnosticCollection
-from aifunctions import aiquery
+from . import aiquery
 
 router = APIRouter()
 
@@ -22,9 +22,12 @@ async def get_config():
         configuration = Configuration()
 
     connection_info = os.getenv("IQENGINE_CONNECTION_INFO", None)
-
     if connection_info:
         configuration.connection_info = json.loads(connection_info)
+
+    feature_flags = os.getenv("IQENGINE_FEATURE_FLAGS", None)
+    if feature_flags:
+        configuration.feature_flags = json.loads(feature_flags)
 
     configuration.google_analytics_key = os.getenv(
         "IQENGINE_GOOGLE_ANALYTICS_KEY", configuration.google_analytics_key
@@ -48,7 +51,7 @@ async def get_config():
 @router.put("/api/config", status_code=200)
 async def update_config(
     config: Configuration,
-    configuration: AgnosticCollection = Depends(config_repo.collection),
+    configuration: AgnosticCollection = Depends(config.collection),
 ):
     """
     update the IQEngine configuration

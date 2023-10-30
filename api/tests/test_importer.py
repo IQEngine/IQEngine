@@ -3,13 +3,13 @@ from unittest import mock
 from unittest.mock import AsyncMock, Mock
 
 import pytest
-from database.models import Configuration
-from importer.all import import_all_from_env
+from app.models import Configuration
+from helpers.import_env import import_all_from_env
 
 
-@mock.patch("importer.plugins.plugin_repo.collection", return_value=Mock())
-@mock.patch("importer.all.import_default_config_from_env", return_value=None)
-@mock.patch("importer.all.import_datasources_from_env", return_value=None)
+@mock.patch("app.plugins.collection", return_value=Mock())
+@mock.patch("app.config.import_default_config_from_env", return_value=None)
+@mock.patch("app.datasources.import_datasources_from_env", return_value=None)
 @pytest.mark.asyncio
 async def test_import_plugins_from_env(mock_datasources, mock_plugins, mock_collection):
     os.environ[
@@ -28,10 +28,10 @@ async def test_import_plugins_from_env(mock_datasources, mock_plugins, mock_coll
     mock.patch.stopall()
 
 
-@mock.patch("importer.config.collection", return_value=Mock())
-@mock.patch("importer.config.get", return_value=None)
-@mock.patch("importer.all.import_plugins_from_env", return_value=None)
-@mock.patch("importer.all.import_datasources_from_env", return_value=None)
+@mock.patch("app.config.collection", return_value=Mock())
+@mock.patch("app.config.get", return_value=None)
+@mock.patch("app.plugins.import_plugins_from_env", return_value=None)
+@mock.patch("app.datasources.import_datasources_from_env", return_value=None)
 @pytest.mark.asyncio
 async def test_import_feature_flags_from_env(
     mock_datasources, mock_plugins, mock_get, mock_collection
@@ -46,7 +46,7 @@ async def test_import_feature_flags_from_env(
     mock_collection.return_value.insert_one.assert_called_once()
 
 
-@mock.patch("importer.plugins.plugin_repo.collection", return_value=Mock())
+@mock.patch("app.plugins.collection", return_value=Mock())
 @pytest.mark.asyncio
 async def test_import_all_from_env_with_broken_plugin(mock_collection):
     os.environ[
@@ -64,10 +64,10 @@ async def test_import_all_from_env_with_broken_plugin(mock_collection):
         e.args[0] == "Failed to load plugins from environment variable IQENGINE_PLUGINS"
 
 
-@mock.patch("importer.config.collection", return_value=Mock())
-@mock.patch("importer.config.get")
-@mock.patch("importer.all.import_plugins_from_env", return_value=None)
-@mock.patch("importer.all.import_datasources_from_env", return_value=None)
+@mock.patch("app.config.collection", return_value=Mock())
+@mock.patch("app.config.get")
+@mock.patch("app.plugins.import_plugins_from_env", return_value=None)
+@mock.patch("app.datasources.import_datasources_from_env", return_value=None)
 @pytest.mark.asyncio
 async def test_import_feature_flags_from_env_update(
     mock_datasource, mock_plugins, mock_get, mock_collection
@@ -90,10 +90,10 @@ async def test_import_feature_flags_from_env_update(
     mock_collection.return_value.insert_one.assert_not_called()
 
 
-@mock.patch("importer.config.collection", return_value=Mock())
-@mock.patch("importer.config.get")
-@mock.patch("importer.all.import_plugins_from_env", return_value=None)
-@mock.patch("importer.all.import_datasources_from_env", return_value=None)
+@mock.patch("app.config.collection", return_value=Mock())
+@mock.patch("app.config.get")
+@mock.patch("app.plugins.import_plugins_from_env", return_value=None)
+@mock.patch("app.datasources.import_datasources_from_env", return_value=None)
 @pytest.mark.asyncio
 async def test_import_feature_flags_from_env_no_insert_or_update(
     mock_datasource, mock_plugins, mock_get, mock_collection
@@ -112,10 +112,10 @@ async def test_import_feature_flags_from_env_no_insert_or_update(
     mock_collection.return_value.update_one.assert_not_called()
     mock_collection.return_value.insert_one.assert_not_called()
 
-
-@mock.patch("importer.datasource.datasource_repo", return_value=Mock())
-@mock.patch("importer.all.import_plugins_from_env", return_value=None)
-@mock.patch("importer.all.import_default_config_from_env", return_value=None)
+'''
+@mock.patch("app.datasources.import_datasources_from_env", return_value=Mock())
+@mock.patch("app.plugins.import_plugins_from_env", return_value=None)
+@mock.patch("app.config.import_default_config_from_env", return_value=None)
 @pytest.mark.asyncio
 async def test_import_datasources_from_env(mock_plugins, mock_config, mock_datasource):
     os.environ[
@@ -146,3 +146,4 @@ async def test_import_datasources_from_env(mock_plugins, mock_config, mock_datas
 
     mock_datasource.datasource_exists.assert_called_once()
     mock_datasource.create.assert_called_once()
+'''

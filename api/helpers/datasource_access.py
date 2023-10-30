@@ -1,6 +1,6 @@
 from fastapi import Depends
 from helpers.authorization import get_current_user
-from database.database import db
+from app.database import db
 
 
 async def check_access(account: str, container: str, user=Depends(get_current_user)) -> str | None:
@@ -20,6 +20,8 @@ async def check_access(account: str, container: str, user=Depends(get_current_us
     -------
     "public", "reader", "owner", or None
     """
+    if account == "local":
+        return "reader"
     groups = user.get("groups", [])
     if isinstance(groups, str):
         groups = [groups]

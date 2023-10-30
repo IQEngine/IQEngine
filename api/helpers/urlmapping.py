@@ -1,9 +1,6 @@
 from enum import Enum
-
 from pydantic import SecretStr
-
 from .cipher import decrypt
-
 
 class ApiType(Enum):
     IMAGE = 1

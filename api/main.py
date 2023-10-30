@@ -2,19 +2,21 @@ import logging
 import os
 from logging.config import dictConfig
 
-from database.database import db
+from app.database import db
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
-from handlers.config import router as config_router
-from handlers.datasources import router as datasources_router
-from handlers.iq import router as iq_router
-from handlers.metadata import router as metadata_router
-from handlers.plugins import router as plugins_router
-from handlers.status import router as status_router
+
+from app.config_router import router as config_router
+from app.datasources_router import router as datasources_router
+from app.iq_router import router as iq_router
+from app.metadata_router import router as metadata_router
+from app.plugins_router import router as plugins_router
+from app.status_router import router as status_router
+from app.users_router import router as users_router
+
 from helpers.apidisconnect import CancelOnDisconnectRoute
-from handlers.users import router as users_router
-from importer.all import import_all_from_env
+from helpers.import_env import import_all_from_env
 from pydantic import BaseModel
 from pymongo.errors import ServerSelectionTimeoutError
 from starlette.exceptions import HTTPException

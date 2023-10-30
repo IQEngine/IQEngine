@@ -1,5 +1,5 @@
-from database import plugin_repo
-from database.models import Plugin
+from . import plugins
+from .models import Plugin
 from fastapi import APIRouter, Depends, HTTPException
 from helpers.authorization import get_current_user
 from motor.core import AgnosticCollection
@@ -12,7 +12,7 @@ router = APIRouter()
 @router.post("/api/plugins", status_code=201, response_model=Plugin)
 async def create_plugin(
     plugin: Plugin,
-    plugins: AgnosticCollection = Depends(plugin_repo.collection),
+    plugins: AgnosticCollection = Depends(plugins.collection),
     current_user: Optional[dict] = Depends(get_current_user),
 ):
     """
@@ -29,7 +29,7 @@ async def create_plugin(
 @router.get("/api/plugins/", response_model=list[Plugin])
 @router.get("/api/plugins", response_model=list[Plugin])
 async def get_plugins(
-    plugins: AgnosticCollection = Depends(plugin_repo.collection),
+    plugins: AgnosticCollection = Depends(plugins.collection),
     current_user: Optional[dict] = Depends(get_current_user),
 ):
     """
@@ -44,7 +44,7 @@ async def get_plugins(
 )
 async def get_plugin(
     plugin_name: str,
-    plugins: AgnosticCollection = Depends(plugin_repo.collection),
+    plugins: AgnosticCollection = Depends(plugins.collection),
     current_user: Optional[dict] = Depends(get_current_user),
 ):
     """
@@ -63,7 +63,7 @@ async def get_plugin(
 async def update_plugin(
     plugin_name: str,
     plugin: Plugin,
-    plugins: AgnosticCollection = Depends(plugin_repo.collection),
+    plugins: AgnosticCollection = Depends(plugins.collection),
     current_user: Optional[dict] = Depends(get_current_user),
 ):
     """
@@ -84,7 +84,7 @@ async def update_plugin(
 )
 async def delete_plugin(
     plugin_name: str,
-    plugins: AgnosticCollection = Depends(plugin_repo.collection),
+    plugins: AgnosticCollection = Depends(plugins.collection),
     current_user: Optional[dict] = Depends(get_current_user),
 ):
     """

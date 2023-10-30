@@ -1,10 +1,25 @@
+from .database import db
+from .models import Configuration
+from motor.core import AgnosticCollection
 import copy
 import json
 import os
 
-from database.config_repo import collection, get
-from database.models import Configuration
 
+def collection() -> AgnosticCollection:
+    collection: AgnosticCollection = db().configuration
+    return collection
+
+
+async def get() -> Configuration | None:
+    current = await collection().find_one()
+    if current is None:
+        return None
+    return Configuration(**current)
+
+
+async def exists() -> bool:
+    return (await get()) is not None
 
 async def import_default_config_from_env():
     try:

@@ -3,9 +3,9 @@ import io
 import math
 from typing import List
 
-from blob.azure_client import AzureBlobClient
-from database import datasource_repo
-from database.models import DataSource
+from .azure_client import AzureBlobClient
+from . import datasources
+from .models import DataSource
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.responses import StreamingResponse
 from helpers.apidisconnect import CancelOnDisconnectRoute, cancel_on_disconnect
@@ -14,7 +14,7 @@ from helpers.conversions import find_smallest_and_largest_next_to_each_other
 from helpers.datasource_access import check_access
 from helpers.urlmapping import ApiType, get_content_type, get_file_name
 from pydantic import BaseModel, SecretStr
-from rf.samples import get_bytes_per_iq_sample
+from helpers.samples import get_bytes_per_iq_sample
 
 router = APIRouter(route_class=CancelOnDisconnectRoute)
 
@@ -23,19 +23,6 @@ class IQData(BaseModel):
     indexes: List[int]
     tile_size: int
     bytes_per_iq_sample: int
-
-
-async def get_sas_token(
-    datasource: DataSource = Depends(datasource_repo.get),
-):
-    if not datasource:
-        raise HTTPException(status_code=404, detail="Datasource not found")
-
-    if "sasToken" in datasource and datasource["sasToken"] != "":
-        decrypted_sas_token = decrypt(datasource["sasToken"])
-        return decrypted_sas_token
-    else:
-        return SecretStr("")
 
 
 @router.get(
@@ -48,7 +35,7 @@ async def get_iq_data(
     block_indexes_str: str,
     block_size: int, # we grab 2x this many ints/floats
     format: str,
-    datasource: DataSource = Depends(datasource_repo.get),
+    datasource: DataSource = Depends(datasources.get),
     azure_client: AzureBlobClient = Depends(AzureBlobClient),
     access_allowed=Depends(check_access),
 ):
@@ -173,7 +160,7 @@ async def get_byte_stream(
 )
 async def get_iqfile(
     filepath: str,
-    datasource: DataSource = Depends(datasource_repo.get),
+    datasource: DataSource = Depends(datasources.get),
     azure_client: AzureBlobClient = Depends(AzureBlobClient),
     access_allowed=Depends(check_access),
 ):
@@ -191,7 +178,7 @@ async def get_iqfile(
         raise HTTPException(status_code=404, detail="File not found")
 
     response = await azure_client.get_blob_stream(iq_path)
-    return StreamingResponse(response.chunks(), media_type=content_type)
+    return StreamingResponse(response, media_type=content_type)
 
 
 @router.get(
@@ -203,7 +190,7 @@ async def get_minimap_iq(
     filepath: str,
     format: str,
     access_allowed=Depends(check_access),
-    datasource: DataSource = Depends(datasource_repo.get),
+    datasource: DataSource = Depends(datasources.get),
     azure_client: AzureBlobClient = Depends(AzureBlobClient),
 ):
     fft_size = 64
@@ -225,8 +212,7 @@ async def get_minimap_iq(
         else:
             file_name = get_file_name(filepath, ApiType.IQDATA)
             bytes_per_sample = get_bytes_per_iq_sample(format)
-            blob_data_properties = await azure_client.get_blob_properties(file_name)
-            blob_size = blob_data_properties.size
+            blob_size = await azure_client.get_file_length(file_name)
             total_ffts = math.floor(blob_size / (bytes_per_sample * fft_size))
             # get 1000 ffts equally spaced out
             block_indexes = [math.floor(i * total_ffts / 1000) for i in range(1000)]

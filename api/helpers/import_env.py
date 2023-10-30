@@ -1,7 +1,8 @@
-from importer.config import import_default_config_from_env
-from importer.datasource import import_datasources_from_env
-from importer.plugins import import_plugins_from_env
+from app.datasources import import_datasources_from_env
+from app.plugins import import_plugins_from_env
+from app.config import import_default_config_from_env
 
+# For whatever reason we cant define the 3 above in this file or else the mocks fail
 
 async def import_all_from_env():
     try:
