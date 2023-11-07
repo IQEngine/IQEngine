@@ -23,7 +23,11 @@ export class BlobClient implements IQDataClient {
     for (let i = 0; i < numFfts; i++) {
       dataRange.push(i * skipNFfts);
     }
-    const { account, container, file_path } = meta.getOrigin();
+    let { account, container, file_path } = meta.getOrigin();
+    // if filePath does not finish in .sigmf-data, add it
+    if (!file_path.endsWith('.sigmf-data')) {
+      file_path += '.sigmf-data';
+    }
     const blobClient = getBlobClient(this.dataSources, account, container, file_path);
     const iqBlocks: Float32Array[] = [];
     for (const index of dataRange) {
