@@ -19,7 +19,7 @@ import { toast } from 'react-hot-toast';
 import { dataTypeToBytesPerIQSample } from '@/utils/selector';
 import { useSpectrogramContext } from '../hooks/use-spectrogram-context';
 import { useCursorContext } from '../hooks/use-cursor-context';
-import { CLIENT_TYPE_LOCAL } from '@/api/Models';
+import { CLIENT_TYPE_API } from '@/api/Models';
 
 export enum MimeTypes {
   ci8 = 'iq/ci8',
@@ -52,7 +52,7 @@ export const PluginsPane = () => {
   let byte_length = meta.getBytesPerIQSample() * Math.ceil(cursorTime.end - cursorTime.start);
 
   useEffect(() => {
-    if (type == CLIENT_TYPE_LOCAL) {
+    if (type != CLIENT_TYPE_API) {
       setUseCloudStorage(false);
     }
   }, [type]);
@@ -300,9 +300,9 @@ export const PluginsPane = () => {
     <div className="pluginForm" id="pluginFormId" onSubmit={handleSubmit}>
       {isPluginRunning && (
         <div className="fixed top-0 left-0 right-0 bottom-0 w-full h-screen z-50 overflow-hidden bg-gray-700 opacity-75 flex flex-col items-center justify-center">
-            <span className="loading loading-infinity loading-lg text-primary"></span>
-            <h2 className="text-center text-white text-xl font-semibold">Running Plugin...</h2>
-            <p className="w-1/3 text-center text-white">This may take a few minutes.</p>
+          <span className="loading loading-infinity loading-lg text-primary"></span>
+          <h2 className="text-center text-white text-xl font-semibold">Running Plugin...</h2>
+          <p className="w-1/3 text-center text-white">This may take a few minutes.</p>
         </div>
       )}
       <label className="label">
@@ -334,7 +334,7 @@ export const PluginsPane = () => {
           ))}
         </select>
       </label>
-      {type != CLIENT_TYPE_LOCAL && (
+      {type == CLIENT_TYPE_API && (
         <label className="label cursor-pointer">
           <span>Use Cloud Storage</span>
           <input
