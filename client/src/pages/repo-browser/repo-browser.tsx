@@ -12,6 +12,7 @@ import SiggenTile from './siggen-tile';
 import ValidatorTile from './validator-tile';
 import WebfftBenchmark from './webfft-benchmark-tile';
 import MetadataQueryTile from './metadata-query-tile';
+import ConverterTile from './converter-tile';
 import { useConfigQuery } from '@/api/config/queries';
 import { getDataSources } from '@/api/datasource/queries';
 import { CLIENT_TYPE_API, CLIENT_TYPE_BLOB, DataSource } from '@/api/Models';
@@ -67,6 +68,7 @@ export const RepoBrowser = () => {
           <SiggenTile />
           <ValidatorTile />
           <WebfftBenchmark />
+          <ConverterTile />
         </div>
       </div>
     </div>
