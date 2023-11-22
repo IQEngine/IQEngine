@@ -38,14 +38,18 @@ def _convert_data(data: np.ndarray, destination_path: str):
     """Convert a numpy array to a SigMF data file."""
 
     with open(f"{destination_path}.sigmf-data", "wb") as f:
-        for sample in data:
-
-            real = sample[0].astype(np.float32)
-            imag = sample[1].astype(np.float32)
-
-            f.write(real.tobytes())
-            f.write(imag.tobytes())
-
+        if len(data.shape) == 2:
+            for sample in data:
+                real = sample[0].astype(np.float32)
+                imag = sample[1].astype(np.float32)
+                f.write(real.tobytes())
+                f.write(imag.tobytes())
+        else: # only one channel (eg mono audio)
+            for sample in data:
+                real = sample.astype(np.float32)
+                imag = np.float32(0) # until IQEngine supports real-valued SigMF recordings
+                f.write(real.tobytes())
+                f.write(imag.tobytes())
 
 def remove_files(file_paths: str):
     for file_path in file_paths:
@@ -108,5 +112,5 @@ async def convert_wav_to_sigmf(
 
         return zipfiles(zip_name=wav_file.filename.split(".")[0], filenames=created_files)
 
-    except Exception:
-        return "Error converting wav file"
+    except Exception as e:
+        print("Error converting wav file:", e)
