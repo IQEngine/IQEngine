@@ -54,4 +54,4 @@ tiling/spectrogram.pmtiles
 # ignore parsed files in sdriq2sigmf
 **/sdriq2sigmf/**/*.sigmf*
 
-e2e/__tests__/confirm_wav_converter.spec.ts
+e2e/test.zip

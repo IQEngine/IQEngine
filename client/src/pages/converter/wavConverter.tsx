@@ -52,10 +52,11 @@ export const WavConverter = () => {
             onChange={(e) => setSelectedFile(e.target.files[0])}
             accept=".wav"
             max={1}
+            id={'file-chooser-button'}
           />
 
           <div className="flex justify-center">
-            <button disabled={!selectedFile} onClick={() => refetch()}>
+            <button id="convert-button" disabled={!selectedFile} onClick={() => refetch()}>
               Convert
             </button>
           </div>
@@ -68,7 +69,9 @@ export const WavConverter = () => {
             Converting was successful. Click the button below to download the SigMF Dataset.
           </p>
           <div className="flex justify-center">
-            <button onClick={() => download()}>Download</button>
+            <button id="download-button" onClick={() => download()}>
+              Download
+            </button>
           </div>
         </>
       )}
