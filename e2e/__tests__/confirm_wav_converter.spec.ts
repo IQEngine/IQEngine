@@ -1,7 +1,8 @@
 import { test, expect } from '@playwright/test';
 import { skipLandingPage } from '../common-steps';
+import AdmZip from 'adm-zip';
 
-test('Confirm Validator and AzureBlob cards @CICompatible', async ({ page }) => {
+test('Confirm Wav to SigMF converter and Converter Card @CICompatible', async ({ page }) => {
   await page.goto('/');
   skipLandingPage(page);
 
@@ -27,5 +28,8 @@ test('Confirm Validator and AzureBlob cards @CICompatible', async ({ page }) => 
   console.log('file downloaded to', await download.path());
   expect(download.suggestedFilename()).toBe('test.zip');
 
-  // TODO: unzip the file or at least make sure it contains the sigmf data and meta files
+  const path = await download.path();
+  const zip = new AdmZip(path!);
+  expect(zip.getEntries()).toHaveLength(2);
+  expect(zip.getEntries().map((entry) => entry.name)).toStrictEqual(['test.sigmf-data', 'test.sigmf-meta']);
 });
