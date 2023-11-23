@@ -44,7 +44,7 @@ IQEngine is rapidly evolving, so [sign up](https://dashboard.mailerlite.com/form
 
 ## Project History via Stars
 
-[![Star History Chart](https://api.star-history.com/svg?repos=IQEngine/iqengine&type=Date)](https://star-history.com/#IQEngine/iqengine&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=IQEngine/iqengine&type=Date)](https://star-history.com/#IQEngine/IQEngine&Date)
 
 <p align="center"><h2>IQEngine is Supported By:</h2></p>
 
