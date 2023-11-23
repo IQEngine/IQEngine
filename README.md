@@ -42,6 +42,10 @@ IQEngine is rapidly evolving, so [sign up](https://dashboard.mailerlite.com/form
 * User/admin system for controlling access to certain recordings
 * The IQEngine team is currently creating a new web library for performing FFTs and related functions, called [WebFFT](https://www.npmjs.com/package/webfft), you can play with it using the [demo here](https://webfft.com/)
 
+## Project History via Stars
+
+[![Star History Chart](https://api.star-history.com/svg?repos=IQEngine/iqengine&type=Date)](https://star-history.com/#IQEngine/iqengine&Date)
+
 <p align="center"><h2>IQEngine is Supported By:</h2></p>
 
 <p align="center"><img width=250 src="client/public/microsoft-logo.svg" /></p>
