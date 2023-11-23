@@ -14,6 +14,7 @@ from app.metadata_router import router as metadata_router
 from app.plugins_router import router as plugins_router
 from app.status_router import router as status_router
 from app.users_router import router as users_router
+from app.converter_router import router as converter_router
 
 from helpers.apidisconnect import CancelOnDisconnectRoute
 from helpers.import_env import import_all_from_env
@@ -92,6 +93,7 @@ app.include_router(status_router)
 app.include_router(config_router)
 app.include_router(plugins_router)
 app.include_router(users_router)
+app.include_router(converter_router)
 
 app.mount("/", SPAStaticFiles(directory="iqengine", html=True), name="iqengine")
 
@@ -104,7 +106,8 @@ app.add_event_handler("startup", import_all_from_env)
 async def database_exception_handler():
     return JSONResponse(
         status_code=503,
-        content={"message": "Service Unavailable: Unable to connect to the database."},
+        content={
+            "message": "Service Unavailable: Unable to connect to the database."},
     )
 
 

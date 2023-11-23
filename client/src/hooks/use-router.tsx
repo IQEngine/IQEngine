@@ -69,6 +69,13 @@ export function useRouter() {
             return { Component: SignalGenerator };
           },
         },
+         {
+          path: 'convert',
+          async lazy() {
+            let { Converter } = await import('@/pages/converter/converter');
+            return { Component: Converter };
+          },
+        },
         {
           path: 'admin',
           async lazy() {
