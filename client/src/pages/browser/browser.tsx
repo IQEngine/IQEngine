@@ -15,6 +15,12 @@ import { directoryOpen, fileOpen, supported } from 'browser-fs-access';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { FileWithDirectoryAndFileHandle } from 'browser-fs-access';
+import SiggenTile from './siggen-tile';
+import ValidatorTile from './validator-tile';
+import WebfftBenchmark from './webfft-benchmark-tile';
+import MetadataQueryTile from './metadata-query-tile';
+import ConverterTile from './converter-tile';
+import { ModalDialog } from '@/features/ui/modal/Modal';
 
 export const Browser = () => {
   const apiDataSources = getDataSources(CLIENT_TYPE_API);
@@ -28,6 +34,8 @@ export const Browser = () => {
   const [goToPage, setGoToPage] = useState(false);
   const { setFiles, addDataSource } = useUserSettings();
   const [filePath, setFilePath] = useState<string>(null);
+  const [showModal, setShowModal] = useState(false);
+
   const localDataSourceQuery = getDataSource(
     CLIENT_TYPE_LOCAL,
     'local',
@@ -158,6 +166,27 @@ export const Browser = () => {
 
   return (
     <div className="mb-0 ml-1 mr-0 p-0 pt-3">
+      {/* -------Misc Tools------- */}
+      <div
+        className="absolute right-2 top-12 p-2 mr-2 text-2xl text-primary outline outline-1 outline-primary rounded-lg hover:bg-accent hover:bg-opacity-50"
+        onClick={() => {
+          setShowModal(true);
+        }}
+      >
+        Misc Tools
+      </div>
+      {showModal && (
+        <ModalDialog setShowModal={setShowModal} heading="" classList="max-w-full">
+          <div className="grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-10 justify-items-center text-lg text-white">
+            <MetadataQueryTile />
+            <SiggenTile />
+            <ValidatorTile />
+            <WebfftBenchmark />
+            <ConverterTile />
+          </div>
+        </ModalDialog>
+      )}
+
       <div className="flex flex-row w-full">
         {/* -------Repo list------- */}
         <div className="w-64 block">
