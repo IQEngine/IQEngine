@@ -46,9 +46,11 @@ IQEngine is rapidly evolving, so [sign up](https://dashboard.mailerlite.com/form
 
 <a href="https://star-history.com/#IQEngine/IQEngine&Date">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=IQEngine/IQEngine&type=Date&theme=dark" />
-    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=IQEngine/IQEngine&type=Date" />
-    <img width="50%" alt="Star History Chart" src="https://api.star-history.com/svg?repos=IQEngine/IQEngine&type=Date" />
+    <center>
+      <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=IQEngine/IQEngine&type=Date&theme=dark" />
+      <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=IQEngine/IQEngine&type=Date" />
+      <img width="50%" alt="Star History Chart" src="https://api.star-history.com/svg?repos=IQEngine/IQEngine&type=Date" />
+    </center>
   </picture>
 </a>
 
