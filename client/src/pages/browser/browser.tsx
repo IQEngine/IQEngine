@@ -4,27 +4,55 @@
 
 import React, { useState } from 'react';
 import { useEffect } from 'react';
-import { useConfigQuery } from '@/api/config/queries';
 import { getDataSources } from '@/api/datasource/queries';
-import { CLIENT_TYPE_API, CLIENT_TYPE_BLOB, DataSource } from '@/api/Models';
-import { useQueryClient } from '@tanstack/react-query';
-import { useFeatureFlags } from '@/hooks/use-feature-flags';
+import { CLIENT_TYPE_API, CLIENT_TYPE_LOCAL } from '@/api/Models';
 import { useUserSettings } from '@/api/user-settings/use-user-settings';
 import Directory from './directory';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { useParams } from 'react-router-dom';
 import { useQueryDataSourceMetaPaths } from '@/api/metadata/queries';
 import { DirectoryNode, groupDataByDirectories } from './directory-node';
+import { directoryOpen, fileOpen, supported } from 'browser-fs-access';
+import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
+import { getDataSource } from '@/api/datasource/queries';
+import { FileWithDirectoryAndFileHandle } from 'browser-fs-access';
 
 export const Browser = () => {
   const apiDataSources = getDataSources(CLIENT_TYPE_API);
+  const [currentType, setCurrentType] = useState(CLIENT_TYPE_API);
   const [currentContainer, setCurrentContainer] = useState('iqengine');
   const [currentAccount, setCurrentAccount] = useState('gnuradio');
   const [currentSas, setCurrentSas] = useState('gnuradio');
-  const metadataCollection = useQueryDataSourceMetaPaths(CLIENT_TYPE_API, currentAccount, currentContainer);
+  const metadataCollection = useQueryDataSourceMetaPaths(currentType, currentAccount, currentContainer);
   const [directoryNode, setDirectoryNode] = useState<DirectoryNode>(null);
+  const navigate = useNavigate();
+  const [goToPage, setGoToPage] = useState(false);
+  const { setFiles } = useUserSettings();
+  const [filePath, setFilePath] = useState<string>(null);
+  const localDataSourceQuery = getDataSource(
+    CLIENT_TYPE_LOCAL,
+    'local',
+    currentContainer,
+    !!currentContainer || !!filePath
+  );
+
+  useEffect(() => {
+    if (localDataSourceQuery.data && localDataSourceQuery.data.container === currentContainer && goToPage) {
+      if (filePath) {
+        const spectogramLink = `/view/${CLIENT_TYPE_LOCAL}/local/single_file/${encodeURIComponent(filePath)}`;
+        navigate(spectogramLink);
+      } else {
+        setCurrentType(CLIENT_TYPE_LOCAL);
+        setCurrentAccount(localDataSourceQuery.data.account);
+        setCurrentContainer(localDataSourceQuery.data.container);
+        setCurrentSas(null);
+        console.log('Switching to a local dir');
+      }
+    }
+  }, [localDataSourceQuery.data, currentContainer, filePath, goToPage]);
 
   async function handleOnClick(container, account, sas) {
+    setCurrentType(CLIENT_TYPE_API);
     setCurrentAccount(account);
     setCurrentContainer(container);
     setCurrentSas(sas);
@@ -37,6 +65,36 @@ export const Browser = () => {
       setDirectoryNode(dataRoot);
     }
   }, [metadataCollection.data]);
+
+  const openFile = async () => {
+    console.log('opening local file');
+    const files = await fileOpen({
+      multiple: true,
+    });
+    console.log('files', files);
+    if (files.length != 2) {
+      toast('Please select 1 .sigmf-meta and 1 .sigmf-data file (matching)');
+      return;
+    }
+    let fileWithoutExtension = files[0].name.replace('.sigmf-meta', '').replace('.sigmf-data', '');
+    setFiles(files);
+    setFilePath(fileWithoutExtension);
+    setGoToPage(true);
+  };
+
+  const openDir = async () => {
+    console.log('opening local directory');
+    const dirHandle = (await directoryOpen({
+      recursive: true,
+    })) as FileWithDirectoryAndFileHandle[];
+    if (dirHandle.length === 0) {
+      return;
+    }
+    let containerPath = dirHandle[0].webkitRelativePath.split('/')[0];
+    setFiles(dirHandle);
+    setCurrentContainer(containerPath);
+    setGoToPage(true);
+  };
 
   return (
     <div className="mb-0 ml-1 mr-0 p-0 pt-3">
@@ -58,6 +116,28 @@ export const Browser = () => {
                 <h2 className="col-span-3 p-0 m-0 leading-tight">{item.name}</h2>
               </div>
             ))}
+
+            {supported && (
+              <div
+                className="gap-2 w-48 h-12 items-center p-0 m-0 outline outline-1 outline-primary rounded-lg hover:bg-accent hover:bg-opacity-50"
+                id={'local-dir'}
+                onClick={openDir}
+                aria-label={'local directory'}
+                key={'localdir'}
+              >
+                <h2 className="pl-12 pr-0 pt-3 m-0 leading-tight">Local Directory</h2>
+              </div>
+            )}
+
+            <div
+              className="gap-2 w-48 h-12 items-center p-0 m-0 outline outline-1 outline-primary rounded-lg hover:bg-accent hover:bg-opacity-50"
+              id={'local-files'}
+              onClick={openFile}
+              aria-label={'local files'}
+              key={'localfiles'}
+            >
+              <h2 className="pl-12 pr-0 pt-3 m-0 leading-tight ">Local File Pair</h2>
+            </div>
           </div>
         </div>
 
@@ -116,7 +196,7 @@ export const Browser = () => {
                           directory={directoryNode}
                           setExpanded={(name) => '/'}
                           isExpanded={directoryNode.name == '/'}
-                          type={CLIENT_TYPE_API}
+                          type={currentType}
                           account={currentAccount}
                           container={currentContainer}
                           sasToken={currentSas}
