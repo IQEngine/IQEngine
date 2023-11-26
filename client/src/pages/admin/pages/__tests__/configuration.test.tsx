@@ -24,7 +24,6 @@ describe('Test Configuration', () => {
     expect(await screen.findByRole('checkbox', { name: 'useIQEngineOutReach' })).toBeInTheDocument();
     expect(await screen.findByRole('checkbox', { name: 'displayIQEngineGitHub' })).toBeInTheDocument();
     expect(await screen.findByRole('checkbox', { name: 'displayInternalBranding' })).toBeInTheDocument();
-    expect(await screen.findByRole('checkbox', { name: 'useAPIDatasources' })).toBeInTheDocument();
     expect(await screen.findByRole('checkbox', { name: 'bypassLandingPage' })).toBeInTheDocument();
 
     expect(await screen.findByText('Use IQEngine Outreach')).toBeInTheDocument();
@@ -39,7 +38,6 @@ describe('Test Configuration', () => {
     expect(await screen.findByRole('checkbox', { name: 'useIQEngineOutReach' })).toBeChecked();
     expect(await screen.findByRole('checkbox', { name: 'displayIQEngineGitHub' })).toBeChecked();
     expect(await screen.findByRole('checkbox', { name: 'displayInternalBranding' })).not.toBeChecked();
-    expect(await screen.findByRole('checkbox', { name: 'useAPIDatasources' })).toBeChecked();
     //expect(await screen.findByRole('checkbox', { name: 'bypassLandingPage' })).toBeChecked();
   });
 
@@ -51,7 +49,6 @@ describe('Test Configuration', () => {
           useIQEngineOutReach: true,
           displayIQEngineGitHub: true,
           displayInternalBranding: true,
-          useAPIDatasources: true,
           bypassLandingPage: true,
         },
       });
@@ -60,7 +57,6 @@ describe('Test Configuration', () => {
     expect(await screen.findByRole('checkbox', { name: 'useIQEngineOutReach', checked: true })).toBeChecked();
     expect(await screen.findByRole('checkbox', { name: 'displayIQEngineGitHub', checked: true })).toBeChecked();
     expect(await screen.findByRole('checkbox', { name: 'displayInternalBranding', checked: true })).toBeChecked();
-    expect(await screen.findByRole('checkbox', { name: 'useAPIDatasources', checked: true })).toBeChecked();
     expect(await screen.findByRole('checkbox', { name: 'bypassLandingPage', checked: true })).toBeChecked();
   });
 
@@ -71,7 +67,6 @@ describe('Test Configuration', () => {
         featureFlags: {
           useIQEngineOutReach: true,
           displayInternalBranding: true,
-          useAPIDatasources: true,
           invalidFlag: true,
           bypassLandingPage: true,
         },
@@ -81,7 +76,6 @@ describe('Test Configuration', () => {
     expect(await screen.findByRole('checkbox', { name: 'useIQEngineOutReach', checked: true })).toBeChecked();
     expect(await screen.findByRole('checkbox', { name: 'displayIQEngineGitHub', checked: true })).toBeChecked();
     expect(await screen.findByRole('checkbox', { name: 'displayInternalBranding', checked: true })).toBeChecked();
-    expect(await screen.findByRole('checkbox', { name: 'useAPIDatasources', checked: true })).toBeChecked();
     expect(await screen.findByRole('checkbox', { name: 'bypassLandingPage', checked: true })).toBeChecked();
     expect(screen.queryByRole('checkbox', { name: 'invalidFlag' })).not.toBeInTheDocument();
   });
@@ -94,7 +88,6 @@ describe('Test Configuration', () => {
           useIQEngineOutReach: true,
           displayIQEngineGitHub: true,
           displayInternalBranding: true,
-          useAPIDatasources: true,
           bypassLandingPage: true,
         },
       });
@@ -106,19 +99,16 @@ describe('Test Configuration', () => {
       name: 'displayInternalBranding',
       checked: true,
     });
-    const useAPIDatasources = await screen.findByRole('checkbox', { name: 'useAPIDatasources', checked: true });
     const bypassLandingPage = await screen.findByRole('checkbox', { name: 'bypassLandingPage', checked: true });
 
     await userEvent.click(useIQEngineOutReach);
     await userEvent.click(displayIQEngineGitHub);
     await userEvent.click(displayInternalBranding);
-    await userEvent.click(useAPIDatasources);
     await userEvent.click(bypassLandingPage);
 
     await waitFor(() => expect(useIQEngineOutReach).not.toBeChecked());
     await waitFor(() => expect(displayIQEngineGitHub).not.toBeChecked());
     await waitFor(() => expect(displayInternalBranding).not.toBeChecked());
-    await waitFor(() => expect(useAPIDatasources).not.toBeChecked());
     await waitFor(() => expect(bypassLandingPage).not.toBeChecked());
   });
 
@@ -130,7 +120,6 @@ describe('Test Configuration', () => {
           useIQEngineOutReach: true,
           displayIQEngineGitHub: true,
           displayInternalBranding: true,
-          useAPIDatasources: true,
           bypassLandingPage: true,
         },
       });
@@ -148,7 +137,6 @@ describe('Test Configuration', () => {
           useIQEngineOutReach: true,
           displayIQEngineGitHub: true,
           displayInternalBranding: true,
-          useAPIDatasources: true,
           bypassLandingPage: true,
         },
       });
@@ -178,7 +166,6 @@ describe('Test Configuration', () => {
           useIQEngineOutReach: true,
           displayIQEngineGitHub: true,
           displayInternalBranding: true,
-          useAPIDatasources: true,
           bypassLandingPage: true,
         },
       });

@@ -4,27 +4,19 @@
 
 import React, { useState } from 'react';
 import { useEffect } from 'react';
-import LocalFileBrowser from './local-file-browser';
-import AzureBlobBrowser from './azure-blob-browser';
-import RepositoryAPITile from './repository-api-tile';
-import SiggenTile from './siggen-tile';
-import ValidatorTile from './validator-tile';
-import WebfftBenchmark from './webfft-benchmark-tile';
-import MetadataQueryTile from './metadata-query-tile';
-import ConverterTile from './converter-tile';
 import { useConfigQuery } from '@/api/config/queries';
 import { getDataSources } from '@/api/datasource/queries';
 import { CLIENT_TYPE_API, CLIENT_TYPE_BLOB, DataSource } from '@/api/Models';
 import { useQueryClient } from '@tanstack/react-query';
-import { useFeatureFlags } from '@/hooks/use-feature-flags';
+import Feature from '@/features/feature/Feature';
+import { FeatureFlag, useFeatureFlags, FeatureFlagName } from '@/hooks/use-feature-flags';
 import { useUserSettings } from '@/api/user-settings/use-user-settings';
 
-export const RepoBrowser = () => {
+export const Browser = () => {
   let [dataAvailable, setDataAvailable] = useState(false);
   const { getFeatureFlag } = useFeatureFlags();
   const config = useConfigQuery();
   const apiDataSources = getDataSources(CLIENT_TYPE_API);
-  const blobDataSources = getDataSources(CLIENT_TYPE_BLOB, dataAvailable);
   const queryClient = useQueryClient();
   const { addDataSource } = useUserSettings();
   useEffect(() => {
@@ -55,17 +47,10 @@ export const RepoBrowser = () => {
       <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
         <div className="grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-10 justify-items-center">
           {apiDataSources?.data?.map((item, i) => <RepositoryAPITile key={i} item={item} />)}
-          <LocalFileBrowser />
-          <AzureBlobBrowser />
-          <MetadataQueryTile />
-          <SiggenTile />
-          <ValidatorTile />
-          <WebfftBenchmark />
-          <ConverterTile />
         </div>
       </div>
     </div>
   );
 };
 
-export default RepoBrowser;
+export default Browser;

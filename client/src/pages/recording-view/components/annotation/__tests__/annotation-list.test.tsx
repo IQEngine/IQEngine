@@ -16,16 +16,12 @@ describe('Annotation list component', () => {
   beforeEach(() => {
     queryClient.clear();
     nock.cleanAll();
-    nock('http://localhost:3000')
-      .get('/api/config')
-      .reply(200, {
-        uploadPageBlobSasUrl: 'NOT A VALID SAS URL',
+    nock('http://localhost:3000').get('/api/config').reply(200, {
+      uploadPageBlobSasUrl: 'NOT A VALID SAS URL',
 
-        internalBranding: false,
-        featureFlags: {
-          useAPIDatasources: true,
-        },
-      });
+      internalBranding: false,
+      featureFlags: {},
+    });
   });
 
   test('Columns display correctly', async () => {

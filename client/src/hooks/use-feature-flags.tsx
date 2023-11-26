@@ -22,11 +22,6 @@ export const FeatureFlag = {
     description: 'Display Internal Branding',
     default: false,
   },
-  useAPIDatasources: {
-    name: 'useAPIDatasources',
-    description: 'Use API Datasources',
-    default: true,
-  },
   bypassLandingPage: {
     name: 'bypassLandingPage',
     description: 'Bypass Landing Page',
