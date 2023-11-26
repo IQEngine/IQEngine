@@ -7,9 +7,8 @@
 [![Prod](https://img.shields.io/github/actions/workflow/status/IQEngine/IQEngine/periodic_test_of_prod.yml?label=prod)](https://iqengine.org)
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/IQEngine)](https://github.com/sponsors/IQEngine)
 
-<p align="center">
-  <img width=250 src="client/public/IQEngine_Black.svg" />
-</p>
+<p align="center"><img width=250 src="client/public/IQEngine.svg#gh-dark-mode-only" /></p>
+<p align="center"><img width=250 src="client/public/IQEngine_Black.svg#gh-light-mode-only" /></p>
 
 <p align="center">Try it out at <a href="https://www.iqengine.org">www.iqengine.org</a></p>
 
@@ -42,10 +41,22 @@ IQEngine is rapidly evolving, so [sign up](https://dashboard.mailerlite.com/form
 * User/admin system for controlling access to certain recordings
 * The IQEngine team is currently creating a new web library for performing FFTs and related functions, called [WebFFT](https://www.npmjs.com/package/webfft), you can play with it using the [demo here](https://webfft.com/)
 
+<a href="https://star-history.com/#IQEngine/IQEngine&Date">
+  <picture>
+    <p align="center">
+      <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=IQEngine/IQEngine&type=Date&theme=dark" />
+      <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=IQEngine/IQEngine&type=Date" />
+      <img width="70%" alt="Star History Chart" src="https://api.star-history.com/svg?repos=IQEngine/IQEngine&type=Date" />
+    </p>
+  </picture>
+</a>
+
+
 <p align="center"><h2>IQEngine is Supported By:</h2></p>
 
 <p align="center"><img width=250 src="client/public/microsoft-logo.svg" /></p>
 
 <p align="center"><a href="https://www.qoherent.ai/"><img width=250 src="client/public/clogo-black.png" /></a></p>
+
 <p align="center"><img width=250 src="client/public/AIRBUS_white.png#gh-dark-mode-only" /></p>
 <p align="center"><img width=250 src="client/public/AIRBUS_blue.png#gh-light-mode-only" /></p>
