@@ -4,8 +4,8 @@
 
 import React, { useState } from 'react';
 import { useEffect } from 'react';
-import { getDataSources } from '@/api/datasource/queries';
-import { CLIENT_TYPE_API, CLIENT_TYPE_LOCAL } from '@/api/Models';
+import { getDataSources, getDataSource } from '@/api/datasource/queries';
+import { CLIENT_TYPE_API, CLIENT_TYPE_LOCAL, CLIENT_TYPE_BLOB, DataSource } from '@/api/Models';
 import { useUserSettings } from '@/api/user-settings/use-user-settings';
 import Directory from './directory';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
@@ -14,7 +14,6 @@ import { DirectoryNode, groupDataByDirectories } from './directory-node';
 import { directoryOpen, fileOpen, supported } from 'browser-fs-access';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
-import { getDataSource } from '@/api/datasource/queries';
 import { FileWithDirectoryAndFileHandle } from 'browser-fs-access';
 
 export const Browser = () => {
@@ -27,7 +26,7 @@ export const Browser = () => {
   const [directoryNode, setDirectoryNode] = useState<DirectoryNode>(null);
   const navigate = useNavigate();
   const [goToPage, setGoToPage] = useState(false);
-  const { setFiles } = useUserSettings();
+  const { setFiles, addDataSource } = useUserSettings();
   const [filePath, setFilePath] = useState<string>(null);
   const localDataSourceQuery = getDataSource(
     CLIENT_TYPE_LOCAL,
@@ -96,6 +95,67 @@ export const Browser = () => {
     setGoToPage(true);
   };
 
+  const onAccountNameChange = (event) => {
+    setCurrentAccount(event.target.value);
+  };
+
+  const onContainerNameChange = (event) => {
+    setCurrentContainer(event.target.value);
+  };
+
+  const onSasTokenChange = (event) => {
+    setCurrentSas(event.target.value);
+  };
+
+  const onCustomAzureSubmit = async (event) => {
+    event.preventDefault();
+    if (currentContainer === '' || currentAccount === '') {
+      toast('Please fill in all blob storage account credential fields.', {
+        duration: 5000,
+        position: 'top-center',
+        icon: '😖',
+        className: 'bg-red-100 font-bold',
+      });
+      return;
+    }
+    // Note: leaving sasToken blank works, it means the blob container is publicly accessible
+    if (currentSas != '') {
+      // This code has been extracted from the way that validation of sas token it si done now on RepoBrowser.tsx
+      const tempExpires = currentSas.slice(currentSas.search('se')).split('&')[0].slice(3, 13); // YEAR-MONTH-DAY
+      if (tempExpires.length !== 10) {
+        toast('SAS token invalid', {
+          icon: '😖',
+          className: 'bg-red-100 font-bold',
+        });
+        return;
+      }
+      const todayDate = new Date();
+      const todayFormattedDate = todayDate.toISOString().substring(0, 10);
+      const tempDayDifference = Math.abs((Date.parse(todayFormattedDate) - Date.parse(tempExpires)) / 86400000);
+      if (todayFormattedDate > tempExpires) {
+        toast('SAS Token has expired', {
+          icon: '😖',
+          className: 'bg-red-100 font-bold',
+        });
+        return;
+      } else if (tempDayDifference < 7) {
+        toast('Warning: the SAS token is within 7 days of expiration.', {
+          icon: '⚠️',
+        });
+      }
+    }
+    var dataSource = {
+      name: currentAccount + '/' + currentContainer,
+      type: CLIENT_TYPE_BLOB,
+      account: currentAccount,
+      container: currentContainer,
+      sasToken: currentSas,
+      description: 'Azure Blob Storage',
+    } as DataSource;
+    addDataSource(dataSource);
+    setCurrentType(CLIENT_TYPE_BLOB);
+  };
+
   return (
     <div className="mb-0 ml-1 mr-0 p-0 pt-3">
       <div className="flex flex-row w-full">
@@ -138,6 +198,43 @@ export const Browser = () => {
             >
               <h2 className="pl-12 pr-0 pt-3 m-0 leading-tight ">Local File Pair</h2>
             </div>
+
+            {/* -------Manually enter azure credentials------- */}
+            <details>
+              <summary className="gap-2 w-48 h-12 items-center p-0 m-0 pt-2 outline outline-1 outline-primary rounded-lg hover:bg-accent hover:bg-opacity-50 text-primary text-lg">
+                Azure Blob Storage
+              </summary>
+              <div
+                className="w-48 h-56 p-2 m-0 outline outline-1 outline-primary rounded-b-lg"
+                id={'azure-manual'}
+                aria-label={'azure manual'}
+                key={'azuremanual'}
+              >
+                <form>
+                  <input
+                    type="text"
+                    placeholder="Storage Account"
+                    onChange={onAccountNameChange}
+                    className="input input-bordered input-success w-full max-w-xs mt-2"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Container Name"
+                    onChange={onContainerNameChange}
+                    className="input input-bordered input-success w-full max-w-xs my-2"
+                  />
+                  <input
+                    type="password"
+                    placeholder="SAS Token"
+                    onChange={onSasTokenChange}
+                    className="input input-bordered input-success w-full max-w-xs mb-2"
+                  />
+                </form>
+                <button className="" onClick={onCustomAzureSubmit} id="AzureBlob">
+                  Browse
+                </button>
+              </div>
+            </details>
           </div>
         </div>
 
