@@ -38,7 +38,6 @@ export const useQueryDataSourceMetaPaths = (type: string, account: string, conta
   return useQuery(
     ['datasource', type, account, container, 'meta', 'paths'],
     () => {
-
       return metadataClient.getDataSourceMetaPaths(account, container);
     },
     {
@@ -54,8 +53,8 @@ export const useQueryTrack = (type: string, account: string, container: string, 
   const client = MetadataClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance);
 
   return useQuery<number[][]>({
-    queryKey: ['track', account, container, filepath ],
-    queryFn: ({signal}) => {
+    queryKey: ['track', account, container, filepath],
+    queryFn: ({ signal }) => {
       return client.track(account, container, filepath, signal);
     },
     enabled: enabled && !!filesQuery.data && !!dataSourcesQuery.data,
@@ -133,11 +132,11 @@ export const useSmartQueryMeta = (query: string, enabled = true) => {
   const { instance } = useMsal();
   const metadataClient = MetadataClientFactory(CLIENT_TYPE_API, filesQuery.data, dataSourcesQuery.data, instance);
   return useQuery<SmartQueryResult>({
-    queryKey: ['smart-query', query ],
-    queryFn: ({signal}) => {
+    queryKey: ['smart-query', query],
+    queryFn: ({ signal }) => {
       console.log('smartQuery', query);
       return metadataClient.smartQuery(query, signal);
     },
     enabled: enabled && !!filesQuery.data && !!dataSourcesQuery.data,
   });
-}
+};

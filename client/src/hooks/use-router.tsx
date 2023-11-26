@@ -69,7 +69,7 @@ export function useRouter() {
             return { Component: SignalGenerator };
           },
         },
-         {
+        {
           path: 'convert',
           async lazy() {
             let { Converter } = await import('@/pages/converter/converter');
@@ -150,8 +150,8 @@ export function useRouter() {
         {
           path: 'browser',
           async lazy() {
-            let { RepoBrowser } = await import('@/pages/repo-browser/repo-browser');
-            return { Component: RepoBrowser };
+            let { Browser } = await import('@/pages/browser/browser');
+            return { Component: Browser };
           },
         },
         {

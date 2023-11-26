@@ -9,11 +9,11 @@ import { useParams } from 'react-router-dom';
 import { useQueryDataSourceMetaPaths } from '@/api/metadata/queries';
 import { DirectoryNode, groupDataByDirectories } from './directory-node';
 import { useFeatureFlags } from '@/hooks/use-feature-flags';
+import { CLIENT_TYPE_API, CLIENT_TYPE_BLOB, DataSource } from '@/api/Models';
 
 export function RecordingsBrowser() {
   const { featureFlags } = useFeatureFlags();
-  const { type, account, container, sasToken } = useParams();
-  const metadata_collection = useQueryDataSourceMetaPaths(type, account, container);
+  const metadata_collection = useQueryDataSourceMetaPaths(CLIENT_TYPE_API, 'gnuradio', 'iqengine');
   const [directoryNode, setDirectoryNode] = useState<DirectoryNode>(null);
   useEffect(() => {
     if (metadata_collection.data && metadata_collection.data.length > 0) {
