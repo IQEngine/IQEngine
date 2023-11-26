@@ -58,5 +58,5 @@ IQEngine is rapidly evolving, so [sign up](https://dashboard.mailerlite.com/form
 <p align="center"><img width=250 src="client/public/microsoft-logo.svg" /></p>
 
 <p align="center"><a href="https://www.qoherent.ai/"><img width=250 src="client/public/clogo-black.png" /></a></p>
-<p align="center" style="margin-bottom:10em;"><img width=250 src="client/public/AIRBUS_white.png#gh-dark-mode-only" /></p>
+<p align="center" style="margin-bottom:20em;"><img width=250 src="client/public/AIRBUS_white.png#gh-dark-mode-only" /></p>
 <p align="center"><img width=250 src="client/public/AIRBUS_blue.png#gh-light-mode-only" /></p>
