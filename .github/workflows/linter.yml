@@ -54,7 +54,7 @@ jobs:
       # Run Linter against code base #
       ################################
       - name: MegaLinter
-        uses: oxsecurity/megalinter/flavors/cupcake@a87b2872713c6bdde46d2473c5d7ed23e5752dc2 # v7.4.0
+        uses: oxsecurity/megalinter/flavors/cupcake@5364b811bbe86576d832227be174ebc2aa0f5f49 # v7.6.0
         continue-on-error: true
         env:
           VALIDATE_ALL_CODEBASE: false
