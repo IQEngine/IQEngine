@@ -49,7 +49,14 @@ const exampleMeta = `
 
 export const SigMF = () => {
   return (
-    <div className="mx-32">
+    <div className="mx-32 pt-5">
+      <span className="text-lg">Quick Links: </span>
+      <a href="https://github.com/sigmf/SigMF/blob/sigmf-v1.x/sigmf-spec.md" target="_blank">
+        <button>SigMF Specs</button>
+      </a>{' '}
+      <a href="/convert">
+        <button>X-to-SigMF Converters</button>
+      </a>
       <h1 className="text-primary text-center">What is SigMF?</h1>
       <div className="columns-2">
         <p className="text-justify text-lg">
@@ -87,7 +94,6 @@ export const SigMF = () => {
         <br></br>
         <br></br>
       </div>
-
       {/* SigMF Summary */}
       <h1 className="text-primary text-center mt-16">SigMF in 5 Minutes</h1>
       <p className="text-lg">
@@ -190,7 +196,6 @@ export const SigMF = () => {
         By using SigMF to store and share your RF recordings, you can avoid dataset bitrot while promoting collaboration
         and interoperability!
       </p>
-
       {/* Schema */}
       <iframe src="./sigmf.html" className="w-full mt-8 mb-32" height="800"></iframe>
     </div>
