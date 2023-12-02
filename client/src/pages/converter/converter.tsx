@@ -14,6 +14,13 @@ export const Converter = () => {
             <p className="text-lg">
               SigMF Converter is an online file converter designed to convert various file formats to the SigMF format.
               To get started, simply select the file format and upload a file, the converter will take care of the rest.
+              <br />
+              <br />
+              If you would like to run the converter straight from Python locally, see{' '}
+              <a href="https://github.com/IQEngine/IQEngine/blob/speed-up-wav-converter/api/converters/README.md">
+                these steps
+              </a>
+              .
             </p>
           </div>
           <div className="flex items-center">
