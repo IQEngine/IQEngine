@@ -1,55 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, BackgroundTasks, Response
+from fastapi import APIRouter, Depends, UploadFile, BackgroundTasks, Response
 from helpers.authorization import get_current_user
+from converters.wav_to_sigmf import wav_to_sigmf
 from typing import Optional
 import os
 import shutil
 import io
 import zipfile
-from sigmf import SigMFFile
-from scipy.io import wavfile
-import numpy as np
 
 router = APIRouter()
-
-
-def wav_to_sigmf(wav_file_path: str) -> list[str]:
-    """Convert a wav file to a sigmf file."""
-
-    sample_rate, data = wavfile.read(wav_file_path)
-
-    dest_path = wav_file_path.split(".")[0]
-    _convert_data(data, dest_path)
-
-    meta = SigMFFile(
-        data_file=f"{dest_path}.sigmf-data",
-        global_info={
-            SigMFFile.DATATYPE_KEY: "cf32_le",
-            SigMFFile.SAMPLE_RATE_KEY: sample_rate,
-            SigMFFile.VERSION_KEY: "1.0.0",
-            SigMFFile.NUM_CHANNELS_KEY: 1,
-        }
-    )
-
-    meta.tofile(f"{dest_path}.sigmf-meta")
-    return [f"{dest_path}.sigmf-data", f"{dest_path}.sigmf-meta"]
-
-
-def _convert_data(data: np.ndarray, destination_path: str):
-    """Convert a numpy array to a SigMF data file."""
-
-    with open(f"{destination_path}.sigmf-data", "wb") as f:
-        if len(data.shape) == 2:
-            for sample in data:
-                real = sample[0].astype(np.float32)
-                imag = sample[1].astype(np.float32)
-                f.write(real.tobytes())
-                f.write(imag.tobytes())
-        else: # only one channel (eg mono audio)
-            for sample in data:
-                real = sample.astype(np.float32)
-                imag = np.float32(0) # until IQEngine supports real-valued SigMF recordings
-                f.write(real.tobytes())
-                f.write(imag.tobytes())
 
 def remove_files(file_paths: str):
     for file_path in file_paths:

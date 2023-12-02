@@ -39,3 +39,13 @@ The following diagram shows the high-level architecture of IQEngine, not includi
 </div>
 </center>
 <br></br>
+
+## Optimizations for Speed 🚀🚀🚀🚀🚀
+
+While viewing a signal, it only downloads IQ samples to the client that are being viewed at the time (which caching as much as possible).
+
+To look at a larger region of a signal, when you zoom out, it uses batch decimation so it's not sending 100% of samples, but instead it gives 1 FFT worth of samples then skips N FFTs worth of samples.
+
+Currently IQEngine hosts the webapp and storage container on two separate regions (East US and UK South), with Azure Front Door as the CDN to route traffic to the closest region to each user.
+
+The frontend/backend and plugins server run within Container Apps, and they are set to auto-scale in replicas based on traffic, making sure it can handle any load.
