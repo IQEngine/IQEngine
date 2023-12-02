@@ -50,7 +50,7 @@ const exampleMeta = `
 export const SigMF = () => {
   return (
     <div className="mx-32 pt-5">
-      <span className="text-lg">Quick Links: </span>
+      <span className="text-lg text-primary">Quick Links: </span>
       <a href="https://github.com/sigmf/SigMF/blob/sigmf-v1.x/sigmf-spec.md" target="_blank">
         <button>SigMF Specs</button>
       </a>{' '}
