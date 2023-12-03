@@ -42,7 +42,7 @@ updates:
   - package-ecosystem: npm
     directory: /client
     schedule:
-      interval: weekly
+      interval: monthly
       day: sunday
     groups:
       npm-client:
@@ -70,7 +70,7 @@ updates:
   - package-ecosystem: pip
     directory: /api
     schedule:
-      interval: weekly
+      interval: monthly
       day: sunday
     groups:
       pip-api:
