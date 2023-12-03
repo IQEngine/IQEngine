@@ -39,7 +39,7 @@ IQEngine is rapidly evolving, so [sign up](https://dashboard.mailerlite.com/form
 * Plugins, allowing DSP to run on the backend (currently supports Python and GNU Radio)
 * Ability to search/query over millions of recordings by parsing metadata into database
 * User/admin system for controlling access to certain recordings
-* The IQEngine team is currently creating a new web library for performing FFTs and related functions, called [WebFFT](https://www.npmjs.com/package/webfft), you can play with it using the [demo here](https://webfft.com/)
+* The IQEngine team created a new web library for performing FFTs and related functions, called [WebFFT](https://www.npmjs.com/package/webfft), you can play with it using the [demo here](https://webfft.com/)
 
 <a href="https://star-history.com/#IQEngine/IQEngine&Date">
   <picture>
