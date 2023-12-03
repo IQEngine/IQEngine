@@ -10,9 +10,9 @@
 <p align="center"><img width=250 src="client/public/IQEngine.svg#gh-dark-mode-only" /></p>
 <p align="center"><img width=250 src="client/public/IQEngine_Black.svg#gh-light-mode-only" /></p>
 
-<p align="center">Try it out at <a href="https://www.iqengine.org">www.iqengine.org</a></p>
+<p align="center"><h4 style="text-align: center;"><i>A web-based SDR toolkit for analyzing, processing, and sharing RF recordings</i></h4></p>
 
-<h4 style="text-align: center;"><i>A web-based SDR toolkit for analyzing, processing, and sharing RF recordings</i></h4>
+<p align="center">🔎 Try it out at <a href="https://www.iqengine.org">www.iqengine.org</a></p>
 
 * Spectrogram-based visualization and editor tool, built on SigMF
 * Share your RF recordings or RFML datasets with others, without them having to download files or install any software
