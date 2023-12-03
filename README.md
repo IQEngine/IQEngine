@@ -52,7 +52,7 @@ IQEngine is rapidly evolving, so [sign up](https://dashboard.mailerlite.com/form
 </a>
 
 
-<div style="font-size: 1.5em; font-weight: bold;">IQEngine is Supported By:</div>
+<div style="font-size: 3em; font-weight: bold;">IQEngine is Supported By:</div>
 
 <p align="center"><img width=250 src="client/public/microsoft-logo.svg" /></p>
 
