@@ -27,7 +27,7 @@ IQEngine is rapidly evolving, so [sign up](https://dashboard.mailerlite.com/form
 
 [Link to the live docs](https://staging.iqengine.org/docs) which can also be found in the source code at `client/src/pages/docs/***.mdx`
 
-## List of Major Features
+### List of Major Features:
 
 * Spectrogram + time + freq + IQ plots with zooming and adjustable scales
 * Table of all RF recordings available in a directory or blob storage account, with spectrogram thumbnails
@@ -52,7 +52,7 @@ IQEngine is rapidly evolving, so [sign up](https://dashboard.mailerlite.com/form
 </a>
 
 
-<h3>IQEngine is Supported By:</h3>
+### IQEngine is Supported By:
 
 <p align="center"><img width=250 src="client/public/microsoft-logo.svg" /></p>
 
