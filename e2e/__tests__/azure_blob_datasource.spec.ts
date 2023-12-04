@@ -44,6 +44,7 @@ test('Azure Blob Datasource', async ({ page }) => {
   await page.getByPlaceholder('Container Name').fill('e2e-test-container');
   // Note that this container was set to public so that SAS token isnt needed
   await page.locator('#AzureBlob').click();
+  await page.waitForTimeout(2000);
   await expect(page.getByText('cellular3', { exact: true })).toBeVisible();
 });
 
