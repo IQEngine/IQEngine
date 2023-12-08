@@ -180,6 +180,30 @@ async def get_iqfile(
     response = await azure_client.get_blob_stream(iq_path)
     return StreamingResponse(response, media_type=content_type)
 
+@router.get(
+    "/api/datasources/{account}/{container}/{filepath:path}.sigmf-meta",
+    response_class=StreamingResponse,
+)
+async def get_metafile(
+    filepath: str,
+    datasource: DataSource = Depends(datasources.get),
+    azure_client: AzureBlobClient = Depends(AzureBlobClient),
+    access_allowed=Depends(check_access),
+):
+    if access_allowed is None:
+        raise HTTPException(status_code=403, detail="No Access")
+
+    if not datasource:
+        raise HTTPException(status_code=404, detail="Datasource not found")
+
+    azure_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
+    content_type = get_content_type(ApiType.METADATA)
+    meta_path = get_file_name(filepath, ApiType.METADATA)
+    if not azure_client.blob_exist(meta_path):
+        raise HTTPException(status_code=404, detail="File not found")
+
+    response = await azure_client.get_blob_stream(meta_path)
+    return StreamingResponse(response, media_type=content_type)
 
 @router.get(
     "/api/datasources/{account}/{container}/{filepath:path}/minimap-data",
