@@ -92,9 +92,9 @@ const SettingsPane = ({ currentFFT }) => {
     const fftSize = context.fftSize;
     const imageHeight = context.spectrogramHeight;
     const totalSamples = context.meta.getTotalSamples();
-    const onePercent = (totalSamples / fftSize) / 100;
+    const onePercent = totalSamples / fftSize / 100;
 
-    const zoomLevels = [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ];
+    const zoomLevels = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
     return zoomLevels.map((z) => Math.floor((onePercent * z) / imageHeight));
   }
 
@@ -188,7 +188,7 @@ const SettingsPane = ({ currentFFT }) => {
       </div>
       <div className="mt-4">
         <div className="dropdown dropdown-hover dropdown-right w-full">
-          <label tabIndex={0} className="btn btn-outline btn-success btn-sm w-full">
+          <label tabIndex={0} className="btn btn-outline btn-success btn-sm w-full text-base">
             Colormap <ArrowRightIcon />
           </label>
           <ul className="p-2 shadow menu dropdown-content mt-0 z-[1] bg-base-100 rounded-box w-52">
@@ -208,7 +208,7 @@ const SettingsPane = ({ currentFFT }) => {
       </div>
       <div className="mt-4">
         <div className="dropdown dropdown-hover dropdown-right w-full">
-          <label tabIndex={0} className="btn btn-outline btn-success btn-sm w-full">
+          <label tabIndex={0} className="btn btn-outline btn-success btn-sm w-full text-base">
             FFT Size <ArrowRightIcon />
           </label>
           <ul className="p-2 shadow menu dropdown-content z-[1] mt-0 bg-base-100 rounded-box w-52">
@@ -258,7 +258,7 @@ const SettingsPane = ({ currentFFT }) => {
       </>
       <div className="mt-2">
         <div className="dropdown dropdown-hover dropdown-right w-full">
-          <label tabIndex={0} className="btn btn-outline btn-success btn-sm w-full">
+          <label tabIndex={0} className="btn btn-outline btn-success btn-sm w-full text-base">
             Example Filter Taps <ArrowRightIcon />
           </label>
           <ul className="p-2 shadow menu dropdown-content z-[1] mt-0 bg-base-100 rounded-box w-96">
@@ -280,8 +280,8 @@ const SettingsPane = ({ currentFFT }) => {
         </div>
       </div>
       <div className="mt-4 mb-2">
-      <div className="dropdown dropdown-hover dropdown-right w-full">
-          <label tabIndex={0} className="btn btn-outline btn-success btn-sm w-full">
+        <div className="dropdown dropdown-hover dropdown-right w-full">
+          <label tabIndex={0} className="btn btn-outline btn-success btn-sm w-full text-base">
             Window <ArrowRightIcon />
           </label>
           <ul className="p-2 shadow menu dropdown-content z-[1] mt-0 bg-base-100 rounded-box w-70">
