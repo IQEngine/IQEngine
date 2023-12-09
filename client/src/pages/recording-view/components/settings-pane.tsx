@@ -186,6 +186,7 @@ const SettingsPane = ({ currentFFT }) => {
           unit="dB"
         />
       </div>
+
       <div className="mt-4">
         <div className="dropdown dropdown-hover dropdown-right w-full">
           <label tabIndex={0} className="btn btn-outline btn-success btn-sm w-full text-base">
@@ -206,6 +207,7 @@ const SettingsPane = ({ currentFFT }) => {
           </ul>
         </div>
       </div>
+
       <div className="mt-4">
         <div className="dropdown dropdown-hover dropdown-right w-full">
           <label tabIndex={0} className="btn btn-outline btn-success btn-sm w-full text-base">
@@ -226,6 +228,7 @@ const SettingsPane = ({ currentFFT }) => {
           </ul>
         </div>
       </div>
+
       <>
         <div className="mt-2" id="formTaps">
           <label className="label">
@@ -256,6 +259,7 @@ const SettingsPane = ({ currentFFT }) => {
           </div>
         </div>
       </>
+
       <div className="mt-2">
         <div className="dropdown dropdown-hover dropdown-right w-full">
           <label tabIndex={0} className="btn btn-outline btn-success btn-sm w-full text-base">
@@ -279,6 +283,7 @@ const SettingsPane = ({ currentFFT }) => {
           </ul>
         </div>
       </div>
+
       <div className="mt-4 mb-2">
         <div className="dropdown dropdown-hover dropdown-right w-full">
           <label tabIndex={0} className="btn btn-outline btn-success btn-sm w-full text-base">
@@ -303,6 +308,7 @@ const SettingsPane = ({ currentFFT }) => {
           </ul>
         </div>
       </div>
+
       <div id="toggleFreq">
         <label className="label">
           <span className="label-text text-base">Display RF Freq</span>
@@ -316,6 +322,7 @@ const SettingsPane = ({ currentFFT }) => {
           />
         </label>
       </div>
+
       <div className="mb-3" id="formPythonSnippet">
         <label className="label">
           <span className="label-text text-base">Python Snippet</span>
