@@ -12,7 +12,7 @@ const RulerTop = () => {
   const [ticks, setTicks] = useState([]);
   const [labels, setLabels] = useState([]);
   const sampleRate = meta.getSampleRate();
-  const coreFrequency = meta.getCenterFrequency();
+  const centerFrequency = meta.getCenterFrequency();
 
   useEffect(() => {
     const num_ticks = 16;
@@ -21,7 +21,7 @@ const RulerTop = () => {
     for (let i = 0; i <= num_ticks; i++) {
       if (i % (num_ticks / 4) === 0) {
         let f = (i / num_ticks) * sampleRate - sampleRate / 2;
-        if (includeRfFreq) f = f + coreFrequency;
+        if (includeRfFreq) f = f + centerFrequency;
         f = f / 1e6; // convert to MHz
         let text = f.toString();
         if (f > 1000) {
