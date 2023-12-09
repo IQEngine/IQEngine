@@ -17,6 +17,7 @@ export function useSpectrogram(currentFFT) {
     setSpectrogramHeight,
     meta,
     taps,
+    squareSignal,
     pythonSnippet,
   } = useSpectrogramContext();
 
@@ -27,6 +28,7 @@ export function useSpectrogram(currentFFT) {
     filePath,
     fftSize,
     taps,
+    squareSignal,
     pythonSnippet,
     fftStepSize
   );
@@ -91,7 +93,16 @@ export function useSpectrogram(currentFFT) {
       offset += fftSize * 2;
     }
     return iqData;
-  }, [processedDataUpdated, fftSize, debouncedCurrentFFT, fftStepSize, totalFFTs, spectrogramHeight, taps]);
+  }, [
+    processedDataUpdated,
+    fftSize,
+    debouncedCurrentFFT,
+    fftStepSize,
+    totalFFTs,
+    spectrogramHeight,
+    taps,
+    squareSignal,
+  ]);
 
   return {
     totalFFTs,

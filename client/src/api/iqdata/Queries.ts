@@ -41,6 +41,7 @@ export function useGetIQData(
   filePath: string,
   fftSize: number, // we grab 2x this many floats/ints
   taps: number[] = [1],
+  squareSignal: boolean = false,
   pythonScript: string = INITIAL_PYTHON_SNIPPET,
   fftStepSize: number = 0
 ) {
@@ -133,6 +134,7 @@ export function useGetIQData(
           filePath,
           fftSize,
           taps,
+          squareSignal,
           pythonScript,
           !!pyodide,
         ]);
@@ -150,7 +152,7 @@ export function useGetIQData(
           iqData.forEach((data, index) => {
             iqDataFloatArray.set(data, index * fftSize * 2);
           });
-          const result = applyProcessing(iqDataFloatArray, taps, pythonScript, pyodide);
+          const result = applyProcessing(iqDataFloatArray, taps, squareSignal, pythonScript, pyodide);
 
           for (let i = 0; i < group.count; i++) {
             currentProcessedData[group.start + i] = result.slice(i * fftSize * 2, (i + 1) * fftSize * 2);
@@ -159,13 +161,13 @@ export function useGetIQData(
         // performance.mark('end');
         // const performanceMeasure = performance.measure('processing', 'start', 'end');
         queryClient.setQueryData(
-          ['processedIQData', type, account, container, filePath, fftSize, taps, pythonScript, !!pyodide],
+          ['processedIQData', type, account, container, filePath, fftSize, taps, squareSignal, pythonScript, !!pyodide],
           currentProcessedData
         );
 
         return currentProcessedData;
       },
-      [!!pyodide, pythonScript, taps.join(',')]
+      [!!pyodide, pythonScript, taps.join(','), squareSignal]
     ),
     enabled: !!meta && !!filesQuery.data && !!dataSourcesQuery.data,
   });

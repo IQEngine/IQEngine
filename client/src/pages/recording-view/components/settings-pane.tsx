@@ -310,7 +310,7 @@ const SettingsPane = ({ currentFFT }) => {
       </div>
 
       <div id="toggleFreq">
-        <label className="label">
+        <label className="label py-0">
           <span className="label-text text-base">Display RF Freq</span>
           <input
             type="checkbox"
@@ -318,6 +318,20 @@ const SettingsPane = ({ currentFFT }) => {
             checked={context.includeRfFreq}
             onChange={(e) => {
               context.setIncludeRfFreq(e.target.checked);
+            }}
+          />
+        </label>
+      </div>
+
+      <div id="toggleSquaring">
+        <label className="label pb-0 pt-2">
+          <span className="label-text text-base">Square Signal</span>
+          <input
+            type="checkbox"
+            className="toggle toggle-primary"
+            checked={context.squareSignal}
+            onChange={(e) => {
+              context.setSquareSignal(e.target.checked);
             }}
           />
         </label>
