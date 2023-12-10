@@ -144,6 +144,9 @@ async def import_datasources_from_env():
                     owners=connection["owners"] if "owners" in connection else ["IQEngine-Admin"],
                     readers=connection["readers"] if "readers" in connection else [],
                 )
+                # Check one more time that it doesn't exist yet (the above block can take 0.1s or more)
+                if await datasource_exists(connection["accountName"], connection["containerName"]):
+                    continue
                 # It's important to immediately add it to the db so other workers see it and dont add a duplicate
                 await create(datasource=datasource, user=None)
                 # This should only get triggered once (one worker)
