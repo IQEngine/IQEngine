@@ -12,7 +12,7 @@ def collection() -> AgnosticCollection:
 
 
 async def get() -> Configuration | None:
-    current = await collection().find_one()
+    current = await collection().find_one() # even if there are multiple entries (eg due to multiple workers adding them at the same time), they should all match
     if current is None:
         return None
     return Configuration(**current)
