@@ -29,7 +29,7 @@ async def datasource_exists(account, container) -> bool:
 async def sync(account: str, container: str):
     from .metadata import exists, create
 
-    print(f"[SYNC] Starting sync for {account}/{container}")
+    print(f"[SYNC] Starting sync for {account}/{container} on PID {os.getpid()}")
     azure_blob_client = AzureBlobClient(account, container)
     datasource = await get(account, container)
     if datasource is None:
