@@ -27,6 +27,8 @@ interface SpectrogramContextProperties {
   setFFTStepSize: (fftStepSize: number) => void;
   includeRfFreq: boolean;
   setIncludeRfFreq: (includeRfFreq: boolean) => void;
+  squareSignal: boolean;
+  setSquareSignal: (squareSignal: boolean) => void;
   taps: number[];
   setTaps: (taps: number[]) => void;
   pythonSnippet: string;
@@ -58,7 +60,6 @@ export function SpectrogramContextProvider({
     fftStepSize: 0,
   },
 }) {
-
   const [magnitudeMin, setMagnitudeMin] = useState<number>(seedValues.magnitudeMin);
   const [magnitudeMax, setMagnitudeMax] = useState<number>(seedValues.magnitudeMax);
   const [colmap, setColmap] = useState<string>(seedValues.colmap);
@@ -68,6 +69,7 @@ export function SpectrogramContextProvider({
   const [spectrogramWidth, setSpectrogramWidth] = useState<number>(seedValues.spectrogramWidth);
   const [fftStepSize, setFFTStepSize] = useState<number>(seedValues.fftStepSize);
   const [includeRfFreq, setIncludeRfFreq] = useState<boolean>(false);
+  const [squareSignal, setSquareSignal] = useState<boolean>(false);
   const [taps, setTaps] = useState<number[]>([1]);
   const [pythonSnippet, setPythonLocalSnippet] = useState<string>(INITIAL_PYTHON_SNIPPET);
   const { data: originMeta } = useMeta(type, account, container, filePath);
@@ -110,6 +112,8 @@ export function SpectrogramContextProvider({
         setFFTStepSize,
         includeRfFreq,
         setIncludeRfFreq,
+        squareSignal,
+        setSquareSignal,
         taps,
         setTaps,
         pythonSnippet,

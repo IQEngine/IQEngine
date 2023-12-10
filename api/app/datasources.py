@@ -15,22 +15,16 @@ def collection() -> AgnosticCollection:
     collection: AgnosticCollection = db().datasources
     return collection
 
-
 async def get(account, container) -> DataSource | None:
     # Get a datasource by account and container
     datasource_collection: AgnosticCollection = collection()
-    datasource = await datasource_collection.find_one(
-        {"account": account, "container": container}
-    )
+    datasource = await datasource_collection.find_one({"account": account, "container": container})
     if datasource is None:
         return None
     return DataSource(**datasource)
 
-
 async def datasource_exists(account, container) -> bool:
-    # Check if a datasource exists by account and container
     return await get(account, container) is not None
-
 
 async def sync(account: str, container: str):
     from .metadata import exists, create
@@ -61,19 +55,15 @@ async def sync(account: str, container: str):
                 }
             )
             metadata.globalMetadata.traceability_revision = 0
-            file_length = await azure_blob_client.get_file_length(
-                filepath + ".sigmf-data"
-            )
+            file_length = await azure_blob_client.get_file_length(filepath + ".sigmf-data")
             metadata.globalMetadata.traceability_sample_length = (
-                file_length
-                / get_bytes_per_iq_sample(metadata.globalMetadata.core_datatype)
+                file_length / get_bytes_per_iq_sample(metadata.globalMetadata.core_datatype)
             )
             await create(metadata, user=None)
             print(f"[SYNC] Created metadata for {filepath}")
         except Exception as e:
             print(f"[SYNC] Error creating metadata for {filepath}: {e}")
     print(f"[SYNC] Finished syncing {account}/{container}")
-
 
 async def create(datasource: DataSource, user: Optional[dict]) -> DataSource:
     """
@@ -108,8 +98,8 @@ async def create(datasource: DataSource, user: Optional[dict]) -> DataSource:
 async def import_datasources_from_env():
     connection_info = os.getenv("IQENGINE_CONNECTION_INFO", None)
     base_filepath = os.getenv("IQENGINE_BACKEND_LOCAL_FILEPATH", None)
-    if (not connection_info) and (not base_filepath):
-        return None
+
+    # Add datasource corresponding to the local backend storage
     if base_filepath:
         try:
             if not await datasource_exists('local', 'local'):
@@ -130,12 +120,12 @@ async def import_datasources_from_env():
                 asyncio.create_task(sync("local", "local"))
         except Exception as e:
             print(f"Failed to import datasource local to backend", e)
+
+    # Add all cloud datasources
     if connection_info:
         for connection in json.loads(connection_info)["settings"]:
             try:
-                if await datasource_exists(
-                    connection["accountName"], connection["containerName"]
-                ):
+                if await datasource_exists(connection["accountName"], connection["containerName"]):
                     continue
                 datasource = DataSource(
                     account=connection["accountName"],
@@ -153,11 +143,7 @@ async def import_datasources_from_env():
                     readers=connection["readers"] if "readers" in connection else [],
                 )
                 await create(datasource=datasource, user=None)
-                asyncio.create_task(
-                    sync(
-                        connection["accountName"], connection["containerName"]
-                    )
-                )
+                asyncio.create_task(sync(connection["accountName"], connection["containerName"]))
             except Exception as e:
                 print(f"Failed to import datasource {connection['name']}", e)
                 continue

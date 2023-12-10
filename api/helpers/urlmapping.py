@@ -32,7 +32,7 @@ def get_content_type(apiType: ApiType):
         case ApiType.IQDATA:
             return "application/octet-stream"
         case ApiType.METADATA:
-            return "application/json"
+            return "application/octet-stream" # was "application/json" but it didn't download the file when you clicked it, it opened it in browser, which was annoying considering we are only using this functionality within the downlink link in the recordingslist
         case ApiType.MINIMAP:
             return "application/octet-stream"
         case _:

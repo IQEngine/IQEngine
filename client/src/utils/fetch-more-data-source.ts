@@ -54,7 +54,10 @@ function callPyodide(pyodide, pythonSnippet, samples) {
   return samples;
 }
 
-export function applyProcessing(samples, taps, pythonSnippet, pyodide) {
+export function applyProcessing(samples, taps, squareSignal, pythonSnippet, pyodide) {
+  if (squareSignal) {
+    for (let i = 0; i < samples.length; i++) samples[i] = samples[i] * samples[i];
+  }
   if (taps && taps.length !== 1) {
     samples = convolve(samples, taps); // we apply the taps here and not in the FFT calcs so transients dont hurt us as much
   }
@@ -81,7 +84,7 @@ export function convertToFloat32(buffer, dataType) {
     let samples = Float32Array.from(new Uint16Array(buffer));
     for (let i = 0; i < samples.length; i++) samples[i] = (samples[i] - 32768.0) / 32768.0;
     return samples;
-  } else if (dataType === 'ci32_le'  || dataType === 'ci32') {
+  } else if (dataType === 'ci32_le' || dataType === 'ci32') {
     let samples = Float32Array.from(new Int32Array(buffer));
     for (let i = 0; i < samples.length; i++) samples[i] = samples[i] / 2147483647.0;
     return samples;
