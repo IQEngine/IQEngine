@@ -24,7 +24,7 @@ build-docker:
 
 run-docker:
 	@echo "Running IQEngine Docker container..."
-	@docker run -p 5000:5000 -p 3000:3000 iqengine
+	@docker run --env-file .env -p 5000:5000 -p 3000:3000 iqengine
 
 build-infra:
 	@echo "Building infrastructure..."
