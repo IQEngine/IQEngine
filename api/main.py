@@ -100,6 +100,7 @@ app.include_router(converter_router)
 app.mount("/", SPAStaticFiles(directory="iqengine", html=True), name="iqengine")
 
 # Sleep a random amount of time so that the multiple workers dont all initialize stuff at the exact same time
+random.seed(os.getpid()) # by default the seed is the system time, which might be the same for multiple workers
 time.sleep(random.randint(0, 5000) / 1000) # 0-5 seconds
 
 app.add_event_handler("startup", db) # connect to mongodb or set up in-memory db
