@@ -9,7 +9,7 @@ from app.config import import_default_config_from_env
 
 async def import_all_from_env():
     # Sleep a random amount of time so that the multiple workers dont all initialize stuff at the exact same time
-    time.sleep(random.randint(0, 60000) / 1000) # 0-60 seconds, to greatly reduce risk of duplicates
+    time.sleep(random.randint(0, 10000) / 1000) # 0-10 seconds, to greatly reduce risk of duplicates
     print(f"import_all_from_env starting on PID {os.getpid()} at {time.time()}")
     try:
         await import_plugins_from_env()

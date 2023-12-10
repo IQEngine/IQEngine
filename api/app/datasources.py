@@ -33,7 +33,8 @@ async def sync(account: str, container: str):
     azure_blob_client = AzureBlobClient(account, container)
     datasource = await get(account, container)
     if datasource is None:
-        raise Exception(f"[SYNC] Datasource {account}/{container} does not exist")
+        print(f"[SYNC] Datasource {account}/{container} does not exist") # dont raise exception or it will cause unclosed connection errors
+        return
     if datasource.sasToken:
         azure_blob_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
     metadatas = azure_blob_client.get_metadata_files()
