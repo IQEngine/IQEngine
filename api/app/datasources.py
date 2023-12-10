@@ -2,6 +2,8 @@ from typing import Optional
 import asyncio
 import json
 import os
+import time
+import random
 
 from .azure_client import AzureBlobClient
 from .models import DataSource, DataSourceReference
@@ -29,11 +31,12 @@ async def datasource_exists(account, container) -> bool:
 async def sync(account: str, container: str):
     from .metadata import exists, create
 
-    print(f"[SYNC] Starting sync for {account}/{container}")
+    print(f"[SYNC] Starting sync for {account}/{container} on PID {os.getpid()} at {time.time()}")
     azure_blob_client = AzureBlobClient(account, container)
     datasource = await get(account, container)
     if datasource is None:
-        raise Exception(f"[SYNC] Datasource {account}/{container} does not exist")
+        print(f"[SYNC] Datasource {account}/{container} does not exist") # dont raise exception or it will cause unclosed connection errors
+        return
     if datasource.sasToken:
         azure_blob_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
     metadatas = azure_blob_client.get_metadata_files()
@@ -61,9 +64,10 @@ async def sync(account: str, container: str):
                 file_length / get_bytes_per_iq_sample(metadata.globalMetadata.core_datatype)
             )
             await create(metadata, user=None)
-            print(f"[SYNC] Created metadata for {filepath}")
+            #print(f"[SYNC] Created metadata for {filepath}")
         except Exception as e:
             print(f"[SYNC] Error creating metadata for {filepath}: {e}")
+
     print(f"[SYNC] Finished syncing {account}/{container}")
 
 async def create(datasource: DataSource, user: Optional[dict]) -> DataSource:
@@ -74,7 +78,8 @@ async def create(datasource: DataSource, user: Optional[dict]) -> DataSource:
     """
     datasource_collection: AgnosticCollection = collection()
     if await datasource_exists(datasource.account, datasource.container):
-        raise Exception("Datasource Already Exists")
+        print("Datasource Already Exists!")
+        return None
     if datasource.sasToken:
         datasource.sasToken = encrypt(datasource.sasToken)
     else:
@@ -100,6 +105,9 @@ async def import_datasources_from_env():
     connection_info = os.getenv("IQENGINE_CONNECTION_INFO", None)
     base_filepath = os.getenv("IQENGINE_BACKEND_LOCAL_FILEPATH", None)
 
+    # Add another random delay for good measure, we kept having ones start really close together
+    time.sleep(random.randint(0, 10000) / 1000) # 0-10 seconds, to greatly reduce risk of duplicates
+
     # Add datasource corresponding to the local backend storage
     if base_filepath:
         try:
@@ -117,8 +125,11 @@ async def import_datasources_from_env():
                     owners=["IQEngine-Admin"],
                     readers=[],
                 )
-                await create(datasource=datasource, user=None)
-                asyncio.create_task(sync("local", "local"))
+                # Check one more time that it doesn't exist yet (the above block can take 0.1s or more)
+                if not await datasource_exists('local', 'local'):
+                    create_ret = await create(datasource=datasource, user=None)
+                    if create_ret:
+                        await sync("local", "local")
         except Exception as e:
             print(f"Failed to import datasource local to backend", e)
 
@@ -143,10 +154,14 @@ async def import_datasources_from_env():
                     owners=connection["owners"] if "owners" in connection else ["IQEngine-Admin"],
                     readers=connection["readers"] if "readers" in connection else [],
                 )
+                # Check one more time that it doesn't exist yet (the above block can take 0.1s or more)
+                if await datasource_exists(connection["accountName"], connection["containerName"]):
+                    continue
                 # It's important to immediately add it to the db so other workers see it and dont add a duplicate
-                await create(datasource=datasource, user=None)
+                create_ret = await create(datasource=datasource, user=None)
                 # This should only get triggered once (one worker)
-                asyncio.create_task(sync(connection["accountName"], connection["containerName"]))
+                if create_ret:
+                    await sync(connection["accountName"], connection["containerName"])
             except Exception as e:
                 print(f"Failed to import datasource {connection['name']}", e)
                 continue
