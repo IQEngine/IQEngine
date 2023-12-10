@@ -101,6 +101,7 @@ app.mount("/", SPAStaticFiles(directory="iqengine", html=True), name="iqengine")
 
 # Sleep a random amount of time so that the multiple workers dont all initialize stuff at the exact same time
 time.sleep(random.randint(0, 5000) / 1000) # 0-5 seconds
+print(f"App starting on PID {os.getpid()}")
 
 app.add_event_handler("startup", db) # connect to mongodb or set up in-memory db
 app.add_event_handler("startup", import_all_from_env) # adds plugins connections, feature flags, and inits datasources
