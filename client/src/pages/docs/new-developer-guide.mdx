@@ -58,20 +58,23 @@ This command will launch IQEngine, and you can access it at [http://localhost:30
 
 If you prefer to build and run the IQEngine Docker image locally, follow these steps:
 
-1. Clone the repository and navigate to the project directory.
-2. Build the Docker image by executing the following command:
+1. Clone the repository and navigate to the project directory
+2. Copy the example.env to .env and edit it to insert anything such as cloud datasources to IQENGINE_CONNECTION_INFO
+3. Build the Docker image by executing the following command:
 
 ```bash
 docker build -t iqengine-local .
 ```
 
-3. Once the image is built successfully, run the Docker container with the following command:
+4. Once the image is built successfully, run the Docker container with the following command:
 
 ```bash
-docker run -p 3000:3000 -d iqengine-local
+docker run --env-file .env -p 3000:3000 -d iqengine-local
 ```
 <br />
-This will instantiate IQEngine using your locally built Docker image, and you can access it at [http://localhost:3000](http://localhost:3000).
+This will instantiate IQEngine using your locally built Docker image with your local .env file, and you can access it at [http://localhost:3000](http://localhost:3000).
+
+If the .env file is causing issues, remove the `--env-file .env` from the command above and it should work, just without custom datasources/settings
 
 ### Misc Developer Tips
 
