@@ -29,6 +29,7 @@ async def datasource_exists(account, container) -> bool:
 async def sync(account: str, container: str):
     from .metadata import exists, create
 
+    print(f"[SYNC] Starting sync for {account}/{container}")
     azure_blob_client = AzureBlobClient(account, container)
     datasource = await get(account, container)
     if datasource is None:
@@ -142,7 +143,9 @@ async def import_datasources_from_env():
                     owners=connection["owners"] if "owners" in connection else ["IQEngine-Admin"],
                     readers=connection["readers"] if "readers" in connection else [],
                 )
+                # It's important to immediately add it to the db so other workers see it and dont add a duplicate
                 await create(datasource=datasource, user=None)
+                # This should only get triggered once (one worker)
                 asyncio.create_task(sync(connection["accountName"], connection["containerName"]))
             except Exception as e:
                 print(f"Failed to import datasource {connection['name']}", e)
