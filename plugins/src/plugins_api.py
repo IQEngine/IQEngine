@@ -65,6 +65,7 @@ async def run(plugin_name, plugin: Plugin):
             samples = await get_from_samples_cloud(plugin.samples_cloud[0])
             custom_params["sample_rate"] = plugin.samples_cloud[0].sample_rate
             custom_params["center_freq"] = plugin.samples_cloud[0].center_freq
+        # at this point samples are always np.complex64 regardless of how they were provided
         
         plugin_instance = plugin_definition(**custom_params)  # a way to provide params as a single dict
 
