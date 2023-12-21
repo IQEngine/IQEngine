@@ -189,37 +189,41 @@ export const Browser = () => {
 
       <div className="flex flex-row w-full">
         {/* -------Repo list------- */}
-        <div className="w-64 block">
+        <div className="w-60 block">
           <div className="grid grid-cols-1 gap-4">
             {apiDataSources?.data?.map((item, i) => (
               <div
-                className="grid grid-cols-4 gap-2 w-48 h-12 items-center p-0 m-0 outline outline-1 outline-primary rounded-lg hover:bg-accent hover:bg-opacity-50"
+                className="grid grid-cols-10 gap-2 w-52 h-12 items-center p-0 m-0 outline outline-1 outline-primary rounded-lg hover:bg-accent hover:bg-opacity-50"
                 id={item.name.replaceAll(' ', '')}
                 onClick={() => handleOnClick(item.container, item.account, item.sasToken)}
                 aria-label={item.name}
                 key={i}
               >
-                <div>
+                <div className="col-span-3">
                   <img className="h-12 rounded-l-lg p-0 m-0" src={item.imageURL ?? '/api.png'} alt={item.name} />
                 </div>
-                <h2 className="col-span-3 p-0 m-0 leading-tight">{item.name}</h2>
+                <h2 className="col-span-6 p-0 m-0 leading-tight">{item.name}</h2>
+                {currentContainer === item.container && currentAccount === item.account && (
+                  <div className="col-span-1 mb-2 text-4xl text-primary">⇨</div>
+                )}
               </div>
             ))}
 
             {supported && (
               <div
-                className="gap-2 w-48 h-12 items-center p-0 m-0 outline outline-1 outline-primary rounded-lg hover:bg-accent hover:bg-opacity-50"
+                className="grid grid-cols-9 gap-2 w-52 h-12 items-center p-0 m-0 outline outline-1 outline-primary rounded-lg hover:bg-accent hover:bg-opacity-50"
                 id={'local-dir'}
                 onClick={openDir}
                 aria-label={'local directory'}
                 key={'localdir'}
               >
-                <h2 className="pl-12 pr-0 pt-3 m-0 leading-tight">Local Directory</h2>
+                <h2 className="col-span-8 pl-12 pr-0 m-0 leading-tight">Local Directory</h2>
+                {currentType === CLIENT_TYPE_LOCAL && <div className="col-span-1 mb-2 text-4xl text-primary">⇨</div>}
               </div>
             )}
 
             <div
-              className="gap-2 w-48 h-12 items-center p-0 m-0 outline outline-1 outline-primary rounded-lg hover:bg-accent hover:bg-opacity-50"
+              className="gap-2 w-52 h-12 items-center p-0 m-0 outline outline-1 outline-primary rounded-lg hover:bg-accent hover:bg-opacity-50"
               id={'local-files'}
               onClick={openFile}
               aria-label={'local files'}
@@ -230,7 +234,7 @@ export const Browser = () => {
 
             {/* -------Manually enter azure credentials------- */}
             <details>
-              <summary className="gap-2 w-48 h-12 items-center p-0 m-0 pt-2 outline outline-1 outline-primary rounded-lg hover:bg-accent hover:bg-opacity-50 text-primary text-lg">
+              <summary className="gap-2 w-52 h-12 items-center p-0 m-0 pt-2 outline outline-1 outline-primary rounded-lg hover:bg-accent hover:bg-opacity-50 text-primary text-lg">
                 Azure Blob Storage
               </summary>
               <div

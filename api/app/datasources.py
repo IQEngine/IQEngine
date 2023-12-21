@@ -110,7 +110,7 @@ async def import_datasources_from_env():
     base_filepath = os.getenv("IQENGINE_BACKEND_LOCAL_FILEPATH", None)
     if (not connection_info) and (not base_filepath):
         return None
-    if base_filepath:
+    if base_filepath and os.path.exists(base_filepath):
         try:
             if not await datasource_exists('local', 'local'):
                 datasource = DataSource(
