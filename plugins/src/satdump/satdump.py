@@ -59,8 +59,10 @@ class Plugin:
             snr_start_indx = logs.rfind('Peak SNR: ')
             if snr_start_indx:
                 snr_stop_indx = logs[snr_start_indx:].find('\n')
-                snr_dB = float(logs[snr_start_indx + 10:snr_start_indx+snr_stop_indx-2].strip()[:-3])
-                print(snr_dB)
+                if snr_stop_indx != -1:
+                    snr_dB_str = logs[snr_start_indx + 10:snr_start_indx+snr_stop_indx-2].strip()[:-3].strip()
+                    snr_dB = float(snr_dB_str)
+
 
             # Analyze results directory
             #if self.pipeline_id == 'aqua_db':
@@ -95,16 +97,20 @@ class Plugin:
 
 # For testing
 if __name__ == "__main__":
+    # Aqua
     #samples = np.fromfile('/mnt/d/Aqua_DB.sigmf-data', dtype=np.complex64, count=int(2e8), offset=0) # minimum to get imagery out for aqua
     #sample_rate = 15e6
     #center_freq = 1360e6
     #params = {'sample_rate': sample_rate, 'center_freq': center_freq, 'pipeline_id': 'aqua_db'}
 
-    samples = np.fromfile('/mnt/d/NOAA_HRPT.sigmf-data', dtype=np.complex64, count=int(2e8), offset=0) # minimum to get imagery out for aqua
-    sample_rate = 3e6
-    center_freq = 1707e6 # 1698e6 # 1702.5e6
-    params = {'sample_rate': sample_rate, 'center_freq': center_freq, 'pipeline_id': 'noaa_hrpt'}
-
+    # Terra
+    samples = np.fromfile('/mnt/c/Users/marclichtman/Downloads/Terra_36000000SPS_1262500000Hz.s8', dtype=np.int8)
+    samples = samples.astype(np.float32) / 128
+    samples = samples[::2] + 1j * samples[1::2]
+    print(max(samples))
+    sample_rate = 36e6
+    center_freq = 1262.5e6
+    params = {'sample_rate': sample_rate, 'center_freq': center_freq, 'pipeline_id': 'terra_db'}
 
 
     detector = Plugin(**params)
