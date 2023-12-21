@@ -192,20 +192,35 @@ export const Browser = () => {
         <div className="w-60 block">
           <div className="grid grid-cols-1 gap-4">
             {apiDataSources?.data?.map((item, i) => (
-              <div
-                className="grid grid-cols-10 gap-2 w-52 h-12 items-center p-0 m-0 outline outline-1 outline-primary rounded-lg hover:bg-accent hover:bg-opacity-50"
-                id={item.name.replaceAll(' ', '')}
-                onClick={() => handleOnClick(item.container, item.account, item.sasToken)}
-                aria-label={item.name}
-                key={i}
-              >
-                <div className="col-span-3">
-                  <img className="h-12 rounded-l-lg p-0 m-0" src={item.imageURL ?? '/api.png'} alt={item.name} />
+              <div className="group">
+                {/* -------Pop up box------- */}
+                <div className="hidden absolute ml-48 group-hover:block">
+                  <div className="repocard bg-opacity-100">
+                    <figure>
+                      <img className="repoimage" src={item.imageURL ?? '/api.png'} alt={item.name} />
+                    </figure>
+                    <div className="repocardbody">
+                      <h2>{item.name}</h2>
+                      <p>{item.description}</p>
+                    </div>
+                  </div>
                 </div>
-                <h2 className="col-span-6 p-0 m-0 leading-tight">{item.name}</h2>
-                {currentContainer === item.container && currentAccount === item.account && (
-                  <div className="col-span-1 mb-2 text-4xl text-primary">⇨</div>
-                )}
+                {/* -------Actual label------- */}
+                <div
+                  className="grid grid-cols-10 gap-2 w-52 h-12 items-center p-0 m-0 outline outline-1 outline-primary rounded-lg hover:bg-accent hover:bg-opacity-50"
+                  id={item.name.replaceAll(' ', '')}
+                  onClick={() => handleOnClick(item.container, item.account, item.sasToken)}
+                  aria-label={item.name}
+                  key={i}
+                >
+                  <div className="col-span-3">
+                    <img className="h-12 rounded-l-lg p-0 m-0" src={item.imageURL ?? '/api.png'} alt={item.name} />
+                  </div>
+                  <h2 className="col-span-6 p-0 m-0 leading-tight">{item.name}</h2>
+                  {currentContainer === item.container && currentAccount === item.account && (
+                    <div className="col-span-1 mb-2 text-4xl text-primary">⇨</div>
+                  )}
+                </div>
               </div>
             ))}
 
