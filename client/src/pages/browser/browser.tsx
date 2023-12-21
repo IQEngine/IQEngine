@@ -189,8 +189,8 @@ export const Browser = () => {
 
       <div className="flex flex-row w-full">
         {/* -------Repo list------- */}
-        <div className="fixed w-60 block">
-          <div className="grid grid-cols-1 gap-4">
+        <div className="w-60 block">
+          <div className="sticky top-0 grid grid-cols-1 gap-4">
             {apiDataSources?.data?.map((item, i) => (
               <div className="group">
                 {/* -------Pop up box------- */}
@@ -287,7 +287,7 @@ export const Browser = () => {
         </div>
 
         {/* -------Recording list------- */}
-        <div className="flex flex-col pl-56">
+        <div className="flex flex-col pl-6">
           <div className="ml-auto col-span-3">
             {!metadataCollection.isFetched ? (
               <div className="flex justify-center">
