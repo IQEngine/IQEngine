@@ -187,103 +187,101 @@ export const Browser = () => {
         </ModalDialog>
       )}
 
-      <div className="flex flex-row w-full">
+      <div className="flex w-full">
         {/* -------Repo list------- */}
-        <div className="w-60 block">
-          <div className="sticky top-0 grid grid-cols-1 gap-4">
-            {apiDataSources?.data?.map((item, i) => (
-              <div className="group">
-                {/* -------Pop up box------- */}
-                <div className="hidden absolute ml-48 group-hover:block">
-                  <div className="repocard bg-opacity-100">
-                    <figure>
-                      <img className="repoimage" src={item.imageURL ?? '/api.png'} alt={item.name} />
-                    </figure>
-                    <div className="repocardbody">
-                      <h2>{item.name}</h2>
-                      <p>{item.description}</p>
-                    </div>
+        <div className="h-fit w-60 sticky top-0 grid gap-4">
+          {apiDataSources?.data?.map((item, i) => (
+            <div className="group">
+              {/* -------Pop up box------- */}
+              <div className="hidden absolute ml-48 group-hover:block">
+                <div className="repocard bg-opacity-100">
+                  <figure>
+                    <img className="repoimage" src={item.imageURL ?? '/api.png'} alt={item.name} />
+                  </figure>
+                  <div className="repocardbody">
+                    <h2>{item.name}</h2>
+                    <p>{item.description}</p>
                   </div>
-                </div>
-                {/* -------Actual label------- */}
-                <div
-                  className="grid grid-cols-10 gap-2 w-52 h-12 items-center p-0 m-0 outline outline-1 outline-primary rounded-lg hover:bg-accent hover:bg-opacity-50"
-                  id={item.name.replaceAll(' ', '')}
-                  onClick={() => handleOnClick(item.container, item.account, item.sasToken)}
-                  aria-label={item.name}
-                  key={i}
-                >
-                  <div className="col-span-3">
-                    <img className="h-12 rounded-l-lg p-0 m-0" src={item.imageURL ?? '/api.png'} alt={item.name} />
-                  </div>
-                  <h2 className="col-span-6 p-0 m-0 leading-tight">{item.name}</h2>
-                  {currentContainer === item.container && currentAccount === item.account && (
-                    <div className="col-span-1 mb-2 text-4xl text-primary">⇨</div>
-                  )}
                 </div>
               </div>
-            ))}
-
-            {supported && (
+              {/* -------Actual label------- */}
               <div
-                className="grid grid-cols-9 gap-2 w-52 h-12 items-center p-0 m-0 outline outline-1 outline-primary rounded-lg hover:bg-accent hover:bg-opacity-50"
-                id={'local-dir'}
-                onClick={openDir}
-                aria-label={'local directory'}
-                key={'localdir'}
+                className="grid grid-cols-10 gap-2 w-52 h-12 items-center outline outline-1 outline-primary rounded-lg hover:bg-accent hover:bg-opacity-50"
+                id={item.name.replaceAll(' ', '')}
+                onClick={() => handleOnClick(item.container, item.account, item.sasToken)}
+                aria-label={item.name}
+                key={i}
               >
-                <h2 className="col-span-8 pl-12 pr-0 m-0 leading-tight">Local Directory</h2>
-                {currentType === CLIENT_TYPE_LOCAL && <div className="col-span-1 mb-2 text-4xl text-primary">⇨</div>}
+                <div className="col-span-3">
+                  <img className="h-12 rounded-l-lg" src={item.imageURL ?? '/api.png'} alt={item.name} />
+                </div>
+                <h2 className="col-span-6 m-0 leading-tight">{item.name}</h2>
+                {currentContainer === item.container && currentAccount === item.account && (
+                  <div className="col-span-1 mb-2 text-4xl text-primary">⇨</div>
+                )}
               </div>
-            )}
-
-            <div
-              className="gap-2 w-52 h-12 items-center p-0 m-0 outline outline-1 outline-primary rounded-lg hover:bg-accent hover:bg-opacity-50"
-              id={'local-files'}
-              onClick={openFile}
-              aria-label={'local files'}
-              key={'localfiles'}
-            >
-              <h2 className="pl-12 pr-0 pt-3 m-0 leading-tight ">Local File Pair</h2>
             </div>
+          ))}
 
-            {/* -------Manually enter azure credentials------- */}
-            <details>
-              <summary className="gap-2 w-52 h-12 items-center p-0 m-0 pt-2 outline outline-1 outline-primary rounded-lg hover:bg-accent hover:bg-opacity-50 text-primary text-lg">
-                Azure Blob Storage
-              </summary>
-              <div
-                className="w-48 h-56 p-2 m-0 outline outline-1 outline-primary rounded-b-lg"
-                id={'azure-manual'}
-                aria-label={'azure manual'}
-                key={'azuremanual'}
-              >
-                <form>
-                  <input
-                    type="text"
-                    placeholder="Storage Account"
-                    onChange={onAccountNameChange}
-                    className="input input-bordered input-success w-full max-w-xs mt-2"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Container Name"
-                    onChange={onContainerNameChange}
-                    className="input input-bordered input-success w-full max-w-xs my-2"
-                  />
-                  <input
-                    type="password"
-                    placeholder="SAS Token"
-                    onChange={onSasTokenChange}
-                    className="input input-bordered input-success w-full max-w-xs mb-2"
-                  />
-                </form>
-                <button className="" onClick={onCustomAzureSubmit} id="AzureBlob">
-                  Browse
-                </button>
-              </div>
-            </details>
+          {supported && (
+            <div
+              className="grid grid-cols-9 gap-2 w-52 h-12 items-center outline outline-1 outline-primary rounded-lg hover:bg-accent hover:bg-opacity-50"
+              id={'local-dir'}
+              onClick={openDir}
+              aria-label={'local directory'}
+              key={'localdir'}
+            >
+              <h2 className="col-span-8 pl-12 m-0 leading-tight">Local Directory</h2>
+              {currentType === CLIENT_TYPE_LOCAL && <div className="col-span-1 mb-2 text-4xl text-primary">⇨</div>}
+            </div>
+          )}
+
+          <div
+            className="gap-2 w-52 h-12 items-center outline outline-1 outline-primary rounded-lg hover:bg-accent hover:bg-opacity-50"
+            id={'local-files'}
+            onClick={openFile}
+            aria-label={'local files'}
+            key={'localfiles'}
+          >
+            <h2 className="pl-12 pt-3 m-0 leading-tight ">Local File Pair</h2>
           </div>
+
+          {/* -------Manually enter azure credentials------- */}
+          <details>
+            <summary className="gap-2 w-52 h-12 items-center pt-2 outline outline-1 outline-primary rounded-lg hover:bg-accent hover:bg-opacity-50 text-primary text-lg">
+              Azure Blob Storage
+            </summary>
+            <div
+              className="w-48 h-56 p-2 outline outline-1 outline-primary rounded-b-lg"
+              id={'azure-manual'}
+              aria-label={'azure manual'}
+              key={'azuremanual'}
+            >
+              <form>
+                <input
+                  type="text"
+                  placeholder="Storage Account"
+                  onChange={onAccountNameChange}
+                  className="input input-bordered input-success w-full max-w-xs mt-2"
+                />
+                <input
+                  type="text"
+                  placeholder="Container Name"
+                  onChange={onContainerNameChange}
+                  className="input input-bordered input-success w-full max-w-xs my-2"
+                />
+                <input
+                  type="password"
+                  placeholder="SAS Token"
+                  onChange={onSasTokenChange}
+                  className="input input-bordered input-success w-full max-w-xs mb-2"
+                />
+              </form>
+              <button className="" onClick={onCustomAzureSubmit} id="AzureBlob">
+                Browse
+              </button>
+            </div>
+          </details>
         </div>
 
         {/* -------Recording list------- */}
