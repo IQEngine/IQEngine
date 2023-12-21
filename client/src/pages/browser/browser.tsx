@@ -177,7 +177,7 @@ export const Browser = () => {
       </div>
       {showModal && (
         <ModalDialog setShowModal={setShowModal} heading="" classList="max-w-full">
-          <div className="grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-10 justify-items-center text-lg text-white">
+          <div className="grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-10 justify-items-center text-lg text-white">
             <MetadataQueryTile />
             <SiggenTile />
             <ValidatorTile />
@@ -189,7 +189,7 @@ export const Browser = () => {
 
       <div className="flex flex-row w-full">
         {/* -------Repo list------- */}
-        <div className="w-60 block">
+        <div className="fixed w-60 block">
           <div className="grid grid-cols-1 gap-4">
             {apiDataSources?.data?.map((item, i) => (
               <div className="group">
@@ -287,7 +287,7 @@ export const Browser = () => {
         </div>
 
         {/* -------Recording list------- */}
-        <div className="flex flex-col pl-3">
+        <div className="flex flex-col pl-56">
           <div className="ml-auto col-span-3">
             {!metadataCollection.isFetched ? (
               <div className="flex justify-center">
