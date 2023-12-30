@@ -2,7 +2,6 @@ import '@/mocks/setup-tests';
 import { describe, expect, test, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
-
 import Results from '@/pages/browser/metadata-query/results';
 import { SigMFMetadata, Annotation, CaptureSegment } from '@/utils/sigmfMetadata';
 import { useAllProviders } from '@/mocks/setup-tests';

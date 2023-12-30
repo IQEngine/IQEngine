@@ -1,9 +1,7 @@
 import { describe, expect, test, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-
 import StringQuery from '@/pages/browser/metadata-query/string-query';
 
 describe('Test StringQuery', () => {

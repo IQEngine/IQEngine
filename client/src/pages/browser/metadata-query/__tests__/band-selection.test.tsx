@@ -1,9 +1,7 @@
 import { describe, expect, test, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
 import React from 'react';
-
 import BandSelection from '@/pages/browser/metadata-query/band-selection';
 
 describe('Test BandSelection', () => {

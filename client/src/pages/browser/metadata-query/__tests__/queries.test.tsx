@@ -1,5 +1,4 @@
 import { describe, expect, test, vi } from 'vitest';
-
 import { queries } from '@/pages/browser/metadata-query/queries';
 
 describe('Test query validation objects', () => {

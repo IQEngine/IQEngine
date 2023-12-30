@@ -1,5 +1,3 @@
-//react functional component
-
 import React, { useState } from 'react';
 
 export const StringQuery = ({ queryName, description, validator, handleQueryValid, handleQueryInvalid }) => {

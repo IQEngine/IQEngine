@@ -1,8 +1,6 @@
 import { describe, expect, test, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-
 import React from 'react';
-
 import { SourceQuery } from '@/pages/browser/metadata-query/data-source-query';
 import userEvent from '@testing-library/user-event';
 import { AllProviders } from '@/mocks/setup-tests';

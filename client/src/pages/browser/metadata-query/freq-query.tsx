@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useEffectOnce } from 'usehooks-ts';
-
 import BandSelection from './band-selection';
 
 export const FreqQuery = ({ description, validator, queryName, handleQueryValid, handleQueryInvalid }) => {

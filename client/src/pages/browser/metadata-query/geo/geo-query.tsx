@@ -2,7 +2,6 @@ import React, { useState, useMemo, useRef, useCallback } from 'react';
 import 'leaflet/dist/leaflet.css';
 import { MapContainer, TileLayer, Marker, Circle, LayerGroup, Polyline } from 'react-leaflet';
 import { Icon } from 'leaflet';
-
 import GeoQueryTypes from './geo-query-types';
 import TrackView from './track-view';
 
