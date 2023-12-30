@@ -164,6 +164,7 @@ export const Browser = () => {
     <div className="mb-0 ml-1 mr-0 p-0 pt-3">
       {/* -------Misc Tools------- */}
       <div
+        id="misc_tools_button"
         className="absolute right-2 top-12 p-2 mr-2 text-2xl text-primary outline outline-1 outline-primary rounded-lg hover:bg-accent hover:bg-opacity-50"
         onClick={() => {
           setShowModal(true);

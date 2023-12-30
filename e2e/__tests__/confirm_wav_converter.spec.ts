@@ -6,6 +6,7 @@ test('Confirm Wav to SigMF converter and Converter Card @CICompatible', async ({
   await page.goto('/');
   skipLandingPage(page);
 
+  await page.locator('[id="misc_tools_button"]').click();
   await page.locator('[id="convert"]').click();
   await expect(page.getByText('to SigMF', { exact: true })).toBeVisible();
 

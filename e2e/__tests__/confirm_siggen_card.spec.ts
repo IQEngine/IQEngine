@@ -6,6 +6,7 @@ test('Confirm siggen card @CICompatible', async ({ page }) => {
   skipLandingPage(page);
 
   // signal generator
+  await page.locator('[id="misc_tools_button"]').click();
   await page.locator('[id="Siggen"]').click();
   await page.locator('[id="IQEngineLogo"]').click();
 });
