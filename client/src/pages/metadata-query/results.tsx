@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQueryMeta } from '@/api/datasource/queries';
-import FileRow from '@/pages/recordings-browser/file';
+import FileRow from '@/pages/browser/file-row';
 import { CLIENT_TYPE_API } from '@/api/Models';
 
 export const Results = ({ queryString, geoSelected, handleToggleTrack }) => {

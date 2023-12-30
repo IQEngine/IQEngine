@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { vscodeDark } from '@uiw/codemirror-theme-vscode';
 import CodeMirror from '@uiw/react-codemirror';
 import { langs } from '@uiw/codemirror-extensions-langs';
-import FileRow from '../recordings-browser/file';
+import FileRow from '../browser/file-row';
 import TrackView from './geo/track-view';
 import 'leaflet/dist/leaflet.css';
 import { MapContainer, TileLayer, Polyline } from 'react-leaflet';
