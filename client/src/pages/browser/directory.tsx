@@ -1,7 +1,3 @@
-// Copyright (c) 2022 Microsoft Corporation
-// Copyright (c) 2023 Marc Lichtman
-// Licensed under the MIT License
-
 import FileRow from './file-row';
 import styled from 'styled-components';
 import FolderIcon from '@mui/icons-material/Folder';

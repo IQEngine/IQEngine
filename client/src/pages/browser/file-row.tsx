@@ -1,7 +1,3 @@
-// Copyright (c) 2022 Microsoft Corporation
-// Copyright (c) 2023 Marc Lichtman
-// Licensed under the MIT License
-
 import React, { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CLIENT_TYPE_BLOB, CLIENT_TYPE_LOCAL } from '@/api/Models';
