@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 
 import React from 'react';
 
-import DateQuery from '@/pages/metadata-query/date-query';
+import DateQuery from '@/pages/browser/metadata-query/date-query';
 import userEvent from '@testing-library/user-event';
 
 describe('Test DateQuery', () => {

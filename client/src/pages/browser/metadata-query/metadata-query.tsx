@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { CLIENT_TYPE_API } from '@/api/Models';
 import { useQueryTrack } from '@/api/metadata/queries';
-
 import Results from './results';
 import { queries } from './queries';
 
@@ -137,7 +136,7 @@ export const MetadataQuery = () => {
 
   return (
     <div className="m-10 mt-100">
-      <h1 className="text-3xl font-bold">Field Selection</h1>
+      <h1 className="text-3xl font-bold">Regular Query</h1>
       <div className="grid grid-cols-10 gap-3">
         <div className="col-span-1">
           <div className="form-control">{renderQuerySelection()}</div>

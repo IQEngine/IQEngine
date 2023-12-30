@@ -14,9 +14,10 @@ import { FileWithDirectoryAndFileHandle } from 'browser-fs-access';
 import SiggenTile from './siggen-tile';
 import ValidatorTile from './validator-tile';
 import WebfftBenchmark from './webfft-benchmark-tile';
-import MetadataQueryTile from './metadata-query-tile';
 import ConverterTile from './converter-tile';
 import { ModalDialog } from '@/features/ui/modal/Modal';
+import { MetadataQuery } from './metadata-query/metadata-query';
+import { SmartQuery } from './metadata-query/smart-query';
 
 export const Browser = () => {
   const apiDataSources = getDataSources(CLIENT_TYPE_API);
@@ -31,6 +32,7 @@ export const Browser = () => {
   const { setFiles, addDataSource } = useUserSettings();
   const [filePath, setFilePath] = useState<string>(null);
   const [showModal, setShowModal] = useState(false);
+  const [queryActive, setQueryActive] = useState(false);
 
   const localDataSourceQuery = getDataSource(
     CLIENT_TYPE_LOCAL,
@@ -40,12 +42,16 @@ export const Browser = () => {
   );
 
   useEffect(() => {
-    if (localDataSourceQuery.data && localDataSourceQuery.data.container === currentContainer && goToPage) {
+    if (
+      localDataSourceQuery.data &&
+      localDataSourceQuery.data.container === currentContainer &&
+      goToPage &&
+      currentType === CLIENT_TYPE_LOCAL
+    ) {
       if (filePath) {
         const spectogramLink = `/view/${CLIENT_TYPE_LOCAL}/local/single_file/${encodeURIComponent(filePath)}`;
         navigate(spectogramLink);
       } else {
-        setCurrentType(CLIENT_TYPE_LOCAL);
         setCurrentAccount(localDataSourceQuery.data.account);
         setCurrentContainer(localDataSourceQuery.data.container);
         setCurrentSas(null);
@@ -55,6 +61,7 @@ export const Browser = () => {
   }, [localDataSourceQuery.data, currentContainer, filePath, goToPage]);
 
   async function handleOnClick(container, account, sas) {
+    setQueryActive(false);
     setCurrentType(CLIENT_TYPE_API);
     setCurrentAccount(account);
     setCurrentContainer(container);
@@ -97,6 +104,8 @@ export const Browser = () => {
     setFiles(dirHandle);
     setCurrentContainer(containerPath);
     setGoToPage(true);
+    setQueryActive(false);
+    setCurrentType(CLIENT_TYPE_LOCAL);
   };
 
   const onAccountNameChange = (event) => {
@@ -175,7 +184,6 @@ export const Browser = () => {
       {showModal && (
         <ModalDialog setShowModal={setShowModal} heading="" classList="max-w-full">
           <div className="grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-10 justify-items-center text-lg text-white">
-            <MetadataQueryTile />
             <SiggenTile />
             <ValidatorTile />
             <WebfftBenchmark />
@@ -213,12 +221,23 @@ export const Browser = () => {
                   <img className="h-12 rounded-l-lg" src={item.imageURL ?? '/api.png'} alt={item.name} />
                 </div>
                 <h2 className="col-span-6 m-0 leading-tight">{item.name}</h2>
-                {currentContainer === item.container && currentAccount === item.account && (
+                {currentContainer === item.container && currentAccount === item.account && !queryActive && (
                   <div className="col-span-1 mb-2 text-4xl text-primary">⇨</div>
                 )}
               </div>
             </div>
           ))}
+
+          <div
+            className="grid grid-cols-9 gap-2 w-52 h-12 items-center outline outline-1 outline-primary rounded-lg hover:bg-accent hover:bg-opacity-50"
+            id={'query-metadata'}
+            onClick={() => setQueryActive(true)}
+            aria-label={'query'}
+            key={'query'}
+          >
+            <h2 className="col-span-8 pl-12 m-0 leading-tight ">Query</h2>
+            {queryActive && <div className="col-span-1 mb-2 text-4xl text-primary">⇨</div>}
+          </div>
 
           {supported && (
             <div
@@ -229,7 +248,9 @@ export const Browser = () => {
               key={'localdir'}
             >
               <h2 className="col-span-8 pl-12 m-0 leading-tight">Local Directory</h2>
-              {currentType === CLIENT_TYPE_LOCAL && <div className="col-span-1 mb-2 text-4xl text-primary">⇨</div>}
+              {currentType === CLIENT_TYPE_LOCAL && !queryActive && (
+                <div className="col-span-1 mb-2 text-4xl text-primary">⇨</div>
+              )}
             </div>
           )}
 
@@ -254,7 +275,9 @@ export const Browser = () => {
                 key={'localdir'}
               >
                 <h2 className="col-span-8 pl-12 m-0 leading-tight text-gray-500">Local Directory</h2>
-                {currentType === CLIENT_TYPE_LOCAL && <div className="col-span-1 mb-2 text-4xl text-primary">⇨</div>}
+                {currentType === CLIENT_TYPE_LOCAL && !queryActive && (
+                  <div className="col-span-1 mb-2 text-4xl text-primary">⇨</div>
+                )}
               </div>
             </div>
           )}
@@ -306,11 +329,17 @@ export const Browser = () => {
             </div>
           </details>
         </div>
+        {queryActive && (
+          <div>
+            <SmartQuery /> <br></br>
+            <MetadataQuery />
+          </div>
+        )}
 
         {/* -------Recording list------- */}
         <div className="flex flex-col pl-6">
           <div className="ml-auto col-span-3">
-            {!metadataCollection.isFetched ? (
+            {!metadataCollection.isFetched && !queryActive && (
               <div className="flex justify-center">
                 <svg
                   className="animate-spin ml-1 mr-3 w-96 text-white"
@@ -328,7 +357,8 @@ export const Browser = () => {
                   />
                 </svg>
               </div>
-            ) : (
+            )}
+            {metadataCollection.isFetched && !queryActive && (
               <div className="">
                 <div className="flex justify-items-stretch text-start">
                   <table className="w-full">

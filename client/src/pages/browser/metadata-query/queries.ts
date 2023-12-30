@@ -8,7 +8,7 @@ import { SourceQuery } from './data-source-query';
 export const queries = {
   date: {
     component: DateQuery,
-    selected: true,
+    selected: false,
     description: 'The date the document was created',
     validator: ({ from, to }) => {
       let parsedTo = moment(to);

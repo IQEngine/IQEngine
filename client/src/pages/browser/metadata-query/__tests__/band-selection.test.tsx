@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 
 import React from 'react';
 
-import BandSelection from '@/pages/metadata-query/band-selection';
+import BandSelection from '@/pages/browser/metadata-query/band-selection';
 
 describe('Test BandSelection', () => {
   const mockHandle = vi.fn();

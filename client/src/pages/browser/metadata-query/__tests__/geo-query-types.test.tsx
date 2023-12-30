@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 
 import React from 'react';
 
-import GeoQueryTypes from '@/pages/metadata-query/geo/geo-query-types';
+import GeoQueryTypes from '@/pages/browser/metadata-query/geo/geo-query-types';
 
 describe('Test GeoQueryTypes', () => {
   const mockHandle = vi.fn();

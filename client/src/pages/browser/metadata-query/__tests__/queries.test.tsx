@@ -1,6 +1,6 @@
 import { describe, expect, test, vi } from 'vitest';
 
-import { queries } from '@/pages/metadata-query/queries';
+import { queries } from '@/pages/browser/metadata-query/queries';
 
 describe('Test query validation objects', () => {
   /* DISABLED BECAUSE WAS GETTING min_datetime=2022-01-02T00%3A00%3A00-05  %3A00&max_datetime=2023-01-01T00%3A00%3A00-05  %3A00

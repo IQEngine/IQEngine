@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { vscodeDark } from '@uiw/codemirror-theme-vscode';
 import CodeMirror from '@uiw/react-codemirror';
 import { langs } from '@uiw/codemirror-extensions-langs';
-import FileRow from '../browser/file-row';
+import FileRow from '../file-row';
 import TrackView from './geo/track-view';
 import 'leaflet/dist/leaflet.css';
 import { MapContainer, TileLayer, Polyline } from 'react-leaflet';
@@ -89,6 +89,7 @@ export const SmartQuery = () => {
   return (
     <div className="flex-row p-8">
       <div className="flex justify-center">
+        <h1 className="text-3xl font-bold">OpenAI Based Query</h1>
         <input
           type="text"
           onKeyDown={handleInputQuery}

@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 
 import React from 'react';
 
-import GeoQueryType from '@/pages/metadata-query/geo/geo-query-type';
+import GeoQueryType from '@/pages/browser/metadata-query/geo/geo-query-type';
 
 describe('Test BandSelection', () => {
   const mockHandle = vi.fn();

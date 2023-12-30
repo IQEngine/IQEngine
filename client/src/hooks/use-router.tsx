@@ -27,20 +27,6 @@ export function useRouter() {
           },
         },
         {
-          path: 'query',
-          async lazy() {
-            let { MetadataQuery } = await import('@/pages/metadata-query/metadata-query');
-            return { Component: MetadataQuery };
-          },
-        },
-        {
-          path: 'smart-query',
-          async lazy() {
-            let { SmartQuery } = await import('@/pages/metadata-query/smart-query');
-            return { Component: SmartQuery };
-          },
-        },
-        {
           path: 'upload',
           async lazy() {
             let { UploadPage } = await import('@/pages/upload-page');
