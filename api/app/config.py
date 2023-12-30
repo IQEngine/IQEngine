@@ -5,29 +5,27 @@ import copy
 import json
 import os
 
-
 def collection() -> AgnosticCollection:
     collection: AgnosticCollection = db().configuration
     return collection
 
-
 async def get() -> Configuration | None:
-    current = await collection().find_one()
+    current = await collection().find_one() # even if there are multiple entries (eg due to multiple workers adding them at the same time), they should all match
     if current is None:
         return None
     return Configuration(**current)
 
-
 async def exists() -> bool:
     return (await get()) is not None
 
+# Either create the config entry or update it
 async def import_default_config_from_env():
     try:
         configuration = await get()
         updated_configuration = copy.deepcopy(configuration)
 
         if updated_configuration is None:
-            updated_configuration = Configuration()
+            updated_configuration = Configuration() # empty shell for a config
 
         feature_flags = os.getenv("IQENGINE_FEATURE_FLAGS", None)
         if updated_configuration.feature_flags is None and feature_flags:

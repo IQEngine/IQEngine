@@ -97,9 +97,8 @@ app.include_router(converter_router)
 
 app.mount("/", SPAStaticFiles(directory="iqengine", html=True), name="iqengine")
 
-
-app.add_event_handler("startup", db)
-app.add_event_handler("startup", import_all_from_env)
+app.add_event_handler("startup", db) # connect to mongodb or set up in-memory db
+app.add_event_handler("startup", import_all_from_env) # adds plugins connections, feature flags, and inits datasources
 
 
 @app.exception_handler(ServerSelectionTimeoutError)

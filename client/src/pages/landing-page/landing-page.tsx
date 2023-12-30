@@ -63,9 +63,13 @@ export const LandingPage = () => {
                   </button>
                 </div>
                 <div className="font-bold text-lg text-primary pb-4">
-                  Browse RF recordings shared by the community or your own local files, all in the browser!
+                  Bringing the open-source RF community together
                   <br></br>
-                  View SigMF annotations and other useful metadata
+                  Browse RF recordings shared by the community or your own local files
+                  <br></br>
+                  View/edit SigMF annotations and other useful metadata
+                  <br></br>
+                  Expand your knowledge of wireless signals and how to analyze/process them
                 </div>
                 {/* Hero image */}
                 <div>

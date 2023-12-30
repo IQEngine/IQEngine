@@ -11,16 +11,16 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@azure/identity": "^3.3.2",
-    "@azure/storage-blob": "^12.16.0",
-    "@playwright/test": "^1.39.0",
-    "@types/adm-zip": "^0.5.5",
-    "dotenv": "^16.3.1",
-    "dotenv-expand": "^10.0.0",
-    "mongodb": "^6.2.0"
+    "@azure/identity": "3.3.2",
+    "@azure/storage-blob": "12.17.0",
+    "@playwright/test": "1.39.0",
+    "@types/adm-zip": "0.5.5",
+    "dotenv": "16.3.1",
+    "dotenv-expand": "10.0.0",
+    "mongodb": "6.3.0"
   },
   "dependencies": {
-    "adm-zip": "^0.5.10",
-    "playwright": "^1.40.0"
+    "adm-zip": "0.5.10",
+    "playwright": "1.39.0"
   }
 }
