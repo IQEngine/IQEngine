@@ -8,8 +8,7 @@ import { SigMFMetadata, Annotation, CaptureSegment } from '@/utils/sigmfMetadata
 import { useAllProviders } from '@/mocks/setup-tests';
 
 describe('disabled test', () => {
-  test('null test', () => {
-  });
+  test('null test', () => {});
 });
 
 /* TODO: This test needs to be fixed, we starting getting the following error after adding konva to the FileRow component:

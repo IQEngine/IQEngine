@@ -9,6 +9,10 @@ import { AllProviders, queryClient } from '@/mocks/setup-tests';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
 
+describe('disabled test', () => {
+  test('null test', () => {});
+});
+
 /* TODO: This test needs to be fixed, we starting getting the following error after adding konva to the FileRow component:
             Error: Cannot find module 'canvas'
 
