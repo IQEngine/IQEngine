@@ -232,6 +232,32 @@ export const Browser = () => {
             </div>
           )}
 
+          {!supported && (
+            <div className="group">
+              <div className="hidden absolute ml-48 group-hover:block">
+                <div className="repocard bg-opacity-100">
+                  <div className="repocardbody">
+                    <p>
+                      Not supported in your current browser, use Local File Pair instead.<br></br>
+                      <a target="_blank" href="https://caniuse.com/mdn-api_window_showdirectorypicker">
+                        Compatibility chart
+                      </a>
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div
+                className="grid grid-cols-9 gap-2 w-52 h-12 items-center outline outline-1 outline-gray-500 rounded-lg "
+                id={'local-dir'}
+                aria-label={'local directory'}
+                key={'localdir'}
+              >
+                <h2 className="col-span-8 pl-12 m-0 leading-tight text-gray-500">Local Directory</h2>
+                {currentType === CLIENT_TYPE_LOCAL && <div className="col-span-1 mb-2 text-4xl text-primary">⇨</div>}
+              </div>
+            </div>
+          )}
+
           <div
             className="gap-2 w-52 h-12 items-center outline outline-1 outline-primary rounded-lg hover:bg-accent hover:bg-opacity-50"
             id={'local-files'}
