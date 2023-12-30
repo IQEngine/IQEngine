@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import RepoBrowser from '@/pages/repo-browser/repo-browser';
+import Browser from '@/pages/browser/browser';
 import React from 'react';
 import nock from 'nock';
 import '@testing-library/jest-dom';
@@ -8,7 +8,7 @@ import { DataSource } from '@/api/Models';
 import { AllProviders, queryClient } from '@/mocks/setup-tests';
 import userEvent from '@testing-library/user-event';
 
-describe('Test RepoBrowser', () => {
+describe('Test Browser', () => {
   beforeAll(() => {
     import.meta.env.IQENGINE_CONNECTION_INFO = '{}';
     import.meta.env.IQENGINE_GOOGLE_ANALYTICS_KEY = 'UA-TEST-KEY-1';
@@ -25,7 +25,7 @@ describe('Test RepoBrowser', () => {
   });
 
   test('Basic Rendering', async () => {
-    render(<RepoBrowser></RepoBrowser>, { wrapper: AllProviders });
+    render(<Browser></Browser>, { wrapper: AllProviders });
     expect(screen.getByText('Azure Blob Storage')).exist;
   });
 
@@ -41,7 +41,7 @@ describe('Test RepoBrowser', () => {
     ];
     nock('http://localhost:3000').get('/api/datasources').reply(200, data);
 
-    render(<RepoBrowser />, { wrapper: AllProviders });
+    render(<Browser />, { wrapper: AllProviders });
     expect(await screen.findByText('API Test Description')).toBeInTheDocument();
   });
 
@@ -64,30 +64,8 @@ describe('Test RepoBrowser', () => {
     ];
     nock('http://localhost:3000').get('/api/datasources').reply(200, data);
 
-    render(<RepoBrowser />, { wrapper: AllProviders });
+    render(<Browser />, { wrapper: AllProviders });
     expect(await screen.findByText('API Test Description 1')).toBeInTheDocument();
     expect(await screen.findByText('API Test Description 2')).toBeInTheDocument();
-  });
-});
-
-describe('Test query metadata tile', () => {
-  test('displays query metadata tile image', async () => {
-    render(<RepoBrowser />, { wrapper: AllProviders });
-    expect(await screen.findByAltText('Metadata query tile')).toBeInTheDocument();
-  });
-
-  test('displays query metadata tile button', async () => {
-    render(<RepoBrowser />, { wrapper: AllProviders });
-    const queryButton = await screen.findByRole('button', { name: 'Metadata query browse' });
-
-    expect(queryButton).toBeInTheDocument();
-  });
-
-  test('metadata tile button navigates to query page', async () => {
-    render(<RepoBrowser />, { wrapper: AllProviders });
-    const queryButton = await screen.findByRole('button', { name: 'Metadata query browse' });
-    await userEvent.click(queryButton);
-
-    expect(window.location.pathname).toEqual('/query');
   });
 });

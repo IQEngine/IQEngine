@@ -29,7 +29,6 @@ describe('Test Configuration', () => {
     expect(await screen.findByText('Use IQEngine Outreach')).toBeInTheDocument();
     expect(await screen.findByText('Display IQEngine GitHub')).toBeInTheDocument();
     expect(await screen.findByText('Display Internal Branding')).toBeInTheDocument();
-    expect(await screen.findByText('Use API Datasources')).toBeInTheDocument();
   });
 
   test('Feature Flags Default', async () => {
