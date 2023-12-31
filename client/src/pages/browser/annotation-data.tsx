@@ -7,7 +7,7 @@ interface Props {
   annotations: Annotation[];
 }
 
-export const FileAnnotationData = ({ annotations }: Props) => {
+export const AnnotationData = ({ annotations }: Props) => {
   const [pieChartValues, setPieChartValues] = useState([]); // so that it can be directly used in the pie chart https://plotly.com/javascript/pie-charts/
   const [pieChartLabels, setPieChartLabels] = useState([]);
 

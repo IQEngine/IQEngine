@@ -187,7 +187,6 @@ export const SmartQuery = () => {
                           trackToggle={(account, container, filepath) =>
                             handleSetSelectedTrack(account, container, filepath)
                           }
-                          queryResult={false}
                           geoSelected={true}
                           filepath={item.file_path}
                           account={item.account}

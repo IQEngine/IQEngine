@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CLIENT_TYPE_BLOB, CLIENT_TYPE_LOCAL } from '@/api/Models';
 import { getMeta } from '@/api/metadata/queries';
-import { FileAnnotationData } from './file-annotation-data';
+import { AnnotationData } from './annotation-data';
 import { ModalDialog } from '@/features/ui/modal/Modal';
 import { useIntersectionObserver } from 'usehooks-ts';
 import LocalDirThumbnail from './local-dir-thumbnail';
@@ -13,21 +13,11 @@ interface FileRowProps {
   account?: string;
   container?: string;
   sasToken?: string;
-  queryResult?: boolean;
   geoSelected?: boolean;
   trackToggle?: (account: string, container: string, filepath: string) => any;
 }
 
-const FileRow = ({
-  filepath,
-  type,
-  account,
-  container,
-  sasToken,
-  queryResult = false,
-  geoSelected = false,
-  trackToggle,
-}: FileRowProps) => {
+const FileRow = ({ filepath, type, account, container, sasToken, geoSelected = false, trackToggle }: FileRowProps) => {
   const [showModal, setShowModal] = useState(false);
   const ref = useRef<HTMLTableRowElement | null>(null);
   const entry = useIntersectionObserver(ref, {});
@@ -98,14 +88,7 @@ const FileRow = ({
   }
 
   return (
-    <tr
-      ref={ref}
-      className={
-        queryResult
-          ? 'hover:bg-info/10 grid grid-cols-10 text-center py-2 h-32 mb-5'
-          : 'hover:bg-info/10 text-center py-2 h-32'
-      }
-    >
+    <tr ref={ref} className={'hover:bg-info/10 text-center py-2 h-32'}>
       {
         <>
           <td className="pl-0 pr-1 min-w-fit">
@@ -124,7 +107,7 @@ const FileRow = ({
               </Link>
             )}
           </td>
-          <td className={queryResult ? 'ml-10 align-middle col-span-2 text-left' : 'align-middle text-left'}>
+          <td className={'align-middle text-left'}>
             <Link to={spectrogramLink} onClick={() => {}}>
               <h2>{item.getFileName()}</h2>
             </Link>
@@ -159,7 +142,7 @@ const FileRow = ({
           </button>
           {showModal && (
             <ModalDialog setShowModal={setShowModal} heading={item.getFileName()} classList="max-w-full">
-              <FileAnnotationData annotations={item?.annotations} />
+              <AnnotationData annotations={item?.annotations} />
             </ModalDialog>
           )}
           <br></br>({item.captures?.length ?? 0} Capture{item.captures?.length > 1 && 's'})

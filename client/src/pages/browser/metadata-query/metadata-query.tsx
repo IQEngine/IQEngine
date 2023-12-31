@@ -135,7 +135,7 @@ export const MetadataQuery = () => {
   };
 
   return (
-    <div className="m-10 mt-100">
+    <div className="ml-10 mt-100">
       <h1 className="text-3xl font-bold">Regular Query</h1>
       <div className="grid grid-cols-10 gap-3">
         <div className="col-span-1">
