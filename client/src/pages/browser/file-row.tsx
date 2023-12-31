@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CLIENT_TYPE_BLOB, CLIENT_TYPE_LOCAL } from '@/api/Models';
+import { CLIENT_TYPE_BLOB, CLIENT_TYPE_LOCAL, CLIENT_TYPE_API } from '@/api/Models';
 import { getMeta } from '@/api/metadata/queries';
 import { AnnotationData } from './annotation-data';
 import { ModalDialog } from '@/features/ui/modal/Modal';
@@ -93,9 +93,13 @@ const FileRow = ({ filepath, type, account, container, sasToken, geoSelected = f
         <>
           <td className="pl-0 pr-1 min-w-fit">
             {/* When looking at a local dir vs blob */}
-            {type === CLIENT_TYPE_LOCAL ? (
+            {type === CLIENT_TYPE_LOCAL && (
               <LocalDirThumbnail filepath={filepath} type={type} account={account} container={container} />
-            ) : (
+            )}
+            {type === CLIENT_TYPE_BLOB && (
+              <LocalDirThumbnail filepath={filepath} type={type} account={account} container={container} />
+            )}
+            {type === CLIENT_TYPE_API && (
               <Link to={spectrogramLink} onClick={() => {}}>
                 <div className="zoom">
                   <img
