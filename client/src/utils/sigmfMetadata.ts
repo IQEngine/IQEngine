@@ -66,7 +66,9 @@ export class SigMFMetadata {
     return Number(this.captures[0]['core:frequency'] ?? 1e6);
   }
   getAuthor() {
-    return String(this.global['core:author'] ?? '');
+    return String(this.global['core:author'] ?? '')
+      .replace('<', '')
+      .replace('>', '');
   }
   getFilePath() {
     return this.global['traceability:origin'].file_path;

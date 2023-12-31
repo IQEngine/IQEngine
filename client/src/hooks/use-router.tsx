@@ -27,20 +27,6 @@ export function useRouter() {
           },
         },
         {
-          path: 'query',
-          async lazy() {
-            let { MetadataQuery } = await import('@/pages/metadata-query/metadata-query');
-            return { Component: MetadataQuery };
-          },
-        },
-        {
-          path: 'smart-query',
-          async lazy() {
-            let { SmartQuery } = await import('@/pages/metadata-query/smart-query');
-            return { Component: SmartQuery };
-          },
-        },
-        {
           path: 'upload',
           async lazy() {
             let { UploadPage } = await import('@/pages/upload-page');
@@ -69,7 +55,7 @@ export function useRouter() {
             return { Component: SignalGenerator };
           },
         },
-         {
+        {
           path: 'convert',
           async lazy() {
             let { Converter } = await import('@/pages/converter/converter');
@@ -150,15 +136,15 @@ export function useRouter() {
         {
           path: 'browser',
           async lazy() {
-            let { RepoBrowser } = await import('@/pages/repo-browser/repo-browser');
-            return { Component: RepoBrowser };
+            let { Browser } = await import('@/pages/browser/browser');
+            return { Component: Browser };
           },
         },
         {
           path: 'recordings/:type/:account/:container/:sasToken?',
           async lazy() {
-            let { RecordingsBrowser } = await import('@/pages/recordings-browser/recordings-browser');
-            return { Component: RecordingsBrowser };
+            let { Browser } = await import('@/pages/browser/browser');
+            return { Component: Browser };
           },
         },
         {

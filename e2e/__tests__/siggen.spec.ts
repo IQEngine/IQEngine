@@ -5,6 +5,7 @@ test('confirm siggen operation  @CICompatible', async ({ page }) => {
   await page.goto('/');
   skipLandingPage(page);
 
+  await page.locator('[id="misc_tools_button"]').click();
   await page.locator('#Siggen').click();
 
   const locator = page.getByText('Run');

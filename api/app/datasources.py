@@ -109,7 +109,7 @@ async def import_datasources_from_env():
     time.sleep(random.randint(0, 10000) / 1000) # 0-10 seconds, to greatly reduce risk of duplicates
 
     # Add datasource corresponding to the local backend storage
-    if base_filepath:
+    if base_filepath and os.path.exists(base_filepath):
         try:
             if not await datasource_exists('local', 'local'):
                 datasource = DataSource(

@@ -52,10 +52,6 @@
     @apply !text-base-content font-bold text-center;
   }
 
-  .flex-one {
-    @apply w-64 m-8 flex-auto;
-  }
-
   .repocard {
     @apply card rounded-xl w-72 m-3 bg-neutral bg-opacity-50 outline-secondary outline-1 outline;
   }

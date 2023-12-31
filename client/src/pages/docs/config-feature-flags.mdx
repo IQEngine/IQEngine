@@ -12,7 +12,7 @@ To configure the project, you need to set specific environment variables. The cu
 
 * `IQENGINE_PLUGINS`: Use this variable to specify the plugins you want to use it needs to be an array of objects with the following properties: name, url. The name is the name of the plugin and the url is the url to the plugin. ex: IQENGINE_PLUGINS = [\{"name": "My Plugin", "url": "http://localhost:3000"\}]
 
-* `IQENGINE_FEATURE_FLAGS`: Use this variable to specify feature flags for the web app. If you have a Metadata database you can specify the `useAPIDatasources` flag like this: IQENGINE_FEATURE_FLAGS = \{"useAPIDatasources": false\}. Additional feature flags can be added using comma separation.
+* `IQENGINE_FEATURE_FLAGS`: Use this variable to specify feature flags for the web app, see example.env as an example.
 
 * `IQENGINE_METADATA_DB_CONNECTION_STRING`: This variable stores the connection string for the Metadata DB. If you don't want to utilize the Metadata DB, you can leave this variable empty. Please note that this variable is only used by the backend API.
 
@@ -29,8 +29,6 @@ To configure the project, you need to set specific environment variables. The cu
 We have several feature flags currently in use. Their purposes are as follows:
 
 * `useIQEngineOutReach`: When true this flag shows IQEngine outreach links, specifically the Discord and the link to sign up for the monthly IQEngine email. This is true as default.
-
-* `useAPIDatasources`: When true this flag allows the use and display of API data sources in the RepoBrowser component. This is true as default.
 
 * `displayIQEngineGitHub`: When true this flag shows the link for the IQEngine GitHub repo. This is true as default.
 

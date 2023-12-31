@@ -5,7 +5,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFeatureFlags } from '@/hooks/use-feature-flags';
 import Transition from './transition';
-import RepoBrowser from '../repo-browser/repo-browser';
+import Browser from '../browser/browser';
 
 export const LandingPage = () => {
   const navigate = useNavigate();
@@ -31,7 +31,7 @@ export const LandingPage = () => {
   };
 
   return getFeatureFlag('bypassLandingPage') ? (
-    <RepoBrowser />
+    <Browser />
   ) : (
     <>
       <main className="flex-grow">
