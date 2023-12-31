@@ -59,7 +59,7 @@ export const Browser = () => {
         console.log('Switching to a local dir');
       }
     }
-  }, [localDataSourceQuery.data, currentContainer, filePath, goToPage]);
+  }, [localDataSourceQuery.data, currentContainer, filePath, goToPage, currentType]);
 
   async function handleOnClick(container, account, sas) {
     setQueryActive(false);
@@ -91,6 +91,7 @@ export const Browser = () => {
     setFiles(files);
     setFilePath(fileWithoutExtension);
     setGoToPage(true);
+    setCurrentType(CLIENT_TYPE_LOCAL);
   };
 
   const openDir = async () => {
