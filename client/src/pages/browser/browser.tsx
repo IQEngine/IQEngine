@@ -11,10 +11,10 @@ import { directoryOpen, fileOpen, supported } from 'browser-fs-access';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { FileWithDirectoryAndFileHandle } from 'browser-fs-access';
-import SiggenTile from './siggen-tile';
-import ValidatorTile from './validator-tile';
-import WebfftBenchmark from './webfft-benchmark-tile';
-import ConverterTile from './converter-tile';
+import SiggenTile from './misc-tiles/siggen-tile';
+import ValidatorTile from './misc-tiles/validator-tile';
+import WebfftBenchmark from './misc-tiles/webfft-benchmark-tile';
+import ConverterTile from './misc-tiles/converter-tile';
 import { ModalDialog } from '@/features/ui/modal/Modal';
 import { MetadataQuery } from './metadata-query/metadata-query';
 import { SmartQuery } from './metadata-query/smart-query';
@@ -218,11 +218,11 @@ export const Browser = () => {
                 key={i}
               >
                 <div className="col-span-3">
-                  <img className="h-12 rounded-l-lg" src={item.imageURL ?? '/api.png'} alt={item.name} />
+                  <img className="h-12 w-12 rounded-l-lg" src={item.imageURL ?? '/api.png'} alt={item.name} />
                 </div>
                 <h2 className="col-span-6 m-0 leading-tight">{item.name}</h2>
                 {currentContainer === item.container && currentAccount === item.account && !queryActive && (
-                  <div className="col-span-1 mb-2 text-4xl text-primary">⇨</div>
+                  <div className="col-span-1 mb-2 text-4xl text-primary">→</div>
                 )}
               </div>
             </div>
@@ -235,8 +235,8 @@ export const Browser = () => {
             aria-label={'query'}
             key={'query'}
           >
-            <h2 className="col-span-8 pl-12 m-0 leading-tight ">Query</h2>
-            {queryActive && <div className="col-span-1 mb-2 text-4xl text-primary">⇨</div>}
+            <h2 className="col-span-8 pl-2 m-0 leading-tight ">Query Recordings</h2>
+            {queryActive && <div className="col-span-1 mb-2 text-4xl text-primary">→</div>}
           </div>
 
           {supported && (
@@ -247,9 +247,9 @@ export const Browser = () => {
               aria-label={'local directory'}
               key={'localdir'}
             >
-              <h2 className="col-span-8 pl-12 m-0 leading-tight">Local Directory</h2>
+              <h2 className="col-span-8 pl-2 m-0 leading-tight">Local Directory</h2>
               {currentType === CLIENT_TYPE_LOCAL && !queryActive && (
-                <div className="col-span-1 mb-2 text-4xl text-primary">⇨</div>
+                <div className="col-span-1 mb-2 text-4xl text-primary">→</div>
               )}
             </div>
           )}
@@ -274,9 +274,9 @@ export const Browser = () => {
                 aria-label={'local directory'}
                 key={'localdir'}
               >
-                <h2 className="col-span-8 pl-12 m-0 leading-tight text-gray-500">Local Directory</h2>
+                <h2 className="col-span-8 pl-2 m-0 leading-tight text-gray-500">Local Directory</h2>
                 {currentType === CLIENT_TYPE_LOCAL && !queryActive && (
-                  <div className="col-span-1 mb-2 text-4xl text-primary">⇨</div>
+                  <div className="col-span-1 mb-2 text-4xl text-primary">→</div>
                 )}
               </div>
             </div>
@@ -289,7 +289,7 @@ export const Browser = () => {
             aria-label={'local files'}
             key={'localfiles'}
           >
-            <h2 className="pl-12 pt-3 m-0 leading-tight ">Local File Pair</h2>
+            <h2 className="pl-2 pt-3 m-0 leading-tight ">Local File Pair</h2>
           </div>
 
           {/* -------Manually enter azure credentials------- */}
