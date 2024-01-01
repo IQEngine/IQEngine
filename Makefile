@@ -67,6 +67,11 @@ test-pw-prod:
 	@cd e2e && npx playwright test --config playwright-prod.config.ts
 	@e2e/teardown.sh
 
+test-pw-staging:
+	@echo "Running Playwright frontend and end-to-end tests"
+	@cd e2e && npx playwright test --config playwright-staging.config.ts
+	@e2e/teardown.sh
+
 test-api:
 	@echo "Running pytest api tests"
 	@cd api && pytest

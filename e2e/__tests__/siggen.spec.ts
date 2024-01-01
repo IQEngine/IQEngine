@@ -1,9 +1,7 @@
 import { test, expect } from '@playwright/test';
-import { skipLandingPage } from '../common-steps';
 
-test('confirm siggen operation  @CICompatible', async ({ page }) => {
-  await page.goto('/');
-  skipLandingPage(page);
+test('confirm siggen operation @CICompatible', async ({ page }) => {
+  await page.goto('/browser');
 
   await page.locator('[id="misc_tools_button"]').click();
   await page.locator('#Siggen').click();
