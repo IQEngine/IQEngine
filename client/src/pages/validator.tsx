@@ -28,16 +28,22 @@ export const Validator = () => {
 
   return (
     <div>
-      <div className="grid justify-center place-items-center">
-        <h2 className="">Allow AdditionalProperties</h2>
-        <input
-          type="checkbox"
-          className="toggle toggle-primary"
-          checked={additionalProperties}
-          onChange={(e) => {
-            onChangeAdditionalProperties(e);
-          }}
-        />
+      <div className="grid place-items-center pb-12">
+        <div className="p-4">
+          <span className="text-primary text-xl align-top">Allow Additional Properties</span>
+          <input
+            type="checkbox"
+            className="toggle toggle-primary ml-2"
+            checked={additionalProperties}
+            onChange={(e) => {
+              onChangeAdditionalProperties(e);
+            }}
+          />
+          <br></br>
+          <span className="text-primary text-md align-top">
+            (SigMF does allow them, but for catching typos it is useful to disallow)
+          </span>
+        </div>
 
         <CodeMirror
           aria-label="Validator Code Editor"
