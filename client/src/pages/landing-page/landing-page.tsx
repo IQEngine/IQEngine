@@ -62,16 +62,16 @@ export const LandingPage = () => {
                     &#128270; Start Browsing
                   </button>
                 </div>
-                <div className="font-bold text-lg text-primary pb-4">
-                  Bringing the open-source RF community together
-                  <br></br>
-                  Browse RF recordings shared by the community or your own local files
-                  <br></br>
-                  View/edit SigMF annotations and other useful metadata
-                  <br></br>
-                  Expand your knowledge of wireless signals and how to analyze/process them
+                <div className="grid gap-2 font-bold text-lg text-primary pb-4 justify-items-center">
+                  <p>Browse RF recordings shared by the community or your own local files</p>
+                  <hr className="border-secondary border-2 rounded w-16 " />
+                  <p>View/edit SigMF annotations and other useful metadata</p>
+                  <hr className="border-secondary border-2 rounded w-16" />
+                  <p>Expand your knowledge of wireless signals and how to analyze/process them</p>
+                  <hr className="border-secondary border-2 rounded w-16" />
+                  <p>Bringing the open-source RF community together</p>
                 </div>
-                {/* Hero image */}
+                {/* Animation
                 <div>
                   <div className="relative flex justify-center mb-8" data-aos="zoom-y-out" data-aos-delay="450">
                     <div className="flex flex-col justify-center">
@@ -79,6 +79,7 @@ export const LandingPage = () => {
                     </div>
                   </div>
                 </div>
+                */}
               </div>
             </div>
           </div>
