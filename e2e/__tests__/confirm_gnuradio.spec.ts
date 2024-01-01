@@ -1,9 +1,7 @@
 import { test, expect } from '@playwright/test';
-import { skipLandingPage } from '../common-steps';
 
 test('GNURadio repocard displays spectrogram page', async ({ page }) => {
-  await page.goto('/');
-  skipLandingPage(page);
+  await page.goto('/browser');
 
   const grRepo = page.locator('#GNURadioSigMFRepo');
   const grRepo2 = page.locator('#GNURadioHostedRecordings');

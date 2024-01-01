@@ -12,7 +12,7 @@ stage4 - uint8 values after having the min/max and colormap applied
 
 // @ts-ignore
 import { fftshift } from 'fftshift';
-import { FFT } from '@/utils/fft';
+//import { FFT } from '@/utils/fft';
 import webfft from 'webfft';
 
 export function calcFfts(samples: Float32Array, fftSize: number, windowFunction: string, numberOfFfts: number) {
@@ -20,12 +20,12 @@ export function calcFfts(samples: Float32Array, fftSize: number, windowFunction:
 
   if (typeof window.webfft === 'undefined') {
     window.webfft = new webfft(fftSize);
-    window.webfft.profile(0.5);
+    window.webfft.profile(0.5, true, true); // causes webfft to switch to using the fastest sublibrary
   } else {
     if (window.webfft.size !== fftSize) {
       console.log('Changing to FFT Size:', window.webfft.size);
       window.webfft = new webfft(fftSize);
-      window.webfft.profile(0.5);
+      window.webfft.profile(0.5, true, true); // causes webfft to switch to using the fastest sublibrary
     }
   }
 

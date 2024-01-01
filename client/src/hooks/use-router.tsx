@@ -115,7 +115,7 @@ export function useRouter() {
         {
           path: 'validator',
           async lazy() {
-            let { Validator } = await import('@/pages/validator/Validator');
+            let { Validator } = await import('@/pages/validator');
             return { Component: Validator };
           },
         },

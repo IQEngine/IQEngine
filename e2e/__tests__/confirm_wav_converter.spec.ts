@@ -1,10 +1,8 @@
 import { test, expect } from '@playwright/test';
-import { skipLandingPage } from '../common-steps';
 import AdmZip from 'adm-zip';
 
 test('Confirm Wav to SigMF converter and Converter Card @CICompatible', async ({ page }) => {
-  await page.goto('/');
-  skipLandingPage(page);
+  await page.goto('/browser');
 
   await page.locator('[id="misc_tools_button"]').click();
   await page.locator('[id="convert"]').click();

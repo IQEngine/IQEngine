@@ -80,7 +80,7 @@
     "vite-plugin-svgr": "4.2.0",
     "vite-tsconfig-paths": "4.2.1",
     "web-vitals": "3.5.0",
-    "webfft": "1.0.1"
+    "webfft": "^1.0.3"
   },
   "devDependencies": {
     "@tanstack/eslint-plugin-query": "^4.36.1",

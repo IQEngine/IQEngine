@@ -235,9 +235,6 @@ export const Browser = () => {
 
           {/* -------Manually enter azure credentials------- */}
           <CustomAzureForm
-            currentContainer={currentContainer}
-            currentAccount={currentAccount}
-            currentSas={currentSas}
             setCurrentContainer={setCurrentContainer}
             setCurrentAccount={setCurrentAccount}
             setCurrentSas={setCurrentSas}

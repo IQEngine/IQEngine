@@ -11,16 +11,40 @@ import { langs } from '@uiw/codemirror-extensions-langs';
 export const Validator = () => {
   const [metadata, setMetadata] = useState(INITIAL_METADATA_SNIPPET);
   const [errors, setErrors] = useState([]);
+  const [additionalProperties, setAdditionalProperties] = useState(true);
 
   const onChangeHandler = (metadataValue) => {
-    const metadata = metadataValidator(metadataValue);
-    setMetadata(metadata.metadata);
-    setErrors(metadata.errors);
+    const metadataRet = metadataValidator(metadataValue, null, additionalProperties);
+    setMetadata(metadataRet.metadata);
+    setErrors(metadataRet.errors);
+  };
+
+  const onChangeAdditionalProperties = (e) => {
+    setAdditionalProperties(e.target.checked);
+    const metadataRet = metadataValidator(metadata, null, e.target.checked);
+    setMetadata(metadataRet.metadata);
+    setErrors(metadataRet.errors);
   };
 
   return (
     <div>
-      <div className="flex justify-center">
+      <div className="grid place-items-center pb-12">
+        <div className="p-4">
+          <span className="text-primary text-xl align-top">Allow Additional Properties</span>
+          <input
+            type="checkbox"
+            className="toggle toggle-primary ml-2"
+            checked={additionalProperties}
+            onChange={(e) => {
+              onChangeAdditionalProperties(e);
+            }}
+          />
+          <br></br>
+          <span className="text-primary text-md align-top">
+            (SigMF does allow them, but for catching typos it is useful to disallow)
+          </span>
+        </div>
+
         <CodeMirror
           aria-label="Validator Code Editor"
           value={metadata}
