@@ -11,16 +11,34 @@ import { langs } from '@uiw/codemirror-extensions-langs';
 export const Validator = () => {
   const [metadata, setMetadata] = useState(INITIAL_METADATA_SNIPPET);
   const [errors, setErrors] = useState([]);
+  const [additionalProperties, setAdditionalProperties] = useState(true);
 
   const onChangeHandler = (metadataValue) => {
-    const metadata = metadataValidator(metadataValue);
-    setMetadata(metadata.metadata);
-    setErrors(metadata.errors);
+    const metadataRet = metadataValidator(metadataValue, null, additionalProperties);
+    setMetadata(metadataRet.metadata);
+    setErrors(metadataRet.errors);
+  };
+
+  const onChangeAdditionalProperties = (e) => {
+    setAdditionalProperties(e.target.checked);
+    const metadataRet = metadataValidator(metadata, null, e.target.checked);
+    setMetadata(metadataRet.metadata);
+    setErrors(metadataRet.errors);
   };
 
   return (
     <div>
-      <div className="flex justify-center">
+      <div className="grid justify-center place-items-center">
+        <h2 className="">Allow AdditionalProperties</h2>
+        <input
+          type="checkbox"
+          className="toggle toggle-primary"
+          checked={additionalProperties}
+          onChange={(e) => {
+            onChangeAdditionalProperties(e);
+          }}
+        />
+
         <CodeMirror
           aria-label="Validator Code Editor"
           value={metadata}

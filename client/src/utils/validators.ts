@@ -2,16 +2,21 @@ import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
 import sigmfSchema from '@/data/sigmf-schema.json';
 
-interface MetadataValidator {
+interface MetadataValidatorProps {
   metadata: string;
   errors: any[];
 }
 
-export function metadataValidator(metadataValue: string, path: string = null) {
-  let metadataValidator = { metadata: metadataValue, errors: [] } as MetadataValidator;
+export function metadataValidator(metadataValue: string, path: string = null, additionalProperties: boolean = true) {
+  let metadataValidator = { metadata: metadataValue, errors: [] } as MetadataValidatorProps;
   metadataValidator.metadata = metadataValue;
-
-  return validator(metadataValue, sigmfSchema, metadataValidator, path);
+  let sigmfSchemaCopy = JSON.parse(JSON.stringify(sigmfSchema));
+  if (!additionalProperties) {
+    sigmfSchemaCopy.properties.global.additionalProperties = false;
+    sigmfSchemaCopy.properties.captures.items.anyOf[0].additionalProperties = false;
+    sigmfSchemaCopy.properties.annotations.items.anyOf[0].additionalProperties = false;
+  }
+  return validator(metadataValue, sigmfSchemaCopy, metadataValidator, path);
 }
 
 export function validator(value: string, schema: any, validator: any, path: string = null) {
