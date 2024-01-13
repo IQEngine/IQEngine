@@ -7,8 +7,9 @@ import Backend from './backend.mdx';
 import AdminPage from './admin-page.mdx';
 import CodingStyle from './coding-style.mdx';
 import NewDevGuide from './new-developer-guide.mdx';
+import InstallWithDocker from './install-with-docker.mdx';
 import ConfigFeatureFlags from './config-feature-flags.mdx';
-import ReadingSpectrograms from './reading-spectrograms.mdx'
+import ReadingSpectrograms from './reading-spectrograms.mdx';
 import { Link } from 'react-router-dom';
 
 export const DocsPages = () => {
@@ -43,6 +44,9 @@ export const DocsPages = () => {
     case 'reading-spectrograms':
       currentPage = <ReadingSpectrograms />;
       break;
+    case 'install-with-docker':
+      currentPage = <InstallWithDocker />;
+      break;
     default:
       currentPage = <OverviewPage />;
   }
@@ -55,11 +59,12 @@ export const DocsPages = () => {
             <div className="flex flex-col w-48 mb-8 sticky top-0">
               <TableHeader>User Docs</TableHeader>
               <TableItem href="/docs">Overview</TableItem>
-              <TableItem href="/docs/plugins">Plugins</TableItem>
+              <TableItem href="/install-with-docker">Install with Docker</TableItem>
+              <TableItem href="/docs/config-feature-flags">Config & Feature Flags</TableItem>
               <TableItem href="/docs/frontend">Frontend</TableItem>
               <TableItem href="/docs/backend">Backend</TableItem>
+              <TableItem href="/docs/plugins">Plugins</TableItem>
               <TableItem href="/docs/admin-page">Admin Page</TableItem>
-              <TableItem href="/docs/config-feature-flags">Config & Feature Flags</TableItem>
               <TableItem href="/docs/reading-spectrograms">Reading Spectrograms</TableItem>
               <TableHeader>Developer Docs</TableHeader>
               <TableItem href="/docs/new-developer-guide">New Dev Guide</TableItem>

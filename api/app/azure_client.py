@@ -23,6 +23,7 @@ class AzureBlobClient:
         self.clients: dict[str, BlobClient] = {}
         if account == "local":
             self.base_filepath = os.getenv("IQENGINE_BACKEND_LOCAL_FILEPATH", None)
+            self.base_filepath = self.base_filepath.replace('"','')
             if not self.base_filepath:
                 raise Exception("IQENGINE_BACKEND_LOCAL_FILEPATH must be set to use local")
 

@@ -4,7 +4,7 @@ param name string
 param containerAppEnvironmentId string
 
 // Container Image ref
-param containerImage string = 'iqengine/iqengine:latest'
+param containerImage string = 'iqengine/iqengine:pre'
 param registry string = 'ghcr.io'
 
 // Networking

@@ -1,0 +1,41 @@
+# Install with Docker
+
+For folks who want to deploy their own instance of IQEngine and don't have any plans to modify it, using the docker images is a good choice.
+As part of IQEngine's CI/CD, Docker images are built and pushed to GitHub Container Registry.
+
+## Using the Public Docker Image
+
+You can run the latest Docker image from the GitHub repository using the following steps:
+
+1. [Install Docker](https://docs.docker.com/engine/install/ubuntu/)
+2. Download [this example .env file](https://raw.githubusercontent.com/IQEngine/IQEngine/main/example.env), rename it to `.env`, and fill it out with your own situation, which may not require any changes at all.  If you dont change `IQENGINE_CONNECTION_INFO` then that's OK but expect there to be a broken datasource when you use the tool.  Note- you don't have to fill out IQENGINE_METADATA_DB_CONNECTION_STRING, you can leave it as-is.
+3. Out of the same directory you put the .env file, run `docker run --env-file .env -v /path/to/myrecordings:/tmp/myrecordings -p 3000:3000 -d ghcr.io/iqengine/iqengine:pre` replacing `/path/to/myrecordings` with the local directory filled with SigMF recordings (this gets mounted to /tmp/myrecordings within the container, and the example .env already has that directory added to it)
+4. (Optionally) `docker ps` to check that it's running, there should be a line with IMAGE `ghcr.io/iqengine/iqengine:pre`, this container is running both the backend and frontend
+5. Access IQEngine at [http://localhost:3000](http://localhost:3000), it may take a few minutes to load depending on how many datasources you added to your .env file
+6. (Optionally) You can SSH in and check if your recordings are there using `docker exec -it <CONTAINER ID> /bin/bash` replacing CONTAINER ID with that from `docker ps`, then `ls /tmp/myrecordings`
+
+<br />
+
+## Build the Docker Image using Local Code
+
+(This is meant for developers)
+
+If you prefer to build and run the IQEngine Docker image locally, follow these steps:
+
+1. Clone the repository and navigate to the project directory
+2. Copy the example.env to .env and edit it to insert anything such as cloud datasources to IQENGINE_CONNECTION_INFO
+3. Build the Docker image by executing the following command:
+
+```bash
+docker build -t iqengine-local .
+```
+
+4. Once the image is built successfully, run the Docker container with the following command:
+
+```bash
+docker run --env-file .env -p 3000:3000 -d iqengine-local
+```
+<br />
+This will instantiate IQEngine using your locally built Docker image with your local .env file, and you can access it at [http://localhost:3000](http://localhost:3000).
+
+If the .env file is causing issues, remove the `--env-file .env` from the command above and it should work, just without custom datasources/settings
