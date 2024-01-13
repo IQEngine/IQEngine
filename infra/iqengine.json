@@ -339,7 +339,7 @@
             },
             "containerImage": {
               "type": "string",
-              "defaultValue": "iqengine/iqengine:latest"
+              "defaultValue": "iqengine/iqengine:pre"
             },
             "registry": {
               "type": "string",
