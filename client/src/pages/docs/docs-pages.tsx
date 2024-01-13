@@ -59,7 +59,7 @@ export const DocsPages = () => {
             <div className="flex flex-col w-48 mb-8 sticky top-0">
               <TableHeader>User Docs</TableHeader>
               <TableItem href="/docs">Overview</TableItem>
-              <TableItem href="/install-with-docker">Install with Docker</TableItem>
+              <TableItem href="/docs/install-with-docker">Install with Docker</TableItem>
               <TableItem href="/docs/config-feature-flags">Config & Feature Flags</TableItem>
               <TableItem href="/docs/frontend">Frontend</TableItem>
               <TableItem href="/docs/backend">Backend</TableItem>

@@ -1,7 +1,7 @@
 # Install with Docker
 
 For folks who want to deploy their own instance of IQEngine and don't have any plans to modify it, using the docker images is a good choice.
-As part of IQEngine's CI/CD, Docker images are built and pushed to GitHub Container Registry.
+As part of IQEngine's CI/CD, Docker images are built and pushed to GitHub Container Registry with every merge into main.
 
 ## Using the Public Docker Image
 
@@ -13,6 +13,7 @@ You can run the latest Docker image from the GitHub repository using the followi
 4. (Optionally) `docker ps` to check that it's running, there should be a line with IMAGE `ghcr.io/iqengine/iqengine:pre`, this container is running both the backend and frontend
 5. Access IQEngine at [http://localhost:3000](http://localhost:3000), it may take a few minutes to load depending on how many datasources you added to your .env file
 6. (Optionally) You can SSH in and check if your recordings are there using `docker exec -it <CONTAINER ID> /bin/bash` replacing CONTAINER ID with that from `docker ps`, then `ls /tmp/myrecordings`
+7. (Optionally) Stop the server with `docker stop <CONTAINER ID>`
 
 <br />
 
