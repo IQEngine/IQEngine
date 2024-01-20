@@ -260,73 +260,63 @@ export const Browser = () => {
         )}
 
         {/* -------Recording list------- */}
-        <div className="flex flex-col pl-6">
-          <div className="ml-auto col-span-3">
-            {!metadataCollection.isFetched && !queryActive && (
-              <div className="flex justify-center">
-                <svg
-                  className="animate-spin ml-1 mr-3 w-96 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1"></circle>
-                  <circle
-                    className="percent fifty stroke-current text-primary"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    pathLength="100"
-                  />
-                </svg>
-              </div>
-            )}
-            {metadataCollection.isFetched && !queryActive && (
-              <div className="">
-                <div className="flex justify-items-stretch text-start">
-                  <table className="w-full">
-                    <thead>
-                      <tr>
-                        <th className="p-2">Spectrogram Thumbnail</th>
-                        <th className="p-2">Recording Name</th>
-                        <th className="p-2">Length in Samples</th>
-                        <th className="p-2">
-                          Data Type
-                          <a
-                            style={{ textDecoration: 'none', color: 'white' }}
-                            className="mr-2"
-                            target="_blank"
-                            rel="noreferrer"
-                            href="https://pysdr.org/content/iq_files.html#binary-files"
-                          >
-                            <InfoOutlinedIcon></InfoOutlinedIcon>
-                          </a>
-                        </th>
-                        <th className="p-2">Frequency</th>
-                        <th className="p-2">Sample Rate</th>
-                        <th className="p-2">Number of Annotations</th>
-                        <th className="p-2">Author</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {directoryNode && (
-                        <Directory
-                          key={Math.random()}
-                          directory={directoryNode}
-                          setExpanded={(name) => '/'}
-                          isExpanded={directoryNode.name == '/'}
-                          type={currentType}
-                          account={currentAccount}
-                          container={currentContainer}
-                          sasToken={currentSas}
-                        />
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
-          </div>
+        <div className="flex pl-6 justify-center w-full">
+          {!metadataCollection.isFetched && !queryActive && (
+            <div className="h-64 mb-12 mr-64">
+              <svg
+                className="animate-spin ml-1 mr-3  text-white w-full"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1"></circle>
+                <circle className="percent fifty stroke-current text-primary" cx="12" cy="12" r="10" pathLength="100" />
+              </svg>
+            </div>
+          )}
+          {metadataCollection.isFetched && !queryActive && (
+            <div className="flex justify-items-stretch text-start w-full">
+              <table className="w-full">
+                <thead>
+                  <tr>
+                    <th className="p-2">Spectrogram Thumbnail</th>
+                    <th className="p-2">Recording Name</th>
+                    <th className="p-2">Length in Samples</th>
+                    <th className="p-2">
+                      Data Type
+                      <a
+                        style={{ textDecoration: 'none', color: 'white' }}
+                        className="mr-2"
+                        target="_blank"
+                        rel="noreferrer"
+                        href="https://pysdr.org/content/iq_files.html#binary-files"
+                      >
+                        <InfoOutlinedIcon></InfoOutlinedIcon>
+                      </a>
+                    </th>
+                    <th className="p-2">Frequency</th>
+                    <th className="p-2">Sample Rate</th>
+                    <th className="p-2">Number of Annotations</th>
+                    <th className="p-2">Author</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {directoryNode && (
+                    <Directory
+                      key={Math.random()}
+                      directory={directoryNode}
+                      setExpanded={(name) => '/'}
+                      isExpanded={directoryNode.name == '/'}
+                      type={currentType}
+                      account={currentAccount}
+                      container={currentContainer}
+                      sasToken={currentSas}
+                    />
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </div>
     </div>
