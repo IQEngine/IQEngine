@@ -21,7 +21,7 @@ import { SmartQuery } from './metadata-query/smart-query';
 import { CustomAzureForm } from './custom-azure-form';
 
 export const Browser = () => {
-  const apiDataSources = getDataSources(CLIENT_TYPE_API);
+  const apiDataSources = getDataSources(CLIENT_TYPE_API); // doesn't load immediately
   const [currentType, setCurrentType] = useState(CLIENT_TYPE_API);
   const [currentContainer, setCurrentContainer] = useState('iqengine');
   const [currentAccount, setCurrentAccount] = useState('gnuradio');
@@ -34,6 +34,7 @@ export const Browser = () => {
   const [filePath, setFilePath] = useState<string>(null);
   const [showModal, setShowModal] = useState(false);
   const [queryActive, setQueryActive] = useState(false);
+  const [defaultRepoSet, setDefaultRepoSet] = useState(false);
 
   const localDataSourceQuery = getDataSource(
     CLIENT_TYPE_LOCAL,
@@ -41,6 +42,16 @@ export const Browser = () => {
     currentContainer,
     !!currentContainer || !!filePath
   );
+
+  // Used to set default selected repo to the first one to load
+  useEffect(() => {
+    if (apiDataSources && apiDataSources.data && apiDataSources.data.length > 0 && !defaultRepoSet) {
+      setCurrentAccount(apiDataSources.data[0].account);
+      setCurrentContainer(apiDataSources.data[0].container);
+      setCurrentType(apiDataSources.data[0].type);
+      setDefaultRepoSet(true);
+    }
+  }, [apiDataSources.data]);
 
   useEffect(() => {
     if (
