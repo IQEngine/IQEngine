@@ -1,7 +1,5 @@
 from typing import List, Optional
-
-from pydantic import BaseModel, Extra, Field, SecretStr
-
+from pydantic import BaseModel, Extra, Field, SecretStr, validator
 
 class DataSource(BaseModel):
     type: str
@@ -53,6 +51,12 @@ class MetadataGlobal(BaseModel):
     class Config:
         extra = Extra.allow
 
+    # If someone has a dict as their core:extensions then dont error out, just treat it as no extensions
+    @validator('core_extensions', pre=True)
+    def validate_age(cls, v):
+        if isinstance(v, dict):
+            v = []
+        return v
 
 class MetadataCapture(BaseModel):
     core_sample_start: int = Field(alias="core:sample_start")
