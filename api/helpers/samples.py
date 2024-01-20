@@ -34,14 +34,16 @@ def get_samples(data_bytes, data_type) -> np.ndarray:
     return samples
 
 def get_bytes_per_iq_sample(data_type):
-    if data_type == "cf32_le" or data_type == "cf32" or data_type == "cf32_be":
+    if "64" in data_type:
+        return 16
+    elif "32" in data_type:
         return 8
-    elif data_type == "ci16_le" or data_type == "ci16" or data_type == "ci16_be":
+    elif "16" in data_type:
         return 4
-    elif data_type == "ci8" or data_type == "i8":
+    elif "8" in data_type:
         return 2
     else:
-        raise ValueError("Datatype " + data_type + " not implemented")
+        raise ValueError("within get_bytes_per_iq_sample, didn't see 64 or 32 or 16 or 8")
 
 def get_spectrogram_image(
     content: bytes,

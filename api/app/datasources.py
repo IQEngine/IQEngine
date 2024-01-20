@@ -156,7 +156,7 @@ async def import_datasources_from_env():
                 if await datasource_exists(connection["accountName"], connection["containerName"]):
                     continue
                 # It's important to immediately add it to the db so other workers see it and dont add a duplicate
-                create_ret = await create(datasource=datasource, user=None)
+                create_ret = await create_datasource(datasource=datasource, user=None)
                 # This should only get triggered once (one worker)
                 if create_ret:
                     await sync(connection["accountName"], connection["containerName"])
