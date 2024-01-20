@@ -12,7 +12,7 @@ class CancelOnDisconnectRoute(APIRoute):
             print(f"Request {self.endpoint.__name__} cancelled")
             raise
 
-# Decorator that will check if the client disconnects, and cancel the task if required
+# Decorator that will check if the client disconnects, and cancel the task if required. Only used in iq_router
 def cancel_on_disconnect(handler: Callable[[Any, str, str, int, str, Any, Any], Coroutine[Any, Any, Any]]):
     @wraps(handler)
     async def cancel_on_disconnect_decorator(request: Request, *args, **kwargs):
