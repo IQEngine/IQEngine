@@ -27,6 +27,11 @@ export const FeatureFlag = {
     description: 'Bypass Landing Page',
     default: true,
   },
+  allowRefreshing: {
+    name: 'allowRefreshing',
+    description: 'Allows anyone to refresh the datasources using a button at the top-right',
+    default: false,
+  },
 };
 
 interface ContextProps {

@@ -1,10 +1,11 @@
 from typing import Optional
-
+import os
+import json
 import httpx
 from .azure_client import AzureBlobClient
 from . import datasources
-from .datasources import create, datasource_exists
-from .models import DataSource
+from .datasources import create_datasource, datasource_exists
+from .models import DataSource, Configuration
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query
 from fastapi.responses import StreamingResponse
 from helpers.authorization import get_current_user
@@ -18,7 +19,7 @@ router = APIRouter()
 
 
 @router.post("/api/datasources", status_code=201, response_model=DataSource)
-async def create_datasource(
+async def create_datasource_endpoint(
     datasource: DataSource,
     datasources: AgnosticCollection = Depends(datasources.collection),
     current_user: dict = Depends(get_current_user),
@@ -30,7 +31,7 @@ async def create_datasource(
     if await datasource_exists(datasource.account, datasource.container):
         raise HTTPException(status_code=409, detail="Datasource Already Exists")
 
-    datasource = await create(datasource=datasource, user=current_user)
+    datasource = await create_datasource(datasource=datasource, user=current_user)
     return datasource
 
 
@@ -50,6 +51,33 @@ async def get_datasources(
         ):
             result.append(datasource_item)
     return result
+
+
+@router.put("/api/datasources/syncAll", status_code=204)
+async def sync_all_datasources(
+    background_tasks: BackgroundTasks,
+    datasources_collection: AgnosticCollection = Depends(datasources.collection),
+):
+    # Check if the feature is enabled, for anyone to be able to sync all
+    feature_flags = os.getenv("IQENGINE_FEATURE_FLAGS", None)
+    if feature_flags:
+        configuration = Configuration()
+        configuration.feature_flags = json.loads(feature_flags)
+        if configuration.feature_flags.get('allowRefreshing', False):
+            # First wipe out all the metadata
+            from .metadata import collection
+            metadata_collection: AgnosticCollection = collection()
+            await metadata_collection.delete_many({}) # deletes all docs in the collection
+
+            # Now sync all the datasources
+            all_datasources = datasources_collection.find()
+            all_datasources_list = await all_datasources.to_list(length=100)
+            for datasource in all_datasources_list:
+                print("Syncing-", datasource)
+                background_tasks.add_task(datasources.sync, datasource["account"], datasource["container"])
+        else:
+            raise HTTPException(status_code=404, detail="allowRefreshing wasn't set to true in env vars")
+    return {"message": "Syncing All"}
 
 
 @router.get(

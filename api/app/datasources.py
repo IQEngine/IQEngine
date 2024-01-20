@@ -29,7 +29,7 @@ async def datasource_exists(account, container) -> bool:
     return await get(account, container) is not None
 
 async def sync(account: str, container: str):
-    from .metadata import exists, create
+    from .metadata import create
 
     print(f"[SYNC] Starting sync for {account}/{container} on PID {os.getpid()} at {time.time()}")
     azure_blob_client = AzureBlobClient(account, container)
@@ -43,9 +43,6 @@ async def sync(account: str, container: str):
     async for metadata in metadatas:
         filepath = metadata[0].replace(".sigmf-meta", "")
         try:
-            if await exists(account, container, filepath):
-                print(f"[SYNC] Metadata already exists for {filepath}")
-                continue
             if not await azure_blob_client.blob_exist(filepath + ".sigmf-data"):
                 print(f"[SYNC] Data file {filepath} does not exist for metadata file")
                 continue
@@ -63,14 +60,14 @@ async def sync(account: str, container: str):
             metadata.globalMetadata.traceability_sample_length = (
                 file_length / get_bytes_per_iq_sample(metadata.globalMetadata.core_datatype)
             )
-            await create(metadata, user=None)
-            #print(f"[SYNC] Created metadata for {filepath}")
+            await create(metadata, user=None) # creates or updates the metadata object
+            #print(f"[SYNC] Created metadata for {filepath}") # commented out, caused too much spam
         except Exception as e:
             print(f"[SYNC] Error creating metadata for {filepath}: {e}")
 
     print(f"[SYNC] Finished syncing {account}/{container}")
 
-async def create(datasource: DataSource, user: Optional[dict]) -> DataSource:
+async def create_datasource(datasource: DataSource, user: Optional[dict]) -> DataSource:
     """
     Create a new datasource. The datasource will be henceforth identified by account/container which
     must be unique or this function will return a 400.
@@ -128,7 +125,7 @@ async def import_datasources_from_env():
                 )
                 # Check one more time that it doesn't exist yet (the above block can take 0.1s or more)
                 if not await datasource_exists('local', 'local'):
-                    create_ret = await create(datasource=datasource, user=None)
+                    create_ret = await create_datasource(datasource=datasource, user=None)
                     if create_ret:
                         await sync("local", "local")
         except Exception as e:
