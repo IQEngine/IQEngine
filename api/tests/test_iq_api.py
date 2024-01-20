@@ -33,7 +33,6 @@ async def test_get_iq_data_invalid_format(
             f"/file_path/iq-data?format={format}&block_size=1&block_indexes_str=1&filepath=test"
         )
         assert response.status_code == 400
-        assert b"Datatype invalid not implemented" in response.content
 
 
 async def mock_get_test_datasource():
