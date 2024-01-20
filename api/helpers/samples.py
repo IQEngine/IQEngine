@@ -4,10 +4,10 @@ import matplotlib.pyplot as plt
 from PIL import Image
 
 def get_samples(data_bytes, data_type) -> np.ndarray:
-    if data_type == "ci8" or data_type == "i8":
+    if data_type == "ci8" or data_type == "ci8_le" or data_type == "i8":
         samples = np.frombuffer(data_bytes, dtype=np.int8)
         samples = samples[::2] + 1j * samples[1::2]
-    elif data_type == "cu8" or data_type == "u8":
+    elif data_type == "cu8" or data_type == "cu8_le" or data_type == "u8":
         samples = np.frombuffer(data_bytes, dtype=np.uint8)
         samples = samples[::2] + 1j * samples[1::2]
     elif data_type == "ci16" or data_type == "ci16_le":
