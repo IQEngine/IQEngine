@@ -39,7 +39,7 @@ async def sync(account: str, container: str):
         return
     if datasource.sasToken:
         azure_blob_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
-    metadatas = azure_blob_client.get_metadata_files()
+    metadatas = azure_blob_client.get_metadata_files() # this includes parsing of all the metadata
     async for metadata in metadatas:
         filepath = metadata[0].replace(".sigmf-meta", "")
         try:
@@ -136,7 +136,7 @@ async def import_datasources_from_env():
 
     # Add all cloud datasources
     if connection_info:
-        for connection in json.loads(connection_info)["settings"]:
+        for connection in json.loads(connection_info).get("settings", []):
             try:
                 if await datasource_exists(connection["accountName"], connection["containerName"]):
                     continue
