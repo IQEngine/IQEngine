@@ -384,8 +384,6 @@ async def get_meta_thumbnail(
         return Response(content=image, media_type=content_type)
     content = await azure_client.get_blob_content(thumbnail_path)
 
-    print(dir(background_tasks))
-
     return Response(content=content, media_type=content_type)
 
 
