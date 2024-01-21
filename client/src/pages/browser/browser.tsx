@@ -137,7 +137,7 @@ export const Browser = () => {
         {/* -------Repo list------- */}
         <div className="h-fit w-60 sticky top-0 grid gap-4">
           {apiDataSources?.data?.map((item, i) => (
-            <div className="group">
+            <div className="group" key={item.name}>
               {/* -------Pop up box------- */}
               <div className="hidden absolute ml-48 group-hover:block">
                 <div className="repocard bg-opacity-100">
