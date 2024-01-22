@@ -138,7 +138,8 @@ class AzureBlobClient:
                 for name in files:
                     if name.endswith(".sigmf-meta"):
                         metadata = await self.get_metadata_file(os.path.join(path, name))
-                        yield os.path.join(path, name).replace(self.base_filepath, '')[1:], metadata
+                        if metadata:
+                            yield os.path.join(path, name).replace(self.base_filepath, '')[1:], metadata
             return
 
         # Azure blobs
@@ -148,7 +149,8 @@ class AzureBlobClient:
             if blob.name.endswith(".sigmf-meta"):
                 try:
                     metadata = await self.get_metadata_file(blob.name)
-                    yield str(blob.name), metadata
+                    if metadata:
+                        yield str(blob.name), metadata
                 except Exception as e:
                     print(f"Error while reading metadata file {blob.name}: {e}")
         return
@@ -163,7 +165,12 @@ class AzureBlobClient:
             blob_client = self.get_blob_client(filepath)
             blob = await blob_client.download_blob()
             content = await blob.readall()
-        return Metadata.parse_raw(content)
+        try:
+            metadata = Metadata.parse_raw(content) # Metadata is a pydantic model, parse_raw parses a string of the JSON into the pydantic model
+        except Exception as e:
+            print(f"Error parsing metadata file {filepath}: {e}") # this will give specific reasons parsing failed, it eventually needs to get put in a log or something
+            return None
+        return metadata
 
     async def blob_exist(self, filepath):
         if self.account == "local":

@@ -10,7 +10,6 @@ from fastapi.staticfiles import StaticFiles
 from app.config_router import router as config_router
 from app.datasources_router import router as datasources_router
 from app.iq_router import router as iq_router
-from app.metadata_router import router as metadata_router
 from app.plugins_router import router as plugins_router
 from app.status_router import router as status_router
 from app.users_router import router as users_router
@@ -84,11 +83,10 @@ dictConfig(LogConfig().dict())
 logger = logging.getLogger("api")
 
 app = FastAPI(docs_url="/api_docs")
-app.router.route_class = CancelOnDisconnectRoute
+app.router.route_class = CancelOnDisconnectRoute # our Custom route (path operation) class to be used by this router
 
 app.include_router(iq_router)
 app.include_router(datasources_router)
-app.include_router(metadata_router)
 app.include_router(status_router)
 app.include_router(config_router)
 app.include_router(plugins_router)

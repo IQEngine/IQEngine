@@ -13,6 +13,10 @@ export class BlobClient implements DataSourceClient {
     throw new Error('sync not supported for blob data sources');
   }
 
+  syncAll(account: string, container: string): Promise<void> {
+    throw new Error('sync not supported for blob data sources');
+  }
+
   query(querystring: string, signal: AbortSignal): Promise<TraceabilityOrigin[]> {
     throw new Error('query not supported for blob data sources');
   }
