@@ -10,6 +10,8 @@ paths:
   /:
     get:
       summary: Returns the list of RF Functions available at this ip/host, as a list of strings, must match functionName below.
+      tags:
+        - Plugin
       responses:
         '200':
           description: 'OK'
@@ -22,9 +24,12 @@ paths:
                 minItems: 1
                 maxItems: 1000
                 uniqueItems: true
+
   /{functionName}:
     get:
       summary: Gets the RF Function's custom params in the form of a JSON schema that is only 1 layer deep.
+      tags:
+        - Plugin
       parameters:
         - in: path
           name: functionName
@@ -74,6 +79,8 @@ paths:
                             - type: boolean
     post:
       summary: Run the RF Function, using the provided IQ samples and params
+      tags:
+        - Plugin
       parameters:
         - in: path
           name: functionName
@@ -85,29 +92,33 @@ paths:
         description: IQ samples and parameters needed to run the RF Function
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               # Provide either samples (IQ samples) or samples_pointer (pointer to blob storage)
               oneOf:
-                - required: [samples_b64]
-                - required: [samples_cloud]
+                - required: [metadatas_file, metadatas_cloud]
               properties:
-                samples_b64:
-                  type: array # list of IQ samples, most functions will just have 1
-                  items:
-                    $ref: '#/components/schemas/samples_b64'
-                samples_cloud:
-                  type: array # list of IQ samples, most functions will just have 1
-                  items:
-                    $ref: '#/components/schemas/samples_cloud'
-                # Custom params
-                additionalProperties:
-                  anyOf:
-                    - type: string
-                    - type: number # (float)
-                    - type: integer
-                    - type: boolean
+                  metadatas_file:
+                    type: array # list of metadata to corresponding IQ file, most functions will just have 1
+                    items:
+                      $ref: '#/components/schemas/metadata_file'
+                  metadatas_cloud:
+                    type: array # list of metadata to IQ samples stored in cloud storage, most functions will just have 1
+                    items:
+                      $ref: '#/components/schemas/metadata_cloud'
+                  # Custom params
+                  additionalProperties:
+                    anyOf:
+                      - type: string
+                      - type: number # (float)
+                      - type: integer
+                      - type: boolean
+                  iq_files:
+                    type: array
+                    items:
+                      type: string
+                      format: binary
       responses:
         '400':
           description: Bad request. RF Function does not exist.
@@ -118,36 +129,92 @@ paths:
           content:
             application/json:
               schema:
-                # The following is taken from SigMF's annotations schema (currently a subset of it)
+                $ref: '#/components/schemas/job_status'
+
+  /{jobID}/result:
+    get:
+      summary: Gets the RF Function's results
+      tags:
+        - Plugin
+      parameters:
+        - in: path
+          name: jobID
+          schema:
+            type: string
+          required: true
+          description: ID of the job returned by a Plugin run.
+      responses:
+        '400':
+          description: Bad request. Job does not exist.
+        '200':
+          description: OK. Plugin run is done. Return the results.
+          content:
+            multipart/mixed::
+              schema:
                 type: object
                 properties:
-                  samples_b64:
-                    type: array # list of IQ samples, most functions will just have 1
+                  job_status:
+                    $ref: '#/components/schemas/job_status'
+                  metadatas_file:
+                    type: array # list of metadata to corresponding IQ file, most functions will just have 1
                     items:
-                      $ref: '#/components/schemas/samples_b64'
-                  samples_cloud:
-                    type: array # list of IQ samples, most functions will just have 1
+                      $ref: '#/components/schemas/metadata_file'
+                  metadatas_cloud:
+                    type: array # list of metadata to IQ samples stored in cloud storage, most functions will just have 1
                     items:
-                      $ref: '#/components/schemas/samples_cloud'
+                      $ref: '#/components/schemas/metadata_cloud'
+                  # Custom params
+                  additionalProperties:
+                    anyOf:
+                      - type: string
+                      - type: number # (float)
+                      - type: integer
+                      - type: boolean
                   annotations:
                     description: See https://github.com/sigmf/SigMF/blob/sigmf-v1.x/sigmf-spec.md#annotations-array
                     type: array
                     items:
                       $ref: '#/components/schemas/annotation'
+                  iq_files:
+                    type: array
+                    items:
+                      type: string
+                      format: binary
+
+  /{jobID}/status:
+    get:
+      summary: Gets the RF Function's status
+      tags:
+        - Plugin
+      parameters:
+        - in: path
+          name: jobID
+          schema:
+            type: string
+          required: true
+          description: ID of the job returned by a Plugin run.
+      responses:
+        '400':
+          description: Bad request. Job does not exist.
+        '200':
+          description: Accepted. Plugin is running.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/job_status'
 
 # A way to specify properties that are reused, or simply too large to have look good within parameters/responses objects
 components:
   schemas:
-    samples_b64: # samples directly within the JSON request/response
+    metadata_file: # samples directly within the JSON request/response
       type: object
       required:
         - samples
         - data_type
       properties:
-        samples:
-          # IQ samples, as a base64 encoded string, MIME type will indicate the datatype of the underlying bytes
+        file_name:
           type: string
-          format: byte # base64-encoded characters
+
         data_type: # uses MIME types, plus custom types we are adding for IQ, based on SigMF
           $ref: '#/components/schemas/data_type'
         sample_rate: # in case sample rate changed
@@ -157,7 +224,7 @@ components:
           type: number
           default: 0
 
-    samples_cloud: # a pointer to IQ samples in cloud storage
+    metadata_cloud: # a pointer to IQ samples in cloud storage
       type: object
       required:
         - account_name
@@ -197,6 +264,23 @@ components:
         - audio/wav
         - application/octet-stream # eg application/octet-stream
         - text/plain # e.g. for representing an ASCII message or speech to text output
+
+    job_status:
+      type: object
+      required:
+        - functionName
+      properties:
+        jobID:
+          description: ID of the job returned by a Plugin run.
+          type: string
+        functionName:
+          description: Name of the corresponding RF function.
+          type: string
+        progress:
+          description: Progress of the running Plugin in percentage
+          type: number
+          minimum: 0
+          maximum: 100
 
     annotation:
       type: object
