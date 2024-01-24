@@ -38,6 +38,16 @@ export class SigMFMetadata {
   dataFileHandle?: FileWithDirectoryAndFileHandle;
   dataClient?: BlobClient;
 
+  getCapture(sampleStart: number): CaptureSegment {
+    let capture = this.captures[0];
+    for (let c of this.captures) {
+      if (c['core:sample_start'] > sampleStart) break;
+
+      capture = c;
+    }
+    return capture;
+  }
+
   getBytesPerIQSample(): number {
     return dataTypeToBytesPerIQSample(this.global['core:datatype']) ?? 2;
   }

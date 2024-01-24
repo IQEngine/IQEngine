@@ -101,10 +101,11 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
 
       const visible = start < maximumFFT && end > minimumFFT;
       const labelVisible = (start > minimumFFT && start < maximumFFT) || (end < maximumFFT && end > minimumFFT);
+      const capture = meta.getCapture(annotation['core:sample_start']);
 
       return {
-        x1: (annotation['core:freq_lower_edge'] - meta.getCenterFrequency()) / meta.getSampleRate() + 0.5,
-        x2: (annotation['core:freq_upper_edge'] - meta.getCenterFrequency()) / meta.getSampleRate() + 0.5,
+        x1: (annotation['core:freq_lower_edge'] - capture['core:frequency']) / meta.getSampleRate() + 0.5,
+        x2: (annotation['core:freq_upper_edge'] - capture['core:frequency']) / meta.getSampleRate() + 0.5,
         y1: (start - minimumFFT) / (fftStepSize + 1),
         y2: (end - minimumFFT) / (fftStepSize + 1),
         label: annotation.getLabel(),
