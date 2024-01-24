@@ -100,7 +100,7 @@ async def create_datasource(datasource: DataSource, user: Optional[dict]) -> Dat
 async def import_datasources_from_env():
     connection_info = os.getenv("IQENGINE_CONNECTION_INFO", None)
     base_filepath = os.getenv("IQENGINE_BACKEND_LOCAL_FILEPATH", None)
-    base_filepath = base_filepath.replace('"','')
+    base_filepath = base_filepath.replace('"','') if base_filepath else None
 
     # Add another random delay for good measure, we kept having ones start really close together
     time.sleep(random.randint(0, 10000) / 1000) # 0-10 seconds, to greatly reduce risk of duplicates
