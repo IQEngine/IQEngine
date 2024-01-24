@@ -99,7 +99,7 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
       const start = annotation['core:sample_start'] / fftSize;
       const end = annotation['core:sample_count'] / fftSize + start;
 
-      const visible = start < maximumFFT || end > minimumFFT;
+      const visible = start < maximumFFT && end > minimumFFT;
       const labelVisible = (start > minimumFFT && start < maximumFFT) || (end < maximumFFT && end > minimumFFT);
 
       return {
@@ -289,55 +289,55 @@ const AnnotationViewer = ({ currentFFT }: AnnotationViewerProps) => {
               />
               {/* Label */}
               {annotation.labelVisible && (
-              <>
-              <Html>
-                <div
-                  className={annotation.comment ? 'tooltip tooltip-bottom tooltip-accent absolute' : 'absolute'}
-                  data-tip={annotation.shortComment}
-                  id={index.toString()}
-                  onClick={onAnnotationLabelClick}
-                  style={{
-                    top: annotation.y1 - 23,
-                    left: annotation.x1 * spectrogramWidth,
-                    color: selectedAnnotation == index ? 'pink' : 'black',
-                  }}
-                >
-                  <p
-                    className="font-serif font-bold"
-                    style={{
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {annotation.label}
-                  </p>
-                </div>
-              </Html>
-              <>
-              {editAnnotationLabelId === index.toString() && (
-                <Html>
-                  <div
-                    className="form-control w-full max-w-xs"
-                    style={{
-                      top: annotation.y1 - 50,
-                      left: annotation.x1 * spectrogramWidth,
-                      position: 'absolute',
-                    }}
-                  >
-                    <label style={{ width: '200px', fontSize: '16px' }}>
-                      <span>Hit Enter to Finish</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={editAnnotationLabelText}
-                      onChange={(e) => setEditAnnotationLabelText(e.target.value)}
-                      onKeyDown={onAnnotationsLabelKeyDown}
-                      style={{ width: '200px', fontSize: '16px', color: 'black' }}
-                    />
-                  </div>
-                </Html>
-              )}
-              </>
-              </>
+                <>
+                  <Html>
+                    <div
+                      className={annotation.comment ? 'tooltip tooltip-bottom tooltip-accent absolute' : 'absolute'}
+                      data-tip={annotation.shortComment}
+                      id={index.toString()}
+                      onClick={onAnnotationLabelClick}
+                      style={{
+                        top: annotation.y1 - 23,
+                        left: annotation.x1 * spectrogramWidth,
+                        color: selectedAnnotation == index ? 'pink' : 'black',
+                      }}
+                    >
+                      <p
+                        className="font-serif font-bold"
+                        style={{
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {annotation.label}
+                      </p>
+                    </div>
+                  </Html>
+                  <>
+                    {editAnnotationLabelId === index.toString() && (
+                      <Html>
+                        <div
+                          className="form-control w-full max-w-xs"
+                          style={{
+                            top: annotation.y1 - 50,
+                            left: annotation.x1 * spectrogramWidth,
+                            position: 'absolute',
+                          }}
+                        >
+                          <label style={{ width: '200px', fontSize: '16px' }}>
+                            <span>Hit Enter to Finish</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={editAnnotationLabelText}
+                            onChange={(e) => setEditAnnotationLabelText(e.target.value)}
+                            onKeyDown={onAnnotationsLabelKeyDown}
+                            style={{ width: '200px', fontSize: '16px', color: 'black' }}
+                          />
+                        </div>
+                      </Html>
+                    )}
+                  </>
+                </>
               )}
             </Fragment>
           )
