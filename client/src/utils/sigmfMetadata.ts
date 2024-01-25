@@ -65,7 +65,7 @@ export class SigMFMetadata {
   }
 
   getSampleRate() {
-    return Number(this.global['core:sample_rate'] ?? 1e6);
+    return Number(this.global['core:sample_rate'] ?? 1);
   }
 
   getTotalSamples() {
