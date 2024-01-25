@@ -112,8 +112,7 @@
           "$id": "#/properties/global/properties/core%3Aversion",
           "description": "The SHA512 hash of the Dataset file associated with the SigMF file.",
           "default": "1.0.0",
-          "type": "string",
-          "enum": ["1.0.0"]
+          "type": "string"
         },
         "core:extensions": {
           "$id": "#/properties/global/properties/core%3Aextensions",

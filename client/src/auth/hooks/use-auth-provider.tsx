@@ -10,6 +10,10 @@ export const AuthProvider = ({ children }) => {
     console.log('WARNING- HTTP MODE! MSAL WILL NOT WORK!');
     return <>{children}</>;
   }
+  if (typeof window.crypto.randomUUID === 'undefined') {
+    console.log('WARNING- window.crypto.randomUUID was not found, MSAL WILL NOT WORK!');
+    return <>{children}</>;
+  }
 
   const config = useConfigQuery();
   const msalInstance = new PublicClientApplication(msalConfig(config));
