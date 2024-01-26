@@ -127,8 +127,9 @@ class AzureBlobClient:
 
     async def get_new_thumbnail(self, data_type: str, filepath: str) -> bytes:
         iq_path = get_file_name(filepath, ApiType.IQDATA)
-        fftSize = 1024
-        content = await self.get_blob_content(iq_path, 8000, fftSize * 512)
+        fftSize = 512
+        skip_bytes = 256000 # sort of arbitrary, want to avoid weird stuff that happens at the beginning of signal, must be an integer multiple of 16!!
+        content = await self.get_blob_content(iq_path, skip_bytes, fftSize * 1024) # it's not going to be 1024 rows, for f32 its 128 rows and for int16 its 256 rows
         return get_spectrogram_image(content, data_type, fftSize)
 
     async def get_metadata_files(self):
