@@ -2,10 +2,7 @@ import base64
 
 import numpy as np
 from pydantic.dataclasses import dataclass
-from scipy import signal
 from scipy.io.wavfile import write
-import io
-import json
 import random
 import string
 import os
@@ -41,8 +38,6 @@ class Plugin:
         time.sleep(0.1) # I don't think any sleep is nessesary, tofile is blocking
         if os.stat(temp_filename).st_size != len(x) * 8:
             raise fastapi.HTTPException(status_code=500, detail="tempfile wasnt the expected size")
-        
-
 
         temp_output_dir = '/tmp/' + ''.join(random.choices(string.ascii_uppercase + string.digits, k=10)) + '/'
         os.mkdir(temp_output_dir)
@@ -63,28 +58,18 @@ class Plugin:
                     snr_dB_str = logs[snr_start_indx + 10:snr_start_indx+snr_stop_indx-2].strip()[:-3].strip()
                     snr_dB = float(snr_dB_str)
 
-
-            # Analyze results directory
+            # Analyze results directory STOPPED HERE BECAUSE I HAD ISSUES GETTING IT TO PROVIDE A FULL RESULTS IMAGE UNLESS IT GOT A HUGE AMOUNT OF SAMPLES
             #if self.pipeline_id == 'aqua_db':
-                
 
-
-            # Create wav file out of real samples
-            #byte_io = io.BytesIO(bytes())
-            #write(byte_io, 48000, x)
-
-            samples_obj = {
-                #"samples": base64.b64encode(byte_io.read()),
-                #"data_type": "audio/wav",
-            }
-            
             # Cleanup
             if os.path.exists(temp_filename):
                 os.remove(temp_filename)
-            exit()
+
             if os.path.exists(temp_output_dir) and os.path.isdir(temp_output_dir):
                 shutil.rmtree(temp_output_dir)
 
+            # TODO
+            samples_obj = {}
             return {"data_output": [samples_obj], "annotations": []}
 
         except Exception as err:
@@ -111,7 +96,6 @@ if __name__ == "__main__":
     sample_rate = 36e6
     center_freq = 1262.5e6
     params = {'sample_rate': sample_rate, 'center_freq': center_freq, 'pipeline_id': 'terra_db'}
-
 
     detector = Plugin(**params)
     ret = detector.run(samples)

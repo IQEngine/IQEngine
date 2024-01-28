@@ -1,7 +1,3 @@
-// Copyright (c) 2022 Microsoft Corporation
-// Copyright (c) 2023 Marc Lichtman
-// Licensed under the MIT License
-
 import React, { useState, useEffect } from 'react';
 import { useConfigQuery } from '@/api/config/queries';
 import { newPipeline, AnonymousCredential, BlockBlobClient } from '@azure/storage-blob';
