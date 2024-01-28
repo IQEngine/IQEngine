@@ -25,7 +25,13 @@ export const fetchDataSource = async (client: DataSourceClient, account: string,
   return response;
 };
 
-const fetchSasToken = async (client: DataSourceClient, account: string, container: string, filepath: string, write: boolean = false) => {
+const fetchSasToken = async (
+  client: DataSourceClient,
+  account: string,
+  container: string,
+  filepath: string,
+  write: boolean = false
+) => {
   const response = await client.getSasToken(account, container, filepath, write);
   return response;
 };
@@ -54,7 +60,14 @@ export const getDataSource = (type: string, account: string, container: string, 
   );
 };
 
-export const useSasToken = (type: string, account: string, container: string, filepath: string, write: boolean = false, enabled = true) => {
+export const useSasToken = (
+  type: string,
+  account: string,
+  container: string,
+  filepath: string,
+  write: boolean = false,
+  enabled = true
+) => {
   const { dataSourcesQuery, filesQuery } = useUserSettings();
   const { instance } = useMsal();
   const client = DataSourceClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance);
@@ -97,6 +110,14 @@ export const useSyncDataSource = (type: string, account: string, container) => {
   const { instance } = useMsal();
   const client = DataSourceClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance);
   return () => client.sync(account, container);
+};
+
+// only implemented for API type
+export const useSyncAllDataSource = () => {
+  const { dataSourcesQuery, filesQuery } = useUserSettings();
+  const { instance } = useMsal();
+  const client = DataSourceClientFactory('api', filesQuery.data, dataSourcesQuery.data, instance);
+  return () => client.syncAll();
 };
 
 export const useGetDataSource = (type: string, account: string, container: string) => {
@@ -147,7 +168,7 @@ export const useUploadDataSource = (type: string, account: string, container: st
   const { instance } = useMsal();
   const dataSourceClient = DataSourceClientFactory(ClientType.API, filesQuery.data, dataSourcesQuery.data, instance);
 
-  async function uploadBlob(f:FileWithHandle, account, container) {
+  async function uploadBlob(f: FileWithHandle, account, container) {
     // Create azure blob client
     const blobName = f.name;
     const sas_token = await fetchSasToken(dataSourceClient, account, container, blobName, true); // Note - it needs ADD, CREATE, WRITE
@@ -172,7 +193,6 @@ export const useUploadDataSource = (type: string, account: string, container: st
     }
     await blockBlobClient.commitBlockList(blockIds);
     setProgress(100);
-
   }
 
   const uploadFiles = async () => {

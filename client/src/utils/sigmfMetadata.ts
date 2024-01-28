@@ -38,6 +38,16 @@ export class SigMFMetadata {
   dataFileHandle?: FileWithDirectoryAndFileHandle;
   dataClient?: BlobClient;
 
+  getCapture(sampleStart: number): CaptureSegment {
+    let capture = this.captures[0];
+    for (let c of this.captures) {
+      if (c['core:sample_start'] > sampleStart) break;
+
+      capture = c;
+    }
+    return capture;
+  }
+
   getBytesPerIQSample(): number {
     return dataTypeToBytesPerIQSample(this.global['core:datatype']) ?? 2;
   }
@@ -55,7 +65,7 @@ export class SigMFMetadata {
   }
 
   getSampleRate() {
-    return Number(this.global['core:sample_rate'] ?? 1e6);
+    return Number(this.global['core:sample_rate'] ?? 1);
   }
 
   getTotalSamples() {
@@ -66,7 +76,9 @@ export class SigMFMetadata {
     return Number(this.captures[0]['core:frequency'] ?? 1e6);
   }
   getAuthor() {
-    return String(this.global['core:author'] ?? '');
+    return String(this.global['core:author'] ?? '')
+      .replace('<', '')
+      .replace('>', '');
   }
   getFilePath() {
     return this.global['traceability:origin'].file_path;

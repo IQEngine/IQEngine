@@ -16,6 +16,7 @@ from helpers.urlmapping import ApiType, get_content_type, get_file_name
 from pydantic import BaseModel, SecretStr
 from helpers.samples import get_bytes_per_iq_sample
 
+# Why is this needed here and in main.py?
 router = APIRouter(route_class=CancelOnDisconnectRoute)
 
 

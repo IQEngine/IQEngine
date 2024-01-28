@@ -4,10 +4,10 @@ import matplotlib.pyplot as plt
 from PIL import Image
 
 def get_samples(data_bytes, data_type) -> np.ndarray:
-    if data_type == "ci8" or data_type == "i8":
+    if data_type == "ci8" or data_type == "ci8_le" or data_type == "i8":
         samples = np.frombuffer(data_bytes, dtype=np.int8)
         samples = samples[::2] + 1j * samples[1::2]
-    elif data_type == "cu8" or data_type == "u8":
+    elif data_type == "cu8" or data_type == "cu8_le" or data_type == "u8":
         samples = np.frombuffer(data_bytes, dtype=np.uint8)
         samples = samples[::2] + 1j * samples[1::2]
     elif data_type == "ci16" or data_type == "ci16_le":
@@ -34,14 +34,16 @@ def get_samples(data_bytes, data_type) -> np.ndarray:
     return samples
 
 def get_bytes_per_iq_sample(data_type):
-    if data_type == "cf32_le" or data_type == "cf32" or data_type == "cf32_be":
+    if "64" in data_type:
+        return 16
+    elif "32" in data_type:
         return 8
-    elif data_type == "ci16_le" or data_type == "ci16" or data_type == "ci16_be":
+    elif "16" in data_type:
         return 4
-    elif data_type == "ci8" or data_type == "i8":
+    elif "8" in data_type:
         return 2
     else:
-        raise ValueError("Datatype " + data_type + " not implemented")
+        raise ValueError("within get_bytes_per_iq_sample, didn't see 64 or 32 or 16 or 8")
 
 def get_spectrogram_image(
     content: bytes,
@@ -60,7 +62,7 @@ def get_spectrogram_image(
     ax = plt.Axes(fig, [0.0, 0.0, 1.0, 1.0])
     ax.set_axis_off()
     fig.add_axes(ax)
-    ax.imshow(spectrogram, cmap=cmap, aspect="auto", vmin=30 + np.min(np.min(spectrogram)))
+    ax.imshow(spectrogram, cmap=cmap, aspect="auto", vmin=30+np.min(np.min(spectrogram)))
     img_buf = io.BytesIO()
     plt.savefig(img_buf, bbox_inches="tight", pad_inches=0)
     img_buf.seek(0)

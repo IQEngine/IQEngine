@@ -9,5 +9,6 @@ export interface DataSourceClient {
   create(dataSource: DataSource): Promise<DataSource>;
   update(dataSource: DataSource): Promise<DataSource>;
   sync(account: string, container: string): Promise<void>;
+  syncAll(): Promise<void>;
   features(): { updateMeta: boolean; sync: boolean; query: boolean };
 }

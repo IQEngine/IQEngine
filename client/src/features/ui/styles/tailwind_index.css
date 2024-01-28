@@ -52,10 +52,6 @@
     @apply !text-base-content font-bold text-center;
   }
 
-  .flex-one {
-    @apply w-64 m-8 flex-auto;
-  }
-
   .repocard {
     @apply card rounded-xl w-72 m-3 bg-neutral bg-opacity-50 outline-secondary outline-1 outline;
   }
@@ -114,5 +110,9 @@
 
   .thumb::-moz-range-thumb {
     @apply bg-accent cursor-pointer h-4 w-4 mt-1 pointer-events-auto relative rounded-lg appearance-none;
+  }
+
+  code {
+    background-color: rgba(255, 255, 255, 0.2);
   }
 }

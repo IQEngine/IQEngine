@@ -29,6 +29,7 @@ async def get_config():
     if feature_flags:
         configuration.feature_flags = json.loads(feature_flags)
 
+    # Add the environment variables that are not part of IQENGINE_FEATURE_FLAGS
     configuration.google_analytics_key = os.getenv(
         "IQENGINE_GOOGLE_ANALYTICS_KEY", configuration.google_analytics_key
     )

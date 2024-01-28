@@ -22,15 +22,15 @@ export const FeatureFlag = {
     description: 'Display Internal Branding',
     default: false,
   },
-  useAPIDatasources: {
-    name: 'useAPIDatasources',
-    description: 'Use API Datasources',
-    default: true,
-  },
   bypassLandingPage: {
     name: 'bypassLandingPage',
     description: 'Bypass Landing Page',
     default: true,
+  },
+  allowRefreshing: {
+    name: 'allowRefreshing',
+    description: 'Allows anyone to refresh the datasources using a button at the top-right',
+    default: false,
   },
 };
 

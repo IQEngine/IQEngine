@@ -12,7 +12,7 @@
 
 <p align="center"><b><i>A web-based SDR toolkit for analyzing, processing, and sharing RF recordings</i></b></p>
 
-<p align="center"><b><i>🔎Try it out at <a href="https://iqengine.org">iqengine.org</a>🔎</i></b></p>
+<p align="center">🔎<b><i>Try it out at <a href="https://iqengine.org">iqengine.org</a></i></b>🔎</p>
 
 IQEngine is a web application that powers <a href="https://iqengine.org">iqengine.org</a> but can also be deployed as a private instance to share recordings within a company/organization.  The public instance, <a href="https://iqengine.org">iqengine.org</a>, is used by thousands each month to browse RF recordings shared by the community, although you can also use the site to visualize your own local files (processing is done client-side).  It includes a spectrogram-based visualization and editor tool, built on top of the [SigMF](https://github.com/gnuradio/SigMF) standard.  Use IQEngine to expand your knowledge of wireless signals and how to analyze/process them, while learning more about FFTs, filtering, and other RF DSP.  IQEngine's goal is to bring the open-source RF community together.
 

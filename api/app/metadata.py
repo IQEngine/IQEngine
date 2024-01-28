@@ -55,42 +55,9 @@ async def get_metadata(account, container, filepath, access_allowed=Depends(chec
     return Metadata(**metadata)
 
 
-async def exists(account, container, filepath, access_allowed=Depends(check_access)) -> bool:
-    """
-    Check if a metadata exists by account, container and filepath
-
-    Parameters
-    ----------
-    account : str
-        The account name.
-    container : str
-        The container name.
-    filepath : str
-        The filepath
-
-    Returns
-    -------
-    bool
-        True if the metadata exists, False otherwise.
-    """
-    if access_allowed is None:
-        return False
-
-    metadata_collection: AgnosticCollection = collection()
-    metadata = await metadata_collection.find_one(
-        {
-            "global.traceability:origin.account": account,
-            "global.traceability:origin.container": container,
-            "global.traceability:origin.file_path": filepath,
-        },
-        {"_id": 1},
-    )
-    return metadata is not None
-
-
 async def create(metadata: Metadata, user: str):
     """
-    Create a new metadata. The metadata will be henceforth identified by account/container/filepath which
+    Create or updates a metadata. The metadata will be henceforth identified by account/container/filepath which
     must be unique or this function will throw an exception.
 
     This function will also create a new version of the metadata in the versions collection.
@@ -104,22 +71,25 @@ async def create(metadata: Metadata, user: str):
     -------
     None
     """
+    if Depends(check_access) is None:
+        return False
+    
     if metadata.globalMetadata.traceability_origin is None:
         raise Exception("Metadata must have origin")
 
-    if await exists(
-        metadata.globalMetadata.traceability_origin.account,
-        metadata.globalMetadata.traceability_origin.container,
-        metadata.globalMetadata.traceability_origin.file_path,
-    ):
-        raise Exception("Metadata Already Exists")
-
     metadata_collection: AgnosticCollection = collection()
-    versions: AgnosticCollection = versions_collection()
 
-    await metadata_collection.insert_one(
-        metadata.dict(by_alias=True, exclude_unset=True)
-    )
+    account = metadata.globalMetadata.traceability_origin.account
+    container = metadata.globalMetadata.traceability_origin.container
+    filepath = metadata.globalMetadata.traceability_origin.file_path
+    filter = {
+            "global.traceability:origin.account": account,
+            "global.traceability:origin.container": container,
+            "global.traceability:origin.file_path": filepath,
+        } # {"_id": 1},
+
+    # Either creates or updates based on whether it exists
+    await metadata_collection.replace_one(filter=filter, replacement=metadata.dict(by_alias=True, exclude_unset=True), upsert=True)
 
     # audit document
     audit_document = {
@@ -128,6 +98,7 @@ async def create(metadata: Metadata, user: str):
         "action": "create",
     }
 
+    versions: AgnosticCollection = versions_collection()
     await versions.insert_one(audit_document)
 
 

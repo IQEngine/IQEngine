@@ -1,7 +1,5 @@
 from typing import List, Optional
-
-from pydantic import BaseModel, Extra, Field, SecretStr
-
+from pydantic import BaseModel, Extra, Field, SecretStr, validator
 
 class DataSource(BaseModel):
     type: str
@@ -28,7 +26,7 @@ class MetadataGlobal(BaseModel):
     antenna_gain: float | None = Field(alias="antenna:gain")
     antenna_type: str | None = Field(alias="antenna:type")
     core_datatype: str = Field(alias="core:datatype")
-    core_sample_rate: int = Field(alias="core:sample_rate")
+    core_sample_rate: int | None = Field(alias="core:sample_rate")
     core_version: str = Field(alias="core:version")
     core_num_channels: int | None = Field(alias="core:num_channels")
     core_sha512: str | None = Field(alias="core:sha512")
@@ -53,6 +51,17 @@ class MetadataGlobal(BaseModel):
     class Config:
         extra = Extra.allow
 
+    # If someone has a dict as their core:extensions then dont error out, just treat it as no extensions
+    @validator('core_extensions', pre=True)
+    def validate_age(cls, v):
+        if isinstance(v, dict):
+            v = []
+        return v
+
+    # If sample_rate is left out, set it to 1, since SigMF doesn't actually require it
+    @validator('core_sample_rate')
+    def default_core_sample_rate(cls, v):
+        return v or 1.0
 
 class MetadataCapture(BaseModel):
     core_sample_start: int = Field(alias="core:sample_start")

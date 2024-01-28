@@ -5,6 +5,16 @@ import { MsalProvider } from '@azure/msal-react';
 import React from 'react';
 
 export const AuthProvider = ({ children }) => {
+  // Without this, IQEngine wont work when deployed onprem without https set up (unless localhost is used)
+  if (window.location.protocol === 'http:') {
+    console.log('WARNING- HTTP MODE! MSAL WILL NOT WORK!');
+    return <>{children}</>;
+  }
+  if (typeof window.crypto.randomUUID === 'undefined') {
+    console.log('WARNING- window.crypto.randomUUID was not found, MSAL WILL NOT WORK!');
+    return <>{children}</>;
+  }
+
   const config = useConfigQuery();
   const msalInstance = new PublicClientApplication(msalConfig(config));
 

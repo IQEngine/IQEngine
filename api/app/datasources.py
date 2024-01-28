@@ -1,5 +1,4 @@
 from typing import Optional
-import asyncio
 import json
 import os
 import time
@@ -29,7 +28,7 @@ async def datasource_exists(account, container) -> bool:
     return await get(account, container) is not None
 
 async def sync(account: str, container: str):
-    from .metadata import exists, create
+    from .metadata import create
 
     print(f"[SYNC] Starting sync for {account}/{container} on PID {os.getpid()} at {time.time()}")
     azure_blob_client = AzureBlobClient(account, container)
@@ -39,13 +38,10 @@ async def sync(account: str, container: str):
         return
     if datasource.sasToken:
         azure_blob_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
-    metadatas = azure_blob_client.get_metadata_files()
+    metadatas = azure_blob_client.get_metadata_files() # this includes parsing of all the metadata
     async for metadata in metadatas:
         filepath = metadata[0].replace(".sigmf-meta", "")
         try:
-            if await exists(account, container, filepath):
-                print(f"[SYNC] Metadata already exists for {filepath}")
-                continue
             if not await azure_blob_client.blob_exist(filepath + ".sigmf-data"):
                 print(f"[SYNC] Data file {filepath} does not exist for metadata file")
                 continue
@@ -63,14 +59,14 @@ async def sync(account: str, container: str):
             metadata.globalMetadata.traceability_sample_length = (
                 file_length / get_bytes_per_iq_sample(metadata.globalMetadata.core_datatype)
             )
-            await create(metadata, user=None)
-            #print(f"[SYNC] Created metadata for {filepath}")
+            await create(metadata, user=None) # creates or updates the metadata object
+            #print(f"[SYNC] Created metadata for {filepath}") # commented out, caused too much spam
         except Exception as e:
             print(f"[SYNC] Error creating metadata for {filepath}: {e}")
 
     print(f"[SYNC] Finished syncing {account}/{container}")
 
-async def create(datasource: DataSource, user: Optional[dict]) -> DataSource:
+async def create_datasource(datasource: DataSource, user: Optional[dict]) -> DataSource:
     """
     Create a new datasource. The datasource will be henceforth identified by account/container which
     must be unique or this function will return a 400.
@@ -104,12 +100,13 @@ async def create(datasource: DataSource, user: Optional[dict]) -> DataSource:
 async def import_datasources_from_env():
     connection_info = os.getenv("IQENGINE_CONNECTION_INFO", None)
     base_filepath = os.getenv("IQENGINE_BACKEND_LOCAL_FILEPATH", None)
+    base_filepath = base_filepath.replace('"','') if base_filepath else None
 
     # Add another random delay for good measure, we kept having ones start really close together
     time.sleep(random.randint(0, 10000) / 1000) # 0-10 seconds, to greatly reduce risk of duplicates
 
     # Add datasource corresponding to the local backend storage
-    if base_filepath:
+    if base_filepath and os.path.exists(base_filepath):
         try:
             if not await datasource_exists('local', 'local'):
                 datasource = DataSource(
@@ -127,7 +124,7 @@ async def import_datasources_from_env():
                 )
                 # Check one more time that it doesn't exist yet (the above block can take 0.1s or more)
                 if not await datasource_exists('local', 'local'):
-                    create_ret = await create(datasource=datasource, user=None)
+                    create_ret = await create_datasource(datasource=datasource, user=None)
                     if create_ret:
                         await sync("local", "local")
         except Exception as e:
@@ -135,7 +132,7 @@ async def import_datasources_from_env():
 
     # Add all cloud datasources
     if connection_info:
-        for connection in json.loads(connection_info)["settings"]:
+        for connection in json.loads(connection_info).get("settings", []):
             try:
                 if await datasource_exists(connection["accountName"], connection["containerName"]):
                     continue
@@ -158,7 +155,7 @@ async def import_datasources_from_env():
                 if await datasource_exists(connection["accountName"], connection["containerName"]):
                     continue
                 # It's important to immediately add it to the db so other workers see it and dont add a duplicate
-                create_ret = await create(datasource=datasource, user=None)
+                create_ret = await create_datasource(datasource=datasource, user=None)
                 # This should only get triggered once (one worker)
                 if create_ret:
                     await sync(connection["accountName"], connection["containerName"])

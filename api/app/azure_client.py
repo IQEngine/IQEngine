@@ -23,6 +23,7 @@ class AzureBlobClient:
         self.clients: dict[str, BlobClient] = {}
         if account == "local":
             self.base_filepath = os.getenv("IQENGINE_BACKEND_LOCAL_FILEPATH", None)
+            self.base_filepath = self.base_filepath.replace('"','')
             if not self.base_filepath:
                 raise Exception("IQENGINE_BACKEND_LOCAL_FILEPATH must be set to use local")
 
@@ -126,8 +127,9 @@ class AzureBlobClient:
 
     async def get_new_thumbnail(self, data_type: str, filepath: str) -> bytes:
         iq_path = get_file_name(filepath, ApiType.IQDATA)
-        fftSize = 1024
-        content = await self.get_blob_content(iq_path, 8000, fftSize * 512)
+        fftSize = 512
+        skip_bytes = 256000 # sort of arbitrary, want to avoid weird stuff that happens at the beginning of signal, must be an integer multiple of 16!!
+        content = await self.get_blob_content(iq_path, skip_bytes, fftSize * 1024) # it's not going to be 1024 rows, for f32 its 128 rows and for int16 its 256 rows
         return get_spectrogram_image(content, data_type, fftSize)
 
     async def get_metadata_files(self):
@@ -137,7 +139,8 @@ class AzureBlobClient:
                 for name in files:
                     if name.endswith(".sigmf-meta"):
                         metadata = await self.get_metadata_file(os.path.join(path, name))
-                        yield os.path.join(path, name).replace(self.base_filepath, '')[1:], metadata
+                        if metadata:
+                            yield os.path.join(path, name).replace(self.base_filepath, '')[1:], metadata
             return
 
         # Azure blobs
@@ -147,7 +150,8 @@ class AzureBlobClient:
             if blob.name.endswith(".sigmf-meta"):
                 try:
                     metadata = await self.get_metadata_file(blob.name)
-                    yield str(blob.name), metadata
+                    if metadata:
+                        yield str(blob.name), metadata
                 except Exception as e:
                     print(f"Error while reading metadata file {blob.name}: {e}")
         return
@@ -162,7 +166,12 @@ class AzureBlobClient:
             blob_client = self.get_blob_client(filepath)
             blob = await blob_client.download_blob()
             content = await blob.readall()
-        return Metadata.parse_raw(content)
+        try:
+            metadata = Metadata.parse_raw(content) # Metadata is a pydantic model, parse_raw parses a string of the JSON into the pydantic model
+        except Exception as e:
+            print(f"Error parsing metadata file {filepath}: {e}") # this will give specific reasons parsing failed, it eventually needs to get put in a log or something
+            return None
+        return metadata
 
     async def blob_exist(self, filepath):
         if self.account == "local":

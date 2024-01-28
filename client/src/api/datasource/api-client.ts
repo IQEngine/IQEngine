@@ -18,6 +18,14 @@ export class ApiClient implements DataSourceClient {
       url: `/api/datasources/${account}/${container}/sync`,
     });
   }
+
+  async syncAll(): Promise<void> {
+    await this.authUtil.requestWithAuthIfRequired({
+      method: 'put',
+      url: `/api/datasources/syncAll`,
+    });
+  }
+
   async query(queryString: string, signal: AbortSignal): Promise<TraceabilityOrigin[]> {
     const response = await this.authUtil.requestWithAuthIfRequired({
       method: 'get',
@@ -29,6 +37,7 @@ export class ApiClient implements DataSourceClient {
       return item;
     });
   }
+
   async list(): Promise<DataSource[]> {
     const response = await this.authUtil.requestWithAuthIfRequired({
       method: 'get',
@@ -42,6 +51,7 @@ export class ApiClient implements DataSourceClient {
     }
     return response.data;
   }
+
   async get(account: string, container: string): Promise<DataSource> {
     const response = await this.authUtil.requestWithAuthIfRequired({
       method: 'get',
@@ -55,6 +65,7 @@ export class ApiClient implements DataSourceClient {
     }
     return response.data;
   }
+
   async getSasToken(account: string, container: string, filepath: string, write: boolean): Promise<Object> {
     try {
       const response = await this.authUtil.requestWithAuthIfRequired({
@@ -65,16 +76,15 @@ export class ApiClient implements DataSourceClient {
         return null;
       }
 
-      return response
-
+      return response;
     } catch (error) {
-      const status = error.response.status
+      const status = error.response.status;
       if (status !== 200) {
         throw new Error(`Unexpected status code: ${status}`);
       }
     }
-
   }
+
   async update(dataSource: DataSource): Promise<DataSource> {
     const response = await this.authUtil.requestWithAuthIfRequired({
       method: 'put',
@@ -86,6 +96,7 @@ export class ApiClient implements DataSourceClient {
     }
     return response.data;
   }
+
   async create(dataSource: DataSource): Promise<DataSource> {
     const response = await this.authUtil.requestWithAuthIfRequired({
       method: 'post',
@@ -100,6 +111,7 @@ export class ApiClient implements DataSourceClient {
     }
     return response.data;
   }
+
   features() {
     return {
       updateMeta: true,

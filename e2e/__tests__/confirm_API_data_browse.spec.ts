@@ -2,7 +2,6 @@ import { test, expect } from '@playwright/test';
 import { MongoClient, Db } from 'mongodb';
 import dotenv from 'dotenv';
 import dotenvExpand from 'dotenv-expand';
-import { skipLandingPage } from '../common-steps';
 
 test.beforeAll(async ({ request }) => {
   const dataSource = {
@@ -17,8 +16,7 @@ test.beforeAll(async ({ request }) => {
 });
 
 test('API Datasource Browsing @CICompatible', async ({ page }) => {
-  await page.goto('/');
-  skipLandingPage(page);
+  await page.goto('/browser');
   await page.locator('[id="TestAPIDataSource"]').first().click(); // After first run there will be more than one element by this name
   await expect(page.getByText('Author')).toBeDefined();
 });

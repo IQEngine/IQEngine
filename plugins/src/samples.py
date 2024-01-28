@@ -49,6 +49,7 @@ async def get_from_samples_cloud(samples_cloud: SamplesCloud) -> np.ndarray:
 
 def get_from_backend_server(file_path, offset, length, data_type):
     base_filepath = os.getenv("IQENGINE_BACKEND_LOCAL_FILEPATH", None)
+    base_filepath = base_filepath.replace('"','')
     if not base_filepath:
         raise Exception("IQENGINE_BACKEND_LOCAL_FILEPATH not set")
     dtype = data_mapping[data_type]
