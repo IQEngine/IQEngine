@@ -53,5 +53,5 @@ def get_from_backend_server(file_path, offset, length, data_type):
     if not base_filepath:
         raise Exception("IQENGINE_BACKEND_LOCAL_FILEPATH not set")
     dtype = data_mapping[data_type]
-    count = length // np.dtype(dtype).itemsize
+    count = length // (np.dtype(dtype).itemsize * 2)
     return np.fromfile(os.path.join(base_filepath, file_path + '.sigmf-data'), dtype=dtype, count=count, offset=offset)
