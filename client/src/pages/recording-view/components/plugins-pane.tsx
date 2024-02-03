@@ -32,6 +32,7 @@ export enum MimeTypes {
   cf32 = 'iq/cf32',
   cf32_le = 'iq/cf32_le',
   audio_wav = 'audio/wav',
+  image_png = 'image/png',
 }
 
 export const PluginsPane = () => {
@@ -254,7 +255,9 @@ export const PluginsPane = () => {
                 case MimeTypes.audio_wav:
                   ext = 'wav';
                   break;
-
+                case MimeTypes.image_png:
+                  ext = 'png';
+                  break;
                 default:
                   toast.error(`The plugins pane doesn't handle the mime type ${data_type} output by the plugin.`);
                   break;
