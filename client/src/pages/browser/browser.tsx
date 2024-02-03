@@ -138,7 +138,7 @@ export const Browser = () => {
           <div className="grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-10 justify-items-center text-lg text-white">
             <SiggenTile />
             <ValidatorTile />
-            <WebfftBenchmarkTile />
+            {/*<WebfftBenchmarkTile />*/}
             <ConverterTile />
           </div>
         </ModalDialog>

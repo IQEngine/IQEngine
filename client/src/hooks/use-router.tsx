@@ -119,6 +119,7 @@ export function useRouter() {
             return { Component: Validator };
           },
         },
+        /*
         {
           path: 'webfftbenchmark',
           async lazy() {
@@ -126,6 +127,7 @@ export function useRouter() {
             return { Component: WebfftBenchmark };
           },
         },
+        */
         {
           index: true,
           async lazy() {
