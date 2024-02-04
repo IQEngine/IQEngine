@@ -27,10 +27,13 @@ class Plugin:
     center_freq: int = 0
 
     # custom params
-    pipeline_id: str = 'noaa_hrpt' # aqua_db, terra_db, aura_db, noaa_hrpt
+    pipeline_id: str = 'noaa_apt' # aqua_db, terra_db, aura_db, noaa_hrpt
 
     def run(self, x: np.ndarray):
         print("starting")
+
+        print(len(x))
+        print(x[100000])
 
         # TODO: use a ramdisk instead or something similar where its kept in memory, or figure out how to feed the live processing mode of satdump
         # Save to a temporary IQ file
@@ -47,6 +50,7 @@ class Plugin:
         try:
             # Run SatDump
             satdump_cmd = f"satdump {self.pipeline_id} baseband {temp_filename} {temp_output_dir} --samplerate {self.sample_rate} --baseband_format f32"
+            satdump_cmd += ' --freq_shift -120e3 --satellite_number 15' # ADDED FOR DEMO, REMOVE LATER OR ADD TO CUSTOM PARAMS
             print("Running satdump:", satdump_cmd)
             result = subprocess.run([satdump_cmd], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE) # this is blocking
             logs = result.stdout.decode('utf-8') + result.stderr.decode('utf-8') # for whatever reason all of satdumps output is in stderr
@@ -70,6 +74,11 @@ class Plugin:
                 final_output = temp_output_dir + 'AVHRR/AVHRR-1.png' # TODO FIGURE OUT CORRECT ONE
                 binary_fc = open(final_output, 'rb').read()
                 base64_utf8_str = base64.b64encode(binary_fc).decode('utf-8')
+            
+            if self.pipeline_id == 'noaa_apt':
+                final_output = temp_output_dir + 'avhrr_3_APT_channel_B.png'
+                binary_fc = open(final_output, 'rb').read()
+                base64_utf8_str = base64.b64encode(binary_fc).decode('utf-8')
 
             # Cleanup
             if os.path.exists(temp_filename):
@@ -88,8 +97,8 @@ class Plugin:
             print("Error running satdump:", err)
             if os.path.exists(temp_filename):
                 os.remove(temp_filename)
-            #if os.path.exists(temp_output_dir) and os.path.isdir(temp_output_dir):
-            #    shutil.rmtree(temp_output_dir)
+            if os.path.exists(temp_output_dir) and os.path.isdir(temp_output_dir):
+                shutil.rmtree(temp_output_dir)
             raise fastapi.HTTPException(status_code=500, detail="Error during satdump execution")
 
 # For testing
@@ -109,14 +118,15 @@ if __name__ == "__main__":
     #center_freq = 1262.5e6
     #params = {'sample_rate': sample_rate, 'center_freq': center_freq, 'pipeline_id': 'terra_db'}
 
-    # NOAA HRPT
-    samples = np.fromfile('/mnt/c/Users/marclichtman/Downloads/recordings/NOAA_HRPT.s16', dtype=np.int16)
-    samples = samples.astype(np.float32) / 1024
+    # NOAA noaa_apt 
+    samples = np.fromfile('/mnt/c/Users/marclichtman/Downloads/recordings/APT_2024-02-03_10-52-34.s16', dtype=np.int16)
+    samples = samples.astype(np.float32)
     samples = samples[::2] + 1j * samples[1::2]
+    samples /= np.max(np.abs(samples))
     print(max(samples))
-    sample_rate = 36e6
-    center_freq = 1262.5e6
-    params = {'sample_rate': sample_rate, 'center_freq': center_freq, 'pipeline_id': 'noaa_hrpt'}
+    sample_rate = 375000
+    center_freq = 137500000
+    params = {'sample_rate': sample_rate, 'center_freq': center_freq, 'pipeline_id': 'noaa_apt'}
 
     detector = Plugin(**params)
     ret = detector.run(samples)
