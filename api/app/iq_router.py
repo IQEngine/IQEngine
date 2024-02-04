@@ -231,6 +231,7 @@ async def get_minimap_iq(
                 decrypt(datasource.accountKey.get_secret_value())
             )
         minimap_iq_file = get_file_name(filepath, ApiType.MINIMAP)
+        # If minimap has already been generated
         if await azure_client.blob_exist(minimap_iq_file):
             blob = await azure_client.get_blob_content(filepath=minimap_iq_file)
             return Response(content=blob, media_type="application/octet-stream")
@@ -239,8 +240,9 @@ async def get_minimap_iq(
             bytes_per_sample = get_bytes_per_iq_sample(format)
             blob_size = await azure_client.get_file_length(file_name)
             total_ffts = math.floor(blob_size / (bytes_per_sample * fft_size))
-            # get 1000 ffts equally spaced out
-            block_indexes = [math.floor(i * total_ffts / 1000) for i in range(1000)]
+            # get N ffts equally spaced out
+            N = 200
+            block_indexes = [math.floor(i * total_ffts / N) for i in range(N)]
             # make sure that no block index it is larger than the total number of ffts
             block_indexes = [i for i in block_indexes if i < total_ffts]
             data = calculate_iq_data(
@@ -251,7 +253,6 @@ async def get_minimap_iq(
                 azure_client,
                 request,
             )
-
             content = io.BytesIO()
             async for chunk in data:
                 content.write(chunk)

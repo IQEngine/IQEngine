@@ -48,7 +48,7 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
     for (let i = 0; i < minimapData.length; i++) {
       iqData.set(minimapData[i], i * minimapData[i].length);
     }
-    const ffts_calc = calcFfts(iqData, MINIMAP_FFT_SIZE, windowFunction, 1000);
+    const ffts_calc = calcFfts(iqData, MINIMAP_FFT_SIZE, windowFunction, 100);
     const min = Math.min(...ffts_calc);
     const max = Math.max(...ffts_calc);
     setMagnitudeMin(min);
