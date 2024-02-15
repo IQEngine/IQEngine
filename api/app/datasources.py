@@ -78,18 +78,15 @@ async def sync(account: str, container: str):
             try:
                 metadata = Metadata.parse_raw(content) # Metadata is a pydantic model, parse_raw parses a string of the JSON into the pydantic model
             except Exception as e:
-                print(f"Error parsing metadata file {blob_client.blob_name}: {e}") # this will give specific reasons parsing failed, it eventually needs to get put in a log or something
+                print(f"Error parsing metadata file {meta_blob_name}: {e}") # this will give specific reasons parsing failed, it eventually needs to get put in a log or something
                 return None
             if metadata:
-                return (str(blob_client.blob_name), metadata)
+                return (meta_blob_name, metadata)
         coroutines = []
         for meta_blob_name in meta_blob_names: # Start all the coroutines that will fetch and parse the metadata
             coroutines.append(get_metadata(meta_blob_name))
         metadatas = await asyncio.gather(*coroutines) # Wait for all the coroutines to finish
-        for coroutine in coroutines:
-            coroutine.close() # Close all the coroutines, this is important to avoid unclosed connection errors NOT SURE THIS IS FIXING IT
 
-   
     for metadata in metadatas:
         filepath = metadata[0].replace(".sigmf-meta", "") #TODO: clean up the tuple messiness
         try:
@@ -116,6 +113,7 @@ async def sync(account: str, container: str):
             print(f"[SYNC] Error creating metadata for {filepath}: {e}")
 
     print(f"[SYNC] Finished syncing {account}/{container}")
+    await azure_blob_client.close_blob_clients() # Close all the blob clients to avoid unclosed connection errors
 
 async def create_datasource(datasource: DataSource, user: Optional[dict]) -> DataSource:
     """

@@ -79,6 +79,10 @@ class AzureBlobClient:
         self.clients[filepath] = blob_client
         return blob_client
 
+    async def close_blob_clients(self):
+        for client in self.clients.values():
+            await client.close()
+
     def get_container_client(self):
         if self.account == "local":
             return None
