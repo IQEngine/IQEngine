@@ -1,13 +1,14 @@
 import datetime
 from typing import Optional
 import os
-
+import time
 from azure.storage.blob import BlobProperties, BlobSasPermissions, generate_blob_sas
 from azure.storage.blob.aio import BlobClient, ContainerClient
 from .models import Metadata
 from helpers.urlmapping import ApiType, get_file_name
 from pydantic import SecretStr
 from helpers.samples import get_spectrogram_image
+from multiprocessing import Pool
 
 # IQEngine-oriented wrappers around the Azure BlobClient class.
 class AzureBlobClient:
@@ -120,7 +121,7 @@ class AzureBlobClient:
 
     async def upload_blob(self, filepath: str, data: bytes):
         if self.account == "local":
-            print("Cannot upload to local") # making this a raise() was causing delay
+            #print("Cannot upload to local") # making this a raise() was causing delay
             return
         blob_client = self.get_blob_client(filepath)
         await blob_client.upload_blob(data, overwrite=True)
@@ -131,47 +132,6 @@ class AzureBlobClient:
         skip_bytes = 256000 # sort of arbitrary, want to avoid weird stuff that happens at the beginning of signal, must be an integer multiple of 16!!
         content = await self.get_blob_content(iq_path, skip_bytes, fftSize * 1024) # it's not going to be 1024 rows, for f32 its 128 rows and for int16 its 256 rows
         return get_spectrogram_image(content, data_type, fftSize)
-
-    async def get_metadata_files(self):
-        # For local files
-        if self.account == "local":
-            for path, subdirs, files in os.walk(self.base_filepath):
-                for name in files:
-                    if name.endswith(".sigmf-meta"):
-                        metadata = await self.get_metadata_file(os.path.join(path, name))
-                        if metadata:
-                            yield os.path.join(path, name).replace(self.base_filepath, '')[1:], metadata
-            return
-
-        # Azure blobs
-        container_client = self.get_container_client()
-        # files that end with .sigmf-meta
-        async for blob in container_client.list_blobs():
-            if blob.name.endswith(".sigmf-meta"):
-                try:
-                    metadata = await self.get_metadata_file(blob.name)
-                    if metadata:
-                        yield str(blob.name), metadata
-                except Exception as e:
-                    print(f"Error while reading metadata file {blob.name}: {e}")
-        return
-
-    async def get_metadata_file(self, filepath: str):
-        if self.account == "local":
-            if '..' in filepath:
-                raise Exception("Invalid filepath")
-            with open(filepath, "r") as f:
-                content = f.read()
-        else:
-            blob_client = self.get_blob_client(filepath)
-            blob = await blob_client.download_blob()
-            content = await blob.readall()
-        try:
-            metadata = Metadata.parse_raw(content) # Metadata is a pydantic model, parse_raw parses a string of the JSON into the pydantic model
-        except Exception as e:
-            print(f"Error parsing metadata file {filepath}: {e}") # this will give specific reasons parsing failed, it eventually needs to get put in a log or something
-            return None
-        return metadata
 
     async def blob_exist(self, filepath):
         if self.account == "local":

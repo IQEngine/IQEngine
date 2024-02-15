@@ -3,13 +3,14 @@ import json
 import os
 import time
 import random
+import asyncio
 
 from .azure_client import AzureBlobClient
 from .models import DataSource, DataSourceReference
 from helpers.cipher import decrypt, encrypt
 from motor.core import AgnosticCollection
 from helpers.samples import get_bytes_per_iq_sample
-from .models import DataSource
+from .models import DataSource, Metadata
 
 def collection() -> AgnosticCollection:
     from .database import db
@@ -38,9 +39,59 @@ async def sync(account: str, container: str):
         return
     if datasource.sasToken:
         azure_blob_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
-    metadatas = azure_blob_client.get_metadata_files() # this includes parsing of all the metadata
-    async for metadata in metadatas:
-        filepath = metadata[0].replace(".sigmf-meta", "")
+    
+    #######################################
+    # Reading and Parsing Local Metafiles #
+    #######################################
+    if azure_blob_client.account == "local":
+        metadatas = []
+        for path, subdirs, files in os.walk(azure_blob_client.base_filepath):
+            for name in files:
+                if name.endswith(".sigmf-meta"):
+                    filepath = os.path.join(path, name)
+                    if '..' in filepath:
+                        raise Exception("Invalid filepath")
+                    with open(filepath, "r") as f:
+                        content = f.read()
+                    try:
+                        metadata = Metadata.parse_raw(content) # Metadata is a pydantic model, parse_raw parses a string of the JSON into the pydantic model
+                    except Exception as e:
+                        print(f"Error parsing metadata file {filepath}: {e}") # this will give specific reasons parsing failed, it eventually needs to get put in a log or something
+                        return None
+                    if metadata:
+                        metadatas.append((os.path.join(path, name).replace(azure_blob_client.base_filepath, '')[1:], metadata))
+    else:
+        ###################################################
+        # Reading and Parsing Azure Metafiles in Parallel #
+        ###################################################
+        container_client = azure_blob_client.get_container_client()
+        blob_names = container_client.list_blob_names()
+        meta_blob_names = []
+        async for blob_name in blob_names:
+            if blob_name.endswith(".sigmf-meta"):
+                meta_blob_names.append(blob_name)
+        print("found", len(meta_blob_names), "meta files") # the process above took about 15s for 36318 metas
+        async def get_metadata(meta_blob_name):
+            blob_client = container_client.get_blob_client(meta_blob_name)
+            blob = await blob_client.download_blob() # takes 0.04s on avg per call, on occasion ~1s
+            content = await blob.readall()
+            try:
+                metadata = Metadata.parse_raw(content) # Metadata is a pydantic model, parse_raw parses a string of the JSON into the pydantic model
+            except Exception as e:
+                print(f"Error parsing metadata file {blob_client.blob_name}: {e}") # this will give specific reasons parsing failed, it eventually needs to get put in a log or something
+                return None
+            if metadata:
+                return (str(blob_client.blob_name), metadata)
+        coroutines = []
+        for meta_blob_name in meta_blob_names: # Start all the coroutines that will fetch and parse the metadata
+            coroutines.append(get_metadata(meta_blob_name))
+        metadatas = await asyncio.gather(*coroutines) # Wait for all the coroutines to finish
+        for coroutine in coroutines:
+            coroutine.close() # Close all the coroutines, this is important to avoid unclosed connection errors NOT SURE THIS IS FIXING IT
+
+   
+    for metadata in metadatas:
+        filepath = metadata[0].replace(".sigmf-meta", "") #TODO: clean up the tuple messiness
         try:
             if not await azure_blob_client.blob_exist(filepath + ".sigmf-data"):
                 print(f"[SYNC] Data file {filepath} does not exist for metadata file")
