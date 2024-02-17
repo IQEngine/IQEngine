@@ -88,7 +88,8 @@ async def create(metadata: Metadata, user: str):
             "global.traceability:origin.file_path": filepath,
         } # {"_id": 1},
 
-    # Either creates or updates based on whether it exists
+
+    # Either creates or updates based on whether it exists (by replacing the entire document)
     await metadata_collection.replace_one(filter=filter, replacement=metadata.dict(by_alias=True, exclude_unset=True, exclude_none=True), upsert=True)
 
     # audit document
