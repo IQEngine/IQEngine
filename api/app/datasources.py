@@ -138,7 +138,7 @@ async def sync(account: str, container: str):
                 file_length = data_blob_sizes[filepath + ".sigmf-data"]
                 bytes_per_iq_sample = get_bytes_per_iq_sample(metadata.globalMetadata.core_datatype)
                 metadata.globalMetadata.traceability_sample_length = (file_length / bytes_per_iq_sample)
-                return metadata.dict(by_alias=True, exclude_unset=True)
+                return metadata.dict(by_alias=True, exclude_unset=True, exclude_none=True)
 
         # Running all coroutines at once failed for datasets with 10k's metas, so we need to break it up into batches
         start_t = time.time()
