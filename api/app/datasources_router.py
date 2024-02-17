@@ -69,7 +69,7 @@ async def sync_all_datasources(
         if configuration.feature_flags.get('allowRefreshing', False):
             # First wipe out all the metadata
             from .metadata import collection
-            metadata_collection: AgnosticCollection = collection()
+            metadata_collection = collection()
             await metadata_collection.delete_many({}) # deletes all docs in the collection
 
             # Now sync all the datasources

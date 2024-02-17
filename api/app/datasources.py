@@ -4,6 +4,9 @@ import os
 import time
 import random
 import asyncio
+import numpy as np
+from fastapi import Depends
+from pymongo.operations import ReplaceOne
 
 from .azure_client import AzureBlobClient
 from .models import DataSource, DataSourceReference
@@ -11,9 +14,10 @@ from helpers.cipher import decrypt, encrypt
 from motor.core import AgnosticCollection
 from helpers.samples import get_bytes_per_iq_sample
 from .models import DataSource, Metadata
+from helpers.datasource_access import check_access
+from .database import db
 
 def collection() -> AgnosticCollection:
-    from .database import db
     collection: AgnosticCollection = db().datasources
     return collection
 
@@ -39,7 +43,7 @@ async def sync(account: str, container: str):
         return
     if datasource.sasToken:
         azure_blob_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
-    
+
     #######################################
     # Reading and Parsing Local Metafiles #
     #######################################
@@ -56,61 +60,119 @@ async def sync(account: str, container: str):
                     try:
                         metadata = Metadata.parse_raw(content) # Metadata is a pydantic model, parse_raw parses a string of the JSON into the pydantic model
                     except Exception as e:
-                        print(f"Error parsing metadata file {filepath}: {e}") # this will give specific reasons parsing failed, it eventually needs to get put in a log or something
+                        print(f"[SYNC] Error parsing metadata file {filepath}: {e}") # this will give specific reasons parsing failed, it eventually needs to get put in a log or something
                         return None
                     if metadata:
                         metadatas.append((os.path.join(path, name).replace(azure_blob_client.base_filepath, '')[1:], metadata))
+        # Even though the below code is similar to Azure version, the Azure version had to be tweaked to parallelize it
+        for metadata in metadatas:
+            filepath = metadata[0].replace(".sigmf-meta", "") #TODO: clean up the tuple messiness
+            try:
+                if not await azure_blob_client.blob_exist(filepath + ".sigmf-data"):
+                    print(f"[SYNC] Data file {filepath} does not exist for metadata file")
+                    continue
+                metadata = metadata[1]
+                metadata.globalMetadata.traceability_origin = DataSourceReference(
+                    **{
+                        "type": "api",
+                        "account": account,
+                        "container": container,
+                        "file_path": filepath,
+                    }
+                )
+                metadata.globalMetadata.traceability_revision = 0
+                file_length = await azure_blob_client.get_file_length(filepath + ".sigmf-data")
+                metadata.globalMetadata.traceability_sample_length = (
+                    file_length / get_bytes_per_iq_sample(metadata.globalMetadata.core_datatype)
+                )
+                await create(metadata, user=None) # creates or updates the metadata object
+                #print(f"[SYNC] Created metadata for {filepath}") # commented out, caused too much spam
+            except Exception as e:
+                print(f"[SYNC] Error creating metadata for {filepath}: {e}")
+    
     else:
         ###################################################
         # Reading and Parsing Azure Metafiles in Parallel #
         ###################################################
         container_client = azure_blob_client.get_container_client()
-        blob_names = container_client.list_blob_names()
+        blobs = container_client.list_blobs(include=["metadata"]) # cant use list_blob_names because we also need data file length
         meta_blob_names = []
-        async for blob_name in blob_names:
-            if blob_name.endswith(".sigmf-meta"):
-                meta_blob_names.append(blob_name)
-        print("found", len(meta_blob_names), "meta files") # the process above took about 15s for 36318 metas
+        data_blob_sizes = {} # holds the names and sizes of sigmf-data files
+        start_t = time.time()
+        async for blob in blobs:
+            if blob.name.endswith(".sigmf-meta"):
+                meta_blob_names.append(blob.name)
+            elif blob.name.endswith(".sigmf-data"):
+                data_blob_sizes[blob.name] = blob.size
+        print("[SYNC] getting list of metas took", time.time() - start_t, "seconds") # 30s for MIT
+        print("[SYNC] found", len(meta_blob_names), "meta files") # the process above took about 15s for 36318 metas
+        
         async def get_metadata(meta_blob_name):
+            if not meta_blob_name.replace(".sigmf-meta", ".sigmf-data") in data_blob_sizes: # bail early if data file doesnt exist
+                print(f"[SYNC] Data file for {meta_blob_name} wasn't found")
+                return None
             blob_client = container_client.get_blob_client(meta_blob_name)
             blob = await blob_client.download_blob() # takes 0.04s on avg per call, on occasion ~1s
+            #print(time.time())
             content = await blob.readall()
             try:
                 metadata = Metadata.parse_raw(content) # Metadata is a pydantic model, parse_raw parses a string of the JSON into the pydantic model
             except Exception as e:
-                print(f"Error parsing metadata file {meta_blob_name}: {e}") # this will give specific reasons parsing failed, it eventually needs to get put in a log or something
+                print(f"[SYNC] Error parsing metadata file {meta_blob_name}: {e}") # this will give specific reasons parsing failed, it eventually needs to get put in a log or something
                 return None
             if metadata:
-                return (meta_blob_name, metadata)
-        coroutines = []
-        for meta_blob_name in meta_blob_names: # Start all the coroutines that will fetch and parse the metadata
-            coroutines.append(get_metadata(meta_blob_name))
-        metadatas = await asyncio.gather(*coroutines) # Wait for all the coroutines to finish
+                filepath = meta_blob_name.replace(".sigmf-meta", "")
+                # add traceability:origin
+                metadata.globalMetadata.traceability_origin = DataSourceReference(
+                    **{
+                        "type": "api",
+                        "account": account,
+                        "container": container,
+                        "file_path": filepath,
+                    }
+                )
+                metadata.globalMetadata.traceability_revision = 0
+                file_length = data_blob_sizes[filepath + ".sigmf-data"]
+                bytes_per_iq_sample = get_bytes_per_iq_sample(metadata.globalMetadata.core_datatype)
+                metadata.globalMetadata.traceability_sample_length = (file_length / bytes_per_iq_sample)
+                return metadata.dict(by_alias=True, exclude_unset=True)
 
-    for metadata in metadatas:
-        filepath = metadata[0].replace(".sigmf-meta", "") #TODO: clean up the tuple messiness
-        try:
-            if not await azure_blob_client.blob_exist(filepath + ".sigmf-data"):
-                print(f"[SYNC] Data file {filepath} does not exist for metadata file")
-                continue
-            metadata = metadata[1]
-            metadata.globalMetadata.traceability_origin = DataSourceReference(
-                **{
-                    "type": "api",
-                    "account": account,
-                    "container": container,
-                    "file_path": filepath,
+        # Running all coroutines at once failed for datasets with 10k's metas, so we need to break it up into batches
+        start_t = time.time()
+        batch_size = 1000 # manually tweaked, above 1000 it doesnt seem to speed up by much
+        num_batches = int(np.ceil(len(meta_blob_names) / batch_size))
+        metadatas = []
+        for i in range(num_batches):
+            coroutines = []
+            for meta_blob_name in meta_blob_names[i*batch_size:(i+1)*batch_size]:
+                coroutines.append(get_metadata(meta_blob_name))
+            metadatas.extend(await asyncio.gather(*coroutines)) # Wait for all the coroutines to finish
+        print("[SYNC] getting and parsing all metas took", time.time() - start_t, "seconds")
+
+        if Depends(check_access) is None:
+            return False
+
+        bulk_writes = []
+        for metadata in metadatas:
+            filter = {
+                "global.traceability:origin.account": account,
+                "global.traceability:origin.container": container,
+                "global.traceability:origin.file_path": metadata['global']['traceability:origin']['file_path'],
                 }
-            )
-            metadata.globalMetadata.traceability_revision = 0
-            file_length = await azure_blob_client.get_file_length(filepath + ".sigmf-data")
-            metadata.globalMetadata.traceability_sample_length = (
-                file_length / get_bytes_per_iq_sample(metadata.globalMetadata.core_datatype)
-            )
-            await create(metadata, user=None) # creates or updates the metadata object
-            #print(f"[SYNC] Created metadata for {filepath}") # commented out, caused too much spam
-        except Exception as e:
-            print(f"[SYNC] Error creating metadata for {filepath}: {e}")
+            bulk_writes.append(ReplaceOne(filter=filter, replacement=metadata, upsert=True))
+        metadata_collection = db().metadata
+        metadata_collection.bulk_write(bulk_writes)
+        
+        ''' At some point we may remove the versions thing
+        # audit document
+        audit_document = {
+            "metadata": metadata.dict(by_alias=True, exclude_unset=True, exclude_none=True),
+            "user": None,
+            "action": "create",
+        }
+        versions: AgnosticCollection = versions_collection()
+        await versions.insert_one(audit_document)
+        '''
 
     print(f"[SYNC] Finished syncing {account}/{container}")
     await azure_blob_client.close_blob_clients() # Close all the blob clients to avoid unclosed connection errors
@@ -153,6 +215,10 @@ async def import_datasources_from_env():
 
     # Add another random delay for good measure, we kept having ones start really close together
     time.sleep(random.randint(0, 10000) / 1000) # 0-10 seconds, to greatly reduce risk of duplicates
+
+    # Clear the metadata db
+    metadata_collection = db().metadata
+    await metadata_collection.delete_many({}) # clears the metadata db
 
     # Add datasource corresponding to the local backend storage
     if base_filepath and os.path.exists(base_filepath):
