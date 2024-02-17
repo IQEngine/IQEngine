@@ -87,7 +87,7 @@ export function SpectrogramContextProvider({
     setMeta(originMeta);
 
     // If the recording size is real small, lower FFT size so it fills out vertically better
-    if (meta.getTotalSamples() < 100e3) {
+    if (meta && meta.getTotalSamples() < 100e3) {
       setFFTSize(256);
     }
   }, [originMeta]);
