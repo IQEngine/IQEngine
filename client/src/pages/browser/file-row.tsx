@@ -26,7 +26,6 @@ const FileRow = ({ filepath, type, account, container, sasToken, geoSelected = f
   const isVisible = !!entry?.isIntersecting;
   const { data: item } = getMeta(type, account, container, filepath, isVisible);
 
-  // update diff
   useEffect(() => {
     if (item !== undefined) {
       const formatted = unitPrefixSamples(item.getLengthInIQSamples());
