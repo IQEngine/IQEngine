@@ -299,6 +299,7 @@ async def get_all_meta_name(
 @router.get(
     "/api/datasources/{account}/{container}/{filepath:path}/meta",
     response_model=Metadata,
+    response_model_exclude_unset=True,
 )
 async def get_meta(
     metadata: Metadata = Depends(get_metadata),
