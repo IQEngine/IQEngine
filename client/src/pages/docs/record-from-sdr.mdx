@@ -1,0 +1,81 @@
+# Record Using an SDR
+
+On this page we provide the steps needed to create a SigMF recording using popular SDRs.  Note that this process is done entirely outside of IQEngine.  Once you have a SigMF recording, you can then open it in IQEngine for analysis.
+
+The following steps were tested to work under Ubuntu 22.  Feel free to update this doc by editing https://github.com/IQEngine/IQEngine/blob/main/client/src/pages/docs/record-from-sdr.mdx
+
+## Example SigMF Meta File
+
+For each SDR below, you can make the metafile by creating a new text file called `recording.sigmf-meta` and populate it with the following minimal example.  You will have to update datatype, sample_rate, and frequency.
+
+```json
+{
+    "global": {
+        "core:datatype": "cf32_le",
+        "core:sample_rate": 1000000,
+        "core:hw": "Info about your SDR here",
+        "core:author": "Your name",
+        "core:version": "1.0.0"
+    },
+    "captures": [
+        {
+            "core:sample_start": 0,
+            "core:frequency": 915000000
+        }
+    ],
+    "annotations": []
+}
+```
+
+## RTL-SDR
+
+```bash
+sudo apt install rtl-sdr
+rtl_sdr -f 915e6 -s 2048e3 -n 1e6 recording.sigmf-data
+```
+
+f is center freq, s is sample rate, n is number of samples, run just `rtl_sdr` for more options/info
+
+Create a the SigMF metafile using the above example and `cu8_le` for core:datatype
+
+## USRP
+
+Should work for B200, B210, X310, etc
+
+```bash
+sudo apt install uhd-host
+cd /usr/lib/uhd/examples
+rx_samples_to_file --freq 915e6 --rate 1e6 --type float --nsamps 1e6 --file recording.sigmf-data
+```
+
+For `--type float` you'll want a datatype of cf32_le.  See `rx_samples_to_file  --help` for more info.  Adding the num_recv_frames arg and setting it high can help reduce overflows.
+
+## PlutoSDR (aka ADALM-PLUTO)
+
+Follow these instructions to get the library and Python package working https://pysdr.org/content/pluto.html
+
+Then run the Python code
+
+```python
+import adi
+sdr = adi.Pluto('ip:192.168.2.1') # or whatever your Pluto's IP is
+sdr.sample_rate = int(1e6)
+sdr.gain_control_mode_chan0 = 'manual'
+sdr.rx_hardwaregain_chan0 = 70.0 # dB
+sdr.rx_lo = int(915e6)
+sdr.rx_buffer_size = 1e6 # number of samples to receive
+samples = sdr.rx() # receive samples off Pluto
+samples = samples.astype(np.complex64)
+samples.tofile('recording.sigmf-data') # save to binary IQ file
+```
+
+then use cf32_le in your metafile
+
+Alternatively you might be able to:
+
+```bash
+sudo apt install libiio-dev libad9361-dev
+sudo pip install pyadi-iio
+```
+
+Then run the Python code to receive and save to file.

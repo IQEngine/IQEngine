@@ -10,6 +10,7 @@ import NewDevGuide from './new-developer-guide.mdx';
 import InstallWithDocker from './install-with-docker.mdx';
 import ConfigFeatureFlags from './config-feature-flags.mdx';
 import ReadingSpectrograms from './reading-spectrograms.mdx';
+import RecordFromSDR from './record-from-sdr.mdx';
 import { Link } from 'react-router-dom';
 
 export const DocsPages = () => {
@@ -47,6 +48,9 @@ export const DocsPages = () => {
     case 'install-with-docker':
       currentPage = <InstallWithDocker />;
       break;
+    case 'record-from-sdr':
+      currentPage = <RecordFromSDR />;
+      break;
     default:
       currentPage = <OverviewPage />;
   }
@@ -65,6 +69,7 @@ export const DocsPages = () => {
               <TableItem href="/docs/backend">Backend</TableItem>
               <TableItem href="/docs/plugins">Plugins</TableItem>
               <TableItem href="/docs/admin-page">Admin Page</TableItem>
+              <TableItem href="/docs/record-from-sdr">Record Using an SDR</TableItem>
               <TableItem href="/docs/reading-spectrograms">Reading Spectrograms</TableItem>
               <TableHeader>Developer Docs</TableHeader>
               <TableItem href="/docs/new-developer-guide">New Dev Guide</TableItem>
