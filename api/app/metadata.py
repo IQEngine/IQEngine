@@ -52,7 +52,7 @@ async def get_metadata(account, container, filepath, access_allowed=Depends(chec
     )
     if not metadata:
         return None
-    return Metadata(**metadata)
+    return Metadata(**metadata) # inherited from pydantic BaseModel
 
 
 async def create(metadata: Metadata, user: str):
@@ -88,8 +88,9 @@ async def create(metadata: Metadata, user: str):
             "global.traceability:origin.file_path": filepath,
         } # {"_id": 1},
 
+
     # Either creates or updates based on whether it exists (by replacing the entire document)
-    await metadata_collection.replace_one(filter=filter, replacement=metadata.dict(by_alias=True, exclude_unset=True), upsert=True)
+    await metadata_collection.replace_one(filter=filter, replacement=metadata.dict(by_alias=True, exclude_unset=True, exclude_none=True), upsert=True)
 
     # audit document
     audit_document = {

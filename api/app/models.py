@@ -27,7 +27,7 @@ class MetadataGlobal(BaseModel):
     antenna_type: str | None = Field(alias="antenna:type")
     core_datatype: str = Field(alias="core:datatype")
     core_sample_rate: int | None = Field(alias="core:sample_rate")
-    core_version: str = Field(alias="core:version")
+    core_version: str | None = Field(alias="core:version")
     core_num_channels: int | None = Field(alias="core:num_channels")
     core_sha512: str | None = Field(alias="core:sha512")
     core_offset: int | None = Field(alias="core:offset")
