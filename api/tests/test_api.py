@@ -64,8 +64,8 @@ async def test_api_post_meta(client):
     )
     assert response.status_code == 201
     metadata = Metadata.parse_obj(response.json())
-    assert metadata.globalMetadata.traceability_revision == 0
-    assert metadata.globalMetadata.traceability_origin == {
+    assert metadata["global"]["traceability:revision"] == 0
+    assert metadata["global"]["traceability:origin"] == {
         "type": "api",
         "account": test_datasource["account"],
         "container": test_datasource["container"],
