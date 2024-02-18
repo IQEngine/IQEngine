@@ -53,7 +53,7 @@ class MetadataGlobal(BaseModel):
 
     # If someone has a dict as their core:extensions then dont error out, just treat it as no extensions
     @validator('core_extensions', pre=True)
-    def validate_age(cls, v):
+    def validate_core_extensions(cls, v):
         if isinstance(v, dict):
             v = []
         return v
@@ -73,6 +73,10 @@ class MetadataCapture(BaseModel):
     class Config:
         extra = Extra.allow
 
+    # If frequency is left out, set it to 0
+    @validator('core_frequency')
+    def default_core_frequency(cls, v):
+        return v or 0.0
 
 class MetadataAnnotation(BaseModel):
     core_sample_start: int = Field(alias="core:sample_start")
@@ -90,9 +94,16 @@ class MetadataAnnotation(BaseModel):
 
 class Metadata(BaseModel):
     globalMetadata: MetadataGlobal = Field(alias="global")
-    captures: list[MetadataCapture]
+    captures: list[MetadataCapture] | None # no need for Field(alias="captures") because it already matches
     annotations: list[MetadataAnnotation]
 
+    # If captures is an empty list or missing, set it to a good default
+    @validator('captures', pre=True, always=True)
+    def validate_captures(cls, v):
+        if (isinstance(v, list) and len(v) == 0) or v is None:
+            v = [{'core:sample_start': 0, 'core:frequency': 0.0}] # occurs before pydantic translates it to model
+            print("GOT HERE")
+        return v
 
 class Plugin(BaseModel):
     name: str
