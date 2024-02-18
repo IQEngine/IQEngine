@@ -1,14 +1,11 @@
 import datetime
 from typing import Optional
 import os
-import time
-from azure.storage.blob import BlobProperties, BlobSasPermissions, generate_blob_sas
+from azure.storage.blob import BlobSasPermissions, generate_blob_sas
 from azure.storage.blob.aio import BlobClient, ContainerClient
-from .models import Metadata
 from helpers.urlmapping import ApiType, get_file_name
 from pydantic import SecretStr
 from helpers.samples import get_spectrogram_image
-from multiprocessing import Pool
 
 # IQEngine-oriented wrappers around the Azure BlobClient class.
 class AzureBlobClient:
