@@ -63,7 +63,7 @@ async def sync(account: str, container: str):
                     except Exception as e:
                         # this will give specific reasons parsing failed, it eventually needs to get put in a log or something
                         print(f"[SYNC] Error parsing metadata file {filepath}: {e}")
-                        return None
+                        continue
                     if metadata:
                         metadatas.append((os.path.join(path, name).replace(azure_blob_client.base_filepath, '')[1:], metadata))
         # Even though the below code is similar to Azure version, the Azure version had to be tweaked to parallelize it
@@ -149,7 +149,8 @@ async def sync(account: str, container: str):
             coroutines = []
             for meta_blob_name in meta_blob_names[i * batch_size:(i + 1) * batch_size]:
                 coroutines.append(get_metadata(meta_blob_name))
-            metadatas.extend(await asyncio.gather(*coroutines))  # Wait for all the coroutines to finish
+            ret = await asyncio.gather(*coroutines)  # Wait for all the coroutines to finish
+            metadatas.extend([x for x in ret if x is not None]) # remove the Nones
         print("[SYNC] getting and parsing all metas took", time.time() - start_t, "seconds")
 
         if Depends(check_access) is None:
