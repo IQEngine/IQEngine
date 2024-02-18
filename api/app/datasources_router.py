@@ -70,7 +70,7 @@ async def sync_all_datasources(
             # First wipe out all the metadata
             from .metadata import collection
             metadata_collection = collection()
-            await metadata_collection.delete_many({}) # deletes all docs in the collection
+            await metadata_collection.delete_many({})  # deletes all docs in the collection
 
             # Now sync all the datasources
             all_datasources = datasources_collection.find()
@@ -297,14 +297,14 @@ async def get_all_meta_name(
 
 @router.get("/api/datasources/{account}/{container}/{filepath:path}/meta")
 async def get_meta(
-    metadata = Depends(get_metadata),
+    metadata=Depends(get_metadata),
     access_allowed=Depends(check_access),
 ):
     if access_allowed is None:
         raise HTTPException(status_code=403, detail="No Access")
     if not metadata:
         raise HTTPException(status_code=404, detail="Metadata not found")
-    del metadata["_id"] # remove the _id field since its not json serializable and doesnt matter to client
+    del metadata["_id"]  # remove the _id field since its not json serializable and doesnt matter to client
     return metadata
 
 
@@ -313,7 +313,7 @@ async def get_meta(
     response_model=TrackMetadata,
 )
 async def get_track_meta(
-    metadata = Depends(get_metadata),
+    metadata=Depends(get_metadata),
     access_allowed=Depends(check_access),
 ):
     if access_allowed is None:
@@ -349,7 +349,7 @@ async def get_meta_thumbnail(
     # No authorization header is added to the request so the access_allowed is always None
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
-    
+
     sas_token = datasource.sasToken.get_secret_value() if datasource.sasToken else None
     if sas_token is not None:
         azure_client.set_sas_token(decrypt(sas_token))
@@ -591,11 +591,11 @@ async def create_meta(
 
     # Create the first metadata record
     metadata["global"]["traceability:origin"] = {
-            "type": "api",
-            "account": account,
-            "container": container,
-            "file_path": filepath,
-        }
+        "type": "api",
+        "account": account,
+        "container": container,
+        "file_path": filepath,
+    }
     metadata["global"]["traceability:revision"] = 0
     await metadatas.insert_one(metadata)
 

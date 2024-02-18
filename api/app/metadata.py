@@ -19,7 +19,7 @@ def validate_metadata(metadata: dict):
     if metadata.get("captures") is None or (isinstance(metadata.get("captures"), list) and len(metadata.get("captures")) == 0):
         metadata["captures"] = [{"core:sample_start": 0, "core:frequency": 0}]
     if isinstance(metadata["global"].get("core:extensions", None), dict):
-        metadata["global"]["core:extensions"] = [] # empty list instead of whatever dict they provided
+        metadata["global"]["core:extensions"] = []  # empty list instead of whatever dict they provided
     return metadata
 
 
@@ -61,15 +61,15 @@ async def create(metadata: dict, user: str):
     """
     if Depends(check_access) is None:
         return False
-    
+
     if metadata["global"].get('traceability:origin') is None:
         raise Exception("Metadata must have origin")
 
     filter = {
-            "global.traceability:origin.account": metadata["global"]["traceability:origin"]["account"],
-            "global.traceability:origin.container": metadata["global"]["traceability:origin"]["container"],
-            "global.traceability:origin.file_path": metadata["global"]["traceability:origin"]["file_path"],
-        }
+        "global.traceability:origin.account": metadata["global"]["traceability:origin"]["account"],
+        "global.traceability:origin.container": metadata["global"]["traceability:origin"]["container"],
+        "global.traceability:origin.file_path": metadata["global"]["traceability:origin"]["file_path"],
+    }
 
     # Either creates or updates based on whether it exists (by replacing the entire document)
     metadata_collection: AgnosticCollection = collection()

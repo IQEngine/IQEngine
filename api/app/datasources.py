@@ -76,11 +76,11 @@ async def sync(account: str, container: str):
                     continue
                 metadata = metadata[1]
                 metadata["global"]["traceability:origin"] = {
-                        "type": "api",
-                        "account": account,
-                        "container": container,
-                        "file_path": filepath,
-                    }
+                    "type": "api",
+                    "account": account,
+                    "container": container,
+                    "file_path": filepath,
+                }
                 metadata["global"]["traceability:revision"] = 0
                 file_length = await azure_blob_client.get_file_length(filepath + ".sigmf-data")
                 metadata["global"]["traceability:sample_length"] = (
@@ -127,11 +127,11 @@ async def sync(account: str, container: str):
                 filepath = meta_blob_name.replace(".sigmf-meta", "")
                 # add traceability:origin
                 metadata["global"]["traceability:origin"] = {
-                        "type": "api",
-                        "account": account,
-                        "container": container,
-                        "file_path": filepath,
-                    }
+                    "type": "api",
+                    "account": account,
+                    "container": container,
+                    "file_path": filepath,
+                }
                 metadata["global"]["traceability:revision"] = 0
                 file_length = data_blob_sizes[filepath + ".sigmf-data"]
                 bytes_per_iq_sample = get_bytes_per_iq_sample(metadata["global"]["core:datatype"])
@@ -148,7 +148,7 @@ async def sync(account: str, container: str):
             for meta_blob_name in meta_blob_names[i * batch_size:(i + 1) * batch_size]:
                 coroutines.append(get_metadata(meta_blob_name))
             ret = await asyncio.gather(*coroutines)  # Wait for all the coroutines to finish
-            metadatas.extend([x for x in ret if x is not None]) # remove the Nones
+            metadatas.extend([x for x in ret if x is not None])  # remove the Nones
         print("[SYNC] getting and parsing all metas took", time.time() - start_t, "seconds")
 
         if Depends(check_access) is None:
