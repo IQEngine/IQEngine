@@ -261,6 +261,7 @@ async def get_all_meta(
     )
     result = []
     async for datum in metadata:
+        del datum["_id"]  # remove the _id field since its not json serializable and doesnt matter to client
         result.append(datum)
     return result
 
@@ -606,6 +607,7 @@ async def create_meta(
         "action": "create",
     }
     await versions.insert_one(audit_document)
+    del metadata["_id"]  # remove the _id field since its not json serializable and doesnt matter to client
     return metadata
 
 
@@ -655,9 +657,7 @@ async def update_meta(
         await metadatas.update_one(
             {"_id": id},
             {
-                "$set": metadata.dict(
-                    by_alias=True, exclude_unset=True, exclude_none=True
-                )
+                "$set": metadata
             },
         )
         return
