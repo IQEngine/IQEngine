@@ -79,7 +79,6 @@ export const App = () => {
     <ThemeSelector>
       <Toaster />
       <div>
-        {/* Mobile version! */}
         <div className="container flex mb-16 sm:navbar mb-10 bg-base-100" id="topRow">
           <div className="md:hidden navbar-start">
             <div className="md:hidden dropdown">
@@ -156,7 +155,7 @@ export const App = () => {
             </div>
           </Link>
           <div className="absolute right-0 py-2 mr-2 ">
-            <ul className="flex-row flex mb-4 mt-0 space-x-5 text-sm font-medium">
+            <ul className="flex-row flex mb-4 mt-0 space-x-4 text-sm font-medium">
               <li className="hidden md:block">
                 <Link to="/about" onClick={() => {}}>
                   <div className="text-base">About</div>
@@ -217,8 +216,7 @@ export const App = () => {
                 <li className="hidden md:block">
                   <a href="https://discord.gg/k7C8kp3b76" target="_blank" rel="noreferrer" className="text-base">
                     <div className="flex">
-                      <img src="/discord.svg" className="w-6 pr-1" alt="Discord" />
-                      Discord
+                      <img src="/discord.svg" className="w-5 h-5" alt="Discord" />
                     </div>
                   </a>
                 </li>
@@ -240,6 +238,19 @@ export const App = () => {
                     <path d="M13.545 2.907a13.227 13.227 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.19 12.19 0 0 0-3.658 0 8.258 8.258 0 0 0-.412-.833.051.051 0 0 0-.052-.025c-1.125.194-2.22.534-3.257 1.011a.041.041 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032c.001.014.01.028.021.037a13.276 13.276 0 0 0 3.995 2.02.05.05 0 0 0 .056-.019c.308-.42.582-.863.818-1.329a.05.05 0 0 0-.01-.059.051.051 0 0 0-.018-.011 8.875 8.875 0 0 1-1.248-.595.05.05 0 0 1-.02-.066.051.051 0 0 1 .015-.019c.084-.063.168-.129.248-.195a.05.05 0 0 1 .051-.007c2.619 1.196 5.454 1.196 8.041 0a.052.052 0 0 1 .053.007c.08.066.164.132.248.195a.051.051 0 0 1-.004.085 8.254 8.254 0 0 1-1.249.594.05.05 0 0 0-.03.03.052.052 0 0 0 .003.041c.24.465.515.909.817 1.329a.05.05 0 0 0 .056.019 13.235 13.235 0 0 0 4.001-2.02.049.049 0 0 0 .021-.037c.334-3.451-.559-6.449-2.366-9.106a.034.034 0 0 0-.02-.019Zm-8.198 7.307c-.789 0-1.438-.724-1.438-1.612 0-.889.637-1.613 1.438-1.613.807 0 1.45.73 1.438 1.613 0 .888-.637 1.612-1.438 1.612Zm5.316 0c-.788 0-1.438-.724-1.438-1.612 0-.889.637-1.613 1.438-1.613.807 0 1.451.73 1.438 1.613 0 .888-.631 1.612-1.438 1.612Z" />{' '}
                   </svg>
                 </a>
+
+                <li className="hidden md:block">
+                  <a
+                    href="https://www.linkedin.com/company/iqengine/"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-base"
+                  >
+                    <div className="flex">
+                      <img src="/LinkedIn_icon.svg" className="w-5 h-5 pt-0.5" alt="LinkedIn" />
+                    </div>
+                  </a>
+                </li>
               </Feature>
 
               <Feature flag={FeatureFlag.displayIQEngineGitHub.name}>
@@ -251,8 +262,7 @@ export const App = () => {
                     className="text-base "
                   >
                     <div className="flex">
-                      <img src="/github.svg" className="w-6 h-6 pr-1 pt-1" alt="GitHub" />
-                      GitHub
+                      <img src="/github.svg" className="w-5 h-5" alt="GitHub" />
                     </div>
                   </a>
                 </li>
@@ -280,19 +290,6 @@ export const App = () => {
         </div>
 
         <Outlet />
-
-        {/* TODO Figure out how to use mailerlites embedded form*/}
-        <Feature flag={FeatureFlag.useIQEngineOutReach.name}>
-          <h2 className="text-center py-2">
-            <a
-              target="_blank"
-              rel="noreferrer"
-              href="https://dashboard.mailerlite.com/forms/299501/77960409531811734/share"
-            >
-              Sign up for a once-a-month email update on IQEngine, such as new features, demos, and more!
-            </a>
-          </h2>
-        </Feature>
       </div>
       <ReactQueryDevtools initialIsOpen={false} />
     </ThemeSelector>

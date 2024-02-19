@@ -14,18 +14,12 @@ describe('Test Feature flags', () => {
   test('renders app component with Discord and Sign up link when no feature flag specified', () => {
     render(<App />, { wrapper: AllProviders });
     expect(screen.getByText('Discord')).toBeInTheDocument();
-    expect(
-      screen.getByText('Sign up for a once-a-month email update on IQEngine, such as new features, demos, and more!')
-    ).toBeInTheDocument();
   });
 
   test('renders app component with Discord and Sign up link when flag set to true', () => {
     import.meta.env.IQENGINE_FEATURE_FLAGS = '{"useIQEngineOutReach": true}';
     render(<App />, { wrapper: AllProviders });
     expect(screen.getByText('Discord')).toBeInTheDocument();
-    expect(
-      screen.getByText('Sign up for a once-a-month email update on IQEngine, such as new features, demos, and more!')
-    ).toBeInTheDocument();
   });
 
   test('does not render app component with Discord and Sign up link when flag set to false', async () => {
@@ -33,9 +27,6 @@ describe('Test Feature flags', () => {
     render(<App />, { wrapper: AllProviders });
     await waitForElementToBeRemoved(screen.queryByText('Discord'));
     expect(screen.queryByText('Discord')).toBeNull();
-    expect(
-      screen.queryByText('Sign up for a once-a-month email update on IQEngine, such as new features, demos, and more!')
-    ).toBeNull();
   });
 
   // displayIQEngineGitHub

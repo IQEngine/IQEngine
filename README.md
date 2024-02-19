@@ -16,7 +16,7 @@
 
 IQEngine is a web application that powers <a href="https://iqengine.org">iqengine.org</a> but can also be deployed as a private instance to share recordings within a company/organization.  The public instance, <a href="https://iqengine.org">iqengine.org</a>, is used by thousands each month to browse RF recordings shared by the community, although you can also use the site to visualize your own local files (processing is done client-side).  It includes a spectrogram-based visualization and editor tool, built on top of the [SigMF](https://github.com/gnuradio/SigMF) standard.  Use IQEngine to expand your knowledge of wireless signals and how to analyze/process them, while learning more about FFTs, filtering, and other RF DSP.  IQEngine's goal is to bring the open-source RF community together.
 
-IQEngine is rapidly evolving, so [sign up](https://dashboard.mailerlite.com/forms/299501/77960409531811734/share) for a once-a-month email update, including new features, demos, and more!  There is also an IQEngine [Discord](https://discord.gg/k7C8kp3b76) chat channel if you want to get involved in the development or have questions.
+IQEngine is rapidly evolving, so check out our [LinkedIn](https://www.linkedin.com/company/iqengine/) for updates, including new features, demos, and more!  There is also an IQEngine [Discord](https://discord.gg/k7C8kp3b76) chat channel if you want to get involved in the development or have questions.
 
 [Link to the live docs](https://staging.iqengine.org/docs) which can also be found in the source code at `client/src/pages/docs/***.mdx`
 
