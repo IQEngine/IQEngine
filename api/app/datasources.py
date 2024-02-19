@@ -9,13 +9,14 @@ from fastapi import Depends
 from pymongo.operations import ReplaceOne
 
 from .azure_client import AzureBlobClient
-from .models import DataSource, DataSourceReference
+from .models import DataSource
 from helpers.cipher import decrypt, encrypt
 from motor.core import AgnosticCollection
 from helpers.samples import get_bytes_per_iq_sample
-from .models import DataSource, Metadata
+from .models import DataSource
 from helpers.datasource_access import check_access
 from .database import db
+from .metadata import validate_metadata
 
 def collection() -> AgnosticCollection:
     collection: AgnosticCollection = db().datasources
@@ -58,12 +59,12 @@ async def sync(account: str, container: str):
                     with open(filepath, "r") as f:
                         content = f.read()
                     try:
-                        # Metadata is a pydantic model, parse_raw parses a string of the JSON into the pydantic model
-                        metadata = Metadata.parse_raw(content)
+                        metadata = json.loads(content)
+                        metadata = validate_metadata(metadata)
                     except Exception as e:
                         # this will give specific reasons parsing failed, it eventually needs to get put in a log or something
                         print(f"[SYNC] Error parsing metadata file {filepath}: {e}")
-                        return None
+                        continue
                     if metadata:
                         metadatas.append((os.path.join(path, name).replace(azure_blob_client.base_filepath, '')[1:], metadata))
         # Even though the below code is similar to Azure version, the Azure version had to be tweaked to parallelize it
@@ -74,18 +75,16 @@ async def sync(account: str, container: str):
                     print(f"[SYNC] Data file {filepath} does not exist for metadata file")
                     continue
                 metadata = metadata[1]
-                metadata.globalMetadata.traceability_origin = DataSourceReference(
-                    **{
-                        "type": "api",
-                        "account": account,
-                        "container": container,
-                        "file_path": filepath,
-                    }
-                )
-                metadata.globalMetadata.traceability_revision = 0
+                metadata["global"]["traceability:origin"] = {
+                    "type": "api",
+                    "account": account,
+                    "container": container,
+                    "file_path": filepath,
+                }
+                metadata["global"]["traceability:revision"] = 0
                 file_length = await azure_blob_client.get_file_length(filepath + ".sigmf-data")
-                metadata.globalMetadata.traceability_sample_length = (
-                    file_length / get_bytes_per_iq_sample(metadata.globalMetadata.core_datatype)
+                metadata["global"]["traceability:sample_length"] = (
+                    file_length / get_bytes_per_iq_sample(metadata["global"]["core:datatype"])
                 )
                 await create(metadata, user=None)  # creates or updates the metadata object
                 # print(f"[SYNC] Created metadata for {filepath}") # commented out, caused too much spam
@@ -118,7 +117,8 @@ async def sync(account: str, container: str):
             # print(time.time())
             content = await blob.readall()
             try:
-                metadata = Metadata.parse_raw(content)  # Metadata is a pydantic model, parse_raw parses a string of the JSON into the pydantic model
+                metadata = json.loads(content)
+                metadata = validate_metadata(metadata)
             except Exception as e:
                 # this will give specific reasons parsing failed, it eventually needs to get put in a log or something
                 print(f"[SYNC] Error parsing metadata file {meta_blob_name}: {e}")
@@ -126,19 +126,17 @@ async def sync(account: str, container: str):
             if metadata:
                 filepath = meta_blob_name.replace(".sigmf-meta", "")
                 # add traceability:origin
-                metadata.globalMetadata.traceability_origin = DataSourceReference(
-                    **{
-                        "type": "api",
-                        "account": account,
-                        "container": container,
-                        "file_path": filepath,
-                    }
-                )
-                metadata.globalMetadata.traceability_revision = 0
+                metadata["global"]["traceability:origin"] = {
+                    "type": "api",
+                    "account": account,
+                    "container": container,
+                    "file_path": filepath,
+                }
+                metadata["global"]["traceability:revision"] = 0
                 file_length = data_blob_sizes[filepath + ".sigmf-data"]
-                bytes_per_iq_sample = get_bytes_per_iq_sample(metadata.globalMetadata.core_datatype)
-                metadata.globalMetadata.traceability_sample_length = (file_length / bytes_per_iq_sample)
-                return metadata.dict(by_alias=True, exclude_unset=True, exclude_none=True)
+                bytes_per_iq_sample = get_bytes_per_iq_sample(metadata["global"]["core:datatype"])
+                metadata["global"]["traceability:sample_length"] = (file_length / bytes_per_iq_sample)
+                return metadata
 
         # Running all coroutines at once failed for datasets with 10k's metas, so we need to break it up into batches
         start_t = time.time()
@@ -149,7 +147,8 @@ async def sync(account: str, container: str):
             coroutines = []
             for meta_blob_name in meta_blob_names[i * batch_size:(i + 1) * batch_size]:
                 coroutines.append(get_metadata(meta_blob_name))
-            metadatas.extend(await asyncio.gather(*coroutines))  # Wait for all the coroutines to finish
+            ret = await asyncio.gather(*coroutines)  # Wait for all the coroutines to finish
+            metadatas.extend([x for x in ret if x is not None])  # remove the Nones
         print("[SYNC] getting and parsing all metas took", time.time() - start_t, "seconds")
 
         if Depends(check_access) is None:
@@ -169,7 +168,7 @@ async def sync(account: str, container: str):
         ''' At some point we may remove the versions thing
         # audit document
         audit_document = {
-            "metadata": metadata.dict(by_alias=True, exclude_unset=True, exclude_none=True),
+            "metadata": metadata,
             "user": None,
             "action": "create",
         }

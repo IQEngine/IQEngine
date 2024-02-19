@@ -3,7 +3,7 @@ from unittest.mock import Mock
 
 import pytest
 from app import datasources
-from app.models import DataSource, Metadata
+from app.models import DataSource
 from tests.test_data import test_datasource, valid_metadata
 
 
@@ -17,7 +17,7 @@ def override_dependency_datasources_get():
 )
 @mock.patch(
     "app.metadata.get_metadata",
-    return_value=Metadata(**valid_metadata),
+    return_value=valid_metadata,
 )
 @mock.patch("app.datasources_router.decrypt", return_value="secret")
 @pytest.mark.asyncio

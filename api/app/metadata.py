@@ -5,8 +5,22 @@ from datetime import datetime
 from fastapi import Depends
 from helpers.datasource_access import check_access
 
-from .models import Metadata, DataSourceReference
+from .models import DataSourceReference
 from motor.core import AgnosticCollection
+
+# This defines how IQEngine deals with missing/optional fields
+def validate_metadata(metadata: dict):
+    if metadata.get("global") is None:
+        raise Exception("Metadata must have global section")
+    if metadata["global"].get("core:datatype") is None:
+        raise Exception("Metadata must have global -> core:datatype")
+    if metadata["global"].get("core:sample_rate") is None:
+        metadata["global"]["core:sample_rate"] = 1
+    if metadata.get("captures") is None or (isinstance(metadata.get("captures"), list) and len(metadata.get("captures")) == 0):
+        metadata["captures"] = [{"core:sample_start": 0, "core:frequency": 0}]
+    if isinstance(metadata["global"].get("core:extensions", None), dict):
+        metadata["global"]["core:extensions"] = []  # empty list instead of whatever dict they provided
+    return metadata
 
 
 def collection() -> AgnosticCollection:
@@ -21,24 +35,7 @@ def versions_collection() -> AgnosticCollection:
     return collection
 
 
-async def get_metadata(account, container, filepath, access_allowed=Depends(check_access)) -> Metadata | None:
-    """
-    Get a metadata by account, container and filepath
-
-    Parameters
-    ----------
-    account : str
-        The account name.
-    container : str
-        The container name.
-    filepath : str
-        The filepath
-
-    Returns
-    -------
-    Metadata
-        The Sigmf metadata.
-    """
+async def get_metadata(account, container, filepath, access_allowed=Depends(check_access)):
     if access_allowed is None:
         return None
 
@@ -52,49 +49,35 @@ async def get_metadata(account, container, filepath, access_allowed=Depends(chec
     )
     if not metadata:
         return None
-    return Metadata(**metadata) # inherited from pydantic BaseModel
+    return metadata
 
 
-async def create(metadata: Metadata, user: str):
+async def create(metadata: dict, user: str):
     """
     Create or updates a metadata. The metadata will be henceforth identified by account/container/filepath which
     must be unique or this function will throw an exception.
 
     This function will also create a new version of the metadata in the versions collection.
-
-    Parameters
-    ----------
-    metadata : Metadata
-        The metadata to create.
-
-    Returns
-    -------
-    None
     """
     if Depends(check_access) is None:
         return False
-    
-    if metadata.globalMetadata.traceability_origin is None:
+
+    if metadata["global"].get('traceability:origin') is None:
         raise Exception("Metadata must have origin")
 
-    metadata_collection: AgnosticCollection = collection()
-
-    account = metadata.globalMetadata.traceability_origin.account
-    container = metadata.globalMetadata.traceability_origin.container
-    filepath = metadata.globalMetadata.traceability_origin.file_path
     filter = {
-            "global.traceability:origin.account": account,
-            "global.traceability:origin.container": container,
-            "global.traceability:origin.file_path": filepath,
-        } # {"_id": 1},
-
+        "global.traceability:origin.account": metadata["global"]["traceability:origin"]["account"],
+        "global.traceability:origin.container": metadata["global"]["traceability:origin"]["container"],
+        "global.traceability:origin.file_path": metadata["global"]["traceability:origin"]["file_path"],
+    }
 
     # Either creates or updates based on whether it exists (by replacing the entire document)
-    await metadata_collection.replace_one(filter=filter, replacement=metadata.dict(by_alias=True, exclude_unset=True, exclude_none=True), upsert=True)
+    metadata_collection: AgnosticCollection = collection()
+    await metadata_collection.replace_one(filter=filter, replacement=metadata, upsert=True)
 
     # audit document
     audit_document = {
-        "metadata": metadata.dict(by_alias=True, exclude_unset=True, exclude_none=True),
+        "metadata": metadata,
         "user": user,
         "action": "create",
     }

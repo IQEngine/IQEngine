@@ -15,7 +15,7 @@ from pydantic import SecretStr
 from datetime import datetime
 from typing import List, Optional
 from .metadata import InvalidGeolocationFormat, query_metadata, collection, get_metadata, versions_collection
-from .models import DataSource, DataSourceReference, Metadata, TrackMetadata, Configuration
+from .models import DataSource, DataSourceReference, TrackMetadata, Configuration
 from . import aiquery
 
 router = APIRouter()
@@ -70,7 +70,7 @@ async def sync_all_datasources(
             # First wipe out all the metadata
             from .metadata import collection
             metadata_collection = collection()
-            await metadata_collection.delete_many({}) # deletes all docs in the collection
+            await metadata_collection.delete_many({})  # deletes all docs in the collection
 
             # Now sync all the datasources
             all_datasources = datasources_collection.find()
@@ -242,7 +242,6 @@ async def generate_sas_token(
 @router.get(
     "/api/datasources/{account}/{container}/meta",
     status_code=200,
-    response_model=list[Metadata],
 )
 async def get_all_meta(
     account,
@@ -262,6 +261,7 @@ async def get_all_meta(
     )
     result = []
     async for datum in metadata:
+        del datum["_id"]  # remove the _id field since its not json serializable and doesnt matter to client
         result.append(datum)
     return result
 
@@ -296,19 +296,16 @@ async def get_all_meta_name(
     return result
 
 
-@router.get(
-    "/api/datasources/{account}/{container}/{filepath:path}/meta",
-    response_model=Metadata,
-    response_model_exclude_unset=True,
-)
+@router.get("/api/datasources/{account}/{container}/{filepath:path}/meta")
 async def get_meta(
-    metadata: Metadata = Depends(get_metadata),
+    metadata=Depends(get_metadata),
     access_allowed=Depends(check_access),
 ):
     if access_allowed is None:
         raise HTTPException(status_code=403, detail="No Access")
     if not metadata:
         raise HTTPException(status_code=404, detail="Metadata not found")
+    del metadata["_id"]  # remove the _id field since its not json serializable and doesnt matter to client
     return metadata
 
 
@@ -317,7 +314,7 @@ async def get_meta(
     response_model=TrackMetadata,
 )
 async def get_track_meta(
-    metadata: Metadata = Depends(get_metadata),
+    metadata=Depends(get_metadata),
     access_allowed=Depends(check_access),
 ):
     if access_allowed is None:
@@ -327,13 +324,13 @@ async def get_track_meta(
         raise HTTPException(status_code=404, detail="Metadata not found")
 
     return TrackMetadata(
-        iqengine_geotrack=metadata.globalMetadata.__dict__.get("iqengine:geotrack"),
-        description=metadata.globalMetadata.core_description,
-        account=metadata.globalMetadata.traceability_origin.account
-        if metadata.globalMetadata.traceability_origin is not None
+        iqengine_geotrack=metadata["global"].get("iqengine:geotrack"),
+        description=metadata["global"]["core:description"],
+        account=metadata["global"]["traceability:origin"]["account"]
+        if metadata["global"]["traceability:origin"] is not None
         else None,
-        container=metadata.globalMetadata.traceability_origin.container
-        if metadata.globalMetadata.traceability_origin is not None
+        container=metadata["global"]["traceability:origin"]["container"]
+        if metadata["global"]["traceability:origin"] is not None
         else None,
     )
 
@@ -353,7 +350,7 @@ async def get_meta_thumbnail(
     # No authorization header is added to the request so the access_allowed is always None
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
-    
+
     sas_token = datasource.sasToken.get_secret_value() if datasource.sasToken else None
     if sas_token is not None:
         azure_client.set_sas_token(decrypt(sas_token))
@@ -374,7 +371,7 @@ async def get_meta_thumbnail(
         )
         if not metadata:
             raise HTTPException(status_code=404, detail="Metadata not found")
-        datatype = metadata.globalMetadata.core_datatype
+        datatype = metadata["global"]["core:datatype"]
         image = await azure_client.get_new_thumbnail(
             data_type=datatype, filepath=filepath
         )
@@ -562,13 +559,12 @@ async def open_query_meta(
 @router.post(
     "/api/datasources/{account}/{container}/{filepath:path}/meta",
     status_code=201,
-    response_model=Metadata,
 )
 async def create_meta(
     account: str,
     container: str,
     filepath: str,
-    metadata: Metadata,
+    metadata: dict,
     datasources: AgnosticCollection = Depends(datasources.collection),
     metadatas: AgnosticCollection = Depends(collection),
     versions: AgnosticCollection = Depends(versions_collection),
@@ -595,26 +591,23 @@ async def create_meta(
         raise HTTPException(status_code=409, detail="Metadata already exists")
 
     # Create the first metadata record
-    metadata.globalMetadata.traceability_origin = DataSourceReference(
-        **{
-            "type": "api",
-            "account": account,
-            "container": container,
-            "file_path": filepath,
-        }
-    )
-    metadata.globalMetadata.traceability_revision = 0
-    await metadatas.insert_one(
-        metadata.dict(by_alias=True, exclude_unset=True, exclude_none=True)
-    )
+    metadata["global"]["traceability:origin"] = {
+        "type": "api",
+        "account": account,
+        "container": container,
+        "file_path": filepath,
+    }
+    metadata["global"]["traceability:revision"] = 0
+    await metadatas.insert_one(metadata)
 
     # audit document
     audit_document = {
-        "metadata": metadata.dict(by_alias=True, exclude_unset=True, exclude_none=True),
+        "metadata": metadata,
         "user": current_user["preferred_username"],
         "action": "create",
     }
     await versions.insert_one(audit_document)
+    del metadata["_id"]  # remove the _id field since its not json serializable and doesnt matter to client
     return metadata
 
 
@@ -625,7 +618,7 @@ async def update_meta(
     account,
     container,
     filepath,
-    metadata: Metadata,
+    metadata: dict,
     metadatas: AgnosticCollection = Depends(collection),
     versions: AgnosticCollection = Depends(versions_collection),
     current_user=Depends(get_current_user),
@@ -648,13 +641,11 @@ async def update_meta(
         version = current["global"]["traceability:revision"]
         # This is going to be a race condition
         version_number = version + 1
-        metadata.globalMetadata.traceability_revision = version_number
-        metadata.globalMetadata.traceability_origin = current["global"][
-            "traceability:origin"
-        ]
+        metadata["global"]["traceability:revision"] = version_number
+        metadata["global"]["traceability:origin"] = current["global"]["traceability:origin"]
         # audit document
         audit_document = {
-            "metadata": metadata.dict(by_alias=True, exclude_unset=True, exclude_none=True),
+            "metadata": metadata,
             "user": current_user["preferred_username"],
             "action": "update"
         }
@@ -666,9 +657,7 @@ async def update_meta(
         await metadatas.update_one(
             {"_id": id},
             {
-                "$set": metadata.dict(
-                    by_alias=True, exclude_unset=True, exclude_none=True
-                )
+                "$set": metadata
             },
         )
         return
