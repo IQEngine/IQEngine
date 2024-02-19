@@ -124,8 +124,35 @@ paths:
           description: Bad request. RF Function does not exist.
         '401':
           description: Bad request. Missing a required param.
+        '201':
+          description: 'Created'
+          headers:
+            Location:
+              description: URL to check the status of the job
+              schema:
+                type: string # ie the /{jobID} endpoint
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/job_status'
+
+  /{jobID}:
+    get:
+      summary: Gets the RF Function's status
+      tags:
+        - Plugin
+      parameters:
+        - in: path
+          name: jobID
+          schema:
+            type: string
+          required: true
+          description: ID of the job returned by a Plugin run.
+      responses:
+        '404':
+          description: Not found, job does not exist.
         '200':
-          description: 'OK'
+          description: Accepted. Plugin is running.
           content:
             application/json:
               schema:
@@ -144,8 +171,8 @@ paths:
           required: true
           description: ID of the job returned by a Plugin run.
       responses:
-        '400':
-          description: Bad request. Job does not exist.
+        '404':
+          description: Not found, job does not exist.
         '200':
           description: OK. Plugin run is done. Return the results.
           content:
@@ -181,27 +208,6 @@ paths:
                       type: string
                       format: binary
 
-  /{jobID}/status:
-    get:
-      summary: Gets the RF Function's status
-      tags:
-        - Plugin
-      parameters:
-        - in: path
-          name: jobID
-          schema:
-            type: string
-          required: true
-          description: ID of the job returned by a Plugin run.
-      responses:
-        '400':
-          description: Bad request. Job does not exist.
-        '200':
-          description: Accepted. Plugin is running.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/job_status'
 
 # A way to specify properties that are reused, or simply too large to have look good within parameters/responses objects
 components:
