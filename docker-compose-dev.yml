@@ -3,16 +3,27 @@ version: '3.2'
 
 services:
   iqengine:
-    image: ghcr.io/iqengine/iqengine:latest
+    build:
+      context: .
+    image: iqengine:latest
+    volumes:
+      - ${IQENGINE_BACKEND_LOCAL_FILEPATH}:/tmp/recordings
+    # We have to forward the env file env vars to the container
     environment:
+      IN_MEMORY_DB: 0
+      IQENGINE_CONNECTION_INFO: ${IQENGINE_CONNECTION_INFO}
+      IQENGINE_FEATURE_FLAGS: ${IQENGINE_FEATURE_FLAGS}
       IQENGINE_PLUGINS: '[{"name": "BuiltIn",  "url": "plugins:8000"}]'
       IQENGINE_METADATA_DB_CONNECTION_STRING: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongo:27017
+      IQENGINE_BACKEND_LOCAL_FILEPATH: /tmp/recordings
     depends_on:
       - mongo
     ports:
       - 3000:3000
   plugins:
-    image: ghcr.io/iqengine/plugins:latest
+    build:
+      context: plugins
+    image: plugins:latest
     depends_on:
       - mongo
     ports:
@@ -20,8 +31,6 @@ services:
   mongo:
     image: mongo:4.2
     restart: always
-    volumes:
-      - ${MONGO_DATASOURCE}:/data/db
     ports:
       - 27017:27017
     environment:
