@@ -53,17 +53,16 @@ export function useSpectrogram(currentFFT) {
       requiredFFTIndices.push(nextFFT);
       displayedFFTIndices.push(nextFFT);
     }
-    console.log('********', displayedFFTIndices);
 
     // add the padding to requiredFFTIndices
     const currentPadding = Math.floor(FETCH_PADDING / (fftSize / 1024)); // make the padding (which is in units of ffts) a function of the size of fft so we avoid to fetch too much data for large ffts, this was manually tweaked
     for (let i = 1; i <= currentPadding; i++) {
-      let start = displayedFFTIndices[0];
-      let end = displayedFFTIndices[displayedFFTIndices.length - 1];
+      const firstFFT = currentFFT;
+      const lastFFT = currentFFT + spectrogramHeight - 1;
       let step = i * (fftStepSize + 1);
       // The padding gets added to the beginning and end of the visible ffts on the screen. it cant go beyond recording size or negative
-      if (start - step >= 0) requiredFFTIndices.push(start - step);
-      if (end + step <= totalFFTs) requiredFFTIndices.push(end + step);
+      if (firstFFT - step >= 0) requiredFFTIndices.push(firstFFT - step);
+      if (lastFFT + step <= totalFFTs) requiredFFTIndices.push(lastFFT + step);
     }
 
     if (!currentData || Object.keys(currentData).length === 0) {
