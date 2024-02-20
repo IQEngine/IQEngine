@@ -54,7 +54,7 @@ export function useSpectrogram(currentFFT) {
       displayedFFTIndices.push(nextFFT);
     }
 
-    // add the padding to requiredFFTIndices
+    // add the padding to requiredFFTIndices, to the beginning and end
     const currentPadding = Math.floor(FETCH_PADDING / (fftSize / 1024)); // make the padding (which is in units of ffts) a function of the size of fft so we avoid to fetch too much data for large ffts, this was manually tweaked
     for (let i = 1; i <= currentPadding; i++) {
       const firstFFT = currentFFT;
@@ -65,15 +65,16 @@ export function useSpectrogram(currentFFT) {
       if (lastFFT + step <= totalFFTs) requiredFFTIndices.push(lastFFT + step);
     }
 
+    // at startup currentData wont even exist yet
     if (!currentData || Object.keys(currentData).length === 0) {
       setFFTsRequired(requiredFFTIndices);
       return null;
     }
 
-    // check if the FFT are already loaded
+    // sets the FFTs that still need to be fetched
     setFFTsRequired(requiredFFTIndices.filter((i) => !currentData[i]));
 
-    // return the data with 0s for the missing FFTs
+    // return the data corresponding to whats displayed on the screen, using -inftys for the missing FFTs
     const iqData = new Float32Array(spectrogramHeight * fftSize * 2);
     for (let i = 0; i < spectrogramHeight; i++) {
       if (currentData[displayedFFTIndices[i]]) {
