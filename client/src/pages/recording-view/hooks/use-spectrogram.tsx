@@ -45,9 +45,9 @@ export function useSpectrogram(currentFFT) {
     const requiredFFTIndices: number[] = []; // used alongside setFFTsRequired()
     const currentPadding = Math.floor(FETCH_PADDING / (fftSize / 1024));
     for (let i = -currentPadding; i < spectrogramHeight + currentPadding; i++) {
-      const nextFFT = currentFFT + i * (fftStepSize + 1);
-      if (nextFFT <= totalFFTs && nextFFT >= 0) {
-        requiredFFTIndices.push(nextFFT);
+      const indx = currentFFT + i * (fftStepSize + 1);
+      if (indx <= totalFFTs && indx >= 0) {
+        requiredFFTIndices.push(indx);
       }
     }
 
@@ -60,16 +60,14 @@ export function useSpectrogram(currentFFT) {
     // sets the FFTs that still need to be fetched
     setFFTsRequired(requiredFFTIndices.filter((i) => !currentData[i]));
 
-    // Grab the portion that is visible on the spectrogram right now
+    // Grab the portion that is visible on the spectrogram right now, fill with -infty if data isnt available
     const iqData = new Float32Array(spectrogramHeight * fftSize * 2);
-    let offset = 0;
     for (let i = 0; i < spectrogramHeight; i++) {
       if (currentData[requiredFFTIndices[i + currentPadding]]) {
-        iqData.set(currentData[requiredFFTIndices[i + currentPadding]], offset);
+        iqData.set(currentData[requiredFFTIndices[i + currentPadding]], i * fftSize * 2);
       } else {
-        iqData.fill(-Infinity, offset, offset + fftSize * 2);
+        iqData.fill(-Infinity, i * fftSize * 2, (i + 1) * fftSize * 2);
       }
-      offset += fftSize * 2;
     }
 
     return iqData;
