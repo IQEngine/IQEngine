@@ -20,4 +20,4 @@ COPY api ./
 COPY .en[v] ./
 COPY --from=build-step /app/build ./iqengine
 EXPOSE 3000
-CMD uvicorn --host 0.0.0.0 --port 3000 --workers $(nproc) main:app
+CMD uvicorn --host 0.0.0.0 --port 3000 --workers 1 main:app

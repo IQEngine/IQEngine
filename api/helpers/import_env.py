@@ -10,10 +10,10 @@ from app.database import db
 
 async def import_all_from_env():
     # Sleep a random amount of time so that the multiple workers dont all initialize stuff at the exact same time
-    worker_lock_collection = db().worker_lock
     time.sleep(random.randint(0, 1000) / 1000) # 0-1 seconds
+    worker_lock_collection = db().worker_lock
     if not await worker_lock_collection.find_one(): # semaphore
-        worker_lock_collection.insert_one({"worker_id": os.getpid()})
+        await worker_lock_collection.insert_one({"worker_id": os.getpid()})
         print("This worker is performing the import_all_from_env")
     else:
         print("This worker is NOT performing the import_all_from_env")
