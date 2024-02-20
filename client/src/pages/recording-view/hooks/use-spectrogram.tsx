@@ -11,7 +11,7 @@ export function useSpectrogram(currentFFT) {
     container,
     filePath,
     fftSize,
-    spectrogramHeight,
+    spectrogramHeight, // number of rows to display (each 1 pixel high)
     fftStepSize,
     setFFTStepSize,
     setSpectrogramHeight,
@@ -33,65 +33,43 @@ export function useSpectrogram(currentFFT) {
     fftStepSize
   );
   const totalFFTs = Math.ceil(meta?.getTotalSamples() / fftSize);
-
   const debouncedCurrentFFT = useDebounce<string>(currentFFT, 50);
 
   // This is the list of ffts we display
   const displayedIQ = useMemo<Float32Array>(() => {
-    if (!totalFFTs || !spectrogramHeight) {
+    if (!totalFFTs || !spectrogramHeight || currentFFT < 0) {
       return null;
     }
-    // get the current required blocks
-    const requiredBlocks: number[] = [];
-    const displayedBlocks: number[] = [];
 
-    // make the padding dependent on the size of fft so we avoid to fetch too much data for large ffts
+    // get the current required and displayed FFT indices
+    const requiredFFTIndices: number[] = []; // used alongside setFFTsRequired()
     const currentPadding = Math.floor(FETCH_PADDING / (fftSize / 1024));
-    for (let i = 0; i < spectrogramHeight; i++) {
-      const nextFFT = currentFFT + i * (fftStepSize + 1);
-      if (nextFFT <= totalFFTs && nextFFT >= 0) {
-        requiredBlocks.push(nextFFT);
-        displayedBlocks.push(nextFFT);
-      }
-    }
-    // add the padding
-    for (let i = 1; i <= currentPadding; i++) {
-      let start = displayedBlocks[0];
-      let end = displayedBlocks[displayedBlocks.length - 1];
-      let step = i * (fftStepSize + 1);
-      if (start - step >= 0) {
-        requiredBlocks.push(start - step);
-      }
-      if (end + step <= totalFFTs) {
-        requiredBlocks.push(end + step);
+    for (let i = -currentPadding; i < spectrogramHeight + currentPadding; i++) {
+      const indx = currentFFT + i * (fftStepSize + 1);
+      if (indx <= totalFFTs && indx >= 0) {
+        requiredFFTIndices.push(indx);
       }
     }
 
-    if (!currentData || Object.keys(currentData).length === 0) {
-      setFFTsRequired(requiredBlocks);
+    // at startup currentData wont even exist yet
+    if (!currentData) {
+      setFFTsRequired(requiredFFTIndices);
       return null;
     }
-    // check if the blocks are already loaded
-    const blocksToLoad = requiredBlocks.filter((block) => !currentData[block]);
-    setFFTsRequired(blocksToLoad);
 
-    // return the data with 0s for the missing blocks
+    // sets the FFTs that still need to be fetched
+    setFFTsRequired(requiredFFTIndices.filter((i) => !currentData[i]));
+
+    // Grab the portion that is visible on the spectrogram right now, fill with -infty if data isnt available
     const iqData = new Float32Array(spectrogramHeight * fftSize * 2);
-    let offset = 0;
     for (let i = 0; i < spectrogramHeight; i++) {
-      if (currentData[displayedBlocks[i]]) {
-        if (currentData[displayedBlocks[i]].length + offset > iqData.length) {
-          continue;
-        }
-        iqData.set(currentData[displayedBlocks[i]], offset);
+      if (currentData[i + currentFFT]) {
+        iqData.set(currentData[i + currentFFT], i * fftSize * 2);
       } else {
-        if (offset + fftSize * 2 > iqData.length) {
-          continue;
-        }
-        iqData.fill(-Infinity, offset, offset + fftSize * 2);
+        iqData.fill(-Infinity, i * fftSize * 2, (i + 1) * fftSize * 2);
       }
-      offset += fftSize * 2;
     }
+
     return iqData;
   }, [
     processedDataUpdated,

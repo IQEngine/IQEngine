@@ -148,7 +148,7 @@ export function useGetIQData(
 
         groupContiguousIndexes(dataRange).forEach((group) => {
           const iqData = data.slice(group.start, group.start + group.count);
-          const iqDataFloatArray = new Float32Array((iqData.length + 1) * fftSize * 2);
+          const iqDataFloatArray = new Float32Array(iqData.length * fftSize * 2);
           iqData.forEach((data, index) => {
             iqDataFloatArray.set(data, index * fftSize * 2);
           });
