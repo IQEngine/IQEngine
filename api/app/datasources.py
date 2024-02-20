@@ -7,6 +7,8 @@ import asyncio
 import numpy as np
 from fastapi import Depends
 from pymongo.operations import ReplaceOne
+from bson import encode
+from bson.raw_bson import RawBSONDocument
 
 from .azure_client import AzureBlobClient
 from .models import DataSource
@@ -156,12 +158,17 @@ async def sync(account: str, container: str):
 
         bulk_writes = []
         for metadata in metadatas:
+            meta_name = metadata['global']['traceability:origin']['file_path']
             filter = {
                 "global.traceability:origin.account": account,
                 "global.traceability:origin.container": container,
-                "global.traceability:origin.file_path": metadata['global']['traceability:origin']['file_path'],
+                "global.traceability:origin.file_path": meta_name,
             }
-            bulk_writes.append(ReplaceOne(filter=filter, replacement=metadata, upsert=True))
+            metadata_bson = encode(metadata)
+            if len(metadata_bson) > 16793600:
+                print(f"[SYNC] Metadata for {meta_name} is too large to store in MongoDB (16MB limit per doc), skipping")
+                continue
+            bulk_writes.append(ReplaceOne(filter=filter, replacement=RawBSONDocument(metadata_bson), upsert=True))
         metadata_collection = db().metadata
         metadata_collection.bulk_write(bulk_writes)
 
