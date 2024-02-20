@@ -43,30 +43,16 @@ export function useSpectrogram(currentFFT) {
 
     // get the current required and displayed FFT indices
     const requiredFFTIndices: number[] = []; // used alongside setFFTsRequired()
-    const displayedFFTIndices: number[] = [];
-    for (let i = 0; i < spectrogramHeight; i++) {
-      const nextFFT = currentFFT + i * (fftStepSize + 1); // currentFFT is just the index of the fft corresponding to the top of the spectrogram
-      if (nextFFT > totalFFTs || nextFFT < 0) {
-        console.log('[use-spectrogram] SHOULDNt HAVE GOT HERE!!! C'); // doesnt normally get here
-        continue;
+    const currentPadding = Math.floor(FETCH_PADDING / (fftSize / 1024));
+    for (let i = -currentPadding; i < spectrogramHeight + currentPadding; i++) {
+      const nextFFT = currentFFT + i * (fftStepSize + 1);
+      if (nextFFT <= totalFFTs && nextFFT >= 0) {
+        requiredFFTIndices.push(nextFFT);
       }
-      requiredFFTIndices.push(nextFFT);
-      displayedFFTIndices.push(nextFFT);
-    }
-
-    // add the padding to requiredFFTIndices, to the beginning and end
-    const currentPadding = Math.floor(FETCH_PADDING / (fftSize / 1024)); // make the padding (which is in units of ffts) a function of the size of fft so we avoid to fetch too much data for large ffts, this was manually tweaked
-    for (let i = 1; i <= currentPadding; i++) {
-      const firstFFT = currentFFT;
-      const lastFFT = currentFFT + spectrogramHeight - 1;
-      let step = i * (fftStepSize + 1);
-      // The padding gets added to the beginning and end of the visible ffts on the screen. it cant go beyond recording size or negative
-      if (firstFFT - step >= 0) requiredFFTIndices.push(firstFFT - step);
-      if (lastFFT + step <= totalFFTs) requiredFFTIndices.push(lastFFT + step);
     }
 
     // at startup currentData wont even exist yet
-    if (!currentData || Object.keys(currentData).length === 0) {
+    if (!currentData) {
       setFFTsRequired(requiredFFTIndices);
       return null;
     }
@@ -74,23 +60,18 @@ export function useSpectrogram(currentFFT) {
     // sets the FFTs that still need to be fetched
     setFFTsRequired(requiredFFTIndices.filter((i) => !currentData[i]));
 
-    // return the data corresponding to whats displayed on the screen, using -inftys for the missing FFTs
+    // Grab the portion that is visible on the spectrogram right now
     const iqData = new Float32Array(spectrogramHeight * fftSize * 2);
+    let offset = 0;
     for (let i = 0; i < spectrogramHeight; i++) {
-      if (currentData[displayedFFTIndices[i]]) {
-        if (currentData[displayedFFTIndices[i]].length + i * fftSize * 2 > iqData.length) {
-          console.log('[use-spectrogram] SHOULDNt HAVE GOT HERE!!! A'); // doesnt normally get here
-          continue;
-        }
-        iqData.set(currentData[displayedFFTIndices[i]], i * fftSize * 2);
+      if (currentData[requiredFFTIndices[i + currentPadding]]) {
+        iqData.set(currentData[requiredFFTIndices[i + currentPadding]], offset);
       } else {
-        if ((i + 1) * fftSize * 2 > iqData.length) {
-          console.log('[use-spectrogram] SHOULDNt HAVE GOT HERE!!! B'); // doesnt normally get here
-          continue;
-        }
-        iqData.fill(-Infinity, i * fftSize * 2, (i + 1) * fftSize * 2);
+        iqData.fill(-Infinity, offset, offset + fftSize * 2);
       }
+      offset += fftSize * 2;
     }
+
     return iqData;
   }, [
     processedDataUpdated,
