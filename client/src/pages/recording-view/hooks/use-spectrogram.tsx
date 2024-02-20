@@ -37,7 +37,7 @@ export function useSpectrogram(currentFFT) {
 
   // This is the list of ffts we display
   const displayedIQ = useMemo<Float32Array>(() => {
-    if (!totalFFTs || !spectrogramHeight) {
+    if (!totalFFTs || !spectrogramHeight || currentFFT < 0) {
       return null;
     }
 
@@ -63,8 +63,8 @@ export function useSpectrogram(currentFFT) {
     // Grab the portion that is visible on the spectrogram right now, fill with -infty if data isnt available
     const iqData = new Float32Array(spectrogramHeight * fftSize * 2);
     for (let i = 0; i < spectrogramHeight; i++) {
-      if (currentData[requiredFFTIndices[i + currentPadding]]) {
-        iqData.set(currentData[requiredFFTIndices[i + currentPadding]], i * fftSize * 2);
+      if (currentData[i + currentFFT]) {
+        iqData.set(currentData[i + currentFFT], i * fftSize * 2);
       } else {
         iqData.fill(-Infinity, i * fftSize * 2, (i + 1) * fftSize * 2);
       }
