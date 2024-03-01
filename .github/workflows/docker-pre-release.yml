@@ -44,7 +44,7 @@ jobs:
           GITHUB_SHA: ${{ github.sha }}
       - name: Draft a release
         id: draft_a_release
-        uses: release-drafter/release-drafter@09c613e259eb8d4e7c81c2cb00618eb5fc4575a7 # v5.25.0
+        uses: release-drafter/release-drafter@3f0f87098bd6b5c5b9a36d49c41d998ea58f9348 # v6.0.0
         with:
           config-name: release-drafter.yml
           publish: true
@@ -63,7 +63,7 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN  }}
       - name: Build and Push Docker Image
-        uses: docker/build-push-action@0565240e2d4ab88bba5387d719585280857ece09 # v5.0.0
+        uses: docker/build-push-action@4a13e500e55cf31b7a5d59a38ab2040ab0f42f56 # v5.1.0
         if: steps.draft_a_release.outputs.tag_name != ''
         with:
           labels: |
@@ -76,7 +76,7 @@ jobs:
         env:
           NODE_ENV: production
       - name: Build and Push Plugins
-        uses: docker/build-push-action@0565240e2d4ab88bba5387d719585280857ece09 # v5.0.0
+        uses: docker/build-push-action@4a13e500e55cf31b7a5d59a38ab2040ab0f42f56 # v5.1.0
         if: steps.draft_a_release.outputs.tag_name != ''
         with:
           context: plugins
