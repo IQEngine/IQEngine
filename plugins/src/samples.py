@@ -53,5 +53,10 @@ def get_from_backend_server(file_path, offset, length, data_type):
         raise Exception("IQENGINE_BACKEND_LOCAL_FILEPATH not set")
     base_filepath = base_filepath.replace('"','')
     dtype = data_mapping[data_type]
-    count = length // np.dtype(dtype).itemsize
-    return np.fromfile(os.path.join(base_filepath, file_path + '.sigmf-data'), dtype=dtype, count=count, offset=offset)
+    count = length // np.dtype(dtype).itemsize # needs to be in number of floats/ints, whereas length is provided in bytes. note offset is in bytes not floats/ints
+    samples = np.fromfile(os.path.join(base_filepath, file_path + '.sigmf-data'), dtype=dtype, count=count, offset=offset)
+    if dtype == np.int16:
+        samples = samples.astype(np.float32) / np.iinfo("int16").max
+    elif dtype == np.int8:
+        samples = samples.astype(np.float32) / np.iinfo("int8").max
+    return samples.view(dtype=np.complex64)
