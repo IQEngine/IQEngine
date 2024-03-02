@@ -6,37 +6,37 @@ openai.api_type = os.environ.get("OPENAI_TYPE", "azure")
 openai.api_base = os.environ.get("OPENAI_ENDPOINT")
 openai.api_version = os.environ.get("OPENAI_VERSION", "2023-07-01-preview")
 openai.api_key = os.environ.get("OPENAI_KEY")
-engine=os.environ.get("OPENAI_ENGINE")
+engine = os.environ.get("OPENAI_ENGINE")
 
 rf_function = [
-      {
-  "name": "rf",
-  "description": "Query RF recordings and return a list of recordings",
-  "parameters": {
-    "type": "object",
-    "properties": {
-      "account": {"type": "string", "description": "Account to query"},
-      "container": {"type": "string", "description": "Container to query"},
-      "database_id": {"type": "string", "description": "Database to query"},
-      "min_frequency": {"type": "number", "description": "Min frequency in Hz (VHF, UHF, etc.)"},
-      "max_frequency": {"type": "number", "description": "Max frequency in Hz"},
-      "author": {"type": "string", "description": "Recording author"},
-      "label": {"type": "string", "description": "Recording label"},
-      "comment": {"type": "string", "description": "Recording comment"},
-      "description": {"type": "string", "description": "Recording description"},
-      "min_datetime": {"type": "string", "description": "Min recording date"},
-      "max_datetime": {"type": "string", "description": "Max recording date"},
-      "min_duration": {"type": "number", "description": "Min duration"},
-      "text": {"type": "string", "description": "Text in recording"},
-      "captures_geo_json": {"type": "string", "description": "GeoJSON for recording location (point, line, polygon)"},
-      "captures_radius": {"type": "number", "description": "Recording location radius in meters"},
-      "annotations_geo_json": {"type": "string", "description": "GeoJSON for annotation location (point, line, polygon)"},
-      "annotations_radius": {"type": "number", "description": "Annotation location radius in meters"}
+    {
+        "name": "rf",
+        "description": "Query RF recordings and return a list of recordings",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "account": {"type": "string", "description": "Account to query"},
+                "container": {"type": "string", "description": "Container to query"},
+                "database_id": {"type": "string", "description": "Database to query"},
+                "min_frequency": {"type": "number", "description": "Min frequency in Hz (VHF, UHF, etc.)"},
+                "max_frequency": {"type": "number", "description": "Max frequency in Hz"},
+                "author": {"type": "string", "description": "Recording author"},
+                "label": {"type": "string", "description": "Recording label"},
+                "comment": {"type": "string", "description": "Recording comment"},
+                "description": {"type": "string", "description": "Recording description"},
+                "min_datetime": {"type": "string", "description": "Min recording date"},
+                "max_datetime": {"type": "string", "description": "Max recording date"},
+                "min_duration": {"type": "number", "description": "Min duration"},
+                "text": {"type": "string", "description": "Text in recording"},
+                "captures_geo_json": {"type": "string", "description": "GeoJSON for recording location (point, line, polygon)"},
+                "captures_radius": {"type": "number", "description": "Recording location radius in meters"},
+                "annotations_geo_json": {"type": "string", "description": "GeoJSON for annotation location (point, line, polygon)"},
+                "annotations_radius": {"type": "number", "description": "Annotation location radius in meters"}
+            }
+        }
     }
-  }
-}
 
-  ]
+]
 
 def is_open_ai_available():
     return \
@@ -46,7 +46,7 @@ def is_open_ai_available():
         openai.api_version != None and openai.api_version != ""
 
 
-def get_query_result(query: str) :
+def get_query_result(query: str):
     if not is_open_ai_available():
         return {}
     messages = [
@@ -67,8 +67,8 @@ def get_query_result(query: str) :
     try:
         response = openai.ChatCompletion.create(
             engine=engine,
-            messages = messages,
-            functions = rf_function,
+            messages=messages,
+            functions=rf_function,
             temperature=0.2,
             max_tokens=800,
             top_p=0.95,
@@ -84,4 +84,4 @@ def get_query_result(query: str) :
 
     except Exception as e:
         print(e)
-        raise("Open AI is not available", e)
+        raise ("Open AI is not available", e)

@@ -1,6 +1,5 @@
 from .database import db
-from fastapi import APIRouter, Depends
-from motor.motor_asyncio import AsyncIOMotorCollection
+from fastapi import APIRouter
 from pymongo.errors import ServerSelectionTimeoutError
 
 router = APIRouter()
