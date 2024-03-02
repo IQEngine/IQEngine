@@ -2,7 +2,6 @@ from typing import Optional
 import json
 import os
 import time
-import random
 import asyncio
 import numpy as np
 from fastapi import Depends
@@ -13,20 +12,15 @@ from bson.raw_bson import RawBSONDocument
 from .azure_client import AzureBlobClient
 from .models import DataSource
 from helpers.cipher import decrypt, encrypt
-from motor.core import AgnosticCollection
 from helpers.samples import get_bytes_per_iq_sample
 from .models import DataSource
 from helpers.datasource_access import check_access
 from .database import db
-from .metadata import validate_metadata
-
-def collection() -> AgnosticCollection:
-    collection: AgnosticCollection = db().datasources
-    return collection
+from .metadata import validate_metadata, create
 
 async def get(account, container) -> DataSource | None:
     # Get a datasource by account and container
-    datasource_collection: AgnosticCollection = collection()
+    datasource_collection = db().datasources
     datasource = await datasource_collection.find_one({"account": account, "container": container})
     if datasource is None:
         return None
@@ -36,8 +30,6 @@ async def datasource_exists(account, container) -> bool:
     return await get(account, container) is not None
 
 async def sync(account: str, container: str):
-    from .metadata import create
-
     print(f"[SYNC] Starting sync for {account}/{container} on PID {os.getpid()} at {time.time()}")
     azure_blob_client = AzureBlobClient(account, container)
     datasource = await get(account, container)
@@ -192,7 +184,7 @@ async def create_datasource(datasource: DataSource, user: Optional[dict]) -> Dat
     must be unique or this function will return a 400.
     This will encrypt the sasToken if it is provided.
     """
-    datasource_collection: AgnosticCollection = collection()
+    datasource_collection = db().datasources
     if await datasource_exists(datasource.account, datasource.container):
         print("Datasource Already Exists!")
         return None
@@ -222,35 +214,32 @@ async def import_datasources_from_env():
     base_filepath = os.getenv("IQENGINE_BACKEND_LOCAL_FILEPATH", None)
     base_filepath = base_filepath.replace('"', '') if base_filepath else None
 
-    # Add another random delay for good measure, we kept having ones start really close together
-    time.sleep(random.randint(0, 10000) / 1000)  # 0-10 seconds, to greatly reduce risk of duplicates
-
-    # Clear the metadata db
+    # Clear the db
     metadata_collection = db().metadata
     await metadata_collection.delete_many({})  # clears the metadata db
+
+    datasource_collection = db().datasources
+    await datasource_collection.delete_many({})  # clears the datasource db
 
     # Add datasource corresponding to the local backend storage
     if base_filepath and os.path.exists(base_filepath):
         try:
-            if not await datasource_exists('local', 'local'):
-                datasource = DataSource(
-                    account='local',
-                    container='local',
-                    sasToken=None,
-                    accountKey=None,
-                    name="Local to Backend",
-                    description="Files stored on the backend server in the " + str(base_filepath) + " directory",
-                    imageURL="https://raw.githubusercontent.com/IQEngine/IQEngine/main/client/public/backend-storage.svg",
-                    type="api",
-                    public=True,
-                    owners=["IQEngine-Admin"],
-                    readers=[],
-                )
-                # Check one more time that it doesn't exist yet (the above block can take 0.1s or more)
-                if not await datasource_exists('local', 'local'):
-                    create_ret = await create_datasource(datasource=datasource, user=None)
-                    if create_ret:
-                        await sync("local", "local")
+            datasource = DataSource(
+                account='local',
+                container='local',
+                sasToken=None,
+                accountKey=None,
+                name="Local to Backend",
+                description="Files stored on the backend server in the " + str(base_filepath) + " directory",
+                imageURL="https://raw.githubusercontent.com/IQEngine/IQEngine/main/client/public/backend-storage.svg",
+                type="api",
+                public=True,
+                owners=["IQEngine-Admin"],
+                readers=[],
+            )
+            create_ret = await create_datasource(datasource=datasource, user=None)
+            if create_ret:
+                await sync("local", "local")
         except Exception as e:
             print(f"Failed to import datasource local to backend", e)
 
@@ -258,8 +247,6 @@ async def import_datasources_from_env():
     if connection_info:
         for connection in json.loads(connection_info).get("settings", []):
             try:
-                if await datasource_exists(connection["accountName"], connection["containerName"]):
-                    continue
                 datasource = DataSource(
                     account=connection["accountName"],
                     container=connection["containerName"],
@@ -275,12 +262,7 @@ async def import_datasources_from_env():
                     owners=connection["owners"] if "owners" in connection else ["IQEngine-Admin"],
                     readers=connection["readers"] if "readers" in connection else [],
                 )
-                # Check one more time that it doesn't exist yet (the above block can take 0.1s or more)
-                if await datasource_exists(connection["accountName"], connection["containerName"]):
-                    continue
-                # It's important to immediately add it to the db so other workers see it and dont add a duplicate
                 create_ret = await create_datasource(datasource=datasource, user=None)
-                # This should only get triggered once (one worker)
                 if create_ret:
                     await sync(connection["accountName"], connection["containerName"])
             except Exception as e:
