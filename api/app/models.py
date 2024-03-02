@@ -14,28 +14,23 @@ class DataSource(BaseModel):
     readers: Optional[List[str]] = []
     public: Optional[bool] = False
 
-
 class DataSourceReference(BaseModel):
     type: str
     account: str
     container: str
     file_path: str
 
-
 class Plugin(BaseModel):
     name: str
     url: str
-
 
 class FeatureFlags(BaseModel):
     class Config:
         extra = Extra.allow
 
-
 class ConnectionInfo(BaseModel):
     class Config:
         extra = Extra.allow
-
 
 class Configuration(BaseModel):
     connection_info: ConnectionInfo = Field({}, alias="connectionInfo")
@@ -47,11 +42,9 @@ class Configuration(BaseModel):
     app_authority: str = Field(None, alias="appAuthority")
     has_ai_query: bool = Field(None, alias="hasAIQuery")
 
-
 class GeoTrack(BaseModel):
     type: Optional[str]
     coordinates: Optional[List[List[float]]]
-
 
 class TrackMetadata(BaseModel):
     iqengine_geotrack: Optional[GeoTrack] | None
