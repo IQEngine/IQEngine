@@ -1,11 +1,10 @@
 import json
 import os
 
-from . import config
+from .database import db
 from .config import exists, get
 from .models import Configuration
-from fastapi import APIRouter, Depends, HTTPException
-from motor.core import AgnosticCollection
+from fastapi import APIRouter, HTTPException
 from . import aiquery
 
 router = APIRouter()
@@ -13,9 +12,6 @@ router = APIRouter()
 
 @router.get("/api/config", status_code=200, response_model=Configuration)
 async def get_config():
-    """
-    get the IQEngine configuration
-    """
     configuration: Configuration | None = await get()
 
     if configuration is None:
@@ -50,17 +46,11 @@ async def get_config():
 
 
 @router.put("/api/config", status_code=200)
-async def update_config(
-    config: Configuration,
-    configuration: AgnosticCollection = Depends(config.collection),
-):
-    """
-    update the IQEngine configuration
-    """
+async def update_config(config: Configuration):
     if not (await exists()):
         raise HTTPException(status_code=409, detail="Configuration does not exist")
 
-    await configuration.update_one(
+    await db().configuration.update_one(
         {}, {"$set": config.dict(by_alias=True, exclude_unset=True)}
     )
     return 200
