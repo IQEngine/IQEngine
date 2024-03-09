@@ -167,7 +167,7 @@ export function useGetIQData(
 
         return currentProcessedData;
       },
-      [!!pyodide, pythonScript, taps.join(','), squareSignal]
+      [!!pyodide, pythonScript, taps.join(','), squareSignal, fftSize] // if any of these things change, it reprocesses the data
     ),
     enabled: !!meta && !!filesQuery.data && !!dataSourcesQuery.data,
   });
