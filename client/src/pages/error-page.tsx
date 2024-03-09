@@ -20,14 +20,16 @@ export const ErrorPage = () => {
   return (
     <>
       <div className="w-full h-screen flex flex-col items-center mt-28">
-        <h1>Error</h1>
+        <h2>Error</h2>
         <div>
           {errorMessage.split('\n').map((i, key) => {
             return <div key={key}>{i}</div>;
           })}
         </div>
         <br></br>
-        <Link to={'/browser'}>Back Home</Link>
+        <Link to={'/browser'}>
+          <h1>Back Home</h1>
+        </Link>
         <br></br>
         <div>
           Note - If you see Error "Failed to fetch dynamically imported module", try refreshing your cache with
