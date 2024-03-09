@@ -1,7 +1,5 @@
 // code from: https://github.com/indutny/fft.js
 
-// Note that we have switched the spectrogram over to using webfft instead of this, so its only now used for the Frequency tab and for plugin PSD output at this point
-
 export class FFT {
   size: number;
   _csize: number;
