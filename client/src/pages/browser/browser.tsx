@@ -13,7 +13,7 @@ import { useNavigate } from 'react-router-dom';
 import { FileWithDirectoryAndFileHandle } from 'browser-fs-access';
 import SiggenTile from './misc-tiles/siggen-tile';
 import ValidatorTile from './misc-tiles/validator-tile';
-import WebfftBenchmarkTile from './misc-tiles/webfft-benchmark-tile';
+//import WebfftBenchmarkTile from './misc-tiles/webfft-benchmark-tile';
 import ConverterTile from './misc-tiles/converter-tile';
 import { ModalDialog } from '@/features/ui/modal/Modal';
 import { MetadataQuery } from './metadata-query/metadata-query';
