@@ -32,6 +32,7 @@ export enum MimeTypes {
   cf32 = 'iq/cf32',
   cf32_le = 'iq/cf32_le',
   audio_wav = 'audio/wav',
+  image_png = 'image/png',
 }
 
 export const PluginsPane = () => {
@@ -241,8 +242,16 @@ export const PluginsPane = () => {
             });
 
             setModalOpen(true);
+          } else if (data.data_output[0]['data_type'] == MimeTypes.image_png) {
+            let data_output = data.data_output[0]['samples'];
+            let data_type = data.data_output[0]['data_type'];
+            let blob = BlobFromSamples(data_output, data_type);
+            createImageBitmap(blob).then((imageBitmap) => {
+              setmodalSpectrogram(imageBitmap);
+            });
+            setModalOpen(true);
           } else {
-            // non-IQ Data file
+            // Files to be directly downloaded
             let d = new Date();
             let datestring = new Date().toISOString().split('.')[0];
 
@@ -254,7 +263,9 @@ export const PluginsPane = () => {
                 case MimeTypes.audio_wav:
                   ext = 'wav';
                   break;
-
+                //case MimeTypes.image_png:
+                //  ext = 'png';
+                //  break;
                 default:
                   toast.error(`The plugins pane doesn't handle the mime type ${data_type} output by the plugin.`);
                   break;
