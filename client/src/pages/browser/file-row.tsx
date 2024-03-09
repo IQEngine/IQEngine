@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { CLIENT_TYPE_BLOB, CLIENT_TYPE_LOCAL, CLIENT_TYPE_API } from '@/api/Models';
 import { getMeta } from '@/api/metadata/queries';
@@ -6,6 +6,7 @@ import { AnnotationData } from './annotation-data';
 import { ModalDialog } from '@/features/ui/modal/Modal';
 import { useIntersectionObserver } from 'usehooks-ts';
 import LocalDirThumbnail from './local-dir-thumbnail';
+import { unitPrefixSamples } from '@/utils/rf-functions';
 
 interface FileRowProps {
   filepath: string;
@@ -19,10 +20,18 @@ interface FileRowProps {
 
 const FileRow = ({ filepath, type, account, container, sasToken, geoSelected = false, trackToggle }: FileRowProps) => {
   const [showModal, setShowModal] = useState(false);
+  const [lengthInSamplesString, setLengthInSamplesString] = useState('');
   const ref = useRef<HTMLTableRowElement | null>(null);
   const entry = useIntersectionObserver(ref, {});
   const isVisible = !!entry?.isIntersecting;
   const { data: item } = getMeta(type, account, container, filepath, isVisible);
+
+  useEffect(() => {
+    if (item !== undefined) {
+      const formatted = unitPrefixSamples(item.getLengthInIQSamples());
+      setLengthInSamplesString(formatted.samples + ' ' + formatted.unit);
+    }
+  }, [item]);
 
   const spectrogramLink = `/view/${item?.getOrigin().type}/${item?.getOrigin().account}/${item?.getOrigin()
     .container}/${encodeURIComponent(item?.getFilePath())}`;
@@ -128,7 +137,7 @@ const FileRow = ({ filepath, type, account, container, sasToken, geoSelected = f
         </>
       }
 
-      <td className="align-middle">{item.getLengthInMillionIQSamples()} M</td>
+      <td className="align-middle">{lengthInSamplesString}</td>
       <td className="align-middle">
         <NewlineText text={item.getDataTypeDescription()} />
       </td>

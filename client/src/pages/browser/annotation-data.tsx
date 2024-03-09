@@ -10,12 +10,16 @@ interface Props {
 export const AnnotationData = ({ annotations }: Props) => {
   const [pieChartValues, setPieChartValues] = useState([]); // so that it can be directly used in the pie chart https://plotly.com/javascript/pie-charts/
   const [pieChartLabels, setPieChartLabels] = useState([]);
+  const [numLabels, setNumLabels] = useState(0);
 
   // Calc Pie chart data
   useEffect(() => {
     const counts = {};
     annotations.forEach((item) => {
-      const label = item.getLabel();
+      let label = item.getLabel();
+      if (label.length > 10) {
+        label = label.substring(10) + '...';
+      }
       counts[label] = (counts[label] ?? 0) + 1;
     });
     const vals = [];
@@ -26,6 +30,7 @@ export const AnnotationData = ({ annotations }: Props) => {
     });
     setPieChartValues(vals);
     setPieChartLabels(labels);
+    setNumLabels(Object.keys(counts).length);
   }, [annotations]);
 
   const annotationsData = annotations?.map((item, index) => {
@@ -66,7 +71,7 @@ export const AnnotationData = ({ annotations }: Props) => {
           ]}
           layout={{
             showlegend: false,
-            width: 250,
+            width: 400,
             height: 250,
             template: template,
             margin: { t: 0, b: 0, l: 0, r: 0 },

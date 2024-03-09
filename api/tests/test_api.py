@@ -4,7 +4,7 @@ from unittest import mock
 from unittest.mock import Mock
 
 import pytest
-from app.models import Configuration, Metadata
+from app.models import Configuration
 from tests.test_data import test_datasource, valid_metadata
 
 
@@ -63,26 +63,17 @@ async def test_api_post_meta(client):
         json=valid_metadata,
     )
     assert response.status_code == 201
-    metadata = Metadata.parse_obj(response.json())
-    assert metadata.globalMetadata.traceability_revision == 0
-    assert metadata.globalMetadata.traceability_origin == {
+    metadata = response.json()
+    assert metadata["global"]["traceability:revision"] == 0
+    assert metadata["global"]["traceability:origin"] == {
         "type": "api",
         "account": test_datasource["account"],
         "container": test_datasource["container"],
         "file_path": "file_path",
     }
-    assert (
-        metadata.annotations[0].core_sample_start
-        == valid_metadata["annotations"][0]["core:sample_start"]
-    )
-    assert (
-        metadata.annotations[0].core_sample_count
-        == valid_metadata["annotations"][0]["core:sample_count"]
-    )
-    assert (
-        metadata.captures[0].core_sample_start
-        == valid_metadata["captures"][0]["core:sample_start"]
-    )
+    assert (metadata["annotations"][0]["core:sample_start"] == valid_metadata["annotations"][0]["core:sample_start"])
+    assert (metadata["annotations"][0]["core:sample_count"] == valid_metadata["annotations"][0]["core:sample_count"])
+    assert (metadata["captures"][0]["core:sample_start"] == valid_metadata["captures"][0]["core:sample_start"])
 
 
 @pytest.mark.asyncio

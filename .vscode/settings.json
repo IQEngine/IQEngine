@@ -31,8 +31,10 @@
   "python.testing.pytestEnabled": true,
   "vitest.enable": true,
   "[python]": {
-    "editor.defaultFormatter": "ms-python.python"
+    "editor.formatOnSave": false,
+    "editor.defaultFormatter": "ms-python.autopep8"
   },
+  "autopep8.args": ["--max-line-length=150", "--ignore=E302"],
   "python.formatting.provider": "black",
   "python.analysis.typeCheckingMode": "off"
 }

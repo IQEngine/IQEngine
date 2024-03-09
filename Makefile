@@ -18,13 +18,9 @@ run-plugins:
 	@echo "Running plugins backend on port 8000..."
 	@cd plugins/src && uvicorn plugins_api:app --reload
 
-build-docker:
-	@echo "Building Docker image for IQEngine..."
-	@docker build -t iqengine .
-
 run-docker:
-	@echo "Running IQEngine Docker container..."
-	@docker run --env-file .env -p 5000:5000 -p 3000:3000 iqengine
+	@echo "Building and Running IQEngine Docker container..."
+	@docker-compose -f docker-compose-dev.yml up
 
 build-infra:
 	@echo "Building infrastructure..."

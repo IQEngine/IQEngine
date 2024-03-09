@@ -48,12 +48,12 @@ docker run -d -v $(git rev-parse --show-toplevel):/tmp/lint ghcr.io/oxsecurity/m
 
 Feature flags are set up across the application. To use a feature flag, add it to your .env file in the root of the repo and then use it to wrap UI elements as illustrated below, or use the getFeatureFlag(flagname) method to programmatically get a feature flag value.
 
-Each component needs to import the Feature component.
+Each component needs to import the Feature component, e.g.:
 
 ```HTML
       <Feature flag="useIQEngineOutReach">
         <h2 className="text-center py-2">
-          Sign up for a once-a-month email update on IQEngine, such as new features, demos, and more!
+          Stuff
         </h2>
       </Feature>
 ```

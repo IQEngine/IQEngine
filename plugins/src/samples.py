@@ -49,13 +49,15 @@ async def get_from_samples_cloud(samples_cloud: SamplesCloud) -> np.ndarray:
 
 def get_from_backend_server(file_path, offset, length, data_type):
     base_filepath = os.getenv("IQENGINE_BACKEND_LOCAL_FILEPATH", None)
-    base_filepath = base_filepath.replace('"','')
     if not base_filepath:
         raise Exception("IQENGINE_BACKEND_LOCAL_FILEPATH not set")
+    base_filepath = base_filepath.replace('"','')
     dtype = data_mapping[data_type]
-    count = length // np.dtype(dtype).itemsize
+    count = length // np.dtype(dtype).itemsize # needs to be in number of floats/ints, whereas length is provided in bytes. note offset is in bytes not floats/ints
     samples = np.fromfile(os.path.join(base_filepath, file_path + '.sigmf-data'), dtype=dtype, count=count, offset=offset)
-    samples = samples.astype(np.float32)
-    samples = samples[::2] + 1j*samples[1::2]
-    samples /= np.max(np.abs(samples)) # for now normalize just to be safe
-    return samples
+    if dtype == np.int16:
+        samples = samples.astype(np.float32) / np.iinfo("int16").max
+    elif dtype == np.int8:
+        samples = samples.astype(np.float32) / np.iinfo("int8").max
+    return samples.view(dtype=np.complex64)
+
