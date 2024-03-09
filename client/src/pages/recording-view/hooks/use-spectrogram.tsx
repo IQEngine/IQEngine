@@ -52,7 +52,7 @@ export function useSpectrogram(currentFFT) {
     }
 
     // at startup currentData wont even exist yet
-    if (!currentData) {
+    if (!currentData || currentData.length === 0) {
       setFFTsRequired(requiredFFTIndices);
       return null;
     }
