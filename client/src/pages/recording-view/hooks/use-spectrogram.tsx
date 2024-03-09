@@ -3,7 +3,6 @@ import { useMemo } from 'react';
 import { useSpectrogramContext } from './use-spectrogram-context';
 import { useDebounce } from 'usehooks-ts';
 import { FETCH_PADDING } from '@/utils/constants';
-import { useDataCacheFunctions } from '@/api/iqdata/Queries';
 
 export function useSpectrogram(currentFFT) {
   const {
@@ -22,8 +21,6 @@ export function useSpectrogram(currentFFT) {
     pythonSnippet,
   } = useSpectrogramContext();
 
-  const { clearIQData } = useDataCacheFunctions(type, account, container, filePath, fftSize);
-
   const { currentData, setFFTsRequired, fftsRequired, processedDataUpdated } = useGetIQData(
     type,
     account,
@@ -40,7 +37,6 @@ export function useSpectrogram(currentFFT) {
 
   // This is the list of ffts we display
   const displayedIQ = useMemo<Float32Array>(() => {
-    console.log('fftSize:', fftSize, 'currentFFT:', currentFFT);
     if (!totalFFTs || !spectrogramHeight || currentFFT < 0) {
       return null;
     }
@@ -61,13 +57,6 @@ export function useSpectrogram(currentFFT) {
       return null;
     }
 
-    console.log(currentData[0].length);
-    if (currentData[0].length !== fftSize * 2) {
-      console.log('Invalid FFT size in currentData (this will happen once each time fftsize changes');
-      clearIQData();
-      return null;
-    }
-
     // sets the FFTs that still need to be fetched
     setFFTsRequired(requiredFFTIndices.filter((i) => !currentData[i]));
 
@@ -75,8 +64,6 @@ export function useSpectrogram(currentFFT) {
     const iqData = new Float32Array(spectrogramHeight * fftSize * 2);
     for (let i = 0; i < spectrogramHeight; i++) {
       if (currentData[i + currentFFT]) {
-        //console.log('i:', i, 'currentFFT:', currentFFT, 'fftSize:', fftSize, 'spectrogramHeight:', spectrogramHeight);
-        console.log(currentData[i + currentFFT].length);
         iqData.set(currentData[i + currentFFT], i * fftSize * 2);
       } else {
         iqData.fill(-Infinity, i * fftSize * 2, (i + 1) * fftSize * 2);
