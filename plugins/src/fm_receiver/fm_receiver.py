@@ -4,31 +4,30 @@
 import base64
 
 import numpy as np
-from pydantic.dataclasses import dataclass
 from scipy import signal
 from scipy.io.wavfile import write
 import io
 import json
+from models.plugin import Plugin
 
-@dataclass
-class Plugin:
+class fm_receiver(Plugin):
     sample_rate: int = 0
     center_freq: int = 0
 
     # custom params
     target_freq: float = 0
 
-    def run(self, x):
+    def run(self, x, job_id=None):
         # Freq shift if desired
         if self.target_freq != 0:
             x = x * np.exp(-2j * np.pi * self.target_freq * np.arange(len(x))/self.sample_rate)
-        
+
         # Low pass filter to isolate FM signal
         h = signal.firwin(101, cutoff=150e3, fs=self.sample_rate).astype(np.complex64)
         x = np.convolve(x, h, "valid")
 
         x = signal.resample_poly(x, 10, int(self.sample_rate/500e3*10) ) # 500 kHz is the target
-        
+
         x = np.diff(np.unwrap(np.angle(x))) # Demodulation
 
         # De-emphasis filter, H(s) = 1/(RC*s + 1), implemented as IIR via bilinear transform

@@ -10,7 +10,7 @@ from gnuradio import gr
 from gnuradio.fft import window
 from gnuradio import zeromq
 import zmq
-
+from models.plugin import Plugin
 
 class gnuradio_lowpass_filter(gr.top_block):
     def __init__(self, sample_rate, cutoff, width):
@@ -22,8 +22,7 @@ class gnuradio_lowpass_filter(gr.top_block):
         self.connect(self.zmq_sub_source, self.filter)
 
 
-@dataclass
-class Plugin:
+class lowpass_filter_gnuradio(Plugin):
     sample_rate: int = 0
     center_freq: int = 0
 
@@ -31,7 +30,7 @@ class Plugin:
     cutoff: float = 1e6  # relative to sample rate
     width: float = 0.1e6  # relative to sample rate
 
-    def run(self, samples):
+    def rf_function(self, samples, job_id=None):
         # create a PUB socket
         context = zmq.Context()
         pub_socket = context.socket(zmq.PUB)

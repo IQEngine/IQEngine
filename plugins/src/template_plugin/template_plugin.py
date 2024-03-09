@@ -3,10 +3,9 @@
 
 import numpy as np
 import json
-from pydantic.dataclasses import dataclass
+from models.plugin import Plugin
 
-@dataclass
-class Plugin:
+class template_plugin(Plugin):
     sample_rate: int = 0
     center_freq: int = 0
     # Your custom params are below, call them whatever you want
@@ -14,7 +13,7 @@ class Plugin:
     param2: str = 'test2'
     param3: float = 5.67
 
-    def run(self, samples):
+    def rf_function(self, samples, job_id=None):
         print(samples[0:10])
         print(self.sample_rate)
         print(self.center_freq)
@@ -23,8 +22,8 @@ class Plugin:
         print(self.param3)
 
         # Your Plugin (and optionally, classification) code here
-        
-        # When making a detector, for the return, make a list, then for each detected emission, add one of these dicts to the list:   
+
+        # When making a detector, for the return, make a list, then for each detected emission, add one of these dicts to the list:
         annotations = []
         an = {}
         an['core:freq_lower_edge'] = 1 # Hz

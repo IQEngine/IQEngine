@@ -4,12 +4,10 @@
 import base64
 import fastapi
 import numpy as np
-from pydantic.dataclasses import dataclass
 from scipy import signal
+from models.plugin import Plugin
 
-
-@dataclass
-class Plugin:
+class lowpass_filter(Plugin):
     sample_rate: int = 0
     center_freq: int = 0
 
@@ -18,12 +16,12 @@ class Plugin:
     cutoff: float = 1e6  # relative to sample rate
     width: float = 0.1e6  # relative to sample rate
 
-    def run(self, samples):
+    def rf_function(self, samples, job_id=None):
         if self.numtaps > 10000:
             raise fastapi.HTTPException(status_code=500, detail="too many taps")
         if np.abs(self.width) > self.sample_rate/2:
             raise fastapi.HTTPException(status_code=500, detail="width needs to be less than sample_rate/2")
-        
+
         h = signal.firwin(
             self.numtaps,
             cutoff=self.cutoff,

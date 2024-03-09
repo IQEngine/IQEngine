@@ -2,21 +2,19 @@
 # Licensed under the MIT License.
 
 import base64
-import fastapi
 import numpy as np
 from pydantic.dataclasses import dataclass
-from scipy import signal
+from models.plugin import Plugin
 
 
-@dataclass
-class Plugin:
+class gain_stage(Plugin):
     sample_rate: int = 0
     center_freq: int = 0
 
     # custom params
     gain: float = 1
 
-    def run(self, samples):
+    def rf_function(self, samples, job_id=None):
         samples = samples * self.gain
 
         samples_obj = {

@@ -3,20 +3,18 @@
 
 import numpy as np
 import json
-from pydantic.dataclasses import dataclass
 import cv2
+from models.plugin import Plugin
 
-@dataclass
-class Plugin:
+class simple_detector(Plugin):
     sample_rate: int = 0
     center_freq: int = 0
 
     # Custom Params
     threshold_dB: float = 40.0
 
-
-    def run(self, samples):
-        #print(samples[0:10])
+    def rf_function(self, samples, job_id=None):
+        # print(samples[0:10])
         #print(self.sample_rate)
         #print(self.center_freq)
         #print(self.threshold_dB)
