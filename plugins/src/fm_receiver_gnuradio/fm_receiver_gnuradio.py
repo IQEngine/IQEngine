@@ -3,7 +3,6 @@
 
 import base64
 import numpy as np
-from pydantic.dataclasses import dataclass
 from gnuradio import filter
 from gnuradio.filter import firdes
 from gnuradio import gr
@@ -14,7 +13,7 @@ from gnuradio import analog
 import zmq
 from scipy.io.wavfile import write
 import io
-
+from models.plugin import Plugin
 class flowgraph(gr.top_block):
     def __init__(self, samp_rate):
         gr.top_block.__init__(self, "GNU Radio-based IQEngine Plugin", catch_exceptions=True)
@@ -30,12 +29,11 @@ class flowgraph(gr.top_block):
         self.connect(self.analog_wfm_rcv, self.rational_resampler)
         self.connect(self.rational_resampler, self.zmq_pub_sink)
 
-@dataclass
-class Plugin:
+class fm_receiver_gnuradio(Plugin):
     sample_rate: int = 0
     center_freq: int = 0
 
-    def run(self, samples):
+    def run(self, samples, job_id=None):
         # create a PUB socket
         context = zmq.Context()
         pub_socket = context.socket(zmq.PUB)

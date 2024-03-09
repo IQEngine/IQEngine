@@ -1,15 +1,18 @@
 import copy
+import inspect
+import json
 import logging
 import os
-import base64
+import uuid
 
 import numpy as np
-import fastapi
+from fastapi import BackgroundTasks, Body, FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from models.plugins import Plugin
+from models.plugin import Plugin
+from models.models import JobStatus, MetadataCloud, MetadataFile
 from samples import get_from_samples_cloud
 
-app = fastapi.FastAPI()
+app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
@@ -20,11 +23,7 @@ app.add_middleware(
 )
 
 @app.get("/")
-async def get_root():
-    return "Try /plugins"
-
-@app.get("/plugins")
-async def get_plugins_list():
+async def get_list_of_plugins():
     # This just looks at the list of dirs to figure out the plugins available, each dir is assumed to be 1 plugin
     dirs = []
     for file in os.listdir("."):
@@ -37,57 +36,76 @@ async def get_plugins_list():
         dirs.remove("template_plugin")
     return dirs
 
+@app.get("/{function_name}")
+async def get_custon_params(function_name: str):
+    plugin = await get_plugin_instance(function_name)
+    return plugin.get_definition()
 
-@app.get("/plugins/{plugin_name}")
-async def get_plugin_definition(plugin_name: str):
-    core_definition = await get_core_plugin_definition(plugin_name)
-    definition = copy.deepcopy(core_definition.__pydantic_model__.schema()["properties"])
-    del definition["sample_rate"]
-    del definition["center_freq"]
-    return definition
+@app.post("/{function_name}")
+async def get_root( background_tasks: BackgroundTasks,
+                    function_name: str,
+                    metadata_files: list[MetadataFile] = Body(...),
+                    iq_files: list[UploadFile] = File(...)):
+    plugin = await get_plugin_instance(function_name)
+    if len(metadata_files) != len(iq_files):
+        raise HTTPException(status_code=400, detail="The number of metadata and files do not match")
 
+    if len(metadata_files) > 1:
+        raise HTTPException(status_code=400, detail="Only one metadata file is supported at the moment")
 
-@app.post("/plugins/{plugin_name}")
-async def run(plugin_name, plugin: Plugin):
-    plugin_definition = await get_core_plugin_definition(plugin_name)
     try:
-        if plugin.samples_b64 and plugin.samples_cloud:
-            raise ValueError("Only one of samples_b64 or samples_cloud can be specified")
-        if not plugin.samples_b64 and not plugin.samples_cloud:
-            raise ValueError("One of samples_b64 or samples_cloud must be specified")
+        custom_params = {}
 
-        custom_params = plugin.custom_params
-        if plugin.samples_b64:
-            samples = np.frombuffer(base64.decodebytes(plugin.samples_b64[0].samples.encode()), dtype=np.complex64)
-            custom_params["sample_rate"] = plugin.samples_b64[0].sample_rate
-            custom_params["center_freq"] = plugin.samples_b64[0].center_freq
-        else:
-            samples = await get_from_samples_cloud(plugin.samples_cloud[0])
-            custom_params["sample_rate"] = plugin.samples_cloud[0].sample_rate
-            custom_params["center_freq"] = plugin.samples_cloud[0].center_freq
-        # at this point samples are always np.complex64 regardless of how they were provided
-        
-        plugin_instance = plugin_definition(**custom_params)  # a way to provide params as a single dict
+        samples = np.fromfile(iq_files[0].file, dtype=np.complex64)
+        custom_params["sample_rate"] = metadata_files[0].sample_rate
+        custom_params["center_freq"] = metadata_files[0].center_freq
+        #plugin_instance = plugin_definition(**custom_params)  # a way to provide params as a single dict
+        #print(plugin_instance)
+        job_id = str(uuid.uuid4()) # create a unique id for the job
+        if not os.path.isdir("jobs"):  # check if plugin server has a jobs directory
+            os.mkdir("jobs")
 
-        return plugin_instance.run(samples) # all python plugins should have a run method that takes in the samples
-    
+        # put json file with job status in jobs directory
+        job_status = JobStatus(job_id=job_id, function_name=function_name, progress=0)
+        with open(os.path.join("jobs", job_id + ".json"), "w") as f:
+            f.write(job_status.model_dump_json(indent=4))
+        #start the plugin in the background
+        # all python plugins should have a run method that takes in the samples and a uuid
+        background_tasks.add_task(plugin.run, samples, job_id)
+
+        return job_status
+
     except ValueError as e:
         print(e)
-        raise fastapi.HTTPException(status_code=400, detail="Invalid parameters: " + str(e))
+        raise HTTPException(status_code=400, detail="Invalid parameters: " + str(e))
+
     except Exception as e:
         print(e)
         logging.error(e)
-        raise fastapi.HTTPException(status_code=500, detail="Unknown error in plugins_api")
+        raise HTTPException(status_code=500, detail="Unknown error in plugins_api")
 
+@app.get("/{job_id}/status")
+async def get_job_status(job_id: str):
+    with open(os.path.join("jobs", job_id + ".json"), "r") as f:
+        return json.load(f)
 
-async def get_core_plugin_definition(plugin_name: str):
+@app.get("/{job_id}/result")
+async def get_job_result(job_id: str):
+    with open(os.path.join("results", job_id + ".json"), "r") as f:
+        return f.read()
+
+async def get_plugin_instance(plugin_name: str) -> Plugin:
     try:
         print("plugin_name:", plugin_name)
-        return getattr( __import__(plugin_name + "." + plugin_name, fromlist=["Plugin"]), "Plugin")
+        module =  __import__(plugin_name + "." + plugin_name, fromlist=["Plugin"])
+        PluginClass = getattr(module, plugin_name)
+        return PluginClass()  # Create
     except AttributeError:
-        raise fastapi.HTTPException(status_code=404, detail="Plugin definition could not be generated")
+        raise HTTPException(status_code=404, detail="Plugin definition could not be generated")
     except KeyError as err:
         print(err)
-        raise fastapi.HTTPException(status_code=500, detail="Error in plugin definition")
-    except ModuleNotFoundError:
-        raise fastapi.HTTPException(status_code=404, detail="Plugin does not exist")
+        raise HTTPException(status_code=500, detail="Error in plugin definition")
+    except ModuleNotFoundError as err:
+        print(err)
+        raise HTTPException(status_code=404, detail="Plugin does not exist")
+

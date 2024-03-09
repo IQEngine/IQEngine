@@ -32,7 +32,8 @@
   "vitest.enable": true,
   "[python]": {
     "editor.formatOnSave": false,
-    "editor.defaultFormatter": "ms-python.autopep8"
+    "editor.defaultFormatter": "ms-python.autopep8",
+    "editor.tabSize": 4  
   },
   "autopep8.args": ["--max-line-length=150", "--ignore=E302"],
   "python.formatting.provider": "black",

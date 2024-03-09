@@ -133,3 +133,7 @@ __blobstorage__
 __queuestorage__
 __azurite_db*__.json
 .python_packages
+
+# ignore dir to store job logs
+jobs
+results
