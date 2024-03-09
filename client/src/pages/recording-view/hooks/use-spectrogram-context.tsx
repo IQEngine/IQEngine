@@ -92,6 +92,13 @@ export function SpectrogramContextProvider({
     }
   }, [originMeta]);
 
+  /*
+  useEffect(() => {
+    console.log('fftSize changed');
+    clearIQData();
+  }, [fftSize]);
+  */
+
   return (
     <SpectrogramContext.Provider
       value={{
