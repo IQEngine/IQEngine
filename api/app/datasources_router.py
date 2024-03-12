@@ -184,7 +184,7 @@ async def sync_datasource(
     if not existing_datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
 
-    background_tasks.add_task(datasources.sync, account, container, current_user["preferred_username"])
+    background_tasks.add_task(datasources.sync, account, container)
     return {"message": "Syncing"}
 
 
