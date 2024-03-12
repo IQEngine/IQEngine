@@ -214,6 +214,10 @@ async def import_datasources_from_env():
     base_filepath = os.getenv("IQENGINE_BACKEND_LOCAL_FILEPATH", None)
     base_filepath = base_filepath.replace('"', '') if base_filepath else None
 
+    # For those using MSAL to enter in datasource connection info, leave IQENGINE_CONNECTION_INFO and IQENGINE_BACKEND_LOCAL_FILEPATH empty
+    if not connection_info and not base_filepath:
+        return
+
     # Clear the db
     metadata_collection = db().metadata
     await metadata_collection.delete_many({})  # clears the metadata db
