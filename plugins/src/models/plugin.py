@@ -36,9 +36,15 @@ class Plugin(ABC):
             f.write(json.dumps(result, indent=4))
     
     def get_definition(self):
-        definition = []
+        definition = {}
         for i in inspect.getmembers(self):
             if not i[0].startswith('_') and not inspect.ismethod(i[1]):
                 if not i[0] == "sample_rate" and not i[0] == "center_freq":
-                    definition.append(i[0])
+                    print(i)
+                    definition[i[0]] = {
+                        "title": i[0],
+                        "default": i[1],
+                        "type": type(i[1]).__name__,
+                        "value": i[1]
+                    }
         return definition

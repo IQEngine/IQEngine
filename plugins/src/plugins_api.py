@@ -36,12 +36,12 @@ async def get_list_of_plugins():
         dirs.remove("template_plugin")
     return dirs
 
-@app.get("/{function_name}")
-async def get_custon_params(function_name: str):
+@app.get("/plugins/{function_name}")
+async def get_custom_params(function_name: str):
     plugin = await get_plugin_instance(function_name)
     return plugin.get_definition()
 
-@app.post("/{function_name}")
+@app.post("/plugins/{function_name}")
 async def get_root( background_tasks: BackgroundTasks,
                     function_name: str,
                     metadata_files: list[MetadataFile] = Body(...),
@@ -84,12 +84,12 @@ async def get_root( background_tasks: BackgroundTasks,
         logging.error(e)
         raise HTTPException(status_code=500, detail="Unknown error in plugins_api")
 
-@app.get("/{job_id}/status")
+@app.get("/plugins/{job_id}/status")
 async def get_job_status(job_id: str):
     with open(os.path.join("jobs", job_id + ".json"), "r") as f:
         return json.load(f)
 
-@app.get("/{job_id}/result")
+@app.get("/plugins/{job_id}/result")
 async def get_job_result(job_id: str):
     with open(os.path.join("results", job_id + ".json"), "r") as f:
         return f.read()
@@ -98,8 +98,8 @@ async def get_plugin_instance(plugin_name: str) -> Plugin:
     try:
         print("plugin_name:", plugin_name)
         module =  __import__(plugin_name + "." + plugin_name, fromlist=["Plugin"])
-        PluginClass = getattr(module, plugin_name)
-        return PluginClass()  # Create
+        pluginClass = getattr(module, plugin_name)
+        return pluginClass()
     except AttributeError:
         raise HTTPException(status_code=404, detail="Plugin definition could not be generated")
     except KeyError as err:
