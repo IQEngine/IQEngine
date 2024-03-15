@@ -22,7 +22,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/")
+@app.get("/plugins")
 async def get_list_of_plugins():
     # This just looks at the list of dirs to figure out the plugins available, each dir is assumed to be 1 plugin
     dirs = []
