@@ -20,7 +20,6 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "prettier.printWidth": 120,
-  "prettier.prettierPath": "./client/node_modules/prettier",
   "azureFunctions.deploySubpath": "azure-functions",
   "azureFunctions.scmDoBuildDuringDeployment": true,
   "azureFunctions.projectLanguage": "Python",
@@ -33,7 +32,7 @@
   "[python]": {
     "editor.formatOnSave": false,
     "editor.defaultFormatter": "ms-python.autopep8",
-    "editor.tabSize": 4  
+    "editor.tabSize": 4
   },
   "autopep8.args": ["--max-line-length=150", "--ignore=E302"],
   "python.formatting.provider": "black",
