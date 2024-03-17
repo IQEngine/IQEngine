@@ -10,6 +10,12 @@ from models.plugin import Plugin
 from models.models import JobStatus, MetadataCloud, MetadataFile
 from samples import get_from_samples_cloud
 
+import re
+
+def sanitize(job_id):
+    return re.sub(r'[^\w-]+', '', job_id)
+
+
 app = FastAPI()
 
 app.add_middleware(
@@ -88,6 +94,8 @@ async def get_root(background_tasks: BackgroundTasks,
 @app.get("/plugins/{job_id}/status")
 async def get_job_status(job_id: str):
     try:
+        job_id = sanitize(job_id)
+
         with open(os.path.join("jobs", job_id + ".json"), "r") as f:
             return json.load(f)
     except FileNotFoundError:
@@ -95,6 +103,7 @@ async def get_job_status(job_id: str):
 
 @app.get("/plugins/{job_id}/result")
 async def get_job_result(job_id: str):
+    job_id = sanitize(job_id)
     job_status = await get_job_status(job_id)
     if job_status["progress"] != 100:
         raise HTTPException(status_code=400, detail="Job not complete")
