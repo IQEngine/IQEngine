@@ -8,11 +8,10 @@ from matplotlib.patches import Rectangle
 from collections import deque
 import time
 import cv2 as cv
-import json
-from pydantic.dataclasses import dataclass
 
-@dataclass
-class Plugin:
+from models.plugin import Plugin
+
+class markos_detector(Plugin):
     sample_rate: int = 0
     center_freq: int = 0
     # Your custom params are below, call them whatever you want
@@ -21,7 +20,7 @@ class Plugin:
     time_margin_seconds: float = 0.001
     min_bw: float = 10e3
 
-    def run(self, samples):
+    def rf_function(self, samples, job_id=None):
         noise_params = get_noise_floor(samples, self.sample_rate, n_floor_window_bins=self.time_window_size)
         start_time = time.time()
         anots = highlight_energy(samples=samples,
@@ -134,16 +133,16 @@ def highlight_energy(samples, samp_rate, fft_size, window_size, noise_power, pwr
         np.reshape(col, len(col))
         new_col = np.convolve(col,td_window)[:len(col)]
         smooth_det[:,col_idx] = new_col
-    
+
     gray_smooth = smooth_det.astype(np.uint8)
     print(f"mean: {np.mean(gray_smooth)}, max:{np.max(gray_smooth)}")
     gray_smooth = (gray_smooth * 255 / np.max(gray_smooth)).astype('uint8')
     threshold = 127 # TWEAKABLE PARAM
-    _, thresh = cv.threshold(gray_smooth, threshold, 255, 0) 
+    _, thresh = cv.threshold(gray_smooth, threshold, 255, 0)
     if False:
         cv.imwrite('thresh.png',thresh)
     contours, _ = cv.findContours(thresh, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
-    
+
     print(f"got this many contours: {len(contours)}")
     backtorgb = cv.cvtColor(thresh,cv.COLOR_GRAY2RGB)
     #cv.drawContours(backtorgb, contours, -1, (0,255,0), 3)
@@ -151,7 +150,7 @@ def highlight_energy(samples, samp_rate, fft_size, window_size, noise_power, pwr
     for ct in contours:
         x,y,w,h = cv.boundingRect(ct)
         rectangles.append((x,y,w,h))
-    
+
     #remove little rectangles inside of larger ones
     cleaned_rectangles = []
     for ri in range(len(rectangles)):
@@ -175,7 +174,7 @@ def highlight_energy(samples, samp_rate, fft_size, window_size, noise_power, pwr
 
     for (x,y,w,h) in cleaned_rectangles:
         cv.rectangle(backtorgb,(x,y),(x+w,y+h),(0,255,0),2)
-        
+
         an = {}
         an['core:freq_lower_edge'] = (samp_rate / fft_size) * x - (samp_rate / 2.0) + center_freq
         an['core:freq_upper_edge'] = (samp_rate / fft_size) * (x + w) - (samp_rate / 2.0) + center_freq
@@ -187,4 +186,3 @@ def highlight_energy(samples, samp_rate, fft_size, window_size, noise_power, pwr
     if False:
         cv.imwrite('thresh_cont.png', backtorgb)
     return annotations
-

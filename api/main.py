@@ -17,7 +17,7 @@ from app.converter_router import router as converter_router
 
 from helpers.apidisconnect import CancelOnDisconnectRoute
 from helpers.import_env import import_all_from_env
-from pydantic import BaseModel
+from pydantic import v1 as pydantic_v1
 from pymongo.errors import ServerSelectionTimeoutError
 from starlette.exceptions import HTTPException
 from starlette.responses import JSONResponse
@@ -50,7 +50,7 @@ class SPAStaticFiles(StaticFiles):
         return response
 
 
-class LogConfig(BaseModel):
+class LogConfig(pydantic_v1.BaseModel):
     """Logging configuration to be set for the server"""
 
     LOGGER_NAME: str = "api"

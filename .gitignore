@@ -55,3 +55,4 @@ tiling/spectrogram.pmtiles
 **/sdriq2sigmf/**/*.sigmf*
 
 e2e/test.zip
+python-env
