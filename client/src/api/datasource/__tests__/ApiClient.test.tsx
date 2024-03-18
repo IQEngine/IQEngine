@@ -23,7 +23,7 @@ describe('ApiClient Metadata Tests', () => {
     ];
     nock('http://localhost:3000').get('/api/datasources').reply(200, data);
 
-    const client = new ApiClient();
+    const client = new ApiClient(null, null, null);
     const result = await client.list();
     expect(result).toEqual(data);
   });
@@ -38,7 +38,7 @@ describe('ApiClient Metadata Tests', () => {
     };
     nock('http://localhost:3000').get('/api/datasources/gnuradio/iqengine/datasource').reply(200, data);
 
-    const client = new ApiClient();
+    const client = new ApiClient(null, null, null);
     const result = await client.get('gnuradio', 'iqengine');
     expect(result).toEqual(data);
   });
