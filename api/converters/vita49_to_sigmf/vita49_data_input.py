@@ -6,6 +6,10 @@ def main():
     """This programm converts Vita49 compliant data into SigMF. Change the Path in "vita49_data_input.py" to the location of your binary vita49 file.
     All three python files "vita49_data_input.py", which is the main file, reading in the bytestream, "vita49.py", which parses the vita compliant packets of the
     bytestream, and "Converter.py", which converts the read vita49 packets into SigMF, have to be in the same folder(or paths specified when importing).
+    Currently, Vita49 data and context packets are supported. Other packet types are not supported but should be overread.
+    For the Context packets, the CIf0 context field is implemented with most of its 32 context fields. Fields from Cif0 that are of type 
+    11*32bits, 13*32bits or array of records, are not implemented but should be overread.
+    Other Cif fields are not implemented but should be overread.
     """
     filename = "C:\\Users\\SIGENCE\\Documents\\Vita49_SigMF\\testdata\\vita49dataset3_c.bin"
     f = open(filename, "rb")

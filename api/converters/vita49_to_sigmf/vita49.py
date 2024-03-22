@@ -18,7 +18,7 @@ class Header:
     
     # *Attributes - First Word:*
     
-    - packet_type: (4bit) 0 -> data packet without StreamID, 1 -> data packet with StreamID, 4 -> context packet
+    - packet_type: (4bit) 0 -> da ta packet without StreamID, 1 -> data packet with StreamID, 4 -> context packet
     
     - C: (1bit) 1 -> Class fields (Second Word) present, 0 -> Class fields (Second Word) not present
     

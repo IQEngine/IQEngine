@@ -10,15 +10,31 @@ from datetime import timezone, datetime
 
 #dataclasses.dataclass
 class CurrentContextPacket:
+    """Stores current context packet for each data packet. Context packet object is stored in current_context dict with streamID as key and current context packet
+    object as value
+    """
     current_context = {}
 
 def match_context_packet(context: object, context_dict: CurrentContextPacket):
+    """function gets context packet in parse function and saves it as value in context dict with stream id as key. If
+    streamID does not exist yet in dictionary, the object and according streamID are added to the dictionary. If an StreamID object pair already exists,
+    the object is overwritten with the current object with that matching streamID
+
+    :param object context: object of type Packet
+    :param CurrentContextPacket context_dict: object of type currentcontextpacket (with current_context dictionary inside)
+    """
     #writes current context packet correctly in dict
-    streamID = context.header.stream_identifier #works but ugly, but otherwise circular imports
+    streamID = context.header.stream_identifier #works but ugly, but otherwise circular imports. context is of type packet, but declared as object because import vita49 not possible
     #If Object with streamID already in dictionary, overwrite current object at that streamID. If not, new key value pair is added
     context_dict.current_context[str(streamID)] = context
 
-def get_context_packet(header: object, context_dict: CurrentContextPacket):
+def get_context_packet(header: object, context_dict: CurrentContextPacket) -> object:
+    """_summary_
+
+    :param object header: packet header of type Packet.header
+    :param CurrentContextPacket context_dict: object of type currentcontextpacket (with current_context dictionary inside)
+    :return _type_: object of type packet with current context packet
+    """
     #Call this function in data packet to find the matching context packet
     stream_id = header.stream_identifier
     #return matching context packet with same streamID
@@ -35,6 +51,17 @@ def convert_payload_formats():
     pass
 
 def context_to_meta(data, packet:object, stream_ids:list, current_context_packet: object, sample_start:int) -> list:
+    """Function to create a sigMF metafile if it does not exist for a streamID yet. Necessary context information of vita49 data packed is written
+    into captures. If metafile exists already, function adds only a capture with the given parameters(center freq, sample start, timestamp(add more later))
+
+    :param _type_ data: IQ data written into sigmf data file
+    :param object packet: object of type packet (will always be data packet as function is only called for data packets. Function does not need to be called
+    for Context packets as the context packets are stored in current_context_packet for each data packet)
+    :param list stream_ids: list of streamIDs for which a meta file has been created already. Ensures that for each streamID, only one metafile is created
+    :param object current_context_packet: current context packet linked to current data packet
+    :param int sample_start: start of IQ data (gets incremented each data packet by the length of the IQ data in each data packet)
+    :return list: list of streamIDs for which the meta file has been written
+    """
     
     #write per StreamID one meta core.
     #Append per packet one capture to according meta (according to streamID)
@@ -118,6 +145,12 @@ def context_to_meta(data, packet:object, stream_ids:list, current_context_packet
     return stream_ids 
 
 def data_to_sigmfdata(packet: object, stream_ids:list):
+    """Writes IQ data from Data packet to file. 
+
+    :param object packet: datapacket
+    :param list stream_ids: list of streamIDs for which a meta file has been created already. Ensures that for each streamID, only one metafile is created
+    :return _type_: Tuple of iq_length (length of iq data in payload, so that sample start can be calculated for next data packet) and data (iq data itself in cf32)
+    """
     body = packet.body
     data_type = np.complex64
 
@@ -137,9 +170,14 @@ def data_to_sigmfdata(packet: object, stream_ids:list):
     return [data, iq_length]
 
 def convert(packet: object, stream_ids:list, current_context_packet: object, sample_start:int) -> list:
-    
-    
-    print("Packet converted")
+    """Converts vita49 data packet to sigMF meta and data file
+
+    :param object packet: object of type packet (either data packet or context packet)
+    :param list stream_ids: list of streamIDs for which a meta file has been created already. Ensures that for each streamID, only one metafile is created
+    :param object current_context_packet: current context packet linked to current data packet
+    :param int sample_start: start of IQ data (gets incremented each data packet by the length of the IQ data in each data packet)
+    :return list: tuple of streamids(list) and sample start(int)
+    """
     if packet.header.packet_type == 0 or packet.header.packet_type == 1:
         #only do something if packet type is data packet. Data packet has according context information already because of match and get context packet functions
         [data, iq_length] = data_to_sigmfdata(packet, stream_ids)
