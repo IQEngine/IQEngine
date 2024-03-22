@@ -1,0 +1,10 @@
+#Length of context fields:
+
+CONTEXT_FIELD_ENABLE = 1
+CONTEXT_FIELD_RESERVED = 1
+CONTEXT_FIELD_32 = 32
+CONTEXT_FIELD_64 = 64
+CONTEXT_FIELD_COMPLICATED = 11*32
+CONTEXT_FIELD_ECEF = 13*32
+#ignore Array of Records structure for now as to complicated 
+CONTEXT_FIELD_AOR = None
