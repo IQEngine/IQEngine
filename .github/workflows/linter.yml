@@ -44,7 +44,7 @@ jobs:
       # Checkout the code base #
       ##########################
       - name: Checkout Code
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
         with:
           # Full git history is needed to get a proper
           # list of changed files within `super-linter`
@@ -54,7 +54,7 @@ jobs:
       # Run Linter against code base #
       ################################
       - name: MegaLinter
-        uses: oxsecurity/megalinter/flavors/cupcake@a87b2872713c6bdde46d2473c5d7ed23e5752dc2 # v7.4.0
+        uses: oxsecurity/megalinter/flavors/cupcake@a7a0163b6c8ff7474a283d99a706e27483ddd80f # v7.10.0
         continue-on-error: true
         env:
           VALIDATE_ALL_CODEBASE: false
