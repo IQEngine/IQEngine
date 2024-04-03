@@ -75,7 +75,7 @@
     "tailwindcss": "3.3.5",
     "typescript": "5.3.2",
     "usehooks-ts": "2.9.1",
-    "vite": "5.0.7",
+    "vite": "5.0.13",
     "vite-plugin-env-compatible": "2.0.1",
     "vite-plugin-svgr": "4.2.0",
     "vite-tsconfig-paths": "4.2.1",
