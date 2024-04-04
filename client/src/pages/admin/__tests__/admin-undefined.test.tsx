@@ -6,7 +6,7 @@ import React from 'react';
 import { AllProviders } from '@/mocks/setup-tests';
 import { MemoryRouter } from 'react-router-dom';
 
-describe('Test Admin Unauthorised', () => {
+describe('Test Admin Undefined', () => {
   beforeEach(() => {
     vi.mock('@azure/msal-react', async () => {
       return {
@@ -16,7 +16,6 @@ describe('Test Admin Unauthorised', () => {
               getActiveAccount: () => {
                 return {
                   idTokenClaims: {
-                    roles: ['IQEngine-User'],
                   },
                 };
               },

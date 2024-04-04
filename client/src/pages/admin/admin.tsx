@@ -32,7 +32,7 @@ export const Admin = () => {
   if (
     activeAccount === null ||
     activeAccount === undefined ||
-    activeAccount?.idTokenClaims?.roles?.includes('IQEngine-Admin') === false
+    activeAccount?.idTokenClaims?.roles?.includes('IQEngine-Admin') !== true 
   ) {
     return (
       <>
