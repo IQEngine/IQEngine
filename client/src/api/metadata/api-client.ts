@@ -2,12 +2,13 @@ import { MetadataClient } from './metadata-client';
 import { SigMFMetadata, Annotation, CaptureSegment, Track } from '@/utils/sigmfMetadata';
 import { AccountInfo, IPublicClientApplication } from '@azure/msal-browser';
 import { AuthUtil } from '@/api/utils/Auth-Utils';
+import { AppConfig } from '../config/queries';
 
 export class ApiClient implements MetadataClient {
   private authUtil: AuthUtil;
 
-  constructor(instance: IPublicClientApplication, account: AccountInfo) {
-    this.authUtil = new AuthUtil(instance, account);
+  constructor(instance: IPublicClientApplication, account: AccountInfo, config: AppConfig) {
+    this.authUtil = new AuthUtil(instance, account, config);
   }
 
   async getMeta(account: string, container: string, filePath: string): Promise<SigMFMetadata> {
