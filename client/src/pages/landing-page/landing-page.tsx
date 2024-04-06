@@ -42,35 +42,86 @@ export const LandingPage = () => {
               {/* Section header */}
               <div className="text-center pb-4">
                 <h1 className="text-4xl font-extrabold leading-tighter tracking-tighter mb-4" data-aos="zoom-y-out">
-                  A{' '}
+                  Bringing the{' '}
                   <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-blue-200">
-                    web-based
+                    RF signal processing
                   </span>{' '}
-                  SDR toolkit for analyzing,<br></br> processing, and sharing RF recordings
+                  community together
                 </h1>
+                <hr className="border-secondary border-2 rounded w-16 mx-auto my-6" />
+                <h2 className="font-bold text-xl text-primary">
+                  The IQEngine community is working on the following projects:
+                </h2>
+                <div className="grid gap-2 text-xl text-primary pb-4">
+                  <ul className="list-decimal text-left">
+                    <li>
+                      <a className="underline font-bold" href="https://github.com/iqengine/iqengine" target="_blank">
+                        IQEngine
+                      </a>{' '}
+                      - A web-based tool for analyzing, processing, and sharing RF recordings{' '}
+                      <button
+                        id="browse-button"
+                        className="text-regular mx-2 py-0 px-2 bg-accent hover:bg-primary"
+                        onClick={handleOnClick}
+                      >
+                        &#128270; Start Browsing
+                      </button>
+                    </li>
+                    <li>
+                      <a className="underline font-bold" href="https://www.iqengine.org/" target="_blank">
+                        IQEngine.org
+                      </a>{' '}
+                      - The public instance of IQEngine, with public recordings
+                    </li>
+                    <li>
+                      <a className="underline font-bold" href="http://localhost:3000/docs/plugins" target="_blank">
+                        Plugins API
+                      </a>{' '}
+                      - A REST-based API for RF signal processing, used within IQEngine and by others
+                    </li>
+                    <li>
+                      Index of open source software, free online learning resources, and University programs (expand
+                      sections below)
+                    </li>
+                  </ul>
+                </div>
 
-                <div
-                  className="pt-4 pb-6 max-w-xs mx-auto sm:max-w-none sm:flex sm:justify-center"
-                  data-aos="zoom-y-out"
-                  data-aos-delay="300"
-                >
-                  <button
-                    id="browse-button"
-                    className="text-3xl py-2 px-4 bg-accent hover:bg-primary"
-                    onClick={handleOnClick}
-                  >
-                    &#128270; Start Browsing
-                  </button>
-                </div>
-                <div className="grid gap-2 font-bold text-lg text-primary pb-4 justify-items-center">
-                  <p>Browse RF recordings shared by the community or your own local files</p>
-                  <hr className="border-secondary border-2 rounded w-16 " />
-                  <p>View/edit SigMF annotations and other useful metadata</p>
-                  <hr className="border-secondary border-2 rounded w-16" />
-                  <p>Expand your knowledge of wireless signals and how to analyze/process them</p>
-                  <hr className="border-secondary border-2 rounded w-16" />
-                  <p>Bringing the open-source RF community together</p>
-                </div>
+                {/* FOSS Software */}
+                <details>
+                  <summary className="pl-2 mx-16 my-2 bg-primary outline outline-1 outline-primary text-lg text-base-100 hover:bg-green-800">
+                    Open-source software for RF signal processing
+                  </summary>
+                  <div className="outline outline-1 outline-primary p-2 mx-16">
+                    <ul className="list-decimal text-left">
+                      <li>asdasd</li>
+                    </ul>
+                  </div>
+                </details>
+
+                {/* Online learning */}
+                <details>
+                  <summary className="pl-2 mx-16 my-2 bg-primary outline outline-1 outline-primary text-lg text-base-100 hover:bg-green-800">
+                    Online learning resources for RF signal processing
+                  </summary>
+                  <div className="outline outline-1 outline-primary p-2 mx-16">
+                    <ul className="list-decimal text-left">
+                      <li>asdasd</li>
+                    </ul>
+                  </div>
+                </details>
+
+                {/* Universities */}
+                <details>
+                  <summary className="pl-2 mx-16 my-2 bg-primary outline outline-1 outline-primary text-lg text-base-100 hover:bg-green-800">
+                    Universities with emphasis on RF signal processing
+                  </summary>
+                  <div className="outline outline-1 outline-primary p-2 mx-16">
+                    <ul className="list-decimal text-left">
+                      <li>asdasd</li>
+                    </ul>
+                  </div>
+                </details>
+
                 {/* Animation
                 <div>
                   <div className="relative flex justify-center mb-8" data-aos="zoom-y-out" data-aos-delay="450">
