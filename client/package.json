@@ -70,6 +70,7 @@
     "react-loader-spinner": "5.4.5",
     "react-plotly.js": "2.6.0",
     "react-router-dom": "6.20.1",
+    "react-wordcloud": "^1.2.7",
     "styled-components": "6.1.1",
     "swagger-ui-react": "5.10.3",
     "tailwindcss": "3.3.5",

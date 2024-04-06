@@ -6,6 +6,70 @@ import { useNavigate } from 'react-router-dom';
 import { useFeatureFlags } from '@/hooks/use-feature-flags';
 import Transition from './transition';
 import Browser from '../browser/browser';
+import ReactWordcloud from 'react-wordcloud';
+
+const wordcloud = [
+  {
+    text: 'DSP',
+    value: 10,
+  },
+  {
+    text: 'Filtering',
+    value: 5,
+  },
+  {
+    text: 'FFTs',
+    value: 5,
+  },
+  {
+    text: 'RX',
+    value: 5,
+  },
+  {
+    text: 'TX',
+    value: 5,
+  },
+  {
+    text: 'RF',
+    value: 10,
+  },
+  {
+    text: 'Wireless',
+    value: 10,
+  },
+  {
+    text: 'SDR',
+    value: 9,
+  },
+  {
+    text: '5G',
+    value: 5,
+  },
+  {
+    text: 'RFML',
+    value: 10,
+  },
+  {
+    text: 'Comms',
+    value: 10,
+  },
+  {
+    text: 'Radar',
+    value: 6,
+  },
+  {
+    text: 'Detection',
+    value: 8,
+  },
+  {
+    text: 'Satellites',
+    value: 7,
+  },
+  {
+    text: 'Education',
+    value: 7,
+  },
+];
 
 export const LandingPage = () => {
   const navigate = useNavigate();
@@ -48,7 +112,27 @@ export const LandingPage = () => {
                   </span>{' '}
                   community together
                 </h1>
-                <hr className="border-secondary border-2 rounded w-16 mx-auto my-6" />
+                {/*<hr className="border-secondary border-2 rounded w-16 mx-auto mt-6 mb-0" />*/}
+                <div className="mx-auto w-128 h-24">
+                  <ReactWordcloud
+                    words={wordcloud}
+                    options={{
+                      colors: ['#4CE091', '#136f63', '#84cae7', '#a9a9aa', '#2a8583'],
+                      enableTooltip: true,
+                      deterministic: true,
+                      fontFamily: 'impact',
+                      fontSizes: [15, 25],
+                      fontStyle: 'normal',
+                      fontWeight: 'normal',
+                      padding: 2,
+                      rotations: 20,
+                      rotationAngles: [-45, 45], // min to max
+                      scale: 'sqrt',
+                      spiral: 'archimedean',
+                      transitionDuration: 1000,
+                    }}
+                  />
+                </div>
                 <h2 className="font-bold text-xl text-primary">
                   The IQEngine community is working on the following projects:
                 </h2>
@@ -197,15 +281,6 @@ export const LandingPage = () => {
                         </a>{' '}
                         - Trunk Recorder is able to record the calls on trunked and conventional radio systems (e.g.,
                         P25).
-                      </li>
-                      <li>
-                        <a href="" target="_blank"></a>
-                      </li>
-                      <li>
-                        <a href="" target="_blank"></a>
-                      </li>
-                      <li>
-                        <a href="" target="_blank"></a>
                       </li>
                     </ul>
                   </div>
