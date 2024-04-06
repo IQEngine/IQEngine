@@ -86,26 +86,127 @@ export const LandingPage = () => {
                   </ul>
                 </div>
 
-                {/* FOSS Software */}
-                <details>
-                  <summary className="pl-2 mx-16 my-2 bg-primary outline outline-1 outline-primary text-lg text-base-100 hover:bg-green-800">
-                    Open-source software for RF signal processing
-                  </summary>
-                  <div className="outline outline-1 outline-primary p-2 mx-16">
-                    <ul className="list-decimal text-left">
-                      <li>asdasd</li>
-                    </ul>
-                  </div>
-                </details>
-
                 {/* Online learning */}
                 <details>
                   <summary className="pl-2 mx-16 my-2 bg-primary outline outline-1 outline-primary text-lg text-base-100 hover:bg-green-800">
                     Online learning resources for RF signal processing
                   </summary>
-                  <div className="outline outline-1 outline-primary p-2 mx-16">
+                  <div className="outline outline-1 outline-primary p-6 mx-16">
                     <ul className="list-decimal text-left">
-                      <li>asdasd</li>
+                      <li>
+                        <a href="https://pysdr.org/" target="_blank">
+                          PySDR
+                        </a>{' '}
+                        - An intro to RF DSP and SDR using many diagrams, animations, and Python examples, light on
+                        math.
+                      </li>
+                      <li>
+                        <a href="https://www.dspguide.com/" target="_blank">
+                          dspguide.com
+                        </a>{' '}
+                        aka The Scientist and Engineer's Guide to Digital Signal Processing By Steven W. Smith - Not
+                        specific to RF but an excellent primer into DSP techniques.
+                      </li>
+                      <li>
+                        <a href="https://wiki.gnuradio.org/index.php/Tutorials" target="_blank">
+                          GNU Radio Tutorials
+                        </a>{' '}
+                        - A lot of the GNU Radio tutorials are really just introductions to DSP concepts, using GNU
+                        Radio examples to play with the concepts (e.g., FFTs, filtering, resampling, frequency shifts).
+                      </li>
+                      <li>
+                        <a href="https://dsprelated.com/tutorials.php" target="_blank">
+                          DSP Related tutorials and blog posts
+                        </a>{' '}
+                        - Big mix of stuff, likely also found through Google searches on a specific topic.
+                      </li>
+                      <li>
+                        <a href="https://www.youtube.com/watch?v=spUNpyF58BY" target="_blank">
+                          3Blue1Brown's YouTube Videos
+                        </a>{' '}
+                        - Mostly not RF related but some of the best graphical intros to FFTs, convolution, channel
+                        coding.
+                      </li>
+                      <li>
+                        <a href="https://dspillustrations.com/pages/index.html" target="_blank">
+                          DSP Illustrated
+                        </a>{' '}
+                        - A series of blog style posts on RF signal processing topics, full of diagrams, animations, and
+                        Python examples.
+                      </li>
+                      <li>
+                        <a href="https://www.wavewalkerdsp.com/" target="_blank">
+                          Wave Walker DSP
+                        </a>{' '}
+                        - Blog style posts on DSP algorithms for RF systems.
+                      </li>
+                    </ul>
+                  </div>
+                </details>
+
+                {/* FOSS Software */}
+                <details>
+                  <summary className="pl-2 mx-16 my-2 bg-primary outline outline-1 outline-primary text-lg text-base-100 hover:bg-green-800">
+                    Open-source software for RF signal processing
+                  </summary>
+                  <div className="outline outline-1 outline-primary p-6 mx-16">
+                    This list includes software representing applications or frameworks for either realtime (using an
+                    SDR) or offline RF signal processing/visualization/generation. General purpose receivers (e.g.,
+                    GQRX, SDR#, SDR++, SigDigger, ShinySDR), pure libraries (e.g., liquid-dsp, SoapySDR), and
+                    RF/SDR-focused operating systems (e.g., Dragon OS) are not included in order to limit scope.
+                    <ul className="list-decimal text-left">
+                      <li>
+                        <a href="https://www.gnuradio.org/" target="_blank">
+                          GNU Radio
+                        </a>{' '}
+                        - A software development toolkit that provides signal processing blocks to implement software
+                        radios. It can be used with readily-available low-cost external RF hardware to create
+                        software-defined radios, or without hardware in a simulation-like environment. GNU Radio is an
+                        entire ecosystem as there exist many 3rd party modules and corresponding applications to go with
+                        them.
+                      </li>
+                      <li>
+                        <a href="https://github.com/SatDump/SatDump" target="_blank">
+                          SatDump
+                        </a>{' '}
+                        - Satellite signal and data processing software (both PHY layer and up), can also be used to
+                        operate a DIY satellite ground station. Supports dozens of different satellite signals.
+                      </li>
+                      <li>
+                        <a href="https://github.com/srsran/srsRAN_Project" target="_blank">
+                          srsRAN
+                        </a>{' '}
+                        - Software stack for 5G and LTE, both the base station and user equipment (UE), can be used with
+                        a variety of SDRs.
+                      </li>
+                      <li>
+                        <a href="https://github.com/miek/inspectrum" target="_blank">
+                          Inspectrum
+                        </a>{' '}
+                        - A tool for analysing captured signals.
+                      </li>
+                      <li>
+                        <a href="https://github.com/MalcolmRobb/dump1090" target="_blank">
+                          Dump1090
+                        </a>{' '}
+                        - Mode S aircraft ADS-B decoder specifically designed for RTLSDR devices.
+                      </li>
+                      <li>
+                        <a href="https://github.com/robotastic/trunk-recorder" target="_blank">
+                          Trunk Recorder
+                        </a>{' '}
+                        - Trunk Recorder is able to record the calls on trunked and conventional radio systems (e.g.,
+                        P25).
+                      </li>
+                      <li>
+                        <a href="" target="_blank"></a>
+                      </li>
+                      <li>
+                        <a href="" target="_blank"></a>
+                      </li>
+                      <li>
+                        <a href="" target="_blank"></a>
+                      </li>
                     </ul>
                   </div>
                 </details>
@@ -115,9 +216,71 @@ export const LandingPage = () => {
                   <summary className="pl-2 mx-16 my-2 bg-primary outline outline-1 outline-primary text-lg text-base-100 hover:bg-green-800">
                     Universities with emphasis on RF signal processing
                   </summary>
-                  <div className="outline outline-1 outline-primary p-2 mx-16">
+                  <div className="outline outline-1 outline-primary p-6 mx-16">
+                    The following lists universities with strong graduate programs in RF signal processing, along with
+                    related courses that are taught at least once per year. To add to this list, post in the{' '}
+                    <a href="https://discord.gg/k7C8kp3b76" target="_blank">
+                      IQEngine Discord
+                    </a>{' '}
+                    or put in a PR .
                     <ul className="list-decimal text-left">
-                      <li>asdasd</li>
+                      <li>
+                        Virginia Tech
+                        <ul className="text-left">
+                          <li>ECE-3614 Intro Comm Systems</li>
+                          <li>ECE-4624 DSP & Filter Design</li>
+                          <li>ECE-4634 Digital Communications (+ Lab)</li>
+                          <li>ECE-4644 Satellite Communications</li>
+                          <li>ECE-5620 Advanced DSP and Filter Design</li>
+                          <li>ECE-5654 Dig Comm Adv Theory & Analy</li>
+                          <li>ECE-5660 Spread Spectrum Communications</li>
+                          <li>ECE-5664 Cellular Communication Systems</li>
+                          <li>ECE-5674 Software Radios</li>
+                          <li>ECE-6634 Multi-Channel Communications (MIMO + OFDM)</li>
+                        </ul>
+                      </li>
+                      <li>
+                        Northeastern
+                        <ul className="text-left">
+                          <li>EECE 5576 Wireless Communication Systems</li>
+                          <li>EECE 5666 Digital Signal Processing</li>
+                          <li>EECE 5155 Wireless Sensor Networks and the Internet of Things</li>
+                          <li>EECE 7364 Mobile and Wireless Networking</li>
+                          <li>EECE 7374 Fundamentals of Computer Networks</li>
+                          <li>EECE 7336 Digital Communications</li>
+                        </ul>
+                      </li>
+                      <li>
+                        NYU
+                        <ul className="text-left">
+                          <li>ECE-GY 6023 Wireless Communications</li>
+                          <li>ECE-GY 6113 Digital Signal Processing I (+ Lab)</li>
+                          <li>ECE-UY 3404 Fundamentals of Communication Theory</li>
+                          <li>ECE-UY 4283 Wireless Information Systems Laboratory II</li>
+                        </ul>
+                      </li>
+                      <li>
+                        Colorado Boulder
+                        <ul className="text-left">
+                          <li>ECEN 4532 Digital Signal Processing Laboratory</li>
+                          <li>ECEN 5692 Principles of Digital Communication</li>
+                          <li>ECEN 4632 Introduction to Digital Filtering</li>
+                          <li>ECEN 4634 Microwave and RF Laboratory</li>
+                          <li>ECEN 5632 Theory and Application of Digital Filtering</li>
+                        </ul>
+                      </li>
+                      <li>Georgia Tech</li>
+                      <li>Arizona State</li>
+                      <li>
+                        Johns Hopkins
+                        <ul className="text-left">
+                          <li>EN.520.612 Machine Learning for Signal Processing</li>
+                          <li>EN.520.635 Digital Signal Processing</li>
+                          <li>EN.520.646 Wavelets & Filter Banks</li>
+                        </ul>
+                      </li>
+                      <li>UCLA</li>
+                      <li>The University of Utah</li>
                     </ul>
                   </div>
                 </details>
