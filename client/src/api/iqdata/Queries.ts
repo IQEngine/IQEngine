@@ -7,6 +7,7 @@ import { useMeta } from '@/api/metadata/queries';
 import { useMsal } from '@azure/msal-react';
 import { applyProcessing } from '@/utils/fetch-more-data-source';
 import { groupContiguousIndexes } from '@/utils/group';
+import { useConfigQuery } from '../config/queries';
 
 declare global {
   interface Window {
@@ -82,7 +83,9 @@ export function useGetIQData(
 
   const { instance } = useMsal();
 
-  const iqDataClient = IQDataClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance);
+  const { data: config } = useConfigQuery();
+
+  const iqDataClient = IQDataClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance, config);
 
   // fetches iqData, this happens first, and the iqData is in one big continuous chunk
   const { data: iqData } = useQuery({
@@ -211,7 +214,8 @@ export function useGetMinimapIQ(type: string, account: string, container: string
   const { data: meta } = useMeta(type, account, container, filePath);
   const { filesQuery, dataSourcesQuery } = useUserSettings();
   const { instance } = useMsal();
-  const iqDataClient = IQDataClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance);
+  const { data: config } = useConfigQuery();
+  const iqDataClient = IQDataClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance, config);
   const minimapQuery = useQuery<Float32Array[]>({
     queryKey: ['minimapiq', type, account, container, filePath],
     queryFn: async ({ signal }) => {

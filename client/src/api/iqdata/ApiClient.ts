@@ -5,12 +5,13 @@ import { IQDataSlice } from '@/api/Models';
 import { convertToFloat32 } from '@/utils/fetch-more-data-source';
 import { AccountInfo, IPublicClientApplication } from '@azure/msal-browser';
 import { AuthUtil } from '@/api/utils/Auth-Utils';
+import { AppConfig } from '../config/queries';
 
 export class ApiClient implements IQDataClient {
   private authUtil: AuthUtil;
 
-  constructor(instance: IPublicClientApplication, account: AccountInfo) {
-    this.authUtil = new AuthUtil(instance, account);
+  constructor(instance: IPublicClientApplication, account: AccountInfo, config: AppConfig) {
+    this.authUtil = new AuthUtil(instance, account, config);
   }
   async getIQDataBlocks(
     meta: SigMFMetadata,
