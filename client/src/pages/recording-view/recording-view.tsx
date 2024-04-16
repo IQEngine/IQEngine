@@ -133,6 +133,29 @@ export function RecordingViewPage() {
   const [currentFFT, setCurrentFFT] = useState<number>(0);
   const Tabs = Object.keys(Tab).filter((key) => isNaN(Number(key)));
 
+  const handleDownload = async () => {
+    try {
+        const response = await fetch(`/api/download-recording/${type}/${account}/${container}/${filePath}`, {
+            method: 'GET'
+        });
+        if (response.ok) {
+            const blob = await response.blob();
+            const downloadUrl = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.setAttribute('download', `${filePath}.zip`); // Assuming server sends a ZIP
+            document.body.appendChild(link);
+            link.click();
+            link.parentNode.removeChild(link);
+        } else {
+            alert('Failed to download recording');
+        }
+    } catch (error) {
+        console.error('Error downloading recording:', error);
+        alert('Error downloading recording');
+    }
+  };
+
   if (!meta) {
     return (
       <div className="flex flex-col items-center justify-center h-full">
@@ -163,9 +186,12 @@ export function RecordingViewPage() {
                   );
                 })}
               </div>
-              {/* The following displays the spectrogram, time, freq, and IQ plots depending on which one is selected*/}
               <DisplaySpectrogram currentFFT={currentFFT} setCurrentFFT={setCurrentFFT} currentTab={currentTab} />
               <DisplayMetaSummary />
+              {/* Add the Download Button here */}
+              <button onClick={handleDownload} className="mt-4 mb-2 bg-green-500 text-white font-bold py-2 px-4 rounded hover:bg-green-700">
+                Download Full Recording
+              </button>
             </div>
           </div>
           <div className="mt-3 mb-0 px-2 py-0" style={{ margin: '5px' }}>
@@ -177,7 +203,6 @@ export function RecordingViewPage() {
                 <AnnotationList setCurrentFFT={setCurrentFFT} currentFFT={currentFFT} />
               </div>
             </details>
-
             <details>
               <summary className="pl-2 mt-2 bg-primary outline outline-1 outline-primary text-lg text-base-100 hover:bg-green-800">
                 Global Properties

@@ -20,6 +20,46 @@ from helpers.samples import get_bytes_per_iq_sample
 router = APIRouter(route_class=CancelOnDisconnectRoute)
 
 
+import zipfile
+
+@router.get("/api/download-recording/{account}/{container}/{filepath:path}")
+async def download_full_recording(
+    account: str,
+    container: str,
+    filepath: str,
+    datasource: DataSource = Depends(datasources.get),
+    azure_client: AzureBlobClient = Depends(AzureBlobClient),
+    access_allowed=Depends(check_access)
+):
+    if access_allowed is None:
+        raise HTTPException(status_code=403, detail="Access Denied")
+
+    if not datasource:
+        raise HTTPException(status_code=404, detail="Datasource not found")
+
+    # Paths to the SIGMF data and meta files
+    data_path = f'{filepath}.sigmf-data'
+    meta_path = f'{filepath}.sigmf-meta'
+
+    # Check if both files exist
+    if not azure_client.blob_exist(data_path) or not azure_client.blob_exist(meta_path):
+        raise HTTPException(status_code=404, detail="Files not found")
+
+    # Create a ZIP file in memory
+    memory_file = io.BytesIO()
+    with zipfile.ZipFile(memory_file, 'w') as zf:
+        # Add SIGMF data file to the ZIP
+        with azure_client.get_blob_stream(data_path) as data_stream:
+            zf.writestr(f'{filepath}.sigmf-data', data_stream.read())
+        # Add SIGMF meta file to the ZIP
+        with azure_client.get_blob_stream(meta_path) as meta_stream:
+            zf.writestr(f'{filepath}.sigmf-meta', meta_stream.read())
+
+    # Prepare the ZIP file for download
+    memory_file.seek(0)
+    return StreamingResponse(memory_file, media_type="application/zip", headers={"Content-Disposition": f"attachment; filename={filepath}.zip"})
+
+
 class IQData(BaseModel):
     indexes: List[int]
     tile_size: int
