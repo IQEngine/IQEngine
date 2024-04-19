@@ -78,11 +78,11 @@ export function convertToFloat32(buffer, dataType) {
     return samples;
   } else if (dataType === 'ci16_le' || dataType === 'ci16') {
     let samples = Float32Array.from(new Int16Array(buffer));
-    for (let i = 0; i < samples.length; i++) samples[i] = samples[i] / 32768.0;
+    for (let i = 0; i < samples.length; i++) samples[i] = samples[i] / 32767.0;
     return samples;
   } else if (dataType === 'cu16_le' || dataType === 'cu16') {
     let samples = Float32Array.from(new Uint16Array(buffer));
-    for (let i = 0; i < samples.length; i++) samples[i] = (samples[i] - 32768.0) / 32768.0;
+    for (let i = 0; i < samples.length; i++) samples[i] = (samples[i] - 32767.0) / 32767.0;
     return samples;
   } else if (dataType === 'ci32_le' || dataType === 'ci32') {
     let samples = Float32Array.from(new Int32Array(buffer));
