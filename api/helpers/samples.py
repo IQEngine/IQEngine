@@ -5,22 +5,30 @@ from PIL import Image
 
 def get_samples(data_bytes, data_type) -> np.ndarray:
     if data_type == "ci8" or data_type == "ci8_le" or data_type == "i8":
-        samples = np.frombuffer(data_bytes, dtype=np.int8)
+        samples = np.frombuffer(data_bytes, dtype=np.int8).astype(np.float32)
+        samples /= 127.0
         samples = samples[::2] + 1j * samples[1::2]
     elif data_type == "cu8" or data_type == "cu8_le" or data_type == "u8":
-        samples = np.frombuffer(data_bytes, dtype=np.uint8)
+        samples = np.frombuffer(data_bytes, dtype=np.uint8).astype(np.float32)
+        samples -= 127.0
+        samples /= 127.0
         samples = samples[::2] + 1j * samples[1::2]
     elif data_type == "ci16" or data_type == "ci16_le":
-        samples = np.frombuffer(data_bytes, dtype=np.int16)
+        samples = np.frombuffer(data_bytes, dtype=np.int16).astype(np.float32)
+        samples /= 32767.0
         samples = samples[::2] + 1j * samples[1::2]
     elif data_type == "cu16" or data_type == "cu16_le":
-        samples = np.frombuffer(data_bytes, dtype=np.uint16)
+        samples = np.frombuffer(data_bytes, dtype=np.uint16).astype(np.float32)
+        samples -= 32767.0
+        samples /= 32767.0
         samples = samples[::2] + 1j * samples[1::2]
     elif data_type == "cu32" or data_type == "cu32_le":
-        samples = np.frombuffer(data_bytes, dtype=np.uint32)
+        samples = np.frombuffer(data_bytes, dtype=np.uint32).astype(np.float32)
+        samples -= 2147483647.0
+        samples /= 2147483647.0
         samples = samples[::2] + 1j * samples[1::2]
     elif data_type == "f16" or data_type == "f16_le":
-        samples = np.frombuffer(data_bytes, dtype=np.float16)
+        samples = np.frombuffer(data_bytes, dtype=np.float16).astype(np.float32)
         samples = samples[::2] + 1j * samples[1::2]
     elif data_type == "f32" or data_bytes == "f32_le":
         samples = np.frombuffer(data_bytes, dtype=np.float32)
@@ -28,7 +36,7 @@ def get_samples(data_bytes, data_type) -> np.ndarray:
     elif data_type == "cf32_le" or data_type == "cf32":
         samples = np.frombuffer(data_bytes, dtype=np.complex64)
     elif data_type == "cf64_le" or data_type == "cf64":
-        samples = np.frombuffer(data_bytes, dtype=np.complex128)
+        samples = np.frombuffer(data_bytes, dtype=np.complex128).astype(np.complex64)
     else:
         raise ValueError("Datatype " + data_type + " not implemented")
     return samples
