@@ -1,7 +1,3 @@
-// Copyright (c) 2022 Microsoft Corporation
-// Copyright (c) 2023 Marc Lichtman
-// Licensed under the MIT License
-
 import React from 'react';
 
 const exampleMeta = `
@@ -50,7 +46,8 @@ const exampleMeta = `
 export const SigMF = () => {
   return (
     <div className="mx-32 pt-5">
-      <span className="text-lg text-primary font-bold">Quick Links: </span>
+      {/* Quick Links */}
+      <span className="text-lg text-primary">Quick Links: </span>
       <a href="https://github.com/sigmf/SigMF/blob/sigmf-v1.x/sigmf-spec.md" target="_blank">
         <button>SigMF Specs</button>
       </a>{' '}
@@ -60,6 +57,45 @@ export const SigMF = () => {
       <a href="/validator">
         <button>SigMF Validator</button>
       </a>
+      <br />
+      {/* Datatype Reference */}
+      <span className="text-lg text-primary pr-4">Datatype Reference:</span>
+      <span className="text-lg">
+        <b className="text-primary text-2xl">c</b>omplex
+      </span>
+      <span className="text-lg text-primary px-2">|</span>
+      <span className="text-lg">
+        <b className="text-primary text-2xl">r</b>eal
+      </span>
+      <span className="text-lg text-primary px-2">|</span>
+      <span className="text-lg">
+        <b className="text-primary text-2xl">f</b>loat
+      </span>
+      <span className="text-lg text-primary px-2">|</span>
+      <span className="text-lg">
+        signed <b className="text-primary text-2xl">i</b>nteger
+      </span>
+      <span className="text-lg text-primary px-2">|</span>
+      <span className="text-lg">
+        <b className="text-primary text-2xl">u</b>nsigned integer
+      </span>
+      <div className="grid grid-cols-3 px-32">
+        <ul>
+          <li>cf32_le</li>
+          <li>cf64_le</li>
+        </ul>
+        <ul>
+          <li>ci16_le</li>
+          <li>cu16_le</li>
+          <li>ci32_le</li>
+          <li>cu32_le</li>
+        </ul>
+        <ul>
+          <li>cu8</li>
+          <li>ci8</li>
+        </ul>
+      </div>
+      {/* What is SigMF */}
       <h1 className="text-primary text-center">What is SigMF?</h1>
       <div className="columns-2">
         <p className="text-justify text-lg">
