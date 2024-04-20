@@ -51,8 +51,6 @@ export function useSpectrogram(currentFFT) {
         requiredFFTIndices.push(indx);
       }
     }
-    console.log('fftStepSize:', fftStepSize);
-    console.log('requiredFFTIndices:', requiredFFTIndices);
 
     // at startup currentData wont even exist yet
     if (!currentData || currentData.length === 0) {
