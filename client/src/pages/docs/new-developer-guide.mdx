@@ -53,11 +53,13 @@ Everything below is specific to the client code
   - api/plugin - key 'plugins', GET/POST/DELETE/PUT /api/plugins/\{plugin.name\} 
   - api/user-settings - some defaults like colormap are stored here
   - api/users - key 'users', GET /api/users
-
-
-
-
-
+- Within api/iqdata there is IQDataClient which only has 2 functions- getIQDataBlocks(), getMinimapIQ(), and then a Factory around it to have different code for API, Blob, and Local storage.
+  - getIQDataBlocks() takes in SigMFMetadata, fftsRequired, fftsize, and an AbortSignal.  It returns Promise\<IQDataSlice[]\>, where each IQDataSlice contains an index and a Float32Array
+- As far as where the IQ samples are stored, there are 3 different keys:
+  - 'iqData' - just the recently fetched raw IQ
+  - 'rawiqdata' - all the raw IQ in storage
+  - 'processedIQData' - stores the output of applyProcessing() which includes pyodide, filter, squaring.  If any of those things change, or fftsize changes, it recomputes processedIQData, this happens in api/iqdata/Queries.ts
+- As far as zooming, 
 
 ### Misc Developer Tips
 

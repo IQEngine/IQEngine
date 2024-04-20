@@ -1,4 +1,4 @@
-import { SigMFMetadata, TraceabilityOrigin } from '@/utils/sigmfMetadata';
+import { SigMFMetadata } from '@/utils/sigmfMetadata';
 import { FileWithDirectoryAndFileHandle } from 'browser-fs-access';
 import { IQDataClient } from './IQDataClient';
 import { IQDataSlice } from '@/api/Models';
