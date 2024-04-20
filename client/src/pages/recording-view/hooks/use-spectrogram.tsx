@@ -35,8 +35,9 @@ export function useSpectrogram(currentFFT) {
   const totalFFTs = Math.ceil(meta?.getTotalSamples() / fftSize);
   const debouncedCurrentFFT = useDebounce<string>(currentFFT, 50);
 
-  // This is the list of ffts we display
+  // useMemo is used to cache displayedIQ between rerenders, it's only recalculated when the dependencies change
   const displayedIQ = useMemo<Float32Array>(() => {
+    console.log('STARTING displayedIQ RECALC');
     if (!totalFFTs || !spectrogramHeight || currentFFT < 0) {
       return null;
     }
@@ -50,6 +51,8 @@ export function useSpectrogram(currentFFT) {
         requiredFFTIndices.push(indx);
       }
     }
+    console.log('fftStepSize:', fftStepSize);
+    console.log('requiredFFTIndices:', requiredFFTIndices);
 
     // at startup currentData wont even exist yet
     if (!currentData || currentData.length === 0) {
@@ -61,10 +64,11 @@ export function useSpectrogram(currentFFT) {
     setFFTsRequired(requiredFFTIndices.filter((i) => !currentData[i]));
 
     // Grab the portion that is visible on the spectrogram right now, fill with -infty if data isnt available
+    // note- currentData is essentially just 'processedIQData' key in react query
     const iqData = new Float32Array(spectrogramHeight * fftSize * 2);
     for (let i = 0; i < spectrogramHeight; i++) {
-      if (currentData[i + currentFFT]) {
-        iqData.set(currentData[i + currentFFT], i * fftSize * 2);
+      if (currentData[currentFFT + i * (fftStepSize + 1)]) {
+        iqData.set(currentData[currentFFT + i * (fftStepSize + 1)], i * fftSize * 2);
       } else {
         iqData.fill(-Infinity, i * fftSize * 2, (i + 1) * fftSize * 2);
       }
