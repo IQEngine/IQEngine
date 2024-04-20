@@ -59,7 +59,13 @@ Everything below is specific to the client code
   - 'iqData' - just the recently fetched raw IQ
   - 'rawiqdata' - all the raw IQ in storage
   - 'processedIQData' - stores the output of applyProcessing() which includes pyodide, filter, squaring.  If any of those things change, or fftsize changes, it recomputes processedIQData, this happens in api/iqdata/Queries.ts
-- As far as zooming, 
+- fftsRequired is currently stored using useState, within api/iqdata/Queries.ts
+- As far as zooming out, the current zoom level is stored in fftStepSize and set with setFFTStepSize, in file recording-view/hooks/use-spectrogram-context.tsx
+   - Zooming out is done by batch decimating, where the batch size matches the FFT size
+   - fftStepSize of 0 means no zooming out, and the samples will be contiguous
+   - setFFTStepSize gets called in just one spot, in settings-pane.tsx when the slider is moved
+   - fftStepSize is used in several spots including the scollbar, plotting annotations, when calculating requiredFFTIndices (happens in hooks/use-spectrogram.tsx)
+- useGetImage is what ultimately creates the 2d RGB bitmap,  
 
 ### Misc Developer Tips
 

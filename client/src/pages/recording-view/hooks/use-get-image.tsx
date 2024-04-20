@@ -36,5 +36,5 @@ export const useGetImage = (
     }
   }, [ffts, magnitudeMin, magnitudeMax, colmap]);
 
-  return { image, setIQData, ffts };
+  return { image, setIQData };
 };
