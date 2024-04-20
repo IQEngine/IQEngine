@@ -1,4 +1,4 @@
-import { TraceabilityOrigin } from "@/utils/sigmfMetadata";
+import { TraceabilityOrigin } from '@/utils/sigmfMetadata';
 
 export interface DataSource {
   type: string;
@@ -13,7 +13,6 @@ export interface DataSource {
   readers?: string[];
   public?: boolean;
 }
-
 
 export interface SmartQueryResult {
   parameters: object;

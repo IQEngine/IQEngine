@@ -1,4 +1,4 @@
-import { SigMFMetadata, TraceabilityOrigin } from '@/utils/sigmfMetadata';
+import { SigMFMetadata } from '@/utils/sigmfMetadata';
 import { FileWithDirectoryAndFileHandle } from 'browser-fs-access';
 import { IQDataClient } from './IQDataClient';
 import { IQDataSlice } from '@/api/Models';
@@ -11,6 +11,7 @@ export class LocalClient implements IQDataClient {
   constructor(files: FileWithDirectoryAndFileHandle[]) {
     this.files = files;
   }
+
   async getMinimapIQ(meta: SigMFMetadata, signal: AbortSignal): Promise<Float32Array[]> {
     const localDirectory: FileWithDirectoryAndFileHandle[] = this.files;
     if (!localDirectory) {
@@ -48,7 +49,6 @@ export class LocalClient implements IQDataClient {
     blockSize: number,
     signal: AbortSignal
   ): Promise<IQDataSlice[]> {
-
     const localDirectory: FileWithDirectoryAndFileHandle[] = this.files;
     if (!localDirectory) {
       return Promise.reject('No local directory found');
@@ -62,14 +62,16 @@ export class LocalClient implements IQDataClient {
       return Promise.reject('No data file found');
     }
 
-    return Promise.all(indexes.map(async (index) => {
-      const bytesPerIQSample = meta.getBytesPerIQSample();
-      const countBytes = blockSize * bytesPerIQSample;
-      const offsetBytes = index * countBytes;
-      const slice = dataFile.slice(offsetBytes, offsetBytes + countBytes);
-      const buffer = await slice.arrayBuffer();
-      const iqArray = convertToFloat32(buffer, meta.getDataType());
-      return { index, iqArray };
-    }));
+    return Promise.all(
+      indexes.map(async (index) => {
+        const bytesPerIQSample = meta.getBytesPerIQSample();
+        const countBytes = blockSize * bytesPerIQSample;
+        const offsetBytes = index * countBytes;
+        const slice = dataFile.slice(offsetBytes, offsetBytes + countBytes);
+        const buffer = await slice.arrayBuffer();
+        const iqArray = convertToFloat32(buffer, meta.getDataType());
+        return { index, iqArray };
+      })
+    );
   }
 }

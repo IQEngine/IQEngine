@@ -2,22 +2,24 @@ import { CLIENT_TYPE_BLOB, DataSource } from '@/api/Models';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FileWithDirectoryAndFileHandle } from 'browser-fs-access';
 import { AppConfig, useConfigQuery } from '@/api/config/queries';
-import { useState } from 'react';
 
 async function getDataSources(config: AppConfig): Promise<Record<string, DataSource>> {
   return config.connectionInfo && config.connectionInfo.settings
-    ? config.connectionInfo.settings.reduce((acc, item) => {
-        acc[`${item.accountName}/${item.containerName}`] = {
-          name: item.name,
-          type: CLIENT_TYPE_BLOB,
-          account: item.accountName,
-          container: item.containerName,
-          imageURL: item.imageURL,
-          sasToken: item.sasToken,
-          description: item.description,
-        } as DataSource;
-        return acc;
-      }, {} as Record<string, DataSource>)
+    ? config.connectionInfo.settings.reduce(
+        (acc, item) => {
+          acc[`${item.accountName}/${item.containerName}`] = {
+            name: item.name,
+            type: CLIENT_TYPE_BLOB,
+            account: item.accountName,
+            container: item.containerName,
+            imageURL: item.imageURL,
+            sasToken: item.sasToken,
+            description: item.description,
+          } as DataSource;
+          return acc;
+        },
+        {} as Record<string, DataSource>
+      )
     : {};
 }
 

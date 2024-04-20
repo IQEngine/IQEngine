@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { DataSourceClient } from './datasource-client';
 import { DataSource } from '@/api/Models';
 import { TraceabilityOrigin } from '@/utils/sigmfMetadata';

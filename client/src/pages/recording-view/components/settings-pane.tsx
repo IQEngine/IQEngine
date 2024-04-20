@@ -110,7 +110,7 @@ const SettingsPane = ({ currentFFT }) => {
   return (
     <div className="form-control">
       <label className="mb-3" id="formZoom">
-        <span className="label-text text-base ">Zoom Level</span>
+        <span className="label-text text-base ">Zoom Out Level</span>
         <input
           type="range"
           className="range range-xs range-primary"
