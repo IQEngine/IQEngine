@@ -9,9 +9,10 @@ import { useSpectrogramContext } from '../hooks/use-spectrogram-context';
 
 interface IQPlotProps {
   displayedIQ: Float32Array;
+  fftStepSize: Number;
 }
 
-export const IQPlot = ({ displayedIQ }: IQPlotProps) => {
+export const IQPlot = ({ displayedIQ, fftStepSize }: IQPlotProps) => {
   const { spectrogramWidth, spectrogramHeight } = useSpectrogramContext();
   const [I, setI] = useState<Float32Array>();
   const [Q, setQ] = useState<Float32Array>();
@@ -38,39 +39,46 @@ export const IQPlot = ({ displayedIQ }: IQPlotProps) => {
   return (
     <div className="px-3">
       <p className="text-primary text-center">Below shows the first 1000 IQ samples displayed on the spectrogram tab</p>
-      <Plot
-        data={[
-          {
-            x: I,
-            y: Q,
-            type: 'scatter',
-            mode: 'markers',
-          },
-        ]}
-        layout={{
-          width: spectrogramHeight,
-          height: spectrogramHeight, // so it's square
-          margin: {
-            l: 0,
-            r: 0,
-            b: 0,
-            t: 0,
-            pad: 0
-          },
-          dragmode: 'pan',
-          template: template,
-          xaxis: {
-            title: 'I',
-          },
-          yaxis: {
-            title: 'Q',
-          },
-        }}
-        config={{
-          displayModeBar: true,
-          scrollZoom: true,
-        }}
-      />
+      {fftStepSize === 0 ? (
+        <Plot
+          data={[
+            {
+              x: I,
+              y: Q,
+              type: 'scatter',
+              mode: 'markers',
+            },
+          ]}
+          layout={{
+            width: spectrogramHeight,
+            height: spectrogramHeight, // so it's square
+            margin: {
+              l: 0,
+              r: 0,
+              b: 0,
+              t: 0,
+              pad: 0,
+            },
+            dragmode: 'pan',
+            template: template,
+            xaxis: {
+              title: 'I',
+            },
+            yaxis: {
+              title: 'Q',
+            },
+          }}
+          config={{
+            displayModeBar: true,
+            scrollZoom: true,
+          }}
+        />
+      ) : (
+        <>
+          <h1 className="text-center">Plot only visible when Zoom Out Level is minimum (0)</h1>
+          <p className="text-primary text-center mb-6">(Otherwise the IQ samples are not contiguous)</p>
+        </>
+      )}
     </div>
   );
 };

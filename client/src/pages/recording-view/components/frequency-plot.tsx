@@ -11,9 +11,10 @@ import { useSpectrogramContext } from '../hooks/use-spectrogram-context';
 
 interface FreqPlotProps {
   displayedIQ: Float32Array;
+  fftStepSize: Number;
 }
 
-export const FrequencyPlot = ({ displayedIQ }: FreqPlotProps) => {
+export const FrequencyPlot = ({ displayedIQ, fftStepSize }: FreqPlotProps) => {
   const { spectrogramWidth, spectrogramHeight, meta, includeRfFreq } = useSpectrogramContext();
   const [frequencies, setFrequencies] = useState([]);
   const [magnitudes, setMagnitudes] = useState([]);
@@ -51,40 +52,47 @@ export const FrequencyPlot = ({ displayedIQ }: FreqPlotProps) => {
       <p className="text-primary text-center">
         Below shows the power spectral density of the sample range displayed on the spectrogram tab
       </p>
-      <Plot
-        data={[
-          {
-            x: frequencies,
-            y: magnitudes,
-            type: 'scatter',
-          },
-        ]}
-        layout={{
-          width: spectrogramWidth,
-          height: spectrogramHeight,
-          margin: {
-            l: 0,
-            r: 0,
-            b: 0,
-            t: 0,
-            pad: 0,
-          },
-          dragmode: 'pan',
-          template: template,
-          xaxis: {
-            title: 'Frequency',
-            rangeslider: {}, // this makes it display
-          },
-          yaxis: {
-            title: 'Magnitude',
-            fixedrange: false,
-          },
-        }}
-        config={{
-          displayModeBar: true,
-          scrollZoom: true,
-        }}
-      />
+      {fftStepSize === 0 ? (
+        <Plot
+          data={[
+            {
+              x: frequencies,
+              y: magnitudes,
+              type: 'scatter',
+            },
+          ]}
+          layout={{
+            width: spectrogramWidth,
+            height: spectrogramHeight,
+            margin: {
+              l: 0,
+              r: 0,
+              b: 0,
+              t: 0,
+              pad: 0,
+            },
+            dragmode: 'pan',
+            template: template,
+            xaxis: {
+              title: 'Frequency',
+              rangeslider: {}, // this makes it display
+            },
+            yaxis: {
+              title: 'Magnitude',
+              fixedrange: false,
+            },
+          }}
+          config={{
+            displayModeBar: true,
+            scrollZoom: true,
+          }}
+        />
+      ) : (
+        <>
+          <h1 className="text-center">Plot only visible when Zoom Out Level is minimum (0)</h1>
+          <p className="text-primary text-center mb-6">(Otherwise the IQ samples are not contiguous)</p>
+        </>
+      )}
     </div>
   );
 };

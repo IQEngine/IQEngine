@@ -7,7 +7,7 @@ import { KonvaEventObject } from 'konva/lib/Node';
 import { RulerTop } from './components/ruler-top';
 import { RulerSide } from './components/ruler-side';
 import { SpectrogramContextProvider, useSpectrogramContext } from './hooks/use-spectrogram-context';
-import { CursorContextProvider, useCursorContext } from './hooks/use-cursor-context';
+import { CursorContextProvider } from './hooks/use-cursor-context';
 import { useMeta } from '@/api/metadata/queries';
 import { IQPlot } from './components/iq-plot';
 import { FrequencyPlot } from './components/frequency-plot';
@@ -103,9 +103,9 @@ export function DisplaySpectrogram({ currentFFT, setCurrentFFT, currentTab }) {
           </div>
         </>
       )}
-      {currentTab === Tab.Time && <TimePlot displayedIQ={displayedIQ} />}
-      {currentTab === Tab.Frequency && <FrequencyPlot displayedIQ={displayedIQ} />}
-      {currentTab === Tab.IQ && <IQPlot displayedIQ={displayedIQ} />}
+      {currentTab === Tab.Time && <TimePlot displayedIQ={displayedIQ} fftStepSize={fftStepSize} />}
+      {currentTab === Tab.Frequency && <FrequencyPlot displayedIQ={displayedIQ} fftStepSize={fftStepSize} />}
+      {currentTab === Tab.IQ && <IQPlot displayedIQ={displayedIQ} fftStepSize={fftStepSize} />}
     </>
   );
 }
