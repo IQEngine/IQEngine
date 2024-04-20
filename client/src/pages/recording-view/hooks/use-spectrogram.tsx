@@ -37,7 +37,6 @@ export function useSpectrogram(currentFFT) {
 
   // useMemo is used to cache displayedIQ between rerenders, it's only recalculated when the dependencies change
   const displayedIQ = useMemo<Float32Array>(() => {
-    console.log('STARTING displayedIQ RECALC');
     if (!totalFFTs || !spectrogramHeight || currentFFT < 0) {
       return null;
     }
