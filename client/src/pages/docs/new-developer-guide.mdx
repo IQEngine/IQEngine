@@ -40,8 +40,19 @@ The following diagram shows the basic organization of the repo, with details on 
 
 ### React Query Notes
 
+Everything below is specific to the client code
+
+- In app.tsx we add ReactQueryDevtools, which only gets enabled if its a development environment.
 - In index.tsx we create QueryClient, set staleTime/cacheTime for each key, and QueryClientProvider gets passed into every component in the app.
-- 
+- Within client/src/api/ there are loads of useQuery's, useMutation's, and useQueryClient's
+  - api/config - GET/PUT /api/config, and a useMutation for key 'config'
+  - api/converter - key 'convertWaveToSigmf', a POST to /api/convert/wav
+  - api/datasource - key 'datasource', 'sas', 'metadata-query', includes code for uploading a file via the admin page
+  - api/iqdata - includes definition of useGetIQData(), useRawIQData(), useGetMinimapIQ(), clearIQData.  
+  - api/metadata - keys 'datasource', 'smart-query', 'track'
+  - api/plugin - key 'plugins', GET/POST/DELETE/PUT /api/plugins/\{plugin.name\} 
+  - api/user-settings - some defaults like colormap are stored here
+  - api/users - key 'users', GET /api/users
 
 
 

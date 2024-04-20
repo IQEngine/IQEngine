@@ -14,7 +14,7 @@ export class ApiClient implements MetadataClient {
   async getMeta(account: string, container: string, filePath: string): Promise<SigMFMetadata> {
     const response = await this.authUtil.requestWithAuthIfRequired({
       method: 'get',
-      url: `/api/datasources/${account}/${container}/${filePath}/meta`
+      url: `/api/datasources/${account}/${container}/${filePath}/meta`,
     });
     let responseMetaData: SigMFMetadata | null = null;
     responseMetaData = Object.assign(new SigMFMetadata(), response.data);
@@ -30,7 +30,7 @@ export class ApiClient implements MetadataClient {
   async getDataSourceMetaPaths(account: string, container: string): Promise<string[]> {
     const response = await this.authUtil.requestWithAuthIfRequired({
       method: 'get',
-      url: `/api/datasources/${account}/${container}/meta/paths`
+      url: `/api/datasources/${account}/${container}/meta/paths`,
     });
     return response.data;
   }
@@ -40,7 +40,7 @@ export class ApiClient implements MetadataClient {
       const config = {
         method: 'PUT',
         url: `/api/datasources/${account}/${container}/${filePath}/meta`,
-        data: meta
+        data: meta,
       };
 
       await this.authUtil.requestWithAuthIfRequired(config);
@@ -73,13 +73,12 @@ export class ApiClient implements MetadataClient {
       }
       return [coord[1], coord[0]];
     });
-
   }
 
   async queryMeta(queryString: string): Promise<SigMFMetadata[]> {
     const response = await this.authUtil.requestWithAuthIfRequired({
-      method:'get',
-      url: `/api/datasources/query?${queryString}`
+      method: 'get',
+      url: `/api/datasources/query?${queryString}`,
     });
     return response.data.map((item, i) => {
       item = Object.assign(new SigMFMetadata(), item);
@@ -98,7 +97,7 @@ export class ApiClient implements MetadataClient {
       },
       signal: signal,
     });
-    console.log('SmartQueryRepsonse' ,response.data);
+    console.log('SmartQueryRepsonse', response.data);
     return response.data;
   }
 

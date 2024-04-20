@@ -1,7 +1,3 @@
-// Copyright (c) 2022 Microsoft Corporation
-// Copyright (c) 2023 Marc Lichtman
-// Licensed under the MIT License
-
 import React from 'react';
 import 'swagger-ui-react/swagger-ui.css';
 // @ts-ignore
