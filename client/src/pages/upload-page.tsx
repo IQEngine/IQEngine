@@ -13,11 +13,11 @@ export const UploadPage = () => {
 
   // Check if sas token is expired
   useEffect(() => {
-    if (config.data.uploadPageBlobSasUrl) {
+    if (config.data) {
       const expireDateTime = config.data.uploadPageBlobSasUrl.split('&se=')[1].split('&')[0];
       if (Date.parse(expireDateTime) - Date.parse(new Date()) < 0) setExpired(true);
     }
-  }, [config.data.uploadPageBlobSasUrl]);
+  }, [config.data]);
 
   async function uploadBlob(f) {
     // Create azure blob client
