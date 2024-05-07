@@ -1,4 +1,4 @@
-import { TraceabilityOrigin } from "@/utils/sigmfMetadata";
+import { Annotation, TraceabilityOrigin } from '@/utils/sigmfMetadata';
 
 export interface DataSource {
   type: string;
@@ -13,7 +13,6 @@ export interface DataSource {
   readers?: string[];
   public?: boolean;
 }
-
 
 export interface SmartQueryResult {
   parameters: object;
@@ -76,6 +75,42 @@ export enum ClientType {
   API = 'api',
   LOCAL = 'local',
   BLOB = 'azure_blob',
+}
+
+export interface JobStatus {
+  job_id: string;
+  function_name: string;
+  progress: number;
+  error?: string | null;
+}
+
+export enum DataType {
+  iq_ci8_le = 'iq/ci8_le',
+  iq_ci16_le = 'iq/ci16_le',
+  iq_cf32_le = 'iq/cf32_le',
+  image_png = 'image/png',
+  audio_wav = 'audio/wav',
+  application_octet_stream = 'application/octet-stream',
+  text_plain = 'text/plain',
+}
+export interface MetadataFile {
+  file_name: string;
+  data_type: DataType;
+  sample_rate: number;
+  center_freq: number;
+}
+interface IDictionary<TValue> {
+  [id: string]: TValue;
+}
+export interface RunPluginBody {
+  metadata_files: MetadataFile[];
+  iq_files: File[];
+  custom_params: IDictionary<any>;
+}
+
+export interface JobResult {
+  data_output: any[];
+  annotations: Annotation[];
 }
 
 export const CLIENT_TYPE_API = 'api';
