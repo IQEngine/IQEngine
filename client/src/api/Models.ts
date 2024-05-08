@@ -104,6 +104,7 @@ interface IDictionary<TValue> {
   [id: string]: TValue;
 }
 export interface RunPluginBody {
+  start_plugin: boolean;
   metadata_file: MetadataFile;
   iq_file: File;
   custom_params: IDictionary<any>;

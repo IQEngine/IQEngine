@@ -35,7 +35,7 @@ export const PluginsPane = () => {
   const [modalSamples, setModalSamples] = useState<Float32Array>(new Float32Array([]));
   const [modalSpectrogram, setmodalSpectrogram] = useState(null);
   const [useCloudStorage, setUseCloudStorage] = useState(true);
-  const token = useSasToken(type, account, container, meta.getDataFileName(), false);
+  //const token = useSasToken(type, account, container, meta.getDataFileName(), false);
   let byte_offset = meta.getBytesPerIQSample() * Math.floor(cursorTime.start);
   let byte_length = meta.getBytesPerIQSample() * Math.ceil(cursorTime.end - cursorTime.start);
 
@@ -63,14 +63,28 @@ export const PluginsPane = () => {
   const resetPluginQueries = () => {
     queryClient.resetQueries(['job', jobStatus?.job_id, 'result'], { exact: true });
     queryClient.resetQueries(['job', jobStatus?.job_id, 'status'], { exact: true });
-    queryClient.resetQueries(['plugin', selectedPlugin, 'run', runPluginBody], { exact: true });
+    queryClient.resetQueries(
+      [
+        'plugin',
+        selectedPlugin,
+        'run',
+        runPluginBody.custom_params,
+        runPluginBody.metadata_file,
+        runPluginBody.iq_file,
+      ],
+      { exact: true }
+    );
   };
 
   useEffect(() => {
-    if (type != CLIENT_TYPE_API) {
-      setUseCloudStorage(false);
+    if (runPluginBody === null) return;
+
+    if (runPluginBody.start_plugin) {
+      runPlugin();
+      setRunPluginBody({ ...runPluginBody, start_plugin: false });
     }
-  }, [type]);
+  }, [runPluginBody]);
+
   const handleChangePlugin = (e) => {
     setSelectedPlugin(e.target.value);
   };
@@ -118,6 +132,7 @@ export const PluginsPane = () => {
       metadata_file: metadata_file,
       iq_file: new File([cursorData], meta.getDataFileName(), { type: DataType.iq_cf32_le }),
       custom_params: {},
+      start_plugin: true,
     };
 
     // Add custom params
@@ -131,7 +146,6 @@ export const PluginsPane = () => {
       }
     }
     setRunPluginBody(body);
-    runPlugin();
   };
 
   useEffect(() => {
@@ -257,12 +271,11 @@ export const PluginsPane = () => {
     }
 
     if (jobOutput.annotations) {
-      console.log('Annotations:', jobOutput.annotations);
       for (let i = 0; i < jobOutput.annotations.length; i++) {
         jobOutput.annotations[i]['core:sample_start'] += cursorTime.start;
       }
       let newAnnotations = jobOutput.annotations.map((annotation) => Object.assign(new Annotation(), annotation));
-      console.log(newAnnotations);
+
       // for now replace the existing annotations
       if (true) {
         meta['annotations'] = newAnnotations;
@@ -295,7 +308,10 @@ export const PluginsPane = () => {
           <h2 className="text-center text-white text-xl font-semibold">Running Plugin...</h2>
           <p className="w-1/3 text-center text-white">This may take a few minutes.</p>
           <div className="w-1/2 bg-gray-200 rounded-full h-2.5 mb-4 ">
-            <div className="w-1/2 bg-blue-600 h-2.5 rounded-full" style={{ width: jobStatus?.progress + '%' }}></div>
+            <div
+              className="w-1/2 bg-blue-600 h-2.5 rounded-full"
+              style={{ width: (jobStatus?.progress || 0) + '%' }}
+            ></div>
           </div>
         </div>
       )}

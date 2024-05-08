@@ -6,7 +6,7 @@ export const useRunPlugin = (
   runPluginBody: RunPluginBody | null
 ): UseQueryResult<JobStatus, unknown> => {
   return useQuery<JobStatus>(
-    ['plugin', pluginURL, 'run', runPluginBody],
+    ['plugin', pluginURL, 'run', runPluginBody.custom_params, runPluginBody.metadata_file, runPluginBody.iq_file],
     async () => {
       let formData = new FormData();
       formData.append('iq_file', runPluginBody.iq_file);
@@ -17,7 +17,6 @@ export const useRunPlugin = (
         body: formData,
       });
       const data = await response.json();
-      console.log('response', data);
       return data;
     },
     {
@@ -58,7 +57,6 @@ export const useGetJobOutput = (pluginURL: string, jobStatus: JobStatus): UseQue
       const response = await fetch(baseURL + `/${jobStatus.job_id}/result`);
 
       const data: JobOutput = await response.json();
-      console.log('response', data);
       return data;
     },
     {
