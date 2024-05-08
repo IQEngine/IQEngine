@@ -12,3 +12,7 @@ insert_final_newline = true
 [Makefile]
 indent_style = tab
 indent_size = 1
+
+[python]
+indent_style = tab
+indent_size = 4
