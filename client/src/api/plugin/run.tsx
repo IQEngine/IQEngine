@@ -1,30 +1,19 @@
-import { useQuery, UseQueryResult } from '@tanstack/react-query';
-import { JobOutput, JobStatus, RunPluginBody } from '../Models';
+import { useMutation, useQuery, UseQueryResult } from '@tanstack/react-query';
+import { JobOutput, JobStatus, PluginBody } from '../Models';
 
-export const useRunPlugin = (
-  pluginURL: string,
-  runPluginBody: RunPluginBody | null
-): UseQueryResult<JobStatus, unknown> => {
-  return useQuery<JobStatus>(
-    ['plugin', pluginURL, 'run', runPluginBody.custom_params, runPluginBody.metadata_file, runPluginBody.iq_file],
-    async () => {
-      let formData = new FormData();
-      formData.append('iq_file', runPluginBody.iq_file);
-      formData.append('metadata_file', JSON.stringify(runPluginBody.metadata_file));
-      formData.append('custom_params', JSON.stringify(runPluginBody.custom_params));
-      const response = await fetch(pluginURL, {
-        method: 'POST',
-        body: formData,
-      });
-      const data = await response.json();
-      return data;
-    },
-    {
-      enabled: false,
-      cacheTime: 0,
-      staleTime: 0,
-    }
-  );
+export const useRunPlugin = (pluginURL: string) => {
+  return useMutation<JobStatus, unknown, PluginBody | null>(async (pluginBody) => {
+    let formData = new FormData();
+    formData.append('iq_file', pluginBody.iq_file);
+    formData.append('metadata_file', JSON.stringify(pluginBody.metadata_file));
+    formData.append('custom_params', JSON.stringify(pluginBody.custom_params));
+    const response = await fetch(pluginURL, {
+      method: 'POST',
+      body: formData,
+    });
+    const data: JobStatus = await response.json();
+    return data;
+  });
 };
 
 export const useGetJobStatus = (pluginURL: string, jobID: string): UseQueryResult<JobStatus, unknown> => {

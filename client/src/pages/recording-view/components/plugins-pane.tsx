@@ -14,14 +14,12 @@ import { fftshift } from 'fftshift';
 import { FFT } from '@/utils/fft';
 import { useGetPluginsComponents } from '@/pages/recording-view/hooks/use-get-plugins-components';
 import { useGetPlugins } from '@/api/plugin/queries';
-import { useSasToken } from '@/api/datasource/queries';
 import { toast } from 'react-hot-toast';
 import { dataTypeToBytesPerIQSample } from '@/utils/selector';
 import { useSpectrogramContext } from '../hooks/use-spectrogram-context';
 import { useCursorContext } from '../hooks/use-cursor-context';
-import { CLIENT_TYPE_API, DataType, MetadataFile, RunPluginBody } from '@/api/Models';
-import { useRunPlugin, useGetJobStatus, useGetJobOutput } from '@/api/plugin/run';
-import { useQueryClient } from '@tanstack/react-query';
+import { CLIENT_TYPE_API, DataType, JobOutput, MetadataFile, PluginBody } from '@/api/Models';
+import { usePlugin } from '../hooks/usePlugin';
 
 export const PluginsPane = () => {
   const { meta, account, type, container, spectrogramWidth, spectrogramHeight, fftSize, selectedAnnotation, setMeta } =
@@ -39,119 +37,7 @@ export const PluginsPane = () => {
   let byte_offset = meta.getBytesPerIQSample() * Math.floor(cursorTime.start);
   let byte_length = meta.getBytesPerIQSample() * Math.ceil(cursorTime.end - cursorTime.start);
 
-  //let runPluginBody: RunPluginBody = null;
-  const queryClient = useQueryClient();
-  const [runPluginBody, setRunPluginBody] = useState<RunPluginBody>(null);
-  const {
-    data: initialJobStatus,
-    refetch: runPlugin,
-    isFetching: isRunPluginFetchin,
-  } = useRunPlugin(selectedPlugin, runPluginBody);
-
-  const { data: jobStatus, isFetching: isJobStatusFetching } = useGetJobStatus(
-    selectedPlugin,
-    initialJobStatus?.job_id
-  );
-  const {
-    data: jobOutput,
-    isFetching: isJobOutputFetching,
-    refetch: fetchJobOutput,
-  } = useGetJobOutput(selectedPlugin, jobStatus);
-
-  const pluginIsRunning = isRunPluginFetchin || jobStatus?.progress < 100 || isJobStatusFetching || isJobOutputFetching;
-
-  const resetPluginQueries = () => {
-    queryClient.resetQueries(['job', jobStatus?.job_id, 'result'], { exact: true });
-    queryClient.resetQueries(['job', jobStatus?.job_id, 'status'], { exact: true });
-    queryClient.resetQueries(
-      [
-        'plugin',
-        selectedPlugin,
-        'run',
-        runPluginBody.custom_params,
-        runPluginBody.metadata_file,
-        runPluginBody.iq_file,
-      ],
-      { exact: true }
-    );
-  };
-
-  useEffect(() => {
-    if (runPluginBody === null) return;
-
-    if (runPluginBody.start_plugin) {
-      runPlugin();
-      setRunPluginBody({ ...runPluginBody, start_plugin: false });
-    }
-  }, [runPluginBody]);
-
-  const handleChangePlugin = (e) => {
-    setSelectedPlugin(e.target.value);
-  };
-
-  const handleChangeMethod = (e) => {
-    setSelectedMethod(e.target.value);
-  };
-
-  const methodOptions = [
-    // { value: 'Full', label: '' },
-    { value: 'Cursor', label: 'Cursor' },
-    { value: 'Annotation', label: 'Annotation' },
-  ];
-
-  const handleSubmit = (e) => {
-    console.log('Plugin Params:', pluginParameters);
-    e.preventDefault();
-
-    if (selectedMethod == 'Cursor' && !cursorTimeEnabled) {
-      toast.error('First enable cursors and choose a region of time to run the plugin on');
-      return;
-    }
-
-    let annotation: Annotation = null;
-    if (selectedMethod === 'Annotation') {
-      if (selectedAnnotation === -1) {
-        toast.error('Please select the annotation you want to run a plugin on');
-        setSelectedMethod('');
-      } else {
-        annotation = meta.annotations[selectedAnnotation];
-        const calculateMultiplier = dataTypeToBytesPerIQSample(DataType[meta.getDataType()]);
-        byte_offset = Math.floor(annotation['core:sample_start']) * calculateMultiplier;
-        byte_length = Math.ceil(annotation['core:sample_count']) * calculateMultiplier;
-      }
-    }
-
-    const metadata_file: MetadataFile = {
-      file_name: meta.getDataFileName(),
-      sample_rate: meta.getSampleRate(),
-      center_freq: meta.getCenterFrequency(),
-      data_type: DataType.iq_cf32_le,
-    };
-
-    let body: RunPluginBody = {
-      metadata_file: metadata_file,
-      iq_file: new File([cursorData], meta.getDataFileName(), { type: DataType.iq_cf32_le }),
-      custom_params: {},
-      start_plugin: true,
-    };
-
-    // Add custom params
-    for (const [key, value] of Object.entries(pluginParameters)) {
-      if (value.type === 'integer') {
-        body['custom_params'][key] = parseInt(value.value); // remember, we updated default with whatever the user enters
-      } else if (value.type === 'number') {
-        body['custom_params'][key] = parseFloat(value.value);
-      } else {
-        body['custom_params'][key] = value.value;
-      }
-    }
-    setRunPluginBody(body);
-  };
-
-  useEffect(() => {
-    console.log('Plugin return:', jobOutput);
-    if (!jobOutput) return;
-
+  const handleJobOutput = (jobOutput: JobOutput) => {
     const BlobFromSamples = (samples_base64, data_type) => {
       const samples = window.atob(samples_base64);
       var blob_array = new Uint8Array(samples.length);
@@ -271,6 +157,10 @@ export const PluginsPane = () => {
     }
 
     if (jobOutput.annotations) {
+      if (jobOutput.annotations.length == 0) {
+        toast.error('No annotations were returned by the plugin');
+        return;
+      }
       for (let i = 0; i < jobOutput.annotations.length; i++) {
         jobOutput.annotations[i]['core:sample_start'] += cursorTime.start;
       }
@@ -286,17 +176,79 @@ export const PluginsPane = () => {
       let newMeta = Object.assign(new SigMFMetadata(), meta);
       setMeta(newMeta);
     }
+  };
 
-    resetPluginQueries();
-  }, [jobOutput]);
+  // usePlugin hook
+  const { runPlugin, jobStatus, pluginIsRunning } = usePlugin({
+    pluginURL: selectedPlugin,
+    handleJobOutput: handleJobOutput,
+  });
+  const handleChangePlugin = (e) => {
+    setSelectedPlugin(e.target.value);
+  };
+
+  const handleChangeMethod = (e) => {
+    setSelectedMethod(e.target.value);
+  };
+
+  const methodOptions = [
+    // { value: 'Full', label: '' },
+    { value: 'Cursor', label: 'Cursor' },
+    { value: 'Annotation', label: 'Annotation' },
+  ];
+
+  const handleSubmit = (e) => {
+    console.log('Plugin Params:', pluginParameters);
+    e.preventDefault();
+
+    if (selectedMethod == 'Cursor' && !cursorTimeEnabled) {
+      toast.error('First enable cursors and choose a region of time to run the plugin on');
+      return;
+    }
+
+    let annotation: Annotation = null;
+    if (selectedMethod === 'Annotation') {
+      if (selectedAnnotation === -1) {
+        toast.error('Please select the annotation you want to run a plugin on');
+        setSelectedMethod('');
+      } else {
+        annotation = meta.annotations[selectedAnnotation];
+        const calculateMultiplier = dataTypeToBytesPerIQSample(DataType[meta.getDataType()]);
+        byte_offset = Math.floor(annotation['core:sample_start']) * calculateMultiplier;
+        byte_length = Math.ceil(annotation['core:sample_count']) * calculateMultiplier;
+      }
+    }
+
+    const metadata_file: MetadataFile = {
+      file_name: meta.getDataFileName(),
+      sample_rate: meta.getSampleRate(),
+      center_freq: meta.getCenterFrequency(),
+      data_type: DataType.iq_cf32_le,
+    };
+
+    let body: PluginBody = {
+      metadata_file: metadata_file,
+      iq_file: new File([cursorData], meta.getDataFileName(), { type: DataType.iq_cf32_le }),
+      custom_params: {},
+    };
+
+    // Add custom params
+    for (const [key, value] of Object.entries(pluginParameters)) {
+      if (value.type === 'integer') {
+        body['custom_params'][key] = parseInt(value.value); // remember, we updated default with whatever the user enters
+      } else if (value.type === 'number') {
+        body['custom_params'][key] = parseFloat(value.value);
+      } else {
+        body['custom_params'][key] = value.value;
+      }
+    }
+
+    runPlugin(body);
+  };
 
   useEffect(() => {
     if (jobStatus?.error) {
       toast.error(`Plugin failed: ${jobStatus.error}`);
-    }
-
-    if (jobStatus?.progress === 100) {
-      fetchJobOutput();
     }
   }, [jobStatus]);
 
