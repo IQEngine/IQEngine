@@ -1,23 +1,18 @@
-import io
 import json
 import logging
 import os
-from typing import Optional, Tuple
+from typing import Optional
 import uuid
 
-from fastapi.responses import FileResponse
 import numpy as np
 from fastapi import BackgroundTasks, Body, FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from models.plugin import Plugin
-from models.models import DataObject, JobStatus, MetadataCloud, MetadataFile, Output
+from models.models import JobStatus, MetadataFile, Output
 from samples import get_from_samples_cloud
 
-import re
-
-def sanitize(job_id):
-    return re.sub(r'[^\w-]+', '', job_id)
-
+from config import PLUGIN_PATH
+from utils import sanitize
 
 app = FastAPI()
 
@@ -33,8 +28,11 @@ app.add_middleware(
 async def get_list_of_plugins():
     # This just looks at the list of dirs to figure out the plugins available, each dir is assumed to be 1 plugin
     dirs = []
-    for file in os.listdir("."):
-        d = os.path.join(".", file)
+    print("PLUGIN_PATH:", PLUGIN_PATH)
+    print(os.listdir(PLUGIN_PATH))
+    for file in os.listdir(PLUGIN_PATH):
+        d = os.path.join(PLUGIN_PATH, file)
+        print(d)
         if os.path.isdir(d) and os.path.isfile(os.path.join(d, file + ".py")):
             dirs.append(file)
     if "models" in dirs:
@@ -125,8 +123,8 @@ async def get_job_result(job_id: str):
 
 async def get_plugin_instance(plugin_name: str) -> Plugin:
     try:
-        print("plugin_name:", plugin_name)
-        module = __import__(plugin_name + "." + plugin_name, fromlist=["Plugin"])
+        module_path = "plugins." + plugin_name + "." + plugin_name
+        module = __import__(module_path, fromlist=["Plugin"])
         pluginClass = getattr(module, plugin_name)
         return pluginClass()
     except AttributeError:

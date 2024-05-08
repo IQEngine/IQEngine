@@ -7,7 +7,6 @@ from scipy import signal
 import base64
 from models.plugin import Plugin
 from models.models import Output, MetadataFile
-
 class lowpass_filter(Plugin):
     sample_rate: int = 0
     center_freq: int = 0
@@ -20,7 +19,7 @@ class lowpass_filter(Plugin):
     def rf_function(self, samples, job_context=None):
         if self.numtaps > 10000:
             raise fastapi.HTTPException(status_code=500, detail="too many taps")
-        if np.abs(self.width) > self.sample_rate/2:
+        if np.abs(self.width) > self.sample_rate / 2:
             raise fastapi.HTTPException(status_code=500, detail="width needs to be less than sample_rate/2")
 
         h = signal.firwin(
@@ -39,6 +38,6 @@ class lowpass_filter(Plugin):
                                 data_type="iq/cf32_le",
                                 sample_rate=self.sample_rate,
                                 center_freq=self.center_freq,
-                         )
+                                )
 
         return Output(metadata_file=metadata, output_data=samples_b64)

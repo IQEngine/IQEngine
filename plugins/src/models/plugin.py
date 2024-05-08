@@ -5,11 +5,13 @@ import json
 import logging
 import traceback
 
+import numpy as np
+
 from models.models import JobStatus, Output
 class Plugin(ABC):
 
     @abstractmethod
-    def rf_function(self, samples, job_context: JobStatus = None) -> Output:
+    def rf_function(self, samples: np.ndarray, job_context: JobStatus = None) -> Output:
         pass
 
     def run(self, samples, job_context: JobStatus):

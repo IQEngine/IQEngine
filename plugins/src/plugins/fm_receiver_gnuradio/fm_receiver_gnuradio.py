@@ -14,7 +14,8 @@ import zmq
 from scipy.io.wavfile import write
 import io
 from models.plugin import Plugin
-from models.models import DataObject, Output
+from models.models import Output, DataObject
+
 class flowgraph(gr.top_block):
     def __init__(self, samp_rate):
         gr.top_block.__init__(self, "GNU Radio-based IQEngine Plugin", catch_exceptions=True)

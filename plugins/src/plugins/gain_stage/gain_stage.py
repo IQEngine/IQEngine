@@ -3,8 +3,7 @@
 
 import base64
 from models.plugin import Plugin
-from models.models import MetadataFile, Output
-
+from models.models import Output, MetadataFile
 
 class gain_stage(Plugin):
     sample_rate: int = 0
@@ -23,9 +22,6 @@ class gain_stage(Plugin):
                                 data_type="iq/cf32_le",
                                 sample_rate=self.sample_rate,
                                 center_freq=self.center_freq,
-                            )
+                                )
 
         return Output(metadata_file=metadata, output_data=samples_b64)
-
-
-

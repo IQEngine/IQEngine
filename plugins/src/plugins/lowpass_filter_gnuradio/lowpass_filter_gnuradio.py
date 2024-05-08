@@ -11,7 +11,7 @@ from gnuradio.fft import window
 from gnuradio import zeromq
 import zmq
 from models.plugin import Plugin
-from models.models import MetadataFile, Output
+from models.models import Output, MetadataFile
 
 class gnuradio_lowpass_filter(gr.top_block):
     def __init__(self, sample_rate, cutoff, width):
@@ -45,8 +45,8 @@ class lowpass_filter_gnuradio(Plugin):
         # create a SUB socket
         sub_socket = context.socket(zmq.SUB)
         sub_socket.connect('tcp://127.0.0.1:5002')
-        sub_socket.setsockopt(zmq.SUBSCRIBE, b'') # subscribe to topic of all (needed or else it won't work)
-        sub_socket.setsockopt(zmq.RCVTIMEO, 500) # may have to increase if its a slow flowgraph
+        sub_socket.setsockopt(zmq.SUBSCRIBE, b'')  # subscribe to topic of all (needed or else it won't work)
+        sub_socket.setsockopt(zmq.RCVTIMEO, 500)  # may have to increase if its a slow flowgraph
         print("started python SUB")
 
         # for now just send entire batch of samples at once, we'll figure out what the limits are later
@@ -58,13 +58,12 @@ class lowpass_filter_gnuradio(Plugin):
             try:
                 resp = sub_socket.recv()
                 newSamples = np.concatenate((newSamples, np.frombuffer(resp, dtype=np.complex64, count=-1)))
-            except Exception as e: # messy way of figuring out when gnuradio is done
+            except Exception as e:  # messy way of figuring out when gnuradio is done
                 print(e)
                 break
 
         tb.stop()
         tb.wait()
-
 
         samples_bytes = newSamples.tobytes()
         samples_b64 = base64.b64encode(samples_bytes).decode()
@@ -73,6 +72,6 @@ class lowpass_filter_gnuradio(Plugin):
                                 data_type="iq/cf32_le",
                                 sample_rate=self.sample_rate,
                                 center_freq=self.center_freq,
-                         )
+                                )
 
         return Output(metadata_file=metadata, output_data=samples_b64)

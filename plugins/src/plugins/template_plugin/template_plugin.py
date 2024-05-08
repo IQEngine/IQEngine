@@ -27,13 +27,14 @@ class template_plugin(Plugin):
         # When making a detector, for the return, make a list, then for each detected emission, add one of these dicts to the list:
         annotations = []
         an = {}
-        an['core:freq_lower_edge'] = 1 # Hz
-        an['core:freq_upper_edge'] = 2 # Hz
+        an['core:freq_lower_edge'] = 1  # Hz
+        an['core:freq_upper_edge'] = 2  # Hz
         an['core:sample_start'] = 3
         an['core:sample_count'] = 4
         an["core:label"] = "Unknown"
         annotations.append(an)
         return Output(annotations=annotations)
+
 
 if __name__ == "__main__":
     # Example of how to test your plugin locally

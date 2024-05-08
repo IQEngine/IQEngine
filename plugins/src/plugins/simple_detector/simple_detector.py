@@ -4,8 +4,10 @@
 import numpy as np
 import json
 import cv2
+
 from models.plugin import Plugin
 from models.models import Output
+
 class simple_detector(Plugin):
     sample_rate: int = 0
     center_freq: int = 0
