@@ -79,6 +79,7 @@ export enum ClientType {
 
 export interface JobStatus {
   job_id: string;
+  file_name: string;
   function_name: string;
   progress: number;
   error?: string | null;
@@ -103,14 +104,25 @@ interface IDictionary<TValue> {
   [id: string]: TValue;
 }
 export interface RunPluginBody {
-  metadata_files: MetadataFile[];
-  iq_files: File[];
+  metadata_file: MetadataFile;
+  iq_file: File;
   custom_params: IDictionary<any>;
 }
 
-export interface JobResult {
-  data_output: any[];
-  annotations: Annotation[];
+export interface JobOutput {
+  job_status?: JobStatus;
+  metadata_file?: MetadataFile;
+  metadata_cloud?: any;
+  additionalProperties?: { [key: string]: string | number | boolean };
+  annotations?: Annotation[];
+  output_data?: string;
+  non_iq_output_data?: DataObject;
+}
+
+export interface DataObject {
+  data_type?: DataType;
+  file_name?: string;
+  data: string;
 }
 
 export const CLIENT_TYPE_API = 'api';

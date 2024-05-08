@@ -104,10 +104,10 @@ async def get_job_status(job_id: str):
 async def get_job_result(job_id: str):
     job_id = sanitize(job_id)
     job_status = await get_job_status(job_id)
-    if job_status["progress"] != 100:
+    if job_status.get("progress") != 100:
         raise HTTPException(status_code=400, detail="Job not complete")
 
-    if job_status["error"]:
+    if job_status.get("error"):
         raise HTTPException(status_code=400, detail=job_status["error"])
 
     try:

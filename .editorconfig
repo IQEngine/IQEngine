@@ -13,6 +13,6 @@ insert_final_newline = true
 indent_style = tab
 indent_size = 1
 
-[python]
-indent_style = tab
+[*py]
+indent_style = space
 indent_size = 4

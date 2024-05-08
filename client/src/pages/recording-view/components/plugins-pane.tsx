@@ -20,7 +20,8 @@ import { dataTypeToBytesPerIQSample } from '@/utils/selector';
 import { useSpectrogramContext } from '../hooks/use-spectrogram-context';
 import { useCursorContext } from '../hooks/use-cursor-context';
 import { CLIENT_TYPE_API, DataType, MetadataFile, RunPluginBody } from '@/api/Models';
-import { useRunPlugin, useGetJobStatus, useGetJobResult } from '@/api/plugin/run';
+import { useRunPlugin, useGetJobStatus, useGetJobOutput } from '@/api/plugin/run';
+import { useQueryClient } from '@tanstack/react-query';
 
 export const PluginsPane = () => {
   const { meta, account, type, container, spectrogramWidth, spectrogramHeight, fftSize, selectedAnnotation, setMeta } =
@@ -39,6 +40,7 @@ export const PluginsPane = () => {
   let byte_length = meta.getBytesPerIQSample() * Math.ceil(cursorTime.end - cursorTime.start);
 
   //let runPluginBody: RunPluginBody = null;
+  const queryClient = useQueryClient();
   const [runPluginBody, setRunPluginBody] = useState<RunPluginBody>(null);
   const {
     data: initialJobStatus,
@@ -50,10 +52,19 @@ export const PluginsPane = () => {
     selectedPlugin,
     initialJobStatus?.job_id
   );
+  const {
+    data: jobOutput,
+    isFetching: isJobOutputFetching,
+    refetch: fetchJobOutput,
+  } = useGetJobOutput(selectedPlugin, jobStatus);
 
-  const { data: jobResult, isFetching: isJobResultFetching } = useGetJobResult(selectedPlugin, jobStatus);
+  const pluginIsRunning = isRunPluginFetchin || jobStatus?.progress < 100 || isJobStatusFetching || isJobOutputFetching;
 
-  const pluginIsRunning = isRunPluginFetchin || jobStatus?.progress < 100 || isJobStatusFetching || isJobResultFetching;
+  const resetPluginQueries = () => {
+    queryClient.resetQueries(['job', jobStatus?.job_id, 'result'], { exact: true });
+    queryClient.resetQueries(['job', jobStatus?.job_id, 'status'], { exact: true });
+    queryClient.resetQueries(['plugin', selectedPlugin, 'run', runPluginBody], { exact: true });
+  };
 
   useEffect(() => {
     if (type != CLIENT_TYPE_API) {
@@ -83,9 +94,6 @@ export const PluginsPane = () => {
       return;
     }
 
-    const sampleRate = meta.getSampleRate();
-    const freq = meta.getCenterFrequency();
-
     let annotation: Annotation = null;
     if (selectedMethod === 'Annotation') {
       if (selectedAnnotation === -1) {
@@ -99,17 +107,16 @@ export const PluginsPane = () => {
       }
     }
 
-    const metadata_files: MetadataFile[] = [
-      {
-        file_name: meta.getDataFileName(),
-        sample_rate: sampleRate,
-        center_freq: freq,
-        data_type: DataType.iq_cf32_le,
-      },
-    ];
+    const metadata_file: MetadataFile = {
+      file_name: meta.getDataFileName(),
+      sample_rate: meta.getSampleRate(),
+      center_freq: meta.getCenterFrequency(),
+      data_type: DataType.iq_cf32_le,
+    };
+
     let body: RunPluginBody = {
-      metadata_files: metadata_files,
-      iq_files: [new File([cursorData], meta.getDataFileName(), { type: DataType.iq_cf32_le })],
+      metadata_file: metadata_file,
+      iq_file: new File([cursorData], meta.getDataFileName(), { type: DataType.iq_cf32_le }),
       custom_params: {},
     };
 
@@ -128,8 +135,8 @@ export const PluginsPane = () => {
   };
 
   useEffect(() => {
-    console.debug('Plugin return:', jobResult);
-    if (!jobResult) return;
+    console.log('Plugin return:', jobOutput);
+    if (!jobOutput) return;
 
     const BlobFromSamples = (samples_base64, data_type) => {
       const samples = window.atob(samples_base64);
@@ -140,10 +147,12 @@ export const PluginsPane = () => {
       return new Blob([blob_array], { type: data_type });
     };
 
-    if (!!jobResult.data_output && jobResult.data_output.length > 0) {
-      if (jobResult.data_output[0]['data_type'] == DataType.iq_cf32_le) {
+    const metadata: MetadataFile = jobOutput.metadata_file;
+
+    if (!!jobOutput.output_data && jobOutput.output_data.length > 0) {
+      if (metadata.data_type == DataType.iq_cf32_le) {
         // just show the first output for now, 99% of plugins will have 0 or 1 IQ output anyway
-        const samples_base64 = jobResult.data_output[0]['samples'];
+        const samples_base64 = jobOutput.output_data;
         const samples = convertBase64ToFloat32Array(samples_base64);
         setModalSamples(samples);
 
@@ -202,58 +211,57 @@ export const PluginsPane = () => {
         });
 
         setModalOpen(true);
-      } else if (jobResult.data_output[0]['data_type'] == DataType.image_png) {
-        let data_output = jobResult.data_output[0]['samples'];
-        let data_type = jobResult.data_output[0]['data_type'];
+      } else if (!!jobOutput.non_iq_output_data && jobOutput.non_iq_output_data.data_type == DataType.image_png) {
+        let data_output = jobOutput.non_iq_output_data.data;
+        let data_type = jobOutput.non_iq_output_data.data_type;
         let blob = BlobFromSamples(data_output, data_type);
         createImageBitmap(blob).then((imageBitmap) => {
           setmodalSpectrogram(imageBitmap);
         });
         setModalOpen(true);
-      } else {
+      } else if (!!jobOutput.non_iq_output_data) {
         // Files to be directly downloaded
         let d = new Date();
         let datestring = new Date().toISOString().split('.')[0];
 
-        for (let j = 0; j < jobResult.data_output.length; j++) {
-          let data_type = jobResult.data_output[j]['data_type'];
+        let data_type = jobOutput.non_iq_output_data.data_type;
 
-          let ext = '';
-          switch (data_type) {
-            case DataType.audio_wav:
-              ext = 'wav';
-              break;
-            //case MimeTypes.image_png:
-            //  ext = 'png';
-            //  break;
-            default:
-              toast.error(`The plugins pane doesn't handle the mime type ${data_type} output by the plugin.`);
-              break;
-          }
-          if (ext == '') continue;
-
-          let data_output = jobResult.data_output[j]['samples'];
-
-          let blob = BlobFromSamples(data_output, data_type);
-
-          let url = window.URL.createObjectURL(blob);
-          let a = document.createElement('a');
-          a.href = url;
-
-          let filename = `sample_${datestring}_${j}.${ext}`;
-          a.download = filename;
-          a.click();
-          window.URL.revokeObjectURL(url);
+        let ext = '';
+        switch (data_type) {
+          case DataType.audio_wav:
+            ext = 'wav';
+            break;
+          //case MimeTypes.image_png:
+          //  ext = 'png';
+          //  break;
+          default:
+            toast.error(`The plugins pane doesn't handle the mime type ${data_type} output by the plugin.`);
+            break;
         }
+
+        if (ext === '') return;
+
+        let data_output = jobOutput.non_iq_output_data.data;
+
+        let blob = BlobFromSamples(data_output, data_type);
+
+        let url = window.URL.createObjectURL(blob);
+        let a = document.createElement('a');
+        a.href = url;
+
+        let filename = `sample_${datestring}_.${ext}`;
+        a.download = filename;
+        a.click();
+        window.URL.revokeObjectURL(url);
       }
     }
 
-    if (jobResult.annotations) {
-      console.log('Annotations:', jobResult.annotations);
-      for (let i = 0; i < jobResult.annotations.length; i++) {
-        jobResult.annotations[i]['core:sample_start'] += cursorTime.start;
+    if (jobOutput.annotations) {
+      console.log('Annotations:', jobOutput.annotations);
+      for (let i = 0; i < jobOutput.annotations.length; i++) {
+        jobOutput.annotations[i]['core:sample_start'] += cursorTime.start;
       }
-      let newAnnotations = jobResult.annotations.map((annotation) => Object.assign(new Annotation(), annotation));
+      let newAnnotations = jobOutput.annotations.map((annotation) => Object.assign(new Annotation(), annotation));
       console.log(newAnnotations);
       // for now replace the existing annotations
       if (true) {
@@ -265,11 +273,17 @@ export const PluginsPane = () => {
       let newMeta = Object.assign(new SigMFMetadata(), meta);
       setMeta(newMeta);
     }
-  }, [jobResult]);
+
+    resetPluginQueries();
+  }, [jobOutput]);
 
   useEffect(() => {
     if (jobStatus?.error) {
       toast.error(`Plugin failed: ${jobStatus.error}`);
+    }
+
+    if (jobStatus?.progress === 100) {
+      fetchJobOutput();
     }
   }, [jobStatus]);
 

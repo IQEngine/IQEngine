@@ -13,7 +13,7 @@ class simple_detector(Plugin):
     # Custom Params
     threshold_dB: float = 40.0
 
-    def rf_function(self, samples, job_id=None):
+    def rf_function(self, samples, job_context=None):
         # print(samples[0:10])
         print(self.sample_rate)
         print(self.center_freq)
@@ -22,7 +22,7 @@ class simple_detector(Plugin):
         # wait 4s to simulate a long running process
         import time
         for i in range(4):
-            self.set_status(job_id, i * 25)
+            self.set_status(job_context.job_id, i * 25)
             time.sleep(1)
 
         # Your detection (and optionally, classification) code here

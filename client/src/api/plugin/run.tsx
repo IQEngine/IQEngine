@@ -1,5 +1,5 @@
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
-import { JobResult, JobStatus, RunPluginBody } from '../Models';
+import { JobOutput, JobStatus, RunPluginBody } from '../Models';
 
 export const useRunPlugin = (
   pluginURL: string,
@@ -8,27 +8,17 @@ export const useRunPlugin = (
   return useQuery<JobStatus>(
     ['plugin', pluginURL, 'run', runPluginBody],
     async () => {
-      console.log(runPluginBody);
-
       let formData = new FormData();
-
-      for (var i = 0; i < runPluginBody.iq_files.length; i++) {
-        formData.append('iq_files', runPluginBody.iq_files[i]);
-      }
-
-      for (var i = 0; i < runPluginBody.metadata_files.length; i++) {
-        console.log(JSON.stringify(runPluginBody.metadata_files[i]));
-        formData.append('metadata_files', JSON.stringify(runPluginBody.metadata_files[i]));
-      }
-
+      formData.append('iq_file', runPluginBody.iq_file);
+      formData.append('metadata_file', JSON.stringify(runPluginBody.metadata_file));
       formData.append('custom_params', JSON.stringify(runPluginBody.custom_params));
-
       const response = await fetch(pluginURL, {
         method: 'POST',
         body: formData,
       });
-
-      return response.json();
+      const data = await response.json();
+      console.log('response', data);
+      return data;
     },
     {
       enabled: false,
@@ -60,19 +50,19 @@ export const useGetJobStatus = (pluginURL: string, jobID: string): UseQueryResul
   );
 };
 
-export const useGetJobResult = (pluginURL: string, jobStatus: JobStatus): UseQueryResult<JobResult, unknown> => {
-  return useQuery<JobResult>(
+export const useGetJobOutput = (pluginURL: string, jobStatus: JobStatus): UseQueryResult<JobOutput, unknown> => {
+  return useQuery<JobOutput>(
     ['job', jobStatus?.job_id, 'result'],
     async () => {
-      console.log('jobStatus', jobStatus);
       const baseURL = pluginURL.split('/').slice(0, -1).join('/'); // url with out rf function name
       const response = await fetch(baseURL + `/${jobStatus.job_id}/result`);
 
-      return JSON.parse(await response.json());
+      const data: JobOutput = await response.json();
+      console.log('response', data);
+      return data;
     },
     {
-      retry: 3,
-      enabled: jobStatus?.job_id != null && jobStatus?.progress === 100 && jobStatus?.error === null,
+      enabled: false,
       cacheTime: 0,
     }
   );

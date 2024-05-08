@@ -9,7 +9,7 @@ from models.models import JobStatus, Output
 class Plugin(ABC):
 
     @abstractmethod
-    def rf_function(self, samples, job_context: JobStatus=None) -> Output:
+    def rf_function(self, samples, job_context: JobStatus = None) -> Output:
         pass
 
     def run(self, samples, job_context: JobStatus):
@@ -25,7 +25,7 @@ class Plugin(ABC):
             logging.error(f"Exception occurred: {e}, traceback: {tb}")
             self.set_status(job_id, 100, str(e))
 
-    def set_status(self, job_id, progress, error=None):
+    def set_status(self, job_id: str, progress, error=None):
         with open(os.path.join("jobs", job_id + ".json"), "r") as f:
             job_status = json.load(f)
             job_status["progress"] = progress
@@ -45,7 +45,7 @@ class Plugin(ABC):
 
             # dump result to disk,
             with open(os.path.join(directory, job_id + ".json"), "w") as f:
-                f.write(result.model_dump_json(indent=4, exclude_none=True, by_alias=True ))
+                f.write(result.model_dump_json(indent=4, exclude_none=True, by_alias=True))
 
             logging.info(f"Stored result for job {job_id}")
 
@@ -58,7 +58,6 @@ class Plugin(ABC):
         for i in inspect.getmembers(self):
             if not i[0].startswith('_') and not inspect.ismethod(i[1]):
                 if not i[0] == "sample_rate" and not i[0] == "center_freq":
-                    print(i)
                     definition[i[0]] = {
                         "title": i[0],
                         "default": i[1],
@@ -68,9 +67,26 @@ class Plugin(ABC):
         return definition
 
     def set_custom_params(self, custom_params: dict):
+
+        type_map = {
+            "float": float,
+            "int": int,
+            "str": str,
+            "bool": bool
+            # Add more types if needed
+        }
+
         definition = self.get_definition()
-        print(definition)
         for key, value in custom_params.items():
             print(key, value)
-            if key in definition or key == "sample_rate" or key == "center_freq":
-                setattr(self, key, value)
+            if key in definition:
+                type_name = definition[key]["type"]
+                if type_name in type_map:
+                    try:
+                        value = type_map[type_name](value)
+                        setattr(self, key, value)
+                    except ValueError:
+                        print(f"Failed to parse {value} as {type_name}")
+                        continue
+            if key == "sample_rate" or key == "center_freq":
+                setattr(self, key, float(value))
