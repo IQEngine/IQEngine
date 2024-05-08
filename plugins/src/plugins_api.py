@@ -28,15 +28,10 @@ app.add_middleware(
 async def get_list_of_plugins():
     # This just looks at the list of dirs to figure out the plugins available, each dir is assumed to be 1 plugin
     dirs = []
-    print("PLUGIN_PATH:", PLUGIN_PATH)
-    print(os.listdir(PLUGIN_PATH))
     for file in os.listdir(PLUGIN_PATH):
         d = os.path.join(PLUGIN_PATH, file)
-        print(d)
         if os.path.isdir(d) and os.path.isfile(os.path.join(d, file + ".py")):
             dirs.append(file)
-    if "models" in dirs:
-        dirs.remove("models")
     if "__pycache__" in dirs:
         dirs.remove("__pycache__")
     if "template_plugin" in dirs:

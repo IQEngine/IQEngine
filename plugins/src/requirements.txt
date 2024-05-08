@@ -14,4 +14,5 @@ pymongo==4.5.0
 Motor==3.3.1
 opencv-python==4.8.1.78
 python-dotenv==1.0.0
-pydantic==1.10.13
+pydantic==2.7.1
+python-multipart==0.0.9
