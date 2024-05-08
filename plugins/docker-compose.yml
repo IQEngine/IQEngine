@@ -1,0 +1,10 @@
+version: '3.8'
+services:
+  iqengine_no_gnradio:
+    image: iqengine_no_gr:latest
+    ports:
+      - '8000:8000'
+    environment:
+      - PLUGIN_PATH=./custom_plugins # replace with your actual environment variables if any
+    volumes:
+      - ./plugins:/src/custom_plugins # replace with your actual volume mapping if any
