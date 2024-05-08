@@ -14,6 +14,7 @@ import zmq
 from scipy.io.wavfile import write
 import io
 from models.plugin import Plugin
+from models.models import DataObject, Output
 class flowgraph(gr.top_block):
     def __init__(self, samp_rate):
         gr.top_block.__init__(self, "GNU Radio-based IQEngine Plugin", catch_exceptions=True)
@@ -33,7 +34,7 @@ class fm_receiver_gnuradio(Plugin):
     sample_rate: int = 0
     center_freq: int = 0
 
-    def run(self, samples, job_id=None):
+    def run(self, samples, job_context=None):
         # create a PUB socket
         context = zmq.Context()
         pub_socket = context.socket(zmq.PUB)
@@ -72,8 +73,5 @@ class fm_receiver_gnuradio(Plugin):
         byte_io = io.BytesIO(bytes())
         write(byte_io, 48000, scaled_float_out)
 
-        samples_obj = {
-            "samples": base64.b64encode(byte_io.read()),
-            "data_type": "audio/wav",
-        }
-        return {"data_output": [samples_obj], "annotations": []}
+        output_data = DataObject(data_type='audio/wav', file_name='output.wav', data=base64.b64encode(byte_io.getvalue()).decode())
+        return Output(non_iq_output_data=output_data)

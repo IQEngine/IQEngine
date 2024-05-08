@@ -10,6 +10,7 @@ import time
 import cv2 as cv
 
 from models.plugin import Plugin
+from models.models import Output
 
 class markos_detector(Plugin):
     sample_rate: int = 0
@@ -43,10 +44,7 @@ class markos_detector(Plugin):
         if False:
             plot_spectrogram(samples, sample_rate, rects)
 
-        return {
-            "data_output" : [],
-            "annotations" : anots
-        }
+        return Output(annotations=anots)
 
 def get_noise_floor(samps, sample_rate, fft_size=1024, n_floor_window_bins=10, n_random_spots=5):
     # this function does an fft of size {fft_size} at {n_random_spots} different locations

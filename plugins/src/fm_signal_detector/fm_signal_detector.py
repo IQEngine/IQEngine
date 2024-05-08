@@ -3,9 +3,9 @@
 
 import numpy as np
 import json
-from pydantic.dataclasses import dataclass
 #import matplotlib.pyplot as plt
 from models.plugin import Plugin
+from models.models import Output
 class fm_signal_detector(Plugin):
     sample_rate: int = 0
     center_freq: int = 0
@@ -13,7 +13,7 @@ class fm_signal_detector(Plugin):
     # Custom Params
     threshold_dB: float = 5.0
 
-    def rf_function(self, samples, job_id=None):
+    def rf_function(self, samples, job_context=None):
         fft_size = 2048
         num_rows = int(np.floor(len(samples)/fft_size))
         spectrogram = np.zeros((num_rows, fft_size))
@@ -69,10 +69,8 @@ class fm_signal_detector(Plugin):
             an["core:label"] = "FM Radio"
             annotations.append(an)
 
-        return {
-            "data_output" : [],
-            "annotations" : annotations
-        }
+        return Output(annotations=annotations)
+
 
 if __name__ == "__main__":
     # Example of how to test your detector locally

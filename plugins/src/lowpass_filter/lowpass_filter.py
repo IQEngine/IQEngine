@@ -1,11 +1,12 @@
 # Copyright (c) 2023 Marc Lichtman.
 # Licensed under the MIT License.
 
-import base64
 import fastapi
 import numpy as np
 from scipy import signal
+import base64
 from models.plugin import Plugin
+from models.models import Output, MetadataFile
 
 class lowpass_filter(Plugin):
     sample_rate: int = 0
@@ -16,7 +17,7 @@ class lowpass_filter(Plugin):
     cutoff: float = 1e6  # relative to sample rate
     width: float = 0.1e6  # relative to sample rate
 
-    def rf_function(self, samples, job_id=None):
+    def rf_function(self, samples, job_context=None):
         if self.numtaps > 10000:
             raise fastapi.HTTPException(status_code=500, detail="too many taps")
         if np.abs(self.width) > self.sample_rate/2:
@@ -31,11 +32,13 @@ class lowpass_filter(Plugin):
         ).astype(np.complex64)
 
         samples = np.convolve(samples, h, "valid")
+        samples_bytes = samples.tobytes()
+        samples_b64 = base64.b64encode(samples_bytes).decode()
 
-        samples_obj = {
-            "samples": base64.b64encode(samples),
-            "sample_rate": self.sample_rate,
-            "center_freq": self.center_freq,
-            "data_type": "iq/cf32_le",
-        }
-        return {"data_output": [samples_obj], "annotations": []}
+        metadata = MetadataFile(file_name=job_context.file_name,
+                                data_type="iq/cf32_le",
+                                sample_rate=self.sample_rate,
+                                center_freq=self.center_freq,
+                         )
+
+        return Output(metadata_file=metadata, output_data=samples_b64)

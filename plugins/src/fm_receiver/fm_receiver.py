@@ -9,6 +9,7 @@ from scipy.io.wavfile import write
 import io
 import json
 from models.plugin import Plugin
+from models.models import Output, DataObject
 
 class fm_receiver(Plugin):
     sample_rate: int = 0
@@ -17,7 +18,7 @@ class fm_receiver(Plugin):
     # custom params
     target_freq: float = 0
 
-    def run(self, x, job_id=None):
+    def run(self, x, job_context=None):
         # Freq shift if desired
         if self.target_freq != 0:
             x = x * np.exp(-2j * np.pi * self.target_freq * np.arange(len(x))/self.sample_rate)
@@ -52,11 +53,8 @@ class fm_receiver(Plugin):
         byte_io = io.BytesIO(bytes())
         write(byte_io, 48000, x)
 
-        samples_obj = {
-            "samples": base64.b64encode(byte_io.read()),
-            "data_type": "audio/wav",
-        }
-        return {"data_output": [samples_obj], "annotations": []}
+        output_data = DataObject(data_type='audio/wav', file_name='output.wav', data=base64.b64encode(byte_io.getvalue()).decode())
+        return Output(non_iq_output_data=output_data)
 
 
 if __name__ == "__main__":

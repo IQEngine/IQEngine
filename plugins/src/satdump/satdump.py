@@ -2,7 +2,6 @@ import base64
 
 import numpy as np
 from pydantic.dataclasses import dataclass
-from scipy.io.wavfile import write
 import random
 import string
 import os
@@ -10,6 +9,7 @@ import fastapi
 import shutil
 import subprocess
 import time
+from models.models import Output, DataObject
 
 '''
 Usage : satdump [pipeline_id] [input_level] [input_file] [output_file_or_directory] [additional options as required]
@@ -56,7 +56,7 @@ class Plugin:
             logs = result.stdout.decode('utf-8') + result.stderr.decode('utf-8') # for whatever reason all of satdumps output is in stderr
             print(logs) # FIXME these logs need to get to client somehow
             logs += str(list(os.walk(temp_output_dir)))
-            
+
             # Grab SNR (there isn't always one listed, depends how long processing takes)
             if False:
                 snr_start_indx = logs.rfind('Peak SNR: ')
@@ -65,7 +65,7 @@ class Plugin:
                     if snr_stop_indx != -1:
                         snr_dB_str = logs[snr_start_indx + 10:snr_start_indx+snr_stop_indx-2].strip()[:-3].strip()
                         snr_dB = float(snr_dB_str)
-            
+
             #time.sleep(3) # shouldnt need this
 
             # Analyze results directory
@@ -74,7 +74,7 @@ class Plugin:
                 final_output = temp_output_dir + 'AVHRR/AVHRR-1.png' # TODO FIGURE OUT CORRECT ONE
                 binary_fc = open(final_output, 'rb').read()
                 base64_utf8_str = base64.b64encode(binary_fc).decode('utf-8')
-            
+
             if self.pipeline_id == 'noaa_apt':
                 final_output = temp_output_dir + 'avhrr_3_APT_channel_B.png'
                 binary_fc = open(final_output, 'rb').read()
@@ -87,11 +87,10 @@ class Plugin:
             if os.path.exists(temp_output_dir) and os.path.isdir(temp_output_dir):
                 shutil.rmtree(temp_output_dir)
 
-            samples_obj = {
-                "samples": base64_utf8_str,
-                "data_type": "image/png",
-            }
-            return {"data_output": [samples_obj], "annotations": []}
+            output_data = DataObject(data_type="image/png", data=base64_utf8_str)
+
+            return Output(non_iq_output_data=output_data)
+
 
         except Exception as err:
             print("Error running satdump:", err)
@@ -118,7 +117,7 @@ if __name__ == "__main__":
     #center_freq = 1262.5e6
     #params = {'sample_rate': sample_rate, 'center_freq': center_freq, 'pipeline_id': 'terra_db'}
 
-    # NOAA noaa_apt 
+    # NOAA noaa_apt
     samples = np.fromfile('/mnt/c/Users/marclichtman/Downloads/recordings/APT_2024-02-03_10-52-34.s16', dtype=np.int16)
     samples = samples.astype(np.float32)
     samples = samples[::2] + 1j * samples[1::2]
@@ -133,4 +132,3 @@ if __name__ == "__main__":
     print(ret)
 
 
-    

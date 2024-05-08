@@ -5,7 +5,7 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import Optional
+from typing import Any, Dict, List, Optional, Union
 from uuid import UUID
 
 from pydantic import BaseModel, Extra, model_validator, Field, confloat, conint
@@ -21,9 +21,24 @@ class DataType(Enum):
     text_plain = 'text/plain'
 
 
+class Output(BaseModel):
+    job_status: Optional[JobStatus] = None
+    metadata_file: Optional[MetadataFile] = None
+    metadata_cloud: Optional[MetadataCloud] = None
+    additionalProperties: Optional[Dict[str, Union[str, float, int, bool]]] = None
+    annotations: Optional[List[Annotation]] = None
+    output_data: Optional[str] = None
+    non_iq_output_data: Optional[DataObject] = None
+
+class DataObject(BaseModel):
+    data_type: DataType = None
+    file_name: str = None
+    data: str
+
 class JobStatus(BaseModel):
     job_id: str
     function_name: str
+    file_name: str
     progress: float
     error: Optional[str] = None
 

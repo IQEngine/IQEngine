@@ -11,6 +11,7 @@ from gnuradio.fft import window
 from gnuradio import zeromq
 import zmq
 from models.plugin import Plugin
+from models.models import MetadataFile, Output
 
 class gnuradio_lowpass_filter(gr.top_block):
     def __init__(self, sample_rate, cutoff, width):
@@ -63,10 +64,15 @@ class lowpass_filter_gnuradio(Plugin):
 
         tb.stop()
         tb.wait()
-        samples_obj = {
-            "samples": base64.b64encode(newSamples),
-            "sample_rate": self.sample_rate,
-            "center_freq": self.center_freq,
-            "data_type": "iq/cf32_le",
-        }
-        return {"data_output": [samples_obj], "annotations": []}
+
+
+        samples_bytes = newSamples.tobytes()
+        samples_b64 = base64.b64encode(samples_bytes).decode()
+
+        metadata = MetadataFile(file_name=f"{job_id}.sigmf-meta",
+                                data_type="iq/cf32_le",
+                                sample_rate=self.sample_rate,
+                                center_freq=self.center_freq,
+                         )
+
+        return Output(metadata_file=metadata, output_data=samples_b64)

@@ -3,19 +3,26 @@ import inspect
 import os
 import json
 import logging
+import traceback
+
+from models.models import JobStatus, Output
 class Plugin(ABC):
 
     @abstractmethod
-    def rf_function(self, samples, job_id=None):
+    def rf_function(self, samples, job_context: JobStatus=None) -> Output:
         pass
 
-    def run(self, samples, job_id):
+    def run(self, samples, job_context: JobStatus):
         try:
-            result = self.rf_function(samples, job_id)
+            job_id = job_context.job_id
+
+            result = self.rf_function(samples, job_context)
+
             self.store_result(job_id, result)
             self.set_status(job_id, 100)
         except Exception as e:
-            logging.error(e)
+            tb = traceback.format_exc()
+            logging.error(f"Exception occurred: {e}, traceback: {tb}")
             self.set_status(job_id, 100, str(e))
 
     def set_status(self, job_id, progress, error=None):
@@ -28,21 +35,20 @@ class Plugin(ABC):
         with open(os.path.join("jobs", job_id + ".json"), "w") as f:
             f.write(json.dumps(job_status, indent=4))
 
-    def store_result(self, job_id, result):
+    def store_result(self, job_id: str, result: Output):
         try:
             if not os.path.isdir("results"):
                 os.mkdir("results")
 
-            with open(os.path.join("results", job_id + ".json"), "w") as f:
-                print(result)
-                # if result is empty, store an empty json object, else there will be no result file
-                if result is None:
-                    result = {
-                        "data_output": [],
-                        "annotations": []
-                    }
+            directory = os.path.join("results", job_id)
+            os.mkdir(directory)
 
-                f.write(json.dumps(result, indent=4))
+            # dump result to disk,
+            with open(os.path.join(directory, job_id + ".json"), "w") as f:
+                f.write(result.model_dump_json(indent=4, exclude_none=True, by_alias=True ))
+
+            logging.info(f"Stored result for job {job_id}")
+
         except Exception as e:
             logging.error(e)
             self.set_status(job_id, 100, str(e))

@@ -4,6 +4,7 @@
 import numpy as np
 import json
 from models.plugin import Plugin
+from models.models import Output
 
 class template_plugin(Plugin):
     sample_rate: int = 0
@@ -32,10 +33,7 @@ class template_plugin(Plugin):
         an['core:sample_count'] = 4
         an["core:label"] = "Unknown"
         annotations.append(an)
-        return {
-            "data_output" : [],
-            "annotations" : annotations
-        }
+        return Output(annotations=annotations)
 
 if __name__ == "__main__":
     # Example of how to test your plugin locally

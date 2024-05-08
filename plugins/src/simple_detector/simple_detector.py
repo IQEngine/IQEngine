@@ -5,7 +5,7 @@ import numpy as np
 import json
 import cv2
 from models.plugin import Plugin
-
+from models.models import Output
 class simple_detector(Plugin):
     sample_rate: int = 0
     center_freq: int = 0
@@ -66,10 +66,7 @@ class simple_detector(Plugin):
             an["core:label"] = "Unknown"
             annotations.append(an)
 
-        return {
-            "data_output" : [],
-            "annotations" : annotations
-        }
+        return Output(annotations=annotations)
 
 if __name__ == "__main__":
     # Example of how to test your detector locally
