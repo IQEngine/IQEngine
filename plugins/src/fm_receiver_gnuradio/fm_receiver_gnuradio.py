@@ -21,7 +21,7 @@ class flowgraph(gr.top_block):
 
         self.zmq_sub_source = zeromq.sub_source(gr.sizeof_gr_complex, 1, 'tcp://127.0.0.1:5001', 100, False, -1)
         self.zmq_pub_sink = zeromq.pub_sink(gr.sizeof_float, 1, 'tcp://127.0.0.1:5002', 100, False, -1)
-        self.pfb_arb_resampler = pfb.arb_resampler_ccf(500e3/samp_rate, taps=[], flt_size=32)
+        self.pfb_arb_resampler = pfb.arb_resampler_ccf(500e3 / samp_rate, taps=[], flt_size=32)
         self.analog_wfm_rcv = analog.wfm_rcv(quad_rate=500e3, audio_decimation=10)
         self.rational_resampler = filter.rational_resampler_fff(interpolation=50, decimation=48, taps=[], fractional_bw=0)
 
@@ -34,7 +34,7 @@ class fm_receiver_gnuradio(Plugin):
     sample_rate: int = 0
     center_freq: int = 0
 
-    def run(self, samples, job_context=None):
+    def rf_function(self, samples, job_context=None):
         # create a PUB socket
         context = zmq.Context()
         pub_socket = context.socket(zmq.PUB)
@@ -48,8 +48,8 @@ class fm_receiver_gnuradio(Plugin):
         # create a SUB socket
         sub_socket = context.socket(zmq.SUB)
         sub_socket.connect('tcp://127.0.0.1:5002')
-        sub_socket.setsockopt(zmq.SUBSCRIBE, b'') # subscribe to topic of all (needed or else it won't work)
-        sub_socket.setsockopt(zmq.RCVTIMEO, 500) # may have to increase if its a slow flowgraph
+        sub_socket.setsockopt(zmq.SUBSCRIBE, b'')  # subscribe to topic of all (needed or else it won't work)
+        sub_socket.setsockopt(zmq.RCVTIMEO, 500)  # may have to increase if its a slow flowgraph
         print("started python SUB")
 
         # for now just send entire batch of samples at once, we'll figure out what the limits are later
@@ -61,7 +61,7 @@ class fm_receiver_gnuradio(Plugin):
             try:
                 resp = sub_socket.recv()
                 float_out = np.concatenate((float_out, np.frombuffer(resp, dtype=np.float32, count=-1)))
-            except Exception as e: # messy way of figuring out when gnuradio is done
+            except Exception as e:  # messy way of figuring out when gnuradio is done
                 print(e)
                 break
 

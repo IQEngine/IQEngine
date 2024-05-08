@@ -37,6 +37,8 @@ async def get_list_of_plugins():
         d = os.path.join(".", file)
         if os.path.isdir(d) and os.path.isfile(os.path.join(d, file + ".py")):
             dirs.append(file)
+    if "models" in dirs:
+        dirs.remove("models")
     if "__pycache__" in dirs:
         dirs.remove("__pycache__")
     if "template_plugin" in dirs:

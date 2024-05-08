@@ -8,7 +8,7 @@ import { TimePlot } from './time-plot';
 import { FrequencyPlot } from './frequency-plot';
 import { IQPlot } from './iq-plot';
 import { Layer, Image, Stage } from 'react-konva';
-import { convertFloat32ArrayToBase64, convertBase64ToFloat32Array } from '@/utils/rf-functions';
+import { convertBase64ToFloat32Array } from '@/utils/rf-functions';
 import { colMaps } from '@/utils/colormap';
 import { fftshift } from 'fftshift';
 import { FFT } from '@/utils/fft';
@@ -211,49 +211,49 @@ export const PluginsPane = () => {
         });
 
         setModalOpen(true);
-      } else if (!!jobOutput.non_iq_output_data && jobOutput.non_iq_output_data.data_type == DataType.image_png) {
-        let data_output = jobOutput.non_iq_output_data.data;
-        let data_type = jobOutput.non_iq_output_data.data_type;
-        let blob = BlobFromSamples(data_output, data_type);
-        createImageBitmap(blob).then((imageBitmap) => {
-          setmodalSpectrogram(imageBitmap);
-        });
-        setModalOpen(true);
-      } else if (!!jobOutput.non_iq_output_data) {
-        // Files to be directly downloaded
-        let d = new Date();
-        let datestring = new Date().toISOString().split('.')[0];
-
-        let data_type = jobOutput.non_iq_output_data.data_type;
-
-        let ext = '';
-        switch (data_type) {
-          case DataType.audio_wav:
-            ext = 'wav';
-            break;
-          //case MimeTypes.image_png:
-          //  ext = 'png';
-          //  break;
-          default:
-            toast.error(`The plugins pane doesn't handle the mime type ${data_type} output by the plugin.`);
-            break;
-        }
-
-        if (ext === '') return;
-
-        let data_output = jobOutput.non_iq_output_data.data;
-
-        let blob = BlobFromSamples(data_output, data_type);
-
-        let url = window.URL.createObjectURL(blob);
-        let a = document.createElement('a');
-        a.href = url;
-
-        let filename = `sample_${datestring}_.${ext}`;
-        a.download = filename;
-        a.click();
-        window.URL.revokeObjectURL(url);
       }
+    } else if (!!jobOutput.non_iq_output_data && jobOutput.non_iq_output_data.data_type == DataType.image_png) {
+      let data_output = jobOutput.non_iq_output_data.data;
+      let data_type = jobOutput.non_iq_output_data.data_type;
+      let blob = BlobFromSamples(data_output, data_type);
+      createImageBitmap(blob).then((imageBitmap) => {
+        setmodalSpectrogram(imageBitmap);
+      });
+      setModalOpen(true);
+    } else if (!!jobOutput.non_iq_output_data) {
+      // Files to be directly downloaded
+      let d = new Date();
+      let datestring = new Date().toISOString().split('.')[0];
+
+      let data_type = jobOutput.non_iq_output_data.data_type;
+
+      let ext = '';
+      switch (data_type) {
+        case DataType.audio_wav:
+          ext = 'wav';
+          break;
+        //case MimeTypes.image_png:
+        //  ext = 'png';
+        //  break;
+        default:
+          toast.error(`The plugins pane doesn't handle the mime type ${data_type} output by the plugin.`);
+          break;
+      }
+
+      if (ext === '') return;
+
+      let data_output = jobOutput.non_iq_output_data.data;
+
+      let blob = BlobFromSamples(data_output, data_type);
+
+      let url = window.URL.createObjectURL(blob);
+      let a = document.createElement('a');
+      a.href = url;
+
+      let filename = `sample_${datestring}_.${ext}`;
+      a.download = filename;
+      a.click();
+      window.URL.revokeObjectURL(url);
     }
 
     if (jobOutput.annotations) {
