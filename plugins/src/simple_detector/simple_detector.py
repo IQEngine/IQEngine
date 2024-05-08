@@ -19,12 +19,6 @@ class simple_detector(Plugin):
         print(self.center_freq)
         print(self.threshold_dB)
 
-        # wait 4s to simulate a long running process
-        import time
-        for i in range(4):
-            self.set_status(job_context.job_id, i * 25)
-            time.sleep(1)
-
         # Your detection (and optionally, classification) code here
         fft_size = 1024
         num_rows = int(np.floor(len(samples) / fft_size))
