@@ -118,7 +118,8 @@ async def get_job_result(job_id: str):
 
 async def get_plugin_instance(plugin_name: str) -> Plugin:
     try:
-        module_path = "plugins." + plugin_name + "." + plugin_name
+        # replace all slashes with dots to get the correct module path
+        module_path = build_module_path(plugin_name)
         module = __import__(module_path, fromlist=["Plugin"])
         pluginClass = getattr(module, plugin_name)
         return pluginClass()
@@ -130,3 +131,18 @@ async def get_plugin_instance(plugin_name: str) -> Plugin:
     except ModuleNotFoundError as err:
         print(err)
         raise HTTPException(status_code=404, detail="Plugin does not exist")
+
+
+def build_module_path(plugin_name: str):
+    # replace all slashes with dots to get the correct module path
+    module_prefix = PLUGIN_PATH.replace("/", ".")
+
+    # remove trailing "."s
+    while module_prefix.endswith("."):
+        module_prefix = module_prefix[:-1]
+
+    # remove leading "."s
+    while module_prefix.startswith("."):
+        module_prefix = module_prefix[1:]
+
+    return f"{module_prefix}.{plugin_name}.{plugin_name}"

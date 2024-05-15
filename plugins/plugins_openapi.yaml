@@ -173,7 +173,7 @@ paths:
         '200':
           description: OK. Plugin run is done. Return the results.
           content:
-            multipart/mixed::
+            multipart/mixed:
               schema:
                 type: object
                 properties:
@@ -199,7 +199,7 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/annotation'
-                  iq_files:
+                  files:
                     type: array
                     items:
                       type: string
