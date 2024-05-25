@@ -11,7 +11,7 @@ from fastapi.responses import StreamingResponse
 from helpers.authorization import get_current_user
 from helpers.cipher import decrypt, encrypt
 from helpers.datasource_access import check_access
-from helpers.urlmapping import ApiType, add_URL_sasToken, get_content_type, get_file_name
+from helpers.urlmapping import ApiType, get_content_type, get_file_name
 from motor.core import AgnosticCollection
 from pydantic import SecretStr
 from datetime import datetime
@@ -23,21 +23,15 @@ from . import aiquery
 router = APIRouter()
 
 
-@router.post("/api/datasources", status_code=201, response_model=DataSource)
+@router.post("/api/datasources", status_code=201)
 async def create_datasource_endpoint(
     datasource: DataSource,
     current_user: dict = Depends(get_current_user),
 ):
-    """
-    Create a new datasource. The datasource will be henceforth identified by account/container which
-    must be unique or this function will return a 400.
-    """
     if await datasource_exists(datasource.account, datasource.container):
         raise HTTPException(status_code=409, detail="Datasource Already Exists")
-
     datasource = await create_datasource(datasource=datasource, user=current_user)
-    return datasource
-
+    return
 
 @router.get("/api/datasources", response_model=list[DataSource])
 async def get_datasources(current_user: Optional[dict] = Depends(get_current_user)):
