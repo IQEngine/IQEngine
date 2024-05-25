@@ -175,7 +175,7 @@ export function useGetIQData(
     enabled: !!meta && !!filesQuery.data && !!dataSourcesQuery.data,
   });
 
-  const currentData = processedIQData;
+  const currentData = processedIQData; // without this line things break
 
   return {
     fftSize,

@@ -19,7 +19,7 @@ const RulerSide = ({ currentRowAtTop }: RulerSideProps) => {
   useEffect(() => {
     // Draw the vertical scales
     let num_ticks = spectrogramHeight / 10 + 1;
-    let tms = 1000 * fftSize / meta.getSampleRate(); // time_per_row_in_ms
+    let tms = (1000 * fftSize) / meta.getSampleRate(); // time_per_row_in_ms
     const temp_ticks = [];
     const temp_labels = [];
     for (let i = 0; i < num_ticks; i++) {

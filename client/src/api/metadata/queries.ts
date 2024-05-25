@@ -138,7 +138,13 @@ export const useSmartQueryMeta = (query: string, enabled = true) => {
   const { filesQuery, dataSourcesQuery } = useUserSettings();
   const { instance } = useMsal();
   const { data: config } = useConfigQuery();
-  const metadataClient = MetadataClientFactory(CLIENT_TYPE_API, filesQuery.data, dataSourcesQuery.data, instance, config);
+  const metadataClient = MetadataClientFactory(
+    CLIENT_TYPE_API,
+    filesQuery.data,
+    dataSourcesQuery.data,
+    instance,
+    config
+  );
   return useQuery<SmartQueryResult>({
     queryKey: ['smart-query', query],
     queryFn: ({ signal }) => {

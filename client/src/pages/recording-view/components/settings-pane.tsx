@@ -21,7 +21,7 @@ interface SettingsPaneProps {
 }
 
 const SettingsPane = ({ currentFFT }) => {
-  const fftSizes = [128, 256, 512, 1024, 2048, 4096, 16384, 65536];
+  const fftSizes = [64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536];
   const context = useSpectrogramContext();
   const cursorContext = useCursorContext();
   const [localPythonSnippet, setLocalPythonSnippet] = useState(context.pythonSnippet);
@@ -110,7 +110,7 @@ const SettingsPane = ({ currentFFT }) => {
   return (
     <div className="form-control">
       <label className="mb-3" id="formZoom">
-        <span className="label-text text-base ">Zoom Level</span>
+        <span className="label-text text-base ">Zoom Out Level</span>
         <input
           type="range"
           className="range range-xs range-primary"
