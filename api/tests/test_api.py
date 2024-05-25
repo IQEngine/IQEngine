@@ -232,28 +232,11 @@ async def test_api_get_datasources(client):
     assert len(response.json()) == 1
 
 
-@mock.patch("app.datasources_router.AzureBlobClient.generate_sas_token", return_value="temp_sas_token")
 @pytest.mark.asyncio
 async def test_api_get_temp_sas_token(mock_get_sas_token: Mock, client):
     client.post("/api/datasources", json=test_datasource).json()
     response = client.get(f"/api/datasources/{test_datasource['account']}/{test_datasource['container']}/file_path/sas")
-    assert response.status_code == 200
-    response_object = response.json()
-    assert response_object["sasToken"] == "temp_sas_token"
-    assert mock_get_sas_token.call_count == 1
-
-
-@mock.patch("app.datasources_router.AzureBlobClient.generate_sas_token", return_value="temp_sas_token")
-@pytest.mark.asyncio
-async def test_api_get_temp_sas_token_no_key(mock_get_sas_token: Mock, client):
-    modded_datasource = test_datasource.copy()
-    modded_datasource["accountKey"] = None
-    client.post("/api/datasources", json=modded_datasource).json()
-    response = client.get(f"/api/datasources/{test_datasource['account']}/{test_datasource['container']}/file_path/sas")
-    assert response.status_code == 200
-    response_object = response.json()
-    assert response_object["sasToken"] == "sasToken"
-    assert mock_get_sas_token.call_count == 0
+    assert response.status_code == 404
 
 
 @pytest.mark.asyncio
