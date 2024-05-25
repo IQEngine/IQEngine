@@ -89,7 +89,6 @@ async def start_plugin(background_tasks: BackgroundTasks,
 async def get_job_status(job_id: str):
     try:
         job_id = sanitize(job_id)
-
         with open(os.path.join("jobs", job_id + ".json"), "r") as f:
             return JobStatus(**json.load(f)).model_dump(exclude_none=True)
     except FileNotFoundError:
@@ -101,48 +100,36 @@ async def get_job_result(job_id: str):
     job_status = await get_job_status(job_id)
     if job_status.get("progress") != 100:
         raise HTTPException(status_code=400, detail="Job not complete")
-
     if job_status.get("error"):
         raise HTTPException(status_code=400, detail=job_status["error"])
-
     try:
         path = os.path.join("results", job_id, job_id + ".json")
         with open(path, "r") as f:
             dict = json.load(f)
             output = Output(job_status=job_status, **dict)
-
         return output.model_dump(exclude_none=True, by_alias=True)
-
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail="Result not found")
 
 async def get_plugin_instance(plugin_name: str) -> Plugin:
     try:
-        # replace all slashes with dots to get the correct module path
-        module_path = build_module_path(plugin_name)
+        module_path = build_module_path(plugin_name)  # replace all slashes with dots to get the correct module path
         module = __import__(module_path, fromlist=["Plugin"])
         pluginClass = getattr(module, plugin_name)
         return pluginClass()
     except AttributeError:
         raise HTTPException(status_code=404, detail="Plugin definition could not be generated")
     except KeyError as err:
-        print(err)
+        print("Error in get_plugin_instance():", err)
         raise HTTPException(status_code=500, detail="Error in plugin definition")
     except ModuleNotFoundError as err:
-        print(err)
+        print("Error in get_plugin_instance():", err)
         raise HTTPException(status_code=404, detail="Plugin does not exist")
 
-
-def build_module_path(plugin_name: str):
-    # replace all slashes with dots to get the correct module path
-    module_prefix = PLUGIN_PATH.replace("/", ".")
-
-    # remove trailing "."s
-    while module_prefix.endswith("."):
+def build_module_path(plugin_name: str) -> str:
+    module_prefix = PLUGIN_PATH.replace("/", ".")  # replace all slashes with dots to get the correct module path
+    while module_prefix.endswith("."):  # remove trailing "."s
         module_prefix = module_prefix[:-1]
-
-    # remove leading "."s
-    while module_prefix.startswith("."):
+    while module_prefix.startswith("."):  # remove leading "."s
         module_prefix = module_prefix[1:]
-
     return f"{module_prefix}.{plugin_name}.{plugin_name}"
