@@ -1,6 +1,3 @@
-# Copyright (c) 2023 Marc Lichtman.
-# Licensed under the MIT License.
-
 import base64
 
 import numpy as np

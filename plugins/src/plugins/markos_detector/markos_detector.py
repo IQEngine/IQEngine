@@ -1,7 +1,3 @@
-# Copyright (c) 2022 Microsoft Corporation.
-# Copyright (c) 2023 Marc Lichtman.
-# Licensed under the MIT License.
-
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.patches import Rectangle

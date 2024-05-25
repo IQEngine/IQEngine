@@ -1,10 +1,6 @@
-# Copyright (c) 2023 Marc Lichtman.
-# Licensed under the MIT License.
-
 import numpy as np
 import json
 import cv2
-
 from models.plugin import Plugin
 from models.models import Output
 

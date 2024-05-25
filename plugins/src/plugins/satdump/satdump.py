@@ -1,5 +1,4 @@
 import base64
-
 import numpy as np
 from pydantic.dataclasses import dataclass
 import random
