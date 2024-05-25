@@ -339,9 +339,9 @@ export const PluginsPane = () => {
                   <Image image={modalSpectrogram} x={0} y={0} width={spectrogramWidth} height={600} />
                 </Layer>
               </Stage>
-              <TimePlot displayedIQ={modalSamples} />
-              <FrequencyPlot displayedIQ={modalSamples} />
-              <IQPlot displayedIQ={modalSamples} />
+              <TimePlot displayedIQ={modalSamples} fftStepSize={0} />
+              <FrequencyPlot displayedIQ={modalSamples} fftStepSize={0} />
+              <IQPlot displayedIQ={modalSamples} fftStepSize={0} />
             </div>
           </form>
         </dialog>
