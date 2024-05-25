@@ -60,14 +60,11 @@ const SettingsPane = ({ currentFFT }) => {
     updateTaps(taps_string);
   };
 
-  const onPressSaveButton = (e) => {
-    console.log(context.meta);
+  const onPressDownloadSelectedSamples = (e) => {
     // Grab metadata and remove the parts that shouldn't be included in the metafile
     let metaClone = JSON.parse(JSON.stringify(context.meta));
     delete metaClone['dataClient'];
     const a = document.createElement('a');
-
-    // Return with the download of the blob
     const blobUrl = window.URL.createObjectURL(
       new Blob([cursorContext.cursorData], { type: 'application/octet-stream' })
     );
@@ -75,12 +72,10 @@ const SettingsPane = ({ currentFFT }) => {
     a.download = 'trimmedSamples.sigmf-data';
     a.click();
     window.URL.revokeObjectURL(blobUrl);
-
     a.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent(JSON.stringify(metaClone, null, 2));
     a.download = 'trimmedSamples.sigmf-meta';
     a.click();
-
-    document.body.removeChild(a);
+    a.remove(); // remove element from dom
   };
 
   // Calculate number of ffts we skip per image line in order to show N% of the total file in the spectrogram. The first element in the array is special, don't skip
@@ -151,7 +146,7 @@ const SettingsPane = ({ currentFFT }) => {
 
       <button
         className="mb-3"
-        onClick={onPressSaveButton}
+        onClick={onPressDownloadSelectedSamples}
         style={{ width: '100%', marginTop: '5px' }}
         disabled={!context.canDownload}
       >
