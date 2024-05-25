@@ -27,7 +27,10 @@ export function useGetPlugin(plugin: PluginDefinition) {
   return useQuery<string[]>(
     ['plugin', plugin.name],
     async () => {
-      const response = await axios.get<string[]>(plugin.url);
+      const response = await axios.get<string[]>(plugin.url).catch((err) => {
+        console.info('Plugin server ' + plugin.url + ' not reachable');
+        return { data: [] };
+      });
       // make sure we only return in case of a string array
       if (!Array.isArray(response.data)) throw new Error(`Plugin ${plugin.name} does not return a string array`);
       return response.data;
