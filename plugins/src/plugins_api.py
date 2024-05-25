@@ -1,5 +1,4 @@
 import json
-import logging
 import os
 from typing import Optional
 import uuid
@@ -57,9 +56,7 @@ async def start_plugin(background_tasks: BackgroundTasks,
         samples = np.fromfile(iq_file.file, dtype=np.complex64)
         plugin_params["sample_rate"] = metadata_file.sample_rate
         plugin_params["center_freq"] = metadata_file.center_freq
-
-        # add params to the plugin
-        plugin.set_custom_params(plugin_params)
+        plugin.set_custom_params(plugin_params)  # add params to the plugin
 
         job_id = str(uuid.uuid4())  # create a unique id for the job
         if not os.path.isdir("jobs"):  # check if plugin server has a jobs directory
@@ -70,8 +67,7 @@ async def start_plugin(background_tasks: BackgroundTasks,
         with open(os.path.join("jobs", job_id + ".json"), "w") as f:
             f.write(job_context.model_dump_json(indent=4))
 
-        # start the plugin in the background
-        # all python plugins should have a run method that takes in the samples and a uuid
+        # start the plugin in the background. all python plugins should have a run method that takes in the samples and a uuid
         background_tasks.add_task(plugin.run, samples, job_context)
 
         return job_context.model_dump(exclude_none=True)
@@ -82,7 +78,6 @@ async def start_plugin(background_tasks: BackgroundTasks,
 
     except Exception as e:
         print(e)
-        logging.error(e)
         raise HTTPException(status_code=500, detail="Unknown error in plugins_api")
 
 @app.get("/plugins/{job_id}/status")
