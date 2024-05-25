@@ -8,6 +8,7 @@ from fastapi import Depends
 from pymongo.operations import ReplaceOne
 from bson import encode
 from bson.raw_bson import RawBSONDocument
+from pydantic import SecretStr
 
 from .azure_client import AzureBlobClient
 from .models import DataSource
@@ -178,7 +179,8 @@ async def sync(account: str, container: str):
     print(f"[SYNC] Finished syncing {account}/{container}")
     await azure_blob_client.close_blob_clients()  # Close all the blob clients to avoid unclosed connection errors
 
-async def create_datasource(datasource: DataSource, user: Optional[dict]) -> DataSource:
+
+async def create_datasource(datasource: DataSource, user: Optional[dict]) -> bool:
     """
     Create a new datasource. The datasource will be henceforth identified by account/container which
     must be unique or this function will return a 400.
@@ -187,12 +189,16 @@ async def create_datasource(datasource: DataSource, user: Optional[dict]) -> Dat
     datasource_collection = db().datasources
     if await datasource_exists(datasource.account, datasource.container):
         print("Datasource Already Exists!")
-        return None
-    if datasource.sasToken:
-        datasource.sasToken = encrypt(datasource.sasToken)
-    if datasource.accountKey:
-        datasource.accountKey = encrypt(datasource.accountKey)
+        return False
     datasource_dict = datasource.dict(by_alias=True, exclude_unset=True)
+
+    # encrypt takes in the SecretStr and returns a string with the encrypted value, which then gets stored in mongo
+    if datasource.sasToken:
+        datasource_dict["sasToken"] = encrypt(datasource.sasToken)
+    if datasource.accountKey:
+        datasource_dict["accountKey"] = encrypt(datasource.accountKey)
+    if datasource.imageURL:
+        datasource_dict["imageURL"] = encrypt(datasource.imageURL)
 
     if "owners" not in datasource_dict:
         datasource_dict["owners"] = []
@@ -202,8 +208,9 @@ async def create_datasource(datasource: DataSource, user: Optional[dict]) -> Dat
         datasource_dict["readers"] = []
     if "public" not in datasource_dict:
         datasource_dict["public"] = True
+
     await datasource_collection.insert_one(datasource_dict)
-    return datasource
+    return True
 
 async def import_datasources_from_env():
     connection_info = os.getenv("IQENGINE_CONNECTION_INFO", None)
@@ -231,7 +238,7 @@ async def import_datasources_from_env():
                 accountKey=None,
                 name="Local to Backend",
                 description="Files stored on the backend server in the " + str(base_filepath) + " directory",
-                imageURL="https://raw.githubusercontent.com/IQEngine/IQEngine/main/client/public/backend-storage.svg",
+                imageURL=SecretStr("https://raw.githubusercontent.com/IQEngine/IQEngine/main/client/public/backend-storage.svg"),
                 type="api",
                 public=True,
                 owners=["IQEngine-Admin"],
@@ -250,21 +257,20 @@ async def import_datasources_from_env():
                 datasource = DataSource(
                     account=connection["accountName"],
                     container=connection["containerName"],
-                    sasToken=connection["sasToken"],
-                    accountKey=connection["accountKey"] if "accountKey" in connection else None,
+                    sasToken=SecretStr(connection["sasToken"]),
+                    accountKey=SecretStr(connection["accountKey"]) if "accountKey" in connection else None,
                     name=connection["name"],
-                    description=connection["description"]
-                    if "description" in connection
-                    else None,
-                    imageURL=connection["imageURL"] if "imageURL" in connection else None,
+                    description=connection["description"] if "description" in connection else None,
+                    imageURL=SecretStr(connection["imageURL"]) if "imageURL" in connection else None,
                     type="api",
                     public=connection["public"] if "public" in connection else True,
                     owners=connection["owners"] if "owners" in connection else ["IQEngine-Admin"],
                     readers=connection["readers"] if "readers" in connection else [],
                 )
                 create_ret = await create_datasource(datasource=datasource, user=None)
+
                 if create_ret:
                     await sync(connection["accountName"], connection["containerName"])
             except Exception as e:
-                print(f"Failed to import datasource {connection['name']}", e)
+                print(f"Failed to import datasource {connection['name']}.", e)
                 continue
