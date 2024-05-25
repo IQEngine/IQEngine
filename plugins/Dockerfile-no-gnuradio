@@ -14,8 +14,6 @@ RUN pip install -r requirements.txt --break-system-packages
 
 COPY src .
 
-
-
 RUN chmod +x start.sh
 EXPOSE 8000
 CMD ["./start.sh"]
