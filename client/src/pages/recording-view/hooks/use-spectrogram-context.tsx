@@ -3,6 +3,7 @@ import { useMeta } from '@/api/metadata/queries';
 import { INITIAL_PYTHON_SNIPPET } from '@/utils/constants';
 import { SigMFMetadata } from '@/utils/sigmfMetadata';
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { COLORMAP_DEFAULT } from '@/utils/constants';
 
 interface SpectrogramContextProperties {
   type: string;
@@ -43,6 +44,7 @@ interface SpectrogramContextProperties {
 
 export const SpectrogramContext = createContext<SpectrogramContextProperties>(null);
 
+// Initial settings
 export function SpectrogramContextProvider({
   children,
   type,
@@ -52,8 +54,8 @@ export function SpectrogramContextProvider({
   seedValues = {
     magnitudeMin: -30,
     magnitudeMax: 5,
-    colmap: 'viridis',
-    windowFunction: 'hann',
+    colmap: COLORMAP_DEFAULT,
+    windowFunction: 'rectangle',
     fftSize: 1024,
     spectrogramHeight: 800,
     spectrogramWidth: 1024,

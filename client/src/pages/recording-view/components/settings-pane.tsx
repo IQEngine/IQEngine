@@ -8,13 +8,13 @@ import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import DualRangeSlider from '@/features/ui/dual-range-slider/DualRangeSlider';
-import { COLORMAP_DEFAULT } from '@/utils/constants';
 import { colMaps } from '@/utils/colormap';
 import { useSpectrogramContext } from '../hooks/use-spectrogram-context';
 import { useCursorContext } from '../hooks/use-cursor-context';
 import { vscodeDark } from '@uiw/codemirror-theme-vscode';
 import CodeMirror from '@uiw/react-codemirror';
 import { langs } from '@uiw/codemirror-extensions-langs';
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
 
 interface SettingsPaneProps {
   currentFFT: number;
@@ -22,6 +22,7 @@ interface SettingsPaneProps {
 
 const SettingsPane = ({ currentFFT }) => {
   const fftSizes = [64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536];
+  const windowFunctions = ['hamming', 'rectangle', 'hanning', 'barlett', 'blackman'];
   const context = useSpectrogramContext();
   const cursorContext = useCursorContext();
   const [localPythonSnippet, setLocalPythonSnippet] = useState(context.pythonSnippet);
@@ -244,6 +245,7 @@ const SettingsPane = ({ currentFFT }) => {
               </a>
             </span>
           </label>
+
           <div className="mt-2 flex">
             <input
               type="text"
@@ -254,7 +256,7 @@ const SettingsPane = ({ currentFFT }) => {
               }}
             />
             <button className="rounded-none rounded-r" onClick={onSubmitTaps}>
-              <FontAwesomeIcon icon={faArrowRight} />
+              <FontAwesomeIcon icon={faArrowRight as IconProp} />
             </button>
           </div>
         </div>
@@ -290,21 +292,11 @@ const SettingsPane = ({ currentFFT }) => {
             Window <ArrowRightIcon />
           </label>
           <ul className="p-2 shadow menu dropdown-content z-[1] mt-0 bg-base-100 rounded-box w-70">
-            <li key={0} data-value="hamming" onClick={onChangeWindowFunction}>
-              {context.windowFunction === 'hamming' ? <a className="active">Hamming</a> : <a>Hamming</a>}
-            </li>
-            <li key={1} data-value="rectangle" onClick={onChangeWindowFunction}>
-              {context.windowFunction === 'rectangle' ? <a className="active">Rectangle</a> : <a>Rectangle</a>}
-            </li>
-            <li key={2} data-value="hanning" onClick={onChangeWindowFunction}>
-              {context.windowFunction === 'hanning' ? <a className="active">Hanning</a> : <a>Hanning</a>}
-            </li>
-            <li key={3} data-value="barlett" onClick={onChangeWindowFunction}>
-              {context.windowFunction === 'barlett' ? <a className="active">Barlett</a> : <a>Barlett</a>}
-            </li>
-            <li key={4} data-value="blackman" onClick={onChangeWindowFunction}>
-              {context.windowFunction === 'blackman' ? <a className="active">Blackman</a> : <a>Blackman</a>}
-            </li>
+            {windowFunctions.map((value) => (
+              <li key={value} data-value={value} onClick={onChangeWindowFunction}>
+                <a className={'capitalize ' + (context.windowFunction === value && 'bg-primary text-black')}>{value}</a>
+              </li>
+            ))}
           </ul>
         </div>
       </div>
