@@ -1,5 +1,5 @@
 from typing import List, Optional
-from pydantic import BaseModel, Extra, Field, SecretStr, validator
+from pydantic import BaseModel, Extra, Field, SecretStr
 
 class DataSource(BaseModel):
     type: str
@@ -7,7 +7,7 @@ class DataSource(BaseModel):
     account: str
     container: str
     description: Optional[str] = None
-    imageURL: Optional[str] = None
+    imageURL: Optional[SecretStr] = None
     sasToken: Optional[SecretStr] = None
     accountKey: Optional[SecretStr] = None
     owners: Optional[List[str]] = []

@@ -9,7 +9,7 @@ def get_key():
         os.environ["DB_ENCRYPTION_KEY"] = key.decode("utf-8")
     return key
 
-def decrypt(sas_token: str):
+def decrypt(sas_token: str) -> SecretStr:
     if not sas_token:
         return None
     key = get_key()

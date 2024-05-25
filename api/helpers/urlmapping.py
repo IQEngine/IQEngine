@@ -42,7 +42,7 @@ def get_file_name(filepath: str, apiType: ApiType) -> str:
             raise ValueError("Invalid ApiType value")
 
 
-def add_URL_sasToken(account, container, sasToken, filepath, apiType: ApiType):
+def add_URL_sasToken(account, container, sasToken, filepath, apiType: ApiType) -> SecretStr:
     match apiType:
         case ApiType.THUMB if filepath and filepath.strip():
             bloburl = (
