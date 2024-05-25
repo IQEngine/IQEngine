@@ -16,3 +16,4 @@ opencv-python==4.8.1.78
 python-dotenv==1.0.0
 pydantic==2.7.1
 python-multipart==0.0.9
+email-validator==2.1.1
