@@ -22,6 +22,7 @@ interface SettingsPaneProps {
 
 const SettingsPane = ({ currentFFT }) => {
   const fftSizes = [64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536];
+  const zoomLevels = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
   const windowFunctions = ['hamming', 'rectangle', 'hanning', 'barlett', 'blackman'];
   const context = useSpectrogramContext();
   const cursorContext = useCursorContext();
@@ -82,27 +83,12 @@ const SettingsPane = ({ currentFFT }) => {
     document.body.removeChild(a);
   };
 
-  function calcZoomStepSizes() {
-    /*
-      What we're doing here is calculating the number of ffts we
-      skip per image line in order to show N% of the total
-      file in the spectrogram. The first element in the
-      array is special, don't skip
-    */
-
-    const fftSize = context.fftSize;
-    const imageHeight = context.spectrogramHeight;
-    const totalSamples = context.meta.getTotalSamples();
-    const onePercent = totalSamples / fftSize / 100;
-
-    const zoomLevels = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
-    return zoomLevels.map((z) => Math.floor((onePercent * z) / imageHeight));
-  }
-
-  const zoomStepSizes = calcZoomStepSizes();
+  // Calculate number of ffts we skip per image line in order to show N% of the total file in the spectrogram. The first element in the array is special, don't skip
+  const onePercent = context.meta.getTotalSamples() / context.fftSize / 100;
+  const zoomStepSizes = zoomLevels.map((z) => Math.floor((onePercent * z) / context.spectrogramHeight));
 
   const onChangePythonSnippet = useCallback(
-    (value, viewUpdate) => {
+    (value: string) => {
       setLocalPythonSnippet(value);
     },
     [localPythonSnippet]
