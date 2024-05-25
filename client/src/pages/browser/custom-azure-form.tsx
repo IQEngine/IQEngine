@@ -120,6 +120,7 @@ export const CustomAzureForm = ({
             placeholder="SAS Token (optional)"
             onChange={onSasTokenChange}
             className="input input-bordered input-success w-full max-w-xs mb-2 pl-2"
+            autoComplete="off"
           />
           <button className="" onClick={onCustomAzureSubmit} id="AzureBlob">
             Browse
