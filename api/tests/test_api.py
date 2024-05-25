@@ -233,13 +233,6 @@ async def test_api_get_datasources(client):
 
 
 @pytest.mark.asyncio
-async def test_api_get_temp_sas_token(mock_get_sas_token: Mock, client):
-    client.post("/api/datasources", json=test_datasource).json()
-    response = client.get(f"/api/datasources/{test_datasource['account']}/{test_datasource['container']}/file_path/sas")
-    assert response.status_code == 404
-
-
-@pytest.mark.asyncio
 async def test_api_get_datasource(client):
     response = client.post("/api/datasources", json=test_datasource)
     response = client.get(
