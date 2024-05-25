@@ -7,7 +7,7 @@ class DataSource(BaseModel):
     account: str
     container: str
     description: Optional[str] = None
-    imageURL: Optional[SecretStr] = None
+    imageURL: Optional[str] = None
     sasToken: Optional[SecretStr] = None
     accountKey: Optional[SecretStr] = None
     owners: Optional[List[str]] = []

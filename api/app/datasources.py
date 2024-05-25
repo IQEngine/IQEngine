@@ -197,8 +197,6 @@ async def create_datasource(datasource: DataSource, user: Optional[dict]) -> boo
         datasource_dict["sasToken"] = encrypt(datasource.sasToken)
     if datasource.accountKey:
         datasource_dict["accountKey"] = encrypt(datasource.accountKey)
-    if datasource.imageURL:
-        datasource_dict["imageURL"] = encrypt(datasource.imageURL)
 
     if "owners" not in datasource_dict:
         datasource_dict["owners"] = []
@@ -238,7 +236,7 @@ async def import_datasources_from_env():
                 accountKey=None,
                 name="Local to Backend",
                 description="Files stored on the backend server in the " + str(base_filepath) + " directory",
-                imageURL=SecretStr("https://raw.githubusercontent.com/IQEngine/IQEngine/main/client/public/backend-storage.svg"),
+                imageURL="https://raw.githubusercontent.com/IQEngine/IQEngine/main/client/public/backend-storage.svg",
                 type="api",
                 public=True,
                 owners=["IQEngine-Admin"],
@@ -261,7 +259,7 @@ async def import_datasources_from_env():
                     accountKey=SecretStr(connection["accountKey"]) if "accountKey" in connection else None,
                     name=connection["name"],
                     description=connection["description"] if "description" in connection else None,
-                    imageURL=SecretStr(connection["imageURL"]) if "imageURL" in connection else None,
+                    imageURL=connection["imageURL"] if "imageURL" in connection else None,
                     type="api",
                     public=connection["public"] if "public" in connection else True,
                     owners=connection["owners"] if "owners" in connection else ["IQEngine-Admin"],

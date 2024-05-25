@@ -45,10 +45,8 @@ def get_file_name(filepath: str, apiType: ApiType) -> str:
 def add_URL_sasToken(account, container, sasToken, filepath, apiType: ApiType) -> SecretStr:
     match apiType:
         case ApiType.THUMB if filepath and filepath.strip():
-            bloburl = (
-                f"https://{account}.blob.core.windows.net/{container}/{filepath}.jpg"
-            )
-        case ApiType.IMAGE:
+            bloburl = f"https://{account}.blob.core.windows.net/{container}/{filepath}.jpg"
+        case ApiType.IMAGE:  # used for the datasource image
             bloburl = f"https://{account}.blob.core.windows.net/{container}/datasource_thumbnail.jpg"
         case ApiType.IQDATA if filepath and filepath.strip():
             bloburl = f"https://{account}.blob.core.windows.net/{container}/{filepath}.sigmf-data"

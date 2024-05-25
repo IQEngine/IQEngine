@@ -167,8 +167,6 @@ async def get_iqfile(
 ):
     if access_allowed is None:
         raise HTTPException(status_code=403, detail="No Access")
-
-    # Create the imageURL with sasToken
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
 
