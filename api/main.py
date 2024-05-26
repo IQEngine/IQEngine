@@ -2,22 +2,20 @@ import logging
 import os
 from logging.config import dictConfig
 
-from app.database import db
-from dotenv import load_dotenv
-from fastapi import FastAPI, Request
-from fastapi.staticfiles import StaticFiles
-
 from app.config_router import router as config_router
+from app.converter_router import router as converter_router
+from app.database import db
 from app.datasources_router import router as datasources_router
 from app.iq_router import router as iq_router
 from app.plugins_router import router as plugins_router
 from app.status_router import router as status_router
 from app.users_router import router as users_router
-from app.converter_router import router as converter_router
-
+from dotenv import load_dotenv
+from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from helpers.apidisconnect import CancelOnDisconnectRoute
 from helpers.import_env import import_all_from_env
-from pydantic import BaseModel
+from pydantic import v1 as pydantic_v1
 from pymongo.errors import ServerSelectionTimeoutError
 from starlette.exceptions import HTTPException
 from starlette.responses import JSONResponse
@@ -50,7 +48,7 @@ class SPAStaticFiles(StaticFiles):
         return response
 
 
-class LogConfig(BaseModel):
+class LogConfig(pydantic_v1.BaseModel):
     """Logging configuration to be set for the server"""
 
     LOGGER_NAME: str = "api"
@@ -103,8 +101,7 @@ app.add_event_handler("startup", import_all_from_env)  # clears db and adds plug
 async def database_exception_handler():
     return JSONResponse(
         status_code=503,
-        content={
-            "message": "Service Unavailable: Unable to connect to the database."},
+        content={"message": "Service Unavailable: Unable to connect to the database."},
     )
 
 

@@ -38,8 +38,8 @@ paths:
           required: true
           description: Name of RF Function
       responses:
-        '400':
-          description: Bad request. RF Function does not exist.
+        '404':
+          description: Not found. RF Function does not exist.
         '200':
           description: 'OK'
           content:
@@ -95,30 +95,27 @@ paths:
           multipart/form-data:
             schema:
               type: object
-              # Provide either samples (IQ samples) or samples_pointer (pointer to blob storage)
-              oneOf:
-                - required: [metadatas_file, metadatas_cloud]
               properties:
-                  metadatas_file:
-                    type: array # list of metadata to corresponding IQ file, most functions will just have 1
-                    items:
-                      $ref: '#/components/schemas/metadata_file'
-                  metadatas_cloud:
-                    type: array # list of metadata to IQ samples stored in cloud storage, most functions will just have 1
-                    items:
-                      $ref: '#/components/schemas/metadata_cloud'
-                  # Custom params
-                  additionalProperties:
-                    anyOf:
-                      - type: string
-                      - type: number # (float)
-                      - type: integer
-                      - type: boolean
-                  iq_files:
-                    type: array
-                    items:
-                      type: string
-                      format: binary
+                metadatas_file:
+                  type: array # list of metadata to corresponding IQ file, most functions will just have 1
+                  items:
+                    $ref: '#/components/schemas/metadata_file'
+                metadatas_cloud:
+                  type: array # list of metadata to IQ samples stored in cloud storage, most functions will just have 1
+                  items:
+                    $ref: '#/components/schemas/metadata_cloud'
+                # Custom params
+                additionalProperties:
+                  anyOf:
+                    - type: string
+                    - type: number # (float)
+                    - type: integer
+                    - type: boolean
+                iq_files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
       responses:
         '400':
           description: Bad request. RF Function does not exist.
@@ -176,7 +173,7 @@ paths:
         '200':
           description: OK. Plugin run is done. Return the results.
           content:
-            multipart/mixed::
+            multipart/mixed:
               schema:
                 type: object
                 properties:
@@ -202,12 +199,11 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/annotation'
-                  iq_files:
+                  files:
                     type: array
                     items:
                       type: string
                       format: binary
-
 
 # A way to specify properties that are reused, or simply too large to have look good within parameters/responses objects
 components:
@@ -285,7 +281,7 @@ components:
         progress:
           description: Progress of the running Plugin in percentage
           type: number
-          minimum: 0
+          minimum: -1
           maximum: 100
 
     annotation:
