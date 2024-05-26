@@ -32,7 +32,7 @@ export const PluginsPane = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalSamples, setModalSamples] = useState<Float32Array>(new Float32Array([]));
   const [modalSpectrogram, setmodalSpectrogram] = useState(null);
-  const [useCloudStorage, setUseCloudStorage] = useState(true);
+  const [useCloudStorage, setUseCloudStorage] = useState(false);
   //const token = useSasToken(type, account, container, meta.getDataFileName(), false);
   let byte_offset = meta.getBytesPerIQSample() * Math.floor(cursorTime.start);
   let byte_length = meta.getBytesPerIQSample() * Math.ceil(cursorTime.end - cursorTime.start);
@@ -301,6 +301,7 @@ export const PluginsPane = () => {
           <span>Use Cloud Storage</span>
           <input
             type="checkbox"
+            disabled={true} // TODO: Implement this feature on plugins side first
             checked={useCloudStorage}
             className="checkbox checkbox-primary"
             onChange={() => {
