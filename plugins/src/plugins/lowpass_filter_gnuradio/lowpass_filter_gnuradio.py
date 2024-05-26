@@ -1,20 +1,19 @@
 import base64
+
 import numpy as np
-from pydantic.dataclasses import dataclass
-from gnuradio import filter
-from gnuradio.filter import firdes
-from gnuradio import gr
-from gnuradio.fft import window
-from gnuradio import zeromq
 import zmq
+from gnuradio import filter, gr, zeromq
+from gnuradio.fft import window
+from gnuradio.filter import firdes
+from models.models import MetadataFile, Output
 from models.plugin import Plugin
-from models.models import Output, MetadataFile
+
 
 class gnuradio_lowpass_filter(gr.top_block):
     def __init__(self, sample_rate, cutoff, width):
         gr.top_block.__init__(self, "GNU Radio-based IQEngine Plugin", catch_exceptions=True)
-        self.zmq_sub_source = zeromq.sub_source(gr.sizeof_gr_complex, 1, 'tcp://127.0.0.1:5001', 100, False, -1)
-        self.zmq_pub_sink = zeromq.pub_sink(gr.sizeof_gr_complex, 1, 'tcp://127.0.0.1:5002', 100, False, -1)
+        self.zmq_sub_source = zeromq.sub_source(gr.sizeof_gr_complex, 1, "tcp://127.0.0.1:5001", 100, False, -1)
+        self.zmq_pub_sink = zeromq.pub_sink(gr.sizeof_gr_complex, 1, "tcp://127.0.0.1:5002", 100, False, -1)
         self.filter = filter.fir_filter_ccf(1, firdes.low_pass(1, sample_rate, cutoff, width, window.WIN_HAMMING, 6.76))
         self.connect(self.filter, self.zmq_pub_sink)
         self.connect(self.zmq_sub_source, self.filter)
@@ -32,7 +31,7 @@ class lowpass_filter_gnuradio(Plugin):
         # create a PUB socket
         context = zmq.Context()
         pub_socket = context.socket(zmq.PUB)
-        pub_socket.bind('tcp://*:5001')
+        pub_socket.bind("tcp://*:5001")
         print("started python PUB")
 
         tb = gnuradio_lowpass_filter(self.sample_rate, self.cutoff, self.width)
@@ -41,8 +40,8 @@ class lowpass_filter_gnuradio(Plugin):
 
         # create a SUB socket
         sub_socket = context.socket(zmq.SUB)
-        sub_socket.connect('tcp://127.0.0.1:5002')
-        sub_socket.setsockopt(zmq.SUBSCRIBE, b'')  # subscribe to topic of all (needed or else it won't work)
+        sub_socket.connect("tcp://127.0.0.1:5002")
+        sub_socket.setsockopt(zmq.SUBSCRIBE, b"")  # subscribe to topic of all (needed or else it won't work)
         sub_socket.setsockopt(zmq.RCVTIMEO, 500)  # may have to increase if its a slow flowgraph
         print("started python SUB")
 
@@ -65,10 +64,11 @@ class lowpass_filter_gnuradio(Plugin):
         samples_bytes = newSamples.tobytes()
         samples_b64 = base64.b64encode(samples_bytes).decode()
 
-        metadata = MetadataFile(file_name=f"{job_id}.sigmf-meta",
-                                data_type="iq/cf32_le",
-                                sample_rate=self.sample_rate,
-                                center_freq=self.center_freq,
-                                )
+        metadata = MetadataFile(
+            file_name=f"{job_id}.sigmf-meta",
+            data_type="iq/cf32_le",
+            sample_rate=self.sample_rate,
+            center_freq=self.center_freq,
+        )
 
         return Output(metadata_file=metadata, output_data=samples_b64)

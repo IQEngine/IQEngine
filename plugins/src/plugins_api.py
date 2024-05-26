@@ -1,16 +1,22 @@
 import json
 import os
-from typing import Optional
 import uuid
+from typing import Optional
 
 import numpy as np
-from fastapi import BackgroundTasks, Body, FastAPI, File, Form, HTTPException, UploadFile
-from fastapi.middleware.cors import CORSMiddleware
-from models.plugin import Plugin
-from models.models import JobStatus, MetadataFile, Output
-from samples import get_from_samples_cloud
-
 from config import PLUGIN_PATH
+from fastapi import (
+    BackgroundTasks,
+    Body,
+    FastAPI,
+    File,
+    Form,
+    HTTPException,
+    UploadFile,
+)
+from fastapi.middleware.cors import CORSMiddleware
+from models.models import JobStatus, MetadataFile, Output
+from models.plugin import Plugin
 from utils import sanitize
 
 app = FastAPI()
@@ -22,6 +28,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 @app.get("/plugins")
 async def get_list_of_plugins():
@@ -37,18 +44,21 @@ async def get_list_of_plugins():
         dirs.remove("template_plugin")
     return dirs
 
+
 @app.get("/plugins/{function_name}")
 async def get_custom_params(function_name: str):
     plugin = await get_plugin_instance(function_name)
     return plugin.get_definition()
 
-@app.post("/plugins/{function_name}")
-async def start_plugin(background_tasks: BackgroundTasks,
-                       function_name: str,
-                       metadata_file: MetadataFile = Body(...),
-                       iq_file: UploadFile = File(...),
-                       custom_params: Optional[str] = Form(None)):
 
+@app.post("/plugins/{function_name}")
+async def start_plugin(
+    background_tasks: BackgroundTasks,
+    function_name: str,
+    metadata_file: MetadataFile = Body(...),
+    iq_file: UploadFile = File(...),
+    custom_params: Optional[str] = Form(None),
+):
     plugin_params = json.loads(custom_params)  # parse custom_params into a dictionary
     plugin = await get_plugin_instance(function_name)
 
@@ -80,6 +90,7 @@ async def start_plugin(background_tasks: BackgroundTasks,
         print(e)
         raise HTTPException(status_code=500, detail="Unknown error in plugins_api")
 
+
 @app.get("/plugins/{job_id}/status")
 async def get_job_status(job_id: str):
     try:
@@ -88,6 +99,7 @@ async def get_job_status(job_id: str):
             return JobStatus(**json.load(f)).model_dump(exclude_none=True)
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail="Job not found")
+
 
 @app.get("/plugins/{job_id}/result")
 async def get_job_result(job_id: str):
@@ -106,6 +118,7 @@ async def get_job_result(job_id: str):
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail="Result not found")
 
+
 async def get_plugin_instance(plugin_name: str) -> Plugin:
     try:
         module_path = build_module_path(plugin_name)  # replace all slashes with dots to get the correct module path
@@ -120,6 +133,7 @@ async def get_plugin_instance(plugin_name: str) -> Plugin:
     except ModuleNotFoundError as err:
         print("Error in get_plugin_instance():", err)
         raise HTTPException(status_code=404, detail="Plugin does not exist")
+
 
 def build_module_path(plugin_name: str) -> str:
     module_prefix = PLUGIN_PATH.replace("/", ".")  # replace all slashes with dots to get the correct module path

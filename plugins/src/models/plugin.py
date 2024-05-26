@@ -1,15 +1,15 @@
-from abc import ABC, abstractmethod
 import inspect
-import os
 import json
 import logging
+import os
 import traceback
+from abc import ABC, abstractmethod
 
 import numpy as np
-
 from models.models import JobStatus, Output
-class Plugin(ABC):
 
+
+class Plugin(ABC):
     @abstractmethod
     def rf_function(self, samples: np.ndarray, job_context: JobStatus = None) -> Output:
         pass
@@ -58,20 +58,14 @@ class Plugin(ABC):
     def get_definition(self):
         definition = {}
         for i in inspect.getmembers(self):
-            if i[0].startswith('_') or inspect.ismethod(i[1]):
+            if i[0].startswith("_") or inspect.ismethod(i[1]):
                 continue
             if i[0] == "sample_rate" or i[0] == "center_freq":
                 continue
-            definition[i[0]] = {
-                "title": i[0],
-                "default": i[1],
-                "type": type(i[1]).__name__,
-                "value": i[1]
-            }
+            definition[i[0]] = {"title": i[0], "default": i[1], "type": type(i[1]).__name__, "value": i[1]}
         return definition
 
     def set_custom_params(self, custom_params: dict):
-
         type_map = {
             "float": float,
             "int": int,

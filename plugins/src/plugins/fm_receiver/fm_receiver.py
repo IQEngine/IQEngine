@@ -1,12 +1,13 @@
 import base64
-
-import numpy as np
-from scipy import signal
-from scipy.io.wavfile import write
 import io
 import json
+
+import numpy as np
+from models.models import DataObject, Output
 from models.plugin import Plugin
-from models.models import Output, DataObject
+from scipy import signal
+from scipy.io.wavfile import write
+
 
 class fm_receiver(Plugin):
     sample_rate: int = 0
@@ -44,24 +45,24 @@ class fm_receiver(Plugin):
 
         # Also save to file, for testing
         if False:
-            write('test.wav', 48000, samples)
+            write("test.wav", 48000, samples)
 
         # Create wav file out of real samples
         byte_io = io.BytesIO(bytes())
         write(byte_io, 48000, samples)
 
-        output_data = DataObject(data_type='audio/wav', file_name='output.wav', data=base64.b64encode(byte_io.getvalue()).decode())
+        output_data = DataObject(data_type="audio/wav", file_name="output.wav", data=base64.b64encode(byte_io.getvalue()).decode())
         return Output(non_iq_output_data=output_data)
 
 
 if __name__ == "__main__":
     fname = "/mnt/c/Users/marclichtman/Downloads/analog_FM_France"  # base name
-    with open(fname + '.sigmf-meta', 'r') as f:
+    with open(fname + ".sigmf-meta", "r") as f:
         meta_data = json.load(f)
     sample_rate = meta_data["global"]["core:sample_rate"]
     print(sample_rate)
-    center_freq = meta_data["captures"][0]['core:frequency']
-    samples = np.fromfile(fname + '.sigmf-data', dtype=np.complex64)
-    params = {'sample_rate': sample_rate, 'center_freq': center_freq, 'target_freq': 0}
+    center_freq = meta_data["captures"][0]["core:frequency"]
+    samples = np.fromfile(fname + ".sigmf-data", dtype=np.complex64)
+    params = {"sample_rate": sample_rate, "center_freq": center_freq, "target_freq": 0}
     detector = Plugin(**params)
     detector.run(samples)

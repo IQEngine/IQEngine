@@ -1,11 +1,13 @@
 from enum import Enum
 
+
 class ApiType(Enum):
     IMAGE = 1
     THUMB = 2
     IQDATA = 3
     METADATA = 4
     MINIMAP = 5
+
 
 def get_content_type(apiType: ApiType):
     match apiType:
@@ -21,6 +23,7 @@ def get_content_type(apiType: ApiType):
             return "application/octet-stream"
         case _:
             raise ValueError("Invalid ApiType value")
+
 
 def get_file_name(filepath: str, apiType: ApiType) -> str:
     match apiType:

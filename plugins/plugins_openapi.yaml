@@ -96,26 +96,26 @@ paths:
             schema:
               type: object
               properties:
-                  metadatas_file:
-                    type: array # list of metadata to corresponding IQ file, most functions will just have 1
-                    items:
-                      $ref: '#/components/schemas/metadata_file'
-                  metadatas_cloud:
-                    type: array # list of metadata to IQ samples stored in cloud storage, most functions will just have 1
-                    items:
-                      $ref: '#/components/schemas/metadata_cloud'
-                  # Custom params
-                  additionalProperties:
-                    anyOf:
-                      - type: string
-                      - type: number # (float)
-                      - type: integer
-                      - type: boolean
-                  iq_files:
-                    type: array
-                    items:
-                      type: string
-                      format: binary
+                metadatas_file:
+                  type: array # list of metadata to corresponding IQ file, most functions will just have 1
+                  items:
+                    $ref: '#/components/schemas/metadata_file'
+                metadatas_cloud:
+                  type: array # list of metadata to IQ samples stored in cloud storage, most functions will just have 1
+                  items:
+                    $ref: '#/components/schemas/metadata_cloud'
+                # Custom params
+                additionalProperties:
+                  anyOf:
+                    - type: string
+                    - type: number # (float)
+                    - type: integer
+                    - type: boolean
+                iq_files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
       responses:
         '400':
           description: Bad request. RF Function does not exist.
@@ -204,7 +204,6 @@ paths:
                     items:
                       type: string
                       format: binary
-
 
 # A way to specify properties that are reused, or simply too large to have look good within parameters/responses objects
 components:

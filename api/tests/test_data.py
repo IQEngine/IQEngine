@@ -17,7 +17,6 @@ test_datasource_id = f'{test_datasource["account"]}_{test_datasource["container"
 
 
 valid_metadata = {
-
     "global": {
         "antenna:gain": None,
         "antenna:type": None,

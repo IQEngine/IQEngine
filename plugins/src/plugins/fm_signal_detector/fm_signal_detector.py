@@ -1,8 +1,12 @@
-import numpy as np
 import json
+
+import numpy as np
+from models.models import Output
+
 # import matplotlib.pyplot as plt
 from models.plugin import Plugin
-from models.models import Output
+
+
 class fm_signal_detector(Plugin):
     sample_rate: int = 0
     center_freq: int = 0
@@ -15,7 +19,7 @@ class fm_signal_detector(Plugin):
         num_rows = int(np.floor(len(samples) / fft_size))
         spectrogram = np.zeros((num_rows, fft_size))
         for i in range(num_rows):
-            spectrogram[i, :] = 10 * np.log10(np.abs(np.fft.fftshift(np.fft.fft(samples[i * fft_size:(i + 1) * fft_size])))**2)
+            spectrogram[i, :] = 10 * np.log10(np.abs(np.fft.fftshift(np.fft.fft(samples[i * fft_size : (i + 1) * fft_size]))) ** 2)
         psd = np.mean(spectrogram, axis=0)
         # plt.plot(psd)
 
@@ -59,10 +63,10 @@ class fm_signal_detector(Plugin):
         annotations = []
         for detection in detections:
             an = {}
-            an['core:freq_lower_edge'] = detection - 0.1e6  # Hz
-            an['core:freq_upper_edge'] = detection + 0.1e6  # Hz
-            an['core:sample_start'] = 0
-            an['core:sample_count'] = len(samples)
+            an["core:freq_lower_edge"] = detection - 0.1e6  # Hz
+            an["core:freq_upper_edge"] = detection + 0.1e6  # Hz
+            an["core:sample_start"] = 0
+            an["core:sample_count"] = len(samples)
             an["core:label"] = "FM Radio"
             annotations.append(an)
 
@@ -72,12 +76,12 @@ class fm_signal_detector(Plugin):
 if __name__ == "__main__":
     # Example of how to test your detector locally
     fname = "/mnt/c/Users/marclichtman/Downloads/analog_FM_France"  # base name
-    with open(fname + '.sigmf-meta', 'r') as f:
+    with open(fname + ".sigmf-meta", "r") as f:
         meta_data = json.load(f)
     sample_rate = meta_data["global"]["core:sample_rate"]
-    center_freq = meta_data["captures"][0]['core:frequency']
-    samples = np.fromfile(fname + '.sigmf-data', dtype=np.complex64)
-    params = {'sample_rate': sample_rate, 'center_freq': center_freq, 'threshold_dB': 5}
+    center_freq = meta_data["captures"][0]["core:frequency"]
+    samples = np.fromfile(fname + ".sigmf-data", dtype=np.complex64)
+    params = {"sample_rate": sample_rate, "center_freq": center_freq, "threshold_dB": 5}
     detector = Plugin(**params)
     annotations = detector.run(samples)
     print(annotations)

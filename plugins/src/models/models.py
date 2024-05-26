@@ -4,21 +4,22 @@
 
 from __future__ import annotations
 
+import json
 from enum import Enum
 from typing import Dict, List, Optional, Union
 from uuid import UUID
 
-from pydantic import BaseModel, Extra, model_validator, Field, confloat, conint
-import json
+from pydantic import BaseModel, Extra, Field, confloat, conint, model_validator
+
 
 class DataType(Enum):
-    iq_ci8_le = 'iq/ci8_le'
-    iq_ci16_le = 'iq/ci16_le'
-    iq_cf32_le = 'iq/cf32_le'
-    image_png = 'image/png'
-    audio_wav = 'audio/wav'
-    application_octet_stream = 'application/octet-stream'
-    text_plain = 'text/plain'
+    iq_ci8_le = "iq/ci8_le"
+    iq_ci16_le = "iq/ci16_le"
+    iq_cf32_le = "iq/cf32_le"
+    image_png = "image/png"
+    audio_wav = "audio/wav"
+    application_octet_stream = "application/octet-stream"
+    text_plain = "text/plain"
 
 
 class Output(BaseModel):
@@ -30,10 +31,12 @@ class Output(BaseModel):
     output_data: Optional[str] = None
     non_iq_output_data: Optional[DataObject] = None
 
+
 class DataObject(BaseModel):
     data_type: DataType = None
     file_name: str = None
     data: str
+
 
 class JobStatus(BaseModel):
     job_id: str
@@ -42,50 +45,43 @@ class JobStatus(BaseModel):
     progress: float
     error: Optional[str] = None
 
+
 class Annotation(BaseModel):
     class Config:
         extra = Extra.allow
 
-    core_comment: Optional[str] = Field(
-        '', alias='core:comment', description='A human-readable comment'
-    )
-    core_freq_lower_edge: Optional[
-        confloat(ge=-1.7976931348623157e308, le=1.7976931348623157e308)
-    ] = Field(
+    core_comment: Optional[str] = Field("", alias="core:comment", description="A human-readable comment")
+    core_freq_lower_edge: Optional[confloat(ge=-1.7976931348623157e308, le=1.7976931348623157e308)] = Field(
         None,
-        alias='core:freq_lower_edge',
-        description='The frequency (Hz) of the lower edge of the feature described by this annotation.',
+        alias="core:freq_lower_edge",
+        description="The frequency (Hz) of the lower edge of the feature described by this annotation.",
     )
-    core_freq_upper_edge: Optional[
-        confloat(ge=-1.7976931348623157e308, le=1.7976931348623157e308)
-    ] = Field(
+    core_freq_upper_edge: Optional[confloat(ge=-1.7976931348623157e308, le=1.7976931348623157e308)] = Field(
         None,
-        alias='core:freq_upper_edge',
-        description='The frequency (Hz) of the upper edge of the feature described by this annotation.',
+        alias="core:freq_upper_edge",
+        description="The frequency (Hz) of the upper edge of the feature described by this annotation.",
     )
     core_generator: Optional[str] = Field(
         None,
-        alias='core:generator',
-        description='Human-readable name of the entity that created this annotation.',
+        alias="core:generator",
+        description="Human-readable name of the entity that created this annotation.",
     )
     core_label: Optional[str] = Field(
         None,
-        alias='core:label',
-        description='A short form human/machine-readable label for the annotation. CAN BE USED TO LABEL CLASSIFIER OUTPUT',
+        alias="core:label",
+        description="A short form human/machine-readable label for the annotation. CAN BE USED TO LABEL CLASSIFIER OUTPUT",
     )
     core_sample_count: conint(ge=0, le=18446744073709551616) = Field(
         ...,
-        alias='core:sample_count',
-        description='The number of samples that this Segment applies to.',
+        alias="core:sample_count",
+        description="The number of samples that this Segment applies to.",
     )
     core_sample_start: conint(ge=0, le=18446744073709551616) = Field(
         ...,
-        alias='core:sample_start',
-        description='The sample index at which this Segment takes effect',
+        alias="core:sample_start",
+        description="The sample index at which this Segment takes effect",
     )
-    core_uuid: Optional[UUID] = Field(
-        None, alias='core:uuid', description='RFC-4122 unique identifier.'
-    )
+    core_uuid: Optional[UUID] = Field(None, alias="core:uuid", description="RFC-4122 unique identifier.")
 
 
 class MetadataFile(BaseModel):
@@ -94,12 +90,13 @@ class MetadataFile(BaseModel):
     sample_rate: float
     center_freq: float
 
-    @model_validator(mode='before')
+    @model_validator(mode="before")
     @classmethod
     def validate_to_json(cls, value):
         if isinstance(value, str):
             return cls(**json.loads(value))
         return value
+
 
 class MetadataCloud(BaseModel):
     account_name: str
