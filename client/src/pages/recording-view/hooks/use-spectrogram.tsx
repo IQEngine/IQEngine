@@ -1,7 +1,7 @@
 import { useGetIQData } from '@/api/iqdata/Queries';
 import { useMemo } from 'react';
 import { useSpectrogramContext } from './use-spectrogram-context';
-import { useDebounceValue } from 'usehooks-ts';
+import { useDebounce } from 'usehooks-ts';
 import { FETCH_PADDING } from '@/utils/constants';
 
 export function useSpectrogram(currentFFT) {
@@ -33,7 +33,7 @@ export function useSpectrogram(currentFFT) {
     fftStepSize
   );
   const totalFFTs = Math.ceil(meta?.getTotalSamples() / fftSize);
-  const debouncedCurrentFFT = useDebounceValue<string>(currentFFT, 50);
+  const debouncedCurrentFFT = useDebounce<string>(currentFFT, 50);
 
   // useMemo is used to cache displayedIQ between rerenders, it's only recalculated when the dependencies change
   const displayedIQ = useMemo<Float32Array>(() => {

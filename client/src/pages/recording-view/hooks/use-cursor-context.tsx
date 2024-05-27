@@ -3,7 +3,7 @@ import { SigMFMetadata } from '@/utils/sigmfMetadata';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useSpectrogramContext } from './use-spectrogram-context';
 import { useGetIQData } from '@/api/iqdata/Queries';
-import { useDebounceValue } from 'usehooks-ts';
+import { useDebounce } from 'usehooks-ts';
 
 interface CursorContextProperties {
   cursorTime: Cursor;
@@ -42,7 +42,7 @@ export function CursorContextProvider({ children }) {
   const { currentData, setFFTsRequired, fftsRequired } = useGetIQData(type, account, container, filePath, fftSize);
 
   const [cursorData, setCursorData] = useState<Float32Array>(new Float32Array(0));
-  const debounceCursorTime = useDebounceValue(cursorTime, 500);
+  const debounceCursorTime = useDebounce(cursorTime, 500);
 
   useEffect(() => {
     if (!currentData || !cursorTime || cursorTime.start === cursorTime.end || !cursorTimeEnabled) {
