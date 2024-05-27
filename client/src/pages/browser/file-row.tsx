@@ -21,8 +21,10 @@ interface FileRowProps {
 const FileRow = ({ filepath, type, account, container, sasToken, geoSelected = false, trackToggle }: FileRowProps) => {
   const [showModal, setShowModal] = useState(false);
   const [lengthInSamplesString, setLengthInSamplesString] = useState('');
-  const { isIntersecting, ref } = useIntersectionObserver();
-  const { data: item } = getMeta(type, account, container, filepath, isIntersecting);
+  const ref = useRef<HTMLTableRowElement | null>(null);
+  const entry = useIntersectionObserver(ref, {});
+  const isVisible = !!entry?.isIntersecting;
+  const { data: item } = getMeta(type, account, container, filepath, isVisible);
 
   useEffect(() => {
     if (item !== undefined) {
