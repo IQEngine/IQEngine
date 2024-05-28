@@ -8,6 +8,7 @@ import { useMsal } from '@azure/msal-react';
 import { ClientType } from '@/api/Models';
 import { BlockBlobClient } from '@azure/storage-blob';
 import { FileWithHandle, fileOpen } from 'browser-fs-access';
+import { useConfigQuery } from '../config/queries';
 
 const fetchDataSources = async (client: DataSourceClient) => {
   let response;
@@ -39,7 +40,8 @@ const fetchSasToken = async (
 export const getDataSources = (type: string, enabled = true) => {
   const { filesQuery, dataSourcesQuery } = useUserSettings();
   const { instance } = useMsal();
-  const client = DataSourceClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance);
+  const { data } = useConfigQuery();
+  const client = DataSourceClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance, data);
   return useQuery(['datasource', type], () => fetchDataSources(client), {
     enabled: enabled,
   });
@@ -48,7 +50,8 @@ export const getDataSources = (type: string, enabled = true) => {
 export const getDataSource = (type: string, account: string, container: string, enabled = true) => {
   const { dataSourcesQuery, filesQuery } = useUserSettings();
   const { instance } = useMsal();
-  const client = DataSourceClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance);
+  const { data } = useConfigQuery();
+  const client = DataSourceClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance, data);
   return useQuery(
     ['datasource', type, account, container],
     () => {
@@ -70,7 +73,8 @@ export const useSasToken = (
 ) => {
   const { dataSourcesQuery, filesQuery } = useUserSettings();
   const { instance } = useMsal();
-  const client = DataSourceClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance);
+  const { data } = useConfigQuery();
+  const client = DataSourceClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance, data);
 
   return useQuery(
     ['sas', type, account, container, filepath, write],
@@ -86,7 +90,8 @@ export const useSasToken = (
 export const useQueryMeta = (type: string, queryString: string, enabled = true) => {
   const { dataSourcesQuery, filesQuery } = useUserSettings();
   const { instance } = useMsal();
-  const client = DataSourceClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance);
+  const { data } = useConfigQuery();
+  const client = DataSourceClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance, data);
   return useQuery<TraceabilityOrigin[]>(
     ['metadata-query', queryString],
     async ({ signal }) => {
@@ -101,14 +106,16 @@ export const useQueryMeta = (type: string, queryString: string, enabled = true) 
 export const useGetDatasourceFeatures = (type: string) => {
   const { dataSourcesQuery, filesQuery } = useUserSettings();
   const { instance } = useMsal();
-  const client = DataSourceClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance);
+  const { data } = useConfigQuery();
+  const client = DataSourceClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance, data);
   return client.features();
 };
 
 export const useSyncDataSource = (type: string, account: string, container) => {
   const { dataSourcesQuery, filesQuery } = useUserSettings();
   const { instance } = useMsal();
-  const client = DataSourceClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance);
+  const { data } = useConfigQuery();
+  const client = DataSourceClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance, data);
   return () => client.sync(account, container);
 };
 
@@ -116,21 +123,30 @@ export const useSyncDataSource = (type: string, account: string, container) => {
 export const useSyncAllDataSource = () => {
   const { dataSourcesQuery, filesQuery } = useUserSettings();
   const { instance } = useMsal();
-  const client = DataSourceClientFactory('api', filesQuery.data, dataSourcesQuery.data, instance);
+  const { data } = useConfigQuery();
+  const client = DataSourceClientFactory('api', filesQuery.data, dataSourcesQuery.data, instance, data);
   return () => client.syncAll();
 };
 
 export const useGetDataSource = (type: string, account: string, container: string) => {
   const { dataSourcesQuery, filesQuery } = useUserSettings();
   const { instance } = useMsal();
-  const client = DataSourceClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance);
+  const { data } = useConfigQuery();
+  const client = DataSourceClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance, data);
   return () => client.get(account, container);
 };
 
 export const useAddDataSource = () => {
   const { dataSourcesQuery, filesQuery } = useUserSettings();
   const { instance } = useMsal();
-  const dataSourceClient = DataSourceClientFactory(ClientType.API, filesQuery.data, dataSourcesQuery.data, instance);
+  const { data } = useConfigQuery();
+  const dataSourceClient = DataSourceClientFactory(
+    ClientType.API,
+    filesQuery.data,
+    dataSourcesQuery.data,
+    instance,
+    data
+  );
 
   return useMutation({
     mutationFn: (dataSource: DataSource) => {
@@ -146,7 +162,14 @@ export const useAddDataSource = () => {
 export const useUpdateDataSource = () => {
   const { dataSourcesQuery, filesQuery } = useUserSettings();
   const { instance } = useMsal();
-  const dataSourceClient = DataSourceClientFactory(ClientType.API, filesQuery.data, dataSourcesQuery.data, instance);
+  const { data } = useConfigQuery();
+  const dataSourceClient = DataSourceClientFactory(
+    ClientType.API,
+    filesQuery.data,
+    dataSourcesQuery.data,
+    instance,
+    data
+  );
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -166,7 +189,14 @@ export const useUpdateDataSource = () => {
 export const useUploadDataSource = (type: string, account: string, container: string, setProgress) => {
   const { dataSourcesQuery, filesQuery } = useUserSettings();
   const { instance } = useMsal();
-  const dataSourceClient = DataSourceClientFactory(ClientType.API, filesQuery.data, dataSourcesQuery.data, instance);
+  const { data } = useConfigQuery();
+  const dataSourceClient = DataSourceClientFactory(
+    ClientType.API,
+    filesQuery.data,
+    dataSourcesQuery.data,
+    instance,
+    data
+  );
 
   async function uploadBlob(f: FileWithHandle, account, container) {
     // Create azure blob client

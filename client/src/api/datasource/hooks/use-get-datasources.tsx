@@ -4,6 +4,7 @@ import { DataSourceClientFactory } from '@/api/datasource/datasource-client-fact
 import { useQuery } from '@tanstack/react-query';
 import { DataSourceClient } from '@/api/datasource/datasource-client';
 import { useMsal } from '@azure/msal-react';
+import { useConfigQuery } from '@/api/config/queries';
 
 const fetchDataSources = async (client: DataSourceClient) => {
   let response;
@@ -20,9 +21,10 @@ export function useGetDatasources() {
   const { filesQuery, dataSourcesQuery } = useUserSettings();
   const enabled = filesQuery.isSuccess && dataSourcesQuery.isSuccess;
   const { instance } = useMsal();
-  const apiClient = DataSourceClientFactory(ClientType.API, filesQuery.data, dataSourcesQuery.data, instance);
-  const localClient = DataSourceClientFactory(ClientType.LOCAL, filesQuery.data, dataSourcesQuery.data, instance);
-  const blobClient = DataSourceClientFactory(ClientType.BLOB, filesQuery.data, dataSourcesQuery.data, instance);
+  const { data } = useConfigQuery();
+  const apiClient = DataSourceClientFactory(ClientType.API, filesQuery.data, dataSourcesQuery.data, instance, data);
+  const localClient = DataSourceClientFactory(ClientType.LOCAL, filesQuery.data, dataSourcesQuery.data, instance, data);
+  const blobClient = DataSourceClientFactory(ClientType.BLOB, filesQuery.data, dataSourcesQuery.data, instance, data);
   const apiQuery = useQuery<DataSource[]>(['datasource', ClientType.API], () => fetchDataSources(apiClient), {
     enabled: enabled,
   });

@@ -7,6 +7,6 @@ test('GNURadio repocard displays spectrogram page', async ({ page }) => {
   const grRepo2 = page.locator('#GNURadioHostedRecordings');
   await grRepo.or(grRepo2).last().click();
   await page.getByRole('link', { name: 'analog_FM_France' }).click();
-  await expect(page.getByText('Zoom Level')).toBeVisible();
+  await expect(page.getByText('Zoom Out Level')).toBeVisible();
   await expect(page.locator('span:has-text("1.0.0")')).toBeHidden();
 });

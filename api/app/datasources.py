@@ -1,43 +1,39 @@
-from typing import Optional
+import asyncio
 import json
 import os
 import time
-import random
-import asyncio
+from typing import Optional
+
 import numpy as np
-from fastapi import Depends
-from pymongo.operations import ReplaceOne
 from bson import encode
 from bson.raw_bson import RawBSONDocument
+from fastapi import Depends
+from helpers.cipher import decrypt, encrypt
+from helpers.datasource_access import check_access
+from helpers.samples import get_bytes_per_iq_sample
+from pydantic import SecretStr
+from pymongo.operations import ReplaceOne
 
 from .azure_client import AzureBlobClient
-from .models import DataSource
-from helpers.cipher import decrypt, encrypt
-from motor.core import AgnosticCollection
-from helpers.samples import get_bytes_per_iq_sample
-from .models import DataSource
-from helpers.datasource_access import check_access
 from .database import db
-from .metadata import validate_metadata
+from .metadata import create, validate_metadata
+from .models import DataSource
 
-def collection() -> AgnosticCollection:
-    collection: AgnosticCollection = db().datasources
-    return collection
 
 async def get(account, container) -> DataSource | None:
     # Get a datasource by account and container
-    datasource_collection: AgnosticCollection = collection()
+    datasource_collection = db().datasources
     datasource = await datasource_collection.find_one({"account": account, "container": container})
     if datasource is None:
         return None
     return DataSource(**datasource)
 
+
 async def datasource_exists(account, container) -> bool:
     return await get(account, container) is not None
 
-async def sync(account: str, container: str):
-    from .metadata import create
 
+async def sync(account: str, container: str):
     print(f"[SYNC] Starting sync for {account}/{container} on PID {os.getpid()} at {time.time()}")
     azure_blob_client = AzureBlobClient(account, container)
     datasource = await get(account, container)
@@ -56,7 +52,7 @@ async def sync(account: str, container: str):
             for name in files:
                 if name.endswith(".sigmf-meta"):
                     filepath = os.path.join(path, name)
-                    if '..' in filepath:
+                    if ".." in filepath:
                         raise Exception("Invalid filepath")
                     with open(filepath, "r") as f:
                         content = f.read()
@@ -68,7 +64,7 @@ async def sync(account: str, container: str):
                         print(f"[SYNC] Error parsing metadata file {filepath}: {e}")
                         continue
                     if metadata:
-                        metadatas.append((os.path.join(path, name).replace(azure_blob_client.base_filepath, '')[1:], metadata))
+                        metadatas.append((os.path.join(path, name).replace(azure_blob_client.base_filepath, "")[1:], metadata))
         # Even though the below code is similar to Azure version, the Azure version had to be tweaked to parallelize it
         for metadata in metadatas:
             filepath = metadata[0].replace(".sigmf-meta", "")  # TODO: clean up the tuple messiness
@@ -85,9 +81,7 @@ async def sync(account: str, container: str):
                 }
                 metadata["global"]["traceability:revision"] = 0
                 file_length = await azure_blob_client.get_file_length(filepath + ".sigmf-data")
-                metadata["global"]["traceability:sample_length"] = (
-                    file_length / get_bytes_per_iq_sample(metadata["global"]["core:datatype"])
-                )
+                metadata["global"]["traceability:sample_length"] = file_length / get_bytes_per_iq_sample(metadata["global"]["core:datatype"])
                 await create(metadata, user=None)  # creates or updates the metadata object
                 # print(f"[SYNC] Created metadata for {filepath}") # commented out, caused too much spam
             except Exception as e:
@@ -111,7 +105,7 @@ async def sync(account: str, container: str):
         print("[SYNC] found", len(meta_blob_names), "meta files")  # the process above took about 15s for 36318 metas
 
         async def get_metadata(meta_blob_name):
-            if not meta_blob_name.replace(".sigmf-meta", ".sigmf-data") in data_blob_sizes:  # bail early if data file doesnt exist
+            if meta_blob_name.replace(".sigmf-meta", ".sigmf-data") not in data_blob_sizes:  # bail early if data file doesnt exist
                 print(f"[SYNC] Data file for {meta_blob_name} wasn't found")
                 return None
             blob_client = container_client.get_blob_client(meta_blob_name)
@@ -137,7 +131,7 @@ async def sync(account: str, container: str):
                 metadata["global"]["traceability:revision"] = 0
                 file_length = data_blob_sizes[filepath + ".sigmf-data"]
                 bytes_per_iq_sample = get_bytes_per_iq_sample(metadata["global"]["core:datatype"])
-                metadata["global"]["traceability:sample_length"] = (file_length / bytes_per_iq_sample)
+                metadata["global"]["traceability:sample_length"] = file_length / bytes_per_iq_sample
                 return metadata
 
         # Running all coroutines at once failed for datasets with 10k's metas, so we need to break it up into batches
@@ -147,7 +141,7 @@ async def sync(account: str, container: str):
         metadatas = []
         for i in range(num_batches):
             coroutines = []
-            for meta_blob_name in meta_blob_names[i * batch_size:(i + 1) * batch_size]:
+            for meta_blob_name in meta_blob_names[i * batch_size : (i + 1) * batch_size]:
                 coroutines.append(get_metadata(meta_blob_name))
             ret = await asyncio.gather(*coroutines)  # Wait for all the coroutines to finish
             metadatas.extend([x for x in ret if x is not None])  # remove the Nones
@@ -158,7 +152,7 @@ async def sync(account: str, container: str):
 
         bulk_writes = []
         for metadata in metadatas:
-            meta_name = metadata['global']['traceability:origin']['file_path']
+            meta_name = metadata["global"]["traceability:origin"]["file_path"]
             filter = {
                 "global.traceability:origin.account": account,
                 "global.traceability:origin.container": container,
@@ -172,7 +166,7 @@ async def sync(account: str, container: str):
         metadata_collection = db().metadata
         metadata_collection.bulk_write(bulk_writes)
 
-        ''' At some point we may remove the versions thing
+        """ At some point we may remove the versions thing
         # audit document
         audit_document = {
             "metadata": metadata,
@@ -181,30 +175,29 @@ async def sync(account: str, container: str):
         }
         versions: AgnosticCollection = versions_collection()
         await versions.insert_one(audit_document)
-        '''
+        """
 
     print(f"[SYNC] Finished syncing {account}/{container}")
     await azure_blob_client.close_blob_clients()  # Close all the blob clients to avoid unclosed connection errors
 
-async def create_datasource(datasource: DataSource, user: Optional[dict]) -> DataSource:
+
+async def create_datasource(datasource: DataSource, user: Optional[dict]) -> bool:
     """
     Create a new datasource. The datasource will be henceforth identified by account/container which
     must be unique or this function will return a 400.
     This will encrypt the sasToken if it is provided.
     """
-    datasource_collection: AgnosticCollection = collection()
+    datasource_collection = db().datasources
     if await datasource_exists(datasource.account, datasource.container):
         print("Datasource Already Exists!")
-        return None
-    if datasource.sasToken:
-        datasource.sasToken = encrypt(datasource.sasToken)
-    else:
-        datasource.sasToken = ""
-    if datasource.accountKey:
-        datasource.accountKey = encrypt(datasource.accountKey)
-    else:
-        datasource.accountKey = ""
+        return False
     datasource_dict = datasource.dict(by_alias=True, exclude_unset=True)
+
+    # encrypt takes in the SecretStr and returns a string with the encrypted value, which then gets stored in mongo
+    if datasource.sasToken:
+        datasource_dict["sasToken"] = encrypt(datasource.sasToken)
+    if datasource.accountKey:
+        datasource_dict["accountKey"] = encrypt(datasource.accountKey)
 
     if "owners" not in datasource_dict:
         datasource_dict["owners"] = []
@@ -214,75 +207,70 @@ async def create_datasource(datasource: DataSource, user: Optional[dict]) -> Dat
         datasource_dict["readers"] = []
     if "public" not in datasource_dict:
         datasource_dict["public"] = True
+
     await datasource_collection.insert_one(datasource_dict)
-    return datasource
+    return True
+
 
 async def import_datasources_from_env():
     connection_info = os.getenv("IQENGINE_CONNECTION_INFO", None)
     base_filepath = os.getenv("IQENGINE_BACKEND_LOCAL_FILEPATH", None)
-    base_filepath = base_filepath.replace('"', '') if base_filepath else None
+    base_filepath = base_filepath.replace('"', "") if base_filepath else None
 
-    # Add another random delay for good measure, we kept having ones start really close together
-    time.sleep(random.randint(0, 10000) / 1000)  # 0-10 seconds, to greatly reduce risk of duplicates
+    # For those using MSAL to enter in datasource connection info, leave IQENGINE_CONNECTION_INFO and IQENGINE_BACKEND_LOCAL_FILEPATH empty
+    if not connection_info and not base_filepath:
+        return
 
-    # Clear the metadata db
+    # Clear the db
     metadata_collection = db().metadata
     await metadata_collection.delete_many({})  # clears the metadata db
+
+    datasource_collection = db().datasources
+    await datasource_collection.delete_many({})  # clears the datasource db
 
     # Add datasource corresponding to the local backend storage
     if base_filepath and os.path.exists(base_filepath):
         try:
-            if not await datasource_exists('local', 'local'):
-                datasource = DataSource(
-                    account='local',
-                    container='local',
-                    sasToken=None,
-                    accountKey=None,
-                    name="Local to Backend",
-                    description="Files stored on the backend server in the " + str(base_filepath) + " directory",
-                    imageURL="https://raw.githubusercontent.com/IQEngine/IQEngine/main/client/public/backend-storage.svg",
-                    type="api",
-                    public=True,
-                    owners=["IQEngine-Admin"],
-                    readers=[],
-                )
-                # Check one more time that it doesn't exist yet (the above block can take 0.1s or more)
-                if not await datasource_exists('local', 'local'):
-                    create_ret = await create_datasource(datasource=datasource, user=None)
-                    if create_ret:
-                        await sync("local", "local")
+            datasource = DataSource(
+                account="local",
+                container="local",
+                sasToken=None,
+                accountKey=None,
+                name="Local to Backend",
+                description="Files stored on the backend server in the " + str(base_filepath) + " directory",
+                imageURL="https://raw.githubusercontent.com/IQEngine/IQEngine/main/client/public/backend-storage.svg",
+                type="api",
+                public=True,
+                owners=["IQEngine-Admin"],
+                readers=[],
+            )
+            create_ret = await create_datasource(datasource=datasource, user=None)
+            if create_ret:
+                await sync("local", "local")
         except Exception as e:
-            print(f"Failed to import datasource local to backend", e)
+            print("Failed to import datasource local to backend", e)
 
     # Add all cloud datasources
     if connection_info:
         for connection in json.loads(connection_info).get("settings", []):
             try:
-                if await datasource_exists(connection["accountName"], connection["containerName"]):
-                    continue
                 datasource = DataSource(
                     account=connection["accountName"],
                     container=connection["containerName"],
-                    sasToken=connection["sasToken"],
-                    accountKey=connection["accountKey"] if "accountKey" in connection else None,
+                    sasToken=SecretStr(connection["sasToken"]),
+                    accountKey=SecretStr(connection["accountKey"]) if "accountKey" in connection else None,
                     name=connection["name"],
-                    description=connection["description"]
-                    if "description" in connection
-                    else None,
+                    description=connection["description"] if "description" in connection else None,
                     imageURL=connection["imageURL"] if "imageURL" in connection else None,
                     type="api",
                     public=connection["public"] if "public" in connection else True,
                     owners=connection["owners"] if "owners" in connection else ["IQEngine-Admin"],
                     readers=connection["readers"] if "readers" in connection else [],
                 )
-                # Check one more time that it doesn't exist yet (the above block can take 0.1s or more)
-                if await datasource_exists(connection["accountName"], connection["containerName"]):
-                    continue
-                # It's important to immediately add it to the db so other workers see it and dont add a duplicate
                 create_ret = await create_datasource(datasource=datasource, user=None)
-                # This should only get triggered once (one worker)
+
                 if create_ret:
                     await sync(connection["accountName"], connection["containerName"])
             except Exception as e:
-                print(f"Failed to import datasource {connection['name']}", e)
+                print(f"Failed to import datasource {connection['name']}.", e)
                 continue

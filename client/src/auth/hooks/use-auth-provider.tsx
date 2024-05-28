@@ -6,11 +6,12 @@ import React from 'react';
 
 export const AuthProvider = ({ children }) => {
   // Without this, IQEngine wont work when deployed onprem without https set up (unless localhost is used)
-  if (window.location.protocol === 'http:') {
+  const islocalhost = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  if (window.location.protocol === 'http:' && !islocalhost) {
     console.log('WARNING- HTTP MODE! MSAL WILL NOT WORK!');
     return <>{children}</>;
   }
-  if (typeof window.crypto.randomUUID === 'undefined') {
+  if (typeof window.crypto.randomUUID === 'undefined' && !islocalhost) {
     console.log('WARNING- window.crypto.randomUUID was not found, MSAL WILL NOT WORK!');
     return <>{children}</>;
   }

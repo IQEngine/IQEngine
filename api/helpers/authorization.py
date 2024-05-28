@@ -28,12 +28,8 @@ http_bearer = OptionalHTTPBearer()
 
 
 class JWKSHandler:
-    openid_config_uri = (
-        "https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration"
-    )
-    jwks_cache: TTLCache[str, Any] = TTLCache(
-        maxsize=1, ttl=600
-    )  # cache the JWKS for 10 minutes
+    openid_config_uri = ("https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration")
+    jwks_cache: TTLCache[str, Any] = TTLCache(maxsize=1, ttl=600)  # cache the JWKS for 10 minutes
 
     @classmethod
     def get_openid_config(cls):
@@ -147,7 +143,7 @@ def required_roles(
                 detail="No Authorization token provided",
             )
         if roles is None:
-            return current_user # repeated to solve linter error
+            return current_user  # repeated to solve linter error
         if not any(role in current_user.get("roles", []) for role in roles):
             logging.info(
                 f"User {current_user.get('preferred_username')} attempted to access without sufficient privileges"

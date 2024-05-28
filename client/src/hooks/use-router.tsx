@@ -2,6 +2,7 @@ import { createBrowserRouter } from 'react-router-dom';
 import React from 'react';
 import SwaggerUI from 'swagger-ui-react';
 import { useProtectedRoute } from '@/auth/hooks/use-protected-route';
+import { ErrorPage } from '@/pages/error-page';
 
 export function useRouter() {
   const router = createBrowserRouter([
@@ -11,6 +12,7 @@ export function useRouter() {
         let { App } = await import('@/app');
         return { Component: App };
       },
+      errorElement: <ErrorPage />,
       children: [
         {
           path: 'about',
@@ -119,6 +121,7 @@ export function useRouter() {
             return { Component: Validator };
           },
         },
+        /*
         {
           path: 'webfftbenchmark',
           async lazy() {
@@ -126,6 +129,7 @@ export function useRouter() {
             return { Component: WebfftBenchmark };
           },
         },
+        */
         {
           index: true,
           async lazy() {

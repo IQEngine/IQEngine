@@ -1,15 +1,15 @@
-import axios from 'axios';
 import { DataSourceClient } from './datasource-client';
 import { DataSource } from '@/api/Models';
 import { TraceabilityOrigin } from '@/utils/sigmfMetadata';
 import { AccountInfo, IPublicClientApplication } from '@azure/msal-browser';
 import { AuthUtil } from '@/api/utils/Auth-Utils';
+import { AppConfig } from '../config/queries';
 
 export class ApiClient implements DataSourceClient {
   private authUtil: AuthUtil;
 
-  constructor(instance: IPublicClientApplication, account: AccountInfo) {
-    this.authUtil = new AuthUtil(instance, account);
+  constructor(instance: IPublicClientApplication, account: AccountInfo, config: AppConfig) {
+    this.authUtil = new AuthUtil(instance, account, config);
   }
 
   async sync(account: string, container: string): Promise<void> {

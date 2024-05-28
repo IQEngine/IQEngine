@@ -1,79 +1,70 @@
-import os
 import json
-import httpx
-from .azure_client import AzureBlobClient
-from . import datasources
-from .datasources import create_datasource, datasource_exists
+import os
+from datetime import datetime
+from typing import List, Optional
+
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Response
 from fastapi.responses import StreamingResponse
 from helpers.authorization import get_current_user
 from helpers.cipher import decrypt, encrypt
 from helpers.datasource_access import check_access
-from helpers.urlmapping import ApiType, add_URL_sasToken, get_content_type, get_file_name
+from helpers.urlmapping import ApiType, get_content_type, get_file_name
 from motor.core import AgnosticCollection
 from pydantic import SecretStr
-from datetime import datetime
-from typing import List, Optional
-from .metadata import InvalidGeolocationFormat, query_metadata, collection, get_metadata, versions_collection
-from .models import DataSource, DataSourceReference, TrackMetadata, Configuration
-from . import aiquery
+
+from . import aiquery, datasources
+from .azure_client import AzureBlobClient
+from .database import db
+from .datasources import create_datasource, datasource_exists
+from .metadata import (
+    InvalidGeolocationFormat,
+    collection,
+    get_metadata,
+    query_metadata,
+    versions_collection,
+)
+from .models import Configuration, DataSource, DataSourceReference, TrackMetadata
 
 router = APIRouter()
 
 
-@router.post("/api/datasources", status_code=201, response_model=DataSource)
+@router.post("/api/datasources", status_code=201)
 async def create_datasource_endpoint(
     datasource: DataSource,
-    datasources: AgnosticCollection = Depends(datasources.collection),
     current_user: dict = Depends(get_current_user),
 ):
-    """
-    Create a new datasource. The datasource will be henceforth identified by account/container which
-    must be unique or this function will return a 400.
-    """
     if await datasource_exists(datasource.account, datasource.container):
         raise HTTPException(status_code=409, detail="Datasource Already Exists")
-
     datasource = await create_datasource(datasource=datasource, user=current_user)
-    return datasource
+    return
 
 
 @router.get("/api/datasources", response_model=list[DataSource])
-async def get_datasources(
-    datasources_collection: AgnosticCollection = Depends(datasources.collection),
-    current_user: Optional[dict] = Depends(get_current_user),
-):
-    datasources = datasources_collection.find()
+async def get_datasources(current_user: Optional[dict] = Depends(get_current_user)):
+    datasources = db().datasources.find()
     result = []
     async for datasource_item in datasources:
-        if (
-            await check_access(
-                datasource_item["account"], datasource_item["container"], current_user
-            )
-            is not None
-        ):
+        if await check_access(datasource_item["account"], datasource_item["container"], current_user) is not None:
             result.append(datasource_item)
     return result
 
 
 @router.put("/api/datasources/syncAll", status_code=204)
-async def sync_all_datasources(
-    background_tasks: BackgroundTasks,
-    datasources_collection: AgnosticCollection = Depends(datasources.collection),
-):
+async def sync_all_datasources(background_tasks: BackgroundTasks):
     # Check if the feature is enabled, for anyone to be able to sync all
     feature_flags = os.getenv("IQENGINE_FEATURE_FLAGS", None)
     if feature_flags:
         configuration = Configuration()
         configuration.feature_flags = json.loads(feature_flags)
-        if configuration.feature_flags.get('allowRefreshing', False):
+        if configuration.feature_flags.get("allowRefreshing", False):
             # First wipe out all the metadata
             from .metadata import collection
+
             metadata_collection = collection()
             await metadata_collection.delete_many({})  # deletes all docs in the collection
 
             # Now sync all the datasources
-            all_datasources = datasources_collection.find()
+            all_datasources = db().datasources.find()
             all_datasources_list = await all_datasources.to_list(length=100)
             for datasource in all_datasources_list:
                 print("Syncing-", datasource)
@@ -83,37 +74,7 @@ async def sync_all_datasources(
     return {"message": "Syncing All"}
 
 
-@router.get("/api/datasources/{account}/{container}/image", response_class=StreamingResponse)
-async def get_datasource_image(
-    account: str,
-    container: str,
-    datasources_collection: AgnosticCollection = Depends(datasources.collection),
-    access_allowed=Depends(check_access),
-):
-    if access_allowed is None:
-        raise HTTPException(status_code=403, detail="No Access")
-
-    # Create the imageURL with sasToken
-    datasource = await datasources_collection.find_one({"account": account, "container": container})
-    if not datasource:
-        raise HTTPException(status_code=404, detail="Datasource not found")
-
-    if not datasource["sasToken"]:
-        datasource["sasToken"] = ""  # set to empty str if null
-
-    imageURL = add_URL_sasToken(account, container, datasource["sasToken"], "", ApiType.IMAGE)
-
-    async with httpx.AsyncClient() as client:
-        response = await client.get(imageURL.get_secret_value())
-    if response.status_code != 200:
-        raise HTTPException(status_code=404, detail="Image not found")
-
-    return StreamingResponse(response.iter_bytes(), media_type=response.headers["Content-Type"])
-
-
-@router.get(
-    "/api/datasources/{account}/{container}/datasource", response_model=DataSource
-)
+@router.get("/api/datasources/{account}/{container}/datasource", response_model=DataSource)
 async def get_datasource(
     datasource: DataSource = Depends(datasources.get),
     current_user: Optional[dict] = Depends(get_current_user),
@@ -129,12 +90,11 @@ async def update_datasource(
     account: str,
     container: str,
     datasource: DataSource,
-    datasources_collection: AgnosticCollection = Depends(datasources.collection),
     access_allowed=Depends(check_access),
 ):
     if access_allowed is None:
         raise HTTPException(status_code=403, detail="No Access")
-    existing_datasource = await datasources_collection.find_one(
+    existing_datasource = await db().datasources.find_one(
         {
             "account": account,
             "container": container,
@@ -161,7 +121,7 @@ async def update_datasource(
     if isinstance(datasource_dict["accountKey"], SecretStr):
         datasource_dict.pop("accountKey")
 
-    await datasources_collection.update_one(
+    await db().datasources.update_one(
         {"account": account, "container": container},
         {"$set": datasource_dict},
     )
@@ -173,17 +133,16 @@ async def sync_datasource(
     account: str,
     container: str,
     background_tasks: BackgroundTasks,
-    datasources_collection: AgnosticCollection = Depends(datasources.collection),
     current_user: Optional[dict] = Depends(get_current_user),
     access_allowed=Depends(check_access),
 ):
     if access_allowed is None:
         raise HTTPException(status_code=403, detail="No Access")
 
-    if current_user is None or 'preferred_username' not in current_user:
+    if current_user is None or "preferred_username" not in current_user:
         raise HTTPException(status_code=403, detail="No Access")
 
-    existing_datasource = await datasources_collection.find_one(
+    existing_datasource = await db().datasources.find_one(
         {
             "account": account,
             "container": container,
@@ -192,7 +151,7 @@ async def sync_datasource(
     if not existing_datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
 
-    background_tasks.add_task(datasources.sync, account, container, current_user["preferred_username"])
+    background_tasks.add_task(datasources.sync, account, container)
     return {"message": "Syncing"}
 
 
@@ -202,7 +161,6 @@ async def generate_sas_token(
     container: str,
     file_path: str,
     write: bool = Query(False),
-    datasources_collection: AgnosticCollection = Depends(datasources.collection),
     access_allowed=Depends(check_access),
 ):
     if (access_allowed != "owner" and write) or access_allowed is None:
@@ -210,7 +168,7 @@ async def generate_sas_token(
     if account == "local":
         return {"sasToken": None}
     token: str = ""
-    existing_datasource = await datasources_collection.find_one(
+    existing_datasource = await db().datasources.find_one(
         {
             "account": account,
             "container": container,
@@ -238,6 +196,7 @@ async def generate_sas_token(
         except Exception:
             raise HTTPException(status_code=500, detail="unable to generate sas token")
     return {"sasToken": token}
+
 
 @router.get(
     "/api/datasources/{account}/{container}/meta",
@@ -326,12 +285,8 @@ async def get_track_meta(
     return TrackMetadata(
         iqengine_geotrack=metadata["global"].get("iqengine:geotrack"),
         description=metadata["global"]["core:description"],
-        account=metadata["global"]["traceability:origin"]["account"]
-        if metadata["global"]["traceability:origin"] is not None
-        else None,
-        container=metadata["global"]["traceability:origin"]["container"]
-        if metadata["global"]["traceability:origin"] is not None
-        else None,
+        account=metadata["global"]["traceability:origin"]["account"] if metadata["global"]["traceability:origin"] is not None else None,
+        container=metadata["global"]["traceability:origin"]["container"] if metadata["global"]["traceability:origin"] is not None else None,
     )
 
 
@@ -355,9 +310,7 @@ async def get_meta_thumbnail(
     if sas_token is not None:
         azure_client.set_sas_token(decrypt(sas_token))
 
-    account_key = (
-        datasource.accountKey.get_secret_value() if datasource.accountKey else None
-    )
+    account_key = datasource.accountKey.get_secret_value() if datasource.accountKey else None
     if account_key is not None:
         azure_client.set_account_key(decrypt(account_key))
 
@@ -372,13 +325,9 @@ async def get_meta_thumbnail(
         if not metadata:
             raise HTTPException(status_code=404, detail="Metadata not found")
         datatype = metadata["global"]["core:datatype"]
-        image = await azure_client.get_new_thumbnail(
-            data_type=datatype, filepath=filepath
-        )
+        image = await azure_client.get_new_thumbnail(data_type=datatype, filepath=filepath)
         # Upload the thumbnail in the background
-        background_tasks.add_task(
-            azure_client.upload_blob, filepath=thumbnail_path, data=image
-        )
+        background_tasks.add_task(azure_client.upload_blob, filepath=thumbnail_path, data=image)
         return Response(content=image, media_type=content_type)
     content = await azure_client.get_blob_content(thumbnail_path)
 
@@ -435,9 +384,7 @@ async def query_meta(
         for item in result:
             key = (item.account, item.container)
             if key not in access_cache:
-                access_cache[key] = await check_access(
-                    item.account, item.container, current_user
-                )
+                access_cache[key] = await check_access(item.account, item.container, current_user)
 
             if access_cache[key] is not None:
                 filtered_result.append(item)
@@ -462,21 +409,12 @@ async def open_query_meta(
     current_user: Optional[dict] = Depends(get_current_user),
 ):
     if not aiquery.is_open_ai_available():
-        return {
-            "parameters": "",
-            "results": []
-        }
+        return {"parameters": "", "results": []}
     if not query:
-        return {
-            "parameters": "",
-            "results": []
-        }
+        return {"parameters": "", "results": []}
     jsonParameters = aiquery.get_query_result(query)
     if not jsonParameters:
-        return {
-            "parameters": "",
-            "results": []
-        }
+        return {"parameters": "", "results": []}
     account = jsonParameters.get("account")
     container = jsonParameters.get("container")
     database_id = jsonParameters.get("database_id")
@@ -524,10 +462,7 @@ async def open_query_meta(
         )
 
         if not result:
-            return {
-                "parameters": jsonParameters,
-                "results": []
-            }
+            return {"parameters": jsonParameters, "results": []}
 
         # Process result to remove metadata from unauthorized datasources
         access_cache = {}
@@ -536,17 +471,12 @@ async def open_query_meta(
         for item in result:
             key = (item.account, item.container)
             if key not in access_cache:
-                access_cache[key] = await check_access(
-                    item.account, item.container, current_user
-                )
+                access_cache[key] = await check_access(item.account, item.container, current_user)
 
             if access_cache[key] is not None:
                 filtered_result.append(item)
 
-        return {
-            "parameters": jsonParameters,
-            "results": filtered_result
-        }
+        return {"parameters": jsonParameters, "results": filtered_result}
 
     except InvalidGeolocationFormat as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -565,8 +495,6 @@ async def create_meta(
     container: str,
     filepath: str,
     metadata: dict,
-    datasources: AgnosticCollection = Depends(datasources.collection),
-    metadatas: AgnosticCollection = Depends(collection),
     versions: AgnosticCollection = Depends(versions_collection),
     current_user=Depends(get_current_user),
     access_allowed=Depends(check_access),
@@ -574,14 +502,12 @@ async def create_meta(
     if access_allowed != "owner":
         raise HTTPException(status_code=403, detail="No Access")
     # Check datasource id is valid
-    datasource = await datasources.find_one(
-        {"account": account, "container": container}
-    )
+    datasource = await db().datasources.find_one({"account": account, "container": container})
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
 
     # Check metadata doesn't already exist
-    if await metadatas.find_one(
+    if await db().metadata.find_one(
         {
             "global.traceability:origin.account": account,
             "global.traceability:origin.container": container,
@@ -598,7 +524,7 @@ async def create_meta(
         "file_path": filepath,
     }
     metadata["global"]["traceability:revision"] = 0
-    await metadatas.insert_one(metadata)
+    await db().metadata.insert_one(metadata)
 
     # audit document
     audit_document = {
@@ -611,15 +537,12 @@ async def create_meta(
     return metadata
 
 
-@router.put(
-    "/api/datasources/{account}/{container}/{filepath:path}/meta", status_code=204
-)
+@router.put("/api/datasources/{account}/{container}/{filepath:path}/meta", status_code=204)
 async def update_meta(
     account,
     container,
     filepath,
     metadata: dict,
-    metadatas: AgnosticCollection = Depends(collection),
     versions: AgnosticCollection = Depends(versions_collection),
     current_user=Depends(get_current_user),
     access_allowed=Depends(check_access),
@@ -627,7 +550,7 @@ async def update_meta(
     if access_allowed != "owner":
         raise HTTPException(status_code=403, detail="No Access")
 
-    current = await metadatas.find_one(
+    current = await db().metadata.find_one(
         {
             "global.traceability:origin.account": account,
             "global.traceability:origin.container": container,
@@ -644,20 +567,14 @@ async def update_meta(
         metadata["global"]["traceability:revision"] = version_number
         metadata["global"]["traceability:origin"] = current["global"]["traceability:origin"]
         # audit document
-        audit_document = {
-            "metadata": metadata,
-            "user": current_user["preferred_username"],
-            "action": "update"
-        }
+        audit_document = {"metadata": metadata, "user": current_user["preferred_username"], "action": "update"}
         try:
             await versions.insert_one(audit_document)
         except Exception as e:
             print(f"Error inserting audit document: {e}")
 
-        await metadatas.update_one(
+        await db().metadata.update_one(
             {"_id": id},
-            {
-                "$set": metadata
-            },
+            {"$set": metadata},
         )
         return

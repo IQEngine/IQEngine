@@ -13,7 +13,7 @@ class AzureBlobClient:
     container: str
     sas_token: SecretStr = None
     account_key: SecretStr = None
-    base_filepath: str = None # only used for local
+    base_filepath: str = None  # only used for local
 
     def __init__(self, account, container):
         self.account = account
@@ -21,7 +21,7 @@ class AzureBlobClient:
         self.clients: dict[str, BlobClient] = {}
         if account == "local":
             self.base_filepath = os.getenv("IQENGINE_BACKEND_LOCAL_FILEPATH", None)
-            self.base_filepath = self.base_filepath.replace('"','')
+            self.base_filepath = self.base_filepath.replace('"', '')
             if not self.base_filepath:
                 raise Exception("IQENGINE_BACKEND_LOCAL_FILEPATH must be set to use local")
 
@@ -115,14 +115,15 @@ class AzureBlobClient:
             f = open(os.path.join(self.base_filepath, filepath), "rb")
             if offset:
                 f.seek(offset)
-            return f # TODO: this leads to the download being pretty slow because it feeds it byte by byte
+            return f  # TODO: this leads to the download being pretty slow because it feeds it byte by byte
         blob_client = self.get_blob_client(filepath)
-        blob = await blob_client.download_blob(offset=offset, length=length) # returns type StorageStreamDownloader, an Azure class, we use its chunks() method which returns Iterator[bytes]
+        # returns type StorageStreamDownloader, an Azure class, we use its chunks() method which returns Iterator[bytes]
+        blob = await blob_client.download_blob(offset=offset, length=length)
         return blob.chunks()
 
     async def upload_blob(self, filepath: str, data: bytes):
         if self.account == "local":
-            #print("Cannot upload to local") # making this a raise() was causing delay
+            # print("Cannot upload to local") # making this a raise() was causing delay
             return
         blob_client = self.get_blob_client(filepath)
         await blob_client.upload_blob(data, overwrite=True)
@@ -130,13 +131,14 @@ class AzureBlobClient:
     async def get_new_thumbnail(self, data_type: str, filepath: str) -> bytes:
         iq_path = get_file_name(filepath, ApiType.IQDATA)
         fftSize = 512
-        skip_bytes = 256000 # sort of arbitrary, want to avoid weird stuff that happens at the beginning of signal, must be an integer multiple of 16!!
-        content = await self.get_blob_content(iq_path, skip_bytes, fftSize * 1024) # it's not going to be 1024 rows, for f32 its 128 rows and for int16 its 256 rows
+        skip_bytes = 256000  # sort of arbitrary, want to avoid weird stuff that happens at the beginning of signal, must be an integer multiple of 16!!
+        # it's not going to be 1024 rows, for f32 its 128 rows and for int16 its 256 rows
+        content = await self.get_blob_content(iq_path, skip_bytes, fftSize * 1024)
         return get_spectrogram_image(content, data_type, fftSize)
 
     async def blob_exist(self, filepath):
         if self.account == "local":
-            return os.path.isfile(os.path.join(self.base_filepath, filepath)) 
+            return os.path.isfile(os.path.join(self.base_filepath, filepath))
         blob_client = self.get_blob_client(filepath)
         return await blob_client.exists()
 

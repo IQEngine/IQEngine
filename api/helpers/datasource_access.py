@@ -2,24 +2,7 @@ from fastapi import Depends
 from helpers.authorization import get_current_user
 from app.database import db
 
-
 async def check_access(account: str, container: str, user=Depends(get_current_user)) -> str | None:
-    """
-    Access check for a datasource by account and container using roles from a JWT claim.
-
-    Parameters
-    ----------
-    account : str
-        The account name.
-    container : str
-        The container name.
-    roles : List[str]
-        The roles from the JWT claim.
-
-    Returns
-    -------
-    "public", "reader", "owner", or None
-    """
     if account == "local":
         return "reader"
     groups = user.get("groups", [])

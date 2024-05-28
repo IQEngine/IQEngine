@@ -7,7 +7,7 @@ import { KonvaEventObject } from 'konva/lib/Node';
 import { RulerTop } from './components/ruler-top';
 import { RulerSide } from './components/ruler-side';
 import { SpectrogramContextProvider, useSpectrogramContext } from './hooks/use-spectrogram-context';
-import { CursorContextProvider, useCursorContext } from './hooks/use-cursor-context';
+import { CursorContextProvider } from './hooks/use-cursor-context';
 import { useMeta } from '@/api/metadata/queries';
 import { IQPlot } from './components/iq-plot';
 import { FrequencyPlot } from './components/frequency-plot';
@@ -70,6 +70,7 @@ export function DisplaySpectrogram({ currentFFT, setCurrentFFT, currentTab }) {
     }
   }
 
+  // Sort of messy but this is how the IQ gets passed into useGetImage which internally has its own state for iqData
   useEffect(() => {
     if (displayedIQ && displayedIQ.length > 0) {
       setIQData(displayedIQ);
@@ -102,9 +103,9 @@ export function DisplaySpectrogram({ currentFFT, setCurrentFFT, currentTab }) {
           </div>
         </>
       )}
-      {currentTab === Tab.Time && <TimePlot displayedIQ={displayedIQ} />}
-      {currentTab === Tab.Frequency && <FrequencyPlot displayedIQ={displayedIQ} />}
-      {currentTab === Tab.IQ && <IQPlot displayedIQ={displayedIQ} />}
+      {currentTab === Tab.Time && <TimePlot displayedIQ={displayedIQ} fftStepSize={fftStepSize} />}
+      {currentTab === Tab.Frequency && <FrequencyPlot displayedIQ={displayedIQ} fftStepSize={fftStepSize} />}
+      {currentTab === Tab.IQ && <IQPlot displayedIQ={displayedIQ} fftStepSize={fftStepSize} />}
     </>
   );
 }
@@ -155,8 +156,9 @@ export function RecordingViewPage() {
                       onClick={() => {
                         setCurrentTab(Tab[key as keyof typeof Tab]);
                       }}
-                      className={` ${currentTab === Tab[key as keyof typeof Tab] ? 'bg-primary !text-base-100' : ''
-                        } inline-block px-3 py-0 outline outline-primary outline-1 text-lg text-primary hover:text-accent hover:shadow-lg hover:shadow-accent`}
+                      className={` ${
+                        currentTab === Tab[key as keyof typeof Tab] ? 'bg-primary !text-base-100' : ''
+                      } inline-block px-3 py-0 outline outline-primary outline-1 text-lg text-primary hover:text-accent hover:shadow-lg hover:shadow-accent`}
                     >
                       {key}
                     </div>

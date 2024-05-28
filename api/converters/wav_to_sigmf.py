@@ -8,10 +8,10 @@ def wav_to_sigmf(wav_file_path: str) -> list[str]:
     sample_rate, data = wavfile.read(wav_file_path)
 
     dest_path = wav_file_path.split(".")[0]
-    
+
     if len(data.shape) == 2:
-        samples = data[:, 0].astype(np.float32) + 1j*data[:, 1].astype(np.float32)
-    else: # only one channel (eg mono audio)
+        samples = data[:, 0].astype(np.float32) + 1j * data[:, 1].astype(np.float32)
+    else:  # only one channel (eg mono audio)
         samples = data.astype(np.float32)
     samples.astype(np.complex64)
     samples /= 32767.0

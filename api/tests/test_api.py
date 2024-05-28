@@ -1,7 +1,6 @@
 # vim: tabstop=4 shiftwidth=4 expandtab
 import os
 from unittest import mock
-from unittest.mock import Mock
 
 import pytest
 from app.models import Configuration
@@ -16,7 +15,7 @@ async def test_api_get_config(client):
     os.environ["IQENGINE_APP_ID"] = "app_id"
     os.environ["IQENGINE_APP_AUTHORITY"] = "app_authority"
     os.environ["IQENGINE_FEATURE_FLAGS"] = '{"bypassLandingPage": false}'
-    os.environ["IQENGINE_UPLOAD_PAGE_BLOB_SAS_URL"] = 'https://test.com'
+    os.environ["IQENGINE_UPLOAD_PAGE_BLOB_SAS_URL"] = "https://test.com"
 
     test_get_config = Configuration()
 
@@ -30,7 +29,7 @@ async def test_api_get_config(client):
             "internalBranding": "internal_branding_string",
             "appId": "app_id",
             "appAuthority": "app_authority",
-            "uploadPageBlobSasUrl": 'https://test.com',
+            "uploadPageBlobSasUrl": "https://test.com",
             "hasAIQuery": False,
         }
 
@@ -38,9 +37,7 @@ async def test_api_get_config(client):
 # This test no longer valid as URL will never be valid with made up account and container
 @pytest.mark.asyncio
 async def test_api_post_meta_bad_datasource_id(client):
-    response = client.post(
-        "/api/datasources/nota/validid/file_path/meta", json=valid_metadata
-    )
+    response = client.post("/api/datasources/nota/validid/file_path/meta", json=valid_metadata)
     assert response.status_code == 404
     assert response.json() == {"detail": "Datasource not found"}
 
@@ -48,9 +45,7 @@ async def test_api_post_meta_bad_datasource_id(client):
 @pytest.mark.asyncio
 async def test_api_post_meta_missing_datasource(client):
     source_id = "madeup/datasource"
-    response = client.post(
-        f"/api/datasources/{source_id}/file_path/meta", json=valid_metadata
-    )
+    response = client.post(f"/api/datasources/{source_id}/file_path/meta", json=valid_metadata)
     assert response.status_code == 404
     assert response.json() == {"detail": "Datasource not found"}
 
@@ -71,9 +66,9 @@ async def test_api_post_meta(client):
         "container": test_datasource["container"],
         "file_path": "file_path",
     }
-    assert (metadata["annotations"][0]["core:sample_start"] == valid_metadata["annotations"][0]["core:sample_start"])
-    assert (metadata["annotations"][0]["core:sample_count"] == valid_metadata["annotations"][0]["core:sample_count"])
-    assert (metadata["captures"][0]["core:sample_start"] == valid_metadata["captures"][0]["core:sample_start"])
+    assert metadata["annotations"][0]["core:sample_start"] == valid_metadata["annotations"][0]["core:sample_start"]
+    assert metadata["annotations"][0]["core:sample_count"] == valid_metadata["annotations"][0]["core:sample_count"]
+    assert metadata["captures"][0]["core:sample_start"] == valid_metadata["captures"][0]["core:sample_start"]
 
 
 @pytest.mark.asyncio
@@ -123,9 +118,7 @@ async def test_api_get_meta(client):
         f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path/meta',
         json=valid_metadata,
     )
-    response = client.get(
-        f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path/meta'
-    )
+    response = client.get(f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path/meta')
     assert response.status_code == 200
 
 
@@ -136,30 +129,22 @@ async def test_api_get_track_meta(client):
         f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path/meta',
         json=valid_metadata,
     )
-    response = client.get(
-        f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path/track'
-    )
+    response = client.get(f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path/track')
     assert response.status_code == 200
 
 
 @pytest.mark.asyncio
 async def test_api_get_missing_track_meta(client):
-    response = client.get(
-        f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path/track'
-    )
+    response = client.get(f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path/track')
     assert response.status_code == 404
 
 
 @pytest.mark.asyncio
 async def test_api_get_meta_not_existing(client):
-    response = client.get(
-        f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path/meta'
-    )
+    response = client.get(f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path/meta')
     assert response.status_code == 404  # Because the datasource doesn't exist
     client.post("/api/datasources", json=test_datasource).json()
-    response = client.get(
-        '/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path/meta'
-    )
+    response = client.get('/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path/meta')
     assert response.status_code == 404  # Because the metadata doesn't exist
 
 
@@ -174,9 +159,7 @@ async def test_api_get_all_meta(client):
         f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/record_b/meta',
         json=valid_metadata,
     )
-    response = client.get(
-        f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/meta'
-    )
+    response = client.get(f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/meta')
     assert response.status_code == 200
     assert len(response.json()) == 2
 
@@ -192,9 +175,7 @@ async def test_api_get_all_meta_path(client):
         f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/record_b/meta',
         json=valid_metadata,
     )
-    response = client.get(
-        f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/meta/paths'
-    )
+    response = client.get(f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/meta/paths')
     assert response.status_code == 200
     assert "record_a" in response.json()
     assert "record_b" in response.json()
@@ -213,8 +194,7 @@ async def test_api_put_datasource(client):
     local_test_datasource["description"] = "new description"
     local_test_datasource["sasToken"] = "new sasToken"
     response = client.put(
-        f'/api/datasources/{local_test_datasource["account"]}'
-        f'/{local_test_datasource["container"]}/datasource',
+        f'/api/datasources/{local_test_datasource["account"]}' f'/{local_test_datasource["container"]}/datasource',
         json=local_test_datasource,
     )
     assert response.status_code == 204
@@ -232,36 +212,10 @@ async def test_api_get_datasources(client):
     assert len(response.json()) == 1
 
 
-@mock.patch("app.datasources_router.AzureBlobClient.generate_sas_token", return_value="temp_sas_token")
-@pytest.mark.asyncio
-async def test_api_get_temp_sas_token(mock_get_sas_token: Mock, client):
-    client.post("/api/datasources", json=test_datasource).json()
-    response = client.get(f"/api/datasources/{test_datasource['account']}/{test_datasource['container']}/file_path/sas")
-    assert response.status_code == 200
-    response_object = response.json()
-    assert response_object["sasToken"] == "temp_sas_token"
-    assert mock_get_sas_token.call_count == 1
-
-
-@mock.patch("app.datasources_router.AzureBlobClient.generate_sas_token", return_value="temp_sas_token")
-@pytest.mark.asyncio
-async def test_api_get_temp_sas_token_no_key(mock_get_sas_token: Mock, client):
-    modded_datasource = test_datasource.copy()
-    modded_datasource["accountKey"] = None
-    client.post("/api/datasources", json=modded_datasource).json()
-    response = client.get(f"/api/datasources/{test_datasource['account']}/{test_datasource['container']}/file_path/sas")
-    assert response.status_code == 200
-    response_object = response.json()
-    assert response_object["sasToken"] == "sasToken"
-    assert mock_get_sas_token.call_count == 0
-
-
 @pytest.mark.asyncio
 async def test_api_get_datasource(client):
     response = client.post("/api/datasources", json=test_datasource)
-    response = client.get(
-        f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/datasource'
-    )
+    response = client.get(f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/datasource')
     assert response.status_code == 200
     assert len(response.json()) > 1
 
@@ -274,19 +228,11 @@ async def test_api_filename_url_encoded(client):
         json=valid_metadata,
     )
     assert response.status_code == 201
-    response = client.get(
-        f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file%2Fpath/meta'
-    )
+    response = client.get(f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file%2Fpath/meta')
     assert response.status_code == 200
     response_object = response.json()
-    assert (
-        response_object["global"]["traceability:origin"]["account"]
-        == test_datasource["account"]
-    )
-    assert (
-        response_object["global"]["traceability:origin"]["container"]
-        == test_datasource["container"]
-    )
+    assert response_object["global"]["traceability:origin"]["account"] == test_datasource["account"]
+    assert response_object["global"]["traceability:origin"]["container"] == test_datasource["container"]
     assert response_object["global"]["traceability:origin"]["file_path"] == "file/path"
 
 
@@ -298,19 +244,11 @@ async def test_api_filename_non_url_encoded(client):
         json=valid_metadata,
     )
     assert response.status_code == 201
-    response = client.get(
-        f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file/path/meta'
-    )
+    response = client.get(f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file/path/meta')
     assert response.status_code == 200
     response_object = response.json()
-    assert (
-        response_object["global"]["traceability:origin"]["account"]
-        == test_datasource["account"]
-    )
-    assert (
-        response_object["global"]["traceability:origin"]["container"]
-        == test_datasource["container"]
-    )
+    assert response_object["global"]["traceability:origin"]["account"] == test_datasource["account"]
+    assert response_object["global"]["traceability:origin"]["container"] == test_datasource["container"]
     assert response_object["global"]["traceability:origin"]["file_path"] == "file/path"
     assert response_object["global"]["traceability:revision"] == 0
 
@@ -330,19 +268,11 @@ async def test_api_update_file_version(client):
         json=new_metadata,
     )
     assert response.status_code == 204
-    response = client.get(
-        f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file/path/meta'
-    )
+    response = client.get(f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file/path/meta')
     assert response.status_code == 200
     response_object = response.json()
     assert response_object["global"]["traceability:revision"] == 1
-    assert (
-        response_object["global"]["traceability:origin"]["account"]
-        == test_datasource["account"]
-    )
-    assert (
-        response_object["global"]["traceability:origin"]["container"]
-        == test_datasource["container"]
-    )
+    assert response_object["global"]["traceability:origin"]["account"] == test_datasource["account"]
+    assert response_object["global"]["traceability:origin"]["container"] == test_datasource["container"]
     assert response_object["global"]["traceability:origin"]["file_path"] == "file/path"
     assert response_object["annotations"][0]["core:sample_start"] == 10000

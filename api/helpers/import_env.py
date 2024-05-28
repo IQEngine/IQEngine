@@ -10,9 +10,9 @@ from app.database import db
 
 async def import_all_from_env():
     # Sleep a random amount of time so that the multiple workers dont all initialize stuff at the exact same time
-    time.sleep(random.randint(0, 1000) / 1000) # 0-1 seconds
+    time.sleep(random.randint(0, 1000) / 1000)  # 0-1 seconds
     worker_lock_collection = db().worker_lock
-    if not await worker_lock_collection.find_one(): # semaphore
+    if not await worker_lock_collection.find_one():  # semaphore
         await worker_lock_collection.insert_one({"worker_id": os.getpid()})
         print("This worker is performing the import_all_from_env")
     else:
@@ -25,7 +25,7 @@ async def import_all_from_env():
         await import_default_config_from_env()
         await import_datasources_from_env()
         await worker_lock_collection.delete_one({"worker_id": os.getpid()})
-        if not await worker_lock_collection.find_one(): # semaphore
+        if not await worker_lock_collection.find_one():  # semaphore
             print("Successfully cleared semaphore!")
     except Exception as e:
         print("Failed to import all from env", e)

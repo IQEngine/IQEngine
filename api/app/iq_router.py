@@ -3,18 +3,19 @@ import io
 import math
 from typing import List
 
-from .azure_client import AzureBlobClient
-from . import datasources
-from .models import DataSource
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.responses import StreamingResponse
 from helpers.apidisconnect import CancelOnDisconnectRoute, cancel_on_disconnect
 from helpers.cipher import decrypt
 from helpers.conversions import find_smallest_and_largest_next_to_each_other
 from helpers.datasource_access import check_access
-from helpers.urlmapping import ApiType, get_content_type, get_file_name
-from pydantic import BaseModel, SecretStr
 from helpers.samples import get_bytes_per_iq_sample
+from helpers.urlmapping import ApiType, get_content_type, get_file_name
+from pydantic import BaseModel
+
+from . import datasources
+from .azure_client import AzureBlobClient
+from .models import DataSource
 
 # Why is this needed here and in main.py?
 router = APIRouter(route_class=CancelOnDisconnectRoute)
@@ -26,15 +27,13 @@ class IQData(BaseModel):
     bytes_per_iq_sample: int
 
 
-@router.get(
-    "/api/datasources/{account}/{container}/{filepath:path}/iq-data", status_code=200
-)
+@router.get("/api/datasources/{account}/{container}/{filepath:path}/iq-data", status_code=200)
 @cancel_on_disconnect
 async def get_iq_data(
     request: Request,
     filepath: str,
     block_indexes_str: str,
-    block_size: int, # we grab 2x this many ints/floats
+    block_size: int,  # we grab 2x this many ints/floats
     format: str,
     datasource: DataSource = Depends(datasources.get),
     azure_client: AzureBlobClient = Depends(AzureBlobClient),
@@ -87,9 +86,7 @@ async def calculate_iq_data(
         yield iq_data
 
 
-async def get_byte_streams(
-    block_indexes, block_size, bytes_per_iq_sample, iq_file, azure_client, request
-):
+async def get_byte_streams(block_indexes, block_size, bytes_per_iq_sample, iq_file, azure_client, request):
     max_concurrent_requests = 100
     chunk_size = 100 * 1024 // block_size
     block_indexes_arrs = find_smallest_and_largest_next_to_each_other(block_indexes)
@@ -97,10 +94,7 @@ async def get_byte_streams(
     block_indexes_chunks = []
     for i in block_indexes_arrs:
         if i[1] - i[0] > chunk_size:
-            indexes = [
-                [j, min(j + chunk_size - 1, i[1])]
-                for j in range(i[0], i[1] + 1, chunk_size)
-            ]
+            indexes = [[j, min(j + chunk_size - 1, i[1])] for j in range(i[0], i[1] + 1, chunk_size)]
             block_indexes_chunks.extend(indexes)
         else:
             block_indexes_chunks.append(i)
@@ -121,10 +115,7 @@ async def get_byte_streams(
                 blob_size,
             )
 
-    tasks = [
-        get_byte_stream_wrapper(block_index_chunk)
-        for block_index_chunk in block_indexes_chunks
-    ]
+    tasks = [get_byte_stream_wrapper(block_index_chunk) for block_index_chunk in block_indexes_chunks]
     return await asyncio.gather(*tasks)
 
 
@@ -137,20 +128,14 @@ async def get_byte_stream(
     azure_client,
     blob_size,
 ):
-    offsetBytes = block_indexes_chunk[0] * block_size * bytes_per_iq_sample # FYI, bytes_per_iq_sample includes the *2 for I+Q
-    countBytes = (
-        (block_indexes_chunk[1] - block_indexes_chunk[0] + 1)
-        * block_size
-        * bytes_per_iq_sample
-    )
+    offsetBytes = block_indexes_chunk[0] * block_size * bytes_per_iq_sample  # FYI, bytes_per_iq_sample includes the *2 for I+Q
+    countBytes = (block_indexes_chunk[1] - block_indexes_chunk[0] + 1) * block_size * bytes_per_iq_sample
 
     if blob_size < offsetBytes:
         return b""
     if blob_size < offsetBytes + countBytes:
         countBytes = blob_size - offsetBytes
-    content = await azure_client.get_blob_content(
-        filepath=iq_file, offset=offsetBytes, length=countBytes
-    )
+    content = await azure_client.get_blob_content(filepath=iq_file, offset=offsetBytes, length=countBytes)
 
     return content
 
@@ -167,8 +152,6 @@ async def get_iqfile(
 ):
     if access_allowed is None:
         raise HTTPException(status_code=403, detail="No Access")
-
-    # Create the imageURL with sasToken
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
 
@@ -180,6 +163,7 @@ async def get_iqfile(
 
     response = await azure_client.get_blob_stream(iq_path)
     return StreamingResponse(response, media_type=content_type)
+
 
 @router.get(
     "/api/datasources/{account}/{container}/{filepath:path}.sigmf-meta",
@@ -206,6 +190,7 @@ async def get_metafile(
     response = await azure_client.get_blob_stream(meta_path)
     return StreamingResponse(response, media_type=content_type)
 
+
 @router.get(
     "/api/datasources/{account}/{container}/{filepath:path}/minimap-data",
     status_code=200,
@@ -227,10 +212,9 @@ async def get_minimap_iq(
         if datasource.sasToken:
             azure_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
         if datasource.accountKey:
-            azure_client.set_account_key(
-                decrypt(datasource.accountKey.get_secret_value())
-            )
+            azure_client.set_account_key(decrypt(datasource.accountKey.get_secret_value()))
         minimap_iq_file = get_file_name(filepath, ApiType.MINIMAP)
+        # If minimap has already been generated
         if await azure_client.blob_exist(minimap_iq_file):
             blob = await azure_client.get_blob_content(filepath=minimap_iq_file)
             return Response(content=blob, media_type="application/octet-stream")
@@ -239,8 +223,9 @@ async def get_minimap_iq(
             bytes_per_sample = get_bytes_per_iq_sample(format)
             blob_size = await azure_client.get_file_length(file_name)
             total_ffts = math.floor(blob_size / (bytes_per_sample * fft_size))
-            # get 1000 ffts equally spaced out
-            block_indexes = [math.floor(i * total_ffts / 1000) for i in range(1000)]
+            # get N ffts equally spaced out
+            N = 200
+            block_indexes = [math.floor(i * total_ffts / N) for i in range(N)]
             # make sure that no block index it is larger than the total number of ffts
             block_indexes = [i for i in block_indexes if i < total_ffts]
             data = calculate_iq_data(
@@ -251,15 +236,12 @@ async def get_minimap_iq(
                 azure_client,
                 request,
             )
-
             content = io.BytesIO()
             async for chunk in data:
                 content.write(chunk)
             content.seek(0)
             if azure_client.can_write():
-                await azure_client.upload_blob(
-                    filepath=minimap_iq_file, data=content.getvalue()
-                )
+                await azure_client.upload_blob(filepath=minimap_iq_file, data=content.getvalue())
             else:
                 print("Cannot write minimap to blob")
             content.seek(0)

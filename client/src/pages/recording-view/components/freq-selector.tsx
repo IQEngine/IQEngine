@@ -15,7 +15,7 @@ const FreqSelector = () => {
   const [upperText, setUpperText] = useState('');
   const [diffText, setDiffText] = useState('');
   const sampleRate = meta?.getSampleRate() || 0;
-  const coreFrequency = (includeRfFreq) ? meta.getCenterFrequency() : 0;
+  const coreFrequency = includeRfFreq ? meta.getCenterFrequency() : 0;
 
   const lowerPosition = (cursorFreq.start + 0.5) * spectrogramWidth; // in pixels. this auto-updates
   const upperPosition = (cursorFreq.end + 0.5) * spectrogramWidth;

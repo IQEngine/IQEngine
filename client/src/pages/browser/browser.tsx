@@ -13,7 +13,7 @@ import { useNavigate } from 'react-router-dom';
 import { FileWithDirectoryAndFileHandle } from 'browser-fs-access';
 import SiggenTile from './misc-tiles/siggen-tile';
 import ValidatorTile from './misc-tiles/validator-tile';
-import WebfftBenchmarkTile from './misc-tiles/webfft-benchmark-tile';
+//import WebfftBenchmarkTile from './misc-tiles/webfft-benchmark-tile';
 import ConverterTile from './misc-tiles/converter-tile';
 import { ModalDialog } from '@/features/ui/modal/Modal';
 import { MetadataQuery } from './metadata-query/metadata-query';
@@ -138,7 +138,7 @@ export const Browser = () => {
           <div className="grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-10 justify-items-center text-lg text-white">
             <SiggenTile />
             <ValidatorTile />
-            <WebfftBenchmarkTile />
+            {/*<WebfftBenchmarkTile />*/}
             <ConverterTile />
           </div>
         </ModalDialog>
