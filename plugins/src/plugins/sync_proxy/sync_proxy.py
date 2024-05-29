@@ -9,6 +9,7 @@ import os
 import urllib.request
 import requests
 
+display_url = os.environ.get('IQENGINE_PROXY_DISPLAY', 'False').lower() in ['true', '1', 't', 'y', 'yes']
 proxy_url = os.environ.get('IQENGINE_PROXY_URL', 'http://127.0.0.1:9000/plugins/userdef')
 
 class sync_proxy(Plugin):
@@ -20,11 +21,12 @@ class sync_proxy(Plugin):
             definition = response.read()
             definition = json.loads(definition)
             # Add proxy_url
-            definition['proxy_url'] = {
-                'title': 'The url of the async url',
-                'type': 'string',
-                'default': proxy_url
-            }
+            if display_url:
+                definition['proxy_url'] = {
+                    'title': 'The url of the async url',
+                    'type': 'string',
+                    'default': proxy_url
+                }
             return definition
 
     def set_custom_params(self, custom_params: dict):
@@ -44,22 +46,26 @@ class sync_proxy(Plugin):
                 'sample_rate': self.sample_rate
             }]
         }
-        print(data)
+        # print(data)
         proxy_url = self.custom_params['proxy_url']
         r = requests.post(url=proxy_url, json=data)
         r = r.json()
-        print(r)
+        # print(r)
         details = r.get('details', None)
         if details is not None:
             self.set_status(job_id, 100, str(details))
             return Output()
         else:
-            samples_b64 = r['data_output'][0]['samples']
+            first_samples = r['data_output'][0]
+            samples_b64 = first_samples['samples']
+            data_type = first_samples.get('data_type', 'iq/cf32_le')
+            sample_rate = first_samples.get('sample_rate', self.sample_rate)
+            center_freq = first_samples.get('center_freq', self.center_freq)
             metadata = MetadataFile(
                 file_name=job_context.file_name or 'iqfile',
-                data_type="iq/cf32_le",
-                sample_rate=self.sample_rate,
-                center_freq=self.center_freq,
+                data_type=data_type,
+                sample_rate=sample_rate,
+                center_freq=center_freq,
             )
 
             return Output(metadata_file=metadata, output_data=samples_b64)
