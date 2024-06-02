@@ -14,12 +14,12 @@ pymongo==4.7.2
 pymongo-inmemory==0.4.2
 pytest==8.2.1
 pytest-asyncio==0.23.7
-uvicorn==0.29.0
+uvicorn==0.30.0
 matplotlib==3.9.0
 python-dotenv==1.0.1
 pytest-mock==3.14.0
 cache3==0.4.3
-openai==1.30.3
+openai==1.30.5
 python-multipart==0.0.9
 SigMF==1.2.1
 scipy==1.13.1
