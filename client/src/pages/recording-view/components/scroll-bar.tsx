@@ -161,7 +161,7 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
 
   return (
     <>
-      <Layer onWheel={handleWheel}>
+      <Layer onWheel={handleWheel} imageSmoothingEnabled={false}>
         {minimapImg ? (
           <Image
             onClick={handleClick}

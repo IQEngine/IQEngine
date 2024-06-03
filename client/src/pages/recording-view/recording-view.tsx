@@ -86,7 +86,7 @@ export function DisplaySpectrogram({ currentFFT, setCurrentFFT, currentTab }) {
           </Stage>
           <div className="flex flex-row" id="spectrogram">
             <Stage width={spectrogramWidth} height={spectrogramHeight}>
-              <Layer onWheel={handleWheel}>
+              <Layer onWheel={handleWheel} imageSmoothingEnabled={false}>
                 <Image image={image} x={0} y={0} width={spectrogramWidth} height={spectrogramHeight} />
               </Layer>
               <AnnotationViewer currentFFT={currentFFT} />
