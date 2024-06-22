@@ -11,7 +11,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@azure/identity": "4.2.0",
+    "@azure/identity": "4.2.1",
     "@azure/storage-blob": "12.18.0",
     "@playwright/test": "1.44.1",
     "@types/adm-zip": "0.5.5",
