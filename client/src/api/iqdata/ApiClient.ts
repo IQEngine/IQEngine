@@ -6,6 +6,7 @@ import { convertToFloat32 } from '@/utils/fetch-more-data-source';
 import { AccountInfo, IPublicClientApplication } from '@azure/msal-browser';
 import { AuthUtil } from '@/api/utils/Auth-Utils';
 import { AppConfig } from '../config/queries';
+import { MINIMAP_FFT_SIZE } from '@/utils/constants';
 
 export class ApiClient implements IQDataClient {
   private authUtil: AuthUtil;
@@ -78,10 +79,10 @@ export class ApiClient implements IQDataClient {
       return null;
     }
     const iqArray = convertToFloat32(binaryResponse.data, meta.getDataType());
-    // slice in 64 samples chunks
+    // un-concatenate them to make an array of float32 arrays
     const iqArrayChunks: Float32Array[] = [];
-    for (let i = 0; i < iqArray.length; i += 64) {
-      iqArrayChunks.push(iqArray.slice(i, i + 64));
+    for (let i = 0; i < iqArray.length / (MINIMAP_FFT_SIZE * 2); i += 1) {
+      iqArrayChunks.push(iqArray.slice(i * MINIMAP_FFT_SIZE * 2, (i + 1) * MINIMAP_FFT_SIZE * 2)); // 2x as many IQ samples as FFT size
     }
     return iqArrayChunks;
   }
