@@ -36,7 +36,7 @@ export const TimePlot = ({ displayedIQ, fftStepSize }: TimePlotProps) => {
       setI(temp_I);
       setQ(temp_Q);
     }
-  }, [displayedIQ, freqShift]);
+  }, [displayedIQ, freqShift, cursorFreqShift]);
 
   return (
     <div className="px-3">
@@ -78,6 +78,7 @@ export const TimePlot = ({ displayedIQ, fftStepSize }: TimePlotProps) => {
               title: 'Samples',
               fixedrange: true,
             },
+            uirevision: 'true', // keeps zoom/pan the same when data changes
           }}
           config={{
             displayModeBar: true,

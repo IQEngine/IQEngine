@@ -72,6 +72,7 @@ export const IQPlot = ({ displayedIQ, fftStepSize }: IQPlotProps) => {
             yaxis: {
               title: 'Q',
             },
+            uirevision: 'true', // keeps zoom/pan the same when data changes
           }}
           config={{
             displayModeBar: true,
