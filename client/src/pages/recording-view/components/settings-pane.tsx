@@ -11,6 +11,7 @@ import { vscodeDark } from '@uiw/codemirror-theme-vscode';
 import CodeMirror from '@uiw/react-codemirror';
 import { langs } from '@uiw/codemirror-extensions-langs';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
+import { unitPrefixHz } from '@/utils/rf-functions';
 
 interface SettingsPaneProps {
   currentFFT: number;
@@ -21,6 +22,8 @@ const SettingsPane = ({ currentFFT }) => {
   const zoomLevels = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
   const windowFunctions = ['hamming', 'rectangle', 'hanning', 'barlett', 'blackman'];
   const context = useSpectrogramContext();
+  const sampleRate = context.meta?.getSampleRate() || 0;
+  const coreFrequency = context.meta?.getCenterFrequency();
   const cursorContext = useCursorContext();
   const [localPythonSnippet, setLocalPythonSnippet] = useState(context.pythonSnippet);
   const [localTaps, setLocalTaps] = useState(JSON.stringify(context.taps));
@@ -292,20 +295,6 @@ const SettingsPane = ({ currentFFT }) => {
         </label>
       </div>
 
-      <div id="toggleFreqShift">
-        <label className="label pb-0 pt-2">
-          <span className="label-text text-base">Frequency Shift</span>
-          <input
-            type="checkbox"
-            className="toggle toggle-primary"
-            checked={context.freqShift}
-            onChange={(e) => {
-              context.setFreqShift(e.target.checked);
-            }}
-          />
-        </label>
-      </div>
-
       <div id="toggleSquaring">
         <label className="label pb-0 pt-2">
           <span className="label-text text-base">Square Signal</span>
@@ -318,6 +307,32 @@ const SettingsPane = ({ currentFFT }) => {
             }}
           />
         </label>
+      </div>
+
+      <div id="toggleFreqShift">
+        <label className="label pb-0 pt-2">
+          <span className="label-text text-base">Frequency Shift</span>
+
+          <input
+            type="checkbox"
+            className="toggle toggle-primary"
+            checked={context.freqShift}
+            onChange={(e) => {
+              context.setFreqShift(e.target.checked);
+            }}
+          />
+        </label>
+        {context.freqShift && (
+          <>
+            <div className="text-base pl-6">
+              Baseband: {unitPrefixHz(cursorContext.cursorFreqShift * sampleRate).freq}{' '}
+              {unitPrefixHz(cursorContext.cursorFreqShift * sampleRate).unit} <br></br>
+              RF: {unitPrefixHz(cursorContext.cursorFreqShift * sampleRate + coreFrequency).freq}{' '}
+              {unitPrefixHz(cursorContext.cursorFreqShift * sampleRate + coreFrequency).unit} <br></br>
+              Normalized: {Math.round(cursorContext.cursorFreqShift * 1000) / 1000} Hz
+            </div>
+          </>
+        )}
       </div>
 
       <div className="mb-3" id="formPythonSnippet">
