@@ -2,6 +2,7 @@ import Plot from 'react-plotly.js';
 import React, { useEffect, useState } from 'react';
 import { template } from '@/utils/plotlyTemplate';
 import { useSpectrogramContext } from '../hooks/use-spectrogram-context';
+import { useCursorContext } from '../hooks/use-cursor-context';
 
 interface TimePlotProps {
   displayedIQ: Float32Array;
@@ -9,25 +10,33 @@ interface TimePlotProps {
 }
 
 export const TimePlot = ({ displayedIQ, fftStepSize }: TimePlotProps) => {
-  const { spectrogramWidth, spectrogramHeight } = useSpectrogramContext();
+  const { spectrogramWidth, spectrogramHeight, freqShift } = useSpectrogramContext();
+  const { cursorFreqShift } = useCursorContext(); // cursorFreqShift is in normalized freq (-0.5 to +0.5) regardless of if display RF is on
   const [I, setI] = useState<Float32Array>();
   const [Q, setQ] = useState<Float32Array>();
 
   useEffect(() => {
     if (displayedIQ && displayedIQ.length > 0) {
-      setI(
-        displayedIQ.filter((element, index) => {
-          return index % 2 === 0;
-        })
-      );
-
-      setQ(
-        displayedIQ.filter((element, index) => {
-          return index % 2 === 1;
-        })
-      );
+      const temp_I = new Float32Array(displayedIQ.length / 2);
+      const temp_Q = new Float32Array(displayedIQ.length / 2);
+      for (let i = 0; i < displayedIQ.length / 2; i++) {
+        if (freqShift) {
+          // Multiplying two complex numbers: (a + ib)(c + id) = (ac - bd) + i(ad + bc).
+          temp_I[i] =
+            displayedIQ[i * 2] * Math.cos(-2 * Math.PI * cursorFreqShift * i) -
+            displayedIQ[i * 2 + 1] * Math.sin(-2 * Math.PI * cursorFreqShift * i);
+          temp_Q[i] =
+            displayedIQ[i * 2] * Math.sin(-2 * Math.PI * cursorFreqShift * i) +
+            displayedIQ[i * 2 + 1] * Math.cos(-2 * Math.PI * cursorFreqShift * i);
+        } else {
+          temp_I[i] = displayedIQ[i * 2];
+          temp_Q[i] = displayedIQ[i * 2 + 1];
+        }
+      }
+      setI(temp_I);
+      setQ(temp_Q);
     }
-  }, [displayedIQ]); // TODO make sure this isnt going to be sluggish when the number of samples is huge
+  }, [displayedIQ, freqShift]);
 
   return (
     <div className="px-3">
