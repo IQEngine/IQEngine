@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
@@ -27,6 +27,7 @@ const SettingsPane = ({ currentFFT }) => {
   const cursorContext = useCursorContext();
   const [localPythonSnippet, setLocalPythonSnippet] = useState(context.pythonSnippet);
   const [localTaps, setLocalTaps] = useState(JSON.stringify(context.taps));
+  const [localFreqShift, setLocalFreqShift] = useState('');
 
   const onChangeWindowFunction = (event) => {
     const newWindowFunction = event.currentTarget.dataset.value;
@@ -52,6 +53,11 @@ const SettingsPane = ({ currentFFT }) => {
   const onSubmitTaps = () => {
     updateTaps(localTaps);
   };
+
+  // When you drag the freqshift selector line, update the text box
+  useEffect(() => {
+    setLocalFreqShift(String(Math.round(cursorContext.cursorFreqShift * 100000) / 100000));
+  }, [cursorContext.cursorFreqShift]);
 
   const onClickPremadeTaps = (event) => {
     let taps_string = event.currentTarget.dataset.value;
@@ -329,7 +335,25 @@ const SettingsPane = ({ currentFFT }) => {
               {unitPrefixHz(cursorContext.cursorFreqShift * sampleRate).unit} <br></br>
               RF: {unitPrefixHz(cursorContext.cursorFreqShift * sampleRate + coreFrequency).freq}{' '}
               {unitPrefixHz(cursorContext.cursorFreqShift * sampleRate + coreFrequency).unit} <br></br>
-              Normalized: {Math.round(cursorContext.cursorFreqShift * 1000) / 1000} Hz
+              <div className="flex">
+                Normalized:{' '}
+                <input
+                  type="text"
+                  className="h-5 w-20 rounded-l text-base-100 ml-1 pl-2"
+                  value={localFreqShift}
+                  onChange={(e) => {
+                    setLocalFreqShift(e.target.value);
+                  }}
+                />
+                <button
+                  className="rounded-none rounded-r h-5"
+                  onClick={() => {
+                    cursorContext.setCursorFreqShift(parseFloat(localFreqShift));
+                  }}
+                >
+                  <FontAwesomeIcon icon={faArrowRight as IconProp} />
+                </button>
+              </div>
             </div>
           </>
         )}
