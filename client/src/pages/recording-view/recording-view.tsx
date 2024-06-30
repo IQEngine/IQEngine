@@ -20,6 +20,7 @@ import AnnotationList from './components/annotation/annotation-list';
 import ScrollBar from './components/scroll-bar';
 import { MINIMAP_FFT_SIZE, MIN_SPECTROGRAM_HEIGHT } from '@/utils/constants';
 import FreqSelector from './components/freq-selector';
+import FreqShiftSelector from './components/freqshift-selector';
 import TimeSelector from './components/time-selector';
 import { AnnotationViewer } from './components/annotation/annotation-viewer';
 import TimeSelectorMinimap from './components/time-selector-minimap';
@@ -91,6 +92,7 @@ export function DisplaySpectrogram({ currentFFT, setCurrentFFT, currentTab }) {
               </Layer>
               <AnnotationViewer currentFFT={currentFFT} />
               <FreqSelector />
+              <FreqShiftSelector />
               <TimeSelector currentFFT={currentFFT} />
             </Stage>
             <Stage width={50} height={spectrogramHeight} className="mr-1">

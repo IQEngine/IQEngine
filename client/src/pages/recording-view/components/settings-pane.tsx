@@ -292,6 +292,20 @@ const SettingsPane = ({ currentFFT }) => {
         </label>
       </div>
 
+      <div id="toggleFreqShift">
+        <label className="label pb-0 pt-2">
+          <span className="label-text text-base">Frequency Shift</span>
+          <input
+            type="checkbox"
+            className="toggle toggle-primary"
+            checked={context.freqShift}
+            onChange={(e) => {
+              context.setFreqShift(e.target.checked);
+            }}
+          />
+        </label>
+      </div>
+
       <div id="toggleSquaring">
         <label className="label pb-0 pt-2">
           <span className="label-text text-base">Square Signal</span>

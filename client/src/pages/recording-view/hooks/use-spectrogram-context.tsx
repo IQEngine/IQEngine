@@ -30,6 +30,8 @@ interface SpectrogramContextProperties {
   setIncludeRfFreq: (includeRfFreq: boolean) => void;
   squareSignal: boolean;
   setSquareSignal: (squareSignal: boolean) => void;
+  freqShift: boolean;
+  setFreqShift: (freqShift: boolean) => void;
   taps: number[];
   setTaps: (taps: number[]) => void;
   pythonSnippet: string;
@@ -72,6 +74,7 @@ export function SpectrogramContextProvider({
   const [fftStepSize, setFFTStepSize] = useState<number>(seedValues.fftStepSize);
   const [includeRfFreq, setIncludeRfFreq] = useState<boolean>(false);
   const [squareSignal, setSquareSignal] = useState<boolean>(false);
+  const [freqShift, setFreqShift] = useState<boolean>(false);
   const [taps, setTaps] = useState<number[]>([1]);
   const [pythonSnippet, setPythonLocalSnippet] = useState<string>(INITIAL_PYTHON_SNIPPET);
   const { data: originMeta } = useMeta(type, account, container, filePath);
@@ -121,6 +124,8 @@ export function SpectrogramContextProvider({
         setIncludeRfFreq,
         squareSignal,
         setSquareSignal,
+        freqShift,
+        setFreqShift,
         taps,
         setTaps,
         pythonSnippet,
