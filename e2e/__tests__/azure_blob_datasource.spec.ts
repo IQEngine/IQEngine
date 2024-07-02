@@ -40,6 +40,7 @@ test.beforeAll(async ({}) => {
 test('Azure Blob Datasource @CICompatible', async ({ page }) => {
   await page.goto('/browser');
   await page.locator('#azure-manual-button').click();
+  await page.waitForTimeout(1000); // test somtimes fails without this
   await page.getByPlaceholder('Storage Account').fill('gnuradio');
   await page.getByPlaceholder('Container Name').fill('e2e-test-container');
   // Note that this container was set to public so that SAS token isnt needed
