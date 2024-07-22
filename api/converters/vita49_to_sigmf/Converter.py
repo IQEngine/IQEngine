@@ -6,6 +6,9 @@ import datetime
 import numpy as np
 import os
 from datetime import timezone, datetime
+import logging
+#uncomment following import if GPS time is used (otherwise the raw value is returned). Also uncomment code for GPS timestamp in this file
+#from astropy.time import Time
 
 
 #dataclasses.dataclass
@@ -46,13 +49,12 @@ def get_context_packet(header: object, context_dict: CurrentContextPacket) -> ob
         print("No matching context packet for data packet found")
     return current_packet
 
-
-def convert_payload_formats():
-    pass
-
-def context_to_meta(data, packet:object, stream_ids:list, current_context_packet: object, sample_start:int) -> list:
+def context_to_meta(data, packet:object, stream_ids:list, current_context_packet: object, sample_start:int, output_path: str) -> list:
     """Function to create a sigMF metafile if it does not exist for a streamID yet. Necessary context information of vita49 data packed is written
     into captures. If metafile exists already, function adds only a capture with the given parameters(center freq, sample start, timestamp(add more later))
+    
+    Warning: If GPS time is used, it is necessary to uncomment the astropy package at the beginning of this file as well as the according command in this function
+    regarding the integer GPS timestamp!
 
     :param _type_ data: IQ data written into sigmf data file
     :param object packet: object of type packet (will always be data packet as function is only called for data packets. Function does not need to be called
@@ -65,71 +67,99 @@ def context_to_meta(data, packet:object, stream_ids:list, current_context_packet
     
     #write per StreamID one meta core.
     #Append per packet one capture to according meta (according to streamID)
-    #Later, check if center frequency has changed and only then write new capture
+    
+    #get current sample rate
+    sample_rate = current_context_packet.current_context[packet.header.stream_identifier].body.sample_rate
 
     if packet.header.stream_identifier not in stream_ids:
         meta={
             "global": {
-            SigMFFile.DATATYPE_KEY: 'cf32_le', #in this case cf32_le                  #From context
-            #SigMFFile.SAMPLE_RATE_KEY : 48000,                                                      #From context
-            SigMFFile.AUTHOR_KEY: 'irgendwas',
+            SigMFFile.DATATYPE_KEY: 'cf32_le', #in this case cf32_le                                #From context
+            #SigMFFile.SAMPLE_RATE_KEY : 48000,                                                     #From context
+            SigMFFile.AUTHOR_KEY: 'test author',
             SigMFFile.DESCRIPTION_KEY: "This is a test description",#add user prompt later? or just edit in file or leave out
             SigMFFile.VERSION_KEY: "1.0.0",
             #SigMFFile.START_OFFSET_KEY: 1,#free runing count timestamp if given
             SigMFFile.HW_KEY: "Test hardware description",
             #Could insert location here but field is currently overread in vita packet    
+            SigMFFile.SAMPLE_RATE_KEY: sample_rate
             },
             "captures": [],
             "annotations": []
 }
     else:
 
-        with open('%s.sigmf-meta' % packet.header.stream_identifier, "r") as metafile:
+        with open('%s%s.sigmf-meta' %(output_path,packet.header.stream_identifier), "r") as metafile:
             meta = json.load(metafile)
 
     
-    #write context informaiton into capture fields (if they a are not None). What if they are none?
+    #write context information into capture fields (if they a are not None). What if they are none?
     if current_context_packet.current_context:
         #IF reference frequency (center frequency)
         if current_context_packet.current_context[packet.header.stream_identifier].body.if_reference_frequency is not None:
             center_freq = current_context_packet.current_context[packet.header.stream_identifier].body.if_reference_frequency
         else:
-            #Error?
-            center_freq = 0
+            if current_context_packet.current_context[packet.header.stream_identifier].body.rf_reference_frequency is not None:
+                center_freq = current_context_packet.current_context[packet.header.stream_identifier].body.rf_reference_frequency
+            else:
+                logging.warning("no center frequency given")
+                center_freq = 0
+             
+        ##Timestamps are always taken from the context packet!!##
+        #Whole timestamp section is barely tested due to the lack of test data   
         #Fractional timestamp
         if current_context_packet.current_context[packet.header.stream_identifier].header.fractional_seconds_timestamp is not None:
+            #frac timestamp is always only a number with different interpretations based on the TSF flags
             frac_timestamp = current_context_packet.current_context[packet.header.stream_identifier].header.fractional_seconds_timestamp
-            #Check what type of timestamp (1 is None, 3 is free running count(just the number, no conversion necessary))
-            if current_context_packet.current_context[packet.header.stream_identifier].header.TSI == 1:
-                #sample count timestamp
-                pass
-            elif current_context_packet.current_context[packet.header.stream_identifier].header.TSI == 2:
-                #Real time (picoseconds) timestamp
-                pass
         else:
-            #Error?
             frac_timestamp = 0
+            
         #Integer timestmap
         if current_context_packet.current_context[packet.header.stream_identifier].header.integer_seconds_timestamp is not None:
             int_timestamp = current_context_packet.current_context[packet.header.stream_identifier].header.integer_seconds_timestamp
-            #Check what type of timestamp (1 is None, 3 is not specified(jsut the number, no conversion necessary))
-            if current_context_packet.current_context[packet.header.stream_identifier].header.TSI == 1:
-                #UTC
-                #This section is not tested due to lack of sufficient test data!
-                int_timestamp = datetime.fromtimestamp(int_timestamp, tz=timezone.utc).strftime('%m/%d/%Y %r %Z')    
-            elif current_context_packet.current_context[packet.header.stream_identifier].header.TSI == 2:
+            if current_context_packet.current_context[packet.header.stream_identifier].header.TSI == '01':
+                #Again check frac timestamp. If frac timestamp = '11' or '00' there is no relation to the integer timestamp, hence it is not
+                #added on top. The sample count timestamp ('01') is used as a reference point -> also not added to int timestamp
+                #->'10' real time timestamp is added to int timestamp
+                #Check what type of timestamp (1 is None, 3 is not specified(just the number, no conversion necessary))
+                if current_context_packet.current_context[packet.header.stream_identifier].header.TSF == '10':
+                    #UTC
+                    #This section is not tested due to lack of sufficient test data!
+                    #int_timestamp = datetime.fromtimestamp(int_timestamp, tz=timezone.utc).strftime('%m/%d/%Y %r %Z')  
+                    #UTC time to ISO 8601 for SigMF  
+                    int_timestamp = datetime.fromtimestamp(int_timestamp).isoformat() + '.' + str(frac_timestamp)
+                else:
+                    int_timestamp = datetime.fromtimestamp(int_timestamp).isoformat()
+            elif current_context_packet.current_context[packet.header.stream_identifier].header.TSI == '10':
                 #GPS
+                #If the GPS timestamp is given either skip this block by uncommenting "pass" and commenting everything else or
+                #convert the GPS timestamp by uncommenting all lines except "pass" in this elif statement
+                #conversion experimental, not yet tested!
+                
                 pass
+                #uncomment as described above if GPS time should be displayed correctly
+                
+                #int_timestamp_GPS = Time(int_timestamp, format ='gps')
+                #int_timestamp = str(Time(int_timestamp_GPS, format='isot', scale='utc'))
+                
+                #Again check frac timestamp. If frac timestamp = '11' or '00' there is no relation to the integer timestamp, hence it is not
+                #added on top. The sample count timestamp ('01') is used as a reference point -> also not added to int timestamp
+                #->'10' real time timestamp is added to int timestamp
+                #Check what type of timestamp (1 is None, 3 is not specified(just the number, no conversion necessary))
+                
+                #uncomment as described above if GPS time should be displayed correctly
+                
+                #if current_context_packet.current_context[packet.header.stream_identifier].header.TSF == '10':
+                #    int_timestamp = int_timestamp + str(frac_timestamp)
+                    
         else:
-            #Error?
-            int_timestamp = 0
+            int_timestamp = 0      
     else:
         #THROW ERRORS INSTEAD?
+        logging.warning("no timestamp found")
         center_freq = 0
         frac_timestamp = 0
         int_timestamp = 0
-    
-    #Convert int timestamp and frac timestamp into useful information
     
     #meta.add_capture(sample_start, metadata={
     meta["captures"].append({"core:sample_start": sample_start,
@@ -137,14 +167,14 @@ def context_to_meta(data, packet:object, stream_ids:list, current_context_packet
                         SigMFFile.DATETIME_KEY: int_timestamp}
                          )
         
-    with open('%s.sigmf-meta' % packet.header.stream_identifier, "w+") as metafile:
+    with open('%s%s.sigmf-meta' %(output_path, packet.header.stream_identifier), "w+") as metafile:
         metafile.write(json.dumps(meta, indent=4))
         
 
     
     return stream_ids 
 
-def data_to_sigmfdata(packet: object, stream_ids:list):
+def data_to_sigmfdata(packet: object, stream_ids:list, output_path:str):
     """Writes IQ data from Data packet to file. 
 
     :param object packet: datapacket
@@ -161,15 +191,16 @@ def data_to_sigmfdata(packet: object, stream_ids:list):
     data.imag = data_imag
     if packet.header.stream_identifier not in stream_ids:
         #check if data file with this stream id exists even though it was not parsed yet (file from running the program before -> has to be deleted as data is just appended)
-        if os.path.isfile('%s.sigmf-data' % packet.header.stream_identifier):
-            os.remove('%s.sigmf-data' % packet.header.stream_identifier)
-    f = open('%s.sigmf-data' % packet.header.stream_identifier, "ab")
+        if os.path.isfile('%s%s.sigmf-data' %(output_path, packet.header.stream_identifier)):
+            #pass
+            os.remove('%s%s.sigmf-data' %(output_path, packet.header.stream_identifier))
+    f = open('%s%s.sigmf-data' %(output_path,packet.header.stream_identifier), "ab")
     f.write(data)
     iq_length = len(data)
 
     return [data, iq_length]
 
-def convert(packet: object, stream_ids:list, current_context_packet: object, sample_start:int) -> list:
+def convert(packet: object, stream_ids:list, current_context_packet: object, sample_start:int, output_path: str) -> list:
     """Converts vita49 data packet to sigMF meta and data file
 
     :param object packet: object of type packet (either data packet or context packet)
@@ -180,10 +211,12 @@ def convert(packet: object, stream_ids:list, current_context_packet: object, sam
     """
     if packet.header.packet_type == 0 or packet.header.packet_type == 1:
         #only do something if packet type is data packet. Data packet has according context information already because of match and get context packet functions
-        [data, iq_length] = data_to_sigmfdata(packet, stream_ids)
-        stream_ids = (context_to_meta(data, packet, stream_ids, current_context_packet, sample_start))
+        [data, iq_length] = data_to_sigmfdata(packet, stream_ids, output_path)
+        stream_ids = (context_to_meta(data, packet, stream_ids, current_context_packet, sample_start, output_path))
         sample_start = sample_start+iq_length
-        
+    elif packet.header.packet_type == 4:
+        data = 0
+        stream_ids = context_to_meta(data, packet, stream_ids, current_context_packet, sample_start, output_path)
         
     return [stream_ids, sample_start]
     

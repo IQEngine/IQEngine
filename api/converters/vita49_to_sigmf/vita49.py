@@ -5,11 +5,19 @@ from io import BytesIO
 import io
 import struct
 import numpy as np
+import scipy.signal
+from scipy import fft
 import matplotlib.pyplot as plt
 import logging
 from pprint import pprint
 from vita_constants import *
+import Converter
 from Converter import match_context_packet, get_context_packet, CurrentContextPacket
+
+global debug
+
+debug = False
+
 
 ####dataclasses Packet structure####
 @dataclasses.dataclass
@@ -421,7 +429,7 @@ def parse_header(bs: bytes) -> Tuple[bool, Header, int]:
         return (success, header, index)
 
 def parse_context(bs: bytes) -> Tuple[bool, Context, int]:
-    """ > parses context payload (from excluding fract timestamp to end of packet)
+    """ > parses context payload (from excluding fract timestamp to end of packet). Only CIF0 field is read!
 
     :param bytes bs: bytestream from [index:] to end
     
@@ -435,7 +443,6 @@ def parse_context(bs: bytes) -> Tuple[bool, Context, int]:
     index = 0
     #parse cif0 indicator field
     
-    #####? Value is not overwritten but appended, is kept over multiple object instances. Why? is attribute of object, should be reinitialized every time?
     context.included_fields = []
     [success, cif0_indicator_field, length] = parse_bits32(bs[index:], True)
     index += length
@@ -446,7 +453,7 @@ def parse_context(bs: bytes) -> Tuple[bool, Context, int]:
             context.included_fields.append(j)
         j+= 1
         
-    #write class atributes in list with correct index(index in class_attributes corresponding to according cif0_indicator_field)
+    #write class attributes in list with correct index(index in class_attributes corresponding to according cif0_indicator_field)
     for f in dataclasses.fields(context):
         #context.class_atr.append(f.name)
         if f.name == "context_field_reserved":
@@ -465,15 +472,18 @@ def parse_context(bs: bytes) -> Tuple[bool, Context, int]:
     #check if cif0 indicator field is valid (is exactly 32 bit long)
     if len(cif0_indicator_field) == 32:
         #adjust index with +4,+8 or +12 bytes, depending on what cif enable fields are active(they are positioned after cif0 indicator field and have to be skipped)
-        #It is sufficient to only read past the other cif enable fields as the cif context fields come after cif0 context fields and can just eb disregarded
+        #It is sufficient to only read past the other cif enable fields as the cif context fields come after cif0 context fields and can just be disregarded
         en_count = 0
         for en in context.included_fields:
             #test here, not in loop below because index has to be adjusted before the first context field is parsed!
             if en == 30 or en == 29 or en == 28: 
+                logging.warning("CIF1, CIF2, CIF3 or CIF7 fields included. Parser may fail as only CIF0 is currently implemented!")
+                print("CIF1, CIF2, CIF3 or CIF7 fields included. Parser may fail as only CIF0 is currently implemented!") 
                 en_count += 1
         index += en_count*4
         #parse through 32 bit cif0 indicator fields
         for i in context.included_fields:
+            print(i)
             if (i == 31 or i == 27 or i == 26 or i == 25):
                 logging.warning("reserved bit was 1. Invalid Packet structure")
                 print("reserved bit was 1. Invalid Packet structure")
@@ -481,6 +491,8 @@ def parse_context(bs: bytes) -> Tuple[bool, Context, int]:
             elif (i == 30 or i == 29 or i == 28 ):
                 logging.warning("Cif enables were 1. Only Cif0 implemented currently!")
                 print("Cif enables were 1. Only Cif0 implemented currently!")
+            elif(i == 0):
+                context.context_field_change_indicator = True
             else:
                 if (context.class_types[i] == ctypes.c_uint32):
                     [success, value, length] = parse_bits32(bs[index:], True)
@@ -756,8 +768,14 @@ def show_trailer_fields(bs: bytes) -> dict:
             j = 0
             for i in trailer[0:12]:
                 if i == "1":
-                    indicator_values[j] = True
-                j +=1                                
+                    if (trailer[j+12] == "1"):
+                        indicator_values[j] = True
+                    else:
+                        indicator_values[j] = False
+                else:
+                    indicator_values[j] = "Field not specified"
+                j +=1     
+                                           
             #write as dictionary,
             trailer_dict = {
                 "raw_value" :   trailer
@@ -859,14 +877,23 @@ def show_state_event_indicators(bs: bytes) -> dict:
     #index 0 is bit 31
     value = bs
     
+    enable_values = [False, False, False, False, False, False, False, False]
     indicator_values = [False, False, False, False, False, False, False, False]
     j = 0
     for i in value[0:8]:
         if i == "1":
-            indicator_values[j] = True
+            enable_values[j] = True
+            if (value[j+12] == "1"):
+                indicator_values[j] = True
+            else:
+                indicator_values[j] = False
+        else:
+            indicator_values[j] = "Field not specified"
         j +=1                                
     #write as dictionary,
     #overwrite value written into self.cif0_field_values before
+    # at points where enable_values = True: find fitting indicator_values(+12)
+    #   if ture give true, if false give false, all other fields as "Not specified"
     val = {
         "raw_value" :   hex(int(value,2))
         ,"calibrated_time_indicator": indicator_values[0]
@@ -938,28 +965,38 @@ def show_signal_data_packet_payload_format(bs: bytes) -> dict:
     elif(real_complex_type == "11"):
         real_complex_type = "Reserved"
         
+    if real_complex_type != "Complex_cartesian":
+        print("WARNING: Data Sample Format not supported. Only Complex Cartesian is supported")
+        
     data_item_format = value[3:8]
-    data_item_size = value [26:32]
-    packing_field_size = value[20:26]
+    #data_item_size = value [26:32]
+    #packing_field_size = value[20:26]
+    
     if(data_item_format == "00000"):
         data_item_format = "Signed_Fixed_Point"
-        if data_item_size == "10000":
-            data_item_size = 16
-            packing_field_size = 16
-        else:
-            data_item_size = 32
+    #    if data_item_size == "001111":
+    #        #rule 9.13.3-13: The Data Item size shall contain an unsignend number that is one less than the actual Data item size in the paired data packet stream
+    #        data_item_size = 16
+    #        packing_field_size = 16
+    #    else:
+    #        data_item_size = 32
     elif(data_item_format == "10000"):
         data_item_format = "Unsigned_Fixed_Point"
     elif(data_item_format == "00111"):
         data_item_format= "Signed_Fixed_point_Non_Normalized"
     elif(data_item_format == "01110"):
         data_item_format = "Single_Precision_Floating_Point"
-        data_item_size = 32
-        packing_field_size = 32
+        #data_item_size = 32
+        #packing_field_size = 32
     else:
         data_item_format = "Other"
-        data_item_size = 16
-        packing_field_size = 16
+        #data_item_size = 16
+        #packing_field_size = 16
+        
+    #rule 9.13.3-13: The Data Item size shall contain an unsignend number that is one less than the actual Data item size in the paired data packet stream
+    data_item_size = int(value[26:32], 2)+1
+    #similar rule to data_item_size
+    packing_field_size = int(value[20:26],2)+1
         
     sample_component_repeat_indicator = value[8]
     if(sample_component_repeat_indicator == "0"):
@@ -994,40 +1031,84 @@ def plot_data(current_context_packet: CurrentContextPacket, header: Header, data
     :param bytes iqdata: _description_
     """
     
-    data_type = np.int16
+    data_type = '>i2'
     #extract payload information from current context packet
     #take payload information from context packet if trailer not used
     if current_context_packet is not None:
-        if current_context_packet.body.signal_data_packet_payload_format["data_item_format"] == "Unsigned_Fixed_Point":
-            data_type = np.int16 #!!!not really, but other is not supported
-        elif current_context_packet.body.signal_data_packet_payload_format["data_item_format"] == "Signed_Fixed_Point":
-            if current_context_packet.body.signal_data_packet_payload_format["Data_Item_Size"] == 32:
-                data_type = np.int32
+        if current_context_packet.body.signal_data_packet_payload_format is not None:
+            if current_context_packet.body.signal_data_packet_payload_format["data_item_format"] == "Unsigned_Fixed_Point":
+                data_type = np.int16 #!!!not really, but other is not supported
+            elif current_context_packet.body.signal_data_packet_payload_format["data_item_format"] == "Signed_Fixed_Point":
+                if current_context_packet.body.signal_data_packet_payload_format["data_item_size"] == 32:
+                    data_type = '>i4'
+                elif current_context_packet.body.signal_data_packet_payload_format["data_item_size"] == 16:
+                    data_type = '>i2'
+            elif current_context_packet.body.signal_data_packet_payload_format["data_item_format"] == "Single_Precision_Floating_Point":
+                data_type = np.float32
+                print("Warning: data payload Format not supported")
+                logging.warning("Warning: data payload Format not supported")
+            elif current_context_packet.body.signal_data_packet_payload_format["data_item_format"] == "Single_Fixed_Point_Non_Normalized":
+                data_type = '>i2'
+                print("Warning: data payloa Format not supported")
+                logging.warning("Warning: data payload Format not supported")
             else:
-                data_type = np.int16
-        elif current_context_packet.body.signal_data_packet_payload_format["data_item_format"] == "Single_Precision_Floating_Point":
-            data_type = np.float32
-        elif current_context_packet.body.signal_data_packet_payload_format["data_item_format"] == "Single_Fixed_Point_Non_Normalized":
-            data_type = np.int16
+                data_type = np.float32
+                print("Warning: data payload Format not supported")
+                logging.warning("Warning: data payload Format not supported")
         else:
-            data_type = np.float32
+            if header.indicators[0] == "1":
+                print("Trailer information not yet implemented. See if should be implemented in the future or if data packets without context packet shall be eliminated")
+                #Trailer present
+                #maybe implement later
+                data_type = '>i2'
     else:
-        if header.indicators[0] == "1":
-            print("Trailer information not yet implemented. See if should be implemented in the future or if data packets without context packet shall be eliminated")
-            #Trailer present
-            #maybe implement later
-            data_type = np.int16
-            
-    ##CURRENTLY HARDCODED TO INT16!, CODE ABOVE NOT USED/TESTED BUT SHOULD BE USED IF SUFFICIENT TEST DATA IS AVAILABLE##
-    data_type = np.int16
-    samples =  np.frombuffer(iqdata, dtype=data_type)
-    samples = samples[::2] + 1j*samples[1::2]
-    plt.plot(samples.real, '.-')
-    plt.plot(samples.imag, '.-')
-    plt.legend(['I', 'Q'])
-    data.iq_data = samples
-    #plt.show()
+        #2byte(16bit), big endian
+        data_type = '>i2'
+  
+    
+    #data_type = np.float32
+    #data_type = np.int16
+    #samples =  np.frombuffer(iqdata, dtype=data_type)
+    raw_data = np.frombuffer(iqdata, dtype=data_type)
+    #samples = samples[::2] + 1j*samples[1::2]
+    samples = raw_data[0::2]+1j*raw_data[1::2]
 
+    
+    samples = samples/32767.0
+    data.iq_data = samples
+    Fs = current_context_packet.body.sample_rate
+    
+    if debug == True:
+        
+        plt.plot(samples.real, '.-')
+        plt.plot(samples.imag, '.-')
+        plt.legend(['I', 'Q'])
+        plt.show()
+        #print(samples)
+        
+        fig, (ax1,ax2) = plt.subplots(1, 2,  figsize=(14, 5))
+        n = len(data.iq_data)
+        
+        [frequencies, psd_db_hz] = calc_power_density_spectrum(Fs=Fs, n=n, iqarray=data.iq_data)
+    
+        #ax1.figure()
+        ax1.plot(frequencies, psd_db_hz)
+        ax1.set_title('Power Density spectrum')
+        ax1.set_xlabel('Frequency [Hz]')
+        ax1.set_ylabel('Power Density [dB/Hz]')
+        ax1.grid()
+    
+        #ax2.specgram(data.iq_data)
+        Pxx, freqs, bins, im = ax2.specgram(data.iq_data)
+        ax2.set_title('Spectogram')
+        ax2.set_xlabel('Time [s]')
+        ax2.set_ylabel('Frequency [Hz]')
+        fig.colorbar(im, ax=ax2).set_label('Power Density [dB/Hz]')
+        
+        plt.tight_layout()
+        
+        plt.show()
+    
 #####other helping functions#####
 def all_data_read(header: Header, index: int):
     """ > Check if all Data has been completely read
@@ -1041,3 +1122,112 @@ def all_data_read(header: Header, index: int):
         logging.info("packet data completely read! %1i bytes from %1i bytes read." % (index, header.packet_size*4))
         print("packet data completely read! %1i bytes from %1i bytes read." % (index, header.packet_size*4))
         
+        
+def convert_input(input_path: str, output_path: str):
+    """This function converts Vita49 compliant data into SigMF. Change the Path in "vita49_data_input.py" to the location of your binary vita49 file.
+    All three python files "vita49_data_input.py", which is the main file, reading in the bytestream, "vita49.py", which parses the vita compliant packets of the
+    bytestream, and "Converter.py", which converts the read vita49 packets into SigMF, have to be in the same folder(or paths specified when importing).
+    Currently, Vita49 data and context packets are supported. Other packet types are not supported but should be overread.
+    For the Context packets, the CIf0 context field is implemented with most of its 32 context fields. Fields from Cif0 that are of type 
+    11*32bits, 13*32bits or array of records, are not implemented but should be overread.
+    Other Cif fields are not implemented but should be overread.
+
+    :param str input_path: _description_
+    :param str output_path: _description_
+    """
+    filename = input_path
+    f = open(filename, "rb")
+    
+    current_context_packet = Converter.CurrentContextPacket()
+    
+    curr_index = 0
+    num_of_packets_read = 0
+    #Iq data length is added each iteration so that sample_start for SigMF is defined
+    sample_start = 0
+    
+    #list of "used" stream IDs. For stream IDs appended to this list, a meta file has already been created and only a capture has to be added
+    stream_ids = []
+    iq_array = []
+    while True:
+        #read first 4 bytes, containing the packet size in 32 bit words of next packet
+        hdr = f.read(4)
+        #packet size
+        packet_size_int = int.from_bytes(hdr[2:4], byteorder ='big')
+        #reset reader to reinclude first 32 bit -> back to start of packet (0 for first packet, index of last packet for all following packets)
+        f.seek(curr_index)
+        print(packet_size_int*4)
+        #read data until packet size (exactly one packet of data)
+        data = f.read((packet_size_int*4))
+        #check if eof is reached
+        if(len(data) == 0):
+            break
+        [success, packet, index] = parse(data, current_context_packet)
+        print("-----------START OF PACKET-----------")
+        print("PACKET HEADER")
+        print("----------")
+        pprint(packet.header)
+        print("PACKET BODY")
+        print("----------")
+        pprint(packet.body)
+        if(packet.header.packet_type == 1):
+            #pprint(packet.body.iq_data)
+            for element in packet.body.iq_data:     
+                iq_array.append(element)     
+        print("-----------END OF PACKET-----------")
+        curr_index += index
+        num_of_packets_read += 1
+
+        ###Convert packet to SigMF###
+        [stream_ids, sample_start] = Converter.convert(packet, stream_ids, current_context_packet, sample_start, output_path)
+        
+        if packet.header.stream_identifier not in stream_ids and (packet.header.packet_type == 0 or packet.header.packet_type == 1):
+            stream_ids.append(packet.header.stream_identifier)
+            
+        if not data:
+            break
+        
+    if debug == True:
+        iq_array = np.array(iq_array)
+        Fs = current_context_packet.current_context[packet.header.stream_identifier].body.sample_rate
+        n = len(iq_array)
+        
+        fig, (ax1,ax2) = plt.subplots(1, 2,  figsize=(14, 5))
+        
+        [frequencies, psd_db_hz] = calc_power_density_spectrum(Fs=Fs, n=n, iqarray=iq_array)
+        
+        #ax1.figure()
+        ax1.plot(frequencies, psd_db_hz)
+        ax1.set_title('Power Density spectrum')
+        ax1.set_xlabel('Frequency [Hz]')
+        ax1.set_ylabel('Power Density [dB/Hz]')
+        ax1.grid()
+        
+        Pxx, freqs, bins, im = ax2.specgram(iq_array)
+        ax2.set_title('Spectogram')
+        ax2.set_xlabel('Time [s]')
+        ax2.set_ylabel('Frequency [Hz]')
+        fig.colorbar(im, ax=ax2).set_label('Power Density [dB/Hz]')
+        
+        plt.tight_layout()
+        
+        plt.show()
+        
+    print("number of packets read: ")
+    print(num_of_packets_read)
+    
+
+def calc_power_density_spectrum(Fs: float, n: int, iqarray):
+    window = scipy.signal.windows.hamming(n)
+    iq_array = iqarray*window
+    if Fs is None:
+        Fs = 1
+    
+    fft_sig = np.fft.fft(iq_array)
+    fft_sig = np.fft.fftshift(fft_sig)
+    frequencies = np.fft.fftfreq(n, 1/Fs)
+    frequencies = np.fft.fftshift(frequencies)
+    
+    psd = (np.abs(fft_sig)**2)/(Fs*n)
+    psd_db_hz = 10*np.log10(psd)
+    
+    return [frequencies, psd_db_hz]
