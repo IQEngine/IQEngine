@@ -7,7 +7,7 @@ import { KonvaEventObject } from 'konva/lib/Node';
 import { RulerTop } from './components/ruler-top';
 import { RulerSide } from './components/ruler-side';
 import { SpectrogramContextProvider, useSpectrogramContext } from './hooks/use-spectrogram-context';
-import { CursorContextProvider, useCursorContext } from './hooks/use-cursor-context';
+import { CursorContextProvider } from './hooks/use-cursor-context';
 import { useMeta } from '@/api/metadata/queries';
 import { IQPlot } from './components/iq-plot';
 import { FrequencyPlot } from './components/frequency-plot';
@@ -20,6 +20,7 @@ import AnnotationList from './components/annotation/annotation-list';
 import ScrollBar from './components/scroll-bar';
 import { MINIMAP_FFT_SIZE, MIN_SPECTROGRAM_HEIGHT } from '@/utils/constants';
 import FreqSelector from './components/freq-selector';
+import FreqShiftSelector from './components/freqshift-selector';
 import TimeSelector from './components/time-selector';
 import { AnnotationViewer } from './components/annotation/annotation-viewer';
 import TimeSelectorMinimap from './components/time-selector-minimap';
@@ -70,6 +71,7 @@ export function DisplaySpectrogram({ currentFFT, setCurrentFFT, currentTab }) {
     }
   }
 
+  // Sort of messy but this is how the IQ gets passed into useGetImage which internally has its own state for iqData
   useEffect(() => {
     if (displayedIQ && displayedIQ.length > 0) {
       setIQData(displayedIQ);
@@ -85,11 +87,12 @@ export function DisplaySpectrogram({ currentFFT, setCurrentFFT, currentTab }) {
           </Stage>
           <div className="flex flex-row" id="spectrogram">
             <Stage width={spectrogramWidth} height={spectrogramHeight}>
-              <Layer onWheel={handleWheel}>
+              <Layer onWheel={handleWheel} imageSmoothingEnabled={false}>
                 <Image image={image} x={0} y={0} width={spectrogramWidth} height={spectrogramHeight} />
               </Layer>
               <AnnotationViewer currentFFT={currentFFT} />
               <FreqSelector />
+              <FreqShiftSelector />
               <TimeSelector currentFFT={currentFFT} />
             </Stage>
             <Stage width={50} height={spectrogramHeight} className="mr-1">
@@ -102,9 +105,9 @@ export function DisplaySpectrogram({ currentFFT, setCurrentFFT, currentTab }) {
           </div>
         </>
       )}
-      {currentTab === Tab.Time && <TimePlot displayedIQ={displayedIQ} />}
-      {currentTab === Tab.Frequency && <FrequencyPlot displayedIQ={displayedIQ} />}
-      {currentTab === Tab.IQ && <IQPlot displayedIQ={displayedIQ} />}
+      {currentTab === Tab.Time && <TimePlot displayedIQ={displayedIQ} fftStepSize={fftStepSize} />}
+      {currentTab === Tab.Frequency && <FrequencyPlot displayedIQ={displayedIQ} fftStepSize={fftStepSize} />}
+      {currentTab === Tab.IQ && <IQPlot displayedIQ={displayedIQ} fftStepSize={fftStepSize} />}
     </>
   );
 }
@@ -155,8 +158,9 @@ export function RecordingViewPage() {
                       onClick={() => {
                         setCurrentTab(Tab[key as keyof typeof Tab]);
                       }}
-                      className={` ${currentTab === Tab[key as keyof typeof Tab] ? 'bg-primary !text-base-100' : ''
-                        } inline-block px-3 py-0 outline outline-primary outline-1 text-lg text-primary hover:text-accent hover:shadow-lg hover:shadow-accent`}
+                      className={` ${
+                        currentTab === Tab[key as keyof typeof Tab] ? 'bg-primary !text-base-100' : ''
+                      } inline-block px-3 py-0 outline outline-primary outline-1 text-lg text-primary hover:text-accent hover:shadow-lg hover:shadow-accent`}
                     >
                       {key}
                     </div>

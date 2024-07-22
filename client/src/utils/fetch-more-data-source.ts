@@ -70,19 +70,19 @@ export function applyProcessing(samples, taps, squareSignal, pythonSnippet, pyod
 export function convertToFloat32(buffer, dataType) {
   if (dataType === 'ci8_le' || dataType === 'ci8' || dataType === 'i8') {
     let samples = Float32Array.from(new Int8Array(buffer));
-    for (let i = 0; i < samples.length; i++) samples[i] = samples[i] / 255.0;
+    for (let i = 0; i < samples.length; i++) samples[i] = samples[i] / 127.0;
     return samples;
   } else if (dataType === 'cu8_le' || dataType === 'cu8' || dataType === 'u8') {
     let samples = Float32Array.from(new Uint8Array(buffer));
-    for (let i = 0; i < samples.length; i++) samples[i] = (samples[i] - 255.0) / 255.0;
+    for (let i = 0; i < samples.length; i++) samples[i] = (samples[i] - 127.0) / 127.0;
     return samples;
   } else if (dataType === 'ci16_le' || dataType === 'ci16') {
     let samples = Float32Array.from(new Int16Array(buffer));
-    for (let i = 0; i < samples.length; i++) samples[i] = samples[i] / 32768.0;
+    for (let i = 0; i < samples.length; i++) samples[i] = samples[i] / 32767.0;
     return samples;
   } else if (dataType === 'cu16_le' || dataType === 'cu16') {
     let samples = Float32Array.from(new Uint16Array(buffer));
-    for (let i = 0; i < samples.length; i++) samples[i] = (samples[i] - 32768.0) / 32768.0;
+    for (let i = 0; i < samples.length; i++) samples[i] = (samples[i] - 32767.0) / 32767.0;
     return samples;
   } else if (dataType === 'ci32_le' || dataType === 'ci32') {
     let samples = Float32Array.from(new Int32Array(buffer));

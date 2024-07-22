@@ -1,5 +1,3 @@
-import { useMeta } from '@/api/metadata/queries';
-import { SigMFMetadata } from '@/utils/sigmfMetadata';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useSpectrogramContext } from './use-spectrogram-context';
 import { useGetIQData } from '@/api/iqdata/Queries';
@@ -10,12 +8,16 @@ interface CursorContextProperties {
   setCursorTime: (cursorTime: Cursor) => void;
   cursorFreq: Cursor;
   setCursorFreq: (cursorFreq: Cursor) => void;
+  cursorFreqShift: number;
+  setCursorFreqShift: (cursorFreqShift: number) => void;
   cursorData: Float32Array;
   setCursorData: (cursorData: Float32Array) => void;
-  cursorFreqEnabled: boolean;
-  setCursorFreqEnabled: (cursorFreqEnabled: boolean) => void;
   cursorTimeEnabled: boolean;
   setCursorTimeEnabled: (cursorTimeEnabled: boolean) => void;
+  cursorFreqEnabled: boolean;
+  setCursorFreqEnabled: (cursorFreqEnabled: boolean) => void;
+  cursorFreqShiftEnabled: boolean;
+  setCursorFreqShiftEnabled: (cursorFreqShiftEnabled: boolean) => void;
 }
 
 export const CursorContext = createContext<CursorContextProperties>(null);
@@ -34,6 +36,7 @@ export function CursorContextProvider({ children }) {
     start: 0,
     end: 0,
   });
+  const [cursorFreqShift, setCursorFreqShift] = useState<number>(0);
 
   const [cursorFreqEnabled, setCursorFreqEnabled] = useState<boolean>(false);
   const [cursorTimeEnabled, setCursorTimeEnabled] = useState<boolean>(false);
@@ -72,6 +75,8 @@ export function CursorContextProvider({ children }) {
         setCursorTime,
         cursorFreq,
         setCursorFreq,
+        cursorFreqShift,
+        setCursorFreqShift,
         cursorData,
         setCursorData,
         cursorFreqEnabled,

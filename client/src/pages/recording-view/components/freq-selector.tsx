@@ -1,7 +1,3 @@
-// Copyright (c) 2022 Microsoft Corporation
-// Copyright (c) 2023 Marc Lichtman
-// Licensed under the MIT License
-
 import React, { useEffect, useState } from 'react';
 import { Layer, Rect, Text } from 'react-konva';
 import { unitPrefixHz } from '@/utils/rf-functions';
@@ -15,7 +11,7 @@ const FreqSelector = () => {
   const [upperText, setUpperText] = useState('');
   const [diffText, setDiffText] = useState('');
   const sampleRate = meta?.getSampleRate() || 0;
-  const coreFrequency = (includeRfFreq) ? meta.getCenterFrequency() : 0;
+  const coreFrequency = includeRfFreq ? meta.getCenterFrequency() : 0;
 
   const lowerPosition = (cursorFreq.start + 0.5) * spectrogramWidth; // in pixels. this auto-updates
   const upperPosition = (cursorFreq.end + 0.5) * spectrogramWidth;
@@ -73,8 +69,6 @@ const FreqSelector = () => {
       });
     }
   };
-
-  const handleMovement = (e) => {};
 
   const handleDragEnd = (e) => {
     setCursorFreq({

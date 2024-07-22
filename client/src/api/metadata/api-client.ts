@@ -2,18 +2,19 @@ import { MetadataClient } from './metadata-client';
 import { SigMFMetadata, Annotation, CaptureSegment, Track } from '@/utils/sigmfMetadata';
 import { AccountInfo, IPublicClientApplication } from '@azure/msal-browser';
 import { AuthUtil } from '@/api/utils/Auth-Utils';
+import { AppConfig } from '../config/queries';
 
 export class ApiClient implements MetadataClient {
   private authUtil: AuthUtil;
 
-  constructor(instance: IPublicClientApplication, account: AccountInfo) {
-    this.authUtil = new AuthUtil(instance, account);
+  constructor(instance: IPublicClientApplication, account: AccountInfo, config: AppConfig) {
+    this.authUtil = new AuthUtil(instance, account, config);
   }
 
   async getMeta(account: string, container: string, filePath: string): Promise<SigMFMetadata> {
     const response = await this.authUtil.requestWithAuthIfRequired({
       method: 'get',
-      url: `/api/datasources/${account}/${container}/${filePath}/meta`
+      url: `/api/datasources/${account}/${container}/${filePath}/meta`,
     });
     let responseMetaData: SigMFMetadata | null = null;
     responseMetaData = Object.assign(new SigMFMetadata(), response.data);
@@ -29,7 +30,7 @@ export class ApiClient implements MetadataClient {
   async getDataSourceMetaPaths(account: string, container: string): Promise<string[]> {
     const response = await this.authUtil.requestWithAuthIfRequired({
       method: 'get',
-      url: `/api/datasources/${account}/${container}/meta/paths`
+      url: `/api/datasources/${account}/${container}/meta/paths`,
     });
     return response.data;
   }
@@ -39,7 +40,7 @@ export class ApiClient implements MetadataClient {
       const config = {
         method: 'PUT',
         url: `/api/datasources/${account}/${container}/${filePath}/meta`,
-        data: meta
+        data: meta,
       };
 
       await this.authUtil.requestWithAuthIfRequired(config);
@@ -72,13 +73,12 @@ export class ApiClient implements MetadataClient {
       }
       return [coord[1], coord[0]];
     });
-
   }
 
   async queryMeta(queryString: string): Promise<SigMFMetadata[]> {
     const response = await this.authUtil.requestWithAuthIfRequired({
-      method:'get',
-      url: `/api/datasources/query?${queryString}`
+      method: 'get',
+      url: `/api/datasources/query?${queryString}`,
     });
     return response.data.map((item, i) => {
       item = Object.assign(new SigMFMetadata(), item);
@@ -97,7 +97,7 @@ export class ApiClient implements MetadataClient {
       },
       signal: signal,
     });
-    console.log('SmartQueryRepsonse' ,response.data);
+    console.log('SmartQueryRepsonse', response.data);
     return response.data;
   }
 

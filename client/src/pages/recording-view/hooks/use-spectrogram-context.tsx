@@ -3,6 +3,7 @@ import { useMeta } from '@/api/metadata/queries';
 import { INITIAL_PYTHON_SNIPPET } from '@/utils/constants';
 import { SigMFMetadata } from '@/utils/sigmfMetadata';
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { COLORMAP_DEFAULT } from '@/utils/constants';
 
 interface SpectrogramContextProperties {
   type: string;
@@ -29,6 +30,8 @@ interface SpectrogramContextProperties {
   setIncludeRfFreq: (includeRfFreq: boolean) => void;
   squareSignal: boolean;
   setSquareSignal: (squareSignal: boolean) => void;
+  freqShift: boolean;
+  setFreqShift: (freqShift: boolean) => void;
   taps: number[];
   setTaps: (taps: number[]) => void;
   pythonSnippet: string;
@@ -43,6 +46,7 @@ interface SpectrogramContextProperties {
 
 export const SpectrogramContext = createContext<SpectrogramContextProperties>(null);
 
+// Initial settings
 export function SpectrogramContextProvider({
   children,
   type,
@@ -52,8 +56,8 @@ export function SpectrogramContextProvider({
   seedValues = {
     magnitudeMin: -30,
     magnitudeMax: 5,
-    colmap: 'viridis',
-    windowFunction: 'hann',
+    colmap: COLORMAP_DEFAULT,
+    windowFunction: 'rectangle',
     fftSize: 1024,
     spectrogramHeight: 800,
     spectrogramWidth: 1024,
@@ -70,6 +74,7 @@ export function SpectrogramContextProvider({
   const [fftStepSize, setFFTStepSize] = useState<number>(seedValues.fftStepSize);
   const [includeRfFreq, setIncludeRfFreq] = useState<boolean>(false);
   const [squareSignal, setSquareSignal] = useState<boolean>(false);
+  const [freqShift, setFreqShift] = useState<boolean>(false);
   const [taps, setTaps] = useState<number[]>([1]);
   const [pythonSnippet, setPythonLocalSnippet] = useState<string>(INITIAL_PYTHON_SNIPPET);
   const { data: originMeta } = useMeta(type, account, container, filePath);
@@ -119,6 +124,8 @@ export function SpectrogramContextProvider({
         setIncludeRfFreq,
         squareSignal,
         setSquareSignal,
+        freqShift,
+        setFreqShift,
         taps,
         setTaps,
         pythonSnippet,

@@ -290,6 +290,13 @@ export const App = () => {
         </div>
 
         <Outlet />
+
+        <Feature flag={FeatureFlag.useIQEngineOutReach.name}>
+          <h2 className="text-center py-2">
+            We want to hear from you! <a href="mailto:info@iqengine.org">info@iqengine.org</a>
+          </h2>
+        </Feature>
+        
       </div>
       <ReactQueryDevtools initialIsOpen={false} />
     </ThemeSelector>
