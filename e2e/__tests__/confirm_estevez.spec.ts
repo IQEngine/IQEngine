@@ -11,6 +11,6 @@ test('Estevez repocard displays spectrogram page', async ({ page }) => {
   await page.goto('/browser');
   await page.locator('[id="DanielEstévez\\\'Recordings"]').last().click();
   await page.getByRole('link', { name: 'W3OH_1665MHz_2022-06-21T19_36_55_pol_x' }).click();
-  await expect(page.getByText('Zoom Level')).toBeVisible();
+  await expect(page.getByText('Zoom Out Level')).toBeVisible();
   await expect(page.locator('span:has-text("1.0.0")')).toBeHidden();
 });

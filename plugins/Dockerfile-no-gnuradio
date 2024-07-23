@@ -1,0 +1,19 @@
+# small image for plugins without gnu radio
+FROM python:3.12-slim
+LABEL org.opencontainers.image.description="Plugins for IQEngine to provide additional post processing capabilities"
+LABEL org.opencontainers.image.licenses=MIT
+
+WORKDIR /src
+
+# open cv
+RUN apt-get update && apt-get install ffmpeg libsm6 libxext6  -y
+
+# Python stuff
+COPY src/requirements.txt .
+RUN pip install -r requirements.txt --break-system-packages
+
+COPY src .
+
+RUN chmod +x start.sh
+EXPOSE 8000
+CMD ["./start.sh"]

@@ -43,12 +43,17 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
 
   const ffts = useMemo(() => {
     if (!minimapData) return null;
-    // transform the minimap data into an one big FLOAT32ARRAY
+    // transform the minimap data (array of float32 arrays) into an one big FLOAT32ARRAY. i.e., concatenation
     const iqData = new Float32Array(minimapData.length * minimapData[0].length);
     for (let i = 0; i < minimapData.length; i++) {
       iqData.set(minimapData[i], i * minimapData[i].length);
     }
-    const ffts_calc = calcFfts(iqData, MINIMAP_FFT_SIZE, windowFunction, 100);
+    if (minimapData[0].length != 2 * MINIMAP_FFT_SIZE) {
+      console.log('minimapData.length:', minimapData.length);
+      console.log('minimapData[0].length:', minimapData[0].length, 'MINIMAP_FFT_SIZE:', MINIMAP_FFT_SIZE);
+      throw new Error('Minimap data does not have the correct length');
+    }
+    const ffts_calc = calcFfts(iqData, MINIMAP_FFT_SIZE, windowFunction, minimapData.length);
     const min = Math.min(...ffts_calc);
     const max = Math.max(...ffts_calc);
     setMagnitudeMin(min);
@@ -161,7 +166,7 @@ const ScrollBar = ({ currentFFT, setCurrentFFT }: ScrollBarProps) => {
 
   return (
     <>
-      <Layer onWheel={handleWheel}>
+      <Layer onWheel={handleWheel} imageSmoothingEnabled={false}>
         {minimapImg ? (
           <Image
             onClick={handleClick}

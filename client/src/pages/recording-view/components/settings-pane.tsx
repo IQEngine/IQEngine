@@ -1,31 +1,33 @@
-// Copyright (c) 2022 Microsoft Corporation
-// Copyright (c) 2023 Marc Lichtman
-// Licensed under the MIT License
-
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import DualRangeSlider from '@/features/ui/dual-range-slider/DualRangeSlider';
-import { COLORMAP_DEFAULT } from '@/utils/constants';
 import { colMaps } from '@/utils/colormap';
 import { useSpectrogramContext } from '../hooks/use-spectrogram-context';
 import { useCursorContext } from '../hooks/use-cursor-context';
 import { vscodeDark } from '@uiw/codemirror-theme-vscode';
 import CodeMirror from '@uiw/react-codemirror';
 import { langs } from '@uiw/codemirror-extensions-langs';
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
+import { unitPrefixHz } from '@/utils/rf-functions';
 
 interface SettingsPaneProps {
   currentFFT: number;
 }
 
 const SettingsPane = ({ currentFFT }) => {
-  const fftSizes = [128, 256, 512, 1024, 2048, 4096, 16384, 65536];
+  const fftSizes = [64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536];
+  const zoomLevels = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+  const windowFunctions = ['hamming', 'rectangle', 'hanning', 'barlett', 'blackman'];
   const context = useSpectrogramContext();
+  const sampleRate = context.meta?.getSampleRate() || 0;
+  const coreFrequency = context.meta?.getCenterFrequency();
   const cursorContext = useCursorContext();
   const [localPythonSnippet, setLocalPythonSnippet] = useState(context.pythonSnippet);
   const [localTaps, setLocalTaps] = useState(JSON.stringify(context.taps));
+  const [localFreqShift, setLocalFreqShift] = useState('');
 
   const onChangeWindowFunction = (event) => {
     const newWindowFunction = event.currentTarget.dataset.value;
@@ -52,20 +54,22 @@ const SettingsPane = ({ currentFFT }) => {
     updateTaps(localTaps);
   };
 
+  // When you drag the freqshift selector line, update the text box
+  useEffect(() => {
+    setLocalFreqShift(String(Math.round(cursorContext.cursorFreqShift * 100000) / 100000));
+  }, [cursorContext.cursorFreqShift]);
+
   const onClickPremadeTaps = (event) => {
     let taps_string = event.currentTarget.dataset.value;
     setLocalTaps(taps_string);
     updateTaps(taps_string);
   };
 
-  const onPressSaveButton = (e) => {
-    console.log(context.meta);
+  const onPressDownloadSelectedSamples = (e) => {
     // Grab metadata and remove the parts that shouldn't be included in the metafile
     let metaClone = JSON.parse(JSON.stringify(context.meta));
     delete metaClone['dataClient'];
     const a = document.createElement('a');
-
-    // Return with the download of the blob
     const blobUrl = window.URL.createObjectURL(
       new Blob([cursorContext.cursorData], { type: 'application/octet-stream' })
     );
@@ -73,35 +77,18 @@ const SettingsPane = ({ currentFFT }) => {
     a.download = 'trimmedSamples.sigmf-data';
     a.click();
     window.URL.revokeObjectURL(blobUrl);
-
     a.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent(JSON.stringify(metaClone, null, 2));
     a.download = 'trimmedSamples.sigmf-meta';
     a.click();
-
-    document.body.removeChild(a);
+    a.remove(); // remove element from dom
   };
 
-  function calcZoomStepSizes() {
-    /*
-      What we're doing here is calculating the number of ffts we
-      skip per image line in order to show N% of the total
-      file in the spectrogram. The first element in the
-      array is special, don't skip
-    */
-
-    const fftSize = context.fftSize;
-    const imageHeight = context.spectrogramHeight;
-    const totalSamples = context.meta.getTotalSamples();
-    const onePercent = totalSamples / fftSize / 100;
-
-    const zoomLevels = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
-    return zoomLevels.map((z) => Math.floor((onePercent * z) / imageHeight));
-  }
-
-  const zoomStepSizes = calcZoomStepSizes();
+  // Calculate number of ffts we skip per image line in order to show N% of the total file in the spectrogram. The first element in the array is special, don't skip
+  const onePercent = context.meta.getTotalSamples() / context.fftSize / 100;
+  const zoomStepSizes = zoomLevels.map((z) => Math.floor((onePercent * z) / context.spectrogramHeight));
 
   const onChangePythonSnippet = useCallback(
-    (value, viewUpdate) => {
+    (value: string) => {
       setLocalPythonSnippet(value);
     },
     [localPythonSnippet]
@@ -110,7 +97,7 @@ const SettingsPane = ({ currentFFT }) => {
   return (
     <div className="form-control">
       <label className="mb-3" id="formZoom">
-        <span className="label-text text-base ">Zoom Level</span>
+        <span className="label-text text-base ">Zoom Out Level</span>
         <input
           type="range"
           className="range range-xs range-primary"
@@ -164,7 +151,7 @@ const SettingsPane = ({ currentFFT }) => {
 
       <button
         className="mb-3"
-        onClick={onPressSaveButton}
+        onClick={onPressDownloadSelectedSamples}
         style={{ width: '100%', marginTop: '5px' }}
         disabled={!context.canDownload}
       >
@@ -244,6 +231,7 @@ const SettingsPane = ({ currentFFT }) => {
               </a>
             </span>
           </label>
+
           <div className="mt-2 flex">
             <input
               type="text"
@@ -254,7 +242,7 @@ const SettingsPane = ({ currentFFT }) => {
               }}
             />
             <button className="rounded-none rounded-r" onClick={onSubmitTaps}>
-              <FontAwesomeIcon icon={faArrowRight} />
+              <FontAwesomeIcon icon={faArrowRight as IconProp} />
             </button>
           </div>
         </div>
@@ -290,21 +278,11 @@ const SettingsPane = ({ currentFFT }) => {
             Window <ArrowRightIcon />
           </label>
           <ul className="p-2 shadow menu dropdown-content z-[1] mt-0 bg-base-100 rounded-box w-70">
-            <li key={0} data-value="hamming" onClick={onChangeWindowFunction}>
-              {context.windowFunction === 'hamming' ? <a className="active">Hamming</a> : <a>Hamming</a>}
-            </li>
-            <li key={1} data-value="rectangle" onClick={onChangeWindowFunction}>
-              {context.windowFunction === 'rectangle' ? <a className="active">Rectangle</a> : <a>Rectangle</a>}
-            </li>
-            <li key={2} data-value="hanning" onClick={onChangeWindowFunction}>
-              {context.windowFunction === 'hanning' ? <a className="active">Hanning</a> : <a>Hanning</a>}
-            </li>
-            <li key={3} data-value="barlett" onClick={onChangeWindowFunction}>
-              {context.windowFunction === 'barlett' ? <a className="active">Barlett</a> : <a>Barlett</a>}
-            </li>
-            <li key={4} data-value="blackman" onClick={onChangeWindowFunction}>
-              {context.windowFunction === 'blackman' ? <a className="active">Blackman</a> : <a>Blackman</a>}
-            </li>
+            {windowFunctions.map((value) => (
+              <li key={value} data-value={value} onClick={onChangeWindowFunction}>
+                <a className={'capitalize ' + (context.windowFunction === value && 'bg-primary text-black')}>{value}</a>
+              </li>
+            ))}
           </ul>
         </div>
       </div>
@@ -335,6 +313,50 @@ const SettingsPane = ({ currentFFT }) => {
             }}
           />
         </label>
+      </div>
+
+      <div id="toggleFreqShift">
+        <label className="label pb-0 pt-2">
+          <span className="label-text text-base">Frequency Shift</span>
+
+          <input
+            type="checkbox"
+            className="toggle toggle-primary"
+            checked={context.freqShift}
+            onChange={(e) => {
+              context.setFreqShift(e.target.checked);
+            }}
+          />
+        </label>
+        {context.freqShift && (
+          <>
+            <div className="text-base pl-6">
+              Baseband: {unitPrefixHz(cursorContext.cursorFreqShift * sampleRate).freq}{' '}
+              {unitPrefixHz(cursorContext.cursorFreqShift * sampleRate).unit} <br></br>
+              RF: {unitPrefixHz(cursorContext.cursorFreqShift * sampleRate + coreFrequency).freq}{' '}
+              {unitPrefixHz(cursorContext.cursorFreqShift * sampleRate + coreFrequency).unit} <br></br>
+              <div className="flex">
+                Normalized:{' '}
+                <input
+                  type="text"
+                  className="h-5 w-20 rounded-l text-base-100 ml-1 pl-2"
+                  value={localFreqShift}
+                  onChange={(e) => {
+                    setLocalFreqShift(e.target.value);
+                  }}
+                />
+                <button
+                  className="rounded-none rounded-r h-5"
+                  onClick={() => {
+                    cursorContext.setCursorFreqShift(parseFloat(localFreqShift));
+                  }}
+                >
+                  <FontAwesomeIcon icon={faArrowRight as IconProp} />
+                </button>
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       <div className="mb-3" id="formPythonSnippet">

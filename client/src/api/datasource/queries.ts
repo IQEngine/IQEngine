@@ -140,7 +140,13 @@ export const useAddDataSource = () => {
   const { dataSourcesQuery, filesQuery } = useUserSettings();
   const { instance } = useMsal();
   const { data } = useConfigQuery();
-  const dataSourceClient = DataSourceClientFactory(ClientType.API, filesQuery.data, dataSourcesQuery.data, instance, data);
+  const dataSourceClient = DataSourceClientFactory(
+    ClientType.API,
+    filesQuery.data,
+    dataSourcesQuery.data,
+    instance,
+    data
+  );
 
   return useMutation({
     mutationFn: (dataSource: DataSource) => {
@@ -157,7 +163,13 @@ export const useUpdateDataSource = () => {
   const { dataSourcesQuery, filesQuery } = useUserSettings();
   const { instance } = useMsal();
   const { data } = useConfigQuery();
-  const dataSourceClient = DataSourceClientFactory(ClientType.API, filesQuery.data, dataSourcesQuery.data, instance, data);
+  const dataSourceClient = DataSourceClientFactory(
+    ClientType.API,
+    filesQuery.data,
+    dataSourcesQuery.data,
+    instance,
+    data
+  );
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -178,7 +190,13 @@ export const useUploadDataSource = (type: string, account: string, container: st
   const { dataSourcesQuery, filesQuery } = useUserSettings();
   const { instance } = useMsal();
   const { data } = useConfigQuery();
-  const dataSourceClient = DataSourceClientFactory(ClientType.API, filesQuery.data, dataSourcesQuery.data, instance, data);
+  const dataSourceClient = DataSourceClientFactory(
+    ClientType.API,
+    filesQuery.data,
+    dataSourcesQuery.data,
+    instance,
+    data
+  );
 
   async function uploadBlob(f: FileWithHandle, account, container) {
     // Create azure blob client

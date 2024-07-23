@@ -5,6 +5,7 @@ import { MetadataClient } from './metadata-client';
 import { useUserSettings } from '@/api/user-settings/use-user-settings';
 import { useMsal } from '@azure/msal-react';
 import { CLIENT_TYPE_API, SmartQueryResult } from '../Models';
+import { useConfigQuery } from '../config/queries';
 
 export const fetchMeta = async (
   client: MetadataClient,
@@ -31,10 +32,11 @@ const updateDataSourceMeta = async (
 export const useQueryDataSourceMetaPaths = (type: string, account: string, container: string, enabled = true) => {
   const { dataSourcesQuery, filesQuery } = useUserSettings();
   const { instance } = useMsal();
+  const { data: config } = useConfigQuery();
   if (!dataSourcesQuery.data || !filesQuery.data) {
     return useQuery(['invalidQuery'], () => null);
   }
-  const metadataClient = MetadataClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance);
+  const metadataClient = MetadataClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance, config);
   return useQuery(
     ['datasource', type, account, container, 'meta', 'paths'],
     () => {
@@ -50,7 +52,8 @@ export const useQueryDataSourceMetaPaths = (type: string, account: string, conta
 export const useQueryTrack = (type: string, account: string, container: string, filepath: string, enabled = true) => {
   const { dataSourcesQuery, filesQuery } = useUserSettings();
   const { instance } = useMsal();
-  const client = MetadataClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance);
+  const { data: config } = useConfigQuery();
+  const client = MetadataClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance, config);
 
   return useQuery<number[][]>({
     queryKey: ['track', account, container, filepath],
@@ -67,7 +70,8 @@ export const getMeta = (type: string, account: string, container: string, filePa
     return useQuery(['invalidQuery'], () => null);
   }
   const { instance } = useMsal();
-  const metadataClient = MetadataClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance);
+  const { data: config } = useConfigQuery();
+  const metadataClient = MetadataClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance, config);
   return useQuery(
     ['datasource', type, account, container, filePath, 'meta'],
     () => {
@@ -88,7 +92,8 @@ export const useUpdateMeta = (meta: SigMFMetadata) => {
   const { type, account, container, file_path: filePath } = meta.getOrigin();
   const { dataSourcesQuery, filesQuery } = useUserSettings();
   const { instance } = useMsal();
-  const metadataClient = MetadataClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance);
+  const { data: config } = useConfigQuery();
+  const metadataClient = MetadataClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance, config);
 
   return useMutation({
     mutationFn: (newMeta: SigMFMetadata) => {
@@ -110,14 +115,16 @@ export const useUpdateMeta = (meta: SigMFMetadata) => {
 export const useGetMetadataFeatures = (type: string) => {
   const { filesQuery, dataSourcesQuery } = useUserSettings();
   const { instance } = useMsal();
-  const metadataClient = MetadataClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance);
+  const { data: config } = useConfigQuery();
+  const metadataClient = MetadataClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance, config);
   return metadataClient.features();
 };
 
 export const useMeta = (type: string, account: string, container: string, filePath: string) => {
   const { filesQuery, dataSourcesQuery } = useUserSettings();
   const { instance } = useMsal();
-  const metadataClient = MetadataClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance);
+  const { data: config } = useConfigQuery();
+  const metadataClient = MetadataClientFactory(type, filesQuery.data, dataSourcesQuery.data, instance, config);
   return useQuery<SigMFMetadata>({
     queryKey: ['datasource', type, account, container, filePath, 'meta'],
     queryFn: () => {
@@ -130,7 +137,14 @@ export const useMeta = (type: string, account: string, container: string, filePa
 export const useSmartQueryMeta = (query: string, enabled = true) => {
   const { filesQuery, dataSourcesQuery } = useUserSettings();
   const { instance } = useMsal();
-  const metadataClient = MetadataClientFactory(CLIENT_TYPE_API, filesQuery.data, dataSourcesQuery.data, instance);
+  const { data: config } = useConfigQuery();
+  const metadataClient = MetadataClientFactory(
+    CLIENT_TYPE_API,
+    filesQuery.data,
+    dataSourcesQuery.data,
+    instance,
+    config
+  );
   return useQuery<SmartQueryResult>({
     queryKey: ['smart-query', query],
     queryFn: ({ signal }) => {
