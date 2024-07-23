@@ -181,25 +181,25 @@ class Context:
     
     
     
-    - *state_event_indicators:*
+    - *state_event_indicators*
     
-    - *signal_data_packet_payload_format:*
+    - *signal_data_packet_payload_format*
     
-    - *formatted_gps:*
+    - *formatted_gps*
     
-    - *formatted_ins:*
+    - *formatted_ins*
     
-    - *ecef_ephemeris:*
+    - *ecef_ephemeris*
     
-    - *relative_ephemeris:*
+    - *relative_ephemeris*
     
-    - *ephemeris_ref_id:*
+    - *ephemeris_ref_id*
     
-    - *gps_ascii:*
+    - *gps_ascii*
     
-    - *context_association_lists:*
+    - *context_association_lists*
     
-    - *field_attributes_enable:*
+    - *field_attributes_enable*
     
     --
     
@@ -282,7 +282,7 @@ class Packet:
         
 ####Methods for parsing packets####
 def parse(bs: bytes, current_context_packet_dict: CurrentContextPacket) -> Tuple[bool, Packet, int]:
-    """ > function parses one packet
+    """  function parses one packet
 
     :param bytes bs: bytestream from one packet
     
@@ -724,7 +724,7 @@ def show_trailer_fields(bs: bytes) -> dict:
     
     trailer fields are structured as follows:
     
-    en          name                          pos.bit
+    en;          name;                          pos.bit
     
     31          calibrated time indicator     19
     
@@ -847,7 +847,7 @@ def show_temperature(bs: bytes) -> float:
 def show_state_event_indicators(bs: bytes) -> dict:
     """    > State/Event Indicators are structured as follows:
     
-    en          name                          pos.bit
+    en;          name;                          pos.bit
     
     31          calibrated time indicator     19
     
@@ -941,7 +941,6 @@ def show_signal_data_packet_payload_format(bs: bytes) -> dict:
     
     see more under vita49.2 spec 9.13.3
     
-    !!More fields to be implemented as well as effect on evaluation of data packets!!
 
     :param bytes bs:  bytestream of signal data packed payload field and exactly 64 bit long
     
@@ -1023,12 +1022,17 @@ def show_signal_data_packet_payload_format(bs: bytes) -> dict:
 
 ####Plot IQ data, depending on context information (also save, do not comment out this function. Only comment out the plot() command if no plotting desired)####
 def plot_data(current_context_packet: CurrentContextPacket, header: Header, data: Data, iqdata: bytes):
-    """_summary_
+    """ Function to interpret the data type and save iq data to packet.body accordingly. If Debug option is enabled, the IQ data, the power density spectrum
+    and the spectogram are plotted.
 
-    :param CurrentContextPacket current_context_packet: _description_
-    :param Header header: _description_
-    :param Data data: _description_
-    :param bytes iqdata: _description_
+    :param CurrentContextPacket current_context_packet: matching context packet (StreamID) for data packet to pull data type information
+    
+    :param Header header: packet header
+    
+    :param Data data: packet data 
+    
+    :param bytes iqdata: IQ data inside data packet
+    
     """
     
     data_type = '>i2'
@@ -1124,16 +1128,12 @@ def all_data_read(header: Header, index: int):
         
         
 def convert_input(input_path: str, output_path: str):
-    """This function converts Vita49 compliant data into SigMF. Change the Path in "vita49_data_input.py" to the location of your binary vita49 file.
-    All three python files "vita49_data_input.py", which is the main file, reading in the bytestream, "vita49.py", which parses the vita compliant packets of the
-    bytestream, and "Converter.py", which converts the read vita49 packets into SigMF, have to be in the same folder(or paths specified when importing).
-    Currently, Vita49 data and context packets are supported. Other packet types are not supported but should be overread.
-    For the Context packets, the CIf0 context field is implemented with most of its 32 context fields. Fields from Cif0 that are of type 
-    11*32bits, 13*32bits or array of records, are not implemented but should be overread.
-    Other Cif fields are not implemented but should be overread.
+    """This function converts Vita49 compliant data into SigMF. Change the Path in "vita49_data_input.py" to the location of your binary vita49 file. 
 
-    :param str input_path: _description_
-    :param str output_path: _description_
+    :param str input_path: input path of VITA49 file, use (\\) as seperator
+    
+    :param str output_path: desired output path of SigMF file, use (\\) as seperator
+    
     """
     filename = input_path
     f = open(filename, "rb")
@@ -1217,6 +1217,17 @@ def convert_input(input_path: str, output_path: str):
     
 
 def calc_power_density_spectrum(Fs: float, n: int, iqarray):
+    """calculates the power density spectrum of an array of iq data.
+
+    :param float Fs: sampling frequency
+    
+    :param int n: length of iq array
+    
+    :param _type_ iqarray: iq data in complex array
+    
+    :return _type_: frequency bins and logarithmic amplitudes
+    
+    """
     window = scipy.signal.windows.hamming(n)
     iq_array = iqarray*window
     if Fs is None:

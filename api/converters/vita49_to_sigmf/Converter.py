@@ -7,8 +7,7 @@ import numpy as np
 import os
 from datetime import timezone, datetime
 import logging
-#uncomment following import if GPS time is used (otherwise the raw value is returned). Also uncomment code for GPS timestamp in this file
-#from astropy.time import Time
+from astropy.time import Time
 
 
 #dataclasses.dataclass
@@ -24,7 +23,9 @@ def match_context_packet(context: object, context_dict: CurrentContextPacket):
     the object is overwritten with the current object with that matching streamID
 
     :param object context: object of type Packet
+    
     :param CurrentContextPacket context_dict: object of type currentcontextpacket (with current_context dictionary inside)
+    
     """
     #writes current context packet correctly in dict
     streamID = context.header.stream_identifier #works but ugly, but otherwise circular imports. context is of type packet, but declared as object because import vita49 not possible
@@ -35,7 +36,9 @@ def get_context_packet(header: object, context_dict: CurrentContextPacket) -> ob
     """_summary_
 
     :param object header: packet header of type Packet.header
+    
     :param CurrentContextPacket context_dict: object of type currentcontextpacket (with current_context dictionary inside)
+    
     :return _type_: object of type packet with current context packet
     """
     #Call this function in data packet to find the matching context packet
@@ -57,11 +60,16 @@ def context_to_meta(data, packet:object, stream_ids:list, current_context_packet
     regarding the integer GPS timestamp!
 
     :param _type_ data: IQ data written into sigmf data file
+    
     :param object packet: object of type packet (will always be data packet as function is only called for data packets. Function does not need to be called
     for Context packets as the context packets are stored in current_context_packet for each data packet)
+    
     :param list stream_ids: list of streamIDs for which a meta file has been created already. Ensures that for each streamID, only one metafile is created
+    
     :param object current_context_packet: current context packet linked to current data packet
+    
     :param int sample_start: start of IQ data (gets incremented each data packet by the length of the IQ data in each data packet)
+    
     :return list: list of streamIDs for which the meta file has been written
     """
     
@@ -124,7 +132,6 @@ def context_to_meta(data, packet:object, stream_ids:list, current_context_packet
                 #Check what type of timestamp (1 is None, 3 is not specified(just the number, no conversion necessary))
                 if current_context_packet.current_context[packet.header.stream_identifier].header.TSF == '10':
                     #UTC
-                    #This section is not tested due to lack of sufficient test data!
                     #int_timestamp = datetime.fromtimestamp(int_timestamp, tz=timezone.utc).strftime('%m/%d/%Y %r %Z')  
                     #UTC time to ISO 8601 for SigMF  
                     int_timestamp = datetime.fromtimestamp(int_timestamp).isoformat() + '.' + str(frac_timestamp)
@@ -136,21 +143,16 @@ def context_to_meta(data, packet:object, stream_ids:list, current_context_packet
                 #convert the GPS timestamp by uncommenting all lines except "pass" in this elif statement
                 #conversion experimental, not yet tested!
                 
-                pass
-                #uncomment as described above if GPS time should be displayed correctly
-                
-                #int_timestamp_GPS = Time(int_timestamp, format ='gps')
-                #int_timestamp = str(Time(int_timestamp_GPS, format='isot', scale='utc'))
+                int_timestamp_GPS = Time(int_timestamp, format ='gps')
+                int_timestamp = str(Time(int_timestamp_GPS, format='isot', scale='utc'))
                 
                 #Again check frac timestamp. If frac timestamp = '11' or '00' there is no relation to the integer timestamp, hence it is not
                 #added on top. The sample count timestamp ('01') is used as a reference point -> also not added to int timestamp
                 #->'10' real time timestamp is added to int timestamp
                 #Check what type of timestamp (1 is None, 3 is not specified(just the number, no conversion necessary))
                 
-                #uncomment as described above if GPS time should be displayed correctly
-                
-                #if current_context_packet.current_context[packet.header.stream_identifier].header.TSF == '10':
-                #    int_timestamp = int_timestamp + str(frac_timestamp)
+                if current_context_packet.current_context[packet.header.stream_identifier].header.TSF == '10':
+                    int_timestamp = int_timestamp + str(frac_timestamp)
                     
         else:
             int_timestamp = 0      
@@ -178,8 +180,11 @@ def data_to_sigmfdata(packet: object, stream_ids:list, output_path:str):
     """Writes IQ data from Data packet to file. 
 
     :param object packet: datapacket
+    
     :param list stream_ids: list of streamIDs for which a meta file has been created already. Ensures that for each streamID, only one metafile is created
+    
     :return _type_: Tuple of iq_length (length of iq data in payload, so that sample start can be calculated for next data packet) and data (iq data itself in cf32)
+    
     """
     body = packet.body
     data_type = np.complex64
@@ -201,13 +206,18 @@ def data_to_sigmfdata(packet: object, stream_ids:list, output_path:str):
     return [data, iq_length]
 
 def convert(packet: object, stream_ids:list, current_context_packet: object, sample_start:int, output_path: str) -> list:
-    """Converts vita49 data packet to sigMF meta and data file
+    """ Converts vita49 data packet to sigMF meta and data file
 
     :param object packet: object of type packet (either data packet or context packet)
+    
     :param list stream_ids: list of streamIDs for which a meta file has been created already. Ensures that for each streamID, only one metafile is created
+    
     :param object current_context_packet: current context packet linked to current data packet
+    
     :param int sample_start: start of IQ data (gets incremented each data packet by the length of the IQ data in each data packet)
+    
     :return list: tuple of streamids(list) and sample start(int)
+    
     """
     if packet.header.packet_type == 0 or packet.header.packet_type == 1:
         #only do something if packet type is data packet. Data packet has according context information already because of match and get context packet functions

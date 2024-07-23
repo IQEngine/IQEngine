@@ -1,0 +1,15 @@
+- ctypes==3.9.1
+- dataclasses==3.10(python)
+- datetime==3.10(python)
+- io==3.10(python)
+- json==3.10(python)
+- logging==3.10(python)
+- matplotlib==3.8.2
+- mkdocs==1.5.3
+- numpy==1.24.2
+- os==3.10(python)
+- pprint==3.10(python)
+- scipy==1.14.1
+- sigmf==1.1.0
+- struct==3.10(python)
+- typing==3.10(python)
