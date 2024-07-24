@@ -54,7 +54,7 @@ export const FrequencyPlot = ({ displayedIQ, fftStepSize }: FreqPlotProps) => {
             {
               x: frequencies,
               y: magnitudes,
-              type: 'scatter',
+              type: 'scattergl',
             },
           ]}
           layout={{

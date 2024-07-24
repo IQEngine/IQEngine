@@ -17,8 +17,8 @@ export const IQPlot = ({ displayedIQ, fftStepSize }: IQPlotProps) => {
 
   useEffect(() => {
     if (displayedIQ && displayedIQ.length > 0) {
-      // For now just show the first 1000 IQ samples, else it's too busy and it crashes the plot
-      const displayedIQ_subset = displayedIQ.slice(0, 2000);
+      // For now just show the first 10k IQ samples, else it's too busy and it crashes the plot
+      const displayedIQ_subset = displayedIQ.slice(0, 20000);
 
       const temp_I = new Float32Array(displayedIQ_subset.length / 2);
       const temp_Q = new Float32Array(displayedIQ_subset.length / 2);
@@ -43,15 +43,18 @@ export const IQPlot = ({ displayedIQ, fftStepSize }: IQPlotProps) => {
 
   return (
     <div className="px-3">
-      <p className="text-primary text-center">Below shows the first 1000 IQ samples displayed on the spectrogram tab</p>
+      <p className="text-primary text-center">Below shows the first 10k IQ samples displayed on the spectrogram tab</p>
       {fftStepSize === 0 ? (
         <Plot
           data={[
             {
               x: I,
               y: Q,
-              type: 'scatter',
+              type: 'scattergl',
               mode: 'markers',
+              marker: {
+                size: 3,
+              },
             },
           ]}
           layout={{

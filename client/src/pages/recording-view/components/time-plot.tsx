@@ -48,12 +48,12 @@ export const TimePlot = ({ displayedIQ, fftStepSize }: TimePlotProps) => {
           data={[
             {
               y: I,
-              type: 'scatter',
+              type: 'scattergl', // scattergl renders on an html5 canvas, whereas regular scatter creates svg objects that get inserted in the current document, consuming muuuuuch more memory
               name: 'I',
             },
             {
               y: Q,
-              type: 'scatter',
+              type: 'scattergl',
               name: 'Q',
             },
           ]}
@@ -72,7 +72,7 @@ export const TimePlot = ({ displayedIQ, fftStepSize }: TimePlotProps) => {
             template: template,
             xaxis: {
               title: 'Time',
-              rangeslider: { range: [0, 1000] },
+              rangeslider: {},
             },
             yaxis: {
               title: 'Samples',
