@@ -6,7 +6,7 @@ LABEL org.opencontainers.image.licenses=MIT
 WORKDIR /src
 
 # Python stuff
-RUN apt-get install python3-full python3-pip -y
+RUN apt update && apt install python3-full python3-pip -y
 COPY src/requirements.txt .
 RUN pip3 install -r requirements.txt --break-system-packages
 
