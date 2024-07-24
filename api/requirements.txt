@@ -22,7 +22,6 @@ pytest-mock==3.14.0
 cache3==0.4.3
 openai==1.30.5
 python-multipart==0.0.9
-SigMF==1.2.1
 scipy==1.13.1
 SigMF==1.2.2
 starlette==0.37.2
