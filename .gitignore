@@ -56,3 +56,5 @@ tiling/spectrogram.pmtiles
 
 e2e/test.zip
 python-env
+api/converters/vita49_to_sigmf/tests/custom_ofdm_out0x0.sigmf-meta
+api/converters/vita49_to_sigmf/tests/custom_ofdm_out0x0.sigmf-data

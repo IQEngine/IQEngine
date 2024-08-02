@@ -1,8 +1,9 @@
 import React from 'react';
 import { WavConverter } from './wavConverter';
+import { VitaConverter } from './Vita49Converter';
 
 export const Converter = () => {
-  const fileTypes = ['Select file type', '.wav'];
+  const fileTypes = ['Select file type', '.wav', '.vita49'];
   const [selectedFileType, setSelectedFileType] = React.useState('');
 
   return (
@@ -40,6 +41,7 @@ export const Converter = () => {
           </div>
           <div className="row-start-2 col-span-2 flex justify-center ">
             {selectedFileType === '.wav' && <WavConverter />}
+            {selectedFileType === '.vita49' && <VitaConverter />}
           </div>
         </div>
       </div>
