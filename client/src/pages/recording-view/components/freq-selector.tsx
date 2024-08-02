@@ -1,7 +1,3 @@
-// Copyright (c) 2022 Microsoft Corporation
-// Copyright (c) 2023 Marc Lichtman
-// Licensed under the MIT License
-
 import React, { useEffect, useState } from 'react';
 import { Layer, Rect, Text } from 'react-konva';
 import { unitPrefixHz } from '@/utils/rf-functions';
@@ -73,8 +69,6 @@ const FreqSelector = () => {
       });
     }
   };
-
-  const handleMovement = (e) => {};
 
   const handleDragEnd = (e) => {
     setCursorFreq({

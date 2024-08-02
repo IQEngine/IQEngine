@@ -99,7 +99,7 @@ export const SigMF = () => {
       <h1 className="text-primary text-center">What is SigMF?</h1>
       <div className="columns-2">
         <p className="text-justify text-lg">
-          The Signal Metadata Format (SigMF) specifies a way to describe sets of recorded digital signals with metadata
+          SigMF specifies a way to describe sets of recorded digital signals with metadata
           written in JSON. It was designed for RF recordings, which consist of IQ samples. SigMF can be used to describe
           general information about the RF recording, the characteristics of the system that generated the samples, and
           features of the signal itself.

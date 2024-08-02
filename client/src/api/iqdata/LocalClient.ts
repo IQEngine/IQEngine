@@ -32,9 +32,9 @@ export class LocalClient implements IQDataClient {
     }
     const result: Float32Array[] = [];
     for (const index of dataRange) {
-      const bytesPerSample = meta.getBytesPerIQSample();
-      const offsetBytes = index * MINIMAP_FFT_SIZE * bytesPerSample;
-      const countBytes = MINIMAP_FFT_SIZE * bytesPerSample;
+      const bytesPerIQSample = meta.getBytesPerIQSample();
+      const offsetBytes = index * MINIMAP_FFT_SIZE * bytesPerIQSample;
+      const countBytes = MINIMAP_FFT_SIZE * bytesPerIQSample;
       const slice = dataFile.slice(offsetBytes, offsetBytes + countBytes);
       const buffer = await slice.arrayBuffer();
       const iqArray = convertToFloat32(buffer, meta.getDataType());

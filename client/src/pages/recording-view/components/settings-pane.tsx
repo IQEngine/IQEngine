@@ -1,8 +1,4 @@
-// Copyright (c) 2022 Microsoft Corporation
-// Copyright (c) 2023 Marc Lichtman
-// Licensed under the MIT License
-
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
@@ -15,6 +11,7 @@ import { vscodeDark } from '@uiw/codemirror-theme-vscode';
 import CodeMirror from '@uiw/react-codemirror';
 import { langs } from '@uiw/codemirror-extensions-langs';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
+import { unitPrefixHz } from '@/utils/rf-functions';
 
 interface SettingsPaneProps {
   currentFFT: number;
@@ -25,9 +22,12 @@ const SettingsPane = ({ currentFFT }) => {
   const zoomLevels = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
   const windowFunctions = ['hamming', 'rectangle', 'hanning', 'barlett', 'blackman'];
   const context = useSpectrogramContext();
+  const sampleRate = context.meta?.getSampleRate() || 0;
+  const coreFrequency = context.meta?.getCenterFrequency();
   const cursorContext = useCursorContext();
   const [localPythonSnippet, setLocalPythonSnippet] = useState(context.pythonSnippet);
   const [localTaps, setLocalTaps] = useState(JSON.stringify(context.taps));
+  const [localFreqShift, setLocalFreqShift] = useState('');
 
   const onChangeWindowFunction = (event) => {
     const newWindowFunction = event.currentTarget.dataset.value;
@@ -53,6 +53,11 @@ const SettingsPane = ({ currentFFT }) => {
   const onSubmitTaps = () => {
     updateTaps(localTaps);
   };
+
+  // When you drag the freqshift selector line, update the text box
+  useEffect(() => {
+    setLocalFreqShift(String(Math.round(cursorContext.cursorFreqShift * 100000) / 100000));
+  }, [cursorContext.cursorFreqShift]);
 
   const onClickPremadeTaps = (event) => {
     let taps_string = event.currentTarget.dataset.value;
@@ -308,6 +313,50 @@ const SettingsPane = ({ currentFFT }) => {
             }}
           />
         </label>
+      </div>
+
+      <div id="toggleFreqShift">
+        <label className="label pb-0 pt-2">
+          <span className="label-text text-base">Frequency Shift</span>
+
+          <input
+            type="checkbox"
+            className="toggle toggle-primary"
+            checked={context.freqShift}
+            onChange={(e) => {
+              context.setFreqShift(e.target.checked);
+            }}
+          />
+        </label>
+        {context.freqShift && (
+          <>
+            <div className="text-base pl-6">
+              Baseband: {unitPrefixHz(cursorContext.cursorFreqShift * sampleRate).freq}{' '}
+              {unitPrefixHz(cursorContext.cursorFreqShift * sampleRate).unit} <br></br>
+              RF: {unitPrefixHz(cursorContext.cursorFreqShift * sampleRate + coreFrequency).freq}{' '}
+              {unitPrefixHz(cursorContext.cursorFreqShift * sampleRate + coreFrequency).unit} <br></br>
+              <div className="flex">
+                Normalized:{' '}
+                <input
+                  type="text"
+                  className="h-5 w-20 rounded-l text-base-100 ml-1 pl-2"
+                  value={localFreqShift}
+                  onChange={(e) => {
+                    setLocalFreqShift(e.target.value);
+                  }}
+                />
+                <button
+                  className="rounded-none rounded-r h-5"
+                  onClick={() => {
+                    cursorContext.setCursorFreqShift(parseFloat(localFreqShift));
+                  }}
+                >
+                  <FontAwesomeIcon icon={faArrowRight as IconProp} />
+                </button>
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       <div className="mb-3" id="formPythonSnippet">

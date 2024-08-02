@@ -203,7 +203,7 @@ async def get_minimap_iq(
     datasource: DataSource = Depends(datasources.get),
     azure_client: AzureBlobClient = Depends(AzureBlobClient),
 ):
-    fft_size = 64
+    fft_size = 64  # needs to match MINIMAP_FFT_SIZE on the client side!
     if access_allowed is None:
         raise HTTPException(status_code=403, detail="No Access")
     if not datasource:
@@ -220,13 +220,13 @@ async def get_minimap_iq(
             return Response(content=blob, media_type="application/octet-stream")
         else:
             file_name = get_file_name(filepath, ApiType.IQDATA)
-            bytes_per_sample = get_bytes_per_iq_sample(format)
+            bytes_per_iq_sample = get_bytes_per_iq_sample(format)
             blob_size = await azure_client.get_file_length(file_name)
-            total_ffts = math.floor(blob_size / (bytes_per_sample * fft_size))
+            total_ffts = math.floor(blob_size / (bytes_per_iq_sample * fft_size))
             # get N ffts equally spaced out
             N = 200
             block_indexes = [math.floor(i * total_ffts / N) for i in range(N)]
-            # make sure that no block index it is larger than the total number of ffts
+            # make sure that no block index is larger than the total number of ffts
             block_indexes = [i for i in block_indexes if i < total_ffts]
             data = calculate_iq_data(
                 block_indexes,

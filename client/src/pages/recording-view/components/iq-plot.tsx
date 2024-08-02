@@ -2,6 +2,7 @@ import Plot from 'react-plotly.js';
 import React, { useEffect, useState } from 'react';
 import { template } from '@/utils/plotlyTemplate';
 import { useSpectrogramContext } from '../hooks/use-spectrogram-context';
+import { useCursorContext } from '../hooks/use-cursor-context';
 
 interface IQPlotProps {
   displayedIQ: Float32Array;
@@ -9,40 +10,51 @@ interface IQPlotProps {
 }
 
 export const IQPlot = ({ displayedIQ, fftStepSize }: IQPlotProps) => {
-  const { spectrogramWidth, spectrogramHeight } = useSpectrogramContext();
+  const { spectrogramWidth, spectrogramHeight, freqShift } = useSpectrogramContext();
+  const { cursorFreqShift } = useCursorContext(); // cursorFreqShift is in normalized freq (-0.5 to +0.5) regardless of if display RF is on
   const [I, setI] = useState<Float32Array>();
   const [Q, setQ] = useState<Float32Array>();
 
   useEffect(() => {
     if (displayedIQ && displayedIQ.length > 0) {
-      // For now just show the first 1000 IQ samples, else it's too busy
-      const tempCurrentSamples = displayedIQ.slice(0, 2000);
+      // For now just show the first 10k IQ samples, else it's too busy and it crashes the plot
+      const displayedIQ_subset = displayedIQ.slice(0, 20000);
 
-      setI(
-        tempCurrentSamples.filter((element, index) => {
-          return index % 2 === 0;
-        })
-      );
-
-      setQ(
-        tempCurrentSamples.filter((element, index) => {
-          return index % 2 === 1;
-        })
-      );
+      const temp_I = new Float32Array(displayedIQ_subset.length / 2);
+      const temp_Q = new Float32Array(displayedIQ_subset.length / 2);
+      for (let i = 0; i < displayedIQ_subset.length / 2; i++) {
+        if (freqShift) {
+          // Multiplying two complex numbers: (a + ib)(c + id) = (ac - bd) + i(ad + bc).
+          temp_I[i] =
+            displayedIQ_subset[i * 2] * Math.cos(-2 * Math.PI * cursorFreqShift * i) -
+            displayedIQ_subset[i * 2 + 1] * Math.sin(-2 * Math.PI * cursorFreqShift * i);
+          temp_Q[i] =
+            displayedIQ_subset[i * 2] * Math.sin(-2 * Math.PI * cursorFreqShift * i) +
+            displayedIQ_subset[i * 2 + 1] * Math.cos(-2 * Math.PI * cursorFreqShift * i);
+        } else {
+          temp_I[i] = displayedIQ_subset[i * 2];
+          temp_Q[i] = displayedIQ_subset[i * 2 + 1];
+        }
+      }
+      setI(temp_I);
+      setQ(temp_Q);
     }
-  }, [displayedIQ]); // TODO make sure this isnt going to be sluggish when currentSamples is huge
+  }, [displayedIQ, freqShift]);
 
   return (
     <div className="px-3">
-      <p className="text-primary text-center">Below shows the first 1000 IQ samples displayed on the spectrogram tab</p>
+      <p className="text-primary text-center">Below shows the first 10k IQ samples displayed on the spectrogram tab</p>
       {fftStepSize === 0 ? (
         <Plot
           data={[
             {
               x: I,
               y: Q,
-              type: 'scatter',
+              type: 'scattergl',
               mode: 'markers',
+              marker: {
+                size: 3,
+              },
             },
           ]}
           layout={{
@@ -63,6 +75,7 @@ export const IQPlot = ({ displayedIQ, fftStepSize }: IQPlotProps) => {
             yaxis: {
               title: 'Q',
             },
+            uirevision: 'true', // keeps zoom/pan the same when data changes
           }}
           config={{
             displayModeBar: true,
