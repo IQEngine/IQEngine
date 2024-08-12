@@ -45,6 +45,8 @@ class CurrentContextPacket:
     """
 
     current_context = {}
+    sample_start = {}
+    #sample_start = 0
 
 
 #### dataclasses Packet structure####
@@ -631,7 +633,7 @@ def parse_data(header: Header, bs: bytes, index: int, current_context_packet_dic
     trailer_dict = show_trailer_fields(trailer)
 
     # Plot data
-    if current_context_packet:
+    if current_context_packet is not None:
         plot_data(current_context_packet, header, data, iqdata)
 
     data.trailer = trailer_dict
@@ -1192,7 +1194,7 @@ def convert_input(input_path: str, output_path: str):
 
     curr_index = 0
     num_of_packets_read = 0
-    sample_start = 0  # IQ data length is added each iteration so that sample_start for SigMF is defined
+    #sample_start = 0  # IQ data length is added each iteration so that sample_start for SigMF is defined
 
     # list of "used" stream IDs. For stream IDs appended to this list, a meta file has already been created and only a capture has to be added
     stream_ids = []
@@ -1229,7 +1231,7 @@ def convert_input(input_path: str, output_path: str):
         print("PACKET BODY")
         print("----------")
         pprint(packet.body)
-        if (packet.header.packet_type == 1) and hasattr(packet.body, "iq_data"):
+        if (packet.header.packet_type == 1) and hasattr(packet.body, "iq_data") and packet.body.iq_data is not None:
             # pprint(packet.body.iq_data)
             for element in packet.body.iq_data:
                 iq_array.append(element)
@@ -1238,7 +1240,7 @@ def convert_input(input_path: str, output_path: str):
         num_of_packets_read += 1
 
         ### Convert packet to SigMF###
-        [stream_ids, sample_start] = convert(packet, stream_ids, current_context_packet, sample_start, output_path)
+        stream_ids = convert(packet, stream_ids, current_context_packet, output_path)
 
         if packet.header.stream_identifier not in stream_ids and (packet.header.packet_type == 0 or packet.header.packet_type == 1):
             stream_ids.append(packet.header.stream_identifier)
@@ -1342,7 +1344,7 @@ def get_context_packet(header: object, context_dict: CurrentContextPacket) -> ob
     return current_packet
 
 
-def context_to_meta(data, packet: object, stream_ids: list, current_context_packet: object, sample_start: int, output_path: str) -> list:
+def context_to_meta(data, packet: object, stream_ids: list, current_context_packet: object, sample_start, output_path: str) -> list:
     """Function to create a sigMF metafile if it does not exist for a streamID yet. Necessary context information of vita49 data packed is written
     into captures. If metafile exists already, function adds only a capture with the given parameters(center freq, sample start, timestamp(add more later))
 
@@ -1367,7 +1369,11 @@ def context_to_meta(data, packet: object, stream_ids: list, current_context_pack
     # Append per packet one capture to according meta (according to streamID)
 
     # get current sample rate
-    sample_rate = current_context_packet.current_context[packet.header.stream_identifier].body.sample_rate
+    if current_context_packet.current_context:
+        sample_rate = current_context_packet.current_context[packet.header.stream_identifier].body.sample_rate
+    else:
+        sample_rate = 0
+        logging.warning("No sample rate given!")
 
     if packet.header.stream_identifier not in stream_ids:
         meta = {
@@ -1452,7 +1458,9 @@ def context_to_meta(data, packet: object, stream_ids: list, current_context_pack
         int_timestamp = 0
 
     # meta.add_capture(sample_start, metadata={
-    meta["captures"].append({"core:sample_start": sample_start, SigMFFile.FREQUENCY_KEY: center_freq, SigMFFile.DATETIME_KEY: int_timestamp})
+    if packet.header.stream_identifier not in current_context_packet.sample_start:
+        current_context_packet.sample_start[packet.header.stream_identifier] = 0
+    meta["captures"].append({"core:sample_start": current_context_packet.sample_start[packet.header.stream_identifier], SigMFFile.FREQUENCY_KEY: center_freq, SigMFFile.DATETIME_KEY: int_timestamp})
 
     with open("%s%s.sigmf-meta" % (output_path, packet.header.stream_identifier), "w+") as metafile:
         metafile.write(json.dumps(meta, indent=4))
@@ -1473,7 +1481,7 @@ def data_to_sigmfdata(packet: object, stream_ids: list, output_path: str):
     body = packet.body
     data_type = np.complex64
 
-    if not hasattr(body, "iq_data"):
+    if not hasattr(body, "iq_data") or body.iq_data is None:
         return (np.zeros(0, dtype=data_type), 0)
 
     data_real = body.iq_data.real
@@ -1493,7 +1501,7 @@ def data_to_sigmfdata(packet: object, stream_ids: list, output_path: str):
     return [data, iq_length]
 
 
-def convert(packet: object, stream_ids: list, current_context_packet: object, sample_start: int, output_path: str) -> list:
+def convert(packet: object, stream_ids: list, current_context_packet: object, output_path: str) -> list:
     """Converts vita49 data packet to sigMF meta and data file
 
     :param object packet: object of type packet (either data packet or context packet)
@@ -1507,13 +1515,16 @@ def convert(packet: object, stream_ids: list, current_context_packet: object, sa
     :return list: tuple of streamids(list) and sample start(int)
 
     """
-    if packet.header.packet_type == 0 or packet.header.packet_type == 1:
+    if (packet.header.packet_type == 0 or packet.header.packet_type == 1) and packet.header.stream_identifier in current_context_packet.current_context:
         # only do something if packet type is data packet. Data packet has according context information already because of match and get context packet functions
         [data, iq_length] = data_to_sigmfdata(packet, stream_ids, output_path)
-        stream_ids = context_to_meta(data, packet, stream_ids, current_context_packet, sample_start, output_path)
-        sample_start = sample_start + iq_length
+        stream_ids = context_to_meta(data, packet, stream_ids, current_context_packet, current_context_packet.sample_start[packet.header.stream_identifier], output_path)
+        current_context_packet.sample_start[packet.header.stream_identifier] = current_context_packet.sample_start[packet.header.stream_identifier]+iq_length
     elif packet.header.packet_type == 4:
         data = 0
-        stream_ids = context_to_meta(data, packet, stream_ids, current_context_packet, sample_start, output_path)
+        stream_ids = context_to_meta(data, packet, stream_ids, current_context_packet, current_context_packet.sample_start, output_path)
+        
+    else:
+        logging.warning("Missing context packet, data packet thrown away!")
 
-    return [stream_ids, sample_start]
+    return stream_ids
