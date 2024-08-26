@@ -26,7 +26,7 @@ const TimeSelector = ({ currentFFT }: TimeSelectorProps) => {
   // update diff
   useEffect(() => {
     if (!cursorTimeEnabled || !meta) return;
-    const diffSeconds = cursorTime.end - cursorTime.start / meta.getSampleRate();
+    const diffSeconds = (cursorTime.end - cursorTime.start) / meta.getSampleRate();
     const formatted = unitPrefixSamples(cursorTime.end - cursorTime.start);
     setDiffSamples('Δ ' + formatted.samples + formatted.unit + ' samples');
     const formattedSeconds = unitPrefixSeconds(diffSeconds);
