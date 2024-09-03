@@ -13,14 +13,14 @@
   "devDependencies": {
     "@azure/identity": "4.4.1",
     "@azure/storage-blob": "12.24.0",
-    "@playwright/test": "1.45.3",
+    "@playwright/test": "1.46.1",
     "@types/adm-zip": "0.5.5",
     "dotenv": "16.4.5",
     "dotenv-expand": "11.0.6",
     "mongodb": "6.8.0"
   },
   "dependencies": {
-    "adm-zip": "0.5.14",
-    "playwright": "1.45.3"
+    "adm-zip": "0.5.16",
+    "playwright": "1.46.1"
   }
 }
