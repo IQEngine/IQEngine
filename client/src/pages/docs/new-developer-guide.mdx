@@ -92,3 +92,8 @@ Azure Container App Config Notes:
 
 * Within the GitHub repository settings under Secrets and vars > Actions, there needs to be a Repository secret with AZUREAPPSERVICE_PUBLISHPROFILE...
 * Connection settings live in GitHub Secrets > Actions (not Azure App Service anymore), enter it in without the outer double quotes and don't escape any quotes.
+
+E2E Tests with Playwright:
+
+* As part of the CI/CD pipeline, E2E tests are run on every PR, and failed tests have a video recording saved, simply go to the github action summary and look for a download of e2e-test-videos.zip.
+* To run the E2E tests locally, you need to have the backend and the frontend running, e.g. `make run-api` and `make dev` in separate tabs, then run `test-pw` in a third tab.

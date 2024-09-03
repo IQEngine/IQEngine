@@ -21,6 +21,9 @@ export default defineConfig({
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
+
+    // Record video of failing tests, see https://playwright.dev/docs/videos
+    video: 'retain-on-failure',
   },
 
   /* Start the API Server */

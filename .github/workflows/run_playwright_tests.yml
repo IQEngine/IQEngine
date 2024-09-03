@@ -55,12 +55,18 @@ jobs:
         working-directory: e2e
         run: npx playwright install --with-deps
 
-      - name: Run Playwright tests
+      - name: Run Playwright tests (if failed, go to GitHub Action summary and download e2e-test-videos to see video)
         working-directory: e2e
         run: |
           npx playwright test --config playwright-pr.config.ts --grep @CICompatible
         env:
           IQENGINE_METADATA_DB_CONNECTION_STRING: mongodb://mongoadmin:secret@localhost:27017/admin
+    
+      - name: Upload videos of failed tests as an artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-test-videos
+          path: e2e/test-results/
 
       - name: Docker down
         run: docker compose -f docker-compose-e2e.yml down
