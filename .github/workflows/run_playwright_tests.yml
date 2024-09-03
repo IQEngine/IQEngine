@@ -61,6 +61,12 @@ jobs:
           npx playwright test --config playwright-pr.config.ts --grep @CICompatible
         env:
           IQENGINE_METADATA_DB_CONNECTION_STRING: mongodb://mongoadmin:secret@localhost:27017/admin
+    
+      - name: Upload videos of failed tests as an artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-test-videos
+          path: e2e/test-results/
 
       - name: Docker down
         run: docker compose -f docker-compose-e2e.yml down
