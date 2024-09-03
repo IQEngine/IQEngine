@@ -55,7 +55,7 @@ jobs:
         working-directory: e2e
         run: npx playwright install --with-deps
 
-      - name: Run Playwright tests
+      - name: Run Playwright tests (if failed, go to GitHub Action summary and download e2e-test-videos to see video)
         working-directory: e2e
         run: |
           npx playwright test --config playwright-pr.config.ts --grep @CICompatible
