@@ -12,6 +12,7 @@ import { useMeta } from '@/api/metadata/queries';
 import { IQPlot } from './components/iq-plot';
 import { FrequencyPlot } from './components/frequency-plot';
 import { TimePlot } from './components/time-plot';
+import { DemodPlot } from './components/demod-plot';
 import { Sidebar } from './components/sidebar';
 import GlobalProperties from './components/global-properties';
 import MetaViewer from './components/meta-viewer';
@@ -108,6 +109,7 @@ export function DisplaySpectrogram({ currentFFT, setCurrentFFT, currentTab }) {
       {currentTab === Tab.Time && <TimePlot displayedIQ={displayedIQ} fftStepSize={fftStepSize} />}
       {currentTab === Tab.Frequency && <FrequencyPlot displayedIQ={displayedIQ} fftStepSize={fftStepSize} />}
       {currentTab === Tab.IQ && <IQPlot displayedIQ={displayedIQ} fftStepSize={fftStepSize} />}
+      {currentTab === Tab.Demod && <DemodPlot displayedIQ={displayedIQ} fftStepSize={fftStepSize} />}
     </>
   );
 }
@@ -127,6 +129,7 @@ enum Tab {
   Time,
   Frequency,
   IQ,
+  Demod,
 }
 
 export function RecordingViewPage() {
