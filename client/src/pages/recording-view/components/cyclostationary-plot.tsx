@@ -51,7 +51,12 @@ export const CyclostationaryPlot = ({ displayedIQ, fftStepSize }: Cyclostationar
         temp_alpha_labels.push({ text: alphas[i].toFixed(2), x: 0, y: i * graphicsScalingFactor });
       }
     }
-    temp_alpha_labels.push({ text: 'alpha', x: 0, y: alphas.length * graphicsScalingFactor });
+    temp_alpha_labels.push({ text: 'alpha [normalized Hz]', x: 0, y: alphas.length * graphicsScalingFactor });
+    temp_alpha_labels.push({
+      text: '(i.e., samples-per-symbol inverted)',
+      x: 0,
+      y: alphas.length * graphicsScalingFactor + 20,
+    });
     setAlphaTicks(temp_alpha_ticks);
     setAlphaLabels(temp_alpha_labels);
   };
@@ -141,6 +146,12 @@ export const CyclostationaryPlot = ({ displayedIQ, fftStepSize }: Cyclostationar
       <p className="text-primary text-center">
         This will process the first 100k IQ samples displayed on the spectrogram tab
       </p>
+      <p className="text-primary text-center">
+        For an intro to cyclostationary signals see{' '}
+        <a className="underline" target="_blank" href="https://pysdr.org/content/cyclostationary.html">
+          PySDR
+        </a>
+      </p>
       {fftStepSize === 0 ? (
         <div>
           <br></br>
@@ -189,7 +200,7 @@ export const CyclostationaryPlot = ({ displayedIQ, fftStepSize }: Cyclostationar
           <br></br>
 
           <div className="flex flex-row" id="spectrogram">
-            <Stage width={numFreqs * graphicsScalingFactor + 50} height={numAlphas * graphicsScalingFactor + 20}>
+            <Stage width={numFreqs * graphicsScalingFactor + 50} height={numAlphas * graphicsScalingFactor + 40}>
               <Layer imageSmoothingEnabled={false}>
                 <Image
                   image={image}
