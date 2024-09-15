@@ -10,6 +10,7 @@ import { SpectrogramContextProvider, useSpectrogramContext } from './hooks/use-s
 import { CursorContextProvider } from './hooks/use-cursor-context';
 import { useMeta } from '@/api/metadata/queries';
 import { IQPlot } from './components/iq-plot';
+import { CyclostationaryPlot } from './components/cyclostationary-plot';
 import { FrequencyPlot } from './components/frequency-plot';
 import { TimePlot } from './components/time-plot';
 import { Sidebar } from './components/sidebar';
@@ -108,6 +109,9 @@ export function DisplaySpectrogram({ currentFFT, setCurrentFFT, currentTab }) {
       {currentTab === Tab.Time && <TimePlot displayedIQ={displayedIQ} fftStepSize={fftStepSize} />}
       {currentTab === Tab.Frequency && <FrequencyPlot displayedIQ={displayedIQ} fftStepSize={fftStepSize} />}
       {currentTab === Tab.IQ && <IQPlot displayedIQ={displayedIQ} fftStepSize={fftStepSize} />}
+      {currentTab === Tab.Cyclostationary && (
+        <CyclostationaryPlot displayedIQ={displayedIQ} fftStepSize={fftStepSize} />
+      )}
     </>
   );
 }
@@ -127,6 +131,7 @@ enum Tab {
   Time,
   Frequency,
   IQ,
+  Cyclostationary,
 }
 
 export function RecordingViewPage() {
