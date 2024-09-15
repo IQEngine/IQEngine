@@ -1,12 +1,5 @@
-// import fft
 import { FFT } from './fft.js';
 import { fftshift } from 'fftshift';
-
-/*
-function fftshift(src) {
-  return rotate(src, Math.floor(src.length / 2));
-}
-*/
 
 function arrayRotate(arr, count) {
   const len = arr.length;
