@@ -1,5 +1,5 @@
 azure-storage-blob==12.22.0
-numpy==2.1.0
+numpy==1.26.4
 scipy==1.14.1
 fastapi==0.112.2
 jsonschema==4.23.0
