@@ -16,10 +16,17 @@ export const TimePlot = ({ displayedIQ, fftStepSize }: TimePlotProps) => {
   const [Q, setQ] = useState<Float32Array>();
 
   useEffect(() => {
+    console.log(displayedIQ.length);
     if (displayedIQ && displayedIQ.length > 0) {
       const temp_I = new Float32Array(displayedIQ.length / 2);
       const temp_Q = new Float32Array(displayedIQ.length / 2);
       for (let i = 0; i < displayedIQ.length / 2; i++) {
+        // Hack to get around the fact that really short recordings will lead to -inftys
+        if (!isFinite(displayedIQ[i * 2])) {
+          temp_I[i] = 0;
+          temp_Q[i] = 0;
+          continue;
+        }
         if (freqShift) {
           // Multiplying two complex numbers: (a + ib)(c + id) = (ac - bd) + i(ad + bc).
           temp_I[i] =

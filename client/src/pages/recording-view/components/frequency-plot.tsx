@@ -4,6 +4,7 @@ import { fftshift } from 'fftshift';
 import { template } from '@/utils/plotlyTemplate';
 import { FFT } from '@/utils/fft';
 import { useSpectrogramContext } from '../hooks/use-spectrogram-context';
+import toast from 'react-hot-toast';
 
 interface FreqPlotProps {
   displayedIQ: Float32Array;
@@ -19,6 +20,12 @@ export const FrequencyPlot = ({ displayedIQ, fftStepSize }: FreqPlotProps) => {
 
   useEffect(() => {
     if (displayedIQ && displayedIQ.length > 0) {
+      // Hack to get around the fact that really short recordings will lead to -inftys
+      if (!isFinite(displayedIQ[displayedIQ.length - 1])) {
+        toast('Recording is too short');
+        return;
+      }
+
       // Calc PSD
       const fftSize = Math.pow(2, Math.floor(Math.log2(displayedIQ.length / 2))); // closest power of 2, rounded down
       const f = new FFT(fftSize);
