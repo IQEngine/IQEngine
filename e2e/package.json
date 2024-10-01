@@ -12,15 +12,15 @@
   "license": "ISC",
   "devDependencies": {
     "@azure/identity": "4.4.1",
-    "@azure/storage-blob": "12.24.0",
-    "@playwright/test": "1.46.1",
+    "@azure/storage-blob": "12.25.0",
+    "@playwright/test": "1.47.2",
     "@types/adm-zip": "0.5.5",
     "dotenv": "16.4.5",
     "dotenv-expand": "11.0.6",
-    "mongodb": "6.8.0"
+    "mongodb": "6.9.0"
   },
   "dependencies": {
     "adm-zip": "0.5.16",
-    "playwright": "1.46.1"
+    "playwright": "1.47.2"
   }
 }
