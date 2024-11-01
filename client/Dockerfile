@@ -1,4 +1,4 @@
-FROM node:22-alpine@sha256:ed9736a13b88ba55cbc08c75c9edac8ae7f72840482e40324670b299336680c1
+FROM node:23-alpine@sha256:1467ea23cce893347696b155b9e00e7f0ac7d21555eb6f27236f1328212e045e
 LABEL org.opencontainers.image.source="https://github.com/IQEngine/IQEngine"
 WORKDIR /app
 COPY package*.json ./
