@@ -21,7 +21,7 @@ python-dotenv==1.0.1
 pytest-mock==3.14.0
 cache3==0.4.3
 openai==1.43.0
-python-multipart==0.0.9
+python-multipart==0.0.18
 SigMF==1.2.2
 scipy==1.14.1
 starlette==0.37.2
