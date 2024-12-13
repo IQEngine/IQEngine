@@ -15,5 +15,5 @@ Motor==3.5.1
 opencv-python==4.10.0.84
 python-dotenv==1.0.1
 pydantic==2.7.1
-python-multipart==0.0.9
+python-multipart==0.0.18
 email-validator==2.2.0
