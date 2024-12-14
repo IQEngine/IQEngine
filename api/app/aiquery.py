@@ -1,12 +1,7 @@
 import json
-import openai
+from openai import AzureOpenAI
 import os
 from datetime import datetime
-openai.api_type = os.environ.get("OPENAI_TYPE", "azure")
-openai.api_base = os.environ.get("OPENAI_ENDPOINT")
-openai.api_version = os.environ.get("OPENAI_VERSION", "2023-07-01-preview")
-openai.api_key = os.environ.get("OPENAI_KEY")
-engine = os.environ.get("OPENAI_ENGINE")
 
 rf_function = [
     {
@@ -38,17 +33,8 @@ rf_function = [
 
 ]
 
-def is_open_ai_available():
-    return \
-        openai.api_type != None and openai.api_type != "" and \
-        openai.api_key != None and openai.api_key != "" and \
-        openai.api_base != None and openai.api_base != "" and \
-        openai.api_version != None and openai.api_version != ""
-
 
 def get_query_result(query: str):
-    if not is_open_ai_available():
-        return {}
     messages = [
         {
             "role": "system",
@@ -65,23 +51,41 @@ def get_query_result(query: str):
         }
     ]
     try:
-        response = openai.ChatCompletion.create(
-            engine=engine,
-            messages=messages,
-            functions=rf_function,
-            temperature=0.2,
-            max_tokens=800,
-            top_p=0.95,
-            frequency_penalty=0,
-            presence_penalty=0,
-            stop=None
+        client = AzureOpenAI(
+            api_key=os.getenv("OPENAI_KEY"),
+            api_version=os.environ.get("OPENAI_VERSION", "2024-10-01-preview"),
+            azure_endpoint=os.getenv("OPENAI_ENDPOINT")
         )
-        response_message = response["choices"][0]["message"]
-        if not response_message.get("function_call"):
+        response = client.chat.completions.create(model=os.environ.get("OPENAI_ENGINE"),
+                                                  messages=messages,
+                                                  functions=rf_function,
+                                                  temperature=0.2,
+                                                  max_tokens=800,
+                                                  top_p=0.95,
+                                                  frequency_penalty=0,
+                                                  presence_penalty=0,
+                                                  stop=None)
+
+        response_message = response.choices[0].message
+        if not response_message.function_call:
+            print("OpenAI response_message function_call was empty")
             return {}
-        function_args = json.loads(response_message["function_call"]["arguments"])
+        function_args = json.loads(response_message.function_call.arguments)
         return function_args
 
     except Exception as e:
         print(e)
-        raise ("Open AI is not available", e)
+        raise ("Error during OpenAI call:", e)
+
+
+if __name__ == "__main__":
+    query = "recordings that contain lte taken on new years of 2021 in central park"
+    print(get_query_result(query))
+    '''
+    on 12/14/24 it returned
+    {'min_datetime': '2021-01-01T00:00:00',
+     'max_datetime': '2021-01-01T23:59:59',
+     'text': 'lte',
+     'captures_geo_json': '{"type":"Polygon","coordinates":[[[-73.9819,40.7681],[-73.9580,40.8003],[-73.9498,40.7968],[-73.9737,40.7646],[-73.9819,40.7681]]]}',
+     'captures_radius': 500}
+    '''
