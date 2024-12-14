@@ -1,19 +1,50 @@
-# Debian's bookworm has GNU Radio 3.10.5 already built
 FROM docker.io/debian:bookworm-slim
 LABEL org.opencontainers.image.description="Plugins for IQEngine to provide additional post processing capabilities"
 LABEL org.opencontainers.image.licenses=MIT
+
+RUN apt update
+
+# GNU Radio apt deps
+RUN apt install ffmpeg libsm6 libxext6 python3-pip \
+git cmake g++ libboost-all-dev libgmp-dev libfftw3-dev \
+libsdl1.2-dev libgsl-dev libcairo2-dev libgirepository1.0-dev \
+liblog4cpp5-dev libzmq3-dev gir1.2-gtk-3.0 libcodec2-dev \
+libgsm1-dev pybind11-dev libsndfile1-dev libspdlog-dev -y
+
+# GNU Radio Python deps
+RUN pip install --break-system-packages numpy==2.1.0 scipy==1.14.1 matplotlib==3.9.2 \
+mako sphinx lxml pyqt5 jsonschema qtpy pygccxml pyqtgraph \
+pyyaml click click-plugins zmq pycairo PyGObject setuptools packaging
+
+# Volk
 WORKDIR /src
-# Leave gnuradio as its own line, and have it be first, because it takes forever to build
-RUN apt-get update && apt-get install gnuradio -y
-RUN apt-get update && apt-get install ffmpeg libsm6 libxext6 -y
-# Note that GNU Radio has a bunch of python3-xyz deps
+RUN git clone --recursive --depth 1 https://github.com/gnuradio/volk.git
+WORKDIR /src/volk
+RUN mkdir build
+WORKDIR /src/volk/build
+RUN cmake ..
+RUN make -j$(nproc)
+RUN make install
+RUN ldconfig
+
+# GNU Radio
+WORKDIR /src
+RUN git clone --depth 1 --branch v3.10.11.0 https://github.com/gnuradio/gnuradio.git
+WORKDIR /src/gnuradio
+RUN mkdir build
+WORKDIR /src/gnuradio/build
+RUN cmake -DCMAKE_BUILD_TYPE=Release -DPYTHON_EXECUTABLE=/usr/bin/python3 ..
+RUN make -j$(nproc)
+RUN make install
+RUN ldconfig
 
 # Satdump
 RUN apt install git cmake libpng-dev libluajit-5.1-dev libnng-dev libzstd-dev libomp-dev -y
+WORKDIR /src
 RUN git clone --depth 1 --branch 1.0.3 https://github.com/altillimity/satdump.git
 WORKDIR /src/satdump
 RUN mkdir build
 WORKDIR /src/satdump/build
 RUN cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_GUI=OFF -DCMAKE_INSTALL_PREFIX=/usr ..
-RUN make -j`nproc`
+RUN make -j$(nproc)
 RUN make install

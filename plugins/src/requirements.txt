@@ -1,13 +1,11 @@
+# Check the base image dockerfile for the rest of the pip installs
 azure-storage-blob==12.22.0
-numpy==2.1.0
-scipy==1.14.1
 fastapi==0.112.2
 jsonschema==4.23.0
 PyYAML==6.0.2
 pre-commit==3.8.0
 uvicorn==0.30.6
 azure-functions==1.20.0
-matplotlib==3.9.2
 urllib3==2.2.2
 json5==0.9.25
 pymongo==4.8.0
