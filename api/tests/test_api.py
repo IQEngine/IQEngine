@@ -30,7 +30,6 @@ async def test_api_get_config(client):
             "appId": "app_id",
             "appAuthority": "app_authority",
             "uploadPageBlobSasUrl": "https://test.com",
-            "hasAIQuery": False,
         }
 
 
