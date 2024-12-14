@@ -22,6 +22,10 @@ run-docker:
 	@echo "Building and Running IQEngine Docker container..."
 	@docker-compose -f docker-compose-dev.yml up
 
+run-docker-rebuild:
+	@echo "Building and Running IQEngine Docker container..."
+	@docker-compose -f docker-compose-dev.yml up --build --force-recreate --no-deps
+
 build-infra:
 	@echo "Building infrastructure..."
 	@bicep build $(shell git rev-parse --show-toplevel)/infra/main.bicep --outfile $(shell git rev-parse --show-toplevel)/infra/iqengine.json
