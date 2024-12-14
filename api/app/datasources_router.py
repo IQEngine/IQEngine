@@ -408,8 +408,6 @@ async def open_query_meta(
     query: str,
     current_user: Optional[dict] = Depends(get_current_user),
 ):
-    if not aiquery.is_open_ai_available():
-        return {"parameters": "", "results": []}
     if not query:
         return {"parameters": "", "results": []}
     jsonParameters = aiquery.get_query_result(query)
