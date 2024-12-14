@@ -39,9 +39,6 @@ async def get_config():
     configuration.app_authority = os.getenv(
         "IQENGINE_APP_AUTHORITY", configuration.app_authority
     )
-
-    configuration.has_ai_query = aiquery.is_open_ai_available()
-
     return configuration
 
 
