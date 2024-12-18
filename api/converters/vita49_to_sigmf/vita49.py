@@ -7,7 +7,7 @@ import struct
 from datetime import datetime
 from io import BytesIO
 from pprint import pprint
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple, Union, ClassVar, Optional
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -23,22 +23,109 @@ import vita49
 vita49.convert_input('yourfile.vita49', 'yourfile_out') # dont include the .sigmf extension in 2nd arg, it will get added
 """
 
+global debug
+
+debug = False
+
 # Length of context fields:
 CONTEXT_FIELD_ENABLE = 1
 CONTEXT_FIELD_RESERVED = 1
 CONTEXT_FIELD_32 = 32
 CONTEXT_FIELD_64 = 64
-CONTEXT_FIELD_COMPLICATED = 11 * 32
-CONTEXT_FIELD_ECEF = 13 * 32
-# ignore Array of Records structure for now as to complicated
+CONTEXT_FIELD_4_32 = 4 * 32
+CONTEXT_FIELD_11_32 = 11 * 32
+CONTEXT_FIELD_13_32 = 13 * 32
 CONTEXT_FIELD_AOR = None
 
-global debug
+##Define custom data types for context fields##
+class Array11x32:
+    """
+    Class to define the 11*32 bit datatype
+    """
+    size: ClassVar[int] = 11
+    element_type = ctypes.c_uint32
+    
+    def __init__(self, data=None):
+        if data is None:
+            self.data = [self.element_type(0) for _ in range(self.size)]
+        elif len(data) != self.size:
+            raise ValueError(f"Array must have {self.size} elements")
+        else:
+            if all(isinstance(item, self.element_type) for item in data):
+                self.data = data
+            else:
+                raise TypeError(f"All Elements must be of type {self.element_type}")
+    def is_correct_type(self):
+        return len(self.data) == self.size and all(isinstance(item, self.element_type) for item in self.data)
+      
+class Array13x32:
+    """
+    Class to define the 13*32 bit datatype
+    """
+    size: ClassVar[int] = 13
+    element_type = ctypes.c_uint32
+    
+    def __init__(self, data=None):
+        if data is None:
+            self.data = [self.element_type(0) for _ in range(self.size)]
+        elif len(data) != self.size:
+            raise ValueError(f"Array must have {self.size} elements")
+        else:
+            if all(isinstance(item, self.element_type) for item in data):
+                self.data = data
+            else:
+                raise TypeError(f"All Elements must be of type {self.element_type}")
+    def is_correct_type(self):
+        return len(self.data) == self.size and all(isinstance(item, self.element_type) for item in self.data)   
 
-debug = False
+class Array4x32:
+    """
+    Class to define the 4*32 bit datatype
+    """
+    size: ClassVar[int] = 4
+    element_type = ctypes.c_uint32
+    
+    def __init__(self, data=None):
+        if data is None:
+            self.data = [self.element_type(0) for _ in range(self.size)]
+        elif len(data) != self.size:
+            raise ValueError(f"Array must have {self.size} elements")
+        else:
+            if all(isinstance(item, self.element_type) for item in data):
+                self.data = data
+            else:
+                raise TypeError(f"All Elements must be of type {self.element_type}")
+    def is_correct_type(self):
+        return len(self.data) == self.size and all(isinstance(item, self.element_type) for item in self.data)   
+
+class GPS_ASCII:
+    """
+    Class to define GPS ASCII datatype (special datatype with 2nd word containing the number of words)
+    -> Size not defined in this class, instead class is used to query the datatypes later
+    """
+    def __init__(self, size:int, element_type):
+        self.size = size
+        self.element_type = element_type
+        self.data = [self.element_type(0) for _ in range(self.size)]
+        
+    def is_correct_type(self):
+        return len(self.data) == self.size and all(isinstance(item, self.element_type) for item in self.data) 
+
+class ContextAssociationLists:
+    """
+    Class to define the Context Association Lists datatype (special datatype with 2nd word containing the number of words)
+    -> Size not defined in this class, instead class is used to query the datatypes later
+    """
+    def __init__(self, size:int, element_type):
+        self.size = size
+        self.element_type = element_type
+        self.data = [self.element_type(0) for _ in range(self.size)]
+        
+    def is_correct_type(self):
+        return len(self.data) == self.size and all(isinstance(item, self.element_type) for item in self.data) 
 
 
-# dataclasses.dataclass
+@dataclasses.dataclass
 class CurrentContextPacket:
     """Stores current context packet for each data packet. Context packet object is stored in current_context dict with streamID as key and current context packet
     object as value
@@ -141,7 +228,7 @@ class Header:
 
 
 @dataclasses.dataclass
-class Context:
+class Context_Cif0:
     """> class for only context data (starting after frac timestamp). Currently only Cif0 is supported!
 
     # **Attributes**:
@@ -191,27 +278,15 @@ class Context:
 
     - *over_range_count:*
 
-    --
-
     - *sample_rate:*
-
-    rate of how the original signal is sampled
 
     - *timestamp_adjustment:*
 
-    adjusts timestmap in header (header timestmap normally first sample in packet) to account for analog and digital system delays
-
     - *timestamp_calibration_time:*
-
-    date and time at which the timestamp in the data and context packets was known to be correct
 
     - *temperature:*
 
-    Temperature in °C
-
     - *device_identifier:*
-
-
 
     - *state_event_indicators*
 
@@ -268,14 +343,14 @@ class Context:
     device_identifier: ctypes.c_uint64 = None
     state_event_indicators: ctypes.c_uint32 = None
     signal_data_packet_payload_format: ctypes.c_uint64 = None
-    formatted_gps: None = None
-    formatted_ins: None = None
-    ecef_ephemeris: None = None
-    relative_ephemeris: None = None
+    formatted_gps: Array11x32 = dataclasses.field(default_factory=Array11x32) #11*32
+    formatted_ins:  Array11x32 = dataclasses.field(default_factory=Array11x32)#11*32
+    ecef_ephemeris:  Array13x32 = dataclasses.field(default_factory=Array13x32) #13*32
+    relative_ephemeris:  Array11x32 = dataclasses.field(default_factory=Array11x32) #11*32
     ephemeris_ref_id: ctypes.c_uint32 = None
-    gps_ascii: None = None
-    context_association_lists: None = None
-    field_attributes_enable: ctypes.c_uint32 = None
+    gps_ascii:  GPS_ASCII = None # Not AoR still variable. Needs to be parsed separately
+    context_association_lists: ContextAssociationLists = None # Not AoR still variable. Needs to be parsed separately
+    field_attributes_enable: str = "0"
     context_field_reserved: str = "0"  # occurs 3 times (index 4,5,6(from specification, reverse as python index))
     context_field_enable: str = "0"  # occurs 3 times (index 1,2,3(from specification, reverse as python index))
     context_field_reserved2: str = "0"  # occurs once (index 0(from specification, reverse as python index))
@@ -285,7 +360,153 @@ class Context:
     class_types = []
 
     included_fields = []
+    
+@dataclasses.dataclass
+class Context_CIF1():
+    """Class containing all CIF1 fields and field sizes.
+    """
+    
+    cif1_indicator_field = []
 
+    phase_offset: ctypes.c_uint32 = None
+    polarization: ctypes.c_uint32 = None
+    #poynting_vector_3D: tuple[ctypes.c_uint32, ctypes.c_uint32]  = None
+    poynting_vector_3D: ctypes.c_uint32 = None
+    poynting_vector_3D_structure: None = None   #AoR
+    spatial_scan_type: ctypes.c_uint32 = None
+    spatial_reference_type: ctypes.c_uint32 = None
+    beam_width: ctypes.c_uint32 = None
+    range_distance: ctypes.c_uint32 = None
+    reserved_23: str = "0"
+    reserved_22: str = "0"
+    reserved_21: str = "0"
+    eb_no_ber: ctypes.c_uint32 = None
+    threshold: ctypes.c_uint32 = None
+    compression_point: ctypes.c_uint32 = None
+    seconds_third_intercept_points: ctypes.c_uint32 = None
+    snr_noise_figure: ctypes.c_uint32 = None
+    aux_frequency: ctypes.c_uint64 = None
+    aux_gain: ctypes.c_uint32 = None
+    aux_bandwidth: ctypes.c_uint64 = None
+    reserved_13: str = "0"
+    array_of_cifs: None = None   #AoR
+    spectrum:  Array13x32 = dataclasses.field(default_factory=Array13x32)   # 13*32 bits
+    sector_scan_step: None = None # AoR
+    reserved_8: str = "0"
+    index_list: None = None #AoR
+    discrete_io_32: ctypes.c_uint32 = None
+    discrete_io_64: ctypes.c_uint64 = None
+    health_status: ctypes.c_uint32 = None
+    v49_spec_compliance: ctypes.c_uint32 = None
+    version_build_code: ctypes.c_uint32 = None
+    buffer_size: ctypes.c_uint64 = None
+    reserved_0: str = "0"
+    
+    context_field_reserved: str = "0" #for all three reserved fields
+
+    class_atr = []
+
+    class_types = []
+
+    included_fields = []
+
+@dataclasses.dataclass
+class Context_CIF2():
+    """Class containing all CIF2 fields and field sizes.
+    """
+    cif2_indicator_field = []
+
+    bind: ctypes.c_uint32 = None
+    cited_SID: ctypes.c_uint32 = None
+    sibling_SID: ctypes.c_uint32 = None
+    parent_SID: ctypes.c_uint32 = None
+    child_SID: ctypes.c_uint32 = None
+    cited_message_ID: ctypes.c_uint32 = None
+    controllee_ID: ctypes.c_uint32 = None
+    controllee_UUID: Array4x32 = dataclasses.field(default_factory=Array4x32) #4*32
+    controller_ID: ctypes.c_uint32 = None
+    controller_UUID: Array4x32 = dataclasses.field(default_factory=Array4x32) #4*32
+    information_source: ctypes.c_uint32 = None
+    track_ID: ctypes.c_uint32 = None
+    country_code: ctypes.c_uint32 = None
+    operator: ctypes.c_uint32 = None
+    platform_class: ctypes.c_uint32 = None
+    platform_instance: ctypes.c_uint32 = None
+    platform_display: ctypes.c_uint32 = None
+    ems_device_class: ctypes.c_uint32 = None
+    ems_device_type: ctypes.c_uint32 = None
+    ems_device_instance: ctypes.c_uint32 = None
+    modulation_class: ctypes.c_uint32 = None
+    modulation_type: ctypes.c_uint32 = None
+    function_ID: ctypes.c_uint32 = None
+    mode_ID: ctypes.c_uint32 = None
+    event_ID: ctypes.c_uint32 = None
+    function_priority_ID: ctypes.c_uint32 = None
+    communication_priority_ID: ctypes.c_uint32 = None
+    rf_footprint: ctypes.c_uint32 = None
+    rf_footprint_range: ctypes.c_uint32 = None
+    reserved_2: str = "0"
+    reserved_1: str = "0"
+    reserved_0: str = "0"
+
+    class_atr = []
+
+    class_types = []
+
+    included_fields = []   
+
+@dataclasses.dataclass
+class Context_CIF3():
+    """Class containing all CIF3 fields and field sizes.
+    """
+    
+    cif3_indicator_field = []
+
+    timestamp_details: ctypes.c_uint64 = None
+    timestamp_skew: ctypes.c_uint64 = None
+    reserved_29: str = "0"
+    reserved_28: str = "0"
+    rise_time: ctypes.c_uint64 = None
+    fall_time: ctypes.c_uint64 = None
+    offset_time: ctypes.c_uint64 = None
+    pulse_width: ctypes.c_uint64 = None
+    period: ctypes.c_uint64 = None
+    duration: ctypes.c_uint64 = None
+    dwell: ctypes.c_uint64 = None
+    jitter: ctypes.c_uint64 = None
+    reserved_19: ctypes.c_uint64 = None
+    reserved_18: ctypes.c_uint64 = None
+    #"None" as datatype in CIF3 is NOT AoR but instead either 32/64/96 bits, depending on TSI and TSF flags. None is used as AoR's dont occur
+    # in CIF3 and hence no collision
+    age: None = None
+    shelf_life: None = None
+    reserved_15: str = "0"
+    reserved_14: str = "0"
+    reserved_13: str = "0"
+    reserved_12: str = "0"
+    reserved_11: str = "0"
+    reserved_10: str = "0"
+    reserved_9: str = "0"
+    reserved_8: str = "0"
+    air_temperature: ctypes.c_uint32 = None
+    sea_ground_temperature: ctypes.c_uint32 = None
+    humidity: ctypes.c_uint32 = None
+    barometric_pressure: ctypes.c_uint32 = None
+    sea_and_swell_state: ctypes.c_uint32 = None
+    tropospheric_state_ID: ctypes.c_uint32 = None
+    network_ID: ctypes.c_uint32 = None
+    reserved_0: str = "0"
+
+    class_atr = []
+
+    class_types = []
+
+    included_fields = []  
+@dataclasses.dataclass
+class Context_CIF7():
+    """Class containing all CIF7 fields and field sizes. Currently not implemented!
+    """
+    pass
 
 @dataclasses.dataclass
 class Data:
@@ -301,7 +522,6 @@ class Data:
     iq_data = None
     trailer: Optional[dict] = None
 
-
 @dataclasses.dataclass
 class Packet:
     """> Class for whole packet (one packet)
@@ -314,7 +534,7 @@ class Packet:
     """
 
     header: Header = dataclasses.field(default_factory=lambda: Header())
-    body: Union[Context, Data] = None  # either context or data
+    body: Union[Context_Cif0, Data] = None  # either context or data
 
 
 #### Methods for parsing packets####
@@ -467,8 +687,8 @@ def parse_header(bs: bytes) -> Tuple[bool, Header, int]:
         return (success, header, index)
 
 
-def parse_context(bs: bytes) -> Tuple[bool, Context, int]:
-    """> parses context payload (from excluding fract timestamp to end of packet). Only CIF0 field is read!
+def parse_context(bs: bytes) -> Tuple[bool, Context_Cif0, int]:
+    """> parses context payload (from excluding fract timestamp to end of packet). Only Cif0 is interpreted, CIF1, CIF2 and CIF3 are parsed over. CIF7 is not implemented
 
     :param bytes bs: bytestream from [index:] to end
 
@@ -476,119 +696,382 @@ def parse_context(bs: bytes) -> Tuple[bool, Context, int]:
 
     index: currently parsed index in bytestream (index: start of next bytestream)
     """
-    context = Context()
+    context_CIF0 = Context_Cif0()
     success = False
+    
+    CIF1: ctypes.c_uint32 = None
+    CIF1_flag = 0
+    CIF2: ctypes.c_uint32 = None
+    CIF2_flag = 0
+    CIF3: ctypes.c_uint32 = None
+    CIF3_flag = 0
+    CIF7: ctypes.c_uint32 = None
+    CIF7_flag = 0
 
     index = 0
     # parse cif0 indicator field
 
-    context.included_fields = []
+    context_CIF0.included_fields = []
     [success, cif0_indicator_field, length] = parse_bits32(bs[index:], True)
     index += length
     j = 0
     for i in cif0_indicator_field:
         if i == "1":
             # appends indices of included fields to list
-            context.included_fields.append(j)
+            context_CIF0.included_fields.append(j)
         j += 1
 
     # write class attributes in list with correct index(index in class_attributes corresponding to according cif0_indicator_field)
-    for f in dataclasses.fields(context):
+    for f in dataclasses.fields(context_CIF0):
         # context.class_atr.append(f.name)
         if f.name == "context_field_reserved":
+            #3bit long reserved field, reserved at index 0, for example, does not need to be checked and can just be appended
             for i in range(2):
                 # 3bits in a row are reserved
-                context.class_atr.append(f.name)
-                context.class_types.append(f.type)
+                context_CIF0.class_atr.append(f.name)
+                context_CIF0.class_types.append(f.type)
         if f.name == "context_field_enable":
             for i in range(2):
                 # 3bits in a row are enables
-                context.class_atr.append(f.name)
-                context.class_types.append(f.type)
-        context.class_atr.append(f.name)
-        context.class_types.append(f.type)
-
+                context_CIF0.class_atr.append(f.name)
+                context_CIF0.class_types.append(f.type)
+        context_CIF0.class_atr.append(f.name)
+        context_CIF0.class_types.append(f.type)
     # check if cif0 indicator field is valid (is exactly 32 bit long)
     if len(cif0_indicator_field) == 32:
         # adjust index with +4,+8 or +12 bytes, depending on what cif enable fields are active(they are positioned after cif0 indicator field and have to be skipped)
         # It is sufficient to only read past the other cif enable fields as the cif context fields come after cif0 context fields and can just be disregarded
-        en_count = 0
-        for en in context.included_fields:
+        for en in context_CIF0.included_fields:
             # test here, not in loop below because index has to be adjusted before the first context field is parsed!
-            if en == 30 or en == 29 or en == 28:
+            if en == 30 or en == 29 or en == 28 or en == 24:
                 logging.warning("CIF1, CIF2, CIF3 or CIF7 fields included. Parser may fail as only CIF0 is currently implemented!")
                 print("CIF1, CIF2, CIF3 or CIF7 fields included. Parser may fail as only CIF0 is currently implemented!")
-                en_count += 1
-        index += en_count * 4
+                if en == 30:
+                    CIF1_flag = 1
+                if en == 29:
+                    CIF2_flag = 1
+                if en == 28:
+                    CIF3_flag = 1
+                if en == 24:
+                    CIF7_flag = 1
+
+        #Parse through context indicator fields. it is necessary to do this here and not in the statements above as the
+        #order of occurance of the fields is inverse to the counting index!
+        #E.g. If CIF0,1,2 enabled they are ordered CIF0->CIF1->CIF2 but because CIF2 enable has en == 29 and
+        #CIF1 enable has en==30 the order would be CIF2->CIF1, which is wrong
+        if CIF1_flag == 1:
+            [success, CIF1, length] = parse_bits32(bs[index:], True)
+            context_CIF1 = Context_CIF1()
+            index += length
+        if CIF2_flag == 1:
+            [success, CIF2, length] = parse_bits32(bs[index:], True)
+            context_CIF2 = Context_CIF2()
+            index += length
+        if CIF3_flag == 1:
+            [success, CIF3, length] = parse_bits32(bs[index:], True)
+            context_CIF3 = Context_CIF3()
+            index += length
+        if CIF7_flag == 1:
+            length = 4
+            # field is not parsed currently and may result in error!
+            index += length
+        
         # parse through 32 bit cif0 indicator fields
-        for i in context.included_fields:
+        for i in context_CIF0.included_fields:
             print(i)
             if i == 31 or i == 27 or i == 26 or i == 25:
                 logging.warning("reserved bit was 1. Invalid Packet structure")
-                print("reserved bit was 1. Invalid Packet structure")
-                # check datatype
-            elif i == 30 or i == 29 or i == 28:
+            elif i == 30 or i == 29 or i == 28 or i == 24:
                 logging.warning("Cif enables were 1. Only Cif0 implemented currently!")
-                print("Cif enables were 1. Only Cif0 implemented currently!")
             elif i == 0:
-                context.context_field_change_indicator = True
+                context_CIF0.context_field_change_indicator = True
             else:
-                if context.class_types[i] == ctypes.c_uint32:
+                if context_CIF0.class_types[i] == ctypes.c_uint32:
                     [success, value, length] = parse_bits32(bs[index:], True)
                     # check if "special" field(not just decimal but with indicator flags and enables, etc.)
-                    if context.class_atr[i] == "state_event_indicators":
+                    if context_CIF0.class_atr[i] == "state_event_indicators":
                         value = show_state_event_indicators(value)
-                    elif context.class_atr[i] == "temperature":
+                    elif context_CIF0.class_atr[i] == "temperature":
                         value = show_temperature(value)
+                    elif context_CIF0.class_atr[i] == "timestamp_calibration_time":
+                        value = int(value, 2)
                     else:
                         # convert value into human readable decimal
                         value = int(value, 2)
-                        # print(value)
+                        if value & (1<<31):
+                            #negative
+                            value -= (1<<32)
                         value /= 2.0**7
-                    setattr(context, context.class_atr[i], value)
+                    setattr(context_CIF0, context_CIF0.class_atr[i], value)
                     index += length
-                elif context.class_types[i] == ctypes.c_uint64:
+                elif context_CIF0.class_types[i] == ctypes.c_uint64:
                     [success, value, length] = parse_bits64(bs[index:], True)
                     # check if "special" field(not just decimal but with indicator flags and enables, etc.)
-                    if context.class_atr[i] == "device_identifier":
+                    if context_CIF0.class_atr[i] == "device_identifier":
                         value = show_device_identifier(value)
-                    elif context.class_atr[i] == "signal_data_packet_payload_format":
+                    elif context_CIF0.class_atr[i] == "signal_data_packet_payload_format":
                         value = show_signal_data_packet_payload_format(value)
+                    elif context_CIF0.class_atr[i] == "timestamp_adjustment":
+                        value = int(value, 2)
                     else:
                         # convert value into human readable decimal
-                        value = int(value, 2)
                         # readable decimal (64 bit signed with radix point after 20th bit from MSB)
+                        value = int(value, 2)
+                        if value & (1<<63):
+                            #negative
+                            value -= (1<<64)
                         value /= 2.0**20
-                    setattr(context, context.class_atr[i], value)
+                    setattr(context_CIF0, context_CIF0.class_atr[i], value)
                     index += length
-                elif context.class_types[i] is None:
-                    if i == 20 or i == 18 or i == 17:
-                        # 11*32 bit field, not parsed currently just "overread"
-                        setattr(context, context.class_atr[i], None)
-                        index += int(CONTEXT_FIELD_COMPLICATED / 8)
-                    elif i == 19:
-                        # 13*32 bit field, not parsed currently just "overread"
-                        setattr(context, context.class_atr[i], None)
-                        index += int(CONTEXT_FIELD_ECEF / 8)
-                    elif i == 22 or i == 23:
-                        # array of records field, not parsed currently just "overread". -> parse only packet size to then skip this size in field
-                        # Adjust size, only information that needs to be parsed from AOR
-                        # SizeofArray if first word (32bit) from structure. SizeofArray describes size of
-                        # AOR including header(and SizeofArray field itself)
-                        SizeofArray_bytes = bs[index: (index + 4)]
-                        SizeofArray = int.from_bytes(SizeofArray_bytes, "big")
-                        print("Array of Records data structure not implemented! Field skipped in packet")
-                        index += SizeofArray * 4
-                        setattr(context, context.class_atr[i], None)
+                #elif context.class_types[i] is None:
+                elif context_CIF0.class_types[i] == Array11x32:
+                    #if i == 20 or i == 18 or i == 17:
+                    # 11*32 bit field, not parsed currently just "overread"
+                    setattr(context_CIF0, context_CIF0.class_atr[i], None)
+                    index += int(CONTEXT_FIELD_11_32 / 8)
+                elif context_CIF0.class_types[i] == Array13x32:
+                    # 13*32 bit field, not parsed currently just "overread"
+                    setattr(context_CIF0, context_CIF0.class_atr[i], None)
+                    index += int(CONTEXT_FIELD_13_32 / 8)
+                elif context_CIF0.class_types[i] == GPS_ASCII:
+                    #Length is in the second word of the field
+                    Sizeoffield_bytes = bs[index+4: (index + 8)]
+                    Sizeoffield = int.from_bytes(Sizeoffield_bytes, "big")
+                    print("Array of Records data structure not implemented! Field skipped in packet")
+                    index += Sizeoffield * 4 + 8#(2*4 = 8, -> fist two words not included in sizeoffield)
+                    setattr(context_CIF0, context_CIF0.class_atr[i], None)
+                elif context_CIF0.class_types[i] == ContextAssociationLists:
+                    first_second_word = bs[index: (index+8)]
+                    #Convert bytearry to 64bit bin array
+                    first_second_word = bin(int.from_bytes(first_second_word, "big")).lstrip('0b').zfill(64)
+                    source_list_size = 4*int(first_second_word[7:16],2)
+                    system_list_size = 4*int(first_second_word[23:32],2)
+                    vector_component_list_size = 4*int(first_second_word[32:48],2)
+                    a_indicator = first_second_word[48]
+                    asynchronous_channel_list_size = 4*int(first_second_word[49:64],2)
+                    index = index + 8 + source_list_size + system_list_size + vector_component_list_size + asynchronous_channel_list_size
+                    #check if asynchronous channel tag list is included (a_indicator == 1) -> same size as Asynchronous Channel Context association list
+                    if a_indicator == "1":
+                        asynchronous_channel_tag_list = asynchronous_channel_list_size
+                        index += asynchronous_channel_tag_list
+                    setattr(context_CIF0, context_CIF0.class_atr[i], None)
+                elif context_CIF0.class_types[i] is None:
+                    # array of records field, not parsed currently just "overread". -> parse only packet size to then skip this size in field
+                    # Adjust size, only information that needs to be parsed from AOR
+                    # SizeofArray if first word (32bit) from structure. SizeofArray describes size of
+                    # AOR including header(and SizeofArray field itself)
+                    SizeofArray_bytes = bs[index: (index + 4)]
+                    SizeofArray = int.from_bytes(SizeofArray_bytes, "big")
+                    print("Array of Records data structure not implemented! Field skipped in packet")
+                    index += SizeofArray * 4
+                    setattr(context_CIF0, context_CIF0.class_atr[i], None)
                 if not success:
                     return (False, None, 0)
 
     else:
-        return (False, None, 0)
-    # pprint(context)
-    # read past other cif enable fields#
+        return (False, 0, 0)
+    
+    #Parse other Cif fields
+    if CIF1_flag == 1:
+        #parse CIF1
+        [success, value, index] = parse_CIF1(context_CIF1=context_CIF1, CIF1=CIF1, bs=bs, index=index)
+    if CIF2_flag == 1:
+        #parse CIF2
+        [success, value, index] = parse_CIF2(context_CIF2=context_CIF2, CIF2=CIF2, bs=bs, index=index)
+    if CIF3_flag == 1:
+        #parse CIF3
+        [success, value, index] = parse_CIF3(context_CIF3=context_CIF3, CIF3=CIF3, bs=bs, index=index)
+    if CIF7_flag == 1:
+        #parse CIF7 -> not implemented
+        pass
 
-    return (success, context, index)
+    return (success, context_CIF0, index)
+
+
+def parse_CIF1(context_CIF1: Context_CIF1, CIF1: int, bs: bytes, index: int) -> Tuple[bool, None, int]:
+    """parses the CIF1 context fields if included in a VITA49 context packet
+
+    :param Context_CIF1 context_CIF1: Class containing all CIF1 field sizes
+    :param int CIF1: CIF1 -> 32bit indicator field indicating which context fields in CIF1 are included
+    :param bytes bs: input bytestream
+    :param int index: current index in packet
+    :return Tuple[bool, None, int]: success indicator (True/False); index: currently parsed index in bytestream (index: start of next bytestream)
+    """
+    context_CIF1.included_fields = []
+    success = True
+    j = 0
+    for i in CIF1:
+        if i == "1":
+            # appends indices of included fields to list
+            context_CIF1.included_fields.append(j)
+        j += 1
+    # write class attributes in list with correct index(index in class_attributes corresponding to according cif0_indicator_field)
+    for f in dataclasses.fields(context_CIF1):
+        context_CIF1.class_atr.append(f.name)
+        context_CIF1.class_types.append(f.type)
+        
+    if len(CIF1) == 32:
+        for i in context_CIF1.included_fields:
+            if i == 31 or i == 23 or i == 19 or i == 10 or i == 9 or i == 8:
+                logging.warning("reserved bit was 1. Invalid Packet structure")
+            if context_CIF1.class_types[i] == ctypes.c_uint32:
+                [success, value, length] = parse_bits32(bs[index:], True)
+                # convert value into human readable decimal
+                value = int(value, 2)
+                if value & (1<<31):
+                    #negative
+                    value -= (1<<32)
+                value /= 2.0**7
+                setattr(context_CIF1, context_CIF1.class_atr[i], value)
+                index += length
+            elif context_CIF1.class_types[i] == ctypes.c_uint64:
+                [success, value, length] = parse_bits64(bs[index:], True)
+                # convert value into human readable decimal
+                # readable decimal (64 bit signed with radix point after 20th bit from MSB)
+                value = int(value, 2)
+                if value & (1<<63):
+                    #negative
+                    value -= (1<<64)
+                value /= 2.0**20
+                setattr(context_CIF1, context_CIF1.class_atr[i], value)
+                index += length
+            elif context_CIF1.class_types[i] == Array11x32:
+                #if i == 20 or i == 18 or i == 17:
+                # 11*32 bit field, not parsed currently just "overread"
+                setattr(context_CIF1, context_CIF1.class_atr[i], None)
+                index += int(CONTEXT_FIELD_11_32 / 8)
+            elif context_CIF1.class_types[i] == Array13x32:
+                # 13*32 bit field, not parsed currently just "overread"
+                setattr(context_CIF1, context_CIF1.class_atr[i], None)
+                index += int(CONTEXT_FIELD_13_32 / 8)
+            elif context_CIF1.class_types[i] is None:
+                # array of records field, not parsed currently just "overread". -> parse only packet size to then skip this size in field
+                # Adjust size, only information that needs to be parsed from AOR
+                # SizeofArray if first word (32bit) from structure. SizeofArray describes size of
+                # AOR including header(and SizeofArray field itself)
+                SizeofArray_bytes = bs[index: (index + 4)]
+                SizeofArray = int.from_bytes(SizeofArray_bytes, "big")
+                print("Array of Records data structure not implemented! Field skipped in packet")
+                index += SizeofArray * 4
+                setattr(context_CIF1, context_CIF1.class_atr[i], None)
+            if not success:
+                return (False, None, 0)
+    else:
+        return (False, None, 0) 
+    return (True, None, index)
+
+
+def parse_CIF2(context_CIF2: Context_CIF2, CIF2: int, bs: bytes, index: int) -> Tuple[bool, None, int]:
+    """parses the CIF2 context fields if included in a VITA49 context packet
+
+    :param Context_CIF2 context_CIF2: Class containing all CIF2 field sizes
+    :param int CIF2: CIF2 -> 32bit indicator field indicating which context fields in CIF2 are included
+    :param bytes bs: input bytestream
+    :param int index: current index in packet
+    :return Tuple[bool, None, int]: success indicator (True/False); index: currently parsed index in bytestream (index: start of next bytestream)
+    """
+    context_CIF2.included_fields = []
+    success = True
+    j = 0
+    for i in CIF2:
+        if i == "1":
+            # appends indices of included fields to list
+            context_CIF2.included_fields.append(j)
+        j += 1
+    # write class attributes in list with correct index(index in class_attributes corresponding to according cif0_indicator_field)
+    for f in dataclasses.fields(context_CIF2):
+        context_CIF2.class_atr.append(f.name)
+        context_CIF2.class_types.append(f.type)
+        
+    if len(CIF2) == 32:
+        for i in context_CIF2.included_fields:
+            if i == 31 or i == 30 or i == 29:
+                logging.warning("reserved bit was 1. Invalid Packet structure")
+            if context_CIF2.class_types[i] == ctypes.c_uint32:
+                [success, value, length] = parse_bits32(bs[index:], True)
+                # convert value into human readable decimal
+                value = int(value, 2)
+                if value & (1<<31):
+                    #negative
+                    value -= (1<<32)
+                value /= 2.0**7
+                setattr(context_CIF2, context_CIF2.class_atr[i], value)
+                index += length
+            elif context_CIF2.class_types[i] == Array4x32:
+                #if i == 20 or i == 18 or i == 17:
+                # 11*32 bit field, not parsed currently just "overread"
+                setattr(context_CIF2, context_CIF2.class_atr[i], None)
+                index += int(CONTEXT_FIELD_4_32 / 8)
+            if not success:
+                return (False, None, 0)
+    else:
+        return (False, None, 0) 
+    return (True, None, index)
+
+
+def parse_CIF3(context_CIF3: Context_CIF3, CIF3: int, bs: bytes, index: int) -> Tuple[bool, None, int]:
+    """parses the CIF3 context fields if included in a VITA49 context packet
+
+    :param Context_CIF3 context_CIF3: Class containing all CIF3 field sizes
+    :param int CIF3: CIF3 -> 32bit indicator field indicating which context fields in CIF3 are included
+    :param bytes bs: input bytestream
+    :param int index: current index in packet
+    :return Tuple[bool, None, int]: success indicator (True/False); index: currently parsed index in bytestream (index: start of next bytestream)
+    """
+    context_CIF3.included_fields = []
+    success = True
+    j = 0
+    for i in CIF3:
+        if i == "1":
+            # appends indices of included fields to list
+            context_CIF3.included_fields.append(j)
+        j += 1
+    # write class attributes in list with correct index(index in class_attributes corresponding to according cif0_indicator_field)
+    for f in dataclasses.fields(context_CIF3):
+        context_CIF3.class_atr.append(f.name)
+        context_CIF3.class_types.append(f.type)
+        
+    if len(CIF3) == 32:
+        for i in context_CIF3.included_fields:
+            if i == 2 or i == 3 or i == 12 or i == 13 or i == 31:
+                logging.warning("reserved bit was 1. Invalid Packet structure")
+            reserved_fields_16_to_23 = [16, 17, 18, 19, 20, 21, 22, 23]
+            if i in reserved_fields_16_to_23:
+                logging.warning("reserved bit was 1. Invalid Packet structure")
+            if context_CIF3.class_types[i] == ctypes.c_uint32:
+                [success, value, length] = parse_bits32(bs[index:], True)
+                # convert value into human readable decimal
+                value = int(value, 2)
+                if value & (1<<31):
+                    #negative
+                    value -= (1<<32)
+                value /= 2.0**7
+                setattr(context_CIF3, context_CIF3.class_atr[i], value)
+                index += length
+            elif context_CIF3.class_types[i] == ctypes.c_uint64:
+                [success, value, length] = parse_bits64(bs[index:], True)
+                # convert value into human readable decimal
+                # readable decimal (64 bit signed with radix point after 20th bit from MSB)
+                value = int(value, 2)
+                if value & (1<<63):
+                    #negative
+                    value -= (1<<64)
+                value /= 2.0**20
+                setattr(context_CIF3, context_CIF3.class_atr[i], value)
+                index += length
+            elif context_CIF3.class_types[i] is None:
+                #Currently hardcoded to 12 bytes
+                #datatype None is for fields 17(index:14) and 16(index:15) (age and shelf life)
+                #if Packet.header.integer_seconds_timestamp is not None:
+                #    index += 4
+                #if Packet.header.fractional_seconds_timestamp is not None:
+                #    index += 8
+                index += 12
+            if not success:
+                return (False, None, 0)
+    else:
+        return (False, None, 0) 
+    return (True, None, index)
 
 
 def parse_data(header: Header, bs: bytes, index: int, current_context_packet_dict: CurrentContextPacket) -> Tuple[bool, Data, int]:
@@ -934,7 +1417,7 @@ def show_state_event_indicators(bs: bytes) -> dict:
     # write as dictionary,
     # overwrite value written into self.cif0_field_values before
     # at points where enable_values = True: find fitting indicator_values(+12)
-    #   if ture give true, if false give false, all other fields as "Not specified"
+    #   if true give true, if false give false, all other fields as "Not specified"
     val = {
         "raw_value": hex(int(value, 2)),
         "calibrated_time_indicator": indicator_values[0],
@@ -1114,9 +1597,7 @@ def plot_data(current_context_packet: CurrentContextPacket, header: Header, data
     else:
         # 2byte(16bit), big endian
         data_type = ">i2"
-
-    # data_type = np.float32
-    # data_type = np.int16
+    #data_type = np.int16
     # samples =  np.frombuffer(iqdata, dtype=data_type)
     raw_data = np.frombuffer(iqdata, dtype=data_type)
     # samples = samples[::2] + 1j*samples[1::2]
@@ -1172,7 +1653,7 @@ def all_data_read(header: Header, index: int):
 
 
 def convert_input(input_path: str, output_path: str):
-    """This function converts Vita49 compliant data into SigMF. Change the Path in "vita49_data_input.py" to the location of your binary vita49 file.
+    """This function converts Vita49 compliant data into SigMF.
 
     :param str input_path: input path of VITA49 file, use (\\) as seperator
 
@@ -1247,32 +1728,39 @@ def convert_input(input_path: str, output_path: str):
 
         if not data:
             break
+    EoF = f.read(4)  #Check if bits are left in the file
+    if not EoF:
+        print("All data read")
+    else:
+        logging.warning("Not all data read")
+        
+    if packet.header.stream_identifier in current_context_packet.current_context:
+        #debug relies on plots, which make no sense withoug e.g. sapmple rate
+        if debug == True:
+            iq_array = np.array(iq_array)
+            Fs = current_context_packet.current_context[packet.header.stream_identifier].body.sample_rate
+            n = len(iq_array)
 
-    if debug == True:
-        iq_array = np.array(iq_array)
-        Fs = current_context_packet.current_context[packet.header.stream_identifier].body.sample_rate
-        n = len(iq_array)
+            fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
 
-        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
+            [frequencies, psd_db_hz] = calc_power_density_spectrum(Fs=Fs, n=n, iqarray=iq_array)
 
-        [frequencies, psd_db_hz] = calc_power_density_spectrum(Fs=Fs, n=n, iqarray=iq_array)
+            # ax1.figure()
+            ax1.plot(frequencies, psd_db_hz)
+            ax1.set_title("Power Density spectrum")
+            ax1.set_xlabel("Frequency [Hz]")
+            ax1.set_ylabel("Power Density [dB/Hz]")
+            ax1.grid()
 
-        # ax1.figure()
-        ax1.plot(frequencies, psd_db_hz)
-        ax1.set_title("Power Density spectrum")
-        ax1.set_xlabel("Frequency [Hz]")
-        ax1.set_ylabel("Power Density [dB/Hz]")
-        ax1.grid()
+            Pxx, freqs, bins, im = ax2.specgram(iq_array)
+            ax2.set_title("Spectogram")
+            ax2.set_xlabel("Time [s]")
+            ax2.set_ylabel("Frequency [Hz]")
+            fig.colorbar(im, ax=ax2).set_label("Power Density [dB/Hz]")
 
-        Pxx, freqs, bins, im = ax2.specgram(iq_array)
-        ax2.set_title("Spectogram")
-        ax2.set_xlabel("Time [s]")
-        ax2.set_ylabel("Frequency [Hz]")
-        fig.colorbar(im, ax=ax2).set_label("Power Density [dB/Hz]")
+            plt.tight_layout()
 
-        plt.tight_layout()
-
-        plt.show()
+            plt.show()
 
     print("number of packets read: ")
     print(num_of_packets_read)
