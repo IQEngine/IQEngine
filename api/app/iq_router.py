@@ -190,9 +190,13 @@ async def get_metafile(
         raise HTTPException(status_code=404, detail="Datasource not found")
 
     meta_path = get_file_name(filepath, ApiType.METADATA)
+    base_path = azure_client.base_filepath
+    full_path = os.path.normpath(os.path.join(base_path, meta_path))
+    if not full_path.startswith(base_path):
+        raise HTTPException(status_code=400, detail="Invalid file path")
 
     if account == "local":
-        return FileResponse(os.path.join(azure_client.base_filepath, meta_path))
+        return FileResponse(full_path)
 
     azure_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
     if not azure_client.blob_exist(meta_path):
