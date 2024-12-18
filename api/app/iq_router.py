@@ -2,9 +2,10 @@ import asyncio
 import io
 import math
 from typing import List
+import os
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, FileResponse
 from helpers.apidisconnect import CancelOnDisconnectRoute, cancel_on_disconnect
 from helpers.cipher import decrypt
 from helpers.conversions import find_smallest_and_largest_next_to_each_other
@@ -146,6 +147,7 @@ async def get_byte_stream(
 )
 async def get_iqfile(
     filepath: str,
+    account: str,
     datasource: DataSource = Depends(datasources.get),
     azure_client: AzureBlobClient = Depends(AzureBlobClient),
     access_allowed=Depends(check_access),
@@ -155,14 +157,20 @@ async def get_iqfile(
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
 
-    azure_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
-    content_type = get_content_type(ApiType.IQDATA)
     iq_path = get_file_name(filepath, ApiType.IQDATA)
+    base_path = azure_client.base_filepath
+    full_path = os.path.normpath(os.path.join(base_path, iq_path))
+    if not full_path.startswith(base_path):
+        raise HTTPException(status_code=400, detail="Invalid file path")
+
+    if account == "local":
+        return FileResponse(full_path)
+
+    azure_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
     if not azure_client.blob_exist(iq_path):
         raise HTTPException(status_code=404, detail="File not found")
-
     response = await azure_client.get_blob_stream(iq_path)
-    return StreamingResponse(response, media_type=content_type)
+    return StreamingResponse(response, media_type=get_content_type(ApiType.IQDATA))
 
 
 @router.get(
@@ -171,24 +179,31 @@ async def get_iqfile(
 )
 async def get_metafile(
     filepath: str,
+    account: str,
     datasource: DataSource = Depends(datasources.get),
     azure_client: AzureBlobClient = Depends(AzureBlobClient),
     access_allowed=Depends(check_access),
 ):
     if access_allowed is None:
         raise HTTPException(status_code=403, detail="No Access")
-
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
 
-    azure_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
-    content_type = get_content_type(ApiType.METADATA)
     meta_path = get_file_name(filepath, ApiType.METADATA)
+    base_path = azure_client.base_filepath
+    full_path = os.path.normpath(os.path.join(base_path, meta_path))
+    if not full_path.startswith(base_path):
+        raise HTTPException(status_code=400, detail="Invalid file path")
+
+    if account == "local":
+        return FileResponse(full_path)
+
+    azure_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
     if not azure_client.blob_exist(meta_path):
         raise HTTPException(status_code=404, detail="File not found")
 
     response = await azure_client.get_blob_stream(meta_path)
-    return StreamingResponse(response, media_type=content_type)
+    return StreamingResponse(response, media_type=get_content_type(ApiType.METADATA))
 
 
 @router.get(
