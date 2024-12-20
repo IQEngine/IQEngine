@@ -1,7 +1,8 @@
-from converters.vita49_to_sigmf import vita49
-import os
 import json
+import os
+
 import numpy as np
+from converters.vita49_to_sigmf import vita49
 from numpy.testing import assert_allclose
 
 

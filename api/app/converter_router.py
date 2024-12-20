@@ -1,13 +1,14 @@
-from fastapi import APIRouter, Depends, UploadFile, BackgroundTasks, Response
-from helpers.authorization import get_current_user
-from converters.wav_to_sigmf import wav_to_sigmf
-import converters.vita49_to_sigmf.vita49 as vita49
-from typing import Optional
-import os
-import sys
-import shutil
 import io
+import os
+import shutil
+import sys
 import zipfile
+from typing import Optional
+
+import converters.vita49_to_sigmf.vita49 as vita49
+from converters.wav_to_sigmf import wav_to_sigmf
+from fastapi import APIRouter, BackgroundTasks, Depends, Response, UploadFile
+from helpers.authorization import get_current_user
 
 router = APIRouter()
 

@@ -1,8 +1,10 @@
-from .database import db
-from .models import Plugin
+from typing import Optional
+
 from fastapi import APIRouter, Depends, HTTPException
 from helpers.authorization import get_current_user
-from typing import Optional
+
+from .database import db
+from .models import Plugin
 
 router = APIRouter()
 

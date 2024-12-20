@@ -1,5 +1,6 @@
-from typing import Optional
 import os
+from typing import Optional
+
 import msal
 import requests
 from fastapi import APIRouter, Depends, HTTPException

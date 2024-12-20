@@ -331,7 +331,6 @@ def parse(bs: bytes, current_context_packet_dict: CurrentContextPacket) -> Tuple
     """
     packet = Packet()
 
-    current_context_packet = None
     index = 0
     # get header information(up to including fractional timestamp) for either context or data packet
     [success, packet.header, index] = parse_header(bs[index:])
@@ -1126,7 +1125,7 @@ def plot_data(current_context_packet: CurrentContextPacket, header: Header, data
     data.iq_data = samples
     Fs = current_context_packet.body.sample_rate
 
-    if debug == True:
+    if debug is True:
         plt.plot(samples.real, ".-")
         plt.plot(samples.imag, ".-")
         plt.legend(["I", "Q"])
@@ -1248,7 +1247,7 @@ def convert_input(input_path: str, output_path: str):
         if not data:
             break
 
-    if debug == True:
+    if debug is True:
         iq_array = np.array(iq_array)
         Fs = current_context_packet.current_context[packet.header.stream_identifier].body.sample_rate
         n = len(iq_array)

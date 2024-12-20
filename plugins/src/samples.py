@@ -56,7 +56,7 @@ def get_from_backend_server(file_path, offset, length, data_type):
     dtype = data_mapping[data_type]
 
     # count needs to be in number of floats/ints, whereas length is provided in bytes. note offset is in bytes not floats/ints
-    count = (length // np.dtype(dtype).itemsize)
+    count = length // np.dtype(dtype).itemsize
     samples = np.fromfile(os.path.join(base_filepath, file_path + ".sigmf-data"), dtype=dtype, count=count, offset=offset)
     if dtype == np.int16:
         samples = samples.astype(np.float32) / np.iinfo("int16").max

@@ -2,14 +2,14 @@ import json
 import logging
 import os
 import time
-from typing import Any, Optional, Tuple, cast, Union, List, Callable
+from typing import Any, Callable, List, Optional, Tuple, Union, cast
 
 import jwt
 import requests
 from cachetools import TTLCache, cached
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
-from fastapi import Depends, HTTPException, status, Header, Request
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi import Depends, Header, HTTPException, Request, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jwt import algorithms
 
 

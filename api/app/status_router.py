@@ -1,6 +1,7 @@
-from .database import db
 from fastapi import APIRouter
 from pymongo.errors import ServerSelectionTimeoutError
+
+from .database import db
 
 router = APIRouter()
 

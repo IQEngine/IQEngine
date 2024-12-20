@@ -64,8 +64,8 @@ def client():
             ):
                 with mock.patch("helpers.import_env.import_all_from_env") as mock_i:
                     mock_i.return_value = None
-                    from main import app
                     import app.database as db
+                    from main import app
 
                     app.add_event_handler("shutdown", db.reset_db)
                     with TestClient(app) as test_client:

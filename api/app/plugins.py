@@ -1,5 +1,6 @@
 import json
 import os
+
 from .database import db
 from .models import Plugin
 

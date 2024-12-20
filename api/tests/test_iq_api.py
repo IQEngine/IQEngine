@@ -3,8 +3,8 @@ from unittest.mock import AsyncMock
 
 import numpy
 import pytest
-from azure.storage.blob import BlobProperties
 from app.models import DataSource
+from azure.storage.blob import BlobProperties
 from tests.test_data import test_datasource
 
 test_binary = b"the quick brown fox jumps over the lazy dog"
@@ -162,7 +162,7 @@ async def test_get_iq_data_with_ci8(mock_decrypt, mock_get_file_length, client):
     """Get IQ data with ci8. Returns populated float of float array."""
     from app import datasources
 
-    mock_client = AsyncMock()
+    AsyncMock()
     client.app.dependency_overrides[datasources.get] = mock_get_test_datasource
     arr = numpy.array([1, 2, 3, 4, 5, 6, 7, 8], dtype=numpy.int8).tobytes()
     format = "ci8"

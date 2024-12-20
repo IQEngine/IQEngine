@@ -1,11 +1,11 @@
 import json
 import os
 
-from .database import db
-from .config import exists, get
-from .models import Configuration
 from fastapi import APIRouter, HTTPException
-from . import aiquery
+
+from .config import exists, get
+from .database import db
+from .models import Configuration
 
 router = APIRouter()
 

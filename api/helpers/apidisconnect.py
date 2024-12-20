@@ -1,8 +1,9 @@
 import asyncio
-from fastapi import Request, HTTPException
-from fastapi.routing import APIRoute
 from functools import wraps
 from typing import Any, Callable, Coroutine
+
+from fastapi import HTTPException, Request
+from fastapi.routing import APIRoute
 
 
 class CancelOnDisconnectRoute(APIRoute):

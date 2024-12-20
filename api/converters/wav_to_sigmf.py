@@ -1,6 +1,6 @@
-from sigmf import SigMFFile
-from scipy.io import wavfile
 import numpy as np
+from scipy.io import wavfile
+from sigmf import SigMFFile
 
 
 def wav_to_sigmf(wav_file_path: str) -> list[str]:

@@ -1,7 +1,8 @@
-import os
 import json
-import pytest
+import os
 from unittest.mock import Mock, patch
+
+import pytest
 from fastapi import HTTPException
 from helpers.authorization import get_current_user, required_roles
 

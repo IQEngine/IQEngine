@@ -1,6 +1,6 @@
+from app.database import db
 from fastapi import Depends
 from helpers.authorization import get_current_user
-from app.database import db
 
 
 async def check_access(account: str, container: str, user=Depends(get_current_user)) -> str | None:

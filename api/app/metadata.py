@@ -1,12 +1,13 @@
 import json
-from typing import List, Dict, Any, Optional
 from datetime import datetime
+from typing import Any, Dict, List, Optional
 
 from fastapi import Depends
 from helpers.datasource_access import check_access
+from motor.core import AgnosticCollection
 
 from .models import DataSourceReference
-from motor.core import AgnosticCollection
+
 
 # This defines how IQEngine deals with missing/optional fields
 def validate_metadata(metadata: dict):

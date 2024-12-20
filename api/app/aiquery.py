@@ -1,7 +1,8 @@
 import json
-from openai import AzureOpenAI
 import os
 from datetime import datetime
+
+from openai import AzureOpenAI
 
 rf_function = [
     {

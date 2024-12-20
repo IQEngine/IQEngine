@@ -1,7 +1,8 @@
-from .database import db
-from .models import Configuration
 import json
 import os
+
+from .database import db
+from .models import Configuration
 
 
 async def get() -> Configuration | None:
