@@ -21,7 +21,7 @@ data_mapping = {
 
 
 async def get_from_samples_cloud(samples_cloud: SamplesCloud) -> np.ndarray:
-    if samples_cloud.account_name == 'local':
+    if samples_cloud.account_name == "local":
         return get_from_backend_server(samples_cloud.file_path, samples_cloud.byte_offset, samples_cloud.byte_length, samples_cloud.data_type)
     blob_url = f"https://{samples_cloud.account_name}.blob.core.windows.net/{samples_cloud.container_name}/{samples_cloud.file_path}.sigmf-data"
     if not samples_cloud.sas_token:
@@ -44,20 +44,22 @@ async def get_from_samples_cloud(samples_cloud: SamplesCloud) -> np.ndarray:
         buffer = buffer.astype(np.float32) / np.iinfo("int16").max
     elif buffer.dtype == np.int8:
         buffer = buffer.astype(np.float32) / np.iinfo("int8").max
-    
+
     return buffer.view(dtype=np.complex64)
+
 
 def get_from_backend_server(file_path, offset, length, data_type):
     base_filepath = os.getenv("IQENGINE_BACKEND_LOCAL_FILEPATH", None)
     if not base_filepath:
         raise Exception("IQENGINE_BACKEND_LOCAL_FILEPATH not set")
-    base_filepath = base_filepath.replace('"','')
+    base_filepath = base_filepath.replace('"', "")
     dtype = data_mapping[data_type]
-    count = length // np.dtype(dtype).itemsize # needs to be in number of floats/ints, whereas length is provided in bytes. note offset is in bytes not floats/ints
-    samples = np.fromfile(os.path.join(base_filepath, file_path + '.sigmf-data'), dtype=dtype, count=count, offset=offset)
+
+    # count needs to be in number of floats/ints, whereas length is provided in bytes. note offset is in bytes not floats/ints
+    count = length // np.dtype(dtype).itemsize
+    samples = np.fromfile(os.path.join(base_filepath, file_path + ".sigmf-data"), dtype=dtype, count=count, offset=offset)
     if dtype == np.int16:
         samples = samples.astype(np.float32) / np.iinfo("int16").max
     elif dtype == np.int8:
         samples = samples.astype(np.float32) / np.iinfo("int8").max
     return samples.view(dtype=np.complex64)
-

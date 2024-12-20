@@ -1,12 +1,14 @@
-import time
 import os
 import random
-from app.datasources import import_datasources_from_env
-from app.plugins import import_plugins_from_env
+import time
+
 from app.config import import_default_config_from_env
 from app.database import db
+from app.datasources import import_datasources_from_env
+from app.plugins import import_plugins_from_env
 
 # For whatever reason we cant define the 3 above in this file or else the mocks fail
+
 
 async def import_all_from_env():
     # Sleep a random amount of time so that the multiple workers dont all initialize stuff at the exact same time

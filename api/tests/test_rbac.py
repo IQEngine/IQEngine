@@ -1,7 +1,8 @@
-import os
 import json
-import pytest
+import os
 from unittest.mock import Mock, patch
+
+import pytest
 from fastapi import HTTPException
 from helpers.authorization import get_current_user, required_roles
 
@@ -47,9 +48,7 @@ TEST_PUBLIC_KEY = json_data["TEST_PUBLIC_KEY"]
 VALID_TEST_TOKEN = json_data["VALID_TEST_TOKEN"]
 
 
-@patch(
-    "helpers.authorization.jwks_handler.get_jwks"
-)
+@patch("helpers.authorization.jwks_handler.get_jwks")
 def test_get_current_user(mock_get_jwks):
     # Tests `get_current_user` which is used to get the current user from the JWT token
     mock_get_jwks.return_value = ({"keys": [TEST_PUBLIC_KEY]}, "test/v2.0")
@@ -58,4 +57,3 @@ def test_get_current_user(mock_get_jwks):
     credentials = Mock(credentials=VALID_TEST_TOKEN)
     current_user = get_current_user(token=credentials)
     assert current_user["preferred_username"] == "JohnDoe@test.com"
-    

@@ -13,6 +13,7 @@ async def env_setup():
     os.environ["IN_MEMORY_DB"] = "1"
     yield
     import app.database as db
+
     db._db = None
 
 
@@ -31,6 +32,7 @@ def required_roles_mock(role: Optional[Union[str, List[str]]] = None):
 def check_access_mock(account: str, container: str, user=None):
     async def wrapper(account: str, container: str, user=None):
         return "owner"
+
     return wrapper
 
 
@@ -40,6 +42,7 @@ def get_current_user_mock():
             "roles": ["IQEngine-Admin", "IQEngine-User"],
             "preferred_username": "emailaddress",
         }
+
     return wrapper
 
 
@@ -52,8 +55,8 @@ def client():
         new=check_access_mock("account", "container", None),
     ):
         with mock.patch(
-                "helpers.authorization.get_current_user",
-                new=get_current_user_mock(),
+            "helpers.authorization.get_current_user",
+            new=get_current_user_mock(),
         ):
             with mock.patch(
                 "app.datasources_router.get_current_user",
@@ -61,8 +64,8 @@ def client():
             ):
                 with mock.patch("helpers.import_env.import_all_from_env") as mock_i:
                     mock_i.return_value = None
-                    from main import app
                     import app.database as db
+                    from main import app
 
                     app.add_event_handler("shutdown", db.reset_db)
                     with TestClient(app) as test_client:

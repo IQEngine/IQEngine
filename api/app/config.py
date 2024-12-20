@@ -1,7 +1,9 @@
-from .database import db
-from .models import Configuration
 import json
 import os
+
+from .database import db
+from .models import Configuration
+
 
 async def get() -> Configuration | None:
     configuration_collection = db().configuration
@@ -11,8 +13,10 @@ async def get() -> Configuration | None:
         return None
     return Configuration(**current)
 
+
 async def exists() -> bool:
     return (await get()) is not None
+
 
 # Create the config entry after clearing the collection
 async def import_default_config_from_env():

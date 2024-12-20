@@ -1,5 +1,7 @@
 from typing import Optional
+
 from pydantic import BaseModel, Extra, Field
+
 
 class Annotation(BaseModel):
     core_sample_start: int = Field(alias="core:sample_start")
@@ -14,12 +16,14 @@ class Annotation(BaseModel):
     class Config:
         extra = Extra.allow
 
+
 # TOOD: remove this once the OpenAPI spec matches the code
 class SamplesB64(BaseModel):
     samples: str
     data_type: str
     sample_rate: Optional[int] = None
     center_freq: Optional[int] = None
+
 
 # TOOD: remove this once the OpenAPI spec matches the code
 class SamplesCloud(BaseModel):
@@ -33,9 +37,11 @@ class SamplesCloud(BaseModel):
     byte_length: Optional[int] = None
     center_freq: Optional[int] = 0
 
+
 class CustomParams(BaseModel):
     class Config:
         extra = Extra.allow
+
 
 class Plugin(BaseModel):
     samples_b64: Optional[list[SamplesB64]] = None

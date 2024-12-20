@@ -30,6 +30,11 @@ app.add_middleware(
 )
 
 
+@app.get("/")
+async def root():
+    return {"message": "try going to /plugins"}
+
+
 @app.get("/plugins")
 async def get_list_of_plugins():
     # This just looks at the list of dirs to figure out the plugins available, each dir is assumed to be 1 plugin
@@ -142,3 +147,15 @@ def build_module_path(plugin_name: str) -> str:
     while module_prefix.startswith("."):  # remove leading "."s
         module_prefix = module_prefix[1:]
     return f"{module_prefix}.{plugin_name}.{plugin_name}"
+
+
+# Used in e2e test to verify GNU Radio built and runs properly
+@app.get("/test-gnuradio")
+async def test_gnuradio():
+    try:
+        from gnuradio.filter import firdes
+
+        print(dir(firdes))
+        return {"status": "success"}
+    except ImportError:
+        raise HTTPException(status_code=500, detail="GNU Radio not installed")

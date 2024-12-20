@@ -80,9 +80,6 @@ test-client:
 	@echo "Running client unit tests"
 	@cd client && npm run test
 
-lint:
-	@echo "Do you want to lint to correct the files? [y/N] " && read ans && if [ $${ans:-'N'} = 'y' ]; then make lint-corrections; else make lint-no-corrections;fi
-
 lint-corrections:
 	@echo "Linting with megalinter and applying corrections..."
 	@docker run -v $(shell git rev-parse --show-toplevel):/tmp/lint ghcr.io/oxsecurity/megalinter-cupcake:v7.1.0
@@ -90,3 +87,8 @@ lint-corrections:
 lint-no-corrections:
 	@echo "Linting with megalinter..."
 	@docker run -e APPLY_FIXES=none -v $(shell git rev-parse --show-toplevel):/tmp/lint ghcr.io/oxsecurity/megalinter-cupcake:v7.1.0
+
+black:
+	@echo "Running black on api and plugins"
+	@cd api && black --line-length 150 .
+	@cd plugins/src && black --line-length 150 .

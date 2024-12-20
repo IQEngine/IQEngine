@@ -1,8 +1,10 @@
 import asyncio
-from fastapi import Request, HTTPException
-from fastapi.routing import APIRoute
 from functools import wraps
 from typing import Any, Callable, Coroutine
+
+from fastapi import HTTPException, Request
+from fastapi.routing import APIRoute
+
 
 class CancelOnDisconnectRoute(APIRoute):
     async def __call__(self, receive, send):
@@ -11,6 +13,7 @@ class CancelOnDisconnectRoute(APIRoute):
         except asyncio.CancelledError:
             print(f"Request {self.endpoint.__name__} cancelled")
             raise
+
 
 # Decorator that will check if the client disconnects, and cancel the task if required. Only used in iq_router
 def cancel_on_disconnect(handler: Callable[[Any, str, str, int, str, Any, Any], Coroutine[Any, Any, Any]]):
@@ -31,7 +34,9 @@ def cancel_on_disconnect(handler: Callable[[Any, str, str, int, str, Any, Any], 
         if handler_task in done:
             return await handler_task
         raise HTTPException(499)
+
     return cancel_on_disconnect_decorator
+
 
 async def disconnect_poller(request: Request, result: Any):
     try:

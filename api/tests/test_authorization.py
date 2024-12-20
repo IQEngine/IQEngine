@@ -29,9 +29,7 @@ def test_get_jwks_failure(mocker):
     mocker.patch(
         "requests.get",
         side_effect=[
-            mocker.Mock(
-                json=lambda: {"jwks_uri": "mock_jwks_uri", "issuer": "mock_issuer"}
-            ),
+            mocker.Mock(json=lambda: {"jwks_uri": "mock_jwks_uri", "issuer": "mock_issuer"}),
             Exception("Mock exception"),
         ],
     )

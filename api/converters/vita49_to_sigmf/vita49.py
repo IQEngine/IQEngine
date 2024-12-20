@@ -46,7 +46,7 @@ class CurrentContextPacket:
 
     current_context = {}
     sample_start = {}
-    #sample_start = 0
+    # sample_start = 0
 
 
 #### dataclasses Packet structure####
@@ -331,7 +331,6 @@ def parse(bs: bytes, current_context_packet_dict: CurrentContextPacket) -> Tuple
     """
     packet = Packet()
 
-    current_context_packet = None
     index = 0
     # get header information(up to including fractional timestamp) for either context or data packet
     [success, packet.header, index] = parse_header(bs[index:])
@@ -575,7 +574,7 @@ def parse_context(bs: bytes) -> Tuple[bool, Context, int]:
                         # Adjust size, only information that needs to be parsed from AOR
                         # SizeofArray if first word (32bit) from structure. SizeofArray describes size of
                         # AOR including header(and SizeofArray field itself)
-                        SizeofArray_bytes = bs[index: (index + 4)]
+                        SizeofArray_bytes = bs[index : (index + 4)]
                         SizeofArray = int.from_bytes(SizeofArray_bytes, "big")
                         print("Array of Records data structure not implemented! Field skipped in packet")
                         index += SizeofArray * 4
@@ -1126,7 +1125,7 @@ def plot_data(current_context_packet: CurrentContextPacket, header: Header, data
     data.iq_data = samples
     Fs = current_context_packet.body.sample_rate
 
-    if debug == True:
+    if debug is True:
         plt.plot(samples.real, ".-")
         plt.plot(samples.imag, ".-")
         plt.legend(["I", "Q"])
@@ -1194,7 +1193,7 @@ def convert_input(input_path: str, output_path: str):
 
     curr_index = 0
     num_of_packets_read = 0
-    #sample_start = 0  # IQ data length is added each iteration so that sample_start for SigMF is defined
+    # sample_start = 0  # IQ data length is added each iteration so that sample_start for SigMF is defined
 
     # list of "used" stream IDs. For stream IDs appended to this list, a meta file has already been created and only a capture has to be added
     stream_ids = []
@@ -1248,7 +1247,7 @@ def convert_input(input_path: str, output_path: str):
         if not data:
             break
 
-    if debug == True:
+    if debug is True:
         iq_array = np.array(iq_array)
         Fs = current_context_packet.current_context[packet.header.stream_identifier].body.sample_rate
         n = len(iq_array)
@@ -1460,7 +1459,13 @@ def context_to_meta(data, packet: object, stream_ids: list, current_context_pack
     # meta.add_capture(sample_start, metadata={
     if packet.header.stream_identifier not in current_context_packet.sample_start:
         current_context_packet.sample_start[packet.header.stream_identifier] = 0
-    meta["captures"].append({"core:sample_start": current_context_packet.sample_start[packet.header.stream_identifier], SigMFFile.FREQUENCY_KEY: center_freq, SigMFFile.DATETIME_KEY: int_timestamp})
+    meta["captures"].append(
+        {
+            "core:sample_start": current_context_packet.sample_start[packet.header.stream_identifier],
+            SigMFFile.FREQUENCY_KEY: center_freq,
+            SigMFFile.DATETIME_KEY: int_timestamp,
+        }
+    )
 
     with open("%s%s.sigmf-meta" % (output_path, packet.header.stream_identifier), "w+") as metafile:
         metafile.write(json.dumps(meta, indent=4))
@@ -1515,15 +1520,21 @@ def convert(packet: object, stream_ids: list, current_context_packet: object, ou
     :return list: tuple of streamids(list) and sample start(int)
 
     """
-    if (packet.header.packet_type == 0 or packet.header.packet_type == 1) and packet.header.stream_identifier in current_context_packet.current_context:
+    if (
+        packet.header.packet_type == 0 or packet.header.packet_type == 1
+    ) and packet.header.stream_identifier in current_context_packet.current_context:
         # only do something if packet type is data packet. Data packet has according context information already because of match and get context packet functions
         [data, iq_length] = data_to_sigmfdata(packet, stream_ids, output_path)
-        stream_ids = context_to_meta(data, packet, stream_ids, current_context_packet, current_context_packet.sample_start[packet.header.stream_identifier], output_path)
-        current_context_packet.sample_start[packet.header.stream_identifier] = current_context_packet.sample_start[packet.header.stream_identifier]+iq_length
+        stream_ids = context_to_meta(
+            data, packet, stream_ids, current_context_packet, current_context_packet.sample_start[packet.header.stream_identifier], output_path
+        )
+        current_context_packet.sample_start[packet.header.stream_identifier] = (
+            current_context_packet.sample_start[packet.header.stream_identifier] + iq_length
+        )
     elif packet.header.packet_type == 4:
         data = 0
         stream_ids = context_to_meta(data, packet, stream_ids, current_context_packet, current_context_packet.sample_start, output_path)
-        
+
     else:
         logging.warning("Missing context packet, data packet thrown away!")
 

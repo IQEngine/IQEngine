@@ -1,11 +1,13 @@
 import datetime
-from typing import Optional
 import os
+from typing import Optional
+
 from azure.storage.blob import BlobSasPermissions, generate_blob_sas
 from azure.storage.blob.aio import BlobClient, ContainerClient
+from helpers.samples import get_spectrogram_image
 from helpers.urlmapping import ApiType, get_file_name
 from pydantic import SecretStr
-from helpers.samples import get_spectrogram_image
+
 
 # IQEngine-oriented wrappers around the Azure BlobClient class.
 class AzureBlobClient:
@@ -21,7 +23,7 @@ class AzureBlobClient:
         self.clients: dict[str, BlobClient] = {}
         if account == "local":
             self.base_filepath = os.getenv("IQENGINE_BACKEND_LOCAL_FILEPATH", None)
-            self.base_filepath = self.base_filepath.replace('"', '')
+            self.base_filepath = self.base_filepath.replace('"', "")
             if not self.base_filepath:
                 raise Exception("IQENGINE_BACKEND_LOCAL_FILEPATH must be set to use local")
 
@@ -54,23 +56,16 @@ class AzureBlobClient:
         if self.account == "local":
             return None
         elif self.account_key:
-            sas_token = self.generate_sas_token(
-                filepath, self.account_key.get_secret_value(), True
-            )
+            sas_token = self.generate_sas_token(filepath, self.account_key.get_secret_value(), True)
             blob_client = BlobClient.from_blob_url(
-                f"https://{self.account}.blob.core.windows.net/"
-                f"{self.container}/{filepath}",
+                f"https://{self.account}.blob.core.windows.net/" f"{self.container}/{filepath}",
                 credential=sas_token,
             )
         elif not self.sas_token:
-            blob_client = BlobClient.from_blob_url(
-                f"https://{self.account}.blob.core.windows.net/"
-                f"{self.container}/{filepath}"
-            )
+            blob_client = BlobClient.from_blob_url(f"https://{self.account}.blob.core.windows.net/" f"{self.container}/{filepath}")
         else:
             blob_client = BlobClient.from_blob_url(
-                f"https://{self.account}.blob.core.windows.net/"
-                f"{self.container}/{filepath}",
+                f"https://{self.account}.blob.core.windows.net/" f"{self.container}/{filepath}",
                 credential=self.sas_token.get_secret_value(),
             )
         self.clients[filepath] = blob_client
@@ -84,19 +79,15 @@ class AzureBlobClient:
         if self.account == "local":
             return None
         elif not self.sas_token:
-            return ContainerClient.from_container_url(
-                f"https://{self.account}.blob.core.windows.net/{self.container}"
-            )
+            return ContainerClient.from_container_url(f"https://{self.account}.blob.core.windows.net/{self.container}")
         return ContainerClient.from_container_url(
             f"https://{self.account}.blob.core.windows.net/{self.container}",
             credential=self.sas_token.get_secret_value(),
         )
 
-    async def get_blob_content(
-        self, filepath: str, offset: Optional[int] = None, length: Optional[int] = None
-    ) -> bytes:
+    async def get_blob_content(self, filepath: str, offset: Optional[int] = None, length: Optional[int] = None) -> bytes:
         if self.account == "local":
-            if '..' in filepath:
+            if ".." in filepath:
                 raise Exception("Invalid filepath")
             with open(os.path.join(self.base_filepath, filepath), "rb") as f:
                 f.seek(offset)
@@ -106,11 +97,9 @@ class AzureBlobClient:
         content = await blob.readall()
         return content
 
-    async def get_blob_stream(
-        self, filepath: str, offset: Optional[int] = None, length: Optional[int] = None
-    ):
+    async def get_blob_stream(self, filepath: str, offset: Optional[int] = None, length: Optional[int] = None):
         if self.account == "local":
-            if '..' in filepath:
+            if ".." in filepath:
                 raise Exception("Invalid filepath")
             f = open(os.path.join(self.base_filepath, filepath), "rb")
             if offset:
@@ -131,7 +120,8 @@ class AzureBlobClient:
     async def get_new_thumbnail(self, data_type: str, filepath: str) -> bytes:
         iq_path = get_file_name(filepath, ApiType.IQDATA)
         fftSize = 512
-        skip_bytes = 256000  # sort of arbitrary, want to avoid weird stuff that happens at the beginning of signal, must be an integer multiple of 16!!
+        # sort of arbitrary, want to avoid weird stuff that happens at the beginning of signal, must be an integer multiple of 16!!
+        skip_bytes = 256000
         # it's not going to be 1024 rows, for f32 its 128 rows and for int16 its 256 rows
         content = await self.get_blob_content(iq_path, skip_bytes, fftSize * 1024)
         return get_spectrogram_image(content, data_type, fftSize)
@@ -149,9 +139,7 @@ class AzureBlobClient:
         blob = await blob_client.get_blob_properties()
         return int(blob.size)
 
-    def generate_sas_token(
-        self, filepath: str, account_key: str, include_write: bool = False
-    ):
+    def generate_sas_token(self, filepath: str, account_key: str, include_write: bool = False):
         if self.account == "local":
             return None
         start_time = datetime.datetime.now(datetime.timezone.utc)
@@ -162,9 +150,7 @@ class AzureBlobClient:
                 container_name=self.container,
                 blob_name=filepath,
                 account_key=account_key,
-                permission=BlobSasPermissions(
-                    read=True, write=include_write, create=include_write, add=include_write
-                ),
+                permission=BlobSasPermissions(read=True, write=include_write, create=include_write, add=include_write),
                 expiry=expiry_time,
                 start=start_time,
             )

@@ -1,12 +1,14 @@
 import os
+
 import pymongo_inmemory
-from motor.motor_asyncio import AsyncIOMotorClient
 from motor.core import AgnosticDatabase
+from motor.motor_asyncio import AsyncIOMotorClient
 
 # IQEngine supports either connecting to an existing MongoDB instance or using an in-memory database (meant primarily for testing or local dev)
 
 _db: AgnosticDatabase = None
 in_memory_db: pymongo_inmemory.MongoClient = None
+
 
 def create_db_client() -> AgnosticDatabase:
     global _db
@@ -14,11 +16,13 @@ def create_db_client() -> AgnosticDatabase:
     _db = AsyncIOMotorClient(connection_string)["IQEngine"]
     return _db
 
+
 def create_in_memory_db_client() -> AgnosticDatabase:
     global _db, in_memory_db
     in_memory_db = pymongo_inmemory.MongoClient()["IQEngine"]
     _db = AsyncIOMotorClient()["IQEngine"]
     return _db
+
 
 def db() -> AgnosticDatabase:
     global _db
@@ -28,6 +32,7 @@ def db() -> AgnosticDatabase:
         else:
             _db = create_db_client()
     return _db
+
 
 async def reset_db():
     global _db

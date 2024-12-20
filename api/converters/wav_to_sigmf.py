@@ -1,6 +1,7 @@
-from sigmf import SigMFFile
-from scipy.io import wavfile
 import numpy as np
+from scipy.io import wavfile
+from sigmf import SigMFFile
+
 
 def wav_to_sigmf(wav_file_path: str) -> list[str]:
     """Convert a wav file to a sigmf file."""
@@ -24,7 +25,7 @@ def wav_to_sigmf(wav_file_path: str) -> list[str]:
             SigMFFile.SAMPLE_RATE_KEY: sample_rate,
             SigMFFile.VERSION_KEY: "1.0.0",
             SigMFFile.NUM_CHANNELS_KEY: 1,
-        }
+        },
     )
 
     meta.tofile(f"{dest_path}.sigmf-meta")

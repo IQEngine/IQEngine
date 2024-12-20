@@ -1,7 +1,9 @@
 import json
 import os
+
 from .database import db
 from .models import Plugin
+
 
 async def get(name) -> Plugin:
     plugins_collection = db().plugins
@@ -9,6 +11,7 @@ async def get(name) -> Plugin:
     if not plugin:
         return None
     return Plugin(**plugin)
+
 
 # Import plugins from environment variable, clears the collection first
 async def import_plugins_from_env(environment_variable_name="IQENGINE_PLUGINS"):

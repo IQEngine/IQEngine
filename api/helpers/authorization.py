@@ -2,21 +2,19 @@ import json
 import logging
 import os
 import time
-from typing import Any, Optional, Tuple, cast, Union, List, Callable
+from typing import Any, Callable, List, Optional, Tuple, Union, cast
 
 import jwt
 import requests
 from cachetools import TTLCache, cached
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
-from fastapi import Depends, HTTPException, status, Header, Request
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi import Depends, Header, HTTPException, Request, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jwt import algorithms
 
 
 class OptionalHTTPBearer(HTTPBearer):
-    async def __call__(
-        self, request: Request, authorization: Optional[str] = Header(None)
-    ) -> Optional[HTTPAuthorizationCredentials]:
+    async def __call__(self, request: Request, authorization: Optional[str] = Header(None)) -> Optional[HTTPAuthorizationCredentials]:
         if authorization is None:
             # If no Authorization header is present, return None instead of raising an HTTPException
             return None
@@ -28,7 +26,7 @@ http_bearer = OptionalHTTPBearer()
 
 
 class JWKSHandler:
-    openid_config_uri = ("https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration")
+    openid_config_uri = "https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration"
     jwks_cache: TTLCache[str, Any] = TTLCache(maxsize=1, ttl=600)  # cache the JWKS for 10 minutes
 
     @classmethod
@@ -87,9 +85,7 @@ def validate_and_decode_jwt(token: str) -> dict:
     try:
         CLIENT_ID = os.getenv("IQENGINE_APP_ID")
         public_key, algorithm = validate_issuer_and_get_public_key(token)
-        payload = jwt.decode(
-            token, public_key, algorithms=[algorithm], audience=CLIENT_ID
-        )  # Checks expiration, audience, and signature
+        payload = jwt.decode(token, public_key, algorithms=[algorithm], audience=CLIENT_ID)  # Checks expiration, audience, and signature
         return payload
     except jwt.PyJWTError:
         raise HTTPException(
@@ -105,9 +101,7 @@ def get_current_user(
         return {}
     try:
         current_user = validate_and_decode_jwt(token.credentials)
-        logging.info(
-            f"User {current_user['preferred_username']} access token validated"
-        )
+        logging.info(f"User {current_user['preferred_username']} access token validated")
         return current_user
     except jwt.PyJWTError:
         raise HTTPException(
@@ -121,9 +115,7 @@ def get_current_user(
         )
 
 
-def required_roles(
-    roles: Optional[Union[str, List[str]]] = None
-) -> Callable[[Optional[dict]], Optional[dict]]:
+def required_roles(roles: Optional[Union[str, List[str]]] = None) -> Callable[[Optional[dict]], Optional[dict]]:
     if roles is None:
         # If roles are None, return the original dependency function without any role check
         return get_current_user
@@ -145,17 +137,13 @@ def required_roles(
         if roles is None:
             return current_user  # repeated to solve linter error
         if not any(role in current_user.get("roles", []) for role in roles):
-            logging.info(
-                f"User {current_user.get('preferred_username')} attempted to access without sufficient privileges"
-            )
+            logging.info(f"User {current_user.get('preferred_username')} attempted to access without sufficient privileges")
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Not enough privileges",
             )
 
-        logging.info(
-            f"User {current_user.get('preferred_username')} accessed successfully"
-        )
+        logging.info(f"User {current_user.get('preferred_username')} accessed successfully")
         return current_user
 
     return _check_roles

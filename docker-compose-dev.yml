@@ -13,7 +13,7 @@ services:
       IN_MEMORY_DB: 0
       IQENGINE_CONNECTION_INFO: ${IQENGINE_CONNECTION_INFO}
       IQENGINE_FEATURE_FLAGS: ${IQENGINE_FEATURE_FLAGS}
-      IQENGINE_PLUGINS: '[{"name": "BuiltIn",  "url": "plugins:8000"}]'
+      IQENGINE_PLUGINS: '[{"name": "BuiltIn",  "url": "plugins:8000"}, {"name": "e2e tests", "url": "http://127.0.0.1:8000/plugins"}]'
       IQENGINE_METADATA_DB_CONNECTION_STRING: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongo:27017
       IQENGINE_BACKEND_LOCAL_FILEPATH: /tmp/recordings
     depends_on:
