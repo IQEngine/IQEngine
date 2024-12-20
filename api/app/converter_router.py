@@ -11,6 +11,7 @@ import zipfile
 
 router = APIRouter()
 
+
 def remove_files(file_paths: str):
     for file_path in file_paths:
         if os.path.exists(file_path):
@@ -34,9 +35,7 @@ def zipfiles(zip_name, filenames):
     zf.close()
 
     # Grab ZIP file from in-memory, make response with correct MIME-type
-    resp = Response(s.getvalue(), media_type="application/x-zip-compressed", headers={
-        'Content-Disposition': f'attachment;filename={zip_filename}'
-    })
+    resp = Response(s.getvalue(), media_type="application/x-zip-compressed", headers={"Content-Disposition": f"attachment;filename={zip_filename}"})
 
     return resp
 
@@ -62,8 +61,7 @@ async def convert_wav_to_sigmf(
     try:
         created_files = wav_to_sigmf(wav_file_path=wav_file_location)
         # delete temporary file
-        background_tasks.add_task(
-            remove_files, created_files)
+        background_tasks.add_task(remove_files, created_files)
         os.remove(wav_file_location)
 
         return zipfiles(zip_name=wav_file.filename.split(".")[0], filenames=created_files)

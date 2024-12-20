@@ -7,6 +7,7 @@ from helpers.authorization import required_roles
 
 router = APIRouter()
 
+
 @router.get("/api/users", status_code=200)
 async def users(current_user: Optional[dict] = Depends(required_roles("IQEngine-Admin"))):
     try:

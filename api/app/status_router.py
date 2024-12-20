@@ -4,6 +4,7 @@ from pymongo.errors import ServerSelectionTimeoutError
 
 router = APIRouter()
 
+
 @router.get("/api/status")
 async def get_status():
     # Validate system functionality

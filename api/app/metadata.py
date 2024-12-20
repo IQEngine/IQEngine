@@ -25,12 +25,14 @@ def validate_metadata(metadata: dict):
 
 def collection() -> AgnosticCollection:
     from .database import db
+
     collection: AgnosticCollection = db().metadata
     return collection
 
 
 def versions_collection() -> AgnosticCollection:
     from .database import db
+
     collection: AgnosticCollection = db().versions
     return collection
 
@@ -62,7 +64,7 @@ async def create(metadata: dict, user: str):
     if Depends(check_access) is None:
         return False
 
-    if metadata["global"].get('traceability:origin') is None:
+    if metadata["global"].get("traceability:origin") is None:
         raise Exception("Metadata must have origin")
 
     filter = {
@@ -241,29 +243,19 @@ async def query_metadata(
     if max_frequency is not None:
         query_condition.update({"captures.core:frequency": {"$lte": max_frequency}})
     if author is not None:
-        query_condition.update(
-            {"global.core:author": {"$regex": author, "$options": "i"}}
-        )
+        query_condition.update({"global.core:author": {"$regex": author, "$options": "i"}})
     # global description
     if description is not None:
-        query_condition.update(
-            {"global.core:description": {"$regex": description, "$options": "i"}}
-        )
+        query_condition.update({"global.core:description": {"$regex": description, "$options": "i"}})
     if label is not None:
-        query_condition.update(
-            {"annotations.core:label": {"$regex": label, "$options": "i"}}
-        )
+        query_condition.update({"annotations.core:label": {"$regex": label, "$options": "i"}})
     if comment is not None:
-        query_condition.update(
-            {"annotations.core:description": {"$regex": comment, "$options": "i"}}
-        )
+        query_condition.update({"annotations.core:description": {"$regex": comment, "$options": "i"}})
 
     if captures_geo:
         query_condition.update(await process_geolocation("captures", captures_geo))
     if annotations_geo:
-        query_condition.update(
-            await process_geolocation("annotations", annotations_geo)
-        )
+        query_condition.update(await process_geolocation("annotations", annotations_geo))
     if captures_geo_json:
         query_condition.update(
             {

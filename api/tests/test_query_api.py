@@ -13,9 +13,7 @@ async def test_query_meta_success(client):
         json=valid_metadata,
     )
     assert response.status_code == 201
-    response = client.get(
-        f"/api/datasources/query?{query_condition}"
-    )
+    response = client.get(f"/api/datasources/query?{query_condition}")
 
     assert response.status_code == 200
     assert response.json() == valid_datasourcereference_array

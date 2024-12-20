@@ -3,6 +3,7 @@ import io
 import matplotlib.pyplot as plt
 from PIL import Image
 
+
 def get_samples(data_bytes, data_type) -> np.ndarray:
     if data_type == "ci8" or data_type == "ci8_le" or data_type == "i8":
         samples = np.frombuffer(data_bytes, dtype=np.int8).astype(np.float32)
@@ -41,6 +42,7 @@ def get_samples(data_bytes, data_type) -> np.ndarray:
         raise ValueError("Datatype " + data_type + " not implemented")
     return samples
 
+
 def get_bytes_per_iq_sample(data_type):
     if "64" in data_type:
         return 16
@@ -52,6 +54,7 @@ def get_bytes_per_iq_sample(data_type):
         return 2
     else:
         raise ValueError("within get_bytes_per_iq_sample, didn't see 64 or 32 or 16 or 8")
+
 
 def get_spectrogram_image(
     content: bytes,
@@ -65,7 +68,7 @@ def get_spectrogram_image(
     num_rows = int(np.floor(len(samples) / fftSize))
     spectrogram = np.zeros((num_rows, fftSize))
     for i in range(num_rows):
-        spectrogram[i, :] = 10 * np.log10(np.abs(np.fft.fftshift(np.fft.fft(samples[i * fftSize: (i + 1) * fftSize])))**2)
+        spectrogram[i, :] = 10 * np.log10(np.abs(np.fft.fftshift(np.fft.fft(samples[i * fftSize : (i + 1) * fftSize]))) ** 2)
     fig = plt.figure(frameon=False)
     ax = plt.Axes(fig, [0.0, 0.0, 1.0, 1.0])
     ax.set_axis_off()

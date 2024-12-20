@@ -8,17 +8,20 @@ from motor.core import AgnosticDatabase
 _db: AgnosticDatabase = None
 in_memory_db: pymongo_inmemory.MongoClient = None
 
+
 def create_db_client() -> AgnosticDatabase:
     global _db
     connection_string = os.getenv("IQENGINE_METADATA_DB_CONNECTION_STRING")
     _db = AsyncIOMotorClient(connection_string)["IQEngine"]
     return _db
 
+
 def create_in_memory_db_client() -> AgnosticDatabase:
     global _db, in_memory_db
     in_memory_db = pymongo_inmemory.MongoClient()["IQEngine"]
     _db = AsyncIOMotorClient()["IQEngine"]
     return _db
+
 
 def db() -> AgnosticDatabase:
     global _db
@@ -28,6 +31,7 @@ def db() -> AgnosticDatabase:
         else:
             _db = create_db_client()
     return _db
+
 
 async def reset_db():
     global _db

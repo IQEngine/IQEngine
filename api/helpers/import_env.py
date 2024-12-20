@@ -8,6 +8,7 @@ from app.database import db
 
 # For whatever reason we cant define the 3 above in this file or else the mocks fail
 
+
 async def import_all_from_env():
     # Sleep a random amount of time so that the multiple workers dont all initialize stuff at the exact same time
     time.sleep(random.randint(0, 1000) / 1000)  # 0-1 seconds

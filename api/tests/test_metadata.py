@@ -12,9 +12,7 @@ def override_dependency_datasources_get():
 
 
 @mock.patch("app.datasources_router.AzureBlobClient.blob_exist", return_value=True)
-@mock.patch(
-    "app.datasources_router.AzureBlobClient.get_blob_content", return_value=b"<image data>"
-)
+@mock.patch("app.datasources_router.AzureBlobClient.get_blob_content", return_value=b"<image data>")
 @mock.patch(
     "app.metadata.get_metadata",
     return_value=valid_metadata,
@@ -28,20 +26,17 @@ async def test_api_get_thumbnail_with_image(
     mock_blob_exist: Mock,
     client,
 ):
-    client.app.dependency_overrides[
-        datasources.get
-    ] = override_dependency_datasources_get
+    client.app.dependency_overrides[datasources.get] = override_dependency_datasources_get
 
-    response = client.get(
-        f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path.jpg'
-    )
+    response = client.get(f'/api/datasources/{test_datasource["account"]}/{test_datasource["container"]}/file_path.jpg')
     assert response.status_code == 200
     mock_get_metadata.assert_not_called()
     mock_get_blob_content.assert_called_once()
     mock_blob_exist.assert_called_once()
     mock_decrypt.mock_calls == 2
 
-''' stopped working while doing a refactor but cant figure out why
+
+""" stopped working while doing a refactor but cant figure out why
 @mock.patch("app.datasources_router.AzureBlobClient.blob_exist", return_value=False)
 @mock.patch(
     "app.metadata.get_metadata",
@@ -74,4 +69,4 @@ async def test_api_get_thumbnail_with_no_image(
     mock_upload_blob.assert_called_once()
     mock_blob_exist.assert_called_once()
     mock_decrypt.mock_calls == 2
-'''
+"""

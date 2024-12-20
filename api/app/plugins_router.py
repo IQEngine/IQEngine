@@ -6,6 +6,7 @@ from typing import Optional
 
 router = APIRouter()
 
+
 @router.post("/api/plugins/", status_code=201, response_model=Plugin)
 @router.post("/api/plugins", status_code=201, response_model=Plugin)
 async def create_plugin(
@@ -29,10 +30,7 @@ async def get_plugins(current_user: Optional[dict] = Depends(get_current_user)):
     return list(await db().plugins.find({}).to_list(1_000_000))
 
 
-@router.get(
-    "/api/plugins/{plugin_name}",
-    response_model=Plugin
-)
+@router.get("/api/plugins/{plugin_name}", response_model=Plugin)
 async def get_plugin(
     plugin_name: str,
     current_user: Optional[dict] = Depends(get_current_user),
@@ -43,10 +41,7 @@ async def get_plugin(
     return plugin
 
 
-@router.put(
-    "/api/plugins/{plugin_name}",
-    response_model=Plugin
-)
+@router.put("/api/plugins/{plugin_name}", response_model=Plugin)
 async def update_plugin(
     plugin_name: str,
     plugin: Plugin,

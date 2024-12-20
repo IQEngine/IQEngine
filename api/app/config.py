@@ -3,6 +3,7 @@ from .models import Configuration
 import json
 import os
 
+
 async def get() -> Configuration | None:
     configuration_collection = db().configuration
     # even if there are multiple entries (eg due to multiple workers adding them at the same time), they should all match
@@ -11,8 +12,10 @@ async def get() -> Configuration | None:
         return None
     return Configuration(**current)
 
+
 async def exists() -> bool:
     return (await get()) is not None
+
 
 # Create the config entry after clearing the collection
 async def import_default_config_from_env():
