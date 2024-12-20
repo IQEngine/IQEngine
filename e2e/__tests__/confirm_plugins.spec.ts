@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test('List plugins and params', async ({ request }) => {
+test('List plugins and params @CICompatible', async ({ request }) => {
   const response = await request.get(`/api/plugins`);
   // remove entry with Local as the name
   const plugins = (await response.json()).filter((plugin) => plugin.name !== 'Local');
@@ -16,11 +16,10 @@ test('List plugins and params', async ({ request }) => {
   expect(plugin_params).toHaveProperty('gain');
 });
 
-test('Make sure GNU Radio works', async ({ request }) => {
+test('Make sure GNU Radio works @CICompatible', async ({ request }) => {
   const response = await request.get(`/api/plugins`);
   const plugins = (await response.json()).filter((plugin) => plugin.name !== 'Local');
   // eg https://iqengine-staging-plugins.agreeableforest-695e4014.eastus2.azurecontainerapps.io/plugins
   const response2 = await request.get(plugins + '/test-gnuradio');
   await expect(response2).toBeOK();
 });
-
