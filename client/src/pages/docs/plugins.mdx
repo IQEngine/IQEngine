@@ -78,6 +78,19 @@ Stop with `docker stop plugins_container` and delete with `docker rm plugins_con
 
 SSH into container with `docker exec -it plugins_container /bin/bash`
 
+## Running old sync-style plugins
+
+This plugin can proxy only function at a time. The url of the proxied sync-style plugin is configured by the environment variable IQENGINE_PROXY_URL.
+
+For instance, let's say you run your sync-style plugin server on port 9000, and it includes a plugin called `mysyncplugin`.  To expose it, simply use:
+
+```bash
+IQENGINE_PROXY_URL=http://127.0.0.1:9000/plugins/mysyncplugin
+make run-plugins
+```
+
+Then open IQEngine.org or a local instance of IQEngine, and there should be a plugin called `sync_proxy` which when used will run your sync-style plugin.  By default `run-plugins` will run the main plugins server on port 8000, so make sure your sync-style plugins server is on a different port (and that port needs to match the one specified in IQENGINE_PROXY_URL)
+
 ## Notes
 
 When deploying with Azure remember to go into the function apps Configuration and under Application Settings there needs to be one for AzureWebJobsStorage which is the storage account connection string, as well as MongoDBConnString
