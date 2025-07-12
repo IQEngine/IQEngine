@@ -8,10 +8,12 @@ class DataSource(BaseModel):
     name: str
     account: str
     container: str
+    awsAccessKeyId: Optional[str] = None
     description: Optional[str] = None
     imageURL: Optional[str] = None
     sasToken: Optional[SecretStr] = None
     accountKey: Optional[SecretStr] = None
+    awsSecretAccessKey: Optional[SecretStr] = None
     owners: Optional[List[str]] = []
     readers: Optional[List[str]] = []
     public: Optional[bool] = False
