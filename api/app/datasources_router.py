@@ -186,7 +186,7 @@ async def generate_sas_token(
         if not write:
             token = decrypt(existing_datasource["sasToken"]).get_secret_value()
     if not token:
-        blob_client = AzureBlobClient(account, container)
+        blob_client = AzureBlobClient(account, container, None)
         try:
             token = blob_client.generate_sas_token(
                 file_path,

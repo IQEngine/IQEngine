@@ -47,6 +47,9 @@ async def get_iq_data(
     if hasattr(datasource, "sasToken"):
         if datasource.sasToken:
             azure_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
+    if hasattr(datasource, "awsSecretAccessKey"):
+        if datasource.awsSecretAccessKey:
+            azure_client.set_aws_secret_access_key(decrypt(datasource.awsSecretAccessKey.get_secret_value()))
 
     try:
         block_indexes = [int(num) for num in block_indexes_str.split(",")]
@@ -228,6 +231,8 @@ async def get_minimap_iq(
             azure_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
         if datasource.accountKey:
             azure_client.set_account_key(decrypt(datasource.accountKey.get_secret_value()))
+        if datasource.awsSecretAccessKey:
+            azure_client.set_aws_secret_access_key(decrypt(datasource.awsSecretAccessKey.get_secret_value()))
         minimap_iq_file = get_file_name(filepath, ApiType.MINIMAP)
         # If minimap has already been generated
         if await azure_client.blob_exist(minimap_iq_file):

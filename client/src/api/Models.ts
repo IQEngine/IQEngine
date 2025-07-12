@@ -9,8 +9,8 @@ export interface DataSource {
   container: string; // azure storage account or S3 bucket name
   sasToken?: string; // azure only
   accountKey?: string; // azure only
-  awsAccessKeyId?: string; // AWS S3 only
-  awsSecretAccessKey?: string; // AWS S3 only
+  //awsAccessKeyId?: string; // AWS S3 only
+  //awsSecretAccessKey?: string; // AWS S3 only
   owners?: string[];
   readers?: string[];
   public?: boolean;
