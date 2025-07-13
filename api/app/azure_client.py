@@ -21,7 +21,7 @@ class AzureBlobClient:
     awsSecretAccessKey: SecretStr = None  # AWS S3 only
     base_filepath: str = None  # only used for local
 
-    def __init__(self, account, container, awsAccessKeyId):
+    def __init__(self, account, container, awsAccessKeyId=None):
         self.account = account
         self.container = container
         self.awsAccessKeyId = awsAccessKeyId
