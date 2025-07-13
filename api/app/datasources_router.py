@@ -314,6 +314,10 @@ async def get_meta_thumbnail(
     if account_key is not None:
         azure_client.set_account_key(decrypt(account_key))
 
+    aws_secret_access_key = datasource.awsSecretAccessKey.get_secret_value() if datasource.awsSecretAccessKey else None
+    if aws_secret_access_key is not None:
+        azure_client.set_aws_secret_access_key(decrypt(aws_secret_access_key))
+
     thumbnail_path = get_file_name(filepath, ApiType.THUMB)
     content_type = get_content_type(ApiType.THUMB)
     if not await azure_client.blob_exist(thumbnail_path):
