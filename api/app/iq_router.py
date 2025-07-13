@@ -170,10 +170,16 @@ async def get_iqfile(
             raise HTTPException(status_code=400, detail="Invalid file path")
         return FileResponse(full_path)
 
-    azure_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
-    azure_client.set_aws_secret_access_key(decrypt(datasource.awsSecretAccessKey.get_secret_value()))
+    if hasattr(datasource, "sasToken"):
+        if datasource.sasToken:
+            azure_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
+    if hasattr(datasource, "awsSecretAccessKey"):
+        if datasource.awsSecretAccessKey:
+            azure_client.set_aws_secret_access_key(decrypt(datasource.awsSecretAccessKey.get_secret_value()))
+
     if not azure_client.blob_exist(iq_path):
         raise HTTPException(status_code=404, detail="File not found")
+
     response = await azure_client.get_blob_stream(iq_path)
     return StreamingResponse(response, media_type=get_content_type(ApiType.IQDATA))
 
@@ -202,8 +208,13 @@ async def get_metafile(
             raise HTTPException(status_code=400, detail="Invalid file path")
         return FileResponse(full_path)
 
-    azure_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
-    azure_client.set_aws_secret_access_key(decrypt(datasource.awsSecretAccessKey.get_secret_value()))
+    if hasattr(datasource, "sasToken"):
+        if datasource.sasToken:
+            azure_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
+    if hasattr(datasource, "awsSecretAccessKey"):
+        if datasource.awsSecretAccessKey:
+            azure_client.set_aws_secret_access_key(decrypt(datasource.awsSecretAccessKey.get_secret_value()))
+
     if not azure_client.blob_exist(meta_path):
         raise HTTPException(status_code=404, detail="File not found")
 
