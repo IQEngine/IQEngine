@@ -113,12 +113,6 @@ class AzureBlobClient:
                 aws_secret_access_key=self.awsSecretAccessKey.get_secret_value(),
                 region_name=self.account
             ) as s3_client:
-                if length is not None and offset is None:
-                    print("ERROR!!!#!#!@")
-                    return None
-                if length is None and offset is not None:
-                    print("ERROR!!!#!#!@")
-                    return None
                 if length is not None and offset is not None:
                     byte_range = f'bytes={offset}-{offset + length - 1}'
                     obj = await s3_client.get_object(Bucket=self.container, Key=filepath, Range=byte_range)
@@ -139,9 +133,23 @@ class AzureBlobClient:
                 f.seek(offset)
             return f  # TODO: this leads to the download being pretty slow because it feeds it byte by byte
         if self.awsAccessKeyId:  # S3
-            # TODO
-            print("TODO!!!")
-            return None
+            session = aioboto3.Session()
+            s3_client = await session.client(
+                's3',
+                aws_access_key_id=self.awsAccessKeyId,
+                aws_secret_access_key=self.awsSecretAccessKey.get_secret_value(),
+                region_name=self.account
+            ).__aenter__()
+            try:
+                if length is not None and offset is not None:
+                    byte_range = f'bytes={offset}-{offset + length - 1}'
+                    obj = await s3_client.get_object(Bucket=self.container, Key=filepath, Range=byte_range)
+                else:
+                    obj = await s3_client.get_object(Bucket=self.container, Key=filepath)
+                return obj['Body']
+            except Exception as e:
+                await s3_client.__aexit__(type(e), e, e.__traceback__)
+                raise
         else:
             blob_client = self.get_blob_client(filepath)
             # returns type StorageStreamDownloader, an Azure class, we use its chunks() method which returns Iterator[bytes]
