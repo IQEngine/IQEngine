@@ -4,6 +4,7 @@ import os
 import time
 from typing import Optional
 
+import boto3
 import numpy as np
 from bson import encode
 from bson.raw_bson import RawBSONDocument
@@ -13,7 +14,6 @@ from helpers.datasource_access import check_access
 from helpers.samples import get_bytes_per_iq_sample
 from pydantic import SecretStr
 from pymongo.operations import ReplaceOne
-import boto3
 
 from .azure_client import AzureBlobClient
 from .database import db
