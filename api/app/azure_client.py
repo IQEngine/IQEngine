@@ -21,7 +21,7 @@ class AzureBlobClient:
     awsSecretAccessKey: SecretStr = None  # AWS S3 only
     base_filepath: str = None  # only used for local
 
-    def __init__(self, account, container, awsAccessKeyId=None):
+    def __init__(self, account, container, awsAccessKeyId):
         self.account = account
         self.container = container
         self.awsAccessKeyId = awsAccessKeyId
@@ -113,6 +113,12 @@ class AzureBlobClient:
                 aws_secret_access_key=self.awsSecretAccessKey.get_secret_value(),
                 region_name=self.account
             ) as s3_client:
+                if length is not None and offset is None:
+                    print("ERROR!!!#!#!@")
+                    return None
+                if length is None and offset is not None:
+                    print("ERROR!!!#!#!@")
+                    return None
                 if length is not None and offset is not None:
                     byte_range = f'bytes={offset}-{offset + length - 1}'
                     obj = await s3_client.get_object(Bucket=self.container, Key=filepath, Range=byte_range)
@@ -165,18 +171,19 @@ class AzureBlobClient:
         if self.account == "local":
             return os.path.isfile(os.path.join(self.base_filepath, filepath))
         elif self.awsAccessKeyId:  # S3
-            try:
-                # TODO reuse the s3_client, figure out if we should be reusing the s3 one or the bucket object.
-                s3_client = boto3.client('s3',
-                                         aws_access_key_id=self.awsAccessKeyId,
-                                         aws_secret_access_key=self.awsSecretAccessKey.get_secret_value(),
-                                         region_name=self.account
-                                         )
-                s3_client.head_object(Bucket=self.container, Key=filepath)
-                return True
-            except ClientError as e:
-                if e.response['Error']['Code'] == '404':
-                    return False
+            session = aioboto3.Session()
+            async with session.client(
+                's3',
+                aws_access_key_id=self.awsAccessKeyId,
+                aws_secret_access_key=self.awsSecretAccessKey.get_secret_value(),
+                region_name=self.account
+            ) as s3_client:
+                try:
+                    await s3_client.head_object(Bucket=self.container, Key=filepath)
+                    return True
+                except ClientError as e:
+                    if e.response['Error']['Code'] == '404':
+                        return False
         else:  # Azure blob
             blob_client = self.get_blob_client(filepath)
             return await blob_client.exists()
