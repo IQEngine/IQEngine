@@ -11,6 +11,7 @@ import boto3
 from botocore.exceptions import ClientError
 import aioboto3
 
+
 # IQEngine-oriented wrappers around the Azure BlobClient class.
 class AzureBlobClient:
     account: str
@@ -108,17 +109,17 @@ class AzureBlobClient:
         elif self.awsAccessKeyId:  # S3
             session = aioboto3.Session()
             async with session.client(
-                's3',
+                "s3",
                 aws_access_key_id=self.awsAccessKeyId,
                 aws_secret_access_key=self.awsSecretAccessKey.get_secret_value(),
-                region_name=self.account
+                region_name=self.account,
             ) as s3_client:
                 if length is not None and offset is not None:
-                    byte_range = f'bytes={offset}-{offset + length - 1}'
+                    byte_range = f"bytes={offset}-{offset + length - 1}"
                     obj = await s3_client.get_object(Bucket=self.container, Key=filepath, Range=byte_range)
                 else:
                     obj = await s3_client.get_object(Bucket=self.container, Key=filepath)
-                return await obj['Body'].read()
+                return await obj["Body"].read()
         else:  # Azure blob
             blob_client = self.get_blob_client(filepath)
             blob = await blob_client.download_blob(offset=offset, length=length)
@@ -135,18 +136,18 @@ class AzureBlobClient:
         if self.awsAccessKeyId:  # S3
             session = aioboto3.Session()
             s3_client = await session.client(
-                's3',
+                "s3",
                 aws_access_key_id=self.awsAccessKeyId,
                 aws_secret_access_key=self.awsSecretAccessKey.get_secret_value(),
-                region_name=self.account
+                region_name=self.account,
             ).__aenter__()
             try:
                 if length is not None and offset is not None:
-                    byte_range = f'bytes={offset}-{offset + length - 1}'
+                    byte_range = f"bytes={offset}-{offset + length - 1}"
                     obj = await s3_client.get_object(Bucket=self.container, Key=filepath, Range=byte_range)
                 else:
                     obj = await s3_client.get_object(Bucket=self.container, Key=filepath)
-                return obj['Body']
+                return obj["Body"]
             except Exception as e:
                 await s3_client.__aexit__(type(e), e, e.__traceback__)
                 raise
@@ -181,16 +182,16 @@ class AzureBlobClient:
         elif self.awsAccessKeyId:  # S3
             session = aioboto3.Session()
             async with session.client(
-                's3',
+                "s3",
                 aws_access_key_id=self.awsAccessKeyId,
                 aws_secret_access_key=self.awsSecretAccessKey.get_secret_value(),
-                region_name=self.account
+                region_name=self.account,
             ) as s3_client:
                 try:
                     await s3_client.head_object(Bucket=self.container, Key=filepath)
                     return True
                 except ClientError as e:
-                    if e.response['Error']['Code'] == '404':
+                    if e.response["Error"]["Code"] == "404":
                         return False
         else:  # Azure blob
             blob_client = self.get_blob_client(filepath)
@@ -200,13 +201,14 @@ class AzureBlobClient:
         if self.account == "local":
             return os.path.getsize(os.path.join(self.base_filepath, filepath))
         elif self.awsAccessKeyId:  # S3
-            s3_client = boto3.client('s3',
-                                     aws_access_key_id=self.awsAccessKeyId,
-                                     aws_secret_access_key=self.awsSecretAccessKey.get_secret_value(),
-                                     region_name=self.account
-                                     )
+            s3_client = boto3.client(
+                "s3",
+                aws_access_key_id=self.awsAccessKeyId,
+                aws_secret_access_key=self.awsSecretAccessKey.get_secret_value(),
+                region_name=self.account,
+            )
             response = s3_client.head_object(Bucket=self.container, Key=filepath)
-            return response['ContentLength']
+            return response["ContentLength"]
         else:
             blob_client = self.get_blob_client(filepath)
             blob = await blob_client.get_blob_properties()

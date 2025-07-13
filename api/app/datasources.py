@@ -95,22 +95,23 @@ async def sync(account: str, container: str, awsAccessKeyId: Optional[str]):
     #########################################################
     else:
         if azure_blob_client.awsAccessKeyId:  # S3
-            s3_client = boto3.client('s3',
-                                     aws_access_key_id=azure_blob_client.awsAccessKeyId,
-                                     aws_secret_access_key=azure_blob_client.awsSecretAccessKey.get_secret_value(),
-                                     region_name=azure_blob_client.account
-                                     )
-            paginator = s3_client.get_paginator('list_objects_v2')
+            s3_client = boto3.client(
+                "s3",
+                aws_access_key_id=azure_blob_client.awsAccessKeyId,
+                aws_secret_access_key=azure_blob_client.awsSecretAccessKey.get_secret_value(),
+                region_name=azure_blob_client.account,
+            )
+            paginator = s3_client.get_paginator("list_objects_v2")
             meta_blob_names = []
             data_blob_sizes = {}  # holds the names and sizes of sigmf-data files
             start_t = time.time()
             for page in paginator.paginate(Bucket=azure_blob_client.container):
-                for obj in page.get('Contents', []):
-                    blob_name = obj['Key']
+                for obj in page.get("Contents", []):
+                    blob_name = obj["Key"]
                     if blob_name.endswith(".sigmf-meta"):
                         meta_blob_names.append(blob_name)
                     elif blob_name.endswith(".sigmf-data"):
-                        data_blob_sizes[blob_name] = obj['Size']  # bytes
+                        data_blob_sizes[blob_name] = obj["Size"]  # bytes
 
         else:  # Azure blob
             container_client = azure_blob_client.get_container_client()
@@ -163,7 +164,7 @@ async def sync(account: str, container: str, awsAccessKeyId: Optional[str]):
         metadatas = []
         for i in range(num_batches):
             coroutines = []
-            for meta_blob_name in meta_blob_names[i * batch_size: (i + 1) * batch_size]:
+            for meta_blob_name in meta_blob_names[i * batch_size : (i + 1) * batch_size]:
                 coroutines.append(get_metadata(meta_blob_name))
             ret = await asyncio.gather(*coroutines)  # Wait for all the coroutines to finish
             metadatas.extend([x for x in ret if x is not None])  # remove the Nones
