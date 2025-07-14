@@ -1,11 +1,11 @@
 import asyncio
 import io
 import math
-from typing import List
 import os
+from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
-from fastapi.responses import StreamingResponse, FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from helpers.apidisconnect import CancelOnDisconnectRoute, cancel_on_disconnect
 from helpers.cipher import decrypt
 from helpers.conversions import find_smallest_and_largest_next_to_each_other
@@ -37,16 +37,21 @@ async def get_iq_data(
     block_size: int,  # we grab 2x this many ints/floats
     format: str,
     datasource: DataSource = Depends(datasources.get),
-    azure_client: AzureBlobClient = Depends(AzureBlobClient),
     access_allowed=Depends(check_access),
 ):
     if access_allowed is None:
         raise HTTPException(status_code=403, detail="No Access")
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
+
+    azure_client = AzureBlobClient(account=datasource.account, container=datasource.container, awsAccessKeyId=datasource.awsAccessKeyId)
+
     if hasattr(datasource, "sasToken"):
         if datasource.sasToken:
             azure_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
+    if hasattr(datasource, "awsSecretAccessKey"):
+        if datasource.awsSecretAccessKey:
+            azure_client.set_aws_secret_access_key(decrypt(datasource.awsSecretAccessKey.get_secret_value()))
 
     try:
         block_indexes = [int(num) for num in block_indexes_str.split(",")]
@@ -149,26 +154,32 @@ async def get_iqfile(
     filepath: str,
     account: str,
     datasource: DataSource = Depends(datasources.get),
-    azure_client: AzureBlobClient = Depends(AzureBlobClient),
     access_allowed=Depends(check_access),
 ):
     if access_allowed is None:
         raise HTTPException(status_code=403, detail="No Access")
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
-
+    azure_client = AzureBlobClient(account=datasource.account, container=datasource.container, awsAccessKeyId=datasource.awsAccessKeyId)
     iq_path = get_file_name(filepath, ApiType.IQDATA)
-    base_path = azure_client.base_filepath
-    full_path = os.path.normpath(os.path.join(base_path, iq_path))
-    if not full_path.startswith(base_path):
-        raise HTTPException(status_code=400, detail="Invalid file path")
 
     if account == "local":
+        base_path = azure_client.base_filepath
+        full_path = os.path.normpath(os.path.join(base_path, iq_path))
+        if not full_path.startswith(base_path):
+            raise HTTPException(status_code=400, detail="Invalid file path")
         return FileResponse(full_path)
 
-    azure_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
+    if hasattr(datasource, "sasToken"):
+        if datasource.sasToken:
+            azure_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
+    if hasattr(datasource, "awsSecretAccessKey"):
+        if datasource.awsSecretAccessKey:
+            azure_client.set_aws_secret_access_key(decrypt(datasource.awsSecretAccessKey.get_secret_value()))
+
     if not azure_client.blob_exist(iq_path):
         raise HTTPException(status_code=404, detail="File not found")
+
     response = await azure_client.get_blob_stream(iq_path)
     return StreamingResponse(response, media_type=get_content_type(ApiType.IQDATA))
 
@@ -181,24 +192,29 @@ async def get_metafile(
     filepath: str,
     account: str,
     datasource: DataSource = Depends(datasources.get),
-    azure_client: AzureBlobClient = Depends(AzureBlobClient),
     access_allowed=Depends(check_access),
 ):
     if access_allowed is None:
         raise HTTPException(status_code=403, detail="No Access")
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
-
+    azure_client = AzureBlobClient(account=datasource.account, container=datasource.container, awsAccessKeyId=datasource.awsAccessKeyId)
     meta_path = get_file_name(filepath, ApiType.METADATA)
-    base_path = azure_client.base_filepath
-    full_path = os.path.normpath(os.path.join(base_path, meta_path))
-    if not full_path.startswith(base_path):
-        raise HTTPException(status_code=400, detail="Invalid file path")
 
     if account == "local":
+        base_path = azure_client.base_filepath
+        full_path = os.path.normpath(os.path.join(base_path, meta_path))
+        if not full_path.startswith(base_path):
+            raise HTTPException(status_code=400, detail="Invalid file path")
         return FileResponse(full_path)
 
-    azure_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
+    if hasattr(datasource, "sasToken"):
+        if datasource.sasToken:
+            azure_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
+    if hasattr(datasource, "awsSecretAccessKey"):
+        if datasource.awsSecretAccessKey:
+            azure_client.set_aws_secret_access_key(decrypt(datasource.awsSecretAccessKey.get_secret_value()))
+
     if not azure_client.blob_exist(meta_path):
         raise HTTPException(status_code=404, detail="File not found")
 
@@ -216,18 +232,20 @@ async def get_minimap_iq(
     format: str,
     access_allowed=Depends(check_access),
     datasource: DataSource = Depends(datasources.get),
-    azure_client: AzureBlobClient = Depends(AzureBlobClient),
 ):
     fft_size = 64  # needs to match MINIMAP_FFT_SIZE on the client side!
     if access_allowed is None:
         raise HTTPException(status_code=403, detail="No Access")
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
+    azure_client = AzureBlobClient(account=datasource.account, container=datasource.container, awsAccessKeyId=datasource.awsAccessKeyId)
     try:
         if datasource.sasToken:
             azure_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
         if datasource.accountKey:
             azure_client.set_account_key(decrypt(datasource.accountKey.get_secret_value()))
+        if datasource.awsSecretAccessKey:
+            azure_client.set_aws_secret_access_key(decrypt(datasource.awsSecretAccessKey.get_secret_value()))
         minimap_iq_file = get_file_name(filepath, ApiType.MINIMAP)
         # If minimap has already been generated
         if await azure_client.blob_exist(minimap_iq_file):

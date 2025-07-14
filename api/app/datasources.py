@@ -4,6 +4,7 @@ import os
 import time
 from typing import Optional
 
+import boto3
 import numpy as np
 from bson import encode
 from bson.raw_bson import RawBSONDocument
@@ -33,15 +34,17 @@ async def datasource_exists(account, container) -> bool:
     return await get(account, container) is not None
 
 
-async def sync(account: str, container: str):
+async def sync(account: str, container: str, awsAccessKeyId: Optional[str]):
     print(f"[SYNC] Starting sync for {account}/{container} on PID {os.getpid()} at {time.time()}")
-    azure_blob_client = AzureBlobClient(account, container)
+    azure_blob_client = AzureBlobClient(account, container, awsAccessKeyId)
     datasource = await get(account, container)
     if datasource is None:
         print(f"[SYNC] Datasource {account}/{container} does not exist")  # dont raise exception or it will cause unclosed connection errors
         return
     if datasource.sasToken:
         azure_blob_client.set_sas_token(decrypt(datasource.sasToken.get_secret_value()))
+    if datasource.awsSecretAccessKey:
+        azure_blob_client.set_aws_secret_access_key(decrypt(datasource.awsSecretAccessKey.get_secret_value()))
 
     #######################################
     # Reading and Parsing Local Metafiles #
@@ -87,20 +90,41 @@ async def sync(account: str, container: str):
             except Exception as e:
                 print(f"[SYNC] Error creating metadata for {filepath}: {e}")
 
+    #########################################################
+    # Reading and Parsing Azure or S3 Metafiles in Parallel #
+    #########################################################
     else:
-        ###################################################
-        # Reading and Parsing Azure Metafiles in Parallel #
-        ###################################################
-        container_client = azure_blob_client.get_container_client()
-        blobs = container_client.list_blobs(include=["metadata"])  # cant use list_blob_names because we also need data file length
-        meta_blob_names = []
-        data_blob_sizes = {}  # holds the names and sizes of sigmf-data files
-        start_t = time.time()
-        async for blob in blobs:
-            if blob.name.endswith(".sigmf-meta"):
-                meta_blob_names.append(blob.name)
-            elif blob.name.endswith(".sigmf-data"):
-                data_blob_sizes[blob.name] = blob.size
+        if azure_blob_client.awsAccessKeyId:  # S3
+            s3_client = boto3.client(
+                "s3",
+                aws_access_key_id=azure_blob_client.awsAccessKeyId,
+                aws_secret_access_key=azure_blob_client.awsSecretAccessKey.get_secret_value(),
+                region_name=azure_blob_client.account,
+            )
+            paginator = s3_client.get_paginator("list_objects_v2")
+            meta_blob_names = []
+            data_blob_sizes = {}  # holds the names and sizes of sigmf-data files
+            start_t = time.time()
+            for page in paginator.paginate(Bucket=azure_blob_client.container):
+                for obj in page.get("Contents", []):
+                    blob_name = obj["Key"]
+                    if blob_name.endswith(".sigmf-meta"):
+                        meta_blob_names.append(blob_name)
+                    elif blob_name.endswith(".sigmf-data"):
+                        data_blob_sizes[blob_name] = obj["Size"]  # bytes
+
+        else:  # Azure blob
+            container_client = azure_blob_client.get_container_client()
+            blobs = container_client.list_blobs(include=["metadata"])  # cant use list_blob_names because we also need data file length
+            meta_blob_names = []
+            data_blob_sizes = {}  # holds the names and sizes of sigmf-data files
+            start_t = time.time()
+            async for blob in blobs:
+                if blob.name.endswith(".sigmf-meta"):
+                    meta_blob_names.append(blob.name)
+                elif blob.name.endswith(".sigmf-data"):
+                    data_blob_sizes[blob.name] = blob.size
+
         print("[SYNC] getting list of metas took", time.time() - start_t, "seconds")  # 30s for MIT
         print("[SYNC] found", len(meta_blob_names), "meta files")  # the process above took about 15s for 36318 metas
 
@@ -108,10 +132,9 @@ async def sync(account: str, container: str):
             if meta_blob_name.replace(".sigmf-meta", ".sigmf-data") not in data_blob_sizes:  # bail early if data file doesnt exist
                 print(f"[SYNC] Data file for {meta_blob_name} wasn't found")
                 return None
-            blob_client = container_client.get_blob_client(meta_blob_name)
-            blob = await blob_client.download_blob()  # takes 0.04s on avg per call, on occasion ~1s
-            # print(time.time())
-            content = await blob.readall()
+
+            # Grab meta contents
+            content = await azure_blob_client.get_blob_content(meta_blob_name)
             try:
                 metadata = json.loads(content)
                 metadata = validate_metadata(metadata)
@@ -198,6 +221,8 @@ async def create_datasource(datasource: DataSource, user: Optional[dict]) -> boo
         datasource_dict["sasToken"] = encrypt(datasource.sasToken)
     if datasource.accountKey:
         datasource_dict["accountKey"] = encrypt(datasource.accountKey)
+    if datasource.awsSecretAccessKey:
+        datasource_dict["awsSecretAccessKey"] = encrypt(datasource.awsSecretAccessKey)
 
     if "owners" not in datasource_dict:
         datasource_dict["owners"] = []
@@ -246,7 +271,7 @@ async def import_datasources_from_env():
             )
             create_ret = await create_datasource(datasource=datasource, user=None)
             if create_ret:
-                await sync("local", "local")
+                await sync("local", "local", None)
         except Exception as e:
             print("Failed to import datasource local to backend", e)
 
@@ -257,8 +282,10 @@ async def import_datasources_from_env():
                 datasource = DataSource(
                     account=connection["accountName"],
                     container=connection["containerName"],
-                    sasToken=SecretStr(connection["sasToken"]),
+                    awsAccessKeyId=connection["awsAccessKeyId"] if "awsAccessKeyId" in connection else None,
+                    sasToken=SecretStr(connection["sasToken"]) if "sasToken" in connection else None,
                     accountKey=SecretStr(connection["accountKey"]) if "accountKey" in connection else None,
+                    awsSecretAccessKey=SecretStr(connection["awsSecretAccessKey"]) if "awsSecretAccessKey" in connection else None,
                     name=connection["name"],
                     description=connection["description"] if "description" in connection else None,
                     imageURL=connection["imageURL"] if "imageURL" in connection else None,
@@ -268,9 +295,8 @@ async def import_datasources_from_env():
                     readers=connection["readers"] if "readers" in connection else [],
                 )
                 create_ret = await create_datasource(datasource=datasource, user=None)
-
                 if create_ret:
-                    await sync(connection["accountName"], connection["containerName"])
+                    await sync(connection["accountName"], connection["containerName"], connection.get("awsAccessKeyId", None))
             except Exception as e:
                 print(f"Failed to import datasource {connection['name']}.", e)
                 continue

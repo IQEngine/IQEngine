@@ -70,7 +70,7 @@ class Plugin(ABC):
             "float": float,
             "int": int,
             "str": str,
-            "bool": bool
+            "bool": bool,
             # Add more types if needed
         }
 

@@ -20,7 +20,7 @@ from pymongo.errors import ServerSelectionTimeoutError
 from starlette.exceptions import HTTPException
 from starlette.responses import JSONResponse
 
-load_dotenv()
+load_dotenv(override=True)
 
 # check if the iqengine directory exists and create it if not
 if not os.path.exists("iqengine"):

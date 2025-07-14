@@ -186,7 +186,7 @@ async def generate_sas_token(
         if not write:
             token = decrypt(existing_datasource["sasToken"]).get_secret_value()
     if not token:
-        blob_client = AzureBlobClient(account, container)
+        blob_client = AzureBlobClient(account, container, None)
         try:
             token = blob_client.generate_sas_token(
                 file_path,
@@ -298,13 +298,14 @@ async def get_meta_thumbnail(
     filepath: str,
     background_tasks: BackgroundTasks,
     datasource: DataSource = Depends(datasources.get),
-    azure_client: AzureBlobClient = Depends(AzureBlobClient),
     # access_allowed=Depends(check_access)
 ):
     # access_allowed is always None because the API url is referenced directly in the UI HTML
     # No authorization header is added to the request so the access_allowed is always None
     if not datasource:
         raise HTTPException(status_code=404, detail="Datasource not found")
+
+    azure_client = AzureBlobClient(account=datasource.account, container=datasource.container, awsAccessKeyId=datasource.awsAccessKeyId)
 
     sas_token = datasource.sasToken.get_secret_value() if datasource.sasToken else None
     if sas_token is not None:
@@ -313,6 +314,10 @@ async def get_meta_thumbnail(
     account_key = datasource.accountKey.get_secret_value() if datasource.accountKey else None
     if account_key is not None:
         azure_client.set_account_key(decrypt(account_key))
+
+    aws_secret_access_key = datasource.awsSecretAccessKey.get_secret_value() if datasource.awsSecretAccessKey else None
+    if aws_secret_access_key is not None:
+        azure_client.set_aws_secret_access_key(decrypt(aws_secret_access_key))
 
     thumbnail_path = get_file_name(filepath, ApiType.THUMB)
     content_type = get_content_type(ApiType.THUMB)
