@@ -7,3 +7,29 @@ Notes
 - it seems fine to leave adAppClientId as the default zeros
 - this only creates the backend/frontend, you'll also need to set up the storage account and plugins server separately
 - tested to work 12/1/23, although doesnt configure the env vars, incl DB_ENCRYPTION_KEY which is needed (see backend docs for generating it, it doesnt have to match anything else)
+
+## AWS S3 and ECS Hosting
+
+Used rclone to do a one-time copy from blob to s3, eg:
+
+`rclone copy blob:northeastern aws:iqengine-northeastern --bwlimit 10M`
+
+For running the app on EC2 using Amazon Linux 2023, with https working:
+
+```bash
+sudo yum update -y
+sudo yum install -y git
+sudo yum install -y docker
+sudo service docker start
+sudo usermod -a -G docker ec2-user
+sudo reboot
+git clone https://github.com/IQEngine/IQEngine.git
+sudo dnf install -y augeas-libs
+sudo python3 -m venv /opt/certbot/
+sudo /opt/certbot/bin/pip install --upgrade pip
+sudo /opt/certbot/bin/pip install certbot
+sudo ln -s /opt/certbot/bin/certbot /usr/bin/certbot
+sudo certbot certonly --standalone
+echo "0 0,12 * * * root /opt/certbot/bin/python -c 'import random; import time; time.sleep(random.random() * 3600)' && sudo certbot renew -q" | sudo tee -a /etc/crontab > /dev/null
+docker run --env-file .env -p 80:3000 -p 443:3000 -v /etc/letsencrypt/archive/iqengine.org:/app/certs --pull=always -d ghcr.io/iqengine/iqengine:pre uvicorn --host 0.0.0.0 --port 3000 --workers 1 --ssl-keyfile /app/certs/privkey1.pem --ssl-certfile /app/certs/cert1.pem main:app
+```
