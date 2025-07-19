@@ -31,11 +31,11 @@ sudo /opt/certbot/bin/pip install certbot
 sudo ln -s /opt/certbot/bin/certbot /usr/bin/certbot
 sudo certbot certonly --standalone
 echo "0 0,12 * * * root /opt/certbot/bin/python -c 'import random; import time; time.sleep(random.random() * 3600)' && sudo certbot renew -q" | sudo tee -a /etc/crontab > /dev/null
-docker run --env-file .env --add-host host.docker.internal:host-gateway -p 80:3000 -p 443:3000 -v /etc/letsencrypt/archive/iqengine.org:/app/certs --pull=always -d ghcr.io/iqengine/iqengine:pre uvicorn --host 0.0.0.0 --port 3000 --workers 1 --ssl-keyfile /app/certs/privkey1.pem --ssl-certfile /app/certs/cert1.pem main:app
+docker run --env-file .env --add-host host.docker.internal:host-gateway -p 80:3000 -p 443:3000 -v /etc/letsencrypt/archive/iqengine.org:/app/certs --pull=always -d ghcr.io/iqengine/iqengine:pre uvicorn --host 0.0.0.0 --port 3000 --workers 10 --ssl-keyfile /app/certs/privkey1.pem --ssl-certfile /app/certs/cert1.pem main:app
 docker run -p 8000:8000 --pull=always -d ghcr.io/iqengine/iqengine-plugins:pre
 ```
 
-See the .env file on the VM for the rest of the details
+Note the number of uvicorn workers.  See the .env file on the VM for the rest of the details
 
 Switched to running mongo locally for cost sake, set up using https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-amazon/ 
 
