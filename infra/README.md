@@ -35,6 +35,8 @@ docker run --restart unless-stopped --log-opt max-size=50m --env-file .env --add
 docker run -p 8000:8000 --pull=always -d ghcr.io/iqengine/iqengine-plugins:pre
 ```
 
+Disk space needed is about 27GB
+
 See the .env file on the VM for the rest of the details
 
 Switched to running mongo locally for cost sake (smallest DocumentdB in AWS is pretty expensive), set up using https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-amazon/ 
