@@ -22,11 +22,6 @@ export const FeatureFlag = {
     description: 'Display Internal Branding',
     default: false,
   },
-  bypassLandingPage: {
-    name: 'bypassLandingPage',
-    description: 'Bypass Landing Page',
-    default: true,
-  },
   allowRefreshing: {
     name: 'allowRefreshing',
     description: 'Allows anyone to refresh the datasources using a button at the top-right',

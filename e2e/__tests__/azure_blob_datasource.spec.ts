@@ -8,7 +8,6 @@ import {
   ContainerClient,
   ContainerCreateResponse,
 } from '@azure/storage-blob';
-import { skipLandingPage } from '../common-steps';
 
 /*
 test.beforeAll(async ({}) => {

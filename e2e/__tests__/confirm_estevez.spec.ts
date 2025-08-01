@@ -1,5 +1,4 @@
 import { test, expect } from '@playwright/test';
-import { skipLandingPage } from '../common-steps';
 
 test('Estevez repocard displays with sas token', async ({ page }) => {
   await page.goto('/browser');
