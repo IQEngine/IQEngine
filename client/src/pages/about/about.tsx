@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { useFeatureFlags } from '@/hooks/use-feature-flags';
 import Transition from './transition';
 
-export const LandingPage = () => {
+export const About = () => {
   const navigate = useNavigate();
   const { getFeatureFlag } = useFeatureFlags();
   const [tab, setTab] = useState(1);
@@ -359,4 +359,4 @@ export const LandingPage = () => {
   );
 };
 
-export default LandingPage;
+export default About;
