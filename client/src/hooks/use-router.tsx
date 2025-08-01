@@ -121,20 +121,11 @@ export function useRouter() {
             return { Component: Validator };
           },
         },
-        /*
-        {
-          path: 'webfftbenchmark',
-          async lazy() {
-            let { WebfftBenchmark } = await import('@/pages/webfft-benchmark/webfft-benchmark');
-            return { Component: WebfftBenchmark };
-          },
-        },
-        */
         {
           index: true,
           async lazy() {
-            let { LandingPage } = await import('@/pages/landing-page/landing-page');
-            return { Component: LandingPage };
+            let { Browser } = await import('@/pages/browser/browser');
+            return { Component: Browser };
           },
         },
         {

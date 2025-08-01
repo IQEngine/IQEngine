@@ -5,7 +5,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFeatureFlags } from '@/hooks/use-feature-flags';
 import Transition from './transition';
-import Browser from '../browser/browser';
 
 export const LandingPage = () => {
   const navigate = useNavigate();
@@ -30,9 +29,7 @@ export const LandingPage = () => {
     navigate('/browser');
   };
 
-  return getFeatureFlag('bypassLandingPage') ? (
-    <Browser />
-  ) : (
+  return (
     <>
       <main className="flex-grow">
         <section className="relative">

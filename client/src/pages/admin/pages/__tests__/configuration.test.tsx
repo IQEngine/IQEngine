@@ -24,7 +24,6 @@ describe('Test Configuration', () => {
     expect(await screen.findByRole('checkbox', { name: 'useIQEngineOutReach' })).toBeInTheDocument();
     expect(await screen.findByRole('checkbox', { name: 'displayIQEngineGitHub' })).toBeInTheDocument();
     expect(await screen.findByRole('checkbox', { name: 'displayInternalBranding' })).toBeInTheDocument();
-    expect(await screen.findByRole('checkbox', { name: 'bypassLandingPage' })).toBeInTheDocument();
 
     expect(await screen.findByText('Use IQEngine Outreach')).toBeInTheDocument();
     expect(await screen.findByText('Display IQEngine GitHub')).toBeInTheDocument();
@@ -37,7 +36,6 @@ describe('Test Configuration', () => {
     expect(await screen.findByRole('checkbox', { name: 'useIQEngineOutReach' })).toBeChecked();
     expect(await screen.findByRole('checkbox', { name: 'displayIQEngineGitHub' })).toBeChecked();
     expect(await screen.findByRole('checkbox', { name: 'displayInternalBranding' })).not.toBeChecked();
-    //expect(await screen.findByRole('checkbox', { name: 'bypassLandingPage' })).toBeChecked();
   });
 
   test('Feature Flags Displays Returned Values', async () => {
@@ -48,7 +46,6 @@ describe('Test Configuration', () => {
           useIQEngineOutReach: true,
           displayIQEngineGitHub: true,
           displayInternalBranding: true,
-          bypassLandingPage: true,
         },
       });
     render(<Configuration></Configuration>, { wrapper: AllProviders });
@@ -56,7 +53,6 @@ describe('Test Configuration', () => {
     expect(await screen.findByRole('checkbox', { name: 'useIQEngineOutReach', checked: true })).toBeChecked();
     expect(await screen.findByRole('checkbox', { name: 'displayIQEngineGitHub', checked: true })).toBeChecked();
     expect(await screen.findByRole('checkbox', { name: 'displayInternalBranding', checked: true })).toBeChecked();
-    expect(await screen.findByRole('checkbox', { name: 'bypassLandingPage', checked: true })).toBeChecked();
   });
 
   test('Feature Flags Displays Returned Values when invalid flag is present', async () => {
@@ -67,7 +63,6 @@ describe('Test Configuration', () => {
           useIQEngineOutReach: true,
           displayInternalBranding: true,
           invalidFlag: true,
-          bypassLandingPage: true,
         },
       });
     render(<Configuration></Configuration>, { wrapper: AllProviders });
@@ -75,7 +70,6 @@ describe('Test Configuration', () => {
     expect(await screen.findByRole('checkbox', { name: 'useIQEngineOutReach', checked: true })).toBeChecked();
     expect(await screen.findByRole('checkbox', { name: 'displayIQEngineGitHub', checked: true })).toBeChecked();
     expect(await screen.findByRole('checkbox', { name: 'displayInternalBranding', checked: true })).toBeChecked();
-    expect(await screen.findByRole('checkbox', { name: 'bypassLandingPage', checked: true })).toBeChecked();
     expect(screen.queryByRole('checkbox', { name: 'invalidFlag' })).not.toBeInTheDocument();
   });
 
@@ -87,7 +81,6 @@ describe('Test Configuration', () => {
           useIQEngineOutReach: true,
           displayIQEngineGitHub: true,
           displayInternalBranding: true,
-          bypassLandingPage: true,
         },
       });
     render(<Configuration></Configuration>, { wrapper: AllProviders });
@@ -98,17 +91,14 @@ describe('Test Configuration', () => {
       name: 'displayInternalBranding',
       checked: true,
     });
-    const bypassLandingPage = await screen.findByRole('checkbox', { name: 'bypassLandingPage', checked: true });
 
     await userEvent.click(useIQEngineOutReach);
     await userEvent.click(displayIQEngineGitHub);
     await userEvent.click(displayInternalBranding);
-    await userEvent.click(bypassLandingPage);
 
     await waitFor(() => expect(useIQEngineOutReach).not.toBeChecked());
     await waitFor(() => expect(displayIQEngineGitHub).not.toBeChecked());
     await waitFor(() => expect(displayInternalBranding).not.toBeChecked());
-    await waitFor(() => expect(bypassLandingPage).not.toBeChecked());
   });
 
   test('Save Button Disabled When No Changes', async () => {
@@ -119,7 +109,6 @@ describe('Test Configuration', () => {
           useIQEngineOutReach: true,
           displayIQEngineGitHub: true,
           displayInternalBranding: true,
-          bypassLandingPage: true,
         },
       });
     render(<Configuration></Configuration>, { wrapper: AllProviders });
@@ -136,7 +125,6 @@ describe('Test Configuration', () => {
           useIQEngineOutReach: true,
           displayIQEngineGitHub: true,
           displayInternalBranding: true,
-          bypassLandingPage: true,
         },
       });
 
@@ -165,7 +153,6 @@ describe('Test Configuration', () => {
           useIQEngineOutReach: true,
           displayIQEngineGitHub: true,
           displayInternalBranding: true,
-          bypassLandingPage: true,
         },
       });
 

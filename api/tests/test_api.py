@@ -14,7 +14,7 @@ async def test_api_get_config(client):
     os.environ["IQENGINE_INTERNAL_BRANDING"] = "internal_branding_string"
     os.environ["IQENGINE_APP_ID"] = "app_id"
     os.environ["IQENGINE_APP_AUTHORITY"] = "app_authority"
-    os.environ["IQENGINE_FEATURE_FLAGS"] = '{"bypassLandingPage": false}'
+    os.environ["IQENGINE_FEATURE_FLAGS"] = '{"displayIQEngineGitHub": true}'
     os.environ["IQENGINE_UPLOAD_PAGE_BLOB_SAS_URL"] = "https://test.com"
 
     test_get_config = Configuration()
@@ -25,7 +25,7 @@ async def test_api_get_config(client):
         assert response.json() == {
             "connectionInfo": {},
             "googleAnalyticsKey": "google_analytics_key",
-            "featureFlags": {"bypassLandingPage": False},
+            "featureFlags": {"displayIQEngineGitHub": True},
             "internalBranding": "internal_branding_string",
             "appId": "app_id",
             "appAuthority": "app_authority",
