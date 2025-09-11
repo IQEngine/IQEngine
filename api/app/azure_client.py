@@ -162,7 +162,15 @@ class AzureBlobClient:
             # print("Cannot upload to local") # making this a raise() was causing delay
             return
         if self.awsAccessKeyId:  # S3
-            print("Cannot upload to S3 yet")
+            # Upload data to filepath in s3
+            session = aioboto3.Session()
+            async with session.client(
+                "s3",
+                aws_access_key_id=self.awsAccessKeyId,
+                aws_secret_access_key=self.awsSecretAccessKey.get_secret_value(),
+                region_name=self.account,
+            ) as s3_client:
+                await s3_client.put_object(Bucket=self.container, Key=filepath, Body=data)
             return
         blob_client = self.get_blob_client(filepath)
         await blob_client.upload_blob(data, overwrite=True)

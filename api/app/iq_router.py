@@ -275,8 +275,8 @@ async def get_minimap_iq(
             content.seek(0)
             if azure_client.can_write():
                 await azure_client.upload_blob(filepath=minimap_iq_file, data=content.getvalue())
-            else:
-                print("Cannot write minimap to blob")
+            elif azure_client.awsAccessKeyId:  # S3:
+                await azure_client.upload_blob(minimap_iq_file, content.getvalue())
             content.seek(0)
             return Response(
                 content=content.getvalue(),
