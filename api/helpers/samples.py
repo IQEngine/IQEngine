@@ -29,6 +29,10 @@ def get_samples(data_bytes, data_type) -> np.ndarray:
         samples -= 2147483647.0
         samples /= 2147483647.0
         samples = samples[::2] + 1j * samples[1::2]
+    elif data_type == "ci32" or data_type == "ci32_le":
+        samples = np.frombuffer(data_bytes, dtype=np.uint32).astype(np.float32)
+        samples /= 2147483647.0
+        samples = samples[::2] + 1j * samples[1::2]
     elif data_type == "f16" or data_type == "f16_le":
         samples = np.frombuffer(data_bytes, dtype=np.float16).astype(np.float32)
         samples = samples[::2] + 1j * samples[1::2]
@@ -69,7 +73,7 @@ def get_spectrogram_image(
     num_rows = int(np.floor(len(samples) / fftSize))
     spectrogram = np.zeros((num_rows, fftSize))
     for i in range(num_rows):
-        spectrogram[i, :] = 10 * np.log10(np.abs(np.fft.fftshift(np.fft.fft(samples[i * fftSize : (i + 1) * fftSize]))) ** 2)
+        spectrogram[i, :] = 10 * np.log10(np.abs(np.fft.fftshift(np.fft.fft(samples[i * fftSize: (i + 1) * fftSize]))) ** 2)
     fig = plt.figure(frameon=False)
     ax = plt.Axes(fig, [0.0, 0.0, 1.0, 1.0])
     ax.set_axis_off()
