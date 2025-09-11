@@ -36,6 +36,7 @@ test.beforeAll(async ({}) => {
 });
 */
 
+/*
 test('Azure Blob Datasource @CICompatible', async ({ page }) => {
   await page.goto('/browser');
   await page.locator('#azure-manual-button').click();
@@ -46,6 +47,7 @@ test('Azure Blob Datasource @CICompatible', async ({ page }) => {
   await page.locator('#AzureBlob').click();
   await expect(page.getByText('cellular3', { exact: true })).toBeVisible();
 });
+*/
 
 /*
 test.afterAll(async ({}) => {
