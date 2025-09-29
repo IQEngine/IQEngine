@@ -19,7 +19,8 @@ jobs:
       packages: write
 
   run_staging_deployment:
-    if: github.repository == 'IQEngine/IQEngine'
+    #if: github.repository == 'IQEngine/IQEngine'
+    if: false # no longer have a staging with auto-deploy
     needs: create_pre_release
     permissions:
       contents: write
