@@ -16,6 +16,10 @@ Used rclone to do a one-time copy from blob to s3, eg:
 
 For running the app on EC2 using Amazon Linux 2023, with https working:
 
+Open port 80 and 443 in the security group page, source should be 0.0.0.0/0
+
+Add the A records to cloudflare, then wait 30m before doing the certbot stuff
+
 ```bash
 sudo yum update -y
 sudo yum install -y git
@@ -35,7 +39,7 @@ docker run --restart unless-stopped --log-opt max-size=50m --env-file .env --add
 docker run -p 8000:8000 --pull=always -d ghcr.io/iqengine/iqengine-plugins:pre
 ```
 
-Disk space needed is about 27GB
+Disk space needed is about 60GB if running mongo locally
 
 See the .env file on the VM for the rest of the details
 
