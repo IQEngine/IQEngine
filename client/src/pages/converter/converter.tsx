@@ -18,7 +18,7 @@ export const Converter = () => {
               <br />
               <br />
               If you would like to run the converter straight from Python locally, see{' '}
-              <a href="https://github.com/IQEngine/IQEngine/blob/speed-up-wav-converter/api/converters/README.md">
+              <a href="https://github.com/IQEngine/IQEngine/blob/main/api/converters/README.md">
                 these steps
               </a>
               .
