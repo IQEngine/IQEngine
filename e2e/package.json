@@ -21,6 +21,6 @@
   },
   "dependencies": {
     "adm-zip": "0.5.16",
-    "playwright": "1.46.1"
+    "playwright": "1.55.1"
   }
 }
