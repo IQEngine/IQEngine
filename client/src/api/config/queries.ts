@@ -18,6 +18,14 @@ const fetchConfig = async () => {
         } as AppConfig,
       };
     });
+    // A 200 is not proof of a config document. A static deployment with no
+    // backend answers /api/config with whatever its not-found fallback is --
+    // on Cloudflare Pages that is the app's own index.html -- and axios hands
+    // that back as a plain string, which the assignments below would throw on.
+    if (!response.data || typeof response.data !== 'object') {
+      console.warn('/api/config did not return a config document, using env vars instead');
+      response.data = {} as AppConfig;
+    }
     if (!response.data.connectionInfo) {
       response.data.connectionInfo = JSON.parse(import.meta.env.IQENGINE_CONNECTION_INFO ?? null);
     }
