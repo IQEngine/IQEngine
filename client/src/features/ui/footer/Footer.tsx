@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { assetUrl } from '@/utils/asset-url';
 
 function Footer() {
   return (
@@ -6,7 +7,7 @@ function Footer() {
       <footer className="row row-cols-1 row-cols-sm-2 row-cols-md-5 py-5 my-5 border-top">
         <div className="col mb-3">
           <a href="/" className="d-flex align-items-center mb-3 link-body-emphasis text-decoration-none">
-            <img width={200} src="/IQEngine.svg" alt="IQEngine" />
+            <img width={200} src={assetUrl('/IQEngine.svg')} alt="IQEngine" />
           </a>
           <p className="text-body-secondary">© 2023</p>
         </div>

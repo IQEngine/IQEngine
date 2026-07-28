@@ -1,11 +1,12 @@
 import * as React from 'react';
+import { assetUrl } from '@/utils/asset-url';
 
 function Navbar() {
   return (
     <div className="">
       <header className="">
         <a href="/" className="">
-          <img width={200} src="/IQEngine.svg" alt="IQEngine" />
+          <img width={200} src={assetUrl('/IQEngine.svg')} alt="IQEngine" />
         </a>
         <nav className="py-2 bg-body-tertiary">
           <div className="">

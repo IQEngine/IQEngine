@@ -18,6 +18,7 @@ import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '@/auth/auth-config';
 import toast from 'react-hot-toast';
 import { useSyncAllDataSource } from '@/api/datasource/queries';
+import { assetUrl } from '@/utils/asset-url';
 
 export const App = () => {
   const { instance } = useMsal();
@@ -74,6 +75,23 @@ export const App = () => {
       addDataSource(dataSource);
     });
   }, [config.data]);
+
+  // A deployment that embeds only part of IQEngine (say the recording view) has
+  // nowhere sensible to send someone who clicks the logo, so the link is a flag.
+  const logo = (
+    <div id="IQEngineLogo" className="absolute mt-4 pt-2 top-0 left-1/2 transform -translate-x-1/2 flex">
+      <Feature flag={FeatureFlag.displayInternalBranding.name}>
+        {config.data && config.data.internalBranding && (
+          <img
+            src={config.data.internalBranding}
+            alt="Internal branding logo"
+            className="md:w-82 md:h-30 mr-8 sm:w-60 sm:h-20"
+          />
+        )}
+      </Feature>
+      <Logo />
+    </div>
+  );
 
   return (
     <ThemeSelector>
@@ -140,20 +158,13 @@ export const App = () => {
               </ul>
             </div>
           </div>
-          <Link to="/browser" onClick={() => {}}>
-            <div id="IQEngineLogo" className="absolute mt-4 pt-2 top-0 left-1/2 transform -translate-x-1/2 flex">
-              <Feature flag={FeatureFlag.displayInternalBranding.name}>
-                {config.data && config.data.internalBranding && (
-                  <img
-                    src={config.data.internalBranding}
-                    alt="Internal branding logo"
-                    className="md:w-82 md:h-30 mr-8 sm:w-60 sm:h-20"
-                  />
-                )}
-              </Feature>
-              <Logo />
-            </div>
-          </Link>
+          {getFeatureFlag(FeatureFlag.linkLogoToBrowser.name) ? (
+            <Link to="/browser" onClick={() => {}}>
+              {logo}
+            </Link>
+          ) : (
+            logo
+          )}
           <div className="absolute right-0 py-2 mr-2 ">
             <ul className="flex-row flex mb-4 mt-0 space-x-4 text-sm font-medium">
               <li className="hidden md:block">
@@ -216,7 +227,7 @@ export const App = () => {
                 <li className="hidden md:block">
                   <a href="https://discord.gg/k7C8kp3b76" target="_blank" rel="noreferrer" className="text-base">
                     <div className="flex">
-                      <img src="/discord.svg" className="w-5 h-5" alt="Discord" />
+                      <img src={assetUrl('/discord.svg')} className="w-5 h-5" alt="Discord" />
                     </div>
                   </a>
                 </li>
@@ -247,7 +258,7 @@ export const App = () => {
                     className="text-base"
                   >
                     <div className="flex">
-                      <img src="/LinkedIn_icon.svg" className="w-5 h-5 pt-0.5" alt="LinkedIn" />
+                      <img src={assetUrl('/LinkedIn_icon.svg')} className="w-5 h-5 pt-0.5" alt="LinkedIn" />
                     </div>
                   </a>
                 </li>
@@ -262,7 +273,7 @@ export const App = () => {
                     className="text-base "
                   >
                     <div className="flex">
-                      <img src="/github.svg" className="w-5 h-5" alt="GitHub" />
+                      <img src={assetUrl('/github.svg')} className="w-5 h-5" alt="GitHub" />
                     </div>
                   </a>
                 </li>
@@ -296,7 +307,6 @@ export const App = () => {
             We want to hear from you! <a href="mailto:info@iqengine.org">info@iqengine.org</a>
           </h2>
         </Feature>
-        
       </div>
       <ReactQueryDevtools initialIsOpen={false} />
     </ThemeSelector>

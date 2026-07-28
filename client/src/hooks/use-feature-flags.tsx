@@ -27,6 +27,21 @@ export const FeatureFlag = {
     description: 'Allows anyone to refresh the datasources using a button at the top-right',
     default: false,
   },
+  displayPythonSnippet: {
+    name: 'displayPythonSnippet',
+    description: 'Display the Python snippet editor in the recording view settings pane',
+    default: true,
+  },
+  displayCyclostationaryTab: {
+    name: 'displayCyclostationaryTab',
+    description: 'Display the Cyclostationary tab in the recording view',
+    default: true,
+  },
+  linkLogoToBrowser: {
+    name: 'linkLogoToBrowser',
+    description: 'Make the header logo a link to the browser page',
+    default: true,
+  },
 };
 
 interface ContextProps {

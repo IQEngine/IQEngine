@@ -75,6 +75,7 @@ export enum ClientType {
   API = 'api',
   LOCAL = 'local',
   BLOB = 'azure_blob',
+  URL = 'url',
 }
 
 export interface JobStatus {
@@ -128,3 +129,7 @@ export interface DataObject {
 export const CLIENT_TYPE_API = 'api';
 export const CLIENT_TYPE_LOCAL = 'local';
 export const CLIENT_TYPE_BLOB = 'azure_blob';
+// Defined next to the rest of the url data source helpers, and re-exported here
+// so it sits with the other client types. sigmfMetadata.ts needs it too, and
+// importing Models from there would be circular.
+export { CLIENT_TYPE_URL } from '@/utils/url-datasource';

@@ -8,6 +8,10 @@ import viteTsconfigPaths from 'vite-tsconfig-paths';
 import svgrPlugin from 'vite-plugin-svgr';
 import envCompatible from 'vite-plugin-env-compatible';
 
+// react-plotly.js pulls in plotly's prebuilt dist, so this one package is the
+// whole ~4.7 MB of it.
+const PLOTLY = /node_modules\/plotly\.js\//;
+
 // https://vitejs.dev/config/
 export default defineConfig(async () => {
   const mdx = await import('@mdx-js/rollup');
@@ -40,6 +44,24 @@ export default defineConfig(async () => {
       // if tou change the sourcemap to true you need to also increate the max heap size
       // export NODE_OPTIONS=--max-old-space-size=32768
       sourcemap: false,
+      rollupOptions: {
+        output: {
+          // Plotly is ~4.7 MB, more than the rest of the app put together, and
+          // only the Time/Frequency/IQ tabs and the browser's annotation pie
+          // chart draw with it. Those import it lazily, but that alone does not
+          // defer the download: rollup otherwise merges plotly into a chunk the
+          // entry needs, so every page pulled all of it before drawing
+          // anything.
+          manualChunks(id) {
+            // Plotly's dist is CommonJS, so the interop helpers end up in its
+            // chunk -- and since every other CJS dependency shares those
+            // helpers, the entry then has to import that chunk, all 4.7 MB of
+            // it. Giving the helpers a chunk of their own breaks that tie.
+            if (id.includes('commonjsHelpers')) return 'commonjs-helpers';
+            if (PLOTLY.test(id)) return 'plotly';
+          },
+        },
+      },
     },
     optimizeDeps: {
       include: ['react/jsx-runtime'],

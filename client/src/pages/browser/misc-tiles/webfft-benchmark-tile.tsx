@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { assetUrl } from '@/utils/asset-url';
 
 const WebfftBenchmarkTile = (props) => {
   const navigate = useNavigate();
@@ -11,7 +12,12 @@ const WebfftBenchmarkTile = (props) => {
   return (
     <div className="repocard">
       <figure>
-        <img onClick={handleOnClick} className="repoimage" src="/webfft_logo.png" alt="WebFFT Benchmark tile" />
+        <img
+          onClick={handleOnClick}
+          className="repoimage"
+          src={assetUrl('/webfft_logo.png')}
+          alt="WebFFT Benchmark tile"
+        />
       </figure>
       <div className="repocardbody">
         <h2>Browser FFT Benchmark</h2>

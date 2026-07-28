@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { assetUrl } from '@/utils/asset-url';
 
 const SiggenTile = (props) => {
   const navigate = useNavigate();
@@ -11,7 +12,7 @@ const SiggenTile = (props) => {
   return (
     <div className="repocard">
       <figure>
-        <img onClick={handleOnClick} className="repoimage" src="/siggen.png" alt="Siggen tile" />
+        <img onClick={handleOnClick} className="repoimage" src={assetUrl('/siggen.png')} alt="Siggen tile" />
       </figure>
       <div className="repocardbody">
         <h2>Signal Generator</h2>

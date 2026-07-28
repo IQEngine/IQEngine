@@ -12,6 +12,8 @@ import CodeMirror from '@uiw/react-codemirror';
 import { langs } from '@uiw/codemirror-extensions-langs';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { unitPrefixHz } from '@/utils/rf-functions';
+import Feature from '@/features/feature/Feature';
+import { FeatureFlag } from '@/hooks/use-feature-flags';
 
 interface SettingsPaneProps {
   currentFFT: number;
@@ -359,26 +361,30 @@ const SettingsPane = ({ currentFFT }) => {
         )}
       </div>
 
-      <div className="mb-3" id="formPythonSnippet">
-        <label className="label">
-          <span className="label-text text-base">Python Snippet</span>
-        </label>
+      {/* Needs Pyodide off a CDN, which a deployment can be unable or unwilling
+          to load (e.g. one that is cross-origin isolated), hence the flag. */}
+      <Feature flag={FeatureFlag.displayPythonSnippet.name}>
+        <div className="mb-3" id="formPythonSnippet">
+          <label className="label">
+            <span className="label-text text-base">Python Snippet</span>
+          </label>
 
-        <CodeMirror
-          className="mb-3"
-          value={localPythonSnippet}
-          onChange={onChangePythonSnippet}
-          height="150px"
-          theme={vscodeDark}
-          extensions={[langs.python()]}
-          basicSetup={{
-            lineNumbers: false,
-            foldGutter: false,
-          }}
-        />
+          <CodeMirror
+            className="mb-3"
+            value={localPythonSnippet}
+            onChange={onChangePythonSnippet}
+            height="150px"
+            theme={vscodeDark}
+            extensions={[langs.python()]}
+            basicSetup={{
+              lineNumbers: false,
+              foldGutter: false,
+            }}
+          />
 
-        <button onClick={onSubmitPythonSnippet}>Run Python</button>
-      </div>
+          <button onClick={onSubmitPythonSnippet}>Run Python</button>
+        </div>
+      </Feature>
     </div>
   );
 };

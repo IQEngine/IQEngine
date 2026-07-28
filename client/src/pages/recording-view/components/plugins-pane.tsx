@@ -2,11 +2,14 @@
 // Copyright (c) 2023 Marc Lichtman
 // Licensed under the MIT License
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense, lazy } from 'react';
 import { Annotation, SigMFMetadata } from '@/utils/sigmfMetadata';
-import { TimePlot } from './time-plot';
-import { FrequencyPlot } from './frequency-plot';
-import { IQPlot } from './iq-plot';
+// Only shown inside the plugin-output dialog, and they bring plotly (~4.5 MB)
+// with them, so they are loaded when that dialog opens rather than with the
+// recording view. Same reasoning as in recording-view.tsx.
+const TimePlot = lazy(() => import('./time-plot').then((m) => ({ default: m.TimePlot })));
+const FrequencyPlot = lazy(() => import('./frequency-plot').then((m) => ({ default: m.FrequencyPlot })));
+const IQPlot = lazy(() => import('./iq-plot').then((m) => ({ default: m.IQPlot })));
 import { Layer, Image, Stage } from 'react-konva';
 import { convertBase64ToFloat32Array } from '@/utils/rf-functions';
 import { colMaps } from '@/utils/colormap';
@@ -340,9 +343,11 @@ export const PluginsPane = () => {
                   <Image image={modalSpectrogram} x={0} y={0} width={spectrogramWidth} height={600} />
                 </Layer>
               </Stage>
-              <TimePlot displayedIQ={modalSamples} fftStepSize={0} />
-              <FrequencyPlot displayedIQ={modalSamples} fftStepSize={0} />
-              <IQPlot displayedIQ={modalSamples} fftStepSize={0} />
+              <Suspense fallback={<div className="text-lg text-primary p-3">Loading plots...</div>}>
+                <TimePlot displayedIQ={modalSamples} fftStepSize={0} />
+                <FrequencyPlot displayedIQ={modalSamples} fftStepSize={0} />
+                <IQPlot displayedIQ={modalSamples} fftStepSize={0} />
+              </Suspense>
             </div>
           </form>
         </dialog>

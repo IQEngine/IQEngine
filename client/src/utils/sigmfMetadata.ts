@@ -2,6 +2,7 @@ import { BlobClient } from '@azure/storage-blob';
 import { dataTypeToBytesPerIQSample } from './selector';
 import { FileWithDirectoryAndFileHandle } from 'browser-fs-access';
 import { metadataValidator } from './validators';
+import { CLIENT_TYPE_URL, urlRecordingLocation } from './url-datasource';
 export class SigMFMetadata {
   global: {
     'antenna:gain'?: number;
@@ -113,6 +114,10 @@ export class SigMFMetadata {
       return `https://${origin.account}.blob.core.windows.net/${origin.container}/${origin.file_path}`;
     } else if (type === 'api') {
       return `/api/datasources/${origin.account}/${origin.container}/${origin.file_path}`; // see backend- api/app/iq_router.py
+    } else if (type === CLIENT_TYPE_URL) {
+      // The two files are addressed independently (see getDataUrl/getMetadataUrl);
+      // this is only the stem the rest of the app appends suffixes to.
+      return urlRecordingLocation(origin.account, origin.container).dataUrl.replace(/\.sigmf-data$/, '');
     } else {
       return `${origin.account}/${origin.container}/${origin.file_path}`;
     }
@@ -139,6 +144,10 @@ export class SigMFMetadata {
     return this.getFullFilePath() + '.jpg';
   }
   getDataUrl() {
+    const origin = this.global['traceability:origin'];
+    if (origin?.type === CLIENT_TYPE_URL) {
+      return urlRecordingLocation(origin.account, origin.container).dataUrl;
+    }
     return this.getFullFilePath() + '.sigmf-data'; // see api/app/iq_router.py
   }
   getMetadataUrl() {
@@ -149,6 +158,10 @@ export class SigMFMetadata {
       return this.getFullFilePath() + '/meta'; // see api/app/metadata_router.py
     } else return this.getFullFilePath() + '.sigmf-meta';
     */
+    const origin = this.global['traceability:origin'];
+    if (origin?.type === CLIENT_TYPE_URL) {
+      return urlRecordingLocation(origin.account, origin.container).metaUrl;
+    }
     return this.getFullFilePath() + '.sigmf-meta'; // see api/app/iq_router.py
   }
   getDataType() {

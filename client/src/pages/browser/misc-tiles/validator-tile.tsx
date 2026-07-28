@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { assetUrl } from '@/utils/asset-url';
 
 const ValidatorTile = (props) => {
   const navigate = useNavigate();
@@ -11,7 +12,7 @@ const ValidatorTile = (props) => {
   return (
     <div className="repocard">
       <figure>
-        <img onClick={handleOnClick} className="repoimage" src="/validator.png" alt="Validator tile" />
+        <img onClick={handleOnClick} className="repoimage" src={assetUrl('/validator.png')} alt="Validator tile" />
       </figure>
       <div className="repocardbody">
         <h2>SigMF Meta Validator</h2>
