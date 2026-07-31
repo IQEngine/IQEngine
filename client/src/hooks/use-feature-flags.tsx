@@ -42,6 +42,11 @@ export const FeatureFlag = {
     description: 'Make the header logo a link to the browser page',
     default: true,
   },
+  displaySiteHeader: {
+    name: 'displaySiteHeader',
+    description: 'Display the site header (logo and navigation) above the page',
+    default: true,
+  },
 };
 
 interface ContextProps {
